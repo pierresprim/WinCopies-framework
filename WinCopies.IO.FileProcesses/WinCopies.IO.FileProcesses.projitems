@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>aceef113-2233-4c78-b0f2-87d104baa60c</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>WinCopies.IO.FileProcesses</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)ActionType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CommonHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Copy.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CopyProcessInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CopyProgressChangedEventArgs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DeleteProcessInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DestinationEqualsSourceException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Exceptions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FileSystemInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Generic.xaml.cs">
+      <DependentUpon>Generic.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)HowToRetry.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)INotifyPropertyChanged.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)LoadFilesInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NativeWin32FilesProcessesErrorCodes.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ResourcesHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SearchMethods.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Search_Terms_Properties.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UnmanagedFileLoader.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="$(MSBuildThisFileDirectory)Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+</Project>

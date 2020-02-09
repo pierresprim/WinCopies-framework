@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>5c6a8e8f-21ab-4c80-b898-5fb090cb72bd</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>WinCopies.IO</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)ArchiveItemInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ArchiveItemInfoFactory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ArchiveItemInfoProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ArchiveLoader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectInfoFactory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectInfoLoader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectTreeNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FileSystemObject.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FileSystemObjectComparer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FileSystemObjectInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FileSystemObjectLoader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FileTypes.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FolderLoader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FolderLoaderFileSystemWatcher.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Generic.xaml.cs">
+      <DependentUpon>Generic.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)GlobalSuppressions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IBrowsableObjectInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IBrowsableObjectInfoFactory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IBrowsableObjectInfoLoader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IFileSystemObject.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IFileSystemObjectComparer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IOException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IRegistryItemInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IRegistryItemInfoFactory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IShellObjectInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IShellObjectInfoFactory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IWMIItemInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IWMIItemInfoFactory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Old.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Path.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PathInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Registry.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RegistryException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RegistryItemInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RegistryItemInfoComparer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RegistryItemInfoFactory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RegistryKeyLoader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ShellObjectInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ShellObjectInfoFactory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Size.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SpecialFolder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WMIItemInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WMIItemInfoComparer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WMIItemInfoFactory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WMIItemInfoFactoryOptions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WMIItemType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WMILoader.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)ClassDiagram.cd" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="$(MSBuildThisFileDirectory)Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+</Project>
