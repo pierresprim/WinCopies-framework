@@ -15,17 +15,103 @@
 * You should have received a copy of the GNU General Public License
 * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-#if DuplicateFinding
-
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text;
+using WinCopies.Collections.DotNetFix;
 
 namespace WinCopies.GUI.IO.Process
 {
-    public class DuplicateFinding : Process<WinCopies.IO.IPathInfo>
+    public enum DuplicateFindingContentMatchingOption : byte
     {
+        None = 0,
+
+        Size = 1,
+
+        Content = 2,
+
+        Both = 3
+    }
+
+    public struct DuplicateFindingMatchingOptions
+    {
+        public bool Name { get; }
+
+        public DuplicateFindingContentMatchingOption ContentMatchingOption { get; }
+
+        public bool ModifiedDate { get; }
+
+        public DuplicateFindingMatchingOptions(in bool name, in DuplicateFindingContentMatchingOption contentMatchingOption, in bool modifiedDate)
+        {
+            Name = name;
+
+            ContentMatchingOption = contentMatchingOption;
+
+            ModifiedDate = modifiedDate;
+        }
+    }
+
+    public struct DuplicateFindingIgnoreOptions
+    {
+        public bool ZeroByteFiles { get; }
+
+        public bool SystemFiles { get; }
+
+        public bool HiddenFiles { get; }
+
+        public string[] FileExtensions { get; }
+
+        public string[] Paths { get; }
+
+        public uint FileSizeUnder { get; }
+
+        public uint FileSizeOver { get; }
+
+        public DuplicateFindingIgnoreOptions(in bool zeroByteFiles, in bool systemFiles, in bool hiddenFiles, in string[] fileExtensions, in string[] paths, in uint fileSizeUnder, in uint fileSizeOver)
+        {
+            ZeroByteFiles = zeroByteFiles;
+
+            SystemFiles = systemFiles;
+
+            HiddenFiles = hiddenFiles;
+
+            FileExtensions = fileExtensions;
+
+            Paths = paths;
+
+            FileSizeUnder = fileSizeUnder;
+
+            FileSizeOver = fileSizeOver;
+        }
+    }
+
+    public struct DuplicateFindingOptions
+    {
+        public DuplicateFindingMatchingOptions MatchingOptions { get; }
+
+        public DuplicateFindingIgnoreOptions IgnoreOptions { get; }
+
+        public DuplicateFindingOptions(in DuplicateFindingMatchingOptions matchingOptions, in DuplicateFindingIgnoreOptions ignoreOptions)
+        {
+            MatchingOptions = matchingOptions;
+
+            IgnoreOptions = ignoreOptions;
+        }
+    }
+
+    public class DuplicateFinding : Process<WinCopies.IO.IPathInfo
+#if DEBUG
+         , ProcessSimulationParameters
+#endif
+        >
+    {
+        public uint Buffer { get; }
+
+        public PathCollection<WinCopies.IO.IPathInfo> PathsToCheckCollection { get; }
+
+        protected ObservableQueueCollection<WinCopies.IO.IPathInfo> _PathsToCheck { get; }
+
+        public ReadOnlyObservableQueueCollection<WinCopies.IO.IPathInfo> PathsToCheck { get; }
     }
 }
-
-#endif

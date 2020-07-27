@@ -57,37 +57,41 @@ namespace WinCopies.GUI.IO.Process
         }
     }
 
-    public class Copy : PathToPathProcess<WinCopies.IO.IPathInfo>
-    {
-        private IEnumerator<WinCopies.IO.IPathInfo> _pathsToLoadEnumerator;
-
+    public class Copy : PathToPathProcess<WinCopies.IO.IPathInfo
 #if DEBUG
-
-        public CopyProcessSimulationParameters SimulationParameters { get; }
-
+         , CopyProcessSimulationParameters
 #endif
+        >
+    {
+        #region Private fields
 
         private bool _autoRenameFiles;
+        private IEnumerator<WinCopies.IO.IPathInfo> _pathsToLoadEnumerator;
+        private int _bufferLength;
+
+        #endregion
+
+        #region Properties
 
         /// <summary>
         /// Gets a value that indicates whether files are automatically renamed when they conflict with existing paths.
         /// </summary>
         public bool AutoRenameFiles { get => _autoRenameFiles; set => _autoRenameFiles = BackgroundWorker.IsBusy ? throw GetBackgroundWorkerIsBusyException() : value; }
 
-        private int _bufferLength;
-
         public int BufferLength { get => _bufferLength; set => _bufferLength = BackgroundWorker.IsBusy ? throw GetBackgroundWorkerIsBusyException() : value < 0 ? throw new ArgumentOutOfRangeException($"{nameof(value)} cannot be less than zero.") : value; }
+
+        #endregion
 
         public Copy(in CopyProcessPathCollection pathsToLoad, in string destPath
 #if DEBUG
             , in CopyProcessSimulationParameters simulationParameters
 #endif
-            ) : base(pathsToLoad, destPath)
-        {
+            ) : base(pathsToLoad, destPath
 #if DEBUG
-            SimulationParameters = simulationParameters;
+                 , simulationParameters
 #endif
-            
+                )
+        {
             // BackgroundWorker.DoWork += (object sender, DoWorkEventArgs e) => OnDoWork(e);
 
             // BackgroundWorker.RunWorkerAsync(pathsToLoad);
@@ -99,51 +103,17 @@ namespace WinCopies.GUI.IO.Process
                     ).GetEnumerator();
         }
 
-        private bool TryReportProgress(int progressPercentage)
-        {
-            if (WorkerReportsProgress)
-            {
-                ReportProgress(progressPercentage);
-
-                return true;
-            }
-
-            return false;
-        }
+        #region Method overrides
 
         protected override ProcessError OnLoadPaths(DoWorkEventArgs e)
         {
-            if (CheckIfDriveIsReady(
-#if DEBUG
-                SimulationParameters
-#endif
-                ))
-            {
-                while (true)
+            ProcessError result = ProcessHelper._LoadFileSystemEnumerationProcessPaths(this, _pathsToLoadEnumerator);
 
-                    try
-                    {
-                        if (CheckIfPauseOrCancellationPending())
+            _pathsToLoadEnumerator.Dispose();
 
-                            return Error;
+            _pathsToLoadEnumerator = null;
 
-                        if (_pathsToLoadEnumerator.MoveNext())
-
-                            _Paths.Enqueue(new PathInfo(_pathsToLoadEnumerator.Current.Path, PathCollection.GetPathSizeDelegate(_pathsToLoadEnumerator.Current))); // todo: use Windows API Code Pack's Shell's implementation instead.
-
-                        else break;
-                    }
-
-                    catch (Exception ex) when (ex.Is(false, typeof(System.IO.IOException), typeof(SecurityException))) { }
-
-                _pathsToLoadEnumerator.Dispose();
-
-                _pathsToLoadEnumerator = null;
-
-                return ProcessError.None;
-            }
-
-            return Error;
+            return result;
         }
 
         protected override ProcessError OnProcessDoWork(DoWorkEventArgs e)
@@ -553,5 +523,7 @@ namespace WinCopies.GUI.IO.Process
 
             return error;
         }
+
+        #endregion
     }
 }

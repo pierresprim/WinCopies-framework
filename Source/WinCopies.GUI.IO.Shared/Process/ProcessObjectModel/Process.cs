@@ -28,10 +28,18 @@ using static WinCopies.Util.Util;
 using static WinCopies.Util.Desktop.ThrowHelper;
 
 using Size = WinCopies.IO.Size;
+using System.Diagnostics;
 
 namespace WinCopies.GUI.IO.Process
 {
-    public abstract class Process<T> : ViewModelBase where T : WinCopies.IO.IPathInfo
+    public abstract class ProcessBase
+#if DEBUG
+         <TSimulationParameters>
+#endif
+        : ViewModelBase
+#if DEBUG
+        where TSimulationParameters : ProcessSimulationParameters
+#endif
     {
         #region Private fields
 
@@ -82,7 +90,7 @@ namespace WinCopies.GUI.IO.Process
             }
         }
 
-        protected ObservableQueueCollection<IPathInfo> _Paths { get; } = new ObservableQueueCollection<IPathInfo>();
+        protected internal ObservableQueueCollection<IPathInfo> _Paths { get; } = new ObservableQueueCollection<IPathInfo>();
 
         /// <summary>
         /// Gets the paths that have been loaded.
@@ -237,11 +245,15 @@ namespace WinCopies.GUI.IO.Process
             }
         }
 
-        protected PathCollection<T> PathCollection { get; }
+#if DEBUG
+        public TSimulationParameters SimulationParameters { get; }
+#endif
 
         #endregion
 
         #region Events
+
+        public event DoWorkEventHandler DoWork;
 
         public event ProgressChangedEventHandler ProgressChanged;
 
@@ -249,33 +261,88 @@ namespace WinCopies.GUI.IO.Process
 
         #endregion
 
-        ///// <summary>
-        ///// Initializes a new instance of the <see cref="Process"/> class.
-        ///// </summary>
-        protected Process(in PathCollection<T> paths)
+        protected ProcessBase(in string sourcePath
+#if DEBUG
+             , in TSimulationParameters simulationParameters
+#endif
+            )
         {
-            SourcePath = GetSourcePathFromPathCollection(paths);
-
-            BackgroundWorker.DoWork += (object sender, DoWorkEventArgs e) => OnDoWork(e);
-
-            BackgroundWorker.ProgressChanged += (object sender, ProgressChangedEventArgs e) => OnProgressChanged(e);
-
-            ProgressChanged += (object sender, ProgressChangedEventArgs e) => OnProcessProgressChanged(e);
-
-            BackgroundWorker.RunWorkerCompleted += (object sender, RunWorkerCompletedEventArgs e) => OnRunWorkerCompleted(e);
-
-            RunWorkerCompleted += (object sender, RunWorkerCompletedEventArgs e) => OnRunWorkerProcessCompleted(e);
+            SourcePath = sourcePath;
 
             Paths = new ProcessQueueCollection(_Paths);
 
-            PathCollection = paths;
-
             ErrorPaths = new ReadOnlyObservableQueueCollection<IErrorPathInfo>(_errorPaths);
+
+
+
+            BackgroundWorker.DoWork += BackgroundWorker_DoWork;
+
+            BackgroundWorker.ProgressChanged += BackgroundWorker_ProgressChanged;
+
+            BackgroundWorker.RunWorkerCompleted += BackgroundWorker_RunWorkerCompleted;
+
+
+
+#if DEBUG
+            SimulationParameters = simulationParameters;
+#endif
         }
 
         #region Methods
 
-        public static string GetSourcePathFromPathCollection(in PathCollection<T> paths) => (paths ?? throw GetArgumentNullException(nameof(paths))).Path;
+        #region BackgroundWorker implementation
+
+        private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) => OnDoWork(e);
+
+        public void RunWorkerAsync() => BackgroundWorker.RunWorkerAsync();
+
+        public void RunWorkerAsync(object argument) => BackgroundWorker.RunWorkerAsync(argument);
+
+
+
+        private void BackgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e) => OnProgressChanged(e);
+
+        protected void ReportProgress(int progressPercentage) => BackgroundWorker.ReportProgress(progressPercentage);
+
+        protected void ReportProgress(int progressPercentage, object userState) => BackgroundWorker.ReportProgress(progressPercentage, userState);
+
+        protected virtual void OnProgressChanged(ProgressChangedEventArgs e)
+        {
+            ProgressPercentage = (e ?? throw GetArgumentNullException(nameof(e))).ProgressPercentage;
+
+            ProgressChanged?.Invoke(this, e);
+        }
+
+
+
+        private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) => OnRunWorkerCompleted(e);
+
+        protected virtual void OnRunWorkerCompleted(RunWorkerCompletedEventArgs e)
+        {
+            OnPropertyChanged(nameof(IsBusy));
+
+            RunWorkerCompleted?.Invoke(this, e);
+        }
+
+        public void PauseAsync()
+        {
+            BackgroundWorker.PauseAsync();
+
+            OnPropertyChanged(nameof(PausePending));
+        }
+
+        public void CancelAsync() => OnCancelAsync();
+
+        protected virtual void OnCancelAsync()
+        {
+            BackgroundWorker.CancelAsync();
+
+            OnPropertyChanged(nameof(CancellationPending));
+        }
+
+        #endregion
+
+        #region Helpers
 
         protected void ThrowIfCompleted()
         {
@@ -283,6 +350,33 @@ namespace WinCopies.GUI.IO.Process
 
                 throw new InvalidOperationException("The process has already been completed.");
         }
+
+        public string[] PathsToStringArray()
+        {
+            string[] paths = new string[_Paths.Count];
+
+            int i = 0;
+
+            foreach (string path in _Paths.Select(_path => _path.Path))
+
+                paths[i++] = path;
+
+            return paths;
+        }
+
+        protected bool TryReportProgress(int progressPercentage)
+        {
+            if (WorkerReportsProgress)
+            {
+                ReportProgress(progressPercentage);
+
+                return true;
+            }
+
+            return false;
+        }
+
+        #region Checks
 
         protected virtual bool CheckIfEnoughSpace()
         {
@@ -296,17 +390,22 @@ namespace WinCopies.GUI.IO.Process
             return true;
         }
 
-        protected virtual bool CheckIfDriveIsReady(
-#if DEBUG
-            in ProcessSimulationParameters simulationParameters
-#endif
-            )
+        protected internal virtual bool CheckIfDriveIsReady()
         {
             string drive = System.IO.Path.GetPathRoot(SourcePath);
 
+            bool _return(in ProcessError error, in bool value)
+            {
+                Debug.Assert(value == (error == ProcessError.None));
+
+                Error = error;
+
+                return value;
+            }
+
             if (
 #if DEBUG
-                    simulationParameters?.SourcePathRootExists ??
+                    SimulationParameters?.SourcePathRootExists ??
 #endif
                     System.IO.Directory.Exists(drive))
             {
@@ -314,28 +413,15 @@ namespace WinCopies.GUI.IO.Process
 
                 if (
 #if DEBUG
-                    simulationParameters?.SourceDriveReady ??
+                    SimulationParameters?.SourceDriveReady ??
 #endif
-                    driveInfo.IsReady) return true;
+                    driveInfo.IsReady) return _return(ProcessError.None, true);
             }
 
-            Error = ProcessError.DriveNotReady;
-
-            return false;
+            return _return(ProcessError.DriveNotReady, false);
         }
 
-        protected virtual ProcessError OnPausePending() => ProcessError.AbortedByUser;
-
-        protected virtual ProcessError OnCancellationPending()
-        {
-            _Paths.Clear();
-
-            IsCompleted = true;
-
-            return ProcessError.AbortedByUser;
-        }
-
-        public bool CheckIfPauseOrCancellationPending()
+        protected internal virtual bool CheckIfPauseOrCancellationPending()
         {
             if (PausePending)
 
@@ -348,11 +434,28 @@ namespace WinCopies.GUI.IO.Process
             return Error != ProcessError.None;
         }
 
+        #endregion
+
+        #endregion
+
+        protected virtual ProcessError OnPausePending() => ProcessError.AbortedByUser;
+
+        protected virtual ProcessError OnCancellationPending()
+        {
+            _Paths.Clear();
+
+            IsCompleted = true;
+
+            return ProcessError.AbortedByUser;
+        }
+
         protected virtual void OnDoWork(DoWorkEventArgs e)
         {
-            ThrowIfCompleted();
-
             OnPropertyChanged(nameof(IsBusy));
+
+            DoWork?.Invoke(this, e);
+
+            ThrowIfCompleted();
 
             LoadPaths(e);
 
@@ -371,6 +474,13 @@ namespace WinCopies.GUI.IO.Process
             }
         }
 
+        protected void DequeueErrorPath(ProcessError error)
+        {
+            _errorPaths.Enqueue(new ErrorPathInfo(CurrentPath, error));
+
+            _ = _Paths.Dequeue();
+        }
+
         protected abstract ProcessError OnLoadPaths(DoWorkEventArgs e);
 
         protected void _DoWork(DoWorkEventArgs e)
@@ -384,63 +494,48 @@ namespace WinCopies.GUI.IO.Process
                 IsCompleted = true;
         }
 
-        protected void DequeueErrorPath(ProcessError error)
-        {
-            _errorPaths.Enqueue(new ErrorPathInfo(CurrentPath, error));
-
-            _ = _Paths.Dequeue();
-        }
-
         protected abstract ProcessError OnProcessDoWork(DoWorkEventArgs e);
 
-        protected virtual void OnProgressChanged(ProgressChangedEventArgs e) => ProgressChanged?.Invoke(this, e);
+        #endregion
+    }
 
-        protected virtual void OnProcessProgressChanged(ProgressChangedEventArgs e) => ProgressPercentage = (e ?? throw GetArgumentNullException(nameof(e))).ProgressPercentage;
+    public abstract class Process<T
+#if DEBUG
+        , TSimulationParameters
+#endif
+        > : ProcessBase
+#if DEBUG
+         <TSimulationParameters> where TSimulationParameters : ProcessSimulationParameters
+#endif
+        where T : WinCopies.IO.IPathInfo
+    {
 
-        protected virtual void OnRunWorkerCompleted(RunWorkerCompletedEventArgs e)
-        {
-            OnPropertyChanged(nameof(IsBusy));
+        protected internal PathCollection<T> PathCollection { get; }
 
-            RunWorkerCompleted?.Invoke(this, e);
-        }
+        ///// <summary>
+        ///// Initializes a new instance of the <see cref="Process"/> class.
+        ///// </summary>
+        protected Process(in PathCollection<T> paths
+#if DEBUG
+            , in TSimulationParameters simulationParameters
+#endif
+            ) : base(
+#if DEBUG
+             GetSourcePathFromPathCollection(paths),
 
-        protected virtual void OnRunWorkerProcessCompleted(RunWorkerCompletedEventArgs e) { }
+                   simulationParameters
+#endif
+                )
 
-        public void PauseAsync() => BackgroundWorker.PauseAsync();
+         => PathCollection = paths;
 
-        public void CancelAsync() => OnCancelAsync();
+        #region Methods
 
-        protected virtual void OnCancelAsync()
-        {
-            BackgroundWorker.CancelAsync();
-
-            OnPropertyChanged(nameof(CancellationPending));
-        }
-
-        public void RunWorkerAsync() => BackgroundWorker.RunWorkerAsync();
-
-        public void RunWorkerAsync(object argument) => BackgroundWorker.RunWorkerAsync(argument);
-
-        public void ReportProgress(int progressPercentage) => BackgroundWorker.ReportProgress(progressPercentage);
-
-        public void ReportProgress(int progressPercentage, object userState) => BackgroundWorker.ReportProgress(progressPercentage, userState);
+        public static string GetSourcePathFromPathCollection(in PathCollection<T> paths) => (paths ?? throw GetArgumentNullException(nameof(paths))).Path;
 
         //protected virtual void OnPropertyChanged(PropertyChangedEventArgs e) => PropertyChanged?.Invoke(this, e);
 
         //protected virtual void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-        public string[] PathsToStringArray()
-        {
-            string[] paths = new string[_Paths.Count];
-
-            int i = 0;
-
-            foreach (string path in _Paths.Select(_path => _path.Path))
-
-                paths[i++] = path;
-
-            return paths;
-        }
 
         #endregion
     }

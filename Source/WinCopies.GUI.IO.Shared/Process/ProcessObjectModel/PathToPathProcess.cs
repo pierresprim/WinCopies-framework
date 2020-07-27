@@ -21,14 +21,33 @@ using System.IO;
 namespace WinCopies.GUI.IO.Process
 {
 
-    public abstract class PathToPathProcess<T> : Process<T> where T : WinCopies.IO.IPathInfo
+    public abstract class PathToPathProcess<T
+#if DEBUG
+         , TSimulationParameters
+#endif
+        > : Process<T
+#if DEBUG
+         , TSimulationParameters
+#endif
+            > where T : WinCopies.IO.IPathInfo
+#if DEBUG
+        where TSimulationParameters : ProcessSimulationParameters
+#endif
     {
         /// <summary>
         /// Gets the destination root path.
         /// </summary>
         public string DestPath { get; }
 
-        protected PathToPathProcess(in PathCollection<T> paths, in string destPath) : base(paths) => DestPath = WinCopies.IO.Path.IsFileSystemPath(destPath) && System.IO.Path.IsPathRooted(destPath) ? destPath : throw new ArgumentException($"{nameof(destPath)} is not a valid path.");
+        protected PathToPathProcess(in PathCollection<T> paths, in string destPath,
+#if DEBUG
+            in TSimulationParameters simulationParameters
+#endif
+            ) : base(paths
+#if DEBUG
+                , simulationParameters
+#endif
+                ) => DestPath = WinCopies.IO.Path.IsFileSystemPath(destPath) && System.IO.Path.IsPathRooted(destPath) ? destPath : throw new ArgumentException($"{nameof(destPath)} is not a valid path.");
 
         protected virtual ProcessError CheckIfDrivesAreReady(
 #if DEBUG

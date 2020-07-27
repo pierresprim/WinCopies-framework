@@ -21,8 +21,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessCollections\PathInfoPathCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\Compression.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\Copy.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\ProcessHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\PathInfoPathToPathProcess.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\SevenZipProcess.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\ArchiveProcess.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessSimulationParameters\CopyProcessSimulationParameters.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Directory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\ExplorerControl.cs" />

@@ -19,9 +19,29 @@ using System.ComponentModel;
 
 namespace WinCopies.GUI.IO.Process
 {
-    public abstract class PathInfoPathToPathProcess<T> : PathToPathProcess<T> where T : WinCopies.IO.IPathInfo
+    public abstract class PathInfoPathToPathProcess<T
+#if DEBUG
+         , TSimulationParameters
+#endif
+        > : PathToPathProcess<T
+#if DEBUG
+             , TSimulationParameters
+#endif
+            > where T : WinCopies.IO.IPathInfo
+#if DEBUG
+        where TSimulationParameters : ProcessSimulationParameters
+#endif
     {
-        protected PathInfoPathToPathProcess(in PathCollection<T> pathsToExtract, in string destPath) : base(pathsToExtract, destPath) { }
+        protected PathInfoPathToPathProcess(in PathCollection<T> pathsToExtract, in string destPath
+#if DEBUG
+             , in TSimulationParameters simulationParameters
+#endif
+            ) : base(pathsToExtract, destPath
+#if DEBUG
+                 , simulationParameters
+#endif
+                )
+        { }
 
         protected override ProcessError OnLoadPaths(DoWorkEventArgs e)
         {
