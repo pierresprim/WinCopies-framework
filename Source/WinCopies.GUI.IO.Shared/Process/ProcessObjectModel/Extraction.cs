@@ -44,11 +44,39 @@ namespace WinCopies.GUI.IO.Process
     //    }
     //}
 
-    public class Extraction : ArchiveProcess<IPathInfo>
+    public class Extraction : ArchiveProcess<IPathInfo, ProcessQueueCollection, ReadOnlyProcessQueueCollection, ProcessErrorPathQueueCollection, ReadOnlyProcessErrorPathQueueCollection
+#if DEBUG
+         , ProcessSimulationParameters
+#endif
+        >
     {
         protected SevenZipExtractor ArchiveExtractor { get; }
 
-        public Extraction(in PathInfoPathCollection pathsToExtract, in string destPath, in SevenZipExtractor archiveExtractor) : base(pathsToExtract, destPath) =>
+        public static Extraction From(in PathInfoPathCollection pathsToExtract, in string destPath, in SevenZipExtractor archiveExtractor
+#if DEBUG
+             , ProcessSimulationParameters simulationParameters
+#endif
+            )
+        {
+            var processQueueCollection = new ProcessQueueCollection();
+            var processErrorPathQueueCollection = new ProcessErrorPathQueueCollection();
+
+            return new Extraction(pathsToExtract, destPath, archiveExtractor, processQueueCollection, new ReadOnlyProcessQueueCollection(processQueueCollection), processErrorPathQueueCollection, new ReadOnlyProcessErrorPathQueueCollection(processErrorPathQueueCollection)
+#if DEBUG
+                 , simulationParameters
+#endif
+                );
+        }
+
+        private Extraction(in PathInfoPathCollection pathsToExtract, in string destPath, in SevenZipExtractor archiveExtractor, in ProcessQueueCollection pathCollection, in ReadOnlyProcessQueueCollection readOnlyPathCollection, in ProcessErrorPathQueueCollection errorPathCollection, ReadOnlyProcessErrorPathQueueCollection readOnlyErrorPathCollection
+#if DEBUG
+             , ProcessSimulationParameters simulationParameters
+#endif
+            ) : base(pathsToExtract, destPath, pathCollection, readOnlyPathCollection, errorPathCollection, readOnlyErrorPathCollection
+#if DEBUG
+                 , simulationParameters
+#endif
+                ) =>
 
             // ValidateDestPath(destPath);
 

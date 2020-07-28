@@ -19,24 +19,30 @@ using System.ComponentModel;
 
 namespace WinCopies.GUI.IO.Process
 {
-    public abstract class PathInfoPathToPathProcess<T
+    public abstract class PathInfoPathToPathProcess<T, TCollection, TReadOnlyCollection, TErrorPathCollection, TReadOnlyErrorPathCollection
 #if DEBUG
          , TSimulationParameters
 #endif
-        > : PathToPathProcess<T
+        > : PathToPathProcess<T, TCollection, TReadOnlyCollection, TErrorPathCollection, TReadOnlyErrorPathCollection
 #if DEBUG
              , TSimulationParameters
 #endif
-            > where T : WinCopies.IO.IPathInfo
+            > 
+
+        where T : WinCopies.IO.IPathInfo
+        where TCollection : IProcessCollection
+        where TReadOnlyCollection : IReadOnlyProcessCollection
+        where TErrorPathCollection : IProcessErrorPathCollection
+        where TReadOnlyErrorPathCollection : IReadOnlyProcessErrorPathCollection
 #if DEBUG
         where TSimulationParameters : ProcessSimulationParameters
 #endif
     {
-        protected PathInfoPathToPathProcess(in PathCollection<T> pathsToExtract, in string destPath
+        protected PathInfoPathToPathProcess(in PathCollection<T> pathsToExtract, in string destPath, in TCollection pathCollection, in TReadOnlyCollection readOnlyPathCollection, in TErrorPathCollection errorPathCollection, TReadOnlyErrorPathCollection readOnlyErrorPathCollection
 #if DEBUG
              , in TSimulationParameters simulationParameters
 #endif
-            ) : base(pathsToExtract, destPath
+            ) : base(pathsToExtract, destPath, pathCollection, readOnlyPathCollection, errorPathCollection, readOnlyErrorPathCollection
 #if DEBUG
                  , simulationParameters
 #endif
@@ -47,7 +53,7 @@ namespace WinCopies.GUI.IO.Process
         {
             foreach (IPathInfo path in PathCollection)
 
-                _Paths.Enqueue(path);
+                _Paths.Add(path);
 
             return ProcessError.None;
         }

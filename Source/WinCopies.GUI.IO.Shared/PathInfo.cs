@@ -26,7 +26,7 @@ namespace WinCopies.GUI.IO
 
     namespace Process
     {
-        public interface IErrorPathInfo
+        public interface IErrorPathInfo : IPathInfo
         {
             IPathInfo Path { get; }
 
@@ -61,6 +61,14 @@ namespace WinCopies.GUI.IO
 
                 Error = error;
             }
+
+            #region IPathInfo implementation
+            string WinCopies.IO.IPathInfo.Path => Path.Path;
+
+            bool WinCopies.IO.IPathInfo.IsDirectory => Path.IsDirectory;
+
+            Size? IPathInfo.Size => Path.Size;
+            #endregion
         }
     }
 }

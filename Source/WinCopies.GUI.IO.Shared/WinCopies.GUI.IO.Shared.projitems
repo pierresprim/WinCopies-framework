@@ -17,7 +17,11 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AssemblyInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\BrowsableObjectInfoViewModel.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ProcessError.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\DuplicateFindingOptions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessCollections\IProcessCollections.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessCollections\ProcessLinkedCollections.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessCollections\ProcessQueueCollections.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessError.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessCollections\PathInfoPathCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\Compression.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\Copy.cs" />
@@ -47,7 +51,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\PathToPathProcess.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\Process.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\ProcessControl.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessCollections\ProcessQueueCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\Recycling.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Temp.cs" />
   </ItemGroup>

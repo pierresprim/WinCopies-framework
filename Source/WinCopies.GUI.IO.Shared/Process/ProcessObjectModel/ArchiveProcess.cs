@@ -25,24 +25,30 @@ using WinCopies.Util;
 
 namespace WinCopies.GUI.IO.Process
 {
-    public abstract class ArchiveProcess<T
+    public abstract class ArchiveProcess<T, TCollection, TReadOnlyCollection, TErrorPathCollection, TReadOnlyErrorPathCollection
 #if DEBUG
          , TSimulationParameters
 #endif
-        > : PathInfoPathToPathProcess<T
+        > : PathInfoPathToPathProcess<T, TCollection, TReadOnlyCollection, TErrorPathCollection, TReadOnlyErrorPathCollection
 #if DEBUG
              , TSimulationParameters
 #endif
-            > where T : WinCopies.IO.IPathInfo
+            > 
+
+        where T : WinCopies.IO.IPathInfo
+        where TCollection : IProcessCollection
+        where TReadOnlyCollection : IReadOnlyProcessCollection
+        where TErrorPathCollection : IProcessErrorPathCollection
+        where TReadOnlyErrorPathCollection : IReadOnlyProcessErrorPathCollection
 #if DEBUG
         where TSimulationParameters : ProcessSimulationParameters
 #endif
     {
-        protected ArchiveProcess(in PathCollection<T> pathsToExtract, in string destPath
+        protected ArchiveProcess(in PathCollection<T> pathsToExtract, in string destPath, in TCollection pathCollection, in TReadOnlyCollection readOnlyPathCollection, in TErrorPathCollection errorPathCollection, TReadOnlyErrorPathCollection readOnlyErrorPathCollection
 #if DEBUG
              , in TSimulationParameters simulationParameters
 #endif
-            ) : base(pathsToExtract, destPath
+            ) : base(pathsToExtract, destPath, pathCollection, readOnlyPathCollection, errorPathCollection, readOnlyErrorPathCollection
 #if DEBUG
                  , simulationParameters
 #endif
@@ -73,7 +79,7 @@ namespace WinCopies.GUI.IO.Process
 
         protected virtual bool OnFileProcessCompleted()
         {
-            _ = _Paths.Dequeue();
+            _Paths.Remove();
 
             return false;
         }

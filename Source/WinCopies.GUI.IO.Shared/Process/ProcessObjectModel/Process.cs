@@ -32,28 +32,42 @@ using System.Diagnostics;
 
 namespace WinCopies.GUI.IO.Process
 {
-    public abstract class ProcessBase
+    public abstract class ProcessBase<TCollection, TReadOnlyCollection, TErrorPathCollection, TReadOnlyErrorPathCollection
 #if DEBUG
-         <TSimulationParameters>
+         , TSimulationParameters
 #endif
+        >
         : ViewModelBase
+
+        where TCollection : IProcessCollection
+        where TReadOnlyCollection : IReadOnlyProcessCollection
+        where TErrorPathCollection : IProcessErrorPathCollection
+        where TReadOnlyErrorPathCollection : IReadOnlyProcessErrorPathCollection
 #if DEBUG
         where TSimulationParameters : ProcessSimulationParameters
 #endif
     {
         #region Private fields
-
         private Size _initialSize;
         private int _initialItemCount;
         private bool _completed = false;
         private bool _pathsLoaded = false;
-        private readonly ObservableQueueCollection<IErrorPathInfo> _errorPaths = new ObservableQueueCollection<IErrorPathInfo>();
+        private ProcessError _error;
         private int _progressPercentage = 0;
         private IPathInfo _currentPath;
-
+        private readonly TErrorPathCollection _errorPaths;
         #endregion
 
         #region Properties
+
+        protected internal TCollection _Paths { get; }
+
+        /// <summary>
+        /// Gets the paths that have been loaded.
+        /// </summary>
+        public TReadOnlyCollection Paths { get; }
+
+        public TReadOnlyErrorPathCollection ErrorPaths { get; }
 
         /// <summary>
         /// Gets the inner background worker.
@@ -89,13 +103,6 @@ namespace WinCopies.GUI.IO.Process
                 OnPropertyChanged(nameof(InitialItemCount));
             }
         }
-
-        protected internal ObservableQueueCollection<IPathInfo> _Paths { get; } = new ObservableQueueCollection<IPathInfo>();
-
-        /// <summary>
-        /// Gets the paths that have been loaded.
-        /// </summary>
-        public ProcessQueueCollection Paths { get; }
 
         /// <summary>
         /// Gets a value that indicates whether the process has completed.
@@ -204,12 +211,22 @@ namespace WinCopies.GUI.IO.Process
         /// </summary>
         public bool PausePending => BackgroundWorker.PausePending;
 
-        public ReadOnlyObservableQueueCollection<IErrorPathInfo> ErrorPaths { get; }
-
         /// <summary>
         /// Gets the global process error, if any.
         /// </summary>
-        public ProcessError Error { get; private set; }
+        public ProcessError Error
+        {
+            get => _error;
+            private set
+            {
+                if (value != _error)
+                {
+                    _error = value;
+
+                    OnPropertyChanged(nameof(Error));
+                }
+            }
+        }
 
         /// <summary>
         /// Gets the current processed <see cref="IPathInfo"/>.
@@ -261,17 +278,27 @@ namespace WinCopies.GUI.IO.Process
 
         #endregion
 
-        protected ProcessBase(in string sourcePath
+        protected ProcessBase(in string sourcePath, in TCollection pathCollection, in TReadOnlyCollection readOnlyPathCollection, in TErrorPathCollection errorPathCollection, TReadOnlyErrorPathCollection readOnlyErrorPathCollection
 #if DEBUG
              , in TSimulationParameters simulationParameters
 #endif
             )
         {
+            ThrowIfNullEmptyOrWhiteSpace(sourcePath, nameof(sourcePath));
+            ThrowIfNull(pathCollection, nameof(pathCollection));
+            ThrowIfNull(readOnlyPathCollection, nameof(readOnlyPathCollection));
+            ThrowIfNull(errorPathCollection, nameof(errorPathCollection));
+            ThrowIfNull(readOnlyErrorPathCollection, nameof(readOnlyErrorPathCollection));
+
             SourcePath = sourcePath;
 
-            Paths = new ProcessQueueCollection(_Paths);
+            _Paths = pathCollection;
 
-            ErrorPaths = new ReadOnlyObservableQueueCollection<IErrorPathInfo>(_errorPaths);
+            Paths = readOnlyPathCollection;
+
+            _errorPaths = errorPathCollection;
+
+            ErrorPaths = readOnlyErrorPathCollection;
 
 
 
@@ -474,11 +501,11 @@ namespace WinCopies.GUI.IO.Process
             }
         }
 
-        protected void DequeueErrorPath(ProcessError error)
+        protected void RemoveErrorPath(ProcessError error)
         {
-            _errorPaths.Enqueue(new ErrorPathInfo(CurrentPath, error));
+            _errorPaths.Add(new ErrorPathInfo(CurrentPath, error));
 
-            _ = _Paths.Dequeue();
+            _Paths.Remove();
         }
 
         protected abstract ProcessError OnLoadPaths(DoWorkEventArgs e);
@@ -499,13 +526,22 @@ namespace WinCopies.GUI.IO.Process
         #endregion
     }
 
-    public abstract class Process<T
+    public abstract class Process<T, TCollection, TReadOnlyCollection, TErrorPathCollection, TReadOnlyErrorPathCollection
 #if DEBUG
         , TSimulationParameters
 #endif
-        > : ProcessBase
+        > : ProcessBase<TCollection, TReadOnlyCollection, TErrorPathCollection, TReadOnlyErrorPathCollection
 #if DEBUG
-         <TSimulationParameters> where TSimulationParameters : ProcessSimulationParameters
+         , TSimulationParameters
+#endif
+            >
+
+        where TCollection : IProcessCollection
+        where TReadOnlyCollection : IReadOnlyProcessCollection
+        where TErrorPathCollection : IProcessErrorPathCollection
+        where TReadOnlyErrorPathCollection : IReadOnlyProcessErrorPathCollection
+#if DEBUG
+         where TSimulationParameters : ProcessSimulationParameters
 #endif
         where T : WinCopies.IO.IPathInfo
     {
@@ -515,19 +551,15 @@ namespace WinCopies.GUI.IO.Process
         ///// <summary>
         ///// Initializes a new instance of the <see cref="Process"/> class.
         ///// </summary>
-        protected Process(in PathCollection<T> paths
+        protected Process(in PathCollection<T> paths, in TCollection pathCollection, in TReadOnlyCollection readOnlyPathCollection, in TErrorPathCollection errorPathCollection, TReadOnlyErrorPathCollection readOnlyErrorPathCollection
 #if DEBUG
             , in TSimulationParameters simulationParameters
 #endif
-            ) : base(
+            ) : base(GetSourcePathFromPathCollection(paths ), pathCollection, readOnlyPathCollection, errorPathCollection, readOnlyErrorPathCollection
 #if DEBUG
-             GetSourcePathFromPathCollection(paths),
-
-                   simulationParameters
+                 , simulationParameters
 #endif
-                )
-
-         => PathCollection = paths;
+                ) => PathCollection = paths;
 
         #region Methods
 

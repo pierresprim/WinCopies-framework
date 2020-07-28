@@ -31,6 +31,7 @@ using WinCopies.Util;
 using static WinCopies.Util.Desktop.ThrowHelper;
 
 using Size = WinCopies.IO.Size;
+using WinCopies.Collections.DotNetFix;
 
 namespace WinCopies.GUI.IO.Process
 {
@@ -57,7 +58,7 @@ namespace WinCopies.GUI.IO.Process
         }
     }
 
-    public class Copy : PathToPathProcess<WinCopies.IO.IPathInfo
+    public class Copy : PathToPathProcess<WinCopies.IO.IPathInfo, ProcessQueueCollection, ReadOnlyProcessQueueCollection, ProcessErrorPathQueueCollection, ReadOnlyProcessErrorPathQueueCollection
 #if DEBUG
          , CopyProcessSimulationParameters
 #endif
@@ -76,17 +77,63 @@ namespace WinCopies.GUI.IO.Process
         /// <summary>
         /// Gets a value that indicates whether files are automatically renamed when they conflict with existing paths.
         /// </summary>
-        public bool AutoRenameFiles { get => _autoRenameFiles; set => _autoRenameFiles = BackgroundWorker.IsBusy ? throw GetBackgroundWorkerIsBusyException() : value; }
+        public bool AutoRenameFiles
+        {
+            get => _autoRenameFiles;
 
-        public int BufferLength { get => _bufferLength; set => _bufferLength = BackgroundWorker.IsBusy ? throw GetBackgroundWorkerIsBusyException() : value < 0 ? throw new ArgumentOutOfRangeException($"{nameof(value)} cannot be less than zero.") : value; }
+            set
+            {
+                if (BackgroundWorker.IsBusy) throw GetBackgroundWorkerIsBusyException();
+
+                if (value != _autoRenameFiles)
+                {
+                    _autoRenameFiles = value;
+
+                    OnPropertyChanged(nameof(AutoRenameFiles));
+                }
+            }
+        }
+
+        public int BufferLength
+        {
+            get => _bufferLength;
+
+            set
+            {
+                if (BackgroundWorker.IsBusy) throw GetBackgroundWorkerIsBusyException();
+
+                if (value < 0 ? throw new ArgumentOutOfRangeException($"{nameof(value)} cannot be less than zero.") : value != _bufferLength)
+                {
+                    _bufferLength = value;
+
+                    OnPropertyChanged(nameof(BufferLength));
+                }
+            }
+        }
 
         #endregion
 
-        public Copy(in CopyProcessPathCollection pathsToLoad, in string destPath
+        public static Copy From(in CopyProcessPathCollection pathsToLoad, in string destPath
+#if DEBUG
+             , in CopyProcessSimulationParameters simulationParameters
+#endif
+            )
+        {
+            var processQueueCollection = new ProcessQueueCollection();
+            var processErrorPathQueueCollection = new ProcessErrorPathQueueCollection();
+
+            return new Copy(pathsToLoad, destPath, processQueueCollection, new ReadOnlyProcessQueueCollection(processQueueCollection), processErrorPathQueueCollection, new ReadOnlyProcessErrorPathQueueCollection(processErrorPathQueueCollection)
+#if DEBUG
+                 , simulationParameters
+#endif
+                );
+        }
+
+        private Copy(in CopyProcessPathCollection pathsToLoad, in string destPath, in ProcessQueueCollection pathCollection, in ReadOnlyProcessQueueCollection readOnlyPathCollection, in ProcessErrorPathQueueCollection errorPathCollection, ReadOnlyProcessErrorPathQueueCollection readOnlyErrorPathCollection
 #if DEBUG
             , in CopyProcessSimulationParameters simulationParameters
 #endif
-            ) : base(pathsToLoad, destPath
+            ) : base(pathsToLoad, destPath, pathCollection, readOnlyPathCollection, errorPathCollection, readOnlyErrorPathCollection
 #if DEBUG
                  , simulationParameters
 #endif
@@ -233,7 +280,7 @@ namespace WinCopies.GUI.IO.Process
                             {
                                 if (alreadyRenamed)
                                 {
-                                    DequeueErrorPath(ProcessError.FileRenamingFailed);
+                                    RemoveErrorPath(ProcessError.FileRenamingFailed);
 
                                     return;
                                 }
@@ -248,43 +295,43 @@ namespace WinCopies.GUI.IO.Process
                                 }
                             }
 
-                            DequeueErrorPath(ProcessError.FileSystemEntryAlreadyExists);
+                            RemoveErrorPath(ProcessError.FileSystemEntryAlreadyExists);
 
                             break;
 
                         case ErrorCode.PathNotFound:
 
-                            DequeueErrorPath(ProcessError.PathNotFound);
+                            RemoveErrorPath(ProcessError.PathNotFound);
 
                             break;
 
                         case ErrorCode.AccessDenied:
 
-                            DequeueErrorPath(ProcessError.AccessDenied);
+                            RemoveErrorPath(ProcessError.AccessDenied);
 
                             break;
 
                         case ErrorCode.DiskFull:
 
-                            DequeueErrorPath(ProcessError.NotEnoughSpace);
+                            RemoveErrorPath(ProcessError.NotEnoughSpace);
 
                             break;
 
                         case ErrorCode.DiskOperationFailed:
 
-                            DequeueErrorPath(ProcessError.DiskError);
+                            RemoveErrorPath(ProcessError.DiskError);
 
                             break;
 
                         case (ErrorCode)6000: // Encryption failed
 
-                            DequeueErrorPath(ProcessError.EncryptionFailed);
+                            RemoveErrorPath(ProcessError.EncryptionFailed);
 
                             break;
 
                         default:
 
-                            DequeueErrorPath(ProcessError.UnknownError);
+                            RemoveErrorPath(ProcessError.UnknownError);
 
                             break;
                     }
@@ -459,7 +506,7 @@ namespace WinCopies.GUI.IO.Process
 
                                     catch (Exception ex) when (ex.Is(false, typeof(System.UnauthorizedAccessException), typeof(System.Security.SecurityException)))
                                     {
-                                        DequeueErrorPath(ProcessError.DestinationReadProtection);
+                                        RemoveErrorPath(ProcessError.DestinationReadProtection);
 
                                         continue;
                                     }
@@ -477,28 +524,28 @@ namespace WinCopies.GUI.IO.Process
 
                                 catch (System.IO.IOException ex) when (ex.Is(false, typeof(System.IO.FileNotFoundException), typeof(System.IO.DirectoryNotFoundException)))
                                 {
-                                    DequeueErrorPath(ProcessError.PathNotFound);
+                                    RemoveErrorPath(ProcessError.PathNotFound);
 
                                     continue;
                                 }
 
                                 catch (System.IO.PathTooLongException)
                                 {
-                                    DequeueErrorPath(ProcessError.PathTooLong);
+                                    RemoveErrorPath(ProcessError.PathTooLong);
 
                                     continue;
                                 }
 
                                 catch (System.IO.IOException)
                                 {
-                                    DequeueErrorPath(ProcessError.UnknownError);
+                                    RemoveErrorPath(ProcessError.UnknownError);
 
                                     continue;
                                 }
 
                                 catch (Exception ex) when (ex.Is(false, typeof(System.UnauthorizedAccessException), typeof(System.Security.SecurityException)))
                                 {
-                                    DequeueErrorPath(ProcessError.ReadProtection);
+                                    RemoveErrorPath(ProcessError.ReadProtection);
 
                                     continue;
                                 }
@@ -512,7 +559,7 @@ namespace WinCopies.GUI.IO.Process
 
                         else
                         {
-                            DequeueErrorPath(ProcessError.FileSystemEntryAlreadyExists);
+                            RemoveErrorPath(ProcessError.FileSystemEntryAlreadyExists);
 
                             continue;
                         }

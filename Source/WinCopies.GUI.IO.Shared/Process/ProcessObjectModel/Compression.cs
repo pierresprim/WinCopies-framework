@@ -21,11 +21,39 @@ using SevenZip;
 
 namespace WinCopies.GUI.IO.Process
 {
-    public class Compression : ArchiveProcess<WinCopies.IO.IPathInfo>
+    public class Compression : ArchiveProcess<WinCopies.IO.IPathInfo, ProcessQueueCollection, ReadOnlyProcessQueueCollection, ProcessErrorPathQueueCollection, ReadOnlyProcessErrorPathQueueCollection
+#if DEBUG
+         , ProcessSimulationParameters
+#endif
+        >
     {
         protected SevenZipCompressor ArchiveCompressor { get; }
 
-        public Compression(in PathCollection<WinCopies.IO.IPathInfo> pathsToExtract, in string destPath, in SevenZipCompressor archiveCompressor) : base(pathsToExtract, destPath) => ArchiveCompressor = archiveCompressor;
+        public static Compression From(in PathCollection<WinCopies.IO.IPathInfo> pathsToCompress, in string destPath, in SevenZipCompressor archiveCompressor
+#if DEBUG
+             , ProcessSimulationParameters simulationParameters
+#endif
+            )
+        {
+            var processQueueCollection = new ProcessQueueCollection();
+            var processErrorPathQueueCollection = new ProcessErrorPathQueueCollection();
+
+            return new Compression(pathsToCompress, destPath, archiveCompressor, processQueueCollection, new ReadOnlyProcessQueueCollection(processQueueCollection), processErrorPathQueueCollection, new ReadOnlyProcessErrorPathQueueCollection(processErrorPathQueueCollection)
+#if DEBUG
+                 , simulationParameters
+#endif
+                );
+        }
+
+        private Compression(in PathCollection<WinCopies.IO.IPathInfo> pathsToCompress, in string destPath, in SevenZipCompressor archiveCompressor, in ProcessQueueCollection pathCollection, in ReadOnlyProcessQueueCollection readOnlyPathCollection, in ProcessErrorPathQueueCollection errorPathCollection, ReadOnlyProcessErrorPathQueueCollection readOnlyErrorPathCollection
+#if DEBUG
+             , ProcessSimulationParameters simulationParameters
+#endif
+            ) : base(pathsToCompress, destPath, pathCollection, readOnlyPathCollection, errorPathCollection, readOnlyErrorPathCollection
+#if DEBUG
+                 , simulationParameters
+#endif
+                ) => ArchiveCompressor = archiveCompressor;
 
         private void ArchiveCompressor_FileCompressionStarted(object sender, FileNameEventArgs e)
         {

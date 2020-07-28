@@ -17,19 +17,26 @@
 
 using System;
 using System.IO;
+using WinCopies.Collections.DotNetFix;
 
 namespace WinCopies.GUI.IO.Process
 {
 
-    public abstract class PathToPathProcess<T
+    public abstract class PathToPathProcess<T, TCollection, TReadOnlyCollection, TErrorPathCollection, TReadOnlyErrorPathCollection
 #if DEBUG
          , TSimulationParameters
 #endif
-        > : Process<T
+        > : Process<T, TCollection, TReadOnlyCollection, TErrorPathCollection, TReadOnlyErrorPathCollection
 #if DEBUG
          , TSimulationParameters
 #endif
-            > where T : WinCopies.IO.IPathInfo
+            > 
+
+        where T : WinCopies.IO.IPathInfo
+        where TCollection : IProcessCollection
+        where TReadOnlyCollection : IReadOnlyProcessCollection
+        where TErrorPathCollection : IProcessErrorPathCollection
+        where TReadOnlyErrorPathCollection : IReadOnlyProcessErrorPathCollection
 #if DEBUG
         where TSimulationParameters : ProcessSimulationParameters
 #endif
@@ -39,11 +46,11 @@ namespace WinCopies.GUI.IO.Process
         /// </summary>
         public string DestPath { get; }
 
-        protected PathToPathProcess(in PathCollection<T> paths, in string destPath,
+        protected PathToPathProcess(in PathCollection<T> paths, in string destPath, in TCollection pathCollection, in TReadOnlyCollection readOnlyPathCollection, in TErrorPathCollection errorPathCollection, TReadOnlyErrorPathCollection readOnlyErrorPathCollection
 #if DEBUG
-            in TSimulationParameters simulationParameters
+            ,    in TSimulationParameters simulationParameters
 #endif
-            ) : base(paths
+            ) : base(paths, pathCollection, readOnlyPathCollection, errorPathCollection, readOnlyErrorPathCollection
 #if DEBUG
                 , simulationParameters
 #endif

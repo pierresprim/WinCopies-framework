@@ -18,7 +18,7 @@
 using System;
 using System.Collections.Generic;
 using System.Security;
-
+using WinCopies.Collections.DotNetFix;
 using WinCopies.Util;
 
 using static WinCopies.Util.Util;
@@ -27,30 +27,42 @@ namespace WinCopies.GUI.IO.Process
 {
     public static class ProcessHelper
     {
-        public static ProcessError LoadFileSystemEnumerationProcessPaths<T
+        public static ProcessError LoadFileSystemEnumerationProcessPaths<T, TCollection, TReadOnlyCollection, TErrorPathCollection, TReadOnlyErrorPathCollection
 #if DEBUG
              , TSimulationParameters
 #endif
-            >(Process<T
+            >(Process<T, TCollection, TReadOnlyCollection, TErrorPathCollection, TReadOnlyErrorPathCollection
 #if DEBUG
              , TSimulationParameters
 #endif
-           > process, IEnumerator<T> pathsToLoadEnumerator) where T : WinCopies.IO.IPathInfo
+           > process, IEnumerator<T> pathsToLoadEnumerator)
+
+            where T : WinCopies.IO.IPathInfo
+        where TCollection : IProcessCollection
+        where TReadOnlyCollection : IReadOnlyProcessCollection
+        where TErrorPathCollection : IProcessErrorPathCollection
+        where TReadOnlyErrorPathCollection : IReadOnlyProcessErrorPathCollection
 #if DEBUG
             where TSimulationParameters : ProcessSimulationParameters
 #endif
 
              => _LoadFileSystemEnumerationProcessPaths(process ?? throw GetArgumentNullException(nameof(process)), pathsToLoadEnumerator ?? throw GetArgumentNullException(nameof(pathsToLoadEnumerator)));
 
-        internal static ProcessError _LoadFileSystemEnumerationProcessPaths<T
+        internal static ProcessError _LoadFileSystemEnumerationProcessPaths<T, TCollection, TReadOnlyCollection, TErrorPathCollection, TReadOnlyErrorPathCollection
 #if DEBUG
              , TSimulationParameters
 #endif
-            >(Process<T
+            >(Process<T, TCollection, TReadOnlyCollection, TErrorPathCollection, TReadOnlyErrorPathCollection
 #if DEBUG
              , TSimulationParameters
 #endif
-           > process, IEnumerator<T> pathsToLoadEnumerator) where T : WinCopies.IO.IPathInfo
+           > process, IEnumerator<T> pathsToLoadEnumerator)
+
+            where T : WinCopies.IO.IPathInfo
+        where TCollection : IProcessCollection
+        where TReadOnlyCollection : IReadOnlyProcessCollection
+        where TErrorPathCollection : IProcessErrorPathCollection
+        where TReadOnlyErrorPathCollection : IReadOnlyProcessErrorPathCollection
 #if DEBUG
             where TSimulationParameters : ProcessSimulationParameters
 #endif
@@ -67,7 +79,7 @@ namespace WinCopies.GUI.IO.Process
 
                         if (pathsToLoadEnumerator.MoveNext())
 
-                            process._Paths.Enqueue(new PathInfo(pathsToLoadEnumerator.Current.Path, process.PathCollection.GetPathSizeDelegate(pathsToLoadEnumerator.Current))); // todo: use Windows API Code Pack's Shell's implementation instead.
+                            process._Paths.Add(new PathInfo(pathsToLoadEnumerator.Current.Path, process.PathCollection.GetPathSizeDelegate(pathsToLoadEnumerator.Current))); // todo: use Windows API Code Pack's Shell's implementation instead.
 
                         else break;
                     }
