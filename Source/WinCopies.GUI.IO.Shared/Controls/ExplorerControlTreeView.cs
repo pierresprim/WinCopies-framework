@@ -20,7 +20,7 @@ using System.Windows.Controls;
 
 namespace WinCopies.GUI.IO.Controls
 {
-    public class ExplorerControlTreeView:TreeView
+    public class ExplorerControlTreeView : TreeView
     {
         protected override DependencyObject GetContainerForItemOverride() => new ExplorerControlTreeViewItem();
     }

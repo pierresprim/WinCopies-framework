@@ -16,6 +16,7 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using Microsoft.WindowsAPICodePack.PortableDevices;
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

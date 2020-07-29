@@ -15,6 +15,7 @@
 * You should have received a copy of the GNU General Public License
 * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+using Microsoft.WindowsAPICodePack.Win32Native;
 using SevenZip;
 
 using System;
@@ -33,7 +34,7 @@ namespace WinCopies.GUI.IO.Process
 #if DEBUG
              , TSimulationParameters
 #endif
-            > 
+            >
 
         where T : WinCopies.IO.IPathInfo
         where TCollection : IProcessCollection
@@ -56,7 +57,6 @@ namespace WinCopies.GUI.IO.Process
         { }
 
         protected virtual ProcessError OnPreProcess(DoWorkEventArgs e) => CheckIfDrivesAreReady(
-
 #if DEBUG
                 null
 #endif
@@ -72,14 +72,18 @@ namespace WinCopies.GUI.IO.Process
 
             if (WorkerReportsProgress)
 
-                TryReportProgress(percentDone);
+                _ = TryReportProgress(percentDone);
 
             return false;
         }
 
         protected virtual bool OnFileProcessCompleted()
         {
-            _Paths.Remove();
+            WinCopies.IO.Size? size = _Paths.Remove().Size;
+
+            if (size.HasValue && !size.Value.ValueInBytes.IsNaN)
+
+                _Paths.DecrementSize(size.Value.ValueInBytes.Value);
 
             return false;
         }

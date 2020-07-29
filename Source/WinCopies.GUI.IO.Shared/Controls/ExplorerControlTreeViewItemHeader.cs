@@ -23,10 +23,16 @@ namespace WinCopies.GUI.IO.Controls
 {
     public class ExplorerControlTreeViewItemHeader : Control
     {
+        /// <summary>
+        /// Identifies the <see cref="Icon"/> dependency property.
+        /// </summary>
         public static readonly DependencyProperty IconProperty = DependencyProperty.Register(nameof(Icon), typeof(ImageSource), typeof(ExplorerControlTreeViewItemHeader));
 
         public ImageSource Icon { get => (ImageSource)GetValue(IconProperty); set => SetValue(IconProperty, value); }
 
+        /// <summary>
+        /// Identifies the <see cref="ItemName"/> dependency property.
+        /// </summary>
         public static readonly DependencyProperty ItemNameProperty = DependencyProperty.Register(nameof(ItemName), typeof(string), typeof(ExplorerControlTreeViewItemHeader));
 
         public string ItemName { get => (string)GetValue(ItemNameProperty); set => SetValue(ItemNameProperty, value); }

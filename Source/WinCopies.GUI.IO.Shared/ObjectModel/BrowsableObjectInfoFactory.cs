@@ -17,7 +17,9 @@
 
 using Microsoft.WindowsAPICodePack.PortableDevices;
 using Microsoft.WindowsAPICodePack.Shell;
+
 using System;
+
 using WinCopies.IO;
 using WinCopies.IO.ObjectModel;
 

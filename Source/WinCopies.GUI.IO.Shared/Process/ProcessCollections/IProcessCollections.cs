@@ -24,22 +24,35 @@ namespace WinCopies.GUI.IO.Process
 {
     public interface IProcessCollection<T> : ICountableEnumerable<T>, INotifyPropertyChanged, INotifySimpleLinkedCollectionChanged<T> where T : IPathInfo
     {
+        Size Size { get; }
+
         void Add(T path);
 
-        void Remove();
+        T Remove();
 
         void Clear();
 
         T Peek();
-    }
-    public interface IProcessCollection : IProcessCollection<IPathInfo> { }
 
-    public interface IReadOnlyProcessCollection : ICountableEnumerable<IPathInfo>
+        void DecrementSize(ulong sizeInBytes);
+    }
+    public interface IProcessCollection : IProcessCollection<IPathInfo>
+    {
+        // Left empty.
+    }
+
+    public interface IReadOnlyProcessCollection : ICountableEnumerable<IPathInfo>, INotifyPropertyChanged, INotifySimpleLinkedCollectionChanged<IPathInfo>
     {
         Size Size { get; }
     }
 
-    public interface IProcessErrorPathCollection : IProcessCollection<IErrorPathInfo> { }
+    public interface IProcessErrorPathCollection : IProcessCollection<IErrorPathInfo>
+    {
+        // Left empty.
+    }
 
-    public interface IReadOnlyProcessErrorPathCollection : ICountableEnumerable<IErrorPathInfo>, INotifyPropertyChanged, INotifySimpleLinkedCollectionChanged<IErrorPathInfo> { }
+    public interface IReadOnlyProcessErrorPathCollection : ICountableEnumerable<IErrorPathInfo>, INotifyPropertyChanged, INotifySimpleLinkedCollectionChanged<IErrorPathInfo>
+    {
+        // Left empty.
+    }
 }

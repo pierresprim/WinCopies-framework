@@ -3,11 +3,10 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:WinCopies.GUI.IO"
     xmlns:localObjectModel="clr-namespace:WinCopies.GUI.IO.ObjectModel"
+    xmlns:localProcess="clr-namespace:WinCopies.GUI.IO.Process"
     xmlns:controls="clr-namespace:WinCopies.GUI.Controls;assembly=WinCopies.GUI.Controls"
     xmlns:converters="clr-namespace:WinCopies.Util.Data;assembly=WinCopies.Util.Desktop"
-    xmlns:util="clr-namespace:WinCopies.Util;assembly=WinCopies.Util.Desktop"
     xmlns:icons="clr-namespace:WinCopies.GUI.Icons.Properties;assembly=WinCopies.GUI.Icons"
-    xmlns:commands="clr-namespace:WinCopies.Util.Commands;assembly=WinCopies.Util.Desktop"
     xmlns:data="clr-namespace:WinCopies.Util.Data;assembly=WinCopies.Util.Desktop"
     xmlns:guiData="clr-namespace:WinCopies.GUI.IO.Data"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
@@ -569,16 +568,16 @@
         <Setter Property="Template" Value="{StaticResource CopyProcessControlTemplate}" />
     </Style>
 
-    <DataTemplate DataType="{x:Type local:CopyProcess}" x:Shared="false">
-        <local:CopyProcessControl SourcePath="{Binding SourcePath}" DestPath="{Binding DestPath}" InitialItemCount="{Binding InitialItemCount}" InitialItemSize="{Binding InitialItemSize}" RemainingItemCount="{Binding Paths.Count}" RemainingItemSize="{Binding Paths.Size}" ArePathsLoaded="{Binding ArePathsLoaded}" ProgressPercentage="{Binding ProgressPercentage}">
-            <local:ProcessControl.Header>
+    <DataTemplate DataType="{x:Type local:Copy}" x:Shared="false">
+        <localProcess:CopyProcessControl SourcePath="{Binding SourcePath}" DestPath="{Binding DestPath}" InitialItemCount="{Binding InitialItemCount}" InitialItemSize="{Binding InitialItemSize}" RemainingItemCount="{Binding Paths.Count}" RemainingItemSize="{Binding Paths.Size}" ArePathsLoaded="{Binding ArePathsLoaded}" ProgressPercentage="{Binding ProgressPercentage}">
+            <localProcess:ProcessControl.Header>
                 <MultiBinding StringFormat="{}{0} {1} {2} {3}">
                     <Binding Source="{StaticResource CopyingFrom}" />
                     <Binding Path="SourcePath" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ProcessControl}}" />
                     <Binding Source="{StaticResource To}" />
                     <Binding Path="DestPath" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ProcessControl}}" />
                 </MultiBinding>
-            </local:ProcessControl.Header>
-        </local:CopyProcessControl>
+            </localProcess:ProcessControl.Header>
+        </localProcess:CopyProcessControl>
     </DataTemplate>
 </ResourceDictionary>

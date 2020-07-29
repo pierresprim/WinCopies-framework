@@ -17,10 +17,10 @@
 
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
-using WinCopies.Collections.DotNetFix;
 using WinCopies.Util.Data;
 using WinCopies.Util.DotNetFix;
 
@@ -28,10 +28,27 @@ using static WinCopies.Util.Util;
 using static WinCopies.Util.Desktop.ThrowHelper;
 
 using Size = WinCopies.IO.Size;
-using System.Diagnostics;
 
 namespace WinCopies.GUI.IO.Process
 {
+#if DEBUG
+    /// <summary>
+    /// The base class for WinCopies IO processes.
+    /// </summary>
+    /// <typeparam name="TCollection">The type of the loaded paths collection.</typeparam>
+    /// <typeparam name="TReadOnlyCollection">The type of the loaded paths read-only collection.</typeparam>
+    /// <typeparam name="TErrorPathCollection">The type of the error paths collection.</typeparam>
+    /// <typeparam name="TReadOnlyErrorPathCollection">The type of the error paths read-only collection.</typeparam>
+    /// <typeparam name="TSimulationParameters">The type of the simulation parameters.</typeparam>
+#else
+    /// <summary>
+    /// The base class for WinCopies IO processes.
+    /// </summary>
+    /// <typeparam name="TCollection">The type of the loaded paths collection.</typeparam>
+    /// <typeparam name="TReadOnlyCollection">The type of the loaded paths read-only collection.</typeparam>
+    /// <typeparam name="TErrorPathCollection">The type of the error paths collection.</typeparam>
+    /// <typeparam name="TReadOnlyErrorPathCollection">The type of the error paths read-only collection.</typeparam>
+#endif
     public abstract class ProcessBase<TCollection, TReadOnlyCollection, TErrorPathCollection, TReadOnlyErrorPathCollection
 #if DEBUG
          , TSimulationParameters
@@ -59,7 +76,6 @@ namespace WinCopies.GUI.IO.Process
         #endregion
 
         #region Properties
-
         protected internal TCollection _Paths { get; }
 
         /// <summary>
@@ -140,83 +156,12 @@ namespace WinCopies.GUI.IO.Process
         }
 
         /// <summary>
-        /// Gets or sets a value that indicates whether the process supports cancellation.
-        /// </summary>
-        public bool WorkerSupportsCancellation
-        {
-            get => BackgroundWorker.WorkerSupportsCancellation; set
-            {
-                if (IsBusy)
-
-                    ThrowBackgroundWorkerIsBusyException();
-
-                if (value != BackgroundWorker.WorkerSupportsCancellation)
-                {
-                    BackgroundWorker.WorkerSupportsCancellation = value;
-
-                    OnPropertyChanged(nameof(WorkerSupportsCancellation));
-                }
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets a value that indicates whether the process reports progress.
-        /// </summary>
-        public bool WorkerReportsProgress
-        {
-            get => BackgroundWorker.WorkerReportsProgress; set
-            {
-                if (IsBusy)
-
-                    ThrowBackgroundWorkerIsBusyException();
-
-                if (value != BackgroundWorker.WorkerReportsProgress)
-                {
-                    BackgroundWorker.WorkerReportsProgress = value;
-
-                    OnPropertyChanged(nameof(WorkerReportsProgress));
-                }
-            }
-        }
-
-        /// <summary>
-        /// Gets a value that indicates whether the process is busy.
-        /// </summary>
-        public bool IsBusy => BackgroundWorker.IsBusy;
-
-        /// <summary>
-        /// Gets a value that indicates whether a cancellation is pending.
-        /// </summary>
-        public bool CancellationPending => BackgroundWorker.CancellationPending;
-
-        /// <summary>
-        /// Gets or sets a value that indicates whether the process supports pausing.
-        /// </summary>
-        public bool WorkerSupportsPausing
-        {
-            get => BackgroundWorker.WorkerSupportsPausing; set
-            {
-                bool oldValue = BackgroundWorker.WorkerSupportsPausing;
-
-                BackgroundWorker.WorkerSupportsPausing = value;
-
-                if (value != oldValue) // We make this test after trying to update the inner BackgroundWorker property because this property checks if the BackgroundWorker is busy before updating the underlying value. Because this check has to be performed even if the new value is the same as the old one, in order to let the user know even in this case if there is a bug, and because this check is performed in the inner BackgroundWorker property, to make the check of this line here makes possible to let the user know if there is a bug in all cases, without performing the is-busy check twice.
-
-                    OnPropertyChanged(nameof(WorkerSupportsPausing));
-            }
-        }
-
-        /// <summary>
-        /// Gets a value that indicates whether a pause is pending.
-        /// </summary>
-        public bool PausePending => BackgroundWorker.PausePending;
-
-        /// <summary>
         /// Gets the global process error, if any.
         /// </summary>
         public ProcessError Error
         {
             get => _error;
+
             private set
             {
                 if (value != _error)
@@ -233,7 +178,9 @@ namespace WinCopies.GUI.IO.Process
         /// </summary>
         public IPathInfo CurrentPath
         {
-            get => _currentPath; protected set
+            get => _currentPath;
+
+            protected set
             {
                 if (value != _currentPath)
                 {
@@ -265,17 +212,6 @@ namespace WinCopies.GUI.IO.Process
 #if DEBUG
         public TSimulationParameters SimulationParameters { get; }
 #endif
-
-        #endregion
-
-        #region Events
-
-        public event DoWorkEventHandler DoWork;
-
-        public event ProgressChangedEventHandler ProgressChanged;
-
-        public event RunWorkerCompletedEventHandler RunWorkerCompleted;
-
         #endregion
 
         protected ProcessBase(in string sourcePath, in TCollection pathCollection, in TReadOnlyCollection readOnlyPathCollection, in TErrorPathCollection errorPathCollection, TReadOnlyErrorPathCollection readOnlyErrorPathCollection
@@ -316,61 +252,7 @@ namespace WinCopies.GUI.IO.Process
         }
 
         #region Methods
-
-        #region BackgroundWorker implementation
-
-        private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) => OnDoWork(e);
-
-        public void RunWorkerAsync() => BackgroundWorker.RunWorkerAsync();
-
-        public void RunWorkerAsync(object argument) => BackgroundWorker.RunWorkerAsync(argument);
-
-
-
-        private void BackgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e) => OnProgressChanged(e);
-
-        protected void ReportProgress(int progressPercentage) => BackgroundWorker.ReportProgress(progressPercentage);
-
-        protected void ReportProgress(int progressPercentage, object userState) => BackgroundWorker.ReportProgress(progressPercentage, userState);
-
-        protected virtual void OnProgressChanged(ProgressChangedEventArgs e)
-        {
-            ProgressPercentage = (e ?? throw GetArgumentNullException(nameof(e))).ProgressPercentage;
-
-            ProgressChanged?.Invoke(this, e);
-        }
-
-
-
-        private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) => OnRunWorkerCompleted(e);
-
-        protected virtual void OnRunWorkerCompleted(RunWorkerCompletedEventArgs e)
-        {
-            OnPropertyChanged(nameof(IsBusy));
-
-            RunWorkerCompleted?.Invoke(this, e);
-        }
-
-        public void PauseAsync()
-        {
-            BackgroundWorker.PauseAsync();
-
-            OnPropertyChanged(nameof(PausePending));
-        }
-
-        public void CancelAsync() => OnCancelAsync();
-
-        protected virtual void OnCancelAsync()
-        {
-            BackgroundWorker.CancelAsync();
-
-            OnPropertyChanged(nameof(CancellationPending));
-        }
-
-        #endregion
-
         #region Helpers
-
         protected void ThrowIfCompleted()
         {
             if (IsCompleted)
@@ -404,7 +286,6 @@ namespace WinCopies.GUI.IO.Process
         }
 
         #region Checks
-
         protected virtual bool CheckIfEnoughSpace()
         {
             if (Paths.Size.ValueInBytes.IsNaN)
@@ -460,9 +341,7 @@ namespace WinCopies.GUI.IO.Process
 
             return Error != ProcessError.None;
         }
-
         #endregion
-
         #endregion
 
         protected virtual ProcessError OnPausePending() => ProcessError.AbortedByUser;
@@ -480,9 +359,9 @@ namespace WinCopies.GUI.IO.Process
         {
             OnPropertyChanged(nameof(IsBusy));
 
-            DoWork?.Invoke(this, e);
-
             ThrowIfCompleted();
+
+            Error = ProcessError.None;
 
             LoadPaths(e);
 
@@ -505,7 +384,7 @@ namespace WinCopies.GUI.IO.Process
         {
             _errorPaths.Add(new ErrorPathInfo(CurrentPath, error));
 
-            _Paths.Remove();
+            _ = _Paths.Remove();
         }
 
         protected abstract ProcessError OnLoadPaths(DoWorkEventArgs e);
@@ -522,7 +401,145 @@ namespace WinCopies.GUI.IO.Process
         }
 
         protected abstract ProcessError OnProcessDoWork(DoWorkEventArgs e);
+        #endregion
 
+        #region BackgroundWorker implementation
+        #region Public properties
+        /// <summary>
+        /// Gets or sets a value that indicates whether the process supports cancellation.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">When setting: The process is busy.</exception>
+        public bool WorkerSupportsCancellation
+        {
+            get => BackgroundWorker.WorkerSupportsCancellation; set
+            {
+                if (IsBusy)
+
+                    ThrowBackgroundWorkerIsBusyException();
+
+                if (value != BackgroundWorker.WorkerSupportsCancellation)
+                {
+                    BackgroundWorker.WorkerSupportsCancellation = value;
+
+                    OnPropertyChanged(nameof(WorkerSupportsCancellation));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether the process supports pausing.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">When setting: The process is busy.</exception>
+        public bool WorkerSupportsPausing
+        {
+            get => BackgroundWorker.WorkerSupportsPausing;
+
+            set
+            {
+                bool oldValue = BackgroundWorker.WorkerSupportsPausing;
+
+                BackgroundWorker.WorkerSupportsPausing = value;
+
+                if (value != oldValue) // We make this test after trying to update the inner BackgroundWorker property because this property checks if the BackgroundWorker is busy before updating the underlying value. Because this check has to be performed even if the new value is the same as the old one, in order to let the user know even in this case if there is a bug, and because this check is performed in the inner BackgroundWorker property, to make the check of this line here makes possible to let the user know if there is a bug in all cases, without performing the is-busy check twice.
+
+                    OnPropertyChanged(nameof(WorkerSupportsPausing));
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether the process reports progress.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">When setting: The process is busy.</exception>
+        public bool WorkerReportsProgress
+        {
+            get => BackgroundWorker.WorkerReportsProgress; set
+            {
+                if (IsBusy)
+
+                    ThrowBackgroundWorkerIsBusyException();
+
+                if (value != BackgroundWorker.WorkerReportsProgress)
+                {
+                    BackgroundWorker.WorkerReportsProgress = value;
+
+                    OnPropertyChanged(nameof(WorkerReportsProgress));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets a value that indicates whether the process is busy.
+        /// </summary>
+        public bool IsBusy => BackgroundWorker.IsBusy;
+
+        /// <summary>
+        /// Gets a value that indicates whether a cancellation is pending.
+        /// </summary>
+        public bool CancellationPending => BackgroundWorker.CancellationPending;
+
+        /// <summary>
+        /// Gets a value that indicates whether a pause is pending.
+        /// </summary>
+        public bool PausePending => BackgroundWorker.PausePending;
+        #endregion
+
+        #region Events
+        public event ProgressChangedEventHandler ProgressChanged;
+
+        public event RunWorkerCompletedEventHandler RunWorkerCompleted;
+        #endregion
+
+        #region Methods
+        private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) => OnDoWork(e);
+
+        public void RunWorkerAsync() => BackgroundWorker.RunWorkerAsync();
+
+        public void RunWorkerAsync(object argument) => BackgroundWorker.RunWorkerAsync(argument);
+
+
+
+        private void BackgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e) => OnProgressChanged(e);
+
+        protected void ReportProgress(int progressPercentage) => BackgroundWorker.ReportProgress(progressPercentage);
+
+        protected void ReportProgress(int progressPercentage, object userState) => BackgroundWorker.ReportProgress(progressPercentage, userState);
+
+        protected virtual void OnProgressChanged(ProgressChangedEventArgs e)
+        {
+            ProgressPercentage = (e ?? throw GetArgumentNullException(nameof(e))).ProgressPercentage;
+
+            ProgressChanged?.Invoke(this, e);
+        }
+
+
+
+        private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) => OnRunWorkerCompleted(e);
+
+        protected virtual void OnRunWorkerCompleted(RunWorkerCompletedEventArgs e)
+        {
+            OnPropertyChanged(nameof(IsBusy));
+
+            RunWorkerCompleted?.Invoke(this, e);
+        }
+
+        public void PauseAsync() => OnPauseAsync();
+
+        protected virtual void OnPauseAsync()
+        {
+            BackgroundWorker.PauseAsync();
+
+            OnPropertyChanged(nameof(PausePending));
+        }
+
+        public void CancelAsync() => OnCancelAsync();
+
+        protected virtual void OnCancelAsync()
+        {
+            BackgroundWorker.CancelAsync();
+
+            OnPropertyChanged(nameof(CancellationPending));
+        }
+        #endregion
         #endregion
     }
 
@@ -534,7 +551,7 @@ namespace WinCopies.GUI.IO.Process
 #if DEBUG
          , TSimulationParameters
 #endif
-            >
+            >, IProcess
 
         where TCollection : IProcessCollection
         where TReadOnlyCollection : IReadOnlyProcessCollection
@@ -546,7 +563,16 @@ namespace WinCopies.GUI.IO.Process
         where T : WinCopies.IO.IPathInfo
     {
 
+        /// <summary>
+        /// Gets the <see cref="PathCollection{T}"/> from which to load the paths.
+        /// </summary>
         protected internal PathCollection<T> PathCollection { get; }
+
+        IReadOnlyProcessCollection IProcess.Paths => Paths;
+
+        IReadOnlyProcessErrorPathCollection IProcess.ErrorPaths => ErrorPaths;
+
+        ProcessSimulationParameters IProcess.SimulationParameters => SimulationParameters;
 
         ///// <summary>
         ///// Initializes a new instance of the <see cref="Process"/> class.
@@ -555,20 +581,24 @@ namespace WinCopies.GUI.IO.Process
 #if DEBUG
             , in TSimulationParameters simulationParameters
 #endif
-            ) : base(GetSourcePathFromPathCollection(paths ), pathCollection, readOnlyPathCollection, errorPathCollection, readOnlyErrorPathCollection
+            ) : base(GetSourcePathFromPathCollection(paths), pathCollection, readOnlyPathCollection, errorPathCollection, readOnlyErrorPathCollection
 #if DEBUG
                  , simulationParameters
 #endif
                 ) => PathCollection = paths;
 
         #region Methods
-
+        /// <summary>
+        /// Returns the source path of a given <see cref="PathCollection{T}"/>.
+        /// </summary>
+        /// <param name="paths">The path collection from which to get the source path.</param>
+        /// <returns>The source path of <paramref name="paths"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="paths"/> is <see langword="null"/>.</exception>
         public static string GetSourcePathFromPathCollection(in PathCollection<T> paths) => (paths ?? throw GetArgumentNullException(nameof(paths))).Path;
 
         //protected virtual void OnPropertyChanged(PropertyChangedEventArgs e) => PropertyChanged?.Invoke(this, e);
 
         //protected virtual void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
         #endregion
     }
 }

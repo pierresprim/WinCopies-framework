@@ -24,7 +24,6 @@ namespace WinCopies.GUI.IO.Controls
 {
     public class ExplorerControlListViewItem : ListViewItem, ICommandSource
     {
-
         /// <summary>
         /// Identifies the <see cref="Command"/> dependency property.
         /// </summary>
@@ -75,6 +74,5 @@ namespace WinCopies.GUI.IO.Controls
 
                 e.Handled = true;
         }
-
     }
 }

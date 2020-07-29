@@ -73,7 +73,10 @@ namespace WinCopies.IO.ObjectModel
         public override IBrowsableObjectInfo Parent => _parent ??= GetParent();
 #endif
 
-        public override string LocalizedName => "N/A";
+        /// <summary>
+        /// Returns the same value as <see cref="Name"/>.
+        /// </summary>
+        public override string LocalizedName => Name;
 
         /// <summary>
         /// Gets the name of this <see cref="ArchiveItemInfo"/>.
@@ -109,6 +112,9 @@ namespace WinCopies.IO.ObjectModel
         /// </summary>
         public override string Description => "N/A";
 
+        /// <summary>
+        /// If <see cref="ArchiveFileInfo"/> has value, gets the size of the inner <see cref="SevenZip.ArchiveFileInfo"/>; otherwise, returns <see langword="null"/>.
+        /// </summary>
         public override Size? Size
         {
             get
@@ -123,6 +129,9 @@ namespace WinCopies.IO.ObjectModel
             }
         }
 
+        /// <summary>
+        /// Gets a value that indicates whether this item is a hidden or system item.
+        /// </summary>
         public override bool IsSpecialItem
         {
             get
@@ -206,6 +215,10 @@ namespace WinCopies.IO.ObjectModel
         #region GetItems
         public IEnumerable<IBrowsableObjectInfo> GetItems(in Predicate<ArchiveFileInfoEnumeratorStruct> func) => func is null ? throw GetArgumentNullException(nameof(func)) : GetArchiveItemInfoItems(func);
 
+        /// <summary>
+        /// Returns the items of this <see cref="ArchiveItemInfo"/>.
+        /// </summary>
+        /// <returns>An <see cref="IEnumerable{IBrowsableObjectInfo}"/> that enumerates through the items of this <see cref="ArchiveItemInfo"/>.</returns>
         public override IEnumerable<IBrowsableObjectInfo> GetItems() => GetArchiveItemInfoItems(null);
 
         private IEnumerable<IBrowsableObjectInfo> GetArchiveItemInfoItems(Predicate<ArchiveFileInfoEnumeratorStruct> func) => new Enumerable<IBrowsableObjectInfo>(() => new ArchiveItemInfoEnumerator(this, func));

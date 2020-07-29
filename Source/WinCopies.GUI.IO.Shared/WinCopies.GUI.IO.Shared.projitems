@@ -25,6 +25,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessCollections\PathInfoPathCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\Compression.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\Copy.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\IProcess.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\ProcessHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\PathInfoPathToPathProcess.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\ArchiveProcess.cs" />

@@ -16,7 +16,9 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using System.Windows;
+
 using WinCopies.GUI.Controls;
+
 using Size = WinCopies.IO.Size;
 
 namespace WinCopies.GUI.IO.Process
@@ -59,6 +61,9 @@ namespace WinCopies.GUI.IO.Process
         /// </summary>
         public bool ArePathsLoaded { get => (bool)GetValue(ArePathsLoadedProperty); set => SetValue(ArePathsLoadedProperty, value); }
 
+        /// <summary>
+        /// Identifies the <see cref="Status"/> dependency property.
+        /// </summary>
         public static readonly DependencyProperty StatusProperty = DependencyProperty.Register(nameof(Status), typeof(ProcessStatus), typeof(ProcessControl));
 
         public ProcessStatus Status { get => (ProcessStatus)GetValue(StatusProperty); set => SetValue(StatusProperty, value); } 
@@ -129,6 +134,9 @@ namespace WinCopies.GUI.IO.Process
 
     public class CopyProcessControl : ProcessControl
     {
+        /// <summary>
+        /// Identifies the <see cref="DestPath"/> dependency property.
+        /// </summary>
         public static readonly DependencyProperty DestPathProperty = DependencyProperty.Register(nameof(DestPath), typeof(string), typeof(CopyProcessControl));
 
         public string DestPath { get => (string)GetValue(DestPathProperty); set => SetValue(DestPathProperty, value); }

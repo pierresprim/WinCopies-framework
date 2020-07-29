@@ -213,7 +213,7 @@ namespace WinCopies.GUI.IO.Process
 
                                 _copyProgressRoutine = ___totalBytesTransferred/*, CopyProgressCallbackReason __copyProgressCallbackReason*/ =>
                                 {
-                                    Paths.DecrementSize((ulong)___totalBytesTransferred);
+                                    _Paths.DecrementSize((ulong)___totalBytesTransferred);
 
                                     TryReportProgress(((int)Paths.Size / (int)InitialItemSize) * 100);
 

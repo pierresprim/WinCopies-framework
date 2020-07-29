@@ -23,14 +23,23 @@ namespace WinCopies.GUI.IO.Controls
 {
     public class ExplorerControlTreeViewItem : TreeViewItem, ICommandSource
     {
+        /// <summary>
+        /// Identifies the <see cref="Command"/> dependency property.
+        /// </summary>
         public static readonly DependencyProperty CommandProperty = DependencyProperty.Register(nameof(Command), typeof(ICommand), typeof(ExplorerControlTreeViewItem));
 
         public ICommand Command { get => (ICommand)GetValue(CommandProperty); set => SetValue(CommandProperty, value); }
 
+        /// <summary>
+        /// Identifies the <see cref="CommandParameter"/> dependency property.
+        /// </summary>
         public static readonly DependencyProperty CommandParameterProperty = DependencyProperty.Register(nameof(CommandParameter), typeof(object), typeof(ExplorerControlTreeViewItem));
 
         public object CommandParameter { get => GetValue(CommandParameterProperty); set => SetValue(CommandParameterProperty, value); }
 
+        /// <summary>
+        /// Identifies the <see cref="CommandTarget"/> dependency property.
+        /// </summary>
         public static readonly DependencyProperty CommandTargetProperty = DependencyProperty.Register(nameof(CommandTarget), typeof(IInputElement), typeof(ExplorerControlTreeViewItem));
 
         public IInputElement CommandTarget { get => (IInputElement)GetValue(CommandTargetProperty); set => SetValue(CommandTargetProperty, value); }

@@ -27,6 +27,9 @@ using TsudaKageyu;
 
 namespace WinCopies.IO.ObjectModel
 {
+    /// <summary>
+    /// The base class for all IO browsable objects of the WinCopies framework.
+    /// </summary>
     public abstract class BrowsableObjectInfo : FileSystemObject, IBrowsableObjectInfo
     {
         #region Consts
@@ -42,9 +45,9 @@ namespace WinCopies.IO.ObjectModel
         /// </summary>
         public abstract bool IsBrowsable { get; }
 
-        ///// <summary>
-        ///// Gets the <see cref="IBrowsableObjectInfo"/> parent of this <see cref="BrowsableObjectInfo"/>. Returns <see langword="null"/> if this object is the root object of a hierarchy.
-        ///// </summary>
+        /// <summary>
+        /// Gets the <see cref="IBrowsableObjectInfo"/> parent of this <see cref="BrowsableObjectInfo"/>. Returns <see langword="null"/> if this object is the root object of a hierarchy.
+        /// </summary>
         public abstract IBrowsableObjectInfo Parent { get; }
 
         #region BitmapSources
@@ -80,27 +83,37 @@ namespace WinCopies.IO.ObjectModel
 
         public abstract bool IsSpecialItem { get; }
 
-        /// <summary>
-        /// Gets a value that indicates whether the current object is disposed.
-        /// </summary>
-        public bool IsDisposed { get; internal set; }
-
         public ClientVersion? ClientVersion { get; private set; }
         #endregion
 
         /// <summary>
-        /// When called from a derived class, initializes a new instance of the <see cref="BrowsableObjectInfo"/> class.
+        /// Initializes a new instance of the <see cref="BrowsableObjectInfo"/> class.
         /// </summary>
+        /// <param name="path">The path of the new item.</param>
         protected BrowsableObjectInfo(in string path) : this(path, null) { }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BrowsableObjectInfo"/> class.
+        /// </summary>
+        /// <param name="path">The path of the new item.</param>
+        /// <param name="clientVersion">The <see cref="Microsoft.WindowsAPICodePack.PortableDevices.ClientVersion"/> that will be used to initialize new <see cref="PortableDeviceInfo"/>s and <see cref="PortableDeviceObjectInfo"/>s.</param>
         protected BrowsableObjectInfo(in string path, in ClientVersion? clientVersion) : base(path) => ClientVersion = clientVersion;
 
         #region Methods
         internal static Icon TryGetIcon(in int iconIndex, in string dll, in System.Drawing.Size size) => new IconExtractor(IO.Path.GetRealPathFromEnvironmentVariables("%SystemRoot%\\System32\\" + dll)).GetIcon(iconIndex).Split()?.TryGetIcon(size, 32, true, true);
 
+        /// <summary>
+        /// When overridden in a derived class, returns the items of this <see cref="BrowsableObjectInfo"/>.
+        /// </summary>
+        /// <returns>An <see cref="IEnumerable{IBrowsableObjectInfo}"/> that enumerates through the items of this <see cref="BrowsableObjectInfo"/>.</returns>
         public abstract IEnumerable<IBrowsableObjectInfo> GetItems();
 
         #region IDisposable
+        /// <summary>
+        /// Gets a value that indicates whether the current object is disposed.
+        /// </summary>
+        public bool IsDisposed { get; internal set; }
+
         public void Dispose()
         {
             if (IsDisposed)

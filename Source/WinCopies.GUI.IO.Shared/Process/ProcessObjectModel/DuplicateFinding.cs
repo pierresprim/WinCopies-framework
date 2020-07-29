@@ -16,13 +16,11 @@
 * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
-using System.Text;
+
 using WinCopies.Collections.DotNetFix;
+
 using static WinCopies.Util.Desktop.ThrowHelper;
 using static WinCopies.Util.Util;
 
@@ -35,7 +33,7 @@ namespace WinCopies.GUI.IO.Process
         public DuplicateFindingReadOnlyObservableQueueCollection(ObservableQueueCollection<IPathInfo> queueCollection) : base(queueCollection) { }
     }
 
-    public class DuplicateFinding : Process<WinCopies.IO.IPathInfo, ProcessQueueCollection, ReadOnlyProcessQueueCollection, ProcessErrorPathQueueCollection, ReadOnlyProcessErrorPathQueueCollection
+    public class DuplicateFinding : Process<WinCopies.IO.IPathInfo, ProcessLinkedCollection, ReadOnlyProcessLinkedCollection, ProcessErrorPathQueueCollection, ReadOnlyProcessErrorPathQueueCollection
 #if DEBUG
          , ProcessSimulationParameters
 #endif

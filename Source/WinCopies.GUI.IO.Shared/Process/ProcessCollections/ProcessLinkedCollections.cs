@@ -32,13 +32,17 @@ namespace WinCopies.GUI.IO.Process
 
     public class ProcessLinkedCollection<T> : ObservableLinkedCollection<T>, IProcessCollection<T> where T : IPathInfo
     {
+        private Size _size = new Size(0ul);
+
         public ProcessLinkedCollectionAddMode AddMode { get; }
+
+        public Size Size { get => _size; private set { _size = value; RaisePropertyChangedEvent(nameof(Size)); } }
 
         public ProcessLinkedCollection(ProcessLinkedCollectionAddMode addMode) => AddMode = addMode;
 
         public new event SimpleLinkedCollectionChangedEventHandler<T> CollectionChanged;
 
-        private static NotifyCollectionChangedAction LinkedCollectionChangedActionToNotifyCollectionChangedAction(LinkedCollectionChangedAction action)
+        internal static NotifyCollectionChangedAction LinkedCollectionChangedActionToNotifyCollectionChangedAction(LinkedCollectionChangedAction action)
         {
             switch (action)
             {
@@ -71,6 +75,25 @@ namespace WinCopies.GUI.IO.Process
         {
             base.OnCollectionChanged(e);
 
+            NotifyCollectionChangedAction action = LinkedCollectionChangedActionToNotifyCollectionChangedAction(e.Action);
+
+            switch (action)
+            {
+                case NotifyCollectionChangedAction.Add:
+
+                    if (!e.Node.Value.IsDirectory)
+
+                        Size += e.Node.Value.Size.Value;
+
+                    break;
+
+                case NotifyCollectionChangedAction.Reset:
+
+                    Size = new Size(0ul);
+
+                    break;
+            }
+
             CollectionChanged?.Invoke(this, new SimpleLinkedCollectionChangedEventArgs<T>(LinkedCollectionChangedActionToNotifyCollectionChangedAction(e.Action), e.Node == null ? default : e.Node.Value));
         }
 
@@ -92,11 +115,15 @@ namespace WinCopies.GUI.IO.Process
             }
         }
 
-        public void Remove()
+        public T Remove()
         {
+            T result = default;
+
             switch (AddMode)
             {
                 case ProcessLinkedCollectionAddMode.Ascending:
+
+                    result = First.Value;
 
                     RemoveFirst();
 
@@ -104,10 +131,14 @@ namespace WinCopies.GUI.IO.Process
 
                 case ProcessLinkedCollectionAddMode.Descending:
 
+                    result = Last.Value;
+
                     RemoveLast();
 
                     break;
             }
+
+            return result;
         }
 
         public T Peek()
@@ -136,41 +167,37 @@ namespace WinCopies.GUI.IO.Process
             }
         }
 #endif
+
+        public void DecrementSize(ulong sizeInBytes) => Size -= sizeInBytes;
     }
 
-    public sealed class ProcessLinkedCollection : ProcessQueueCollection<IPathInfo>, IProcessCollection { }
-
-    public sealed class ReadOnlyProcessLinkedCollection : ReadOnlyObservableQueueCollection<IPathInfo>, IReadOnlyProcessCollection
+    public sealed class ProcessLinkedCollection : ProcessLinkedCollection<IPathInfo>, IProcessCollection
     {
-        private Size _size = new Size(0ul);
+        public ProcessLinkedCollection(ProcessLinkedCollectionAddMode addMode) : base(addMode)
+        {
+            // Left empty.
+        }
+    }
 
-        public Size Size { get => _size; private set { _size = value; RaisePropertyChangedEvent(nameof(Size)); } }
+    public class ReadOnlyProcessLinkedCollection<T> : ReadOnlyObservableLinkedCollection<T> where T : IPathInfo
+    {
+        public new event SimpleLinkedCollectionChangedEventHandler<T> CollectionChanged;
 
-        public ReadOnlyProcessLinkedCollection(ObservableQueueCollection<IPathInfo> queueCollection) : base(queueCollection) { }
+        public ReadOnlyProcessLinkedCollection(ProcessLinkedCollection<T> linkedCollection) : base(linkedCollection) { }
 
-        protected override void OnCollectionChanged(SimpleLinkedCollectionChangedEventArgs<IPathInfo> e)
+        protected override void OnCollectionChanged(LinkedCollectionChangedEventArgs<T> e)
         {
             base.OnCollectionChanged(e);
 
-            switch (e.Action)
-            {
-                case NotifyCollectionChangedAction.Add:
-
-                    if (!e.Item.IsDirectory)
-
-                        Size += e.Item.Size.Value;
-
-                    break;
-
-                case NotifyCollectionChangedAction.Reset:
-
-                    Size = new Size(0ul);
-
-                    break;
-            }
+            CollectionChanged?.Invoke(this, new SimpleLinkedCollectionChangedEventArgs<T>(ProcessLinkedCollection.LinkedCollectionChangedActionToNotifyCollectionChangedAction(e.Action), e.Node == null ? default : e.Node.Value));
         }
+    }
 
-        public void DecrementSize(ulong sizeInBytes) => Size -= sizeInBytes;
+    public sealed class ReadOnlyProcessLinkedCollection : ReadOnlyProcessLinkedCollection<IPathInfo>, IReadOnlyProcessCollection
+    {
+        public Size Size => ((ProcessLinkedCollection)InnerLinkedCollection).Size;
+
+        public ReadOnlyProcessLinkedCollection(ProcessLinkedCollection linkedCollection) : base(linkedCollection) { }
     }
 
     public sealed class ProcessErrorPathLinkedCollection : ProcessLinkedCollection<IErrorPathInfo>, IProcessErrorPathCollection
@@ -178,8 +205,12 @@ namespace WinCopies.GUI.IO.Process
         public ProcessErrorPathLinkedCollection(ProcessLinkedCollectionAddMode addMode) : base(addMode) { }
     }
 
-    public sealed class ReadOnlyProcessErrorPathLinkedCollection : ReadOnlyObservableQueueCollection<IErrorPathInfo>, IReadOnlyProcessErrorPathCollection
+    public sealed class ReadOnlyProcessErrorPathLinkedCollection : ReadOnlyProcessLinkedCollection<IErrorPathInfo>, IReadOnlyProcessErrorPathCollection
     {
-        public ReadOnlyProcessErrorPathLinkedCollection(ObservableQueueCollection<IErrorPathInfo> queue) : base(queue) { }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ReadOnlyProcessErrorPathLinkedCollection"/> class.
+        /// </summary>
+        /// <param name="linkedCollection">The inner <see cref="ObservableLinkedCollection{IErrorPathInfo}"/> of the new collection.</param>
+        public ReadOnlyProcessErrorPathLinkedCollection(ProcessErrorPathLinkedCollection linkedCollection) : base(linkedCollection) { }
     }
 }
