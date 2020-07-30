@@ -16,21 +16,78 @@
 * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 
 using WinCopies.Collections.DotNetFix;
+using WinCopies.IO;
 
 using static WinCopies.Util.Desktop.ThrowHelper;
 using static WinCopies.Util.Util;
 
 namespace WinCopies.GUI.IO.Process
 {
-    public class DuplicateFindingReadOnlyObservableQueueCollection : ReadOnlyObservableQueueCollection<IPathInfo>
+    public class DuplicateFindingReadOnlyObservableLinkedCollection : ReadOnlyObservableLinkedCollection<IDuplicateFindingPathInfo>
     {
-        protected internal new ObservableQueueCollection<IPathInfo> InnerQueueCollection => base.InnerQueueCollection;
+        protected internal new ObservableLinkedCollection<IDuplicateFindingPathInfo> InnerLinkedCollection => base.InnerLinkedCollection;
 
-        public DuplicateFindingReadOnlyObservableQueueCollection(ObservableQueueCollection<IPathInfo> queueCollection) : base(queueCollection) { }
+        public DuplicateFindingReadOnlyObservableLinkedCollection(ObservableLinkedCollection<IDuplicateFindingPathInfo> linkedCollection) : base(linkedCollection) { }
+    }
+
+    public enum DuplicateFindingStep : uint
+    {
+        None = 0,
+
+        CheckingForPathsToIgnore = 1,
+
+        CheckingForDuplicates = 2,
+
+        DuplicatesDeletion = 3
+    }
+
+    public interface IDuplicateFindingPathInfo : IPathInfo
+    {
+        bool Delete { get; }
+    }
+
+    public class DuplicateFindingPathInfo : IDuplicateFindingPathInfo, INotifyPropertyChanged
+    {
+        public IPathInfo PathInfo { get; }
+
+        public bool Delete { get; set; }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public DuplicateFindingPathInfo(in IPathInfo pathInfo) => PathInfo = pathInfo;
+
+        protected virtual void OnPropertyChanged(in PropertyChangedEventArgs e) => PropertyChanged?.Invoke(this, e);
+
+        protected virtual void OnPropertyChanged(in string propertyName) => OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
+
+        #region IPathInfo implementation
+        Size? IPathInfo.Size => PathInfo.Size;
+
+        string WinCopies.IO.IPathInfo.Path => PathInfo.Path;
+
+        bool WinCopies.IO.IPathInfo.IsDirectory => PathInfo.IsDirectory;
+        #endregion
+    }
+
+    public class DuplicateFindingDoWorkEventArgs : DoWorkEventArgs
+    {
+        public Func<ProcessError> Func { get; }
+
+        public DuplicateFindingDoWorkEventArgs(Func<DuplicateFindingDoWorkEventArgs, ProcessError> func, object argument) : base(argument) => Func = () => func(this);
+
+        public DuplicateFindingDoWorkEventArgs(Func<DuplicateFindingDoWorkEventArgs, ProcessError> func, DoWorkEventArgs e) : base(e.Argument)
+        {
+            Cancel = e.Cancel;
+
+            Result = e.Result;
+
+            Func = () => func(this);
+        }
     }
 
     public class DuplicateFinding : Process<WinCopies.IO.IPathInfo, ProcessLinkedCollection, ReadOnlyProcessLinkedCollection, ProcessErrorPathQueueCollection, ReadOnlyProcessErrorPathQueueCollection
@@ -41,7 +98,8 @@ namespace WinCopies.GUI.IO.Process
     {
         #region Private fields
         private int _bufferLength;
-        private readonly ObservableQueueCollection<DuplicateFindingReadOnlyObservableQueueCollection> _checkedPaths = new ObservableQueueCollection<DuplicateFindingReadOnlyObservableQueueCollection>();
+        private DuplicateFindingStep _step = 0;
+        private readonly ObservableQueueCollection<DuplicateFindingReadOnlyObservableLinkedCollection> _checkedPaths = new ObservableQueueCollection<DuplicateFindingReadOnlyObservableLinkedCollection>();
         #endregion
 
         #region Public properties
@@ -49,34 +107,61 @@ namespace WinCopies.GUI.IO.Process
 
         public DuplicateFindingOptions Options { get; }
 
-        public ReadOnlyObservableQueueCollection<DuplicateFindingReadOnlyObservableQueueCollection> CheckedPaths { get; }
+        public DuplicateFindingStep Step
+        {
+            get => _step;
+
+            set
+            {
+                _step = value;
+
+                OnPropertyChanged(nameof(Step));
+            }
+        }
+
+        public ReadOnlyObservableQueueCollection<DuplicateFindingReadOnlyObservableLinkedCollection> CheckedPaths { get; }
         #endregion
 
         public DuplicateFinding(DuplicateFindingOptions options)
         {
-            CheckedPaths = new ReadOnlyObservableQueueCollection<DuplicateFindingReadOnlyObservableQueueCollection>(_checkedPaths);
+            CheckedPaths = new ReadOnlyObservableQueueCollection<DuplicateFindingReadOnlyObservableLinkedCollection>(_checkedPaths);
 
             Options = options ?? throw GetArgumentNullException(nameof(Options));
         }
 
-        protected override ProcessError OnProcessDoWork(DoWorkEventArgs e)
+        protected override void OnDoWork(DoWorkEventArgs e)
+        {
+            if (_checkedPaths.Count == 0)
+
+                base.OnDoWork(new DuplicateFindingDoWorkEventArgs(_e => OnCheckForDuplicates(_e), e));
+
+            else
+
+                _DoWork(new DuplicateFindingDoWorkEventArgs(_e => OnDeleteDuplicates(_e), e));
+
+            Step = DuplicateFindingStep.None;
+        }
+
+        protected virtual ProcessError OnCheckForDuplicates(DoWorkEventArgs e)
         {
             DuplicateFindingIgnoreOptions ignoreOptions = Options.IgnoreOptions;
 
-            bool checkIgnoring(IPathInfo _path)
+            LinkedListNode<IPathInfo> node;
+
+            bool checkIgnoring()
             {
                 DuplicateFindingIgnoreValues ignoreValues = ignoreOptions.IgnoreValues;
 
                 if (ignoreValues != DuplicateFindingIgnoreValues.None)
                 {
-                    var fileInfo = new FileInfo(_path.Path);
+                    var fileInfo = new FileInfo(CurrentPath.Path);
 
                     if ((ignoreValues.HasFlag(DuplicateFindingIgnoreValues.SystemFiles) && fileInfo.Attributes.HasFlag(FileAttributes.System)) || (ignoreValues.HasFlag(DuplicateFindingIgnoreValues.HiddenFiles) && fileInfo.Attributes.HasFlag(FileAttributes.Hidden))) return true;
                 }
 
-                if (!_path.Size.Value.ValueInBytes.IsNaN)
+                if (!CurrentPath.Size.Value.ValueInBytes.IsNaN)
                 {
-                    ulong size = _path.Size.Value.ValueInBytes.Value;
+                    ulong size = CurrentPath.Size.Value.ValueInBytes.Value;
 
                     if ((ignoreValues.HasFlag(DuplicateFindingIgnoreValues.ZeroByteFiles) && size == 0)
                         || (ignoreOptions.FileSizeUnder.HasValue && size < ignoreOptions.FileSizeUnder)
@@ -87,15 +172,15 @@ namespace WinCopies.GUI.IO.Process
 
                 if (ignoreOptions.Paths != null && ignoreOptions.Paths.Count > 0)
 
-                    foreach (string __path in ignoreOptions.Paths)
+                    foreach (string _path in ignoreOptions.Paths)
 
-                        if (_path.Path.StartsWith(__path)) return true;
+                        if (CurrentPath.Path.StartsWith(_path)) return true;
 
                 string value;
 
                 if (ignoreOptions.FileNames != null && ignoreOptions.FileNames.Count > 0)
                 {
-                    value = System.IO.Path.GetFileNameWithoutExtension(_path.Path);
+                    value = System.IO.Path.GetFileNameWithoutExtension(CurrentPath.Path);
 
                     foreach (string fileName in ignoreOptions.FileNames)
 
@@ -104,7 +189,7 @@ namespace WinCopies.GUI.IO.Process
 
                 if (ignoreOptions.FileExtensions != null && ignoreOptions.FileExtensions.Count > 0)
                 {
-                    value = System.IO.Path.GetExtension(_path.Path);
+                    value = System.IO.Path.GetExtension(CurrentPath.Path);
 
                     foreach (string extension in ignoreOptions.FileExtensions)
 
@@ -116,21 +201,163 @@ namespace WinCopies.GUI.IO.Process
                 return false;
             }
 
-            while (_Paths.Count > 0)
+            void _checkIgnoring()
             {
-                foreach (IPathInfo path in _Paths)
+                CurrentPath = node.Value;
+
+                if (CheckIfPauseOrCancellationPending())
+
+                    return;
+
+                if (ignoreOptions != null && checkIgnoring())
+
+                    _Paths.Remove(node);
+            }
+
+            Step = DuplicateFindingStep.CheckingForPathsToIgnore;
+
+            if (_Paths.Count < 2)
+            {
+                _Paths.Clear();
+
+                return ProcessError.None;
+            }
+
+            node = _Paths.First;
+
+            _checkIgnoring();
+
+            if (Error != ProcessError.None)
+
+                return Error;
+
+            while (node.Next != null)
+            {
+                node = node.Next;
+
+                _checkIgnoring();
+
+                if (Error != ProcessError.None)
+
+                    return Error;
+            }
+
+            Step = DuplicateFindingStep.CheckingForDuplicates;
+
+            if (_Paths.Count < 2)
+            {
+                _Paths.Clear();
+
+                return ProcessError.None;
+            }
+
+            LinkedListNode<IPathInfo> nodeToCompare;
+
+            IPathInfo pathToCompare;
+
+            DuplicateFindingMatchingOptions matchingOptions = Options.MatchingOptions;
+
+            var duplicates = new WinCopies.Collections.DotNetFix.LinkedList<IDuplicateFindingPathInfo>();
+
+            bool isDuplicate = false;
+
+            bool hasDuplicates = false;
+
+            bool? result;
+
+            void check()
+            {
+                bool? checkSize()
                 {
-                    if (CheckIfPauseOrCancellationPending())
+                    if (matchingOptions.ContentMatchingOption == DuplicateFindingContentMatchingOption.Size)
 
-                        return Error;
+                        return CurrentPath.Size.HasValue && pathToCompare.Size.HasValue && CurrentPath.Size.Value == pathToCompare.Size.Value;
 
-                    if (ignoreOptions != null && checkIgnoring(path))
-
-                        break;
+                    else return null;
                 }
 
-                _ = _Paths.Dequeue();
+                bool? checkContent()
+                {
+                    if (matchingOptions.ContentMatchingOption == DuplicateFindingContentMatchingOption.Content)
+
+                        return _checkContent();
+
+                    else return null;
+                }
+
+                bool _check(bool? value)
+                {
+                    if ((result = value).HasValue)
+
+                        if (result.Value)
+
+                            isDuplicate = true;
+
+                        else
+
+                            return false;
+
+                    return true;
+                }
+
+                CurrentPath = node.Value;
+
+                pathToCompare = nodeToCompare.Value;
+
+                if (_check(checkSize()) && _check(checkContent()) && isDuplicate)
+                {
+                    isDuplicate = false;
+
+                    _ = duplicates.AddLast(new DuplicateFindingPathInfo(pathToCompare));
+
+                    hasDuplicates = true;
+                }
+            }
+
+            void _check()
+            {
+                if (duplicates.Count > 0)
+
+                    duplicates = new WinCopies.Collections.DotNetFix.LinkedList<IDuplicateFindingPathInfo>();
+
+                nodeToCompare = node.Next;
+
+                check();
+
+                while (nodeToCompare.Next != null)
+                {
+                    nodeToCompare = nodeToCompare.Next;
+
+                    check();
+                }
+
+                if (hasDuplicates)
+                {
+                    hasDuplicates = false;
+
+                    _ = duplicates.AddFirst(new DuplicateFindingPathInfo(CurrentPath));
+
+                    _checkedPaths.Enqueue(new DuplicateFindingReadOnlyObservableLinkedCollection(new ObservableLinkedCollection<IDuplicateFindingPathInfo>(duplicates)));
+                }
+            }
+
+            node = _Paths.First;
+
+            _check();
+
+            while (node.Next != null)
+            {
+                node = node.Next;
+
+                _check();
             }
         }
+
+        protected virtual ProcessError OnDeleteDuplicates(DoWorkEventArgs e)
+        {
+
+        }
+
+        protected override ProcessError OnProcessDoWork(DoWorkEventArgs e) => e is DuplicateFindingDoWorkEventArgs _e ? _e.Func() : ProcessError.None;
     }
 }

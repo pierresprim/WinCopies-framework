@@ -253,6 +253,9 @@ namespace WinCopies.GUI.IO.Process
 
         #region Methods
         #region Helpers
+        /// <summary>
+        /// Throws an <see cref="InvalidOperationException"/> if the <see cref="IsCompleted"/> property is <see langword="true"/>.
+        /// </summary>
         protected void ThrowIfCompleted()
         {
             if (IsCompleted)
@@ -329,23 +332,40 @@ namespace WinCopies.GUI.IO.Process
             return _return(ProcessError.DriveNotReady, false);
         }
 
+        /// <summary>
+        /// Checks if a cancellation or a pause is pending. See Remarks section.
+        /// </summary>
+        /// <returns>A value indicating whether a cancellation or a pause is pending.</returns>
+        /// <remarks><para>This method checks if a cancellation is pending, then, if not, checks if a pause is pending. These checks are performed by calling the <see cref="OnCancellationPending"/> and <see cref="OnPausePending"/> methods.</para>
+        /// <para>Each of these methods is called only if the corresponding -Pending property is <see langword="true"/>. If one of these methods is called, the <see cref="Error"/> property is assigned to the value returned by the one of these method that was called.</para>
+        /// <para>If one of these method is called, the other one is not.</para></remarks>
         protected internal virtual bool CheckIfPauseOrCancellationPending()
         {
-            if (PausePending)
-
-                Error = OnPausePending();
+            bool _return(in ProcessError error) => (Error = error) != ProcessError.None;
 
             if (CancellationPending)
 
-                Error = OnCancellationPending();
+                return _return(OnCancellationPending());
 
-            return Error != ProcessError.None;
+            else if (PausePending)
+
+                return _return(OnPausePending());
+
+            return false;
         }
         #endregion
         #endregion
 
+        /// <summary>
+        /// Returns <see cref="ProcessError.AbortedByUser"/>.
+        /// </summary>
+        /// <returns>The <see cref="ProcessError.AbortedByUser"/> error code.</returns>
         protected virtual ProcessError OnPausePending() => ProcessError.AbortedByUser;
 
+        /// <summary>
+        /// Clears <see cref="_Paths"/>, sets <see cref="IsCompleted"/> to <see langword="true"/> and returns <see cref="ProcessError.AbortedByUser"/>.
+        /// </summary>
+        /// <returns>The <see cref="ProcessError.AbortedByUser"/> error code.</returns>
         protected virtual ProcessError OnCancellationPending()
         {
             _Paths.Clear();
@@ -355,6 +375,11 @@ namespace WinCopies.GUI.IO.Process
             return ProcessError.AbortedByUser;
         }
 
+        /// <summary>
+        /// Starts the paths load and process operations. This method reset the <see cref="Error"/> property to <see cref="ProcessError.None"/>.
+        /// </summary>
+        /// <param name="e">The event args of the event that was raised originally.</param>
+        /// <exception cref="InvalidOperationException"><see cref="IsCompleted"/> is <see langword="true"/>.</exception>
         protected virtual void OnDoWork(DoWorkEventArgs e)
         {
             OnPropertyChanged(nameof(IsBusy));
@@ -368,6 +393,10 @@ namespace WinCopies.GUI.IO.Process
             _DoWork(e);
         }
 
+        /// <summary>
+        /// Calls <see cref="OnLoadPaths(DoWorkEventArgs)"/> and initializes the current process to process the loaded paths if <see cref="OnLoadPaths(DoWorkEventArgs)"/> returned a success error code. The <see cref="Error"/> property is assigned to the error code returned by <see cref="OnLoadPaths(DoWorkEventArgs)"/> anyway.
+        /// </summary>
+        /// <param name="e">The event args of the event that was raised originally.</param>
         protected void LoadPaths(DoWorkEventArgs e)
         {
             if ((Error = OnLoadPaths(e)) == ProcessError.None)
@@ -380,6 +409,10 @@ namespace WinCopies.GUI.IO.Process
             }
         }
 
+        /// <summary>
+        /// Adds the value of <see cref="CurrentPath"/> to <see cref="ErrorPaths"/> and removes it from <see cref="_Paths"/>.
+        /// </summary>
+        /// <param name="error">The error associated to the value of <see cref="CurrentPath"/>.</param>
         protected void RemoveErrorPath(ProcessError error)
         {
             _errorPaths.Add(new ErrorPathInfo(CurrentPath, error));
@@ -387,6 +420,11 @@ namespace WinCopies.GUI.IO.Process
             _ = _Paths.Remove();
         }
 
+        /// <summary>
+        /// When overridden in a derived class, loads the paths to process.
+        /// </summary>
+        /// <param name="e">The event args of the event that was raised originally.</param>
+        /// <returns>An error code for the current operation.</returns>
         protected abstract ProcessError OnLoadPaths(DoWorkEventArgs e);
 
         protected void _DoWork(DoWorkEventArgs e)
@@ -492,16 +530,36 @@ namespace WinCopies.GUI.IO.Process
         #region Methods
         private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) => OnDoWork(e);
 
+        /// <summary>
+        /// Starts the process at background.
+        /// </summary>
+        /// <exception cref="InvalidOperationException"><see cref="IsBusy"/> is <see langword="true"/>.</exception>
         public void RunWorkerAsync() => BackgroundWorker.RunWorkerAsync();
 
+        /// <summary>
+        /// Starts the process at background.
+        /// </summary>
+        /// <param name="argument">A parameter for use by the process.</param>
+        /// <exception cref="InvalidOperationException"><see cref="IsBusy"/> is <see langword="true"/>.</exception>
         public void RunWorkerAsync(object argument) => BackgroundWorker.RunWorkerAsync(argument);
 
 
 
         private void BackgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e) => OnProgressChanged(e);
 
+        /// <summary>
+        /// Raises the <see cref="ProgressChanged"/> event of the <see cref="BackgroundWorker"/> property.
+        /// </summary>
+        /// <param name="progressPercentage">The percentage, from 0 to 100, of the background operation that is complete.</param>
+        /// <exception cref="InvalidOperationException">The <see cref="WorkerReportsProgress"/> property is set to <see langword="false"/>.</exception>
         protected void ReportProgress(int progressPercentage) => BackgroundWorker.ReportProgress(progressPercentage);
 
+        /// <summary>
+        /// Raises the <see cref="ProgressChanged"/> event of the <see cref="BackgroundWorker"/> property.
+        /// </summary>
+        /// <param name="progressPercentage">The percentage, from 0 to 100, of the background operation that is complete.</param>
+        /// <param name="userState">The state object passed to <see cref="RunWorkerAsync(object)"/>.</param>
+        /// <exception cref="InvalidOperationException">The <see cref="WorkerReportsProgress"/> property is set to <see langword="false"/>.</exception>
         protected void ReportProgress(int progressPercentage, object userState) => BackgroundWorker.ReportProgress(progressPercentage, userState);
 
         protected virtual void OnProgressChanged(ProgressChangedEventArgs e)
