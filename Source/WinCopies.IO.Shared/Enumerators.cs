@@ -412,101 +412,113 @@ namespace WinCopies.IO
         #endregion
     }
 
-//    public sealed class RecursiveSubEnumerator<T> : IEnumerator<T>
-//    {
-//        private IEnumerator<IEnumerator<T>> _enumerator;
-//        // private EmptyCheckEnumerator<string> _fileEnumerable;
+    //    public sealed class RecursiveSubEnumerator<T> : IEnumerator<T>
+    //    {
+    //        private IEnumerator<IEnumerator<T>> _enumerator;
+    //        // private EmptyCheckEnumerator<string> _fileEnumerable;
 
-//        private bool _completed = false;
+    //        private bool _completed = false;
 
-//        private T _current;
+    //        private T _current;
 
-//        public T Current => IsDisposed ? throw GetExceptionForDispose(false) : _current;
+    //        public T Current => IsDisposed ? throw GetExceptionForDispose(false) : _current;
 
-//        object IEnumerator.Current => Current;
+    //        object IEnumerator.Current => Current;
 
-//#if DEBUG
-//        public IPathInfo PathInfo { get; }
-//#endif 
+    //#if DEBUG
+    //        public IPathInfo PathInfo { get; }
+    //#endif 
 
-//        public FileSystemEntryEnumerator(
-//#if DEBUG
-//            IPathInfo pathInfo,
-//#endif 
-//            IEnumerable<string> directoryEnumerable, IEnumerable<string> fileEnumerable)
-//        {
-//#if DEBUG
-//            ThrowIfNull(pathInfo, nameof(pathInfo));
+    //        public FileSystemEntryEnumerator(
+    //#if DEBUG
+    //            IPathInfo pathInfo,
+    //#endif 
+    //            IEnumerable<string> directoryEnumerable, IEnumerable<string> fileEnumerable)
+    //        {
+    //#if DEBUG
+    //            ThrowIfNull(pathInfo, nameof(pathInfo));
 
-//            PathInfo = pathInfo;
-//#endif
-//            ThrowIfNull(directoryEnumerable, nameof(directoryEnumerable));
-//            ThrowIfNull(fileEnumerable, nameof(fileEnumerable));
+    //            PathInfo = pathInfo;
+    //#endif
+    //            ThrowIfNull(directoryEnumerable, nameof(directoryEnumerable));
+    //            ThrowIfNull(fileEnumerable, nameof(fileEnumerable));
 
-//            _directoryEnumerable = directoryEnumerable.GetEnumerator();
+    //            _directoryEnumerable = directoryEnumerable.GetEnumerator();
 
-//            _fileEnumerable = new EmptyCheckEnumerator<string>(fileEnumerable.GetEnumerator());
-//        }
+    //            _fileEnumerable = new EmptyCheckEnumerator<string>(fileEnumerable.GetEnumerator());
+    //        }
 
-//        public bool MoveNext()
-//        {
-//            if (_completed) return false;
+    //        public bool MoveNext()
+    //        {
+    //            if (_completed) return false;
 
-//                if (_enumerator.MoveNext())
-//                {
-//                    _current = new PathInfo(_enumerator.Current, true);
+    //                if (_enumerator.MoveNext())
+    //                {
+    //                    _current = new PathInfo(_enumerator.Current, true);
 
-//                    return true;
-//                }
+    //                    return true;
+    //                }
 
-//                _directoryEnumerable = null;
+    //                _directoryEnumerable = null;
 
-//                _completed = true;
+    //                _completed = true;
 
-//                return false;
-//        }
+    //                return false;
+    //        }
 
-//        public void Reset() => throw new NotSupportedException();
+    //        public void Reset() => throw new NotSupportedException();
 
-//        public void Dispose()
-//        {
-//            if (_completed)
+    //        public void Dispose()
+    //        {
+    //            if (_completed)
 
-//                _current = null;
+    //                _current = null;
 
-//            else
-//            {
-//                if (_directoryEnumerable != null)
-//                {
-//                    _directoryEnumerable.Dispose();
+    //            else
+    //            {
+    //                if (_directoryEnumerable != null)
+    //                {
+    //                    _directoryEnumerable.Dispose();
 
-//                    _directoryEnumerable = null;
-//                }
+    //                    _directoryEnumerable = null;
+    //                }
 
-//                if (_fileEnumerable != null)
-//                {
-//                    _fileEnumerable.Dispose();
+    //                if (_fileEnumerable != null)
+    //                {
+    //                    _fileEnumerable.Dispose();
 
-//                    _fileEnumerable = null;
-//                }
-//            }
+    //                    _fileEnumerable = null;
+    //                }
+    //            }
 
-//            _current = null;
+    //            _current = null;
 
-//            IsDisposed = true;
-//        }
+    //            IsDisposed = true;
+    //        }
 
-//        public bool IsDisposed { get; private set; }
-//    }
+    //        public bool IsDisposed { get; private set; }
+    //    }
 
 #if DEBUG
 
-    public enum PathType
-    {
-        Directories,
+    public
 
-        Files
+#else
+        
+        internal 
+        
+#endif
+
+        enum PathType
+    {
+        All = 1,
+
+        Directories = 2,
+
+        Files = 3
     }
+
+#if DEBUG
 
     public class FileSystemEntryEnumeratorProcessSimulation
     {

@@ -42,7 +42,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\ExplorerControlBrowsableObjectInfoViewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\IBrowsableObjectInfoViewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\IExplorerControlBrowsableObjectInfoViewModel.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)PathCollection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessCollections\PathCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PathInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\Deletion.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\DuplicateFinding.cs" />

@@ -28,9 +28,27 @@ using static WinCopies.Util.Util;
 
 namespace WinCopies.IO
 {
+    public enum FileSystemEntryEnumerationOrder : byte
+    {
+        None = 0,
+
+        FilesThenDirectories = 1,
+
+        DirectoriesThenFiles = 2
+    }
+
     public interface IEnumerablePath : IEnumerable<IPathInfo>
     {
         string Path { get; }
+
+        IEnumerable<string> GetFileSystemEntryEnumerable(string searchPattern, SearchOption? searchOption
+#if NETCORE
+            , EnumerationOptions enumerationOptions
+#endif
+#if DEBUG
+            , FileSystemEntryEnumeratorProcessSimulation simulationParameters
+#endif
+            );
 
         IEnumerable<string> GetDirectoryEnumerable(string searchPattern, SearchOption? searchOption
 #if NETCORE
@@ -54,6 +72,7 @@ namespace WinCopies.IO
 #if NETCORE
             , EnumerationOptions enumerationOptions
 #endif
+                , FileSystemEntryEnumerationOrder enumerationOrder
 #if DEBUG
             , FileSystemEntryEnumeratorProcessSimulation simulationParameters
 #endif
@@ -65,6 +84,89 @@ namespace WinCopies.IO
         public string Path { get; }
 
         public EnumerablePath(string path) => Path = path;
+
+        public IEnumerable<string> GetFileSystemEntryEnumerable(string searchPattern, SearchOption? searchOption
+#if NETCORE
+            , EnumerationOptions enumerationOptions
+#endif
+#if DEBUG
+            , FileSystemEntryEnumeratorProcessSimulation simulationParameters
+#endif
+            )
+        {
+            if (string.IsNullOrEmpty(searchPattern) && searchOption == null
+#if NETCORE
+                     && enumerationOptions == null
+#endif
+                    )
+            {
+#if DEBUG
+                if (simulationParameters == null)
+#endif
+                    return System.IO.Directory.EnumerateFileSystemEntries(Path);
+#if DEBUG
+
+                else
+
+                    return simulationParameters.EnumerateFunc(Path, PathType.All);
+#endif
+            }
+
+            else if (searchPattern != null && searchOption == null
+#if NETCORE
+                    && enumerationOptions == null
+#endif
+                    )
+            {
+#if DEBUG
+                if (simulationParameters == null)
+#endif
+                    return System.IO.Directory.EnumerateFileSystemEntries(Path, searchPattern);
+#if DEBUG
+
+                else
+
+                    return simulationParameters.EnumerateFunc(Path, PathType.All);
+#endif
+            }
+
+#if NETCORE
+            else if (searchOption == null)
+            {
+                if (searchPattern == null)
+
+                    searchPattern = "";
+#if DEBUG
+                if (simulationParameters == null)
+#endif
+                    return System.IO.Directory.EnumerateFileSystemEntries(Path, searchPattern, enumerationOptions);
+#if DEBUG
+
+                else
+
+                    return simulationParameters.EnumerateFunc(Path, PathType.All);
+#endif
+            }
+#endif
+
+            else
+            {
+                if (searchPattern == null)
+
+                    searchPattern = "";
+#if DEBUG
+                if (simulationParameters == null)
+
+#endif
+                    return System.IO.Directory.EnumerateFileSystemEntries(Path, searchPattern, searchOption.Value);
+#if DEBUG
+
+                else
+
+                    return simulationParameters.EnumerateFunc(Path, PathType.All);
+#endif
+            }
+        }
 
         public IEnumerable<string> GetDirectoryEnumerable(string searchPattern, SearchOption? searchOption
 #if NETCORE
@@ -236,6 +338,7 @@ namespace WinCopies.IO
 #if NETCORE
             , in EnumerationOptions enumerationOptions
 #endif
+                , in FileSystemEntryEnumerationOrder enumerationOrder
 #if DEBUG
             , in FileSystemEntryEnumeratorProcessSimulation simulationParameters
 #endif
@@ -243,6 +346,7 @@ namespace WinCopies.IO
 #if NETCORE
                 , enumerationOptions
 #endif
+                , enumerationOrder
 #if DEBUG
                 , simulationParameters
 #endif
@@ -252,6 +356,7 @@ namespace WinCopies.IO
 #if NETCORE
             , EnumerationOptions enumerationOptions
 #endif
+                , FileSystemEntryEnumerationOrder enumerationOrder
 #if DEBUG
             , FileSystemEntryEnumeratorProcessSimulation simulationParameters
 #endif
@@ -259,6 +364,7 @@ namespace WinCopies.IO
 #if NETCORE
                 , enumerationOptions
 #endif
+                , enumerationOrder
 #if DEBUG
                 , simulationParameters
 #endif
@@ -268,6 +374,7 @@ namespace WinCopies.IO
 #if NETCORE
             , null
 #endif
+            , FileSystemEntryEnumerationOrder.None
 #if DEBUG
             , null
 #endif
@@ -277,6 +384,7 @@ namespace WinCopies.IO
 #if NETCORE
             , null
 #endif
+            , FileSystemEntryEnumerationOrder.None
 #if DEBUG
             , null
 #endif
@@ -284,8 +392,8 @@ namespace WinCopies.IO
 
         public sealed class Enumerator : WinCopies.Collections.Generic.IDisposableEnumeratorInfo<IPathInfo>
         {
-            private System.Collections.Generic.IEnumerator<string> _directoryEnumerator;
-            private System.Collections.Generic.IEnumerator<string> _filesEnumerator;
+            private SubEnumerator[] _enumerators;
+            private SubEnumerator _currentEnumerator;
             private Func<bool> _moveNext;
             private IPathInfo _current;
             internal const bool _isResetSupported = false;
@@ -310,36 +418,136 @@ namespace WinCopies.IO
 
             public bool IsDisposed { get; private set; }
 
-            internal Enumerator(in IEnumerablePath enumerablePath, in string searchPattern, in SearchOption? searchOption
+            private class SubEnumerator
+            {
+                public System.Collections.Generic.IEnumerator<string> Enumerator { get; }
+
+                public PathType PathType { get; }
+
+                public SubEnumerator(System.Collections.Generic.IEnumerator<string> enumerator, PathType pathType)
+                {
+                    Enumerator = enumerator;
+
+                    PathType = pathType;
+                }
+            }
+
+            internal Enumerator(IEnumerablePath enumerablePath, string searchPattern, SearchOption? searchOption
 #if NETCORE
-            , in EnumerationOptions enumerationOptions
+            , EnumerationOptions enumerationOptions
 #endif
+                , in FileSystemEntryEnumerationOrder enumerationOrder
 #if DEBUG
-            , in FileSystemEntryEnumeratorProcessSimulation simulationParameters
+            , FileSystemEntryEnumeratorProcessSimulation simulationParameters
 #endif
                 )
             {
                 Debug.Assert(enumerablePath != null);
 
-                ResetMoveNextDelegate();
+                enumerationOrder.ThrowIfNotValidEnumValue();
 
-                _directoryEnumerator = enumerablePath.GetDirectoryEnumerable(searchPattern, searchOption
+                SubEnumerator getDirectoryEnumerator() => new SubEnumerator(enumerablePath.GetDirectoryEnumerable(searchPattern, searchOption
 #if NETCORE
                     , enumerationOptions
 #endif
 #if DEBUG
                     , simulationParameters
 #endif
-                    ).GetEnumerator();
+                    ).GetEnumerator(), PathType.Directories);
 
-                _filesEnumerator = enumerablePath.GetFileEnumerable(searchPattern, searchOption
+                SubEnumerator getFileEnumerator() => new SubEnumerator(enumerablePath.GetFileEnumerable(searchPattern, searchOption
 #if NETCORE
                     , enumerationOptions
 #endif
 #if DEBUG
                     , simulationParameters
 #endif
-                    ).GetEnumerator();
+                    ).GetEnumerator(), PathType.Files);
+
+                void initEnumeratorArray(in int length) => _enumerators = new SubEnumerator[length];
+
+                void updateCurrent() => _current = new PathInfo(_currentEnumerator.Enumerator.Current, _currentEnumerator.PathType == PathType.Directories ? true : _currentEnumerator.PathType == PathType.Files ? false : WinCopies.IO.Path.Exists(_currentEnumerator.Enumerator.Current));
+
+                void setMoveNext() => _moveNext = () =>
+                {
+                    bool __moveNext()
+                    {
+                        if (_currentEnumerator.Enumerator.MoveNext())
+                        {
+                            updateCurrent();
+
+                            return true;
+                        }
+
+                        return false;
+                    }
+
+                    if (_currentEnumerator.Enumerator.MoveNext())
+                    {
+                        updateCurrent();
+
+                        return true;
+                    }
+
+                    if (_enumerators.Length == 1)
+
+                        return false;
+
+                    _currentEnumerator = _enumerators[1];
+
+                    if (__moveNext())
+                    {
+                        _moveNext = __moveNext;
+
+                        return true;
+                    }
+
+                    return false;
+                };
+
+                switch (enumerationOrder)
+                {
+                    case FileSystemEntryEnumerationOrder.FilesThenDirectories:
+
+                        initEnumeratorArray(2);
+
+                        _enumerators[0] = getFileEnumerator();
+
+                        _enumerators[1] = getDirectoryEnumerator();
+
+                        setMoveNext();
+
+                        break;
+
+                    case FileSystemEntryEnumerationOrder.DirectoriesThenFiles:
+
+                        initEnumeratorArray(2);
+
+                        _enumerators[0] = getDirectoryEnumerator();
+
+                        _enumerators[1] = getFileEnumerator();
+
+                        setMoveNext();
+
+                        break;
+
+                    case FileSystemEntryEnumerationOrder.None:
+
+                        initEnumeratorArray(1);
+
+                        _enumerators[0] = new SubEnumerator(enumerablePath.GetFileSystemEntryEnumerable(searchPattern, searchOption
+#if NETCORE
+                            , enumerationOptions
+#endif
+#if DEBUG
+                            , simulationParameters
+#endif
+                            ).GetEnumerator(), PathType.All);
+
+                        setMoveNext();
+
+                        break;
+                }
 
 #if DEBUG
                 SimulationParameters = simulationParameters;
@@ -350,6 +558,7 @@ namespace WinCopies.IO
 #if NETCORE
             , in EnumerationOptions enumerationOptions
 #endif
+                , in FileSystemEntryEnumerationOrder enumerationOrder
 #if DEBUG
             , in FileSystemEntryEnumeratorProcessSimulation simulationParameters
 #endif
@@ -357,6 +566,7 @@ namespace WinCopies.IO
 #if NETCORE
                     , enumerationOptions
 #endif
+                    , enumerationOrder
 #if DEBUG
                     , simulationParameters
 #endif
@@ -385,48 +595,11 @@ namespace WinCopies.IO
                 return false;
             }
 
-            private void ResetMoveNextDelegate()
-            {
-                void updateCurrent(bool isDirectory) => _current = new PathInfo(_directoryEnumerator.Current, isDirectory);
-
-                _moveNext = () =>
-                {
-                    bool __moveNext()
-                    {
-                        if (_directoryEnumerator.MoveNext())
-                        {
-                            updateCurrent(false);
-
-                            return true;
-                        }
-
-                        return false;
-                    }
-
-                    if (_filesEnumerator.MoveNext())
-                    {
-                        updateCurrent(true);
-
-                        return true;
-                    }
-
-                    if (__moveNext())
-                    {
-                        _moveNext = __moveNext;
-
-                        return true;
-                    }
-
-                    return false;
-                };
-            }
-
             public void Reset() => throw new NotSupportedException();
 
             private void _Reset()
             {
-                _directoryEnumerator = null;
-                _filesEnumerator = null;
+                _enumerators = null;
                 _moveNext = null;
                 _current = null;
                 IsStarted = false;
@@ -462,6 +635,7 @@ namespace WinCopies.IO
 #if NETCORE
             , in EnumerationOptions enumerationOptions
 #endif
+                , in FileSystemEntryEnumerationOrder enumerationOrder
 #if DEBUG
             , in FileSystemEntryEnumeratorProcessSimulation simulationParameters
 #endif
@@ -469,6 +643,7 @@ namespace WinCopies.IO
 #if NETCORE
                 , enumerationOptions
 #endif
+                , enumerationOrder
 #if DEBUG
                 , simulationParameters
 #endif
@@ -478,6 +653,7 @@ namespace WinCopies.IO
 #if NETCORE
             , null
 #endif
+            , FileSystemEntryEnumerationOrder.None
 #if DEBUG
             , null
 #endif
@@ -505,6 +681,7 @@ namespace WinCopies.IO
 #if NETCORE
             , in EnumerationOptions enumerationOptions
 #endif
+                , in FileSystemEntryEnumerationOrder enumerationOrder
 #if DEBUG
             , in FileSystemEntryEnumeratorProcessSimulation simulationParameters
 #endif
@@ -516,6 +693,7 @@ namespace WinCopies.IO
 #if NETCORE
                     , enumerationOptions
 #endif
+                    , enumerationOrder
 #if DEBUG
                     , simulationParameters
 #endif
@@ -526,6 +704,7 @@ namespace WinCopies.IO
 #if NETCORE
             , in EnumerationOptions enumerationOptions
 #endif
+                , in FileSystemEntryEnumerationOrder enumerationOrder
 #if DEBUG
             , in FileSystemEntryEnumeratorProcessSimulation simulationParameters
 #endif
@@ -533,6 +712,7 @@ namespace WinCopies.IO
 #if NETCORE
                     , enumerationOptions
 #endif
+                    , enumerationOrder
 #if DEBUG
                     , simulationParameters
 #endif

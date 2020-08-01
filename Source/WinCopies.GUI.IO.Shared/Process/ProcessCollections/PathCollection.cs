@@ -18,10 +18,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+
 using WinCopies.IO;
+using WinCopies.Util;
+
 using static WinCopies.Util.Util;
 
-namespace WinCopies.GUI.IO
+namespace WinCopies.GUI.IO.Process
 {
     public abstract class PathCollection<T> : ICollection<T>, IList<T> where T : WinCopies.IO.IPathInfo
     {
@@ -106,7 +109,9 @@ namespace WinCopies.GUI.IO
 
         protected virtual void RemoveItemAt(int index) => InnerList.RemoveAt(index);
 
-        public IEnumerator<T> GetEnumerator() => new PathCollectionEnumerator(this);
+        public PathCollectionEnumerator GetEnumerator(in FileSystemEntryEnumerationOrder enumerationOrder) => new PathCollectionEnumerator(this, enumerationOrder);
+
+        public IEnumerator<T> GetEnumerator() => GetEnumerator(FileSystemEntryEnumerationOrder.None);
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
@@ -120,8 +125,29 @@ namespace WinCopies.GUI.IO
         {
             private PathCollection<T> _pathCollection;
             private bool _completed = false;
+            private Queue<T> _queue;
+            private FileSystemEntryEnumerationOrder _enumerationOrder;
+            private Func<bool> _moveNext;
 
-            public PathCollectionEnumerator(PathCollection<T> pathCollection) : base((pathCollection ?? throw GetArgumentNullException(nameof(pathCollection))).InnerList) => _pathCollection = pathCollection;
+            internal PathCollectionEnumerator(in PathCollection<T> pathCollection, in FileSystemEntryEnumerationOrder enumerationOrder) : base(pathCollection.InnerList)
+            {
+                _pathCollection = pathCollection;
+
+                enumerationOrder.ThrowIfNotValidEnumValue(nameof(enumerationOrder));
+
+                if ((_enumerationOrder = enumerationOrder) != FileSystemEntryEnumerationOrder.None)
+
+                    _queue = new Queue<T>();
+            }
+
+            public static PathCollectionEnumerator From(in PathCollection<T> pathCollection, in FileSystemEntryEnumerationOrder enumerationOrder) => new PathCollectionEnumerator(pathCollection ?? throw GetArgumentNullException(nameof(pathCollection)), enumerationOrder);
+
+            protected override void ResetOverride()
+            {
+                base.ResetOverride();
+
+                _completed = false;
+            }
 
             protected override void Dispose(bool disposing)
             {
@@ -143,12 +169,68 @@ namespace WinCopies.GUI.IO
                     return true;
                 }
 
-                if (InnerEnumerator.MoveNext())
+                void updateCurrentWithInnerEnumeratorValue() => Current = _pathCollection.GetNewEnumeratorPathInfoDelegate(InnerEnumerator.Current);
+
+                bool moveNextNone()
                 {
-                    Current = _pathCollection.GetNewEnumeratorPathInfoDelegate(InnerEnumerator.Current);
+                    if (InnerEnumerator.MoveNext())
+                    {
+                        updateCurrentWithInnerEnumeratorValue();
+
+                        return true;
+                    }
+
+                    return false;
+                }
+
+                bool moveNext()
+                {
+                    while (InnerEnumerator.MoveNext())
+                    {
+                        if ((_enumerationOrder == FileSystemEntryEnumerationOrder.FilesThenDirectories) == InnerEnumerator.Current.IsDirectory)
+
+                            _queue.Enqueue(InnerEnumerator.Current);
+
+                        else
+                        {
+                            updateCurrentWithInnerEnumeratorValue();
+
+                            return true;
+                        }
+                    }
+
+                    if (_queue.Count != 0)
+                    {
+                        Current = _pathCollection.GetNewEnumeratorPathInfoDelegate(_queue.Dequeue());
+
+                        return true;
+                    }
+
+                    return false;
+                }
+
+                if (_moveNext == null)
+
+                    switch (_enumerationOrder)
+                    {
+                        case FileSystemEntryEnumerationOrder.None:
+
+                            _moveNext = moveNextNone;
+
+                            break;
+
+                        case FileSystemEntryEnumerationOrder.FilesThenDirectories:
+
+                            _moveNext = moveNext;
+
+                            break;
+                    }
+
+                if (_moveNext())
 
                     return true;
-                }
+
+                _moveNext = null;
 
                 _completed = true;
 
