@@ -12,10 +12,10 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     
     <TargetFrameworks>netcoreapp3.0;netcoreapp3.1;net472;net48</TargetFrameworks>
-    <VersionPrefix>2.5.9</VersionPrefix>
+    <VersionPrefix>2.6</VersionPrefix>
     <VersionSuffix>preview</VersionSuffix>
-    <AssemblyVersion>2.5.9</AssemblyVersion>
-    <FileVersion>2.5.9</FileVersion>
+    <AssemblyVersion>2.6.0.0</AssemblyVersion>
+    <FileVersion>2.6.0.0</FileVersion>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <Authors>Pierre Sprimont</Authors>

@@ -45,7 +45,7 @@ namespace WinCopies.GUI.IO.Process
         DriveNotReady = 4,
 
         /// <summary>
-        /// The source path is read-protected.
+        /// The source or destination path is read-protected.
         /// </summary>
         ReadProtection = 5,
 
@@ -60,50 +60,45 @@ namespace WinCopies.GUI.IO.Process
         WriteProtection = 7,
 
         /// <summary>
-        /// The source or destination path cannot be accessed.
-        /// </summary>
-        AccessDenied = 8,
-
-        /// <summary>
         /// The destination path is too long.
         /// </summary>
-        PathTooLong = 9,
+        PathTooLong = 8,
 
         /// <summary>
         /// The destination disk has not enough space.
         /// </summary>
-        NotEnoughSpace = 10,
+        NotEnoughSpace = 9,
 
         /// <summary>
         /// A file or folder already exists with the same name.
         /// </summary>
-        FileSystemEntryAlreadyExists = 11,
+        FileSystemEntryAlreadyExists = 10,
 
         /// <summary>
         /// A folder already exists with the same name.
         /// </summary>
-        FolderAlreadyExists = 12,
+        FolderAlreadyExists = 11,
 
         /// <summary>
         /// The file could not be renamed.
         /// </summary>
-        FileRenamingFailed = 13,
+        FileRenamingFailed = 12,
 
         /// <summary>
         /// The source and destination relative paths are equal.
         /// </summary>
-        SourceAndDestPathAreEqual = 14,
+        SourceAndDestPathAreEqual = 13,
 
         /// <summary>
         /// The destination path is a sub-path of the source path.
         /// </summary>
-        DestPathIsASubPath = 15,
+        DestPathIsASubPath = 14,
 
         /// <summary>
         /// An unknown disk error occurred.
         /// </summary>
-        DiskError = 16,
+        DiskError = 15,
 
-        EncryptionFailed = 17
+        EncryptionFailed = 16
     }
 }

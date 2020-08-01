@@ -24,14 +24,12 @@ using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.IO;
 using System.Globalization;
-using System.Security;
 
 using WinCopies.Util;
 
 using static WinCopies.Util.Desktop.ThrowHelper;
 
 using Size = WinCopies.IO.Size;
-using WinCopies.Collections.DotNetFix;
 
 namespace WinCopies.GUI.IO.Process
 {
@@ -83,7 +81,7 @@ namespace WinCopies.GUI.IO.Process
 
             set
             {
-                if (BackgroundWorker.IsBusy) throw GetBackgroundWorkerIsBusyException();
+                ThrowIfIsBusy();
 
                 if (value != _autoRenameFiles)
                 {
@@ -100,7 +98,7 @@ namespace WinCopies.GUI.IO.Process
 
             set
             {
-                if (BackgroundWorker.IsBusy) throw GetBackgroundWorkerIsBusyException();
+                ThrowIfIsBusy();
 
                 if (value < 0 ? throw new ArgumentOutOfRangeException($"{nameof(value)} cannot be less than zero.") : value != _bufferLength)
                 {
@@ -307,7 +305,7 @@ namespace WinCopies.GUI.IO.Process
 
                         case ErrorCode.AccessDenied:
 
-                            RemoveErrorPath(ProcessError.AccessDenied);
+                            RemoveErrorPath(ProcessError.ReadProtection);
 
                             break;
 
@@ -501,7 +499,7 @@ namespace WinCopies.GUI.IO.Process
 
                                     catch (System.IO.FileNotFoundException)
                                     {
-                                        // Left empty because this is a duplicate check.
+                                        // Left empty because this is a check for duplicate.
                                     }
 
                                     catch (Exception ex) when (ex.Is(false, typeof(System.UnauthorizedAccessException), typeof(System.Security.SecurityException)))
@@ -552,7 +550,7 @@ namespace WinCopies.GUI.IO.Process
 #if DEBUG
                                 finally
                                 {
-                                    sourceFileStream.Dispose();
+                                    sourceFileStream?.Dispose();
                                 }
 #endif
                             }

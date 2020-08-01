@@ -12,10 +12,30 @@ Updates
 ??/??/???? 2.6-preview
 ======================
 
+Depends on WinCopies.Util 2.5.9 and WinCopies.WindowsAPICodePack 2.0.1
+
 WinCopies.GUI.IO 2.6-preview
 ----------------------------
 
-- Update namespace structure and (Copy)Process and PathCollection implementation.
+- Changes:
+	- Update namespace structure and (Copy)Process and PathCollection implementation.
+	- The 'callback' parameter of the WinCopies.IO.File.IsDuplicate(in Stream leftStream, in Stream rightStream, in int bufferLength, Func\<bool> callback) method can be null.
+	- The meaning of ProcessError.ReadProtection changed -- it is now also used for destination read protection.
+	- See Removals section.
+- Removals:
+	- ProcessError.AccessDenied has been removed -- the value of the next enumeration constants has changed consequently.
+- Additions:
+	- Add new processes
+	- Add ThrowIfIsBusy protected method to Process class.
+
+WinCopies.IO 2.6-preview
+------------------------
+
+- Removals:
+	- FileSystemEntryEnumerator
+	- PathInfoFileSystemEntryEnumerator
+- Additions:
+	- (I)(Recursively)EnumerablePath
 
 07/20/2020 2.5.9-preview
 ========================
@@ -88,7 +108,7 @@ WinCopies.IO (2.3.0-preview5)
 	- WinCopies.IO.Path.PathSeparator const.
 
 05/07/2020 2.2.0-preview4
-===================
+=========================
 
 - .Net Core and .Net Standard are now supported.
 

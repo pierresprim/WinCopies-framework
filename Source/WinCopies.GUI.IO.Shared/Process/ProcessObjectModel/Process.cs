@@ -263,6 +263,13 @@ namespace WinCopies.GUI.IO.Process
                 throw new InvalidOperationException("The process has already been completed.");
         }
 
+        protected void ThrowIfIsBusy()
+        {
+            if (BackgroundWorker.IsBusy)
+
+                throw GetBackgroundWorkerIsBusyException();
+        }
+
         public string[] PathsToStringArray()
         {
             string[] paths = new string[_Paths.Count];

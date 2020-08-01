@@ -18,12 +18,13 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 
 using WinCopies.Collections.DotNetFix;
 using WinCopies.IO;
+using WinCopies.Util;
 
-using static WinCopies.Util.Desktop.ThrowHelper;
 using static WinCopies.Util.Util;
 
 namespace WinCopies.GUI.IO.Process
@@ -97,13 +98,38 @@ namespace WinCopies.GUI.IO.Process
         >
     {
         #region Private fields
-        private int _bufferLength;
+        private int _bufferLength = 4096;
         private DuplicateFindingStep _step = 0;
+        //private bool _ignoreOnError = true;
         private readonly ObservableQueueCollection<DuplicateFindingReadOnlyObservableLinkedCollection> _checkedPaths = new ObservableQueueCollection<DuplicateFindingReadOnlyObservableLinkedCollection>();
         #endregion
 
         #region Public properties
-        public int BufferLength { get => _bufferLength; set => _bufferLength = BackgroundWorker.IsBusy ? throw GetBackgroundWorkerIsBusyException() : value < 0 ? throw new ArgumentOutOfRangeException($"{nameof(value)} cannot be less than zero.") : value; }
+        /// <summary>
+        /// Gets or sets the buffer length for content duplicate checking.
+        /// </summary>
+        /// <exception cref="ArgumentOutOfRangeException">When setting: The given value is less than or equal to zero.</exception>
+        /// <exception cref="InvalidOperationException">The process is busy.</exception>
+        public int BufferLength
+        {
+            get => _bufferLength;
+
+            set
+            {
+                ThrowIfIsBusy();
+
+                if (value <= 0)
+
+                    throw new ArgumentOutOfRangeException($"{nameof(value)} cannot be less than or equal to zero.");
+
+                if (value != _bufferLength)
+                {
+                    _bufferLength = value;
+
+                    OnPropertyChanged(nameof(BufferLength));
+                }
+            }
+        }
 
         public DuplicateFindingOptions Options { get; }
 
@@ -111,13 +137,30 @@ namespace WinCopies.GUI.IO.Process
         {
             get => _step;
 
-            set
+            private set
             {
                 _step = value;
 
                 OnPropertyChanged(nameof(Step));
             }
         }
+
+        //public bool IgnoreOnError
+        //{
+        //    get => _ignoreOnError;
+
+        //    set
+        //    {
+        //        ThrowIfIsBusy();
+
+        //        if (value != _ignoreOnError)
+        //        {
+        //            _ignoreOnError = value;
+
+        //            OnPropertyChanged(nameof(IgnoreOnError));
+        //        }
+        //    }
+        //}
 
         public ReadOnlyObservableQueueCollection<DuplicateFindingReadOnlyObservableLinkedCollection> CheckedPaths { get; }
         #endregion
@@ -142,105 +185,183 @@ namespace WinCopies.GUI.IO.Process
             Step = DuplicateFindingStep.None;
         }
 
-        protected virtual ProcessError OnCheckForDuplicates(DoWorkEventArgs e)
+        protected virtual ProcessError OnCheckIgnoring(DoWorkEventArgs e, out bool result)
         {
             DuplicateFindingIgnoreOptions ignoreOptions = Options.IgnoreOptions;
 
-            LinkedListNode<IPathInfo> node;
+            DuplicateFindingIgnoreValues ignoreValues = ignoreOptions.IgnoreValues;
 
-            bool checkIgnoring()
+            ProcessError error = ProcessError.None;
+
+            if (ignoreValues != DuplicateFindingIgnoreValues.None)
             {
-                DuplicateFindingIgnoreValues ignoreValues = ignoreOptions.IgnoreValues;
-
-                if (ignoreValues != DuplicateFindingIgnoreValues.None)
+                try
                 {
                     var fileInfo = new FileInfo(CurrentPath.Path);
 
-                    if ((ignoreValues.HasFlag(DuplicateFindingIgnoreValues.SystemFiles) && fileInfo.Attributes.HasFlag(FileAttributes.System)) || (ignoreValues.HasFlag(DuplicateFindingIgnoreValues.HiddenFiles) && fileInfo.Attributes.HasFlag(FileAttributes.Hidden))) return true;
+                    if (fileInfo.Exists)
+                    {
+                        if ((ignoreValues.HasFlag(DuplicateFindingIgnoreValues.SystemFiles) && fileInfo.Attributes.HasFlag(FileAttributes.System)) || (ignoreValues.HasFlag(DuplicateFindingIgnoreValues.HiddenFiles) && fileInfo.Attributes.HasFlag(FileAttributes.Hidden)))
+                        {
+                            result = true;
+
+                            return error;
+                        }
+                    }
+
+                    else
+
+                        error = ProcessError.PathNotFound;
                 }
 
-                if (!CurrentPath.Size.Value.ValueInBytes.IsNaN)
+                catch (Exception ex) when (ex.Is(false, typeof(System.Security.SecurityException), typeof(UnauthorizedAccessException)))
                 {
-                    ulong size = CurrentPath.Size.Value.ValueInBytes.Value;
-
-                    if ((ignoreValues.HasFlag(DuplicateFindingIgnoreValues.ZeroByteFiles) && size == 0)
-                        || (ignoreOptions.FileSizeUnder.HasValue && size < ignoreOptions.FileSizeUnder)
-                        || (ignoreOptions.FileSizeOver.HasValue && size > ignoreOptions.FileSizeOver)) return true;
+                    error = ProcessError.ReadProtection;
                 }
 
-                #region Array checks
-
-                if (ignoreOptions.Paths != null && ignoreOptions.Paths.Count > 0)
-
-                    foreach (string _path in ignoreOptions.Paths)
-
-                        if (CurrentPath.Path.StartsWith(_path)) return true;
-
-                string value;
-
-                if (ignoreOptions.FileNames != null && ignoreOptions.FileNames.Count > 0)
+                catch (System.IO.PathTooLongException)
                 {
-                    value = System.IO.Path.GetFileNameWithoutExtension(CurrentPath.Path);
-
-                    foreach (string fileName in ignoreOptions.FileNames)
-
-                        if (value == fileName) return true;
+                    error = ProcessError.PathTooLong;
                 }
 
-                if (ignoreOptions.FileExtensions != null && ignoreOptions.FileExtensions.Count > 0)
+                if (error != ProcessError.None)
                 {
-                    value = System.IO.Path.GetExtension(CurrentPath.Path);
+                    RemoveErrorPath(error);
 
-                    foreach (string extension in ignoreOptions.FileExtensions)
+                    result = true;
 
-                        if (value == extension) return true;
+                    return ProcessError.None;
                 }
-
-                #endregion
-
-                return false;
             }
 
-            void _checkIgnoring()
+            if (!CurrentPath.Size.Value.ValueInBytes.IsNaN)
             {
-                CurrentPath = node.Value;
+                ulong size = CurrentPath.Size.Value.ValueInBytes.Value;
 
-                if (CheckIfPauseOrCancellationPending())
+                if ((ignoreValues.HasFlag(DuplicateFindingIgnoreValues.ZeroByteFiles) && size == 0)
+                    || (ignoreOptions.FileSizeUnder.HasValue && size < ignoreOptions.FileSizeUnder)
+                    || (ignoreOptions.FileSizeOver.HasValue && size > ignoreOptions.FileSizeOver))
+                {
+                    result = true;
 
-                    return;
-
-                if (ignoreOptions != null && checkIgnoring())
-
-                    _Paths.Remove(node);
+                    return error;
+                }
             }
 
+            #region Array checks
+
+            if (ignoreOptions.Paths != null && ignoreOptions.Paths.Count > 0)
+
+                foreach (string _path in ignoreOptions.Paths)
+
+                    if (CurrentPath.Path.StartsWith(_path, StringComparison.CurrentCulture))
+                    {
+                        result = true;
+
+                        return error;
+                    }
+
+            string value;
+
+            if (ignoreOptions.FileNames != null && ignoreOptions.FileNames.Count > 0)
+            {
+                value = System.IO.Path.GetFileNameWithoutExtension(CurrentPath.Path);
+
+                foreach (string fileName in ignoreOptions.FileNames)
+
+                    if (value == fileName)
+                    {
+                        result = true;
+
+                        return error;
+                    }
+            }
+
+            if (ignoreOptions.FileExtensions != null && ignoreOptions.FileExtensions.Count > 0)
+            {
+                value = System.IO.Path.GetExtension(CurrentPath.Path);
+
+                foreach (string extension in ignoreOptions.FileExtensions)
+
+                    if (value == extension)
+                    {
+                        result = true;
+
+                        return error;
+                    }
+            }
+
+            #endregion
+
+            result = false;
+
+            return error;
+        }
+
+        protected virtual ProcessError OnCheckForPathsToIgnore(in DoWorkEventArgs e)
+        {
             Step = DuplicateFindingStep.CheckingForPathsToIgnore;
 
-            if (_Paths.Count < 2)
+            LinkedListNode<IPathInfo> node;
+            ProcessError error = ProcessError.None;
+
+            if (Options.IgnoreOptions != null)
             {
-                _Paths.Clear();
+                bool ignore;
 
-                return ProcessError.None;
-            }
+                void _checkIgnoring()
+                {
+                    CurrentPath = node.Value;
 
-            node = _Paths.First;
+                    if (CheckIfPauseOrCancellationPending())
 
-            _checkIgnoring();
+                        return;
 
-            if (Error != ProcessError.None)
+                    if ((error = OnCheckIgnoring(e, out ignore)) == ProcessError.None && ignore)
 
-                return Error;
+                        _Paths.Remove(node);
+                }
 
-            while (node.Next != null)
-            {
-                node = node.Next;
+                if (_Paths.Count < 2)
+                {
+                    _Paths.Clear();
+
+                    return ProcessError.None;
+                }
+
+                node = _Paths.First;
 
                 _checkIgnoring();
 
                 if (Error != ProcessError.None)
 
                     return Error;
+
+                if (error != ProcessError.None)
+
+                    return error;
+
+                while (node.Next != null)
+                {
+                    node = node.Next;
+
+                    _checkIgnoring();
+
+                    if (Error != ProcessError.None)
+
+                        return Error;
+
+                    if (error != ProcessError.None)
+
+                        return error;
+                }
             }
+
+            return ProcessError.None;
+        }
+
+        protected virtual ProcessError OnDuplicateCheck(DoWorkEventArgs e)
+        {
 
             Step = DuplicateFindingStep.CheckingForDuplicates;
 
@@ -278,6 +399,38 @@ namespace WinCopies.GUI.IO.Process
 
                 bool? checkContent()
                 {
+                    bool _checkContent()
+                    {
+                        try
+                        {
+                            WinCopies.IO.File.IsDuplicate();
+
+                            return true;
+                        }
+
+                        catch (System.IO.IOException ex) when (ex.Is(false, typeof(System.IO.FileNotFoundException), typeof(System.IO.DirectoryNotFoundException)))
+                        {
+                            RemoveErrorPath(ProcessError.PathNotFound);
+                        }
+
+                        catch (System.IO.PathTooLongException)
+                        {
+                            RemoveErrorPath(ProcessError.PathTooLong);
+                        }
+
+                        catch (System.IO.IOException)
+                        {
+                            RemoveErrorPath(ProcessError.UnknownError);
+                        }
+
+                        catch (Exception ex) when (ex.Is(false, typeof(System.UnauthorizedAccessException), typeof(System.Security.SecurityException)))
+                        {
+                            RemoveErrorPath(ProcessError.ReadProtection);
+                        }
+
+                        return false;
+                    }
+
                     if (matchingOptions.ContentMatchingOption == DuplicateFindingContentMatchingOption.Content)
 
                         return _checkContent();
@@ -353,7 +506,20 @@ namespace WinCopies.GUI.IO.Process
             }
         }
 
-        protected virtual ProcessError OnDeleteDuplicates(DoWorkEventArgs e)
+        protected virtual ProcessError OnCheckForDuplicates(in DoWorkEventArgs e)
+        {
+            ProcessError error ;
+
+            if ((error = OnCheckForPathsToIgnore(e)) != ProcessError.None)
+
+                return error;
+
+            if ((error = OnDuplicateCheck(e)) != ProcessError.None)
+
+                return error;
+        }
+
+        protected virtual ProcessError OnDeleteDuplicates(in DoWorkEventArgs e)
         {
 
         }
