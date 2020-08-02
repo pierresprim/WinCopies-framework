@@ -37,7 +37,7 @@ namespace WinCopies.IO
         DirectoriesThenFiles = 2
     }
 
-    public interface IEnumerablePath : IEnumerable<IPathInfo>
+    public interface IEnumerablePath<T> : IEnumerable<T> where T : IPathInfo
     {
         string Path { get; }
 
@@ -68,7 +68,7 @@ namespace WinCopies.IO
 #endif
             );
 
-        WinCopies.Collections.Generic.IDisposableEnumeratorInfo<IPathInfo> GetEnumerator(string searchPattern, SearchOption? searchOption
+        WinCopies.Collections.Generic.IDisposableEnumeratorInfo<T> GetEnumerator(string searchPattern, SearchOption? searchOption
 #if NETCORE
             , EnumerationOptions enumerationOptions
 #endif
@@ -79,11 +79,18 @@ namespace WinCopies.IO
             );
     }
 
-    public class EnumerablePath : IEnumerablePath
+    public class EnumerablePath<T> : IEnumerablePath<T> where T : IPathInfo
     {
         public string Path { get; }
 
-        public EnumerablePath(string path) => Path = path;
+        protected Func<IPathInfo, T> GetNewPathInfoDelegate { get; }
+
+        public EnumerablePath(in string path, in Func<IPathInfo, T> getNewPathInfoDelegate)
+        {
+            Path = path;
+
+            GetNewPathInfoDelegate = getNewPathInfoDelegate;
+        }
 
         public IEnumerable<string> GetFileSystemEntryEnumerable(string searchPattern, SearchOption? searchOption
 #if NETCORE
@@ -352,7 +359,7 @@ namespace WinCopies.IO
 #endif
 );
 
-        WinCopies.Collections.Generic.IDisposableEnumeratorInfo<IPathInfo> IEnumerablePath.GetEnumerator(string searchPattern, SearchOption? searchOption
+        WinCopies.Collections.Generic.IDisposableEnumeratorInfo<T> IEnumerablePath<T>.GetEnumerator(string searchPattern, SearchOption? searchOption
 #if NETCORE
             , EnumerationOptions enumerationOptions
 #endif
@@ -370,7 +377,7 @@ namespace WinCopies.IO
 #endif
                 );
 
-        System.Collections.Generic.IEnumerator<IPathInfo> IEnumerable<IPathInfo>.GetEnumerator() => GetEnumerator(null, null
+        System.Collections.Generic.IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator(null, null
 #if NETCORE
             , null
 #endif
@@ -390,19 +397,20 @@ namespace WinCopies.IO
 #endif
             );
 
-        public sealed class Enumerator : WinCopies.Collections.Generic.IDisposableEnumeratorInfo<IPathInfo>
+        public sealed class Enumerator : WinCopies.Collections.Generic.IDisposableEnumeratorInfo<T>
         {
             private SubEnumerator[] _enumerators;
             private SubEnumerator _currentEnumerator;
             private Func<bool> _moveNext;
-            private IPathInfo _current;
+            private T _current;
             internal const bool _isResetSupported = false;
+            private Func<IPathInfo, T> _func;
 
             public bool IsStarted { get; private set; }
 
             public bool IsCompleted { get; private set; }
 
-            public IPathInfo Current => WinCopies.Util._Util.IsEnumeratorNotStartedOrDisposed(this) ? throw _ThrowHelper.GetEnumeratorNotStartedOrDisposedException() : _current;
+            public T Current => WinCopies.Util._Util.IsEnumeratorNotStartedOrDisposed(this) ? throw _ThrowHelper.GetEnumeratorNotStartedOrDisposedException() : _current;
 
             object IEnumerator.Current => Current;
 
@@ -432,7 +440,7 @@ namespace WinCopies.IO
                 }
             }
 
-            internal Enumerator(IEnumerablePath enumerablePath, string searchPattern, SearchOption? searchOption
+            internal Enumerator(EnumerablePath<T> enumerablePath, string searchPattern, SearchOption? searchOption
 #if NETCORE
             , EnumerationOptions enumerationOptions
 #endif
@@ -445,6 +453,8 @@ namespace WinCopies.IO
                 Debug.Assert(enumerablePath != null);
 
                 enumerationOrder.ThrowIfNotValidEnumValue();
+
+                _func = enumerablePath.GetNewPathInfoDelegate;
 
                 SubEnumerator getDirectoryEnumerator() => new SubEnumerator(enumerablePath.GetDirectoryEnumerable(searchPattern, searchOption
 #if NETCORE
@@ -466,7 +476,7 @@ namespace WinCopies.IO
 
                 void initEnumeratorArray(in int length) => _enumerators = new SubEnumerator[length];
 
-                void updateCurrent() => _current = new PathInfo(_currentEnumerator.Enumerator.Current, _currentEnumerator.PathType == PathType.Directories ? true : _currentEnumerator.PathType == PathType.Files ? false : WinCopies.IO.Path.Exists(_currentEnumerator.Enumerator.Current));
+                void updateCurrent() => _current = _func(new PathInfo(_currentEnumerator.Enumerator.Current, _currentEnumerator.PathType == PathType.Directories ? true : _currentEnumerator.PathType == PathType.Files ? false : WinCopies.IO.Path.Exists(_currentEnumerator.Enumerator.Current)));
 
                 void setMoveNext() => _moveNext = () =>
                 {
@@ -554,11 +564,11 @@ namespace WinCopies.IO
 #endif
             }
 
-            public static Enumerator From(in IEnumerablePath enumerablePath, in string searchPattern, in SearchOption? searchOption
+            public static Enumerator From(in EnumerablePath<T> enumerablePath, in string searchPattern, in SearchOption? searchOption
 #if NETCORE
             , in EnumerationOptions enumerationOptions
 #endif
-                , in FileSystemEntryEnumerationOrder enumerationOrder
+                , in FileSystemEntryEnumerationOrder enumerationOrder, Func<IPathInfo, T> getNewPathInfoDelegate
 #if DEBUG
             , in FileSystemEntryEnumeratorProcessSimulation simulationParameters
 #endif
@@ -601,7 +611,8 @@ namespace WinCopies.IO
             {
                 _enumerators = null;
                 _moveNext = null;
-                _current = null;
+                _current = default;
+                _func = null;
                 IsStarted = false;
             }
 
@@ -620,26 +631,40 @@ namespace WinCopies.IO
         }
     }
 
-    public interface IRecursivelyEnumerablePath : IEnumerablePath, WinCopies.Collections.Generic.ITreeEnumerable<IPathInfo>
+    public interface IRecursivelyEnumerablePath<T> : IEnumerablePath<T>, WinCopies.Collections.Generic.ITreeEnumerable<T> where T : IPathInfo
     {
-        IPathInfo Value { get; }
+        T Value { get; }
     }
 
-    public class RecursivelyEnumerablePath : EnumerablePath, IRecursivelyEnumerablePath
+    public class RecursivelyEnumerablePath<T> : EnumerablePath<T>, IRecursivelyEnumerablePath<T> where T : IPathInfo
     {
-        public IPathInfo Value { get; }
+        private Func<Enumerator> _getRecursiveEnumeratorDelegate;
 
-        public RecursivelyEnumerablePath(in IPathInfo path) : base((path ?? throw GetArgumentNullException(nameof(path))).Path) => Value = path;
+        public T Value { get; }
 
-        public Enumerator GetEnumerator(in string searchPattern, in SearchOption? searchOption
+        public RecursivelyEnumerablePath(in T path, string searchPattern, SearchOption? searchOption
 #if NETCORE
-            , in EnumerationOptions enumerationOptions
+            , EnumerationOptions enumerationOptions
 #endif
-                , in FileSystemEntryEnumerationOrder enumerationOrder
+                , FileSystemEntryEnumerationOrder enumerationOrder
 #if DEBUG
-            , in FileSystemEntryEnumeratorProcessSimulation simulationParameters
+            , FileSystemEntryEnumeratorProcessSimulation simulationParameters
 #endif
-            ) => new Enumerator(this, searchPattern, searchOption
+            , in Func<IPathInfo, T> getNewPathInfoDelegate) : base((path
+#if !CS7
+            ??
+#else
+            == null ? 
+#endif
+            throw GetArgumentNullException(nameof(path))
+#if CS7
+            : path
+#endif
+            ).Path, getNewPathInfoDelegate)
+        {
+            Value = path;
+
+            _getRecursiveEnumeratorDelegate = () => new Enumerator(this, searchPattern, searchOption
 #if NETCORE
                 , enumerationOptions
 #endif
@@ -648,48 +673,46 @@ namespace WinCopies.IO
                 , simulationParameters
 #endif
                 );
+        }
 
-        IEnumerator<ITreeEnumerable<IPathInfo>> IEnumerable<ITreeEnumerable<IPathInfo>>.GetEnumerator() => GetEnumerator(null, null
-#if NETCORE
-            , null
-#endif
-            , FileSystemEntryEnumerationOrder.None
-#if DEBUG
-            , null
-#endif
-            );
+        public IEnumerator<ITreeEnumerable<T>> GetRecursiveEnumerator() => _getRecursiveEnumeratorDelegate();
 
-        public sealed class Enumerator : WinCopies.Collections.Generic.IDisposableEnumeratorInfo<ITreeEnumerable<IPathInfo>>
+        public TreeEnumerator<T> GetEnumerator() => new TreeEnumerator<T>(this);
+
+        IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
+
+        public sealed class Enumerator : WinCopies.Collections.Generic.IDisposableEnumeratorInfo<IRecursivelyEnumerablePath<T>>
         {
-            private WinCopies.Collections.Generic.IEnumeratorInfo<IPathInfo> _enumerator;
-            private IRecursivelyEnumerablePath _path;
-            private ITreeEnumerable<IPathInfo> _current;
+            private WinCopies.Collections.Generic.IEnumeratorInfo<T> _enumerator;
+            private RecursivelyEnumerablePath<T> _path;
+            private IRecursivelyEnumerablePath<T> _current;
+            private Func<RecursivelyEnumerablePath<T>> _getNewRecursivelyEnumerablePathDelegate;
 
             public bool IsDisposed { get; private set; }
 
-            public ITreeEnumerable<IPathInfo> Current => IsDisposed ? throw GetExceptionForDispose(false) : _current;
+            public IRecursivelyEnumerablePath<T> Current => IsDisposed ? throw GetExceptionForDispose(false) : _current;
 
             object IEnumerator.Current => Current;
 
-            public bool? IsResetSupported => EnumerablePath.Enumerator._isResetSupported;
+            public bool? IsResetSupported => EnumerablePath<T>.Enumerator._isResetSupported;
 
             public bool IsStarted => _enumerator.IsStarted;
 
             public bool IsCompleted { get; private set; }
 
-            internal Enumerator(in IRecursivelyEnumerablePath enumerablePath, in string searchPattern, in SearchOption? searchOption
+            internal Enumerator(in RecursivelyEnumerablePath<T> enumerablePath, string searchPattern, SearchOption? searchOption
 #if NETCORE
-            , in EnumerationOptions enumerationOptions
+            , EnumerationOptions enumerationOptions
 #endif
-                , in FileSystemEntryEnumerationOrder enumerationOrder
+                , FileSystemEntryEnumerationOrder enumerationOrder
 #if DEBUG
-            , in FileSystemEntryEnumeratorProcessSimulation simulationParameters
+            , FileSystemEntryEnumeratorProcessSimulation simulationParameters
 #endif
                 )
             {
                 _path = enumerablePath;
 
-                _enumerator = enumerablePath.GetEnumerator(searchPattern, searchOption
+                _enumerator = ((IRecursivelyEnumerablePath<T>)enumerablePath).GetEnumerator(searchPattern, searchOption
 #if NETCORE
                     , enumerationOptions
 #endif
@@ -698,9 +721,19 @@ namespace WinCopies.IO
                     , simulationParameters
 #endif
                     );
+
+                _getNewRecursivelyEnumerablePathDelegate = () => new RecursivelyEnumerablePath<T>(_enumerator.Current, searchPattern, searchOption
+#if NETCORE
+                    , enumerationOptions
+#endif
+                    , enumerationOrder
+#if DEBUG
+                    , simulationParameters
+#endif
+                    , _path.GetNewPathInfoDelegate);
             }
 
-            public static Enumerator From(in IRecursivelyEnumerablePath enumerablePath, in string searchPattern, in SearchOption? searchOption
+            public static Enumerator From(in RecursivelyEnumerablePath<T> enumerablePath, in string searchPattern, in SearchOption? searchOption
 #if NETCORE
             , in EnumerationOptions enumerationOptions
 #endif
@@ -730,7 +763,7 @@ namespace WinCopies.IO
 
                 if (_path.Value.IsDirectory && _enumerator.MoveNext())
                 {
-                    _current = new RecursivelyEnumerablePath(_enumerator.Current);
+                    _current = _getNewRecursivelyEnumerablePathDelegate();
 
                     return true;
                 }
@@ -751,6 +784,10 @@ namespace WinCopies.IO
                     return;
 
                 _current = null;
+
+                _enumerator = null;
+
+                _path = null;
 
                 IsCompleted = false;
 

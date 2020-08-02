@@ -15,22 +15,27 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+
 using WinCopies.Collections;
+using WinCopies.Collections.Generic;
 
 namespace WinCopies.IO
 {
     public static class Directory
     {
-        public static IEnumerable<IPathInfo> Enumerate(IEnumerable<IPathInfo> paths
+        public static IEnumerable<T> Enumerate<T>(IEnumerable<T> paths, Func<IPathInfo, T> getNewPathInfoDelegate
 #if DEBUG
             , FileSystemEntryEnumeratorProcessSimulation simulationParameters
 #endif
-            ) => Enumerate(paths, null, null
+            ) where T : IPathInfo => Enumerate(paths, null, null
 #if NETCORE
             , null
 #endif
+                , FileSystemEntryEnumerationOrder.None, getNewPathInfoDelegate
 #if DEBUG
                 , simulationParameters
 #endif
@@ -39,22 +44,23 @@ namespace WinCopies.IO
         ///// <summary>
         ///// Loads the items.
         ///// </summary>
-        public static IEnumerable<IPathInfo> Enumerate(IEnumerable<IPathInfo> paths, string searchPattern, SearchOption? searchOption
+        public static IEnumerable<T> Enumerate<T>(IEnumerable<T> paths, string searchPattern, SearchOption? searchOption
 #if NETCORE
             , EnumerationOptions enumerationOptions
 #endif
+            , FileSystemEntryEnumerationOrder enumerationOrder, Func<IPathInfo, T> getNewPathInfoDelegate
 #if DEBUG
             , FileSystemEntryEnumeratorProcessSimulation simulationParameters
 #endif
-            ) => new Enumerable<IPathInfo>(() => new PathInfoFileSystemEntryEnumerator(paths, searchPattern, searchOption
+            ) where T : IPathInfo => new Enumerable<T>(() => new TreeEnumerator<T>(paths.Select(item => new RecursivelyEnumerablePath<T>(item, searchPattern, searchOption
 #if NETCORE
                 , enumerationOptions
 #endif
+                , enumerationOrder
 #if DEBUG
                 , simulationParameters
 #endif
-                )
-                );
+                , getNewPathInfoDelegate))));
 
         #region Old
 

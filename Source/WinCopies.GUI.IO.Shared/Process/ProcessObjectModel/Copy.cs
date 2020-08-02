@@ -39,6 +39,8 @@ namespace WinCopies.GUI.IO.Process
 
         protected override Func<WinCopies.IO.IPathInfo, WinCopies.IO.IPathInfo> GetNewEnumeratorPathInfoDelegate { get; }
 
+        protected override Func<WinCopies.IO.IPathInfo, WinCopies.IO.IPathInfo> GetNewPathInfoDelegate { get; } = path => path;
+
         public override Func<WinCopies.IO.IPathInfo, Size?> GetPathSizeDelegate { get; } = item =>
          {
              if (item.IsDirectory) return null;
@@ -135,18 +137,22 @@ namespace WinCopies.GUI.IO.Process
 #if DEBUG
                  , simulationParameters
 #endif
-                )
-        {
+                ) =>
+            // {
             // BackgroundWorker.DoWork += (object sender, DoWorkEventArgs e) => OnDoWork(e);
 
             // BackgroundWorker.RunWorkerAsync(pathsToLoad);
 
-            _pathsToLoadEnumerator = WinCopies.IO.Directory.Enumerate(pathsToLoad
-#if DEBUG
-                    , SimulationParameters?.FileSystemEntryEnumeratorProcessSimulation
+            _pathsToLoadEnumerator = pathsToLoad.GetEnumerator(null, null
+#if NETCORE
+                , null
 #endif
-                    ).GetEnumerator();
-        }
+                , WinCopies.IO.FileSystemEntryEnumerationOrder.FilesThenDirectories
+#if DEBUG
+                , simulationParameters.FileSystemEntryEnumeratorProcessSimulation
+#endif
+                );
+        // }
 
         #region Method overrides
 

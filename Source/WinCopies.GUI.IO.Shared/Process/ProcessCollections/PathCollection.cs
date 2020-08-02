@@ -18,6 +18,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 
 using WinCopies.IO;
 using WinCopies.Util;
@@ -48,6 +49,8 @@ namespace WinCopies.GUI.IO.Process
         protected abstract Func<T> GetNewEmptyEnumeratorPathInfoDelegate { get; }
 
         protected abstract Func<T, T> GetNewEnumeratorPathInfoDelegate { get; }
+
+        protected abstract Func<WinCopies.IO.IPathInfo, T> GetNewPathInfoDelegate { get; }
 
         public abstract Func<T, Size?> GetPathSizeDelegate { get; }
 
@@ -109,11 +112,63 @@ namespace WinCopies.GUI.IO.Process
 
         protected virtual void RemoveItemAt(int index) => InnerList.RemoveAt(index);
 
-        public PathCollectionEnumerator GetEnumerator(in FileSystemEntryEnumerationOrder enumerationOrder) => new PathCollectionEnumerator(this, enumerationOrder);
+        public PathCollectionEnumerator GetTopLevelPathsEnumerator(in FileSystemEntryEnumerationOrder enumerationOrder) => new PathCollectionEnumerator(this, enumerationOrder);
 
-        public IEnumerator<T> GetEnumerator() => GetEnumerator(FileSystemEntryEnumerationOrder.None);
+        public IEnumerable<T> Enumerate(string searchPattern, SearchOption? searchOption
+#if NETCORE
+            , EnumerationOptions enumerationOptions
+#endif
+            , FileSystemEntryEnumerationOrder enumerationOrder
+#if DEBUG
+            , FileSystemEntryEnumeratorProcessSimulation simulationParameters
+#endif
+            ) => WinCopies.IO.Directory.Enumerate(this, null, null
+#if NETCORE
+                , null
+#endif
+                , FileSystemEntryEnumerationOrder.FilesThenDirectories, GetNewPathInfoDelegate
+#if DEBUG
+                    , simulationParameters
+#endif
+                    );
 
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        public IEnumerator<T> GetEnumerator(string searchPattern, SearchOption? searchOption
+#if NETCORE
+            , EnumerationOptions enumerationOptions
+#endif
+            , FileSystemEntryEnumerationOrder enumerationOrder
+#if DEBUG
+            , FileSystemEntryEnumeratorProcessSimulation simulationParameters
+#endif
+            ) => Enumerate(searchPattern, searchOption
+#if NETCORE
+                , enumerationOptions
+#endif
+                , enumerationOrder
+#if DEBUG
+                , simulationParameters
+#endif
+                ).GetEnumerator();
+
+        IEnumerator<T> IEnumerable<T>.GetEnumerator() => WinCopies.IO.Directory.Enumerate(this, null, null
+#if NETCORE
+            , null
+#endif
+            , FileSystemEntryEnumerationOrder.None, GetNewPathInfoDelegate
+#if DEBUG
+            , null
+#endif
+            ).GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => WinCopies.IO.Directory.Enumerate(this, null, null
+#if NETCORE
+            , null
+#endif
+            , FileSystemEntryEnumerationOrder.None, GetNewPathInfoDelegate
+#if DEBUG
+            , null
+#endif
+            ).GetEnumerator();
 
         public int IndexOf(T item) => InnerList.IndexOf(item);
 
@@ -126,7 +181,7 @@ namespace WinCopies.GUI.IO.Process
             private PathCollection<T> _pathCollection;
             private bool _completed = false;
             private Queue<T> _queue;
-            private FileSystemEntryEnumerationOrder _enumerationOrder;
+            private readonly FileSystemEntryEnumerationOrder _enumerationOrder;
             private Func<bool> _moveNext;
 
             internal PathCollectionEnumerator(in PathCollection<T> pathCollection, in FileSystemEntryEnumerationOrder enumerationOrder) : base(pathCollection.InnerList)

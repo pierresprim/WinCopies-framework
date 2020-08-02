@@ -31,6 +31,8 @@ WinCopies.GUI.IO 2.6-preview
 WinCopies.IO 2.6-preview
 ------------------------
 
+- Changes:
+	- WinCopies.IO.Directory.Enumerate methods are now generic.
 - Removals:
 	- FileSystemEntryEnumerator
 	- PathInfoFileSystemEntryEnumerator
