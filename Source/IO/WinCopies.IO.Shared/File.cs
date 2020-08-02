@@ -49,6 +49,13 @@ namespace WinCopies.IO
             }
         }
 
+        /// <summary>
+        /// Determines whether two files are duplicates by checking their content. For the exceptions that can occur, see the doc of the stream class that you use.
+        /// </summary>
+        /// <param name="leftStream">The left <see cref="Stream"/>.</param>
+        /// <param name="rightStream">The right <see cref="Stream"/>.</param>
+        /// <param name="bufferLength">The buffer length to use to read data.</param>
+        /// <returns><see langword="true"/> if the two files are duplicates; otherwise <see langword="false"/>.</returns>
         public static bool IsDuplicate(in Stream leftStream, in Stream rightStream, in int bufferLength)
         {
             ThrowIfNull(leftStream, nameof(leftStream));
@@ -77,6 +84,14 @@ namespace WinCopies.IO
             return true;
         }
 
+        /// <summary>
+        /// Determines whether two files are duplicates by checking their content. For the exceptions that can occur, see the doc of the stream class that you use.
+        /// </summary>
+        /// <param name="leftStream">The left <see cref="Stream"/>.</param>
+        /// <param name="rightStream">The right <see cref="Stream"/>.</param>
+        /// <param name="bufferLength">The buffer length to use to read data.</param>
+        /// <param name="callback">A cancel delegate. If the returned value is <see langword="true"/>, then the process is stopped.</param>
+        /// <returns><see langword="true"/> if the two files are duplicates; <see langword="null"/> if the process has been canceled; otherwise <see langword="false"/>.</returns>
         public static bool? IsDuplicate(in Stream leftStream, in Stream rightStream, in int bufferLength, Func<bool> callback)
         {
             ThrowIfNull(leftStream, nameof(leftStream));

@@ -28,7 +28,7 @@ namespace WinCopies.GUI.IO
     {
         public interface IErrorPathInfo : IPathInfo
         {
-            IPathInfo Path { get; }
+            IPathInfo PathInfo { get; }
 
             ProcessError Error { get; }
         }
@@ -49,15 +49,15 @@ namespace WinCopies.GUI.IO
             }
         }
 
-        public struct ErrorPathInfo : IErrorPathInfo
+        public readonly struct ErrorPathInfo : IErrorPathInfo
         {
-            public IPathInfo Path { get; }
+            public IPathInfo PathInfo { get; }
 
             public ProcessError Error { get; }
 
             public ErrorPathInfo(IPathInfo path, ProcessError error)
             {
-                Path = path;
+                PathInfo = path;
 
                 Error = error;
             }

@@ -17,8 +17,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Security;
-using WinCopies.Collections.DotNetFix;
+
 using WinCopies.Util;
 
 using static WinCopies.Util.Util;
@@ -91,5 +92,7 @@ namespace WinCopies.GUI.IO.Process
 
             return process.Error;
         }
+
+        public static FileStream GetFileStream(in string path , in int bufferLength  ) => new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, bufferLength, FileOptions.None);
     }
 }

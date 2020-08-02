@@ -309,7 +309,7 @@ namespace WinCopies.GUI.IO.Process
             {
                 bool ignore;
 
-                void _checkIgnoring()
+                void _checkIgnoring(DoWorkEventArgs _e)
                 {
                     CurrentPath = node.Value;
 
@@ -317,7 +317,7 @@ namespace WinCopies.GUI.IO.Process
 
                         return;
 
-                    if ((error = OnCheckIgnoring(e, out ignore)) == ProcessError.None && ignore)
+                    if ((error = OnCheckIgnoring(_e, out ignore)) == ProcessError.None && ignore)
 
                         _Paths.Remove(node);
                 }
@@ -331,7 +331,7 @@ namespace WinCopies.GUI.IO.Process
 
                 node = _Paths.First;
 
-                _checkIgnoring();
+                _checkIgnoring(e);
 
                 if (Error != ProcessError.None)
 
@@ -345,7 +345,7 @@ namespace WinCopies.GUI.IO.Process
                 {
                     node = node.Next;
 
-                    _checkIgnoring();
+                    _checkIgnoring(e);
 
                     if (Error != ProcessError.None)
 
@@ -362,16 +362,20 @@ namespace WinCopies.GUI.IO.Process
 
         protected virtual ProcessError OnDuplicateCheck(DoWorkEventArgs e)
         {
-
             Step = DuplicateFindingStep.CheckingForDuplicates;
 
-            if (_Paths.Count < 2)
+            if (_Paths.Count == 0)
+
+                return ProcessError.None;
+
+            if (_Paths.Count == 1)
             {
                 _Paths.Clear();
 
                 return ProcessError.None;
             }
 
+            LinkedListNode<IPathInfo> node;
             LinkedListNode<IPathInfo> nodeToCompare;
 
             IPathInfo pathToCompare;
@@ -384,9 +388,25 @@ namespace WinCopies.GUI.IO.Process
 
             bool hasDuplicates = false;
 
-            bool? result;
+            var errorPaths = new Queue<IErrorPathInfo>();
 
-            void check()
+            // bool? result;
+
+            bool updateCurrentPathAndCheckIfErrorPath()
+            {
+                CurrentPath = node.Value;
+
+                if (CurrentPath == errorPaths.Peek().PathInfo)
+                {
+                    RemoveErrorPath(errorPaths.Dequeue().Error);
+
+                    return true;
+                }
+
+                return false;
+            }
+
+            bool check()
             {
                 bool? checkSize()
                 {
@@ -397,52 +417,65 @@ namespace WinCopies.GUI.IO.Process
                     else return null;
                 }
 
-                bool? checkContent()
+                Result checkContent()
                 {
-                    bool _checkContent()
+                    if (matchingOptions.ContentMatchingOption == DuplicateFindingContentMatchingOption.Content)
                     {
-                        try
+                        FileStream getFileStream(in string path, Action<ProcessError> actionOnError)
                         {
-                            WinCopies.IO.File.IsDuplicate();
+                            try
+                            {
+                                return ProcessHelper.GetFileStream(path, _bufferLength);
+                            }
 
-                            return true;
+                            catch (System.IO.IOException ex) when (ex.Is(false, typeof(System.IO.FileNotFoundException), typeof(System.IO.DirectoryNotFoundException)))
+                            {
+                                actionOnError(ProcessError.PathNotFound);
+                            }
+
+                            catch (System.IO.PathTooLongException)
+                            {
+                                actionOnError(ProcessError.PathTooLong);
+                            }
+
+                            catch (System.IO.IOException)
+                            {
+                                actionOnError(ProcessError.UnknownError);
+                            }
+
+                            catch (Exception ex) when (ex.Is(false, typeof(System.UnauthorizedAccessException), typeof(System.Security.SecurityException)))
+                            {
+                                actionOnError(ProcessError.ReadProtection);
+                            }
+
+                            return null;
                         }
 
-                        catch (System.IO.IOException ex) when (ex.Is(false, typeof(System.IO.FileNotFoundException), typeof(System.IO.DirectoryNotFoundException)))
-                        {
-                            RemoveErrorPath(ProcessError.PathNotFound);
-                        }
+                        FileStream left = getFileStream(CurrentPath.Path, errorValue => RemoveErrorPath(errorValue));
 
-                        catch (System.IO.PathTooLongException)
-                        {
-                            RemoveErrorPath(ProcessError.PathTooLong);
-                        }
+                        if (left == null)
 
-                        catch (System.IO.IOException)
-                        {
-                            RemoveErrorPath(ProcessError.UnknownError);
-                        }
+                            return Result.Error;
 
-                        catch (Exception ex) when (ex.Is(false, typeof(System.UnauthorizedAccessException), typeof(System.Security.SecurityException)))
-                        {
-                            RemoveErrorPath(ProcessError.ReadProtection);
-                        }
+                        FileStream right = getFileStream(pathToCompare.Path, errorValue => errorPaths.Enqueue(new ErrorPathInfo(pathToCompare, errorValue)));
 
-                        return false;
+                        if (right == null)
+
+                            return Result.Error;
+
+                        bool? result = WinCopies.IO.File.IsDuplicate(left, right, _bufferLength, () => CancellationPending);
+
+                        return result.HasValue ? result.Value.ToResultEnum() : Result.Canceled;
                     }
 
-                    if (matchingOptions.ContentMatchingOption == DuplicateFindingContentMatchingOption.Content)
-
-                        return _checkContent();
-
-                    else return null;
+                    else return Result.None;
                 }
 
-                bool _check(bool? value)
+                bool _checkResult(in bool? value)
                 {
-                    if ((result = value).HasValue)
+                    if (value.HasValue)
 
-                        if (result.Value)
+                        if (value.Value)
 
                             isDuplicate = true;
 
@@ -453,62 +486,123 @@ namespace WinCopies.GUI.IO.Process
                     return true;
                 }
 
-                CurrentPath = node.Value;
+                bool? _checkResultEnumResult(in Result value)
+                {
+                    switch (value)
+                    {
+                        case Result.None:
+                        case Result.Error:
+
+                            return _checkResult(null);
+
+                        case Result.True:
+
+                            return _checkResult(true);
+
+                        case Result.False:
+
+                            return _checkResult(false);
+
+                        case Result.Canceled:
+
+                            return null;
+
+                        default: // We should not reach this code path.
+
+                            throw new WinCopies.Util.InvalidEnumArgumentException(nameof(value), value);
+                    }
+                }
+
+                if (updateCurrentPathAndCheckIfErrorPath())
+
+                    return true;
 
                 pathToCompare = nodeToCompare.Value;
 
-                if (_check(checkSize()) && _check(checkContent()) && isDuplicate)
+                if (_checkResult(checkSize()))
                 {
-                    isDuplicate = false;
+                    bool? checkContentResult = _checkResultEnumResult(checkContent());
 
-                    _ = duplicates.AddLast(new DuplicateFindingPathInfo(pathToCompare));
+                    if (checkContentResult.HasValue)
+                    {
+                        if (checkContentResult.Value && isDuplicate)
+                        {
+                            isDuplicate = false;
 
-                    hasDuplicates = true;
+                            _ = duplicates.AddLast(new DuplicateFindingPathInfo(pathToCompare));
+
+                            hasDuplicates = true;
+                        }
+                    }
+
+                    else
+
+                        return false;
                 }
+
+                return true;
             }
 
-            void _check()
+            bool _check()
             {
-                if (duplicates.Count > 0)
-
-                    duplicates = new WinCopies.Collections.DotNetFix.LinkedList<IDuplicateFindingPathInfo>();
-
-                nodeToCompare = node.Next;
-
-                check();
-
-                while (nodeToCompare.Next != null)
+                if (node.Next != null)
                 {
-                    nodeToCompare = nodeToCompare.Next;
+                    nodeToCompare = node.Next;
 
-                    check();
+                    if (!check())
+
+                        return false;
+
+                    while (nodeToCompare.Next != null)
+                    {
+                        nodeToCompare = nodeToCompare.Next;
+
+                        if (!check())
+
+                            return false;
+                    }
+
+                    if (hasDuplicates)
+                    {
+                        hasDuplicates = false;
+
+                        _ = duplicates.AddFirst(new DuplicateFindingPathInfo(CurrentPath));
+
+                        _checkedPaths.Enqueue(new DuplicateFindingReadOnlyObservableLinkedCollection(new ObservableLinkedCollection<IDuplicateFindingPathInfo>(duplicates)));
+
+                        duplicates = new WinCopies.Collections.DotNetFix.LinkedList<IDuplicateFindingPathInfo>();
+                    }
                 }
 
-                if (hasDuplicates)
-                {
-                    hasDuplicates = false;
+                else
 
-                    _ = duplicates.AddFirst(new DuplicateFindingPathInfo(CurrentPath));
+                    _ = updateCurrentPathAndCheckIfErrorPath();
 
-                    _checkedPaths.Enqueue(new DuplicateFindingReadOnlyObservableLinkedCollection(new ObservableLinkedCollection<IDuplicateFindingPathInfo>(duplicates)));
-                }
+                return true;
             }
 
             node = _Paths.First;
 
-            _check();
-
-            while (node.Next != null)
+            if (_check())
             {
-                node = node.Next;
+                while (node.Next != null)
+                {
+                    node = node.Next;
 
-                _check();
+                    if (!_check())
+
+                        return ProcessError.AbortedByUser;
+                }
+
+                return ProcessError.None;
             }
+
+            return ProcessError.AbortedByUser;
         }
 
         protected virtual ProcessError OnCheckForDuplicates(in DoWorkEventArgs e)
         {
-            ProcessError error ;
+            ProcessError error;
 
             if ((error = OnCheckForPathsToIgnore(e)) != ProcessError.None)
 

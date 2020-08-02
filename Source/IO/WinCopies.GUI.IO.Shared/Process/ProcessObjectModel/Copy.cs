@@ -27,8 +27,6 @@ using System.Globalization;
 
 using WinCopies.Util;
 
-using static WinCopies.Util.Desktop.ThrowHelper;
-
 using Size = WinCopies.IO.Size;
 
 namespace WinCopies.GUI.IO.Process
@@ -185,9 +183,9 @@ namespace WinCopies.GUI.IO.Process
                 {
                     destPath =
 #if DEBUG
-                                            SimulationParameters?.RenameOnDuplicateAction(destPath) ??
+                                SimulationParameters?.RenameOnDuplicateAction(destPath) ??
 #endif
-                                            WinCopies.IO.Path.RenameDuplicate(destPath);
+                                WinCopies.IO.Path.RenameDuplicate(destPath);
 
                     alreadyRenamed = true;
                 }
@@ -231,22 +229,22 @@ namespace WinCopies.GUI.IO.Process
 
                         result =
 #if DEBUG
-                                                (SimulationParameters?.CopyFileExAction ??
+                                    (SimulationParameters?.CopyFileExAction ??
 #endif
-                                                Shell.CopyFileEx
+                                        Shell.CopyFileEx
 #if DEBUG
-                                                )
+                                    )
 #endif
-                                                (CurrentPath.Path, destPath, copyProgressRoutine, IntPtr.Zero, ref cancel, copyFileFlags);
+                                    (CurrentPath.Path, destPath, copyProgressRoutine, IntPtr.Zero, ref cancel, copyFileFlags);
                     }
 
                     else
 
                         result =
 #if DEBUG
-                                                SimulationParameters?.CreateDirectoryWAction?.Invoke(destPath) ??
+                                    SimulationParameters?.CreateDirectoryWAction?.Invoke(destPath) ??
 #endif
-                                                Directory.CreateDirectoryW(destPath, IntPtr.Zero);
+                                    Directory.CreateDirectoryW(destPath, IntPtr.Zero);
 
                     void reportProgressCommon() => TryReportProgress((_Paths.Count / InitialItemCount) * 100);
 
@@ -351,9 +349,9 @@ namespace WinCopies.GUI.IO.Process
 
                     if (PathCollection.Count == 0)
                     {
-                        splitLength = PathCollection.Path.Length - System.IO.Path.GetFileName(PathCollection.Path).Length;
+                        splitLength = PathCollection.Path.Length - Path.GetFileName(PathCollection.Path).Length;
 
-                        return $"{DestPath}{WinCopies.IO.Path.PathSeparator}{System.IO.Path.GetFileName(CurrentPath.Path)}";
+                        return $"{DestPath}{WinCopies.IO.Path.PathSeparator}{Path.GetFileName(CurrentPath.Path)}";
                     }
 
                     else
@@ -411,12 +409,12 @@ namespace WinCopies.GUI.IO.Process
 #endif
                                                         var
 #endif
-                                        sourceFileStream = new FileStream(CurrentPath.Path, FileMode.Open, FileAccess.Read, FileShare.Read, _bufferLength, FileOptions.None)
+                                        sourceFileStream = ProcessHelper.GetFileStream(CurrentPath.Path, _bufferLength)
 #if CS7 && !DEBUG
                                                         )
                                                         {
 #else
-                                                        ;
+                                    ;
 #endif
 
 #if DEBUG
@@ -447,7 +445,7 @@ namespace WinCopies.GUI.IO.Process
 #endif
                                                             var
 #endif
-                                            destFileStream = new FileStream(destPath, FileMode.Open, FileAccess.Read, FileShare.Read, _bufferLength, FileOptions.None)
+                                            destFileStream = ProcessHelper.GetFileStream(destPath, _bufferLength)
 #if CS7 && !DEBUG
                                                             )
                                                                 {
