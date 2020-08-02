@@ -49,7 +49,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(Configuration)' == 'Debug'">
-    <ProjectReference Include="..\WinCopies.Util\WinCopies.Util.Temp.csproj" />
+    <ProjectReference Include="..\..\WinCopies.Util\WinCopies.Util.Temp.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -70,6 +70,13 @@
   <ItemGroup>
     <None Update="7z.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
     </None>
   </ItemGroup>
 

@@ -23,7 +23,7 @@ WinCopies.GUI.IO 2.6-preview
 	- The meaning of ProcessError.ReadProtection changed -- it is now also used for destination read protection.
 	- See Removals section.
 - Removals:
-	- ProcessError.AccessDenied has been removed -- the value of the next enumeration constants has changed consequently.
+	- ProcessError.AccessDenied has been removed -- the values of the next enumeration constants have changed consequently.
 - Additions:
 	- Add new processes
 	- Add ThrowIfIsBusy protected method to Process class.

@@ -7,14 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Source\WinCopies.GUI.Controls\WinCopies.GUI.Controls.csproj" />
-    <ProjectReference Include="..\..\Source\WinCopies.GUI.IO\WinCopies.GUI.IO.csproj" />
-    <ProjectReference Include="..\..\Source\WinCopies.GUI.Models\WinCopies.GUI.Models.csproj" />
-    <ProjectReference Include="..\..\Source\WinCopies.GUI.Templates\WinCopies.GUI.Templates.csproj" />
-    <ProjectReference Include="..\..\Source\WinCopies.GUI.Windows\WinCopies.GUI.Windows.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="WinCopies.Util.Desktop" Version="2.5.9" />
   </ItemGroup>
 
@@ -28,6 +20,13 @@
     <Page Update="MainWindow.xaml">
       <SubType>Designer</SubType>
     </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
