@@ -63,11 +63,11 @@ namespace WinCopies.GUI.IO
             }
 
             #region IPathInfo implementation
-            string WinCopies.IO.IPathInfo.Path => Path.Path;
+            string WinCopies.IO.IPathInfo.Path => PathInfo.Path;
 
-            bool WinCopies.IO.IPathInfo.IsDirectory => Path.IsDirectory;
+            bool WinCopies.IO.IPathInfo.IsDirectory => PathInfo.IsDirectory;
 
-            Size? IPathInfo.Size => Path.Size;
+            Size? IPathInfo.Size => PathInfo.Size;
             #endregion
         }
     }

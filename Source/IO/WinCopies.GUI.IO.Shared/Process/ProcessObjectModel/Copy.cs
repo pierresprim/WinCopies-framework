@@ -403,11 +403,11 @@ namespace WinCopies.GUI.IO.Process
 #if DEBUG
                                     if (SimulationParameters == null)
 #else
-                                                        using
+                                    using
 #if CS7
                                                         (
 #endif
-                                                        var
+                                                        FileStream
 #endif
                                         sourceFileStream = ProcessHelper.GetFileStream(CurrentPath.Path, _bufferLength)
 #if CS7 && !DEBUG
@@ -439,11 +439,11 @@ namespace WinCopies.GUI.IO.Process
 #if DEBUG
                                         if (SimulationParameters == null)
 #else
-                                                                using
+                                        using
 #if CS7
                                                             (
 #endif
-                                                            var
+                                                            FileStream
 #endif
                                             destFileStream = ProcessHelper.GetFileStream(destPath, _bufferLength)
 #if CS7 && !DEBUG
@@ -470,32 +470,29 @@ namespace WinCopies.GUI.IO.Process
                                         if (SimulationParameters == null)
 #endif
 
-                                            _result = WinCopies.IO.File.IsDuplicate(sourceFileStream, destFileStream, _bufferLength, () => PausePending || CancellationPending);
+                                        _result = WinCopies.IO.File.IsDuplicate(sourceFileStream, destFileStream, _bufferLength, () => CheckIfPauseOrCancellationPending());
 
 #if DEBUG
 
                                         else
 
-                                            _result = SimulationParameters.IsDuplicateAction(CurrentPath.Path, destPath, () => PausePending || CancellationPending);
+                                            _result = SimulationParameters.IsDuplicateAction(CurrentPath.Path, destPath, () => CheckIfPauseOrCancellationPending());
 
 #endif
 
-                                        if (CheckIfPauseOrCancellationPending())
+                                        if (_result.HasValue)
 
-                                            return Error;
+                                            if (_result.Value)
 
-                                        if (_result.HasValue && _result.Value)
-                                        {
-                                            if (CheckIfPauseOrCancellationPending())
+                                                _ = _Paths.Dequeue();
 
-                                                return Error;
+                                            else
 
-                                            renameOnDuplicate();
-                                        }
+                                                renameOnDuplicate();
 
                                         else
 
-                                            _ = _Paths.Dequeue();
+                                            return Error;
 #if CS7 && !DEBUG
                                                                 }
 #endif

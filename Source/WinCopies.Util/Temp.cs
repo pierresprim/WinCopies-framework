@@ -56,6 +56,15 @@ namespace WinCopies.Util
         True = 1
     }
 
+    public enum XOrResult : sbyte
+    {
+        MoreThanOneTrueResult = -1,
+
+        NoTrueResult = 0,
+
+        OneTrueResult = 1
+    }
+
     public static class _Util
     {
         public static bool IsEnumeratorNotStartedOrDisposed(in WinCopies.Collections.IDisposableEnumeratorInfo enumerator) => (enumerator ?? throw GetArgumentNullException(nameof(enumerator))).IsDisposed || !enumerator.IsStarted;
@@ -66,6 +75,171 @@ namespace WinCopies.Util
         public static Result ToResultEnum(this bool? value) => value.HasValue ? value.Value.ToResultEnum() : Result.None;
 
         public static Result ToResultEnum(this bool value) => value ? Result.True : Result.False;
+
+        public static bool ToBool(this bool? value) => value.HasValue && value.Value;
+
+        public static bool ToBoolIgnoreNull(this bool? value) => value.HasValue ? value.Value : true;
+
+
+
+        public static bool AndAlso(this bool? value, bool other) => ToBool(value) && other;
+
+        public static bool AndAlso(this bool? value, bool? other) => ToBool(value) && ToBool(other);
+
+        public static bool AndAlsoIgnoreNull(this bool? value, bool other) => value.HasValue ? value.Value && other : other;
+
+        public static bool AndAlsoIgnoreNull(this bool? value, bool? other)
+        {
+            if (value.HasValue)
+
+                if (other.HasValue)
+
+                    return value.Value && other.Value;
+
+                else
+
+                    return value.Value;
+
+            else
+
+                return ToBool(other);
+        }
+
+
+
+        public static bool OrElse(this bool? value, bool other) => value.HasValue && (value.Value || other);
+
+        public static bool OrElse(this bool? value, bool? other) => value.HasValue && other.HasValue && (value.Value || other.Value);
+
+        public static bool OrElseIgnoreNull(this bool? value, bool other) => value.HasValue ? value.Value || other : other;
+
+        public static bool OrElseIgnoreValue(this bool? value, bool? other)
+        {
+            if (value.HasValue)
+
+                if (other.HasValue)
+
+                    return value.Value || other.Value;
+
+                else
+
+                    return value.Value;
+
+            else
+
+                return ToBool(other);
+        }
+
+
+
+        public static bool XOr(this bool? value, bool other) => value.HasValue && (value.Value ^ other);
+
+        public static bool XOr(this bool? value, bool? other) => value.HasValue && other.HasValue && (value.Value ^ other.Value);
+
+        public static bool XOrIgnoreNull(this bool? value, bool other) => value.HasValue ? value.Value ^ other : other;
+
+        public static bool XOrIgnoreValue(this bool? value, bool? other)
+        {
+            if (value.HasValue)
+
+                if (other.HasValue)
+
+                    return value.Value ^ other.Value;
+
+                else
+
+                    return value.Value;
+
+            else
+
+                return ToBool(other);
+        }
+
+
+
+        public static XOrResult GetXOrResult(this bool? value, bool other)
+        {
+            if (ToBool(value))
+
+                if (other)
+
+                    return XOrResult.MoreThanOneTrueResult;
+
+                else
+
+                    return XOrResult.OneTrueResult;
+
+            else if (other)
+
+                return XOrResult.OneTrueResult;
+
+            else
+
+                return XOrResult.NoTrueResult;
+        }
+
+        public static XOrResult GetXOrResult(this bool? value, bool? other)
+        {
+            if (ToBool(value))
+
+                if (ToBool(other))
+
+                    return XOrResult.MoreThanOneTrueResult;
+
+                else
+
+                    return XOrResult.OneTrueResult;
+
+            else if (ToBool(other))
+
+                return XOrResult.OneTrueResult;
+
+            else
+
+                return XOrResult.NoTrueResult;
+        }
+
+        public static XOrResult GetXOrResultIgnoreNull(this bool? value, bool other)
+        {
+            if (ToBool(value))
+
+                if (other)
+
+                    return XOrResult.MoreThanOneTrueResult;
+
+                else
+
+                    return XOrResult.OneTrueResult;
+
+            else if (other)
+
+                return XOrResult.OneTrueResult;
+
+            else
+
+                return XOrResult.NoTrueResult;
+        }
+
+        public static XOrResult GetXOrResultIgnoreValue(this bool? value, bool? other)
+        {
+            if (ToBool(value))
+
+                if (ToBool(other))
+
+                    return XOrResult.MoreThanOneTrueResult;
+
+                else
+
+                    return XOrResult.OneTrueResult;
+
+            else if (ToBool(other))
+
+                return XOrResult.OneTrueResult;
+
+            else
+
+                return XOrResult.NoTrueResult;
+        }
     }
 
     public static class _ThrowHelper

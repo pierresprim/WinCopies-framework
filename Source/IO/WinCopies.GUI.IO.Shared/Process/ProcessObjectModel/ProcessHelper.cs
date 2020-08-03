@@ -93,6 +93,31 @@ namespace WinCopies.GUI.IO.Process
             return process.Error;
         }
 
-        public static FileStream GetFileStream(in string path , in int bufferLength  ) => new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, bufferLength, FileOptions.None);
+        public static FileStream GetFileStream(in string path, in int bufferLength) => new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, bufferLength, FileOptions.None);
+
+        public static ProcessError TryGetFileInfo(in string path, out FileInfo fileInfo)
+        {
+            try
+            {
+                fileInfo = new FileInfo(path);
+
+                return ProcessError.None;
+            }
+
+            catch (Exception ex) when (ex.Is(false, typeof(System.Security.SecurityException), typeof(UnauthorizedAccessException)))
+            {
+                return ProcessError.ReadProtection;
+            }
+
+            catch (System.IO.PathTooLongException)
+            {
+                return ProcessError.PathTooLong;
+            }
+
+            finally
+            {
+                fileInfo = null;
+            }
+        }
     }
 }

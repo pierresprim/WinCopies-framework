@@ -18,7 +18,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 
 using WinCopies.Collections.DotNetFix;
@@ -185,6 +184,12 @@ namespace WinCopies.GUI.IO.Process
             Step = DuplicateFindingStep.None;
         }
 
+        /// <summary>
+        /// Determines whether the current processed path should be ignored.
+        /// </summary>
+        /// <param name="e">The event args for this method.</param>
+        /// <param name="result">A value that indicates whether the current processes path should be ignored.</param>
+        /// <returns>A <see cref="ProcessError"/> error code.</returns>
         protected virtual ProcessError OnCheckIgnoring(DoWorkEventArgs e, out bool result)
         {
             DuplicateFindingIgnoreOptions ignoreOptions = Options.IgnoreOptions;
@@ -195,9 +200,7 @@ namespace WinCopies.GUI.IO.Process
 
             if (ignoreValues != DuplicateFindingIgnoreValues.None)
             {
-                try
-                {
-                    var fileInfo = new FileInfo(CurrentPath.Path);
+                if ((error = ProcessHelper.TryGetFileInfo(CurrentPath.Path, out FileInfo fileInfo)) == ProcessError.None)
 
                     if (fileInfo.Exists)
                     {
@@ -210,21 +213,15 @@ namespace WinCopies.GUI.IO.Process
                     }
 
                     else
+                    {
+                        RemoveErrorPath(ProcessError.PathNotFound);
 
-                        error = ProcessError.PathNotFound;
-                }
+                        result = true;
 
-                catch (Exception ex) when (ex.Is(false, typeof(System.Security.SecurityException), typeof(UnauthorizedAccessException)))
-                {
-                    error = ProcessError.ReadProtection;
-                }
+                        return ProcessError.None;
+                    }
 
-                catch (System.IO.PathTooLongException)
-                {
-                    error = ProcessError.PathTooLong;
-                }
-
-                if (error != ProcessError.None)
+                else
                 {
                     RemoveErrorPath(error);
 
@@ -298,6 +295,31 @@ namespace WinCopies.GUI.IO.Process
             return error;
         }
 
+        /// <summary>
+        /// Checks if _Paths count is less than two. If _Paths count is equal to one, _Paths is cleared. Otherwise, nothing is done.
+        /// </summary>
+        /// <returns><see langword="true"/> if _Paths count is less than two; otherwise <see langword="false"/>.</returns>
+        protected bool CheckIfTooLowPathCount()
+        {
+            if (_Paths.Count == 0)
+
+                return true;
+
+            if (_Paths.Count == 1)
+            {
+                _Paths.Clear();
+
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Checks for paths to ignore. If a path is ignored, it is directly removed from the loaded paths collection.
+        /// </summary>
+        /// <param name="e">The event args for this method.</param>
+        /// <returns>A <see cref="ProcessError"/> error code.</returns>
         protected virtual ProcessError OnCheckForPathsToIgnore(in DoWorkEventArgs e)
         {
             Step = DuplicateFindingStep.CheckingForPathsToIgnore;
@@ -322,24 +344,36 @@ namespace WinCopies.GUI.IO.Process
                         _Paths.Remove(node);
                 }
 
-                if (_Paths.Count < 2)
-                {
-                    _Paths.Clear();
+                if (CheckIfTooLowPathCount())
 
                     return ProcessError.None;
+
+                ProcessError? pProcessError = null;
+
+                bool checkIfError()
+                {
+                    bool _checkIfError(in ProcessError _processError)
+                    {
+                        if (_processError != ProcessError.None)
+                        {
+                            pProcessError = _processError;
+
+                            return true;
+                        }
+
+                        return false;
+                    }
+
+                    return _checkIfError(Error) || _checkIfError(error);
                 }
 
                 node = _Paths.First;
 
                 _checkIgnoring(e);
 
-                if (Error != ProcessError.None)
+                if (checkIfError())
 
-                    return Error;
-
-                if (error != ProcessError.None)
-
-                    return error;
+                    return pProcessError.Value;
 
                 while (node.Next != null)
                 {
@@ -347,13 +381,9 @@ namespace WinCopies.GUI.IO.Process
 
                     _checkIgnoring(e);
 
-                    if (Error != ProcessError.None)
+                    if (checkIfError())
 
-                        return Error;
-
-                    if (error != ProcessError.None)
-
-                        return error;
+                        return pProcessError.Value;
                 }
             }
 
@@ -364,16 +394,9 @@ namespace WinCopies.GUI.IO.Process
         {
             Step = DuplicateFindingStep.CheckingForDuplicates;
 
-            if (_Paths.Count == 0)
+            if (CheckIfTooLowPathCount())
 
                 return ProcessError.None;
-
-            if (_Paths.Count == 1)
-            {
-                _Paths.Clear();
-
-                return ProcessError.None;
-            }
 
             LinkedListNode<IPathInfo> node;
             LinkedListNode<IPathInfo> nodeToCompare;
@@ -406,7 +429,7 @@ namespace WinCopies.GUI.IO.Process
                 return false;
             }
 
-            bool check()
+            bool _check()
             {
                 bool? checkSize()
                 {
@@ -415,6 +438,47 @@ namespace WinCopies.GUI.IO.Process
                         return CurrentPath.Size.HasValue && pathToCompare.Size.HasValue && CurrentPath.Size.Value == pathToCompare.Size.Value;
 
                     else return null;
+                }
+
+                bool? checkName()
+                {
+                    if (matchingOptions.Name)
+
+                        return System.IO.Path.GetFileName(CurrentPath.Path) == System.IO.Path.GetFileName(pathToCompare.Path);
+
+                    return null;
+                }
+
+                Result checkModifiedDate()
+                {
+                    if (matchingOptions.ModifiedDate)
+                    {
+                        ProcessError error = ProcessHelper.TryGetFileInfo(CurrentPath.Path, out FileInfo currentPathFileInfo);
+
+                        if (error == ProcessError.None)
+
+                            if ((error = ProcessHelper.TryGetFileInfo(pathToCompare.Path, out FileInfo fileToCompareFileInfo)) == ProcessError.None)
+
+                                return currentPathFileInfo.LastWriteTime == fileToCompareFileInfo.LastWriteTime ? Result.True : Result.False;
+
+                            else
+                            {
+                                errorPaths.Enqueue(new ErrorPathInfo(pathToCompare, error));
+
+                                return Result.Error;
+                            }
+
+                        else
+                        {
+                            RemoveErrorPath(error);
+
+                            return Result.Error;
+                        }
+                    }
+
+                    else
+
+                        return Result.None;
                 }
 
                 Result checkContent()
@@ -463,7 +527,7 @@ namespace WinCopies.GUI.IO.Process
 
                             return Result.Error;
 
-                        bool? result = WinCopies.IO.File.IsDuplicate(left, right, _bufferLength, () => CancellationPending);
+                        bool? result = WinCopies.IO.File.IsDuplicate(left, right, _bufferLength, () => CheckIfPauseOrCancellationPending());
 
                         return result.HasValue ? result.Value.ToResultEnum() : Result.Canceled;
                     }
@@ -491,9 +555,12 @@ namespace WinCopies.GUI.IO.Process
                     switch (value)
                     {
                         case Result.None:
-                        case Result.Error:
 
                             return _checkResult(null);
+
+                        case Result.Error:
+
+                            return false;
 
                         case Result.True:
 
@@ -519,7 +586,7 @@ namespace WinCopies.GUI.IO.Process
 
                 pathToCompare = nodeToCompare.Value;
 
-                if (_checkResult(checkSize()))
+                if (_checkResult(checkSize()) && _checkResult(checkName()) && _checkResultEnumResult(checkModifiedDate()).Value)
                 {
                     bool? checkContentResult = _checkResultEnumResult(checkContent());
 
@@ -543,21 +610,25 @@ namespace WinCopies.GUI.IO.Process
                 return true;
             }
 
-            bool _check()
+            bool check()
             {
                 if (node.Next != null)
                 {
                     nodeToCompare = node.Next;
 
-                    if (!check())
+                    if (!_check())
 
                         return false;
 
                     while (nodeToCompare.Next != null)
                     {
+                        if (CheckIfPauseOrCancellationPending())
+
+                            return false;
+
                         nodeToCompare = nodeToCompare.Next;
 
-                        if (!check())
+                        if (!_check())
 
                             return false;
                     }
@@ -583,34 +654,51 @@ namespace WinCopies.GUI.IO.Process
 
             node = _Paths.First;
 
-            if (_check())
+            if (check())
             {
+                _Paths.RemoveFirst();
+
                 while (node.Next != null)
                 {
+                    if (CheckIfPauseOrCancellationPending())
+
+                        return Error;
+
                     node = node.Next;
 
-                    if (!_check())
+                    if (check())
 
-                        return ProcessError.AbortedByUser;
+                        _Paths.RemoveFirst();
+
+                    else
+
+                        return Error;
                 }
 
                 return ProcessError.None;
             }
 
-            return ProcessError.AbortedByUser;
+            return Error;
         }
 
-        protected virtual ProcessError OnCheckForDuplicates(in DoWorkEventArgs e)
+        protected virtual ProcessError OnCheckForDuplicates(DoWorkEventArgs e)
         {
-            ProcessError error;
+            var funcs = new Queue<Func<ProcessError>>();
+            funcs.Enqueue(() => OnCheckForPathsToIgnore(e));
+            funcs.Enqueue(() => OnDuplicateCheck(e));
 
-            if ((error = OnCheckForPathsToIgnore(e)) != ProcessError.None)
+            var error = ProcessError.None;
 
-                return error;
+            IEnumerator<Func<ProcessError>> enumerator = funcs.GetEnumerator();
 
-            if ((error = OnDuplicateCheck(e)) != ProcessError.None)
+            funcs = null;
 
-                return error;
+            while (enumerator.MoveNext() && (error = enumerator.Current()) == ProcessError.None)
+            {
+                // Left empty.
+            }
+
+            return error;
         }
 
         protected virtual ProcessError OnDeleteDuplicates(in DoWorkEventArgs e)

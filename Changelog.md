@@ -12,21 +12,24 @@ Updates
 ??/??/???? 2.6-preview
 ======================
 
-Depends on WinCopies.Util 2.5.9 and WinCopies.WindowsAPICodePack 2.0.1
+Depends on WinCopies.Util 2.5.9 and WinCopies.WindowsAPICodePack 2.0.1.
 
 WinCopies.GUI.IO 2.6-preview
 ----------------------------
 
+- Bug fixed in the Copy process.
 - Changes:
 	- Update namespace structure and (Copy)Process and PathCollection implementation.
 	- The 'callback' parameter of the WinCopies.IO.File.IsDuplicate(in Stream leftStream, in Stream rightStream, in int bufferLength, Func\<bool> callback) method can be null.
 	- The meaning of ProcessError.ReadProtection changed -- it is now also used for destination read protection.
+	- (I)ErrorPathInfo.Path is now called PathInfo.
 	- See Removals section.
 - Removals:
 	- ProcessError.AccessDenied has been removed -- the values of the next enumeration constants have changed consequently.
 - Additions:
 	- Add new processes
 	- Add ThrowIfIsBusy protected method to Process class.
+	- Process helper methods.
 
 WinCopies.IO 2.6-preview
 ------------------------
