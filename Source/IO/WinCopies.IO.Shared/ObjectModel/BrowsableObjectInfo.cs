@@ -19,11 +19,15 @@
 using Microsoft.WindowsAPICodePack.PortableDevices;
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Windows.Media.Imaging;
 
 using TsudaKageyu;
+
+using WinCopies.Collections.Generic;
 
 namespace WinCopies.IO.ObjectModel
 {
@@ -40,6 +44,8 @@ namespace WinCopies.IO.ObjectModel
         #endregion
 
         #region Properties
+        IBrowsableObjectInfo ITreeEnumerable<IBrowsableObjectInfo>.Value => this;
+
         /// <summary>
         /// When overridden in a derived class, gets a value that indicates whether this <see cref="BrowsableObjectInfo"/> is browsable.
         /// </summary>
@@ -100,7 +106,56 @@ namespace WinCopies.IO.ObjectModel
         protected BrowsableObjectInfo(in string path, in ClientVersion? clientVersion) : base(path) => ClientVersion = clientVersion;
 
         #region Methods
-        internal static Icon TryGetIcon(in int iconIndex, in string dll, in System.Drawing.Size size) => new IconExtractor(IO.Path.GetRealPathFromEnvironmentVariables("%SystemRoot%\\System32\\" + dll)).GetIcon(iconIndex).Split()?.TryGetIcon(size, 32, true, true);
+        internal static Icon TryGetIcon(in int iconIndex, in string dll, in System.Drawing.Size size) => new IconExtractor(IO.Path.GetRealPathFromEnvironmentVariables(WinCopies.IO.Path.System32Path + dll)).GetIcon(iconIndex).Split()?.TryGetIcon(size, 32, true, true);
+
+        public IEnumerable<string> GetFileSystemEntryEnumerable(string searchPattern, SearchOption? searchOption
+#if NETCORE
+            , EnumerationOptions enumerationOptions
+#endif
+#if DEBUG
+            , FileSystemEntryEnumeratorProcessSimulation simulationParameters
+#endif
+            ) => EnumerablePath.GetFileSystemEntryEnumerable(Path, searchPattern, searchOption
+#if NETCORE
+                , enumerationOptions
+#endif
+#if DEBUG
+                , simulationParameters
+#endif
+                );
+
+        public IEnumerable<string> GetDirectoryEnumerable(string searchPattern, SearchOption? searchOption
+#if NETCORE
+            , EnumerationOptions enumerationOptions
+#endif
+#if DEBUG
+            , FileSystemEntryEnumeratorProcessSimulation simulationParameters
+#endif
+            ) => EnumerablePath.GetDirectoryEnumerable(Path, searchPattern, searchOption
+#if NETCORE
+                , enumerationOptions
+#endif
+#if DEBUG
+                , simulationParameters
+#endif
+                );
+
+        public IEnumerable<string> GetFileEnumerable(string searchPattern, SearchOption? searchOption, EnumerationOptions enumerationOptions, FileSystemEntryEnumeratorProcessSimulation simulationParameters) => EnumerablePath.GetFileEnumerable(Path, searchPattern, searchOption
+#if NETCORE
+            , enumerationOptions
+#endif
+#if DEBUG
+            , simulationParameters
+#endif
+            );
+
+        IEnumerator<ITreeEnumerable<IBrowsableObjectInfo>> ITreeEnumerableProviderEnumerable<IBrowsableObjectInfo>.GetRecursiveEnumerator() => GetItems().GetEnumerator();
+
+        public TreeEnumerator<IBrowsableObjectInfo> GetEnumerator() => new TreeEnumerator<IBrowsableObjectInfo>(this);
+
+        IEnumerator<IBrowsableObjectInfo> IEnumerable<IBrowsableObjectInfo>.GetEnumerator() => GetItems().GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => GetItems().GetEnumerator();
 
         /// <summary>
         /// When overridden in a derived class, returns the items of this <see cref="BrowsableObjectInfo"/>.

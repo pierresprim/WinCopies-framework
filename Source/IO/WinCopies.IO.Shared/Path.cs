@@ -35,7 +35,9 @@
 //using System.Collections;
 
 using Microsoft.Win32;
+
 using SevenZip;
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -43,7 +45,9 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
 using System.Text;
+
 using WinCopies.Util;
+
 using static WinCopies.Util.Util;
 
 namespace WinCopies.IO
@@ -51,6 +55,7 @@ namespace WinCopies.IO
     public static class Path
     {
         public const char PathSeparator = '\\';
+        public const string System32Path = "%SystemRoot%\\System32\\";
 
         //public static readonly string[] PathEnvironmentVariables = { "AllUserProfile", "AppData", "CommonProgramFiles", "CommonProgramFiles(x86)", "HomeDrive", "LocalAppData", "ProgramData", "ProgramFiles", "ProgramFiles(x86)", "Public", "SystemDrive", "SystemRoot", "Temp", "UserProfile" };
 

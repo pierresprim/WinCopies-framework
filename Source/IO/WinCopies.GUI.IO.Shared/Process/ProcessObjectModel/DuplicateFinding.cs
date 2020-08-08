@@ -39,11 +39,9 @@ namespace WinCopies.GUI.IO.Process
     {
         None = 0,
 
-        CheckingForPathsToIgnore = 1,
+        CheckForPathsToIgnore = 1,
 
-        CheckingForDuplicates = 2,
-
-        DuplicatesDeletion = 3
+        CheckForDuplicates = 2
     }
 
     public interface IDuplicateFindingPathInfo : IPathInfo
@@ -78,15 +76,18 @@ namespace WinCopies.GUI.IO.Process
     {
         public Func<ProcessError> Func { get; }
 
-        public DuplicateFindingDoWorkEventArgs(Func<DuplicateFindingDoWorkEventArgs, ProcessError> func, object argument) : base(argument) => Func = () => func(this);
+        public DuplicateFindingDoWorkEventArgs(Func<DuplicateFindingDoWorkEventArgs, ProcessError> func, object argument) : base(argument)
+        {
+            ThrowIfNull(func, nameof(func));
 
-        public DuplicateFindingDoWorkEventArgs(Func<DuplicateFindingDoWorkEventArgs, ProcessError> func, DoWorkEventArgs e) : base(e.Argument)
+            Func = () => func(this);
+        }
+
+        public DuplicateFindingDoWorkEventArgs(Func<DuplicateFindingDoWorkEventArgs, ProcessError> func, DoWorkEventArgs e) : this(func, (e ?? throw GetArgumentNullException(nameof(e))).Argument)
         {
             Cancel = e.Cancel;
 
             Result = e.Result;
-
-            Func = () => func(this);
         }
     }
 
@@ -99,6 +100,8 @@ namespace WinCopies.GUI.IO.Process
         #region Private fields
         private int _bufferLength = 4096;
         private DuplicateFindingStep _step = 0;
+        private IPathInfo _currentDuplicateCheckPath;
+        private byte _currentDuplicateCheckPathProgressPercentage;
         //private bool _ignoreOnError = true;
         private readonly ObservableQueueCollection<DuplicateFindingReadOnlyObservableLinkedCollection> _checkedPaths = new ObservableQueueCollection<DuplicateFindingReadOnlyObservableLinkedCollection>();
         #endregion
@@ -138,9 +141,39 @@ namespace WinCopies.GUI.IO.Process
 
             private set
             {
-                _step = value;
+                if (value != _step) // We need to make this check in case of resuming.
+                {
+                    _step = value;
 
-                OnPropertyChanged(nameof(Step));
+                    OnPropertyChanged(nameof(Step));
+                }
+            }
+        }
+
+        public IPathInfo CurrentDuplicateCheckPath
+        {
+            get => _currentDuplicateCheckPath;
+
+            private set
+            {
+                if (value != _currentDuplicateCheckPath)
+                {
+                    _currentDuplicateCheckPath = value;
+
+                    OnPropertyChanged(nameof(CurrentDuplicateCheckPath));
+                }
+            }
+        }
+
+        public byte CurrentDuplicateCheckPathProgressPercentage
+        {
+            get => _currentDuplicateCheckPathProgressPercentage;
+
+            private set
+            {
+                _currentDuplicateCheckPathProgressPercentage = value;
+
+                OnPropertyChanged(nameof(CurrentDuplicateCheckPathProgressPercentage));
             }
         }
 
@@ -173,15 +206,30 @@ namespace WinCopies.GUI.IO.Process
 
         protected override void OnDoWork(DoWorkEventArgs e)
         {
-            if (_checkedPaths.Count == 0)
+            switch (_step)
+            {
+                case DuplicateFindingStep.None:
 
-                base.OnDoWork(new DuplicateFindingDoWorkEventArgs(_e => OnCheckForDuplicates(_e), e));
+                    base.OnDoWork(new DuplicateFindingDoWorkEventArgs(_e => OnCheckForDuplicates(_e), e));
 
-            else
+                    break;
 
-                _DoWork(new DuplicateFindingDoWorkEventArgs(_e => OnDeleteDuplicates(_e), e));
+                case DuplicateFindingStep.CheckForPathsToIgnore:
 
-            Step = DuplicateFindingStep.None;
+                    ThrowIfCompleted();
+
+                    _DoWork(new DuplicateFindingDoWorkEventArgs(_e => OnCheckForPathsToIgnore(_e), e));
+
+                    break;
+
+                case DuplicateFindingStep.CheckForDuplicates:
+
+                    ThrowIfCompleted();
+
+                    _DoWork(new DuplicateFindingDoWorkEventArgs(_e => OnDuplicateCheck(_e), e));
+
+                    break;
+            }
         }
 
         /// <summary>
@@ -322,7 +370,7 @@ namespace WinCopies.GUI.IO.Process
         /// <returns>A <see cref="ProcessError"/> error code.</returns>
         protected virtual ProcessError OnCheckForPathsToIgnore(in DoWorkEventArgs e)
         {
-            Step = DuplicateFindingStep.CheckingForPathsToIgnore;
+            Step = DuplicateFindingStep.CheckForPathsToIgnore;
 
             LinkedListNode<IPathInfo> node;
             ProcessError error = ProcessError.None;
@@ -392,7 +440,7 @@ namespace WinCopies.GUI.IO.Process
 
         protected virtual ProcessError OnDuplicateCheck(DoWorkEventArgs e)
         {
-            Step = DuplicateFindingStep.CheckingForDuplicates;
+            Step = DuplicateFindingStep.CheckForDuplicates;
 
             if (CheckIfTooLowPathCount())
 
@@ -401,7 +449,7 @@ namespace WinCopies.GUI.IO.Process
             LinkedListNode<IPathInfo> node;
             LinkedListNode<IPathInfo> nodeToCompare;
 
-            IPathInfo pathToCompare;
+            //IPathInfo pathToCompare;
 
             DuplicateFindingMatchingOptions matchingOptions = Options.MatchingOptions;
 
@@ -435,7 +483,7 @@ namespace WinCopies.GUI.IO.Process
                 {
                     if (matchingOptions.ContentMatchingOption == DuplicateFindingContentMatchingOption.Size)
 
-                        return CurrentPath.Size.HasValue && pathToCompare.Size.HasValue && CurrentPath.Size.Value == pathToCompare.Size.Value;
+                        return CurrentPath.Size.HasValue && _currentDuplicateCheckPath.Size.HasValue && CurrentPath.Size.Value == _currentDuplicateCheckPath.Size.Value;
 
                     else return null;
                 }
@@ -444,7 +492,7 @@ namespace WinCopies.GUI.IO.Process
                 {
                     if (matchingOptions.Name)
 
-                        return System.IO.Path.GetFileName(CurrentPath.Path) == System.IO.Path.GetFileName(pathToCompare.Path);
+                        return System.IO.Path.GetFileName(CurrentPath.Path) == System.IO.Path.GetFileName(_currentDuplicateCheckPath.Path);
 
                     return null;
                 }
@@ -457,13 +505,13 @@ namespace WinCopies.GUI.IO.Process
 
                         if (error == ProcessError.None)
 
-                            if ((error = ProcessHelper.TryGetFileInfo(pathToCompare.Path, out FileInfo fileToCompareFileInfo)) == ProcessError.None)
+                            if ((error = ProcessHelper.TryGetFileInfo(_currentDuplicateCheckPath.Path, out FileInfo fileToCompareFileInfo)) == ProcessError.None)
 
                                 return currentPathFileInfo.LastWriteTime == fileToCompareFileInfo.LastWriteTime ? Result.True : Result.False;
 
                             else
                             {
-                                errorPaths.Enqueue(new ErrorPathInfo(pathToCompare, error));
+                                errorPaths.Enqueue(new ErrorPathInfo(_currentDuplicateCheckPath, error));
 
                                 return Result.Error;
                             }
@@ -521,7 +569,7 @@ namespace WinCopies.GUI.IO.Process
 
                             return Result.Error;
 
-                        FileStream right = getFileStream(pathToCompare.Path, errorValue => errorPaths.Enqueue(new ErrorPathInfo(pathToCompare, errorValue)));
+                        FileStream right = getFileStream(_currentDuplicateCheckPath.Path, errorValue => errorPaths.Enqueue(new ErrorPathInfo(_currentDuplicateCheckPath, errorValue)));
 
                         if (right == null)
 
@@ -551,6 +599,7 @@ namespace WinCopies.GUI.IO.Process
                 }
 
                 bool? _checkResultEnumResult(in Result value)
+#if CS7
                 {
                     switch (value)
                     {
@@ -579,12 +628,24 @@ namespace WinCopies.GUI.IO.Process
                             throw new WinCopies.Util.InvalidEnumArgumentException(nameof(value), value);
                     }
                 }
+#else
+                    => value switch
+                    {
+                        Result.None => _checkResult(null),
+                        Result.Error => false,
+                        Result.True => _checkResult(true),
+                        Result.False => _checkResult(false),
+                        Result.Canceled => null,
+                        // We should not reach this code path.
+                        _ => throw new Util.InvalidEnumArgumentException(nameof(value), value)
+                    };
+#endif
 
                 if (updateCurrentPathAndCheckIfErrorPath())
 
                     return true;
 
-                pathToCompare = nodeToCompare.Value;
+                CurrentDuplicateCheckPath = nodeToCompare.Value;
 
                 if (_checkResult(checkSize()) && _checkResult(checkName()) && _checkResultEnumResult(checkModifiedDate()).Value)
                 {
@@ -596,7 +657,7 @@ namespace WinCopies.GUI.IO.Process
                         {
                             isDuplicate = false;
 
-                            _ = duplicates.AddLast(new DuplicateFindingPathInfo(pathToCompare));
+                            _ = duplicates.AddLast(new DuplicateFindingPathInfo(_currentDuplicateCheckPath));
 
                             hasDuplicates = true;
                         }
@@ -643,11 +704,13 @@ namespace WinCopies.GUI.IO.Process
 
                         duplicates = new WinCopies.Collections.DotNetFix.LinkedList<IDuplicateFindingPathInfo>();
                     }
+
+                    _Paths.RemoveFirst();
                 }
 
-                else
+                else if (!updateCurrentPathAndCheckIfErrorPath())
 
-                    _ = updateCurrentPathAndCheckIfErrorPath();
+                    _Paths.RemoveFirst();
 
                 return true;
             }
@@ -656,8 +719,6 @@ namespace WinCopies.GUI.IO.Process
 
             if (check())
             {
-                _Paths.RemoveFirst();
-
                 while (node.Next != null)
                 {
                     if (CheckIfPauseOrCancellationPending())
@@ -666,11 +727,7 @@ namespace WinCopies.GUI.IO.Process
 
                     node = node.Next;
 
-                    if (check())
-
-                        _Paths.RemoveFirst();
-
-                    else
+                    if (!check())
 
                         return Error;
                 }
@@ -699,11 +756,6 @@ namespace WinCopies.GUI.IO.Process
             }
 
             return error;
-        }
-
-        protected virtual ProcessError OnDeleteDuplicates(in DoWorkEventArgs e)
-        {
-
         }
 
         protected override ProcessError OnProcessDoWork(DoWorkEventArgs e) => e is DuplicateFindingDoWorkEventArgs _e ? _e.Func() : ProcessError.None;

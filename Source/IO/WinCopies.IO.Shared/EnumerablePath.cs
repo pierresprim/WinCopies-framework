@@ -30,10 +30,19 @@ namespace WinCopies.IO
 {
     public enum FileSystemEntryEnumerationOrder : byte
     {
+        /// <summary>
+        /// Do not enumerates any item.
+        /// </summary>
         None = 0,
 
+        /// <summary>
+        /// Enumerates files then directories.
+        /// </summary>
         FilesThenDirectories = 1,
 
+        /// <summary>
+        /// Enumerates directories then files.
+        /// </summary>
         DirectoriesThenFiles = 2
     }
 
@@ -79,6 +88,258 @@ namespace WinCopies.IO
             );
     }
 
+    public static class EnumerablePath
+    {
+        public static IEnumerable<string> GetFileSystemEntryEnumerable(in string path, string searchPattern, in SearchOption? searchOption
+#if NETCORE
+            , in EnumerationOptions enumerationOptions
+#endif
+#if DEBUG
+            , in FileSystemEntryEnumeratorProcessSimulation simulationParameters
+#endif
+            )
+        {
+            if (string.IsNullOrEmpty(searchPattern) && searchOption == null
+#if NETCORE
+                     && enumerationOptions == null
+#endif
+                    )
+            {
+#if DEBUG
+                if (simulationParameters == null)
+#endif
+                    return System.IO.Directory.EnumerateFileSystemEntries(path);
+#if DEBUG
+
+                else
+
+                    return simulationParameters.EnumerateFunc(path, PathType.All);
+#endif
+            }
+
+            else if (searchPattern != null && searchOption == null
+#if NETCORE
+                    && enumerationOptions == null
+#endif
+                    )
+            {
+#if DEBUG
+                if (simulationParameters == null)
+#endif
+                    return System.IO.Directory.EnumerateFileSystemEntries(path, searchPattern);
+#if DEBUG
+
+                else
+
+                    return simulationParameters.EnumerateFunc(path, PathType.All);
+#endif
+            }
+
+#if NETCORE
+            else if (searchOption == null)
+            {
+                if (searchPattern == null)
+
+                    searchPattern = "";
+#if DEBUG
+                if (simulationParameters == null)
+#endif
+                    return System.IO.Directory.EnumerateFileSystemEntries(path, searchPattern, enumerationOptions);
+#if DEBUG
+
+                else
+
+                    return simulationParameters.EnumerateFunc(path, PathType.All);
+#endif
+            }
+#endif
+
+            else
+            {
+                if (searchPattern == null)
+
+                    searchPattern = "";
+#if DEBUG
+                if (simulationParameters == null)
+
+#endif
+                    return System.IO.Directory.EnumerateFileSystemEntries(path, searchPattern, searchOption.Value);
+#if DEBUG
+
+                else
+
+                    return simulationParameters.EnumerateFunc(path, PathType.All);
+#endif
+            }
+        }
+
+        public static IEnumerable<string> GetDirectoryEnumerable(in string path, string searchPattern, in SearchOption? searchOption
+#if NETCORE
+            , in EnumerationOptions enumerationOptions
+#endif
+#if DEBUG
+            , in FileSystemEntryEnumeratorProcessSimulation simulationParameters
+#endif
+            )
+        {
+            if (string.IsNullOrEmpty(searchPattern) && searchOption == null
+#if NETCORE
+                     && enumerationOptions == null
+#endif
+                    )
+            {
+#if DEBUG
+                if (simulationParameters == null)
+#endif
+                    return System.IO.Directory.EnumerateDirectories(path);
+#if DEBUG
+
+                else
+
+                    return simulationParameters.EnumerateFunc(path, PathType.Directories);
+#endif
+            }
+
+            else if (searchPattern != null && searchOption == null
+#if NETCORE
+                    && enumerationOptions == null
+#endif
+                    )
+            {
+#if DEBUG
+                if (simulationParameters == null)
+#endif
+                    return System.IO.Directory.EnumerateDirectories(path, searchPattern);
+#if DEBUG
+
+                else
+
+                    return simulationParameters.EnumerateFunc(path, PathType.Directories);
+#endif
+            }
+
+#if NETCORE
+            else if (searchOption == null)
+            {
+                if (searchPattern == null)
+
+                    searchPattern = "";
+#if DEBUG
+                if (simulationParameters == null)
+#endif
+                    return System.IO.Directory.EnumerateDirectories(path, searchPattern, enumerationOptions);
+#if DEBUG
+
+                else
+
+                    return simulationParameters.EnumerateFunc(path, PathType.Directories);
+#endif
+            }
+#endif
+
+            else
+            {
+                if (searchPattern == null)
+
+                    searchPattern = "";
+#if DEBUG
+                if (simulationParameters == null)
+
+#endif
+                    return System.IO.Directory.EnumerateDirectories(path, searchPattern, searchOption.Value);
+#if DEBUG
+
+                else
+
+                    return simulationParameters.EnumerateFunc(path, PathType.Directories);
+#endif
+            }
+        }
+
+        public static IEnumerable<string> GetFileEnumerable(in string path, string searchPattern, in SearchOption? searchOption
+#if NETCORE
+            , in EnumerationOptions enumerationOptions
+#endif
+#if DEBUG
+            , in FileSystemEntryEnumeratorProcessSimulation simulationParameters
+#endif
+            )
+        {
+            if (string.IsNullOrEmpty(searchPattern) && searchOption == null
+#if NETCORE
+                     && enumerationOptions == null
+#endif
+                    )
+            {
+#if DEBUG
+                if (simulationParameters == null)
+#endif
+                    return System.IO.Directory.EnumerateFiles(path);
+#if DEBUG
+
+                else
+
+                    return simulationParameters.EnumerateFunc(path, PathType.Files);
+#endif
+            }
+
+            else if (searchPattern != null && searchOption == null
+#if NETCORE
+                    && enumerationOptions == null
+#endif
+                    )
+            {
+#if DEBUG
+                if (simulationParameters == null)
+#endif
+                    return System.IO.Directory.EnumerateFiles(path, searchPattern);
+#if DEBUG
+
+                else
+
+                    return simulationParameters.EnumerateFunc(path, PathType.Files);
+#endif
+            }
+
+#if NETCORE
+            else if (searchOption == null)
+            {
+                if (searchPattern == null)
+
+                    searchPattern = "";
+#if DEBUG
+                if (simulationParameters == null)
+#endif
+                    return System.IO.Directory.EnumerateFiles(path, searchPattern, enumerationOptions);
+#if DEBUG
+
+                else
+
+                    return simulationParameters.EnumerateFunc(path, PathType.Files);
+#endif
+            }
+#endif
+
+            else
+            {
+                if (searchPattern == null)
+
+                    searchPattern = "";
+#if DEBUG
+                if (simulationParameters == null)
+
+#endif
+                    return System.IO.Directory.EnumerateFiles(path, searchPattern, searchOption.Value);
+#if DEBUG
+
+                else
+
+                    return simulationParameters.EnumerateFunc(path, PathType.Files);
+#endif
+            }
+        }
+    }
+
     public class EnumerablePath<T> : IEnumerablePath<T> where T : IPathInfo
     {
         public string Path { get; }
@@ -99,81 +360,14 @@ namespace WinCopies.IO
 #if DEBUG
             , FileSystemEntryEnumeratorProcessSimulation simulationParameters
 #endif
-            )
-        {
-            if (string.IsNullOrEmpty(searchPattern) && searchOption == null
+            ) => EnumerablePath.GetFileSystemEntryEnumerable(Path, searchPattern, searchOption
 #if NETCORE
-                     && enumerationOptions == null
+               , enumerationOptions
 #endif
-                    )
-            {
 #if DEBUG
-                if (simulationParameters == null)
+                , simulationParameters
 #endif
-                    return System.IO.Directory.EnumerateFileSystemEntries(Path);
-#if DEBUG
-
-                else
-
-                    return simulationParameters.EnumerateFunc(Path, PathType.All);
-#endif
-            }
-
-            else if (searchPattern != null && searchOption == null
-#if NETCORE
-                    && enumerationOptions == null
-#endif
-                    )
-            {
-#if DEBUG
-                if (simulationParameters == null)
-#endif
-                    return System.IO.Directory.EnumerateFileSystemEntries(Path, searchPattern);
-#if DEBUG
-
-                else
-
-                    return simulationParameters.EnumerateFunc(Path, PathType.All);
-#endif
-            }
-
-#if NETCORE
-            else if (searchOption == null)
-            {
-                if (searchPattern == null)
-
-                    searchPattern = "";
-#if DEBUG
-                if (simulationParameters == null)
-#endif
-                    return System.IO.Directory.EnumerateFileSystemEntries(Path, searchPattern, enumerationOptions);
-#if DEBUG
-
-                else
-
-                    return simulationParameters.EnumerateFunc(Path, PathType.All);
-#endif
-            }
-#endif
-
-            else
-            {
-                if (searchPattern == null)
-
-                    searchPattern = "";
-#if DEBUG
-                if (simulationParameters == null)
-
-#endif
-                    return System.IO.Directory.EnumerateFileSystemEntries(Path, searchPattern, searchOption.Value);
-#if DEBUG
-
-                else
-
-                    return simulationParameters.EnumerateFunc(Path, PathType.All);
-#endif
-            }
-        }
+                );
 
         public IEnumerable<string> GetDirectoryEnumerable(string searchPattern, SearchOption? searchOption
 #if NETCORE
@@ -182,81 +376,14 @@ namespace WinCopies.IO
 #if DEBUG
             , FileSystemEntryEnumeratorProcessSimulation simulationParameters
 #endif
-            )
-        {
-            if (string.IsNullOrEmpty(searchPattern) && searchOption == null
+            ) => EnumerablePath.GetDirectoryEnumerable(Path, searchPattern, searchOption
 #if NETCORE
-                     && enumerationOptions == null
+                , enumerationOptions
 #endif
-                    )
-            {
 #if DEBUG
-                if (simulationParameters == null)
+                , simulationParameters
 #endif
-                    return System.IO.Directory.EnumerateDirectories(Path);
-#if DEBUG
-
-                else
-
-                    return simulationParameters.EnumerateFunc(Path, PathType.Directories);
-#endif
-            }
-
-            else if (searchPattern != null && searchOption == null
-#if NETCORE
-                    && enumerationOptions == null
-#endif
-                    )
-            {
-#if DEBUG
-                if (simulationParameters == null)
-#endif
-                    return System.IO.Directory.EnumerateDirectories(Path, searchPattern);
-#if DEBUG
-
-                else
-
-                    return simulationParameters.EnumerateFunc(Path, PathType.Directories);
-#endif
-            }
-
-#if NETCORE
-            else if (searchOption == null)
-            {
-                if (searchPattern == null)
-
-                    searchPattern = "";
-#if DEBUG
-                if (simulationParameters == null)
-#endif
-                    return System.IO.Directory.EnumerateDirectories(Path, searchPattern, enumerationOptions);
-#if DEBUG
-
-                else
-
-                    return simulationParameters.EnumerateFunc(Path, PathType.Directories);
-#endif
-            }
-#endif
-
-            else
-            {
-                if (searchPattern == null)
-
-                    searchPattern = "";
-#if DEBUG
-                if (simulationParameters == null)
-
-#endif
-                    return System.IO.Directory.EnumerateDirectories(Path, searchPattern, searchOption.Value);
-#if DEBUG
-
-                else
-
-                    return simulationParameters.EnumerateFunc(Path, PathType.Directories);
-#endif
-            }
-        }
+                );
 
         public IEnumerable<string> GetFileEnumerable(string searchPattern, SearchOption? searchOption
 #if NETCORE
@@ -265,81 +392,14 @@ namespace WinCopies.IO
 #if DEBUG
             , FileSystemEntryEnumeratorProcessSimulation simulationParameters
 #endif
-            )
-        {
-            if (string.IsNullOrEmpty(searchPattern) && searchOption == null
+            ) => EnumerablePath.GetFileEnumerable(Path, searchPattern, searchOption
 #if NETCORE
-                     && enumerationOptions == null
+                , enumerationOptions
 #endif
-                    )
-            {
 #if DEBUG
-                if (simulationParameters == null)
+                , simulationParameters
 #endif
-                    return System.IO.Directory.EnumerateFiles(Path);
-#if DEBUG
-
-                else
-
-                    return simulationParameters.EnumerateFunc(Path, PathType.Files);
-#endif
-            }
-
-            else if (searchPattern != null && searchOption == null
-#if NETCORE
-                    && enumerationOptions == null
-#endif
-                    )
-            {
-#if DEBUG
-                if (simulationParameters == null)
-#endif
-                    return System.IO.Directory.EnumerateFiles(Path, searchPattern);
-#if DEBUG
-
-                else
-
-                    return simulationParameters.EnumerateFunc(Path, PathType.Files);
-#endif
-            }
-
-#if NETCORE
-            else if (searchOption == null)
-            {
-                if (searchPattern == null)
-
-                    searchPattern = "";
-#if DEBUG
-                if (simulationParameters == null)
-#endif
-                    return System.IO.Directory.EnumerateFiles(Path, searchPattern, enumerationOptions);
-#if DEBUG
-
-                else
-
-                    return simulationParameters.EnumerateFunc(Path, PathType.Files);
-#endif
-            }
-#endif
-
-            else
-            {
-                if (searchPattern == null)
-
-                    searchPattern = "";
-#if DEBUG
-                if (simulationParameters == null)
-
-#endif
-                    return System.IO.Directory.EnumerateFiles(Path, searchPattern, searchOption.Value);
-#if DEBUG
-
-                else
-
-                    return simulationParameters.EnumerateFunc(Path, PathType.Files);
-#endif
-            }
-        }
+                );
 
         public Enumerator GetEnumerator(in string searchPattern, in SearchOption? searchOption
 #if NETCORE
@@ -359,7 +419,7 @@ namespace WinCopies.IO
 #endif
 );
 
-        WinCopies.Collections.Generic.IDisposableEnumeratorInfo<T> IEnumerablePath<T>.GetEnumerator(string searchPattern, SearchOption? searchOption
+        IDisposableEnumeratorInfo<T> IEnumerablePath<T>.GetEnumerator(string searchPattern, SearchOption? searchOption
 #if NETCORE
             , EnumerationOptions enumerationOptions
 #endif
@@ -397,7 +457,7 @@ namespace WinCopies.IO
 #endif
             );
 
-        public sealed class Enumerator : WinCopies.Collections.Generic.IDisposableEnumeratorInfo<T>
+        public sealed class Enumerator : IDisposableEnumeratorInfo<T>
         {
             private SubEnumerator[] _enumerators;
             private SubEnumerator _currentEnumerator;
@@ -410,7 +470,7 @@ namespace WinCopies.IO
 
             public bool IsCompleted { get; private set; }
 
-            public T Current => WinCopies.Util._Util.IsEnumeratorNotStartedOrDisposed(this) ? throw _ThrowHelper.GetEnumeratorNotStartedOrDisposedException() : _current;
+            public T Current => _Util.IsEnumeratorNotStartedOrDisposed(this) ? throw _ThrowHelper.GetEnumeratorNotStartedOrDisposedException() : _current;
 
             object IEnumerator.Current => Current;
 
@@ -631,14 +691,14 @@ namespace WinCopies.IO
         }
     }
 
-    public interface IRecursivelyEnumerablePath<T> : IEnumerablePath<T>, WinCopies.Collections.Generic.ITreeEnumerable<T> where T : IPathInfo
+    public interface IRecursivelyEnumerablePath<T> : IEnumerablePath<T>, ITreeEnumerable<T> where T : IPathInfo
     {
-        T Value { get; }
+        // Left empty.
     }
 
     public class RecursivelyEnumerablePath<T> : EnumerablePath<T>, IRecursivelyEnumerablePath<T> where T : IPathInfo
     {
-        private Func<Enumerator> _getRecursiveEnumeratorDelegate;
+        private readonly Func<Enumerator> _getRecursiveEnumeratorDelegate;
 
         public T Value { get; }
 
@@ -681,12 +741,12 @@ namespace WinCopies.IO
 
         IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
 
-        public sealed class Enumerator : WinCopies.Collections.Generic.IDisposableEnumeratorInfo<IRecursivelyEnumerablePath<T>>
+        public sealed class Enumerator : IDisposableEnumeratorInfo<IRecursivelyEnumerablePath<T>>
         {
-            private WinCopies.Collections.Generic.IEnumeratorInfo<T> _enumerator;
+            private IEnumeratorInfo<T> _enumerator;
             private RecursivelyEnumerablePath<T> _path;
             private IRecursivelyEnumerablePath<T> _current;
-            private Func<RecursivelyEnumerablePath<T>> _getNewRecursivelyEnumerablePathDelegate;
+            private readonly Func<RecursivelyEnumerablePath<T>> _getNewRecursivelyEnumerablePathDelegate;
 
             public bool IsDisposed { get; private set; }
 

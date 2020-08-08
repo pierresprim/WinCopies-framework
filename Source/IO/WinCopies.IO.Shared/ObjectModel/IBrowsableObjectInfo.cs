@@ -16,8 +16,11 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using Microsoft.WindowsAPICodePack.PortableDevices;
+
 using System.Collections.Generic;
 using System.Windows.Media.Imaging;
+
+using WinCopies.Collections.Generic;
 
 using IDisposable = WinCopies.Util.DotNetFix.IDisposable;
 
@@ -26,7 +29,7 @@ namespace WinCopies.IO.ObjectModel
     /// <summary>
     /// Provides interoperability for interacting with browsable items.
     /// </summary>
-    public interface IBrowsableObjectInfo : IFileSystemObject, IDisposable
+    public interface IBrowsableObjectInfo : IFileSystemObject,  ITreeEnumerable<IBrowsableObjectInfo>, IDisposable
     {
         /// <summary>
         /// Gets a value that indicates whether this <see cref="IBrowsableObjectInfo"/> is browsable.
