@@ -36,7 +36,7 @@ WinCopies.IO 2.6-preview
 
 - Changes:
 	- WinCopies.IO.Directory.Enumerate methods are now generic.
-	- RegistryItemInfoEnumeratorStruct and RegistryItemType have moved to the WinCopies.IO namespace.
+	- RegistryItemInfoEnumeratorStruct, RegistryItemType and WMIItemType have moved to the WinCopies.IO namespace.
 	- IBrowsableObjectInfo now implements the new WinCopies.Collections.Generic.ITreeEnumerable interface.
 	- Improved performance of the WinCopies.IO.File.IsDuplicate methods.
 - Removals:

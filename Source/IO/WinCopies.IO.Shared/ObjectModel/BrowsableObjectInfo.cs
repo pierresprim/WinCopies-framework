@@ -23,6 +23,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Windows;
+using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 
 using TsudaKageyu;
@@ -41,6 +43,10 @@ namespace WinCopies.IO.ObjectModel
         public const ushort MediumIconSize = 48;
         public const ushort LargeIconSize = 128;
         public const ushort ExtraLargeIconSize = 256;
+
+        public const int FileIcon = 0;
+        public const int ComputerIcon = 15;
+        public const int FolderIcon = 3;
         #endregion
 
         #region Properties
@@ -106,7 +112,23 @@ namespace WinCopies.IO.ObjectModel
         protected BrowsableObjectInfo(in string path, in ClientVersion? clientVersion) : base(path) => ClientVersion = clientVersion;
 
         #region Methods
-        internal static Icon TryGetIcon(in int iconIndex, in string dll, in System.Drawing.Size size) => new IconExtractor(IO.Path.GetRealPathFromEnvironmentVariables(WinCopies.IO.Path.System32Path + dll)).GetIcon(iconIndex).Split()?.TryGetIcon(size, 32, true, true);
+        internal static Icon TryGetIcon(in int iconIndex, in string dll, in System.Drawing.Size size) => new IconExtractor(IO.Path.GetRealPathFromEnvironmentVariables(IO.Path.System32Path + dll)).GetIcon(iconIndex).Split()?.TryGetIcon(size, 32, true, true);
+
+        internal static BitmapSource TryGetBitmapSource(in int iconIndex, in string dllName, in int size)
+        {
+
+#if NETFRAMEWORK
+
+            using (Icon icon = TryGetIcon(iconIndex, dllName, new System.Drawing.Size(size, size)))
+
+#else
+
+            using Icon icon = TryGetIcon(iconIndex, dllName, new System.Drawing.Size(size, size));
+
+#endif
+
+            return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+        }
 
         public IEnumerable<string> GetFileSystemEntryEnumerable(string searchPattern, SearchOption? searchOption
 #if NETCORE
@@ -140,7 +162,14 @@ namespace WinCopies.IO.ObjectModel
 #endif
                 );
 
-        public IEnumerable<string> GetFileEnumerable(string searchPattern, SearchOption? searchOption, EnumerationOptions enumerationOptions, FileSystemEntryEnumeratorProcessSimulation simulationParameters) => EnumerablePath.GetFileEnumerable(Path, searchPattern, searchOption
+        public IEnumerable<string> GetFileEnumerable(string searchPattern, SearchOption? searchOption
+#if NETCORE
+            , EnumerationOptions enumerationOptions
+#endif
+#if DEBUG
+            , FileSystemEntryEnumeratorProcessSimulation simulationParameters
+#endif
+            ) => EnumerablePath.GetFileEnumerable(Path, searchPattern, searchOption
 #if NETCORE
             , enumerationOptions
 #endif

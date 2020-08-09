@@ -16,18 +16,19 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
-using System.Text;
+
+using WinCopies.IO.Reflection;
 
 using static WinCopies.IO.Path;
+using static WinCopies.Util.Util;
 
 namespace WinCopies.IO.ObjectModel.Reflection
 {
-    public class DotNetTypeInfo : BrowsableObjectInfo, IDotNetItemInfo
+    public sealed class DotNetTypeInfo : BrowsableDotNetItemInfo, IDotNetTypeInfo
     {
-        public DotNetAssemblyInfo ParentDotNetAssemblyInfo { get; }
+        public IDotNetAssemblyInfo ParentDotNetAssemblyInfo { get; }
 
         public DotNetItemType DotNetItemType { get; }
 
@@ -35,10 +36,12 @@ namespace WinCopies.IO.ObjectModel.Reflection
 
         public override IBrowsableObjectInfo Parent { get; } 
 
-        internal DotNetTypeInfo(in string path, TypeInfo typeInfo, in DotNetItemType itemType, in IDotNetItemInfo parent ) : base(path)
+        internal DotNetTypeInfo(in string path, TypeInfo typeInfo, in DotNetItemType itemType, in IDotNetItemInfo parent ) : base(path, typeInfo.Name)
         {
 #if DEBUG
             Debug.Assert(path == $"{typeInfo.Namespace.Replace('.', PathSeparator)}{PathSeparator}{typeInfo.Name}");
+
+            Debug.Assert(If(ComparisonType.And, ComparisonMode.Logical, Comparison.NotEqual, null, parent, parent.ParentDotNetAssemblyInfo));
 
             switch (itemType)
             {

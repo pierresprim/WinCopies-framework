@@ -30,20 +30,6 @@ using WinCopies.Collections;
 
 namespace WinCopies.IO.ObjectModel
 {
-    // public interface IFileSystemObjectInfoFactory : IBrowsableObjectInfoFactory { }
-
-    public interface IFileSystemObjectInfo : IBrowsableObjectInfo
-    {
-        /// <summary>
-        /// Gets the <see cref="WinCopies.IO.FileType"/> of this <see cref="IFileSystemObject"/>.
-        /// </summary>
-        FileType FileType { get; }
-
-        Icon TryGetIcon(in int size);
-
-        BitmapSource TryGetBitmapSource(in int size);
-    }
-
     public abstract class FileSystemObjectInfo : BrowsableObjectInfo, IFileSystemObjectInfo
     {
         /// <summary>
@@ -79,15 +65,15 @@ namespace WinCopies.IO.ObjectModel
 
            fileType == FileType.Folder ? TryGetIcon(3, size) : FileOperation.GetFileInfo(extension, FileAttributes.Normal, GetFileInfoOptions.Icon | GetFileInfoOptions.UseFileAttributes).Icon?.TryGetIcon(size, 32, true, true) ?? TryGetIcon(0, size);// else// return TryGetIcon(FileType == FileType.Folder ? 3 : 0, "SHELL32.dll", size);
 
-        public static BitmapSource TryGetBitmapSource(in string extension, in FileType fileType, in System.Drawing.Size size)
+        public static BitmapSource TryGetBitmapSource(in string extension, in FileType fileType, in int size)
         {
 #if NETFRAMEWORK
 
-            using (Icon icon = TryGetIcon(extension, fileType, size))
+            using (Icon icon = TryGetIcon(extension, fileType, new System.Drawing.Size(size, size)))
 
 #else
 
-            using Icon icon = TryGetIcon(extension, fileType, size);
+            using Icon icon = TryGetIcon(extension, fileType, new System.Drawing.Size(size, size));
 
 #endif
             return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
@@ -97,7 +83,7 @@ namespace WinCopies.IO.ObjectModel
 
         public Icon TryGetIcon(in int size) => TryGetIcon(System.IO.Path.GetExtension(Path), FileType, new System.Drawing.Size(size, size));
 
-        public BitmapSource TryGetBitmapSource(in int size) => TryGetBitmapSource(System.IO.Path.GetExtension(Path), FileType, new System.Drawing.Size(size, size));
+        public BitmapSource TryGetBitmapSource(in int size) => TryGetBitmapSource(System.IO.Path.GetExtension(Path), FileType, size);
 
         /*#region Equatable methods
         /// <summary>

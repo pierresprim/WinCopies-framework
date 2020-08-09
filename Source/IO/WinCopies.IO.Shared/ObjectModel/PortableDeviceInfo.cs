@@ -33,13 +33,6 @@ using static WinCopies.Util.Util;
 
 namespace WinCopies.IO.ObjectModel
 {
-    public interface IPortableDeviceInfo : IFileSystemObjectInfo
-    {
-        IPortableDevice PortableDevice { get; }
-
-        PortableDeviceOpeningOptions OpeningOptions { get; set; }
-    }
-
     public class PortableDeviceInfo : FileSystemObjectInfo, IPortableDeviceInfo
     {
         private const int PortableDeviceIcon = 42;

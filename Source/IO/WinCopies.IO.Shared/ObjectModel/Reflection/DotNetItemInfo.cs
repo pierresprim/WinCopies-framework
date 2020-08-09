@@ -15,65 +15,97 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+using System.Windows.Media.Imaging;
+
+using WinCopies.IO.Reflection;
+
+using static Microsoft.WindowsAPICodePack.NativeAPI.Consts.DllNames;
+
 namespace WinCopies.IO.ObjectModel.Reflection
 {
-    public enum DotNetItemType
+    public abstract class DotNetItemInfo : BrowsableObjectInfo, IDotNetItemInfo
     {
-        /// <summary>
-        /// The item is a .Net namespace.
-        /// </summary>
-        Namespace = 1,
+        public override sealed string Name { get; }
 
-        /// <summary>
-        /// The item is a .Net struct.
-        /// </summary>
-        Struct = 2,
+        public sealed override Size? Size { get; } = null;
 
-        /// <summary>
-        /// The item is a .Net enum.
-        /// </summary>
-        Enum = 3,
+        public override sealed string LocalizedName => Name;
 
-        /// <summary>
-        /// The item is a .Net class.
-        /// </summary>
-        Class = 4,
+        public sealed override string Description { get; } = Util.Util.NotApplicable;
 
-        /// <summary>
-        /// The item is a .Net attribute.
-        /// </summary>
-        Attribute = 5,
+        public sealed override FileSystemType ItemFileSystemType { get; } = FileSystemType.None;
 
-        /// <summary>
-        /// The item is a .Net interface.
-        /// </summary>
-        Interface = 6,
+        public abstract IDotNetAssemblyInfo ParentDotNetAssemblyInfo { get; }
 
-        /// <summary>
-        /// The item is a .Net delegate.
-        /// </summary>
-        Delegate = 7,
+        public abstract DotNetItemType DotNetItemType { get; }
 
-        /// <summary>
-        /// The item is a .Net field.
-        /// </summary>
-        Field = 8,
-
-        /// <summary>
-        /// The item is a .Net property.
-        /// </summary>
-        Property = 9,
-
-        /// <summary>
-        /// The item is a .Net method.
-        /// </summary>
-        Method = 10
+        protected DotNetItemInfo(in string path, in string name) : base(path) => Name = name;
     }
 
-    public interface IDotNetItemInfo : IBrowsableObjectInfo
+    public abstract class BrowsableDotNetItemInfo : DotNetItemInfo
     {
-        DotNetAssemblyInfo ParentDotNetAssemblyInfo { get; }
+        public override sealed bool IsBrowsable { get; } = true;
 
-        DotNetItemType DotNetItemType { get; }
+        #region BitmapSources
+        private static BitmapSource TryGetBitmapSource(int size) => TryGetBitmapSource(FolderIcon, Shell32, size);
+
+        private BitmapSource _smallBitmapSource;
+        private BitmapSource _mediumBitmapSource;
+        private BitmapSource _largeBitmapSource;
+        private BitmapSource _extraLargeBitmapSource;
+
+        public sealed override BitmapSource SmallBitmapSource => _smallBitmapSource
+#if CS7
+            ?? (_smallBitmapSource =
+#else
+            ??=
+#endif
+            TryGetBitmapSource(SmallIconSize)
+#if CS7
+            )
+#endif
+            ;
+
+        public sealed override BitmapSource MediumBitmapSource => _mediumBitmapSource
+#if CS7
+            ?? (_mediumBitmapSource =
+#else
+            ??=
+#endif
+            TryGetBitmapSource(MediumIconSize)
+#if CS7
+            )
+#endif
+            ;
+
+        public sealed override BitmapSource LargeBitmapSource => _largeBitmapSource
+#if CS7
+            ?? (_largeBitmapSource =
+#else
+            ??=
+#endif
+            TryGetBitmapSource(LargeIconSize)
+#if CS7
+            )
+#endif
+            ;
+
+        public sealed override BitmapSource ExtraLargeBitmapSource => _extraLargeBitmapSource
+#if CS7
+            ?? (_extraLargeBitmapSource =
+#else
+            ??=
+#endif
+            TryGetBitmapSource(ExtraLargeIconSize)
+#if CS7
+            )
+#endif
+            ;
+        #endregion
+
+        protected BrowsableDotNetItemInfo(in string path, in string name) : base(path, name)
+        {
+            // Left empty.
+        }
     }
 }

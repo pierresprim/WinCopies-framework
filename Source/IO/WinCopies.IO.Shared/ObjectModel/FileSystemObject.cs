@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections.Generic;
+
 using static WinCopies.Util.Util;
 
 namespace WinCopies.IO.ObjectModel
@@ -29,7 +30,7 @@ namespace WinCopies.IO.ObjectModel
         /// <summary>
         /// Gets the path of this <see cref="FileSystemObject"/>.
         /// </summary>
-        public virtual string Path { get; }
+        public  string Path { get; }
 
         /// <summary>
         /// When overridden in a derived class, gets the localized path of this <see cref="FileSystemObject"/>.

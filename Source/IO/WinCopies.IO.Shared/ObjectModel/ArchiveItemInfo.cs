@@ -15,6 +15,8 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+using Microsoft.WindowsAPICodePack.Win32Native.Shell;
+
 using SevenZip;
 
 using System;
@@ -33,17 +35,6 @@ using IfCT = WinCopies.Util.Util.ComparisonType;
 
 namespace WinCopies.IO.ObjectModel
 {
-    /// <summary>
-    /// Represents an archive item.
-    /// </summary>
-    public interface IArchiveItemInfo : IArchiveItemInfoProvider
-    {
-        /// <summary>
-        /// The <see cref="SevenZip.ArchiveFileInfo"/> that this <see cref="IArchiveItemInfo"/> represents.
-        /// </summary>
-        ArchiveFileInfo? ArchiveFileInfo { get; }
-    }
-
     /// <summary>
     /// Represents an archive item.
     /// </summary>
@@ -138,9 +129,9 @@ namespace WinCopies.IO.ObjectModel
             {
                 if (ArchiveFileInfo.HasValue)
                 {
-                    var value = (Microsoft.WindowsAPICodePack.Win32Native.Shell.FileAttributes)ArchiveFileInfo.Value.Attributes;
+                    var value = (FileAttributes)ArchiveFileInfo.Value.Attributes;
 
-                    return value.HasFlag(Microsoft.WindowsAPICodePack.Win32Native.Shell.FileAttributes.Hidden) || value.HasFlag(Microsoft.WindowsAPICodePack.Win32Native.Shell.FileAttributes.System);
+                    return value.HasFlag(FileAttributes.Hidden) || value.HasFlag(FileAttributes.System);
                 }
 
                 else

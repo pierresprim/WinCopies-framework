@@ -29,11 +29,6 @@ using static Microsoft.WindowsAPICodePack.PortableDevices.PropertySystem.Propert
 
 namespace WinCopies.IO.ObjectModel
 {
-    public interface IPortableDeviceObjectInfo : IFileSystemObjectInfo
-    {
-        IPortableDeviceObject PortableDeviceObject { get; }
-    }
-
     public class PortableDeviceObjectInfo : FileSystemObjectInfo, IPortableDeviceObjectInfo
     {
         public IPortableDeviceObject PortableDeviceObject { get; }

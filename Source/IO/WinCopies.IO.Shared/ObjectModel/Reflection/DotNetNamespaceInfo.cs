@@ -15,43 +15,47 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+using System;
 using System.Diagnostics;
-
+using WinCopies.IO.Reflection;
 using static WinCopies.Util.Util;
-
-using IfCT = WinCopies.Util.Util.ComparisonType;
-using IfCM = WinCopies.Util.Util.ComparisonMode;
-using IfComp = WinCopies.Util.Util.Comparison;
 
 namespace WinCopies.IO.ObjectModel.Reflection
 {
-    public sealed class DotNetNamespaceInfo : BrowsableObjectInfo, IDotNetItemInfo
+    public interface IDotNetNamespaceInfo : IDotNetItemInfo
     {
-        public DotNetAssemblyInfo ParentDotNetAssemblyInfo { get; }
+        bool IsRootNamespace { get; }
+    }
+
+    public sealed class DotNetNamespaceInfo : BrowsableDotNetItemInfo, IDotNetNamespaceInfo
+    {
+        public IDotNetAssemblyInfo ParentDotNetAssemblyInfo { get; }
 
         public override IBrowsableObjectInfo Parent { get; }
 
         public bool IsRootNamespace { get; }
 
-        public DotNetItemType DotNetItemType { get; } = DotNetItemType.Namespace;
+        public override DotNetItemType DotNetItemType { get; } = DotNetItemType.Namespace;
 
-        internal DotNetNamespaceInfo(in string path, DotNetAssemblyInfo dotNetAssemblyInfo, IBrowsableObjectInfo parent, bool isRootNamespace) : base(path)
+        internal DotNetNamespaceInfo(in string path, in string name, IDotNetItemInfo parent, bool isRootNamespace) : base(path,name)
         {
 #if DEBUG
             #region Null, empty and white space checks
             Debug.Assert(!IsNullEmptyOrWhiteSpace(path));
 
-            Debug.Assert(If(IfCT.And, IfCM.Logical, IfComp.NotEqual, null, dotNetAssemblyInfo, parent));
+            Debug.Assert(If(ComparisonType.And, ComparisonMode.Logical, Comparison.NotEqual, null, parent, parent.ParentDotNetAssemblyInfo));
             #endregion
 
             #region Value checks
-            Debug.Assert(object.ReferenceEquals(parent, dotNetAssemblyInfo) == isRootNamespace);
+            Debug.Assert(object.ReferenceEquals(parent, parent.ParentDotNetAssemblyInfo) == isRootNamespace);
 
-            Debug.Assert(isRootNamespace == !path.Contains('.'));
+            Debug.Assert(isRootNamespace == !path.Contains('.', StringComparison.CurrentCulture));
+
+            Debug.Assert(path.EndsWith('.' + name, StringComparison.CurrentCulture) || name == path);
             #endregion
 #endif
 
-            ParentDotNetAssemblyInfo = dotNetAssemblyInfo;
+            ParentDotNetAssemblyInfo = parent.ParentDotNetAssemblyInfo;
 
             IsRootNamespace = isRootNamespace;
 

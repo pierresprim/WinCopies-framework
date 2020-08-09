@@ -21,18 +21,16 @@ using Microsoft.WindowsAPICodePack.Shell;
 
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Security;
 using System.Security.AccessControl;
 using System.Text;
-using System.Windows;
-using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 
-using WinCopies.IO.ObjectModel;
 using WinCopies.Linq;
 using WinCopies.Util;
+
+using static Microsoft.WindowsAPICodePack.NativeAPI.Consts.DllNames;
 
 using static WinCopies.Util.Util;
 
@@ -83,11 +81,6 @@ namespace WinCopies.IO
             // public override bool IsRenamingSupported => false;
 
             #region Fields
-
-            private const int FileIcon = 0;
-            private const int ComputerIcon = 15;
-            private const int FolderIcon = 3;
-
             private RegistryKey _registryKey;
 
             private IBrowsableObjectInfo _parent;
@@ -136,7 +129,7 @@ namespace WinCopies.IO
 
             }
 
-            public override string Description => "N/A";
+            public override string Description => NotApplicable;
 
             /// <summary>
             /// The Windows registry item type of this <see cref="RegistryItemInfo"/>.
@@ -203,9 +196,9 @@ namespace WinCopies.IO
 
 #endif
 
-            #endregion
-
             public override FileSystemType ItemFileSystemType => FileSystemType.Registry;
+
+            #endregion
 
             #region Constructors
 
@@ -302,7 +295,7 @@ namespace WinCopies.IO
 
             #endregion
 
-            #region Public methods
+            #region Methods
 
             ///// <summary>
             ///// Gets a default comparer for <see cref="FileSystemObject"/>s.
@@ -364,24 +357,17 @@ namespace WinCopies.IO
             /// <param name="writable">A <see cref="bool"/> value that indicates whether the registry key has to be opened with write-rights</param>
             public void OpenKey(bool writable) => _registryKey = Registry.OpenRegistryKey(Path, writable);
 
-            #endregion
-
-            #region Protected methods
-
             /// <summary>
             /// Returns the parent of this <see cref="RegistryItemInfo"/>.
             /// </summary>
             /// <returns>The parent of this <see cref="RegistryItemInfo"/>.</returns>
             private IBrowsableObjectInfo GetParent()
             {
-
                 switch (RegistryItemType)
-
                 {
-
                     case RegistryItemType.Key:
 
-                        string[] path = RegistryKey.Name.Split(WinCopies.IO.Path.PathSeparator);
+                        string[] path = RegistryKey.Name.Split(IO.Path.PathSeparator);
 
                         if (path.Length == 1)
 
@@ -402,9 +388,7 @@ namespace WinCopies.IO
                     default:
 
                         return null;
-
                 }
-
             }
 
             ///// <summary>
@@ -419,14 +403,8 @@ namespace WinCopies.IO
 
                 if (disposing)
 
-                {
-
                     _registryKey = null;
-
-                }
             }
-
-            #endregion
 
             private BitmapSource TryGetBitmapSource(int size)
             {
@@ -447,17 +425,7 @@ namespace WinCopies.IO
                         break;
                 }
 
-#if NETFRAMEWORK
-
-            using (Icon icon = TryGetIcon(iconIndex, Microsoft.WindowsAPICodePack.NativeAPI.Consts.DllNames.Shell32, new System.Drawing.Size(size, size)))
-
-#else
-
-                using Icon icon = TryGetIcon(iconIndex, Microsoft.WindowsAPICodePack.NativeAPI.Consts.DllNames.Shell32, new System.Drawing.Size(size, size));
-
-#endif
-
-                return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+                return TryGetBitmapSource(iconIndex, Shell32, size);
             }
 
             public override IEnumerable<IBrowsableObjectInfo> GetItems()
@@ -498,6 +466,7 @@ namespace WinCopies.IO
                     //{
 
                     /*FieldInfo[] _registryKeyFields = */
+
                     return typeof(Microsoft.Win32.Registry).GetFields().Select(f => (RegistryKey)f.GetValue(null)).WherePredicate(predicate).Select(item => new RegistryItemInfo(item));
 
                 //string name;
@@ -651,6 +620,8 @@ namespace WinCopies.IO
             public override Collections.IEqualityComparer<IFileSystemObject> GetDefaultEqualityComparer() => new RegistryItemInfoEqualityComparer<IFileSystemObject>();
 
             public override IComparer<IFileSystemObject> GetDefaultComparer() => new RegistryItemInfoComparer<IFileSystemObject>();
+
+            #endregion
         }
     }
 }

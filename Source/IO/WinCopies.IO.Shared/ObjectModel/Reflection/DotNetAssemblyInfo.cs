@@ -27,7 +27,7 @@ using WinCopies.IO.Reflection;
 
 namespace WinCopies.IO.ObjectModel.Reflection
 {
-    public class DotNetAssemblyInfo : ShellObjectInfo
+    public class DotNetAssemblyInfo : ShellObjectInfo, IDotNetAssemblyInfo
     {
         public override bool IsBrowsable => true;
 
