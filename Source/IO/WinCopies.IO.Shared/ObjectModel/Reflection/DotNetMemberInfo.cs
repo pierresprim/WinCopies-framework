@@ -19,9 +19,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
-using System.Text;
-
+using WinCopies.Collections;
 using WinCopies.IO.Reflection;
+
+using static WinCopies.Util.Util;
 
 namespace WinCopies.IO.ObjectModel.Reflection
 {
@@ -32,25 +33,17 @@ namespace WinCopies.IO.ObjectModel.Reflection
 
     public sealed class DotNetMemberInfo : BrowsableDotNetItemInfo, IDotNetMemberInfo
     {
-        public override DotNetItemType DotNetItemType { get; }
-
-        public override IBrowsableObjectInfo Parent { get; }
-
-        public override IDotNetAssemblyInfo ParentDotNetAssemblyInfo { get; }
-
         public MemberInfo MemberInfo { get; }
 
-        internal DotNetMemberInfo(in string path,  in DotNetItemType dotNetItemType, in MemberInfo memberInfo, in IDotNetTypeInfo dotNetTypeInfo ) : base(path, memberInfo.Name)   
+        internal DotNetMemberInfo(in MemberInfo memberInfo, in DotNetItemType dotNetItemType, in IDotNetTypeInfo dotNetTypeInfo) : base($"{dotNetTypeInfo.Path}{IO.Path.PathSeparator}{memberInfo.Name}", memberInfo.Name, dotNetItemType, dotNetTypeInfo)
         {
-            Debug.Assert(Util.Util.If(Util.Util.ComparisonType.And, Util.Util.ComparisonMode.Logical, Util.Util.Comparison.NotEqual, null, dotNetTypeInfo, dotNetTypeInfo.ParentDotNetAssemblyInfo));
-
-            DotNetItemType = dotNetItemType;
-
-            Parent = dotNetTypeInfo;
-
-            ParentDotNetAssemblyInfo = dotNetTypeInfo.ParentDotNetAssemblyInfo;
+            Debug.Assert(If(ComparisonType.And, ComparisonMode.Logical, Comparison.NotEqual, null, dotNetTypeInfo, dotNetTypeInfo.ParentDotNetAssemblyInfo));
 
             MemberInfo = memberInfo;
         }
+
+        public override IEnumerable<IBrowsableObjectInfo> GetItems() => throw new System.NotImplementedException();
+
+        public  IEnumerable<IBrowsableObjectInfo> GetItems(IEnumerable<DotNetItemType> enumerable, Predicate<DotNetMemberInfoEnumeratorStruct> func) => new Enumerable<IBrowsableObjectInfo>(() => new DotNetMemberInfoEnumerator(this, enumerable, func));
     }
 }

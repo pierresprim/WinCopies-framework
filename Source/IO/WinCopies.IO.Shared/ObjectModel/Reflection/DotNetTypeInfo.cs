@@ -22,26 +22,17 @@ using System.Reflection;
 using WinCopies.IO.Reflection;
 
 using static WinCopies.IO.Path;
-using static WinCopies.Util.Util;
 
 namespace WinCopies.IO.ObjectModel.Reflection
 {
     public sealed class DotNetTypeInfo : BrowsableDotNetItemInfo, IDotNetTypeInfo
     {
-        public IDotNetAssemblyInfo ParentDotNetAssemblyInfo { get; }
-
-        public DotNetItemType DotNetItemType { get; }
-
         public TypeInfo TypeInfo { get; }
 
-        public override IBrowsableObjectInfo Parent { get; } 
-
-        internal DotNetTypeInfo(in string path, TypeInfo typeInfo, in DotNetItemType itemType, in IDotNetItemInfo parent ) : base(path, typeInfo.Name)
+        internal DotNetTypeInfo(TypeInfo typeInfo, in DotNetItemType itemType, in IDotNetItemInfo parent) : base($"{parent.Path}{PathSeparator}{typeInfo.Name}", typeInfo.Name, itemType, parent)
         {
 #if DEBUG
-            Debug.Assert(path == $"{typeInfo.Namespace.Replace('.', PathSeparator)}{PathSeparator}{typeInfo.Name}");
-
-            Debug.Assert(If(ComparisonType.And, ComparisonMode.Logical, Comparison.NotEqual, null, parent, parent.ParentDotNetAssemblyInfo));
+            Debug.Assert(parent.ParentDotNetAssemblyInfo != null);
 
             switch (itemType)
             {
@@ -76,16 +67,9 @@ namespace WinCopies.IO.ObjectModel.Reflection
 
                     break;
             }
-
 #endif
 
             TypeInfo = typeInfo;
-
-            Parent = parent;
-
-            ParentDotNetAssemblyInfo = parent.ParentDotNetAssemblyInfo;
-
-            DotNetItemType = itemType;
         }
     }
 }

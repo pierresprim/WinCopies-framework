@@ -52,7 +52,7 @@ namespace WinCopies.IO
 #if DEBUG
             , FileSystemEntryEnumeratorProcessSimulation simulationParameters
 #endif
-            ) where T : IPathInfo => new Enumerable<T>(() => new TreeEnumerator<T>(paths.Select(item => new RecursivelyEnumerablePath<T>(item, searchPattern, searchOption
+            ) where T : IPathInfo => new Enumerable<T>(() => new RecursiveEnumerator<T>(paths.Select(item => new RecursivelyEnumerablePath<T>(item, searchPattern, searchOption
 #if NETCORE
                 , enumerationOptions
 #endif

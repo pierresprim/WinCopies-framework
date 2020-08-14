@@ -50,12 +50,14 @@ namespace WinCopies.IO.ObjectModel
         #endregion
 
         #region Properties
-        IBrowsableObjectInfo ITreeEnumerable<IBrowsableObjectInfo>.Value => this;
+        IBrowsableObjectInfo IRecursiveEnumerable<IBrowsableObjectInfo>.Value => this;
 
         /// <summary>
         /// When overridden in a derived class, gets a value that indicates whether this <see cref="BrowsableObjectInfo"/> is browsable.
         /// </summary>
         public abstract bool IsBrowsable { get; }
+
+        public abstract bool IsRecursivelyBrowsable { get; } 
 
         /// <summary>
         /// Gets the <see cref="IBrowsableObjectInfo"/> parent of this <see cref="BrowsableObjectInfo"/>. Returns <see langword="null"/> if this object is the root object of a hierarchy.
@@ -178,9 +180,9 @@ namespace WinCopies.IO.ObjectModel
 #endif
             );
 
-        IEnumerator<ITreeEnumerable<IBrowsableObjectInfo>> ITreeEnumerableProviderEnumerable<IBrowsableObjectInfo>.GetRecursiveEnumerator() => GetItems().GetEnumerator();
+        IEnumerator<IRecursiveEnumerable<IBrowsableObjectInfo>> IRecursiveEnumerableProviderEnumerable<IBrowsableObjectInfo>.GetRecursiveEnumerator() => GetItems().GetEnumerator();
 
-        public TreeEnumerator<IBrowsableObjectInfo> GetEnumerator() => new TreeEnumerator<IBrowsableObjectInfo>(this);
+        public RecursiveEnumerator<IBrowsableObjectInfo> GetEnumerator() => new RecursiveEnumerator<IBrowsableObjectInfo>(this);
 
         IEnumerator<IBrowsableObjectInfo> IEnumerable<IBrowsableObjectInfo>.GetEnumerator() => GetItems().GetEnumerator();
 

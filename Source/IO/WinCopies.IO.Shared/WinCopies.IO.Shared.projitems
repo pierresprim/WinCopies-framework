@@ -36,6 +36,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\Reflection\DotNetMemberInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\Reflection\DotNetNamespaceInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\Reflection\DotNetTypeInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\Reflection\Enumeration\DotNetMemberInfoEnumerator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\Reflection\Enumeration\DotNetNamespaceInfoEnumerator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\Reflection\Enumeration\DotNetTypeInfoEnumerator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PathInfo.cs" />

@@ -29,12 +29,14 @@ namespace WinCopies.IO.ObjectModel
     /// <summary>
     /// Provides interoperability for interacting with browsable items.
     /// </summary>
-    public interface IBrowsableObjectInfo : IFileSystemObject,  ITreeEnumerable<IBrowsableObjectInfo>, IDisposable
+    public interface IBrowsableObjectInfo : IFileSystemObject,  IRecursiveEnumerable<IBrowsableObjectInfo>, IDisposable
     {
         /// <summary>
         /// Gets a value that indicates whether this <see cref="IBrowsableObjectInfo"/> is browsable.
         /// </summary>
         bool IsBrowsable { get; }
+
+        bool IsRecursivelyBrowsable { get; } 
 
         /// <summary>
         /// Gets the <see cref="IBrowsableObjectInfo"/> parent of this <see cref="IBrowsableObjectInfo"/>. Returns <see langword="null"/> if this object is the root object of a hierarchy.

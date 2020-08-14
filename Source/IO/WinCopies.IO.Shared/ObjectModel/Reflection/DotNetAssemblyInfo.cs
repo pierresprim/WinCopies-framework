@@ -29,7 +29,9 @@ namespace WinCopies.IO.ObjectModel.Reflection
 {
     public class DotNetAssemblyInfo : ShellObjectInfo, IDotNetAssemblyInfo
     {
-        public override bool IsBrowsable => true;
+        public override bool IsBrowsable { get; } = true;
+
+        public sealed override bool IsRecursivelyBrowsable { get; } = false;
 
         public Assembly Assembly { get; }
 
@@ -42,12 +44,12 @@ namespace WinCopies.IO.ObjectModel.Reflection
             return initInfo.FileType == FileType.File ? new DotNetAssemblyInfo(initInfo.Path, shellObject) : throw new ArgumentException($"{nameof(shellObject)} is not a file.");
         }
 
-        public override IEnumerable<IBrowsableObjectInfo> GetItems(in Predicate<ArchiveFileInfoEnumeratorStruct> func) => throw new NotSupportedException();
+        public override IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<ArchiveFileInfoEnumeratorStruct> func) => throw new NotSupportedException();
 
         public override IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<ShellObjectInfoEnumeratorStruct> func) => throw new NotSupportedException();
 
-        public override IEnumerable<IBrowsableObjectInfo> GetItems() => GetItems((Predicate<string>)null);
+        public override IEnumerable<IBrowsableObjectInfo> GetItems() => GetItems(new DotNetItemType[] { DotNetItemType.Namespace, DotNetItemType.Struct, DotNetItemType.Enum, DotNetItemType.Class, DotNetItemType.Interface, DotNetItemType.Delegate }, null);
 
-        public virtual IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<string> func) => new Enumerable<string>(() => new DotNetNamespaceInfoEnumerator(this, func)).Select(_namespace => new DotNetNamespaceInfo(_namespace, this, this, true));
+        public virtual IEnumerable<IBrowsableObjectInfo> GetItems(IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetNamespaceEnumeratorStruct> func) => new Enumerable<IDotNetItemInfo>(() => new DotNetNamespaceInfoEnumerator(this, Assembly.DefinedTypes, typesToEnumerate, func));
     }
 }

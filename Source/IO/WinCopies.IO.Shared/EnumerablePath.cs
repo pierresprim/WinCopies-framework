@@ -691,7 +691,7 @@ namespace WinCopies.IO
         }
     }
 
-    public interface IRecursivelyEnumerablePath<T> : IEnumerablePath<T>, ITreeEnumerable<T> where T : IPathInfo
+    public interface IRecursivelyEnumerablePath<T> : IEnumerablePath<T>, IRecursiveEnumerable<T> where T : IPathInfo
     {
         // Left empty.
     }
@@ -735,9 +735,9 @@ namespace WinCopies.IO
                 );
         }
 
-        public IEnumerator<ITreeEnumerable<T>> GetRecursiveEnumerator() => _getRecursiveEnumeratorDelegate();
+        public IEnumerator<IRecursiveEnumerable<T>> GetRecursiveEnumerator() => _getRecursiveEnumeratorDelegate();
 
-        public TreeEnumerator<T> GetEnumerator() => new TreeEnumerator<T>(this);
+        public RecursiveEnumerator<T> GetEnumerator() => new RecursiveEnumerator<T>(this);
 
         IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
 

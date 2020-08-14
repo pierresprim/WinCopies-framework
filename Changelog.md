@@ -39,10 +39,12 @@ WinCopies.IO 2.6-preview
 	- RegistryItemInfoEnumeratorStruct, RegistryItemType and WMIItemType have moved to the WinCopies.IO namespace.
 	- IBrowsableObjectInfo now implements the new WinCopies.Collections.Generic.ITreeEnumerable interface.
 	- Improved performance of the WinCopies.IO.File.IsDuplicate methods.
+	- ArchiveItemInfo.IsBrowsable returns false when the FileType property is set to Archive.
 - Removals:
 	- FileSystemEntryEnumerator
 	- PathInfoFileSystemEntryEnumerator
 - Additions:
+	- IBrowsableObjectInfo.IsRecursivelyBrowsable property.
 	- .Net reflection browsing using the IBrowsableObjectInfo interface.
 	- ShellObjectInfoEnumerator
 	- (I)(Recursively)EnumerablePath

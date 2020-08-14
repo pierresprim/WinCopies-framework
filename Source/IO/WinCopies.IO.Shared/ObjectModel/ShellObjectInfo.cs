@@ -268,7 +268,7 @@ namespace WinCopies.IO
                 else return null;
             }
 
-            public virtual IEnumerable<IBrowsableObjectInfo> GetItems(in Predicate<ArchiveFileInfoEnumeratorStruct> func)
+            public virtual IEnumerable<IBrowsableObjectInfo> GetItems( Predicate<ArchiveFileInfoEnumeratorStruct> func)
             {
                 ThrowIfNull(func, nameof(func));
 

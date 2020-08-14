@@ -68,12 +68,12 @@ namespace WinCopies.IO
             #endregion
 
             private IBrowsableObjectInfo _parent;
+            private string _itemTypeName;
+            private bool? _isBrowsable;
 
             #region Properties
 
             public override bool IsSpecialItem => false;
-
-            private string _itemTypeName;
 
             public override string ItemTypeName
             {
@@ -127,7 +127,7 @@ namespace WinCopies.IO
 
 #else
 
-        public override IBrowsableObjectInfo Parent => _parent ?? (_parent = GetParent());
+            public override IBrowsableObjectInfo Parent => _parent ?? (_parent = GetParent());
 
 #endif
 
@@ -169,7 +169,35 @@ namespace WinCopies.IO
             /// <summary>
             /// Gets a value that indicates whether this <see cref="WMIItemInfo"/> is browsable.
             /// </summary>
-            public override bool IsBrowsable => WMIItemType == WMIItemType.Namespace || WMIItemType == WMIItemType.Class;
+            public override bool IsBrowsable
+            {
+                get
+                {
+                    if (_isBrowsable.HasValue)
+
+                        return _isBrowsable.Value;
+
+                    switch (WMIItemType)
+                    {
+                        case WMIItemType.Namespace:
+                        case WMIItemType.Class:
+
+                            _isBrowsable = true;
+
+                            break;
+
+                        default:
+
+                            _isBrowsable = false;
+
+                            break;
+                    }
+
+                    return _isBrowsable.Value;
+                }
+            }
+
+            public override bool IsRecursivelyBrowsable { get; } = true;
 
             public WMIItemType WMIItemType { get; }
 

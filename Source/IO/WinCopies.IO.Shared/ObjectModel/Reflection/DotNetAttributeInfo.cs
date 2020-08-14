@@ -15,8 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
+using System.Windows.Media.Imaging;
 
 using WinCopies.IO.Reflection;
 
@@ -24,25 +27,25 @@ using static WinCopies.Util.Util;
 
 namespace WinCopies.IO.ObjectModel.Reflection
 {
-    public sealed class DotNetAttributeInfo : BrowsableDotNetItemInfo, IDotNetAttributeInfo
+    public sealed class DotNetAttributeInfo : DotNetItemInfo, IDotNetAttributeInfo
     {
-        public override IBrowsableObjectInfo Parent { get; }
-
         public CustomAttributeData CustomAttributeData { get; }
 
-        public override DotNetItemType DotNetItemType { get; } = DotNetItemType.Attribute;
+        public override bool IsBrowsable { get; } = false;
 
-        public override IDotNetAssemblyInfo ParentDotNetAssemblyInfo { get; }
+        public override string ItemTypeName => ".Net attribute";
 
-        internal DotNetAttributeInfo(in string path, in IDotNetItemInfo parent, in CustomAttributeData customAttributeData) : base(path, customAttributeData.AttributeType.Name)
+        public override bool IsSpecialItem => false;
+
+        protected sealed override BitmapSource TryGetBitmapSource(in int size) => TryGetBitmapSource(FileIcon, Microsoft.WindowsAPICodePack.NativeAPI.Consts.DllNames.Shell32, size);
+
+        internal DotNetAttributeInfo(in CustomAttributeData customAttributeData, in IDotNetItemInfo parent) : base($"{parent.Path}{IO.Path.PathSeparator}{customAttributeData.AttributeType.Name}", customAttributeData.AttributeType.Name, DotNetItemType.Attribute, parent)
         {
             Debug.Assert(If(ComparisonType.And, ComparisonMode.Logical, Comparison.NotEqual, null, parent, parent.ParentDotNetAssemblyInfo, customAttributeData));
 
-            Parent = parent;
-
             CustomAttributeData = customAttributeData;
-
-            ParentDotNetAssemblyInfo = parent.ParentDotNetAssemblyInfo;
         }
+
+        public override IEnumerable<IBrowsableObjectInfo> GetItems() => throw new NotSupportedException("This item does not support browsing.");
     }
 }

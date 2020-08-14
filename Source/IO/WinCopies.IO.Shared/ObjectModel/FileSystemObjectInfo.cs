@@ -37,6 +37,8 @@ namespace WinCopies.IO.ObjectModel
         /// </summary>
         public abstract FileType FileType { get; }
 
+        public override bool IsRecursivelyBrowsable { get; } = true;
+
         protected FileSystemObjectInfo(in string path) : this(path, null) { }
 
         // /// <param name="fileType">The <see cref="FileType"/> of this <see cref="BrowsableObjectInfo"/>.</param>

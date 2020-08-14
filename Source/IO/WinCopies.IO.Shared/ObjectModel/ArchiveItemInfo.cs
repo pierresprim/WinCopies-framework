@@ -41,6 +41,7 @@ namespace WinCopies.IO.ObjectModel
     public class ArchiveItemInfo : ArchiveItemInfoProvider, IArchiveItemInfo
     {
         private IBrowsableObjectInfo _parent;
+        private bool? _isBrowsable;
 
         #region Properties
         //IShellObjectInfo IArchiveItemInfoProvider.ArchiveShellObject => ArchiveShellObjectOverride;
@@ -56,7 +57,34 @@ namespace WinCopies.IO.ObjectModel
         /// <summary>
         /// Gets a value that indicates whether this <see cref="ArchiveItemInfo"/> is browsable.
         /// </summary>
-        public override bool IsBrowsable => If(IfCT.Or, IfCM.Logical, IfComp.Equal, FileType, FileType.Folder, FileType.Drive, FileType.Archive);
+        public override bool IsBrowsable
+        {
+            get
+            {
+                if (_isBrowsable.HasValue)
+
+                    return _isBrowsable.Value;
+
+                switch (FileType)
+                {
+                    case FileType.Folder:
+                    case FileType.Drive:
+                        // case FileType.Archive:
+
+                        _isBrowsable = true;
+
+                        break;
+
+                    default:
+
+                        _isBrowsable = false;
+
+                        break;
+                }
+
+                return _isBrowsable.Value;
+            }
+        }
 
 #if NETFRAMEWORK
         public override IBrowsableObjectInfo Parent => _parent ?? (_parent=GetParent());

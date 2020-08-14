@@ -16,8 +16,12 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+
+using WinCopies.Collections;
 using WinCopies.IO.Reflection;
+
 using static WinCopies.Util.Util;
 
 namespace WinCopies.IO.ObjectModel.Reflection
@@ -29,37 +33,33 @@ namespace WinCopies.IO.ObjectModel.Reflection
 
     public sealed class DotNetNamespaceInfo : BrowsableDotNetItemInfo, IDotNetNamespaceInfo
     {
-        public IDotNetAssemblyInfo ParentDotNetAssemblyInfo { get; }
-
-        public override IBrowsableObjectInfo Parent { get; }
-
         public bool IsRootNamespace { get; }
 
-        public override DotNetItemType DotNetItemType { get; } = DotNetItemType.Namespace;
+        public override bool IsSpecialItem { get; } = false;
 
-        internal DotNetNamespaceInfo(in string path, in string name, IDotNetItemInfo parent, bool isRootNamespace) : base(path,name)
+        public override string ItemTypeName { get; } = ".Net namespace";
+
+        internal DotNetNamespaceInfo(in string name, bool isRootNamespace, IBrowsableObjectInfo parent) : base(isRootNamespace ? name : $"{parent.Path}{IO.Path.PathSeparator}{name}", name, DotNetItemType.Namespace, parent)
         {
 #if DEBUG
-            #region Null, empty and white space checks
-            Debug.Assert(!IsNullEmptyOrWhiteSpace(path));
+            Debug.Assert((parent is IDotNetAssemblyInfo) == isRootNamespace);
 
-            Debug.Assert(If(ComparisonType.And, ComparisonMode.Logical, Comparison.NotEqual, null, parent, parent.ParentDotNetAssemblyInfo));
-            #endregion
+            Debug.Assert(isRootNamespace == !Path.Contains(
+#if NETFRAMEWORK
+                "."
+#else
+                '.', StringComparison.CurrentCulture
+#endif
+                ));
 
-            #region Value checks
-            Debug.Assert(object.ReferenceEquals(parent, parent.ParentDotNetAssemblyInfo) == isRootNamespace);
-
-            Debug.Assert(isRootNamespace == !path.Contains('.', StringComparison.CurrentCulture));
-
-            Debug.Assert(path.EndsWith('.' + name, StringComparison.CurrentCulture) || name == path);
-            #endregion
+            Debug.Assert(Path.EndsWith('.' + name, StringComparison.CurrentCulture) || name == Path);
 #endif
 
-            ParentDotNetAssemblyInfo = parent.ParentDotNetAssemblyInfo;
-
             IsRootNamespace = isRootNamespace;
-
-            Parent = parent;
         }
+
+        public override IEnumerable<IBrowsableObjectInfo> GetItems() => GetItems(new DotNetItemType[] { DotNetItemType.Namespace, DotNetItemType.Struct, DotNetItemType.Enum, DotNetItemType.Class, DotNetItemType.Interface, DotNetItemType.Delegate }, GetCommonPredicate<DotNetNamespaceEnumeratorStruct>());
+
+        public IEnumerable<IBrowsableObjectInfo> GetItems(IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetNamespaceEnumeratorStruct> func) => new Enumerable<IBrowsableObjectInfo>(() => new DotNetNamespaceInfoEnumerator(this, ParentDotNetAssemblyInfo.Assembly.DefinedTypes, typesToEnumerate, func));
     }
 }

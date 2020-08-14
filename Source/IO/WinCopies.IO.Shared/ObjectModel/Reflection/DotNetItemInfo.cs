@@ -15,39 +15,38 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+using System;
+using System.Diagnostics;
 using System.Windows.Media.Imaging;
 
 using WinCopies.IO.Reflection;
 
-using static Microsoft.WindowsAPICodePack.NativeAPI.Consts.DllNames;
+using static WinCopies.Util.Util;
 
 namespace WinCopies.IO.ObjectModel.Reflection
 {
     public abstract class DotNetItemInfo : BrowsableObjectInfo, IDotNetItemInfo
     {
-        public override sealed string Name { get; }
+        public sealed override string Name { get; }
 
         public sealed override Size? Size { get; } = null;
 
-        public override sealed string LocalizedName => Name;
+        public sealed override string LocalizedName => Name;
 
-        public sealed override string Description { get; } = Util.Util.NotApplicable;
+        public sealed override string Description { get; } = NotApplicable;
 
         public sealed override FileSystemType ItemFileSystemType { get; } = FileSystemType.None;
 
-        public abstract IDotNetAssemblyInfo ParentDotNetAssemblyInfo { get; }
+        public sealed override IBrowsableObjectInfo Parent { get; }
 
-        public abstract DotNetItemType DotNetItemType { get; }
+        public IDotNetAssemblyInfo ParentDotNetAssemblyInfo { get; }
 
-        protected DotNetItemInfo(in string path, in string name) : base(path) => Name = name;
-    }
+        public DotNetItemType DotNetItemType { get; }
 
-    public abstract class BrowsableDotNetItemInfo : DotNetItemInfo
-    {
-        public override sealed bool IsBrowsable { get; } = true;
+        public sealed override bool IsRecursivelyBrowsable { get; } = false;
 
         #region BitmapSources
-        private static BitmapSource TryGetBitmapSource(int size) => TryGetBitmapSource(FolderIcon, Shell32, size);
+        protected abstract BitmapSource TryGetBitmapSource(in int size);
 
         private BitmapSource _smallBitmapSource;
         private BitmapSource _mediumBitmapSource;
@@ -103,9 +102,33 @@ namespace WinCopies.IO.ObjectModel.Reflection
             ;
         #endregion
 
-        protected BrowsableDotNetItemInfo(in string path, in string name) : base(path, name)
+        protected DotNetItemInfo(in string path, in string name, in DotNetItemType dotNetItemType, in IBrowsableObjectInfo parent) : base(path)
+        {
+            Debug.Assert(!(IsNullEmptyOrWhiteSpace(Path) || IsNullEmptyOrWhiteSpace(name)));
+
+            ThrowIfNull(parent, nameof(parent));
+
+            Name = name;
+
+            DotNetItemType = dotNetItemType;
+
+            Parent = parent;
+
+            // todo: provide two constructors:
+
+            ParentDotNetAssemblyInfo = parent is IDotNetItemInfo dotNetItemInfo ? dotNetItemInfo.ParentDotNetAssemblyInfo ?? throw new ArgumentException($"{nameof(dotNetItemInfo)} has no parent IDotNetAssemblyInfo.") : parent is IDotNetAssemblyInfo dotNetAssemblyInfo ? dotNetAssemblyInfo : throw new ArgumentException($"{nameof(parent)} must be an {nameof(IDotNetAssemblyInfo)} or an {nameof(IDotNetItemInfo)}.", nameof(parent));
+        }
+    }
+
+    public abstract class BrowsableDotNetItemInfo : DotNetItemInfo
+    {
+        public override sealed bool IsBrowsable { get; } = true;
+
+        protected BrowsableDotNetItemInfo(in string path, in string name, in DotNetItemType dotNetItemType, in IBrowsableObjectInfo parent) : base(path, name, dotNetItemType, parent)
         {
             // Left empty.
         }
+
+        protected sealed override BitmapSource TryGetBitmapSource(in int size) => TryGetBitmapSource(FolderIcon, Microsoft.WindowsAPICodePack.NativeAPI.Consts.DllNames.Shell32, size);
     }
 }

@@ -87,6 +87,16 @@ namespace WinCopies.IO.Reflection
         /// <summary>
         /// The item is a .Net return parameter.
         /// </summary>
-        ReturnParameter = 14
+        ReturnParameter = 14,
+
+        /// <summary>
+        /// The item is a .Net generic parameter.
+        /// </summary>
+        GenericParameter = 15,
+
+        /// <summary>
+        /// The item is a .Net generic argument.
+        /// </summary>
+        GenericArgument = 16
     }
 }

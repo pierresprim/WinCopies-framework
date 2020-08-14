@@ -82,8 +82,8 @@ namespace WinCopies.IO
 
             #region Fields
             private RegistryKey _registryKey;
-
             private IBrowsableObjectInfo _parent;
+            private bool? _isBrowsable;
 
             #endregion
 
@@ -184,7 +184,35 @@ namespace WinCopies.IO
             /// <summary>
             /// Gets a value that indicates whether this <see cref="RegistryItemInfo"/> is browsable.
             /// </summary>
-            public override bool IsBrowsable => RegistryItemType == RegistryItemType.Root || RegistryItemType == RegistryItemType.Key;
+            public override bool IsBrowsable
+            {
+                get
+                {
+                    if (_isBrowsable.HasValue)
+
+                        return _isBrowsable.Value;
+
+                    switch (RegistryItemType)
+                    {
+                        case RegistryItemType.Root:
+                        case RegistryItemType.Key:
+
+                            _isBrowsable = true;
+
+                            break;
+
+                        default:
+
+                            _isBrowsable = false;
+
+                            break;
+                    }
+
+                    return _isBrowsable.Value;
+                }
+            }
+
+            public override bool IsRecursivelyBrowsable { get; } = true;
 
 #if NETCORE
 
@@ -192,7 +220,7 @@ namespace WinCopies.IO
 
 #else
 
-        public override IBrowsableObjectInfo Parent => _parent ?? (_parent = GetParent());
+            public override IBrowsableObjectInfo Parent => _parent ?? (_parent = GetParent());
 
 #endif
 

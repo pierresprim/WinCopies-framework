@@ -50,7 +50,7 @@ namespace WinCopies.IO.ObjectModel
         /// <param name="path">The path of this <see cref="FileSystemObject"/>.</param>
         protected FileSystemObject(string path) => Path = path;
 
-        public virtual WinCopies.Collections.IEqualityComparer<IFileSystemObject> GetDefaultEqualityComparer() => new FileSystemObjectEqualityComparer<IFileSystemObject>();
+        public virtual Collections.IEqualityComparer<IFileSystemObject> GetDefaultEqualityComparer() => new FileSystemObjectEqualityComparer<IFileSystemObject>();
 
         ///// <summary>
         ///// Determines whether the specified <see cref="IFileSystemObject"/> is equal to the current object by calling the <see cref="Equals(object)"/> method.
