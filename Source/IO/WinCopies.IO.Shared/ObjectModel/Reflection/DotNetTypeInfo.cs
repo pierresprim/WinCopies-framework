@@ -16,6 +16,7 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 
@@ -29,10 +30,20 @@ namespace WinCopies.IO.ObjectModel.Reflection
     {
         public TypeInfo TypeInfo { get; }
 
-        internal DotNetTypeInfo(TypeInfo typeInfo, in DotNetItemType itemType, in IDotNetItemInfo parent) : base($"{parent.Path}{PathSeparator}{typeInfo.Name}", typeInfo.Name, itemType, parent)
+        public bool? IsRootType { get; }
+
+        public override string ItemTypeName => ".Net type";
+
+        internal DotNetTypeInfo(TypeInfo typeInfo, in DotNetItemType itemType, in bool? isRootType, in IBrowsableObjectInfo parent) : base(isRootType.HasValue && isRootType.Value ? typeInfo.Name : $"{parent.Path}{PathSeparator}{typeInfo.Name}", typeInfo.Name, itemType, parent)
         {
 #if DEBUG
-            Debug.Assert(parent.ParentDotNetAssemblyInfo != null);
+            if (isRootType.HasValue && isRootType.Value)
+
+                Debug.Assert(parent is IDotNetAssemblyInfo);
+
+            else
+
+                Debug.Assert(parent is IDotNetNamespaceInfo dotNetNamespaceInfo && dotNetNamespaceInfo.ParentDotNetAssemblyInfo != null);
 
             switch (itemType)
             {
@@ -70,6 +81,12 @@ namespace WinCopies.IO.ObjectModel.Reflection
 #endif
 
             TypeInfo = typeInfo;
+
+            IsRootType = isRootType;
         }
+
+        public override IEnumerable<IBrowsableObjectInfo> GetItems() => throw new NotImplementedException();
+
+        public IEnumerable<IBrowsableObjectInfo> GetItems(IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetTypeInfoEnumeratorStruct> func)
     }
 }

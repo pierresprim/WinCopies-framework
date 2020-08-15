@@ -22,5 +22,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
     public interface IDotNetTypeInfo : IDotNetItemInfo
     {
         TypeInfo TypeInfo { get; }
+
+        bool? IsRootType { get; }
     }
 }

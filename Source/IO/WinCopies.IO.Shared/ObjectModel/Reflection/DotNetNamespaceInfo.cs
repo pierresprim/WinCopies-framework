@@ -35,8 +35,6 @@ namespace WinCopies.IO.ObjectModel.Reflection
     {
         public bool IsRootNamespace { get; }
 
-        public override bool IsSpecialItem { get; } = false;
-
         public override string ItemTypeName { get; } = ".Net namespace";
 
         internal DotNetNamespaceInfo(in string name, bool isRootNamespace, IBrowsableObjectInfo parent) : base(isRootNamespace ? name : $"{parent.Path}{IO.Path.PathSeparator}{name}", name, DotNetItemType.Namespace, parent)
@@ -58,8 +56,8 @@ namespace WinCopies.IO.ObjectModel.Reflection
             IsRootNamespace = isRootNamespace;
         }
 
-        public override IEnumerable<IBrowsableObjectInfo> GetItems() => GetItems(new DotNetItemType[] { DotNetItemType.Namespace, DotNetItemType.Struct, DotNetItemType.Enum, DotNetItemType.Class, DotNetItemType.Interface, DotNetItemType.Delegate }, GetCommonPredicate<DotNetNamespaceEnumeratorStruct>());
+        public override IEnumerable<IBrowsableObjectInfo> GetItems() => GetItems(new DotNetItemType[] { DotNetItemType.Namespace, DotNetItemType.Struct, DotNetItemType.Enum, DotNetItemType.Class, DotNetItemType.Interface, DotNetItemType.Delegate }, GetCommonPredicate<DotNetNamespaceInfoEnumeratorStruct>());
 
-        public IEnumerable<IBrowsableObjectInfo> GetItems(IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetNamespaceEnumeratorStruct> func) => new Enumerable<IBrowsableObjectInfo>(() => new DotNetNamespaceInfoEnumerator(this, ParentDotNetAssemblyInfo.Assembly.DefinedTypes, typesToEnumerate, func));
+        public IEnumerable<IBrowsableObjectInfo> GetItems(IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetNamespaceInfoEnumeratorStruct> func) => new Enumerable<IBrowsableObjectInfo>(() => new DotNetNamespaceInfoEnumerator(this, ParentDotNetAssemblyInfo.Assembly.DefinedTypes, typesToEnumerate, func));
     }
 }

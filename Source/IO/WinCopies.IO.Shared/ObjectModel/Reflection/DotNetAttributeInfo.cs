@@ -31,11 +31,9 @@ namespace WinCopies.IO.ObjectModel.Reflection
     {
         public CustomAttributeData CustomAttributeData { get; }
 
-        public override bool IsBrowsable { get; } = false;
+        public override bool IsBrowsable => false;
 
         public override string ItemTypeName => ".Net attribute";
-
-        public override bool IsSpecialItem => false;
 
         protected sealed override BitmapSource TryGetBitmapSource(in int size) => TryGetBitmapSource(FileIcon, Microsoft.WindowsAPICodePack.NativeAPI.Consts.DllNames.Shell32, size);
 

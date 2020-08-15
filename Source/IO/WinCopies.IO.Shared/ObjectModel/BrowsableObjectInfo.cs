@@ -22,7 +22,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
-using System.IO;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
@@ -50,14 +49,14 @@ namespace WinCopies.IO.ObjectModel
         #endregion
 
         #region Properties
-        IBrowsableObjectInfo IRecursiveEnumerable<IBrowsableObjectInfo>.Value => this;
+        IBrowsableObjectInfo WinCopies.Collections.Generic.IRecursiveEnumerable<IBrowsableObjectInfo>.Value => this;
 
         /// <summary>
         /// When overridden in a derived class, gets a value that indicates whether this <see cref="BrowsableObjectInfo"/> is browsable.
         /// </summary>
         public abstract bool IsBrowsable { get; }
 
-        public abstract bool IsRecursivelyBrowsable { get; } 
+        public abstract bool IsRecursivelyBrowsable { get; }
 
         /// <summary>
         /// Gets the <see cref="IBrowsableObjectInfo"/> parent of this <see cref="BrowsableObjectInfo"/>. Returns <see langword="null"/> if this object is the root object of a hierarchy.
@@ -118,7 +117,6 @@ namespace WinCopies.IO.ObjectModel
 
         internal static BitmapSource TryGetBitmapSource(in int iconIndex, in string dllName, in int size)
         {
-
 #if NETFRAMEWORK
 
             using (Icon icon = TryGetIcon(iconIndex, dllName, new System.Drawing.Size(size, size)))
@@ -132,57 +130,9 @@ namespace WinCopies.IO.ObjectModel
             return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
         }
 
-        public IEnumerable<string> GetFileSystemEntryEnumerable(string searchPattern, SearchOption? searchOption
-#if NETCORE
-            , EnumerationOptions enumerationOptions
-#endif
-#if DEBUG
-            , FileSystemEntryEnumeratorProcessSimulation simulationParameters
-#endif
-            ) => EnumerablePath.GetFileSystemEntryEnumerable(Path, searchPattern, searchOption
-#if NETCORE
-                , enumerationOptions
-#endif
-#if DEBUG
-                , simulationParameters
-#endif
-                );
+        IEnumerator<WinCopies.Collections.Generic.IRecursiveEnumerable<IBrowsableObjectInfo>> IRecursiveEnumerableProviderEnumerable<IBrowsableObjectInfo>.GetRecursiveEnumerator() => GetItems().GetEnumerator();
 
-        public IEnumerable<string> GetDirectoryEnumerable(string searchPattern, SearchOption? searchOption
-#if NETCORE
-            , EnumerationOptions enumerationOptions
-#endif
-#if DEBUG
-            , FileSystemEntryEnumeratorProcessSimulation simulationParameters
-#endif
-            ) => EnumerablePath.GetDirectoryEnumerable(Path, searchPattern, searchOption
-#if NETCORE
-                , enumerationOptions
-#endif
-#if DEBUG
-                , simulationParameters
-#endif
-                );
-
-        public IEnumerable<string> GetFileEnumerable(string searchPattern, SearchOption? searchOption
-#if NETCORE
-            , EnumerationOptions enumerationOptions
-#endif
-#if DEBUG
-            , FileSystemEntryEnumeratorProcessSimulation simulationParameters
-#endif
-            ) => EnumerablePath.GetFileEnumerable(Path, searchPattern, searchOption
-#if NETCORE
-            , enumerationOptions
-#endif
-#if DEBUG
-            , simulationParameters
-#endif
-            );
-
-        IEnumerator<IRecursiveEnumerable<IBrowsableObjectInfo>> IRecursiveEnumerableProviderEnumerable<IBrowsableObjectInfo>.GetRecursiveEnumerator() => GetItems().GetEnumerator();
-
-        public RecursiveEnumerator<IBrowsableObjectInfo> GetEnumerator() => new RecursiveEnumerator<IBrowsableObjectInfo>(this);
+        RecursiveEnumerator<IBrowsableObjectInfo> IRecursiveEnumerable<IBrowsableObjectInfo>.GetEnumerator() => IsRecursivelyBrowsable ? new RecursiveEnumerator<IBrowsableObjectInfo>(this) : throw new NotSupportedException("The current BrowsableObjectInfo does not support recursive browsing.");
 
         IEnumerator<IBrowsableObjectInfo> IEnumerable<IBrowsableObjectInfo>.GetEnumerator() => GetItems().GetEnumerator();
 

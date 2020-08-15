@@ -29,21 +29,25 @@ namespace WinCopies.IO.ObjectModel.Reflection
     public interface IDotNetMemberInfo : IDotNetItemInfo
     {
         MemberInfo MemberInfo { get; }
+
+        IEnumerable<IBrowsableObjectInfo> GetItems(IEnumerable<DotNetItemType> enumerable, Predicate<DotNetMemberInfoEnumeratorStruct> func);
     }
 
     public sealed class DotNetMemberInfo : BrowsableDotNetItemInfo, IDotNetMemberInfo
     {
         public MemberInfo MemberInfo { get; }
 
+        public override string ItemTypeName => ".Net member";
+
         internal DotNetMemberInfo(in MemberInfo memberInfo, in DotNetItemType dotNetItemType, in IDotNetTypeInfo dotNetTypeInfo) : base($"{dotNetTypeInfo.Path}{IO.Path.PathSeparator}{memberInfo.Name}", memberInfo.Name, dotNetItemType, dotNetTypeInfo)
         {
-            Debug.Assert(If(ComparisonType.And, ComparisonMode.Logical, Comparison.NotEqual, null, dotNetTypeInfo, dotNetTypeInfo.ParentDotNetAssemblyInfo));
+            Debug.Assert(If(ComparisonType.And, ComparisonMode.Logical, Util.Util.Comparison.NotEqual, null, dotNetTypeInfo, dotNetTypeInfo.ParentDotNetAssemblyInfo));
 
             MemberInfo = memberInfo;
         }
 
-        public override IEnumerable<IBrowsableObjectInfo> GetItems() => throw new System.NotImplementedException();
+        public override IEnumerable<IBrowsableObjectInfo> GetItems() => GetItems(new DotNetItemType[] { DotNetItemType.Parameter, DotNetItemType.Attribute }, null);
 
-        public  IEnumerable<IBrowsableObjectInfo> GetItems(IEnumerable<DotNetItemType> enumerable, Predicate<DotNetMemberInfoEnumeratorStruct> func) => new Enumerable<IBrowsableObjectInfo>(() => new DotNetMemberInfoEnumerator(this, enumerable, func));
+        public IEnumerable<IBrowsableObjectInfo> GetItems(IEnumerable<DotNetItemType> enumerable, Predicate<DotNetMemberInfoEnumeratorStruct> func) => new Enumerable<IBrowsableObjectInfo>(() => DotNetMemberInfoEnumerator.From(this, enumerable, func));
     }
 }

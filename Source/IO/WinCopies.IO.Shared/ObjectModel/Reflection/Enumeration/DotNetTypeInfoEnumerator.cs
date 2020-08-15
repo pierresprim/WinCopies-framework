@@ -28,20 +28,20 @@ using static WinCopies.Util.Util;
 
 namespace WinCopies.IO.Reflection
 {
-    public enum DotNetTypeEnumeratorGenericTypeStructValue : byte
+    public enum DotNetTypeInfoEnumeratorGenericTypeStructValue : byte
     {
         GenericTypeParameter = 0,
 
         GenericTypeArgument = 1
     }
 
-    public struct DotNetTypeEnumeratorGenericTypeStruct
+    public struct DotNetTypeInfoEnumeratorGenericTypeStruct
     {
-        public DotNetTypeEnumeratorGenericTypeStructValue GenericTypeStructValue { get; }
+        public DotNetTypeInfoEnumeratorGenericTypeStructValue GenericTypeStructValue { get; }
 
         public Type Type { get; }
 
-        public DotNetTypeEnumeratorGenericTypeStruct(in DotNetTypeEnumeratorGenericTypeStructValue genericTypeStructValue, in Type type)
+        public DotNetTypeInfoEnumeratorGenericTypeStruct(in DotNetTypeInfoEnumeratorGenericTypeStructValue genericTypeStructValue, in Type type)
         {
             GenericTypeStructValue = genericTypeStructValue;
 
@@ -49,7 +49,7 @@ namespace WinCopies.IO.Reflection
         }
     }
 
-    public struct DotNetTypeEnumeratorStruct
+    public struct DotNetTypeInfoEnumeratorStruct
     {
         public TypeInfo TypeInfo { get; }
 
@@ -57,9 +57,9 @@ namespace WinCopies.IO.Reflection
 
         public CustomAttributeData CustomAttributeData { get; }
 
-        public DotNetTypeEnumeratorGenericTypeStruct? GenericTypeInfo { get; }
+        public DotNetTypeInfoEnumeratorGenericTypeStruct? GenericTypeInfo { get; }
 
-        public DotNetTypeEnumeratorStruct(TypeInfo typeInfo)
+        public DotNetTypeInfoEnumeratorStruct(TypeInfo typeInfo)
         {
             TypeInfo = typeInfo;
 
@@ -70,7 +70,7 @@ namespace WinCopies.IO.Reflection
             GenericTypeInfo = null;
         }
 
-        public DotNetTypeEnumeratorStruct(MemberInfo memberInfo)
+        public DotNetTypeInfoEnumeratorStruct(MemberInfo memberInfo)
         {
             MemberInfo = memberInfo;
 
@@ -81,7 +81,7 @@ namespace WinCopies.IO.Reflection
             GenericTypeInfo = null;
         }
 
-        public DotNetTypeEnumeratorStruct(CustomAttributeData customAttributeData)
+        public DotNetTypeInfoEnumeratorStruct(CustomAttributeData customAttributeData)
         {
             CustomAttributeData = customAttributeData;
 
@@ -92,7 +92,7 @@ namespace WinCopies.IO.Reflection
             GenericTypeInfo = null;
         }
 
-        public DotNetTypeEnumeratorStruct(DotNetTypeEnumeratorGenericTypeStruct genericTypeInfo)
+        public DotNetTypeInfoEnumeratorStruct(DotNetTypeInfoEnumeratorGenericTypeStruct genericTypeInfo)
         {
             GenericTypeInfo = genericTypeInfo;
 
@@ -118,7 +118,7 @@ namespace WinCopies.IO.Reflection
 
         private DotNetTypeInfoEnumerator(Dictionary<DotNetItemType, IEnumerator<IDotNetItemInfo>> dic) => _moveNext = new DotNetEnumerationMoveNext<IDotNetItemInfo>(dic.Values.GetEnumerator());
 
-        public static DotNetTypeInfoEnumerator From(IDotNetTypeInfo dotNetTypeInfo, IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetTypeEnumeratorStruct> func)
+        public static DotNetTypeInfoEnumerator From(IDotNetTypeInfo dotNetTypeInfo, IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetTypeInfoEnumeratorStruct> func)
         {
             ThrowIfNull(dotNetTypeInfo, nameof(dotNetTypeInfo));
             ThrowIfNull(typesToEnumerate, nameof(typesToEnumerate));
@@ -133,15 +133,15 @@ namespace WinCopies.IO.Reflection
 #else
                 ??=
 #endif
-                GetCommonPredicate<DotNetTypeEnumeratorStruct>();
+                GetCommonPredicate<DotNetTypeInfoEnumeratorStruct>();
 
             IEnumerable<TypeInfo> enumerable = dotNetTypeInfo.TypeInfo.DeclaredNestedTypes;
 
             var dic = new Dictionary<DotNetItemType, IEnumerator<IDotNetItemInfo>>();
 
-            void addTypeInfoEnumerator(DotNetItemType dotNetItemType, Predicate<TypeInfo> __func) => dic.Add(dotNetItemType, DotNetEnumeration.GetDotNetItemInfoEnumerator(enumerable, t => __func(t) && func(new DotNetTypeEnumeratorStruct(t))));
+            void addTypeInfoEnumerator(DotNetItemType dotNetItemType, Predicate<TypeInfo> __func) => dic.Add(dotNetItemType, DotNetEnumeration.GetDotNetItemInfoEnumerator(enumerable, dotNetItemType, false,dotNetTypeInfo, t => __func(t) && func(new DotNetTypeInfoEnumeratorStruct(t))));
 
-            void addMemberInfoEnumerator(DotNetItemType dotNetItemType, IEnumerable<MemberInfo> _enumerable) => dic.Add(dotNetItemType, _enumerable.WherePredicate(f => func(new DotNetTypeEnumeratorStruct(f))).Select(f => new DotNetMemberInfo(f, dotNetItemType, dotNetTypeInfo)).GetEnumerator());
+            void addMemberInfoEnumerator(DotNetItemType dotNetItemType, IEnumerable<MemberInfo> _enumerable) => dic.Add(dotNetItemType, _enumerable.WherePredicate(f => func(new DotNetTypeInfoEnumeratorStruct(f))).Select(f => new DotNetMemberInfo(f, dotNetItemType, dotNetTypeInfo)).GetEnumerator());
 
             foreach (DotNetItemType typeToEnumerate in typesToEnumerate)
             {
@@ -149,7 +149,7 @@ namespace WinCopies.IO.Reflection
                 {
                     case DotNetItemType.Attribute:
 
-                        dic.Add(DotNetItemType.Attribute, dotNetTypeInfo.TypeInfo.CustomAttributes.WherePredicate(a => func(new DotNetTypeEnumeratorStruct(a))).Select(a => new DotNetAttributeInfo(a, dotNetTypeInfo)).GetEnumerator());
+                        dic.Add(DotNetItemType.Attribute, dotNetTypeInfo.TypeInfo.CustomAttributes.WherePredicate(a => func(new DotNetTypeInfoEnumeratorStruct(a))).Select(a => new DotNetAttributeInfo(a, dotNetTypeInfo)).GetEnumerator());
 
                         break;
 
@@ -179,14 +179,14 @@ namespace WinCopies.IO.Reflection
 
                     case DotNetItemType.ImplementedInterface:
 
-                        dic.Add(DotNetItemType.ImplementedInterface, dotNetTypeInfo.TypeInfo.ImplementedInterfaces.WherePredicate(t => func(new DotNetTypeEnumeratorStruct(t))).Select(t => new DotNetTypeInfo(t.GetTypeInfo(), DotNetItemType.ImplementedInterface, dotNetTypeInfo)).GetEnumerator());
+                        dic.Add(DotNetItemType.ImplementedInterface, dotNetTypeInfo.TypeInfo.ImplementedInterfaces.WherePredicate(t => func(new DotNetTypeInfoEnumeratorStruct(t))).Select(t => new DotNetTypeInfo(t.GetTypeInfo(), DotNetItemType.ImplementedInterface, null, dotNetTypeInfo)).GetEnumerator());
 
                         break;
 
                     case DotNetItemType.GenericParameter:
                     case DotNetItemType.GenericArgument:
 
-                        dic.Add(typeToEnumerate, dotNetTypeInfo.TypeInfo.GenericTypeParameters.WherePredicate(p => func(new DotNetTypeEnumeratorStruct(new DotNetTypeEnumeratorGenericTypeStruct(typeToEnumerate == DotNetItemType.GenericParameter ? DotNetTypeEnumeratorGenericTypeStructValue.GenericTypeParameter : DotNetTypeEnumeratorGenericTypeStructValue.GenericTypeArgument, p)))).Select(p => new DotNetTypeInfo(p.GetTypeInfo(), typeToEnumerate, dotNetTypeInfo)).GetEnumerator());
+                        dic.Add(typeToEnumerate, dotNetTypeInfo.TypeInfo.GenericTypeParameters.WherePredicate(p => func(new DotNetTypeInfoEnumeratorStruct(new DotNetTypeInfoEnumeratorGenericTypeStruct(typeToEnumerate == DotNetItemType.GenericParameter ? DotNetTypeInfoEnumeratorGenericTypeStructValue.GenericTypeParameter : DotNetTypeInfoEnumeratorGenericTypeStructValue.GenericTypeArgument, p)))).Select(p => new DotNetTypeInfo(p.GetTypeInfo(), typeToEnumerate,null, dotNetTypeInfo)).GetEnumerator());
 
                         break;
 

@@ -29,13 +29,15 @@ namespace WinCopies.IO.ObjectModel.Reflection
     {
         public sealed override string Name { get; }
 
-        public sealed override Size? Size { get; } = null;
+        public sealed override Size? Size => null;
 
         public sealed override string LocalizedName => Name;
 
-        public sealed override string Description { get; } = NotApplicable;
+        public  override string Description => NotApplicable;
 
-        public sealed override FileSystemType ItemFileSystemType { get; } = FileSystemType.None;
+        public override bool IsSpecialItem => false;
+
+        public sealed override FileSystemType ItemFileSystemType => FileSystemType.None;
 
         public sealed override IBrowsableObjectInfo Parent { get; }
 
@@ -43,7 +45,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
 
         public DotNetItemType DotNetItemType { get; }
 
-        public sealed override bool IsRecursivelyBrowsable { get; } = false;
+        public sealed override bool IsRecursivelyBrowsable => IsBrowsable;
 
         #region BitmapSources
         protected abstract BitmapSource TryGetBitmapSource(in int size);
