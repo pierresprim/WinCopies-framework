@@ -31,8 +31,6 @@ namespace WinCopies.GUI.IO.ObjectModel
     {
         ObservableCollection<IBrowsableObjectInfoViewModel> Items { get; }
 
-        IBrowsableObjectInfo InnerBrowsableObjectInfo { get; }
-
-        Comparison<IBrowsableObjectInfo> SortComparison { get; set; } 
+        Comparison<IBrowsableObjectInfo> SortComparison { get; set; }
     }
 }

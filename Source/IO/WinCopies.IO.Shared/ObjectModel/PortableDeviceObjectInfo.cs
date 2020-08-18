@@ -29,9 +29,16 @@ using static Microsoft.WindowsAPICodePack.PortableDevices.PropertySystem.Propert
 
 namespace WinCopies.IO.ObjectModel
 {
-    public class PortableDeviceObjectInfo : FileSystemObjectInfo, IPortableDeviceObjectInfo
+    public class PortableDeviceObjectInfo : FileSystemObjectInfo<IFileSystemObjectInfoProperties, IPortableDeviceObject>, IPortableDeviceObjectInfo<IFileSystemObjectInfoProperties>
     {
-        public IPortableDeviceObject PortableDeviceObject { get; }
+        private bool? _isBrowsable;
+        private bool _isSizeLoaded;
+        private Size? _size;
+        private bool _isNameLoaded;
+        private string _name;
+
+        #region Properties
+        public sealed override IPortableDeviceObject EncapsulatedObject { get; }
 
         private bool? _isSpecialItem;
 
@@ -43,7 +50,7 @@ namespace WinCopies.IO.ObjectModel
 
                     return _isSpecialItem.Value;
 
-                bool result = (PortableDeviceObject.Properties.TryGetValue(IsSystem, out Property value) && value.TryGetValue(out bool _value) && _value) || (PortableDeviceObject.Properties.TryGetValue(IsHidden, out Property __value) && __value.TryGetValue(out bool ___value) && ___value);
+                bool result = (EncapsulatedObject.Properties.TryGetValue(IsSystem, out Property value) && value.TryGetValue(out bool _value) && _value) || (EncapsulatedObject.Properties.TryGetValue(IsHidden, out Property __value) && __value.TryGetValue(out bool ___value) && ___value);
 
                 _isSpecialItem = result;
 
@@ -59,8 +66,6 @@ namespace WinCopies.IO.ObjectModel
 
         public override BitmapSource ExtraLargeBitmapSource => TryGetBitmapSource(ExtraLargeIconSize);
 
-        private bool? _isBrowsable;
-
         public override bool IsBrowsable
         {
             get
@@ -69,7 +74,7 @@ namespace WinCopies.IO.ObjectModel
 
                     return _isBrowsable.Value;
 
-                bool result = PortableDeviceObject is IEnumerablePortableDeviceObject;
+                bool result = EncapsulatedObject is IEnumerablePortableDeviceObject;
 
                 _isBrowsable = result;
 
@@ -77,13 +82,9 @@ namespace WinCopies.IO.ObjectModel
             }
         }
 
-        public override string ItemTypeName => GetItemTypeName(System.IO.Path.GetExtension(Path), FileType);
+        public override string ItemTypeName => GetItemTypeName(System.IO.Path.GetExtension(Path), ObjectPropertiesGeneric.FileType);
 
         public override string Description => "N/A";
-
-        private bool _isSizeLoaded;
-
-        private Size? _size;
 
         public override Size? Size
         {
@@ -93,7 +94,7 @@ namespace WinCopies.IO.ObjectModel
 
                     return _size;
 
-                if (PortableDeviceObject.Properties.TryGetValue(Microsoft.WindowsAPICodePack.PortableDevices.PropertySystem.Properties.Legacy.Object.Common.Size, out Property value) && value.TryGetValue(out ulong _value))
+                if (EncapsulatedObject.Properties.TryGetValue(Microsoft.WindowsAPICodePack.PortableDevices.PropertySystem.Properties.Legacy.Object.Common.Size, out Property value) && value.TryGetValue(out ulong _value))
 
                     _size = new Size(_value);
 
@@ -107,10 +108,6 @@ namespace WinCopies.IO.ObjectModel
 
         public override string LocalizedName => Name;
 
-        private bool _isNameLoaded;
-
-        private string _name;
-
         public override string Name
         {
             get
@@ -119,7 +116,7 @@ namespace WinCopies.IO.ObjectModel
 
                     return _name;
 
-                _name = PortableDeviceObject.Name;
+                _name = EncapsulatedObject.Name;
 
                 _isNameLoaded = true;
 
@@ -127,9 +124,27 @@ namespace WinCopies.IO.ObjectModel
             }
         }
 
-        public override FileType FileType { get; }
+        public sealed override IFileSystemObjectInfoProperties ObjectPropertiesGeneric { get; }
 
         public override FileSystemType ItemFileSystemType => FileSystemType.PortableDevice;
+
+        public override FileType FileType { get; }
+        #endregion
+
+        #region Constructors
+        internal PortableDeviceObjectInfo(in IPortableDeviceObject portableDeviceObject, in IPortableDeviceInfo parentPortableDevice) : this($"{parentPortableDevice.Path}{IO.Path.PathSeparator}{portableDeviceObject.Name}", portableDeviceObject) => Parent = parentPortableDevice;
+
+        private PortableDeviceObjectInfo(in IPortableDeviceObject portableDeviceObject, in IPortableDeviceObjectInfo parent) : this($"{parent.Path}{IO.Path.PathSeparator}{portableDeviceObject.Name}", portableDeviceObject) => Parent = parent;
+
+        private PortableDeviceObjectInfo(in string path, in IPortableDeviceObject portableDeviceObject) : base(path)
+        {
+            EncapsulatedObject = portableDeviceObject;
+
+            FileType = GetFileType(portableDeviceObject.FileType, Path);
+
+            ObjectPropertiesGeneric = new FileSystemObjectInfoProperties<IFileSystemObjectInfo>(this);
+        }
+        #endregion
 
         private static FileType GetFileType(in PortableDeviceFileType portableDeviceFileType, in string path)
         {
@@ -138,22 +153,11 @@ namespace WinCopies.IO.ObjectModel
             return portableDeviceFileType == PortableDeviceFileType.Folder ? FileType.Folder : extension == ".lnk" ? FileType.Link : extension == ".library.ms" ? FileType.Library : FileType.File;
         }
 
-        internal PortableDeviceObjectInfo(in IPortableDeviceObject portableDeviceObject, in IPortableDeviceInfo parentPortableDevice) : this($"{parentPortableDevice.Path}{IO.Path.PathSeparator}{portableDeviceObject.Name}", portableDeviceObject) => Parent = parentPortableDevice;
-
-        private PortableDeviceObjectInfo(in IPortableDeviceObject portableDeviceObject, in IPortableDeviceObjectInfo parent) : this($"{parent.Path}{IO.Path.PathSeparator}{portableDeviceObject.Name}", portableDeviceObject) => Parent = parent;
-
-        private PortableDeviceObjectInfo(in string path, in IPortableDeviceObject portableDeviceObject) : base(path)
-        {
-            PortableDeviceObject = portableDeviceObject;
-
-            FileType = GetFileType(portableDeviceObject.FileType, Path);
-        }
-
         public override IEnumerable<IBrowsableObjectInfo> GetItems() => GetItems(null);
 
         public IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<IPortableDeviceObject> predicate)
         {
-            if (PortableDeviceObject is IEnumerablePortableDeviceObject enumerablePortableDeviceObject)
+            if (EncapsulatedObject is IEnumerablePortableDeviceObject enumerablePortableDeviceObject)
 
                 return (predicate == null ? enumerablePortableDeviceObject : enumerablePortableDeviceObject.WherePredicate(predicate)).Select(portableDeviceObject => new PortableDeviceObjectInfo(portableDeviceObject, this));
 

@@ -17,12 +17,26 @@
 
 using WinCopies.IO.Reflection;
 
-namespace WinCopies.IO.ObjectModel.Reflection
+namespace WinCopies.IO
 {
-    public interface IDotNetItemInfo : IBrowsableObjectInfo
+    namespace Reflection
     {
-        IDotNetAssemblyInfo ParentDotNetAssemblyInfo { get; }
+        public interface IDotNetItemInfoProperties
+        {
+            DotNetItemType DotNetItemType { get; }
+        }
+    }
 
-        DotNetItemType DotNetItemType { get; }
+    namespace ObjectModel.Reflection
+    {
+        public interface IDotNetItemInfo : IDotNetItemInfoProperties, IBrowsableObjectInfo
+        {
+            IDotNetAssemblyInfo ParentDotNetAssemblyInfo { get; }
+        }
+
+        public interface IDotNetItemInfo<TObjectProperties, TEncapsulatedObject> : IDotNetItemInfo, IBrowsableObjectInfo<TObjectProperties, TEncapsulatedObject> where TObjectProperties : IDotNetItemInfoProperties
+        {
+            // Left empty.
+        }
     }
 }

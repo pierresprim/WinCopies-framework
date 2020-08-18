@@ -16,20 +16,29 @@
  * along with the WinCopies Framework.If not, see<https://www.gnu.org/licenses/>. */
 
 using Microsoft.Win32;
+
 using System;
-using System.Collections;
 using System.Collections.Generic;
 
-namespace WinCopies.IO.ObjectModel
+namespace WinCopies.IO
 {
-    public interface IRegistryItemInfo : IBrowsableObjectInfo
+    public interface IRegistryItemInfoProperties
     {
         RegistryItemType RegistryItemType { get; }
+    }
 
-        RegistryKey RegistryKey { get; }
+    namespace ObjectModel
+    {
+        public interface IRegistryItemInfo : IRegistryItemInfoProperties, IBrowsableObjectInfo, IEncapsulatorBrowsableObjectInfo<RegistryKey>
+        {
+            IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<RegistryKey> predicate);
 
-        IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<RegistryKey> predicate);
+            IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<RegistryItemInfoEnumeratorStruct> predicate, bool catchExceptions);
+        }
 
-        IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<RegistryItemInfoEnumeratorStruct> predicate, bool catchExceptions);
+        public interface IRegistryItemInfo<T> : IRegistryItemInfo, IBrowsableObjectInfo<T, RegistryKey> where T : IRegistryItemInfoProperties
+        {
+            // Left empty.
+        }
     }
 }

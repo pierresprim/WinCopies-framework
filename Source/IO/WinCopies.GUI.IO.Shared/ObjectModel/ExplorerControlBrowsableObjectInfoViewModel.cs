@@ -15,6 +15,7 @@
 * You should have received a copy of the GNU General Public License
 * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+using Microsoft.WindowsAPICodePack.Shell;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -63,9 +64,9 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         public bool IsSelected { get => _isSelected; set { _isSelected = value; OnPropertyChanged(nameof(IsSelected)); } }
 
-        public static IExplorerControlBrowsableObjectInfoViewModel From(IBrowsableObjectInfoViewModel path) => new ExplorerControlBrowsableObjectInfoViewModel(path ?? throw GetArgumentNullException(nameof(path)), new BrowsableObjectInfoFactory(path.InnerBrowsableObjectInfo.ClientVersion.Value));
+        public static IExplorerControlBrowsableObjectInfoViewModel From(IBrowsableObjectInfoViewModel path) => new ExplorerControlBrowsableObjectInfoViewModel(path ?? throw GetArgumentNullException(nameof(path)), new BrowsableObjectInfoFactory(path.ClientVersion.Value));
 
-        public static IExplorerControlBrowsableObjectInfoViewModel From(IBrowsableObjectInfoViewModel path, IBrowsableObjectInfoFactory factory) => new ExplorerControlBrowsableObjectInfoViewModel(path??throw GetArgumentNullException(nameof(path)), factory??throw GetArgumentNullException(nameof(factory)));
+        public static IExplorerControlBrowsableObjectInfoViewModel From(IBrowsableObjectInfoViewModel path, IBrowsableObjectInfoFactory factory) => new ExplorerControlBrowsableObjectInfoViewModel(path ?? throw GetArgumentNullException(nameof(path)), factory ?? throw GetArgumentNullException(nameof(factory)));
 
         private ExplorerControlBrowsableObjectInfoViewModel(IBrowsableObjectInfoViewModel path, IBrowsableObjectInfoFactory factory)
         {
@@ -73,7 +74,7 @@ namespace WinCopies.GUI.IO.ObjectModel
 
             ItemClickCommand = new DelegateCommand<IBrowsableObjectInfoViewModel>(browsableObjectInfo => true, browsableObjectInfo =>
             {
-                if (browsableObjectInfo.InnerBrowsableObjectInfo is IShellObjectInfo shellObjectInfo && shellObjectInfo.FileType == FileType.File)
+                if (browsableObjectInfo.EncapsulatedObject is ShellObject && browsableObjectInfo.FileType == FileType.File)
 
                     _ = System.Diagnostics.Process.Start(new ProcessStartInfo(browsableObjectInfo.Path) { UseShellExecute = true });
 

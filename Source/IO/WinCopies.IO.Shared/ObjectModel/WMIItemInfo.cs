@@ -25,6 +25,7 @@ using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 
 using WinCopies.Collections;
+using WinCopies.IO.ObjectModel;
 using WinCopies.Linq;
 using WinCopies.Util;
 
@@ -53,9 +54,21 @@ namespace WinCopies.IO
         Instance
     }
 
+    public class WMIItemInfoProperties : BrowsableObjectInfoProperties<IWMIItemInfo>, IWMIItemInfoProperties
+    {
+        public WMIItemType WMIItemType => BrowsableObjectInfo.WMIItemType;
+
+        public bool IsRootNode => BrowsableObjectInfo.IsRootNode;
+
+        public WMIItemInfoProperties(in IWMIItemInfo browsableObjectInfo) : base(browsableObjectInfo)
+        {
+            // Left empty.
+        }
+    }
+
     namespace ObjectModel
     {
-        public class WMIItemInfo : BrowsableObjectInfo, IWMIItemInfo
+        public class WMIItemInfo : BrowsableObjectInfo<IWMIItemInfoProperties, ManagementBaseObject>, IWMIItemInfo<IWMIItemInfoProperties>
         {
             #region Consts
 
@@ -67,11 +80,20 @@ namespace WinCopies.IO
 
             #endregion
 
+            #region Fields
+            private ManagementBaseObject _managementObject;
             private IBrowsableObjectInfo _parent;
             private string _itemTypeName;
             private bool? _isBrowsable;
+            #endregion
 
             #region Properties
+            /// <summary>
+            /// Gets a value that indicates whether this <see cref="WMIItemInfo"/> represents a root node.
+            /// </summary>
+            public bool IsRootNode { get; }
+
+            public WMIItemType WMIItemType { get; }
 
             public override bool IsSpecialItem => false;
 
@@ -81,7 +103,7 @@ namespace WinCopies.IO
                 {
                     if (string.IsNullOrEmpty(_itemTypeName))
 
-                        switch (WMIItemType)
+                        switch (ObjectPropertiesGeneric.WMIItemType)
                         {
                             case WMIItemType.Namespace:
                                 _itemTypeName = "WMI Namespace";
@@ -107,7 +129,7 @@ namespace WinCopies.IO
                     if (_description == null)
                     {
 
-                        object value = ManagementObject.Qualifiers["Description"].Value;
+                        object value = _managementObject.Qualifiers["Description"].Value;
 
                         _description = value == null ? "N/A" : (string)value;
 
@@ -130,11 +152,6 @@ namespace WinCopies.IO
             public override IBrowsableObjectInfo Parent => _parent ?? (_parent = GetParent());
 
 #endif
-
-            /// <summary>
-            /// Gets a value that indicates whether this <see cref="WMIItemInfo"/> represents a root node.
-            /// </summary>
-            public bool IsRootNode { get; }
 
             /// <summary>
             /// Gets the localized path of this <see cref="WMIItemInfo"/>.
@@ -177,7 +194,7 @@ namespace WinCopies.IO
 
                         return _isBrowsable.Value;
 
-                    switch (WMIItemType)
+                    switch (ObjectPropertiesGeneric.WMIItemType)
                     {
                         case WMIItemType.Namespace:
                         case WMIItemType.Class:
@@ -199,58 +216,14 @@ namespace WinCopies.IO
 
             public override bool IsRecursivelyBrowsable { get; } = true;
 
-            public WMIItemType WMIItemType { get; }
-
-            //public static ConnectionOptionsDeepClone DefaultConnectionOptionsDeepClone { get; } = (ConnectionOptions connectionOptions, SecureString password) => new ConnectionOptions()
-            //{
-            //    Locale = connectionOptions.Locale,
-            //    Username = connectionOptions.Username,
-            //    SecurePassword = password,
-            //    Authority = connectionOptions.Authority,
-            //    Impersonation = connectionOptions.Impersonation,
-            //    Authentication = connectionOptions.Authentication,
-            //    EnablePrivileges = connectionOptions.EnablePrivileges,
-            //    Timeout = connectionOptions.Timeout
-            //};
-
-            //    public static DeepClone<ManagementPath> DefaultManagementPathDeepClone { get; } = managementPath => new ManagementPath() { Path = managementPath.Path, ClassName = managementPath.ClassName, NamespacePath = managementPath.NamespacePath, RelativePath = managementPath.RelativePath, Server = managementPath.Server };
-
-            //    public static DeepClone<ObjectGetOptions> DefaultObjectGetOptionsDeepClone { get; } = objectGetOptions => new ObjectGetOptions() { Timeout = objectGetOptions.Timeout, UseAmendedQualifiers = objectGetOptions.UseAmendedQualifiers };
-
-            //    public static ManagementObjectDeepClone DefaultManagementObjectDeepClone { get; } = (ManagementObject managementObject, SecureString password) =>
-
-            //    {
-
-            //        ManagementObject _managementObject = managementObject as ManagementClass ?? managementObject as ManagementObject ?? throw new ArgumentException("managementObject must be a ManagementClass or a ManagementObject.", nameof(managementObject));
-
-            //        ManagementPath path = DefaultManagementPathDeepClone(_managementObject.Scope?.Path ?? _managementObject.Path);
-
-            //        return _managementObject is ManagementClass managementClass ? DefaultManagementClassDeepCloneDelegate(managementClass, null) : new ManagementObject(
-            //            new ManagementScope(
-            //path,
-            //                _managementObject.Scope?.Options is null ? null : DefaultConnectionOptionsDeepClone(_managementObject.Scope?.Options, password)
-            //                ), path, _managementObject.Options is null ? null : DefaultObjectGetOptionsDeepClone(_managementObject.Options));
-
-            //    };
-
-            //    public static ManagementClassDeepClone DefaultManagementClassDeepCloneDelegate { get; } = (ManagementClass managementClass, SecureString password) =>
-
-            //    {
-
-            //        ManagementPath path = DefaultManagementPathDeepClone(managementClass.Scope?.Path ?? managementClass.Path);
-
-            //        return new ManagementClass(
-            //            new ManagementScope(
-            //path,
-            //                managementClass?.Scope?.Options is null ? null : DefaultConnectionOptionsDeepClone(managementClass?.Scope?.Options, password)
-            //                ), path, managementClass.Options is null ? null : DefaultObjectGetOptionsDeepClone(managementClass.Options));
-
-            //    };
-
             /// <summary>
             /// Gets the <see cref="ManagementBaseObject"/> that this <see cref="WMIItemInfo"/> represents.
             /// </summary>
-            public ManagementBaseObject ManagementObject { get; private set; }
+            public sealed override ManagementBaseObject EncapsulatedObject => _managementObject;
+
+            public sealed override bool HasProperties => true;
+
+            public sealed override IWMIItemInfoProperties ObjectPropertiesGeneric { get; }
 
             //public override bool NeedsObjectsOrValuesReconstruction => true;
 
@@ -261,9 +234,15 @@ namespace WinCopies.IO
             /// <summary>
             /// Initializes a new instance of the <see cref="WMIItemInfo"/> class as the root WMI item.
             /// </summary>
-            public WMIItemInfo() : this($"{RootPath}{ROOT}{NamespacePath}", WMIItemType.Namespace, new ManagementClass($"{RootPath}{ROOT}{NamespacePath}")) => IsRootNode = true;
+            public WMIItemInfo() : this($"{RootPath}{ROOT}{NamespacePath}", WMIItemType.Namespace, true, new ManagementClass($"{RootPath}{ROOT}{NamespacePath}"))
+            {
+                // Left empty.
+            }
 
-            public WMIItemInfo(WMIItemType wmiItemType, ManagementBaseObject managementBaseObject) : this(GetPath(managementBaseObject, wmiItemType), wmiItemType, managementBaseObject) { }
+            public WMIItemInfo(in WMIItemType wmiItemType, in ManagementBaseObject managementBaseObject) : this(GetPath(managementBaseObject, wmiItemType), wmiItemType, managementBaseObject)
+            {
+                // Left empty.
+            }
 
             ///// <summary>
             ///// Initializes a new instance of the <see cref="WMIItemInfo"/> class. If you want to initialize this class in order to represent the root WMI item, you can also use the <see cref="WMIItemInfo()"/> constructor.
@@ -272,27 +251,30 @@ namespace WinCopies.IO
             ///// <param name="wmiItemType">The type of this <see cref="WMIItemInfo"/>.</param>
             ///// <param name="managementObjectDelegate">The delegate that will be used by the <see cref="BrowsableObjectInfo.DeepClone()"/> method to get a new <see cref="ManagementBaseObject"/>.</param>
             ///// <param name="managementObject">The <see cref="ManagementBaseObject"/> that this <see cref="WMIItemInfo"/> represents.</param>
-            public WMIItemInfo(string path, WMIItemType wmiItemType, ManagementBaseObject managementObject) : base(path)
+            public WMIItemInfo(in string path, in WMIItemType wmiItemType, in ManagementBaseObject managementObject) : this(path, wmiItemType, wmiItemType == WMIItemType.Namespace && path.ToUpper().EndsWith("ROOT:__NAMESPACE"), managementObject)
+            {
+                // Left empty.
+            }
+
+            private WMIItemInfo(in string path, in WMIItemType wmiItemType, in bool isRootNode, in ManagementBaseObject managementObject) : base(path)
             {
                 //ThrowIfNull(managementObjectDelegate, nameof(managementObjectDelegate));
-
-                ThrowIfNull(managementObject, nameof(managementObject));
 
                 // wmiItemType.ThrowIfInvalidEnumValue(true, WMIItemType.Namespace, WMIItemType.Class);
 
                 //_managementObjectDelegate = managementObjectDelegate;
 
-                ManagementObject = managementObject;
+                _managementObject = managementObject ?? throw GetArgumentNullException(nameof(managementObject));
 
                 if (wmiItemType != WMIItemType.Instance)
 
-                    Name = GetName(ManagementObject, wmiItemType);
+                    Name = GetName(managementObject, wmiItemType);
 
                 WMIItemType = wmiItemType;
 
-                if (wmiItemType == WMIItemType.Namespace && Path.ToUpper().EndsWith("ROOT:__NAMESPACE"))
+                IsRootNode = isRootNode;
 
-                    IsRootNode = true;
+                ObjectPropertiesGeneric = new WMIItemInfoProperties(this);
             }
 
             #endregion
@@ -305,7 +287,7 @@ namespace WinCopies.IO
             /// Gets the name of the given <see cref="ManagementBaseObject"/>.
             /// </summary>
             /// <param name="managementObject">The <see cref="ManagementBaseObject"/> for which get the name.</param>
-            /// <param name="wmiItemType">The <see cref="WinCopies.IO.WMIItemType"/> of <paramref name="managementObject"/>.</param>
+            /// <param name="wmiItemType">The <see cref="IO.WMIItemType"/> of <paramref name="managementObject"/>.</param>
             /// <returns>The name of the given <see cref="ManagementBaseObject"/>.</returns>
             public static string GetName(ManagementBaseObject managementObject, WMIItemType wmiItemType)
             {
@@ -369,11 +351,11 @@ namespace WinCopies.IO
 
             private IBrowsableObjectInfo GetParent()
             {
-                if (IsRootNode) return null;
+                if (ObjectPropertiesGeneric.IsRootNode) return null;
 
                 string path;
 
-                switch (WMIItemType)
+                switch (ObjectPropertiesGeneric.WMIItemType)
                 {
                     case WMIItemType.Namespace:
 
@@ -409,11 +391,11 @@ namespace WinCopies.IO
             {
                 base.Dispose(disposing);
 
-                ManagementObject.Dispose();
+                _managementObject.Dispose();
 
                 if (disposing)
                     //{
-                    ManagementObject = null;
+                    _managementObject = null;
 
                 //_managementObjectDelegate = null;
                 //}
@@ -423,11 +405,11 @@ namespace WinCopies.IO
             {
                 int iconIndex = 0;
 
-                if (IsRootNode)
+                if (ObjectPropertiesGeneric.IsRootNode)
 
                     iconIndex = 15;
 
-                else if (WMIItemType == WMIItemType.Namespace || WMIItemType == WMIItemType.Class)
+                else if (ObjectPropertiesGeneric.WMIItemType == WMIItemType.Namespace || ObjectPropertiesGeneric.WMIItemType == WMIItemType.Class)
 
                     iconIndex = 3;
 
@@ -478,7 +460,7 @@ namespace WinCopies.IO
                 bool dispose = false;
 
 #pragma warning disable IDE0019 // Pattern Matching
-                var managementClass = ManagementObject as ManagementClass;
+                var managementClass = _managementObject as ManagementClass;
 #pragma warning restore IDE0019 // Pattern Matching
 
                 if (managementClass == null)
@@ -494,7 +476,7 @@ namespace WinCopies.IO
 
                 try
                 {
-                    if (WMIItemType == WMIItemType.Namespace)
+                    if (ObjectPropertiesGeneric.WMIItemType == WMIItemType.Namespace)
                     {
                         IEnumerable<ManagementBaseObject> namespaces = EnumerateInstances(managementClass, factory);
 
@@ -518,7 +500,7 @@ namespace WinCopies.IO
                         else return new Enumerable<IBrowsableObjectInfo>(() => new WMIItemInfoEnumerator(namespaces, false, WMIItemType.Namespace, catchExceptionsDuringEnumeration)).AppendValues(new Enumerable<IBrowsableObjectInfo>(() => new WMIItemInfoEnumerator(classes, false, WMIItemType.Class, catchExceptionsDuringEnumeration)));
                     }
 
-                    else if (WMIItemType == WMIItemType.Class /*&& WMIItemTypes.HasFlag(WMIItemTypes.Instance)*/)
+                    else if (ObjectPropertiesGeneric.WMIItemType == WMIItemType.Class /*&& WMIItemTypes.HasFlag(WMIItemTypes.Instance)*/)
                     {
                         managementClass.Get();
 

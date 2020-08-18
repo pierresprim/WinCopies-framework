@@ -16,6 +16,7 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using Microsoft.WindowsAPICodePack.Shell;
+
 using System.IO;
 
 namespace WinCopies.IO.ObjectModel
@@ -24,15 +25,13 @@ namespace WinCopies.IO.ObjectModel
     {
         Stream ArchiveFileStream { get; }
 
-        /// <summary>
-        /// Gets a <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> that represents this <see cref="IShellObjectInfo"/>.
-        /// </summary>
-        ShellObject ShellObject { get; }
-
         void OpenArchive(Stream stream);
 
         void CloseArchive();
+    }
 
+    public interface IShellObjectInfo<T> : IShellObjectInfo, IArchiveItemInfoProvider<T, ShellObject> where T : IFileSystemObjectInfoProperties
+    {
         ///// <summary>
         ///// Gets a <see cref="FileSystemInfo"/> object that provides info for the folders and files. This property returns <see langword="null"/> when this <see cref="IShellObjectInfo"/> is not a folder, drive or file. See the <see cref="IFileSystemObjectInfo.FileType"/> property for more details.
         ///// </summary>

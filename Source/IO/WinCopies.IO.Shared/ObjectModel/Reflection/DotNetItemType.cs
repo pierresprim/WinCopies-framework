@@ -40,19 +40,19 @@ namespace WinCopies.IO.Reflection
         Class = 4,
 
         /// <summary>
-        /// The item is a .Net attribute.
-        /// </summary>
-        Attribute = 5,
-
-        /// <summary>
         /// The item is a .Net interface.
         /// </summary>
-        Interface = 6,
+        Interface = 5,
 
         /// <summary>
         /// The item is a .Net delegate.
         /// </summary>
-        Delegate = 7,
+        Delegate = 6,
+
+        /// <summary>
+        /// The item is a .Net attribute.
+        /// </summary>
+        Attribute = 7,
 
         /// <summary>
         /// The item is a .Net field.
@@ -85,18 +85,13 @@ namespace WinCopies.IO.Reflection
         Parameter = 13,
 
         /// <summary>
-        /// The item is a .Net return parameter.
-        /// </summary>
-        ReturnParameter = 14,
-
-        /// <summary>
         /// The item is a .Net generic parameter.
         /// </summary>
-        GenericParameter = 15,
+        GenericParameter = 14,
 
         /// <summary>
         /// The item is a .Net generic argument.
         /// </summary>
-        GenericArgument = 16
+        GenericArgument = 15
     }
 }

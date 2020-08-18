@@ -18,42 +18,80 @@
 using System;
 using System.Diagnostics;
 using System.Windows.Media.Imaging;
-
+using WinCopies.IO.ObjectModel;
+using WinCopies.IO.ObjectModel.Reflection;
 using WinCopies.IO.Reflection;
 
 using static WinCopies.Util.Util;
 
-namespace WinCopies.IO.ObjectModel.Reflection
+namespace WinCopies.IO
 {
-    public abstract class DotNetItemInfo : BrowsableObjectInfo, IDotNetItemInfo
+    namespace Reflection
     {
-        public sealed override string Name { get; }
+        public class DotNetItemInfoProperties<T> : BrowsableObjectInfoProperties<T>, IDotNetItemInfoProperties where T : IDotNetItemInfo
+        {
+            public DotNetItemType DotNetItemType => BrowsableObjectInfo.DotNetItemType;
 
-        public sealed override Size? Size { get; } = null;
+            public DotNetItemInfoProperties(T browsableObjectInfo) : base(browsableObjectInfo)
+            {
+                // Left empty.
+            }
+        }
+    }
 
-        public sealed override string LocalizedName => Name;
+    namespace ObjectModel.Reflection
+    {
+        public abstract class DotNetItemInfo<TObjectProperties, TEncapsulatedObject> : BrowsableObjectInfo<TObjectProperties, TEncapsulatedObject>, IDotNetItemInfo<TObjectProperties, TEncapsulatedObject> where TObjectProperties : IDotNetItemInfoProperties
+        {
+            /// <summary>
+            /// Gets the name of this <see cref="IDotNetItemInfo"/>.
+            /// </summary>
+            public sealed override string Name { get; }
 
-        public sealed override string Description { get; } = NotApplicable;
+            /// <summary>
+            /// Gets the size for this <see cref="IBrowsableObjectInfo"/>.
+            /// </summary>
+            public sealed override Size? Size => null;
 
-        public sealed override FileSystemType ItemFileSystemType { get; } = FileSystemType.None;
+            /// <summary>
+            /// Gets the same value as <see cref="Name"/>.
+            /// </summary>
+            public sealed override string LocalizedName => Name;
 
-        public sealed override IBrowsableObjectInfo Parent { get; }
+            /// <summary>
+            /// Gets the <see cref="NotApplicable"/> value.
+            /// </summary>
+            public override string Description => NotApplicable;
 
-        public IDotNetAssemblyInfo ParentDotNetAssemblyInfo { get; }
+            /// <summary>
+            /// Gets the <see langword="false"/> value.
+            /// </summary>
+            public override bool IsSpecialItem => false;
 
-        public DotNetItemType DotNetItemType { get; }
+            public sealed override FileSystemType ItemFileSystemType => FileSystemType.None;
 
-        public sealed override bool IsRecursivelyBrowsable { get; } = false;
+            /// <summary>
+            /// Gets the parent of this <see cref="IDotNetItemInfo"/>.
+            /// </summary>
+            public sealed override IBrowsableObjectInfo Parent { get; }
 
-        #region BitmapSources
-        protected abstract BitmapSource TryGetBitmapSource(in int size);
+            public IDotNetAssemblyInfo ParentDotNetAssemblyInfo { get; }
 
-        private BitmapSource _smallBitmapSource;
-        private BitmapSource _mediumBitmapSource;
-        private BitmapSource _largeBitmapSource;
-        private BitmapSource _extraLargeBitmapSource;
+            public abstract DotNetItemType DotNetItemType { get; }
 
-        public sealed override BitmapSource SmallBitmapSource => _smallBitmapSource
+            public sealed override bool IsRecursivelyBrowsable => IsBrowsable;
+
+            public override bool HasProperties => true;
+
+            #region BitmapSources
+            protected abstract BitmapSource TryGetBitmapSource(in int size);
+
+            private BitmapSource _smallBitmapSource;
+            private BitmapSource _mediumBitmapSource;
+            private BitmapSource _largeBitmapSource;
+            private BitmapSource _extraLargeBitmapSource;
+
+            public sealed override BitmapSource SmallBitmapSource => _smallBitmapSource
 #if CS7
             ?? (_smallBitmapSource =
 #else
@@ -65,7 +103,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
 #endif
             ;
 
-        public sealed override BitmapSource MediumBitmapSource => _mediumBitmapSource
+            public sealed override BitmapSource MediumBitmapSource => _mediumBitmapSource
 #if CS7
             ?? (_mediumBitmapSource =
 #else
@@ -77,7 +115,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
 #endif
             ;
 
-        public sealed override BitmapSource LargeBitmapSource => _largeBitmapSource
+            public sealed override BitmapSource LargeBitmapSource => _largeBitmapSource
 #if CS7
             ?? (_largeBitmapSource =
 #else
@@ -89,7 +127,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
 #endif
             ;
 
-        public sealed override BitmapSource ExtraLargeBitmapSource => _extraLargeBitmapSource
+            public sealed override BitmapSource ExtraLargeBitmapSource => _extraLargeBitmapSource
 #if CS7
             ?? (_extraLargeBitmapSource =
 #else
@@ -100,35 +138,34 @@ namespace WinCopies.IO.ObjectModel.Reflection
             )
 #endif
             ;
-        #endregion
+            #endregion
 
-        protected DotNetItemInfo(in string path, in string name, in DotNetItemType dotNetItemType, in IBrowsableObjectInfo parent) : base(path)
-        {
-            Debug.Assert(!(IsNullEmptyOrWhiteSpace(Path) || IsNullEmptyOrWhiteSpace(name)));
+            protected DotNetItemInfo(in string path, in string name, in IBrowsableObjectInfo parent) : base(path)
+            {
+                Debug.Assert(!(IsNullEmptyOrWhiteSpace(Path) || IsNullEmptyOrWhiteSpace(name)));
 
-            ThrowIfNull(parent, nameof(parent));
+                ThrowIfNull(parent, nameof(parent));
 
-            Name = name;
+                Name = name;
 
-            DotNetItemType = dotNetItemType;
+                Parent = parent;
 
-            Parent = parent;
+                // todo: provide two constructors:
 
-            // todo: provide two constructors:
-
-            ParentDotNetAssemblyInfo = parent is IDotNetItemInfo dotNetItemInfo ? dotNetItemInfo.ParentDotNetAssemblyInfo ?? throw new ArgumentException($"{nameof(dotNetItemInfo)} has no parent IDotNetAssemblyInfo.") : parent is IDotNetAssemblyInfo dotNetAssemblyInfo ? dotNetAssemblyInfo : throw new ArgumentException($"{nameof(parent)} must be an {nameof(IDotNetAssemblyInfo)} or an {nameof(IDotNetItemInfo)}.", nameof(parent));
-        }
-    }
-
-    public abstract class BrowsableDotNetItemInfo : DotNetItemInfo
-    {
-        public override sealed bool IsBrowsable { get; } = true;
-
-        protected BrowsableDotNetItemInfo(in string path, in string name, in DotNetItemType dotNetItemType, in IBrowsableObjectInfo parent) : base(path, name, dotNetItemType, parent)
-        {
-            // Left empty.
+                ParentDotNetAssemblyInfo = parent is IDotNetItemInfo dotNetItemInfo ? dotNetItemInfo.ParentDotNetAssemblyInfo ?? throw new ArgumentException($"{nameof(dotNetItemInfo)} has no parent IDotNetAssemblyInfo.") : parent is IDotNetAssemblyInfo dotNetAssemblyInfo ? dotNetAssemblyInfo : throw new ArgumentException($"{nameof(parent)} must be an {nameof(IDotNetAssemblyInfo)} or an {nameof(IDotNetItemInfo)}.", nameof(parent));
+            }
         }
 
-        protected sealed override BitmapSource TryGetBitmapSource(in int size) => TryGetBitmapSource(FolderIcon, Microsoft.WindowsAPICodePack.NativeAPI.Consts.DllNames.Shell32, size);
+        public abstract class BrowsableDotNetItemInfo<TObjectProperties, TEncapsulatedObject> : DotNetItemInfo<TObjectProperties, TEncapsulatedObject> where TObjectProperties : IDotNetItemInfoProperties
+        {
+            public override sealed bool IsBrowsable { get; } = true;
+
+            protected BrowsableDotNetItemInfo(in string path, in string name, in IBrowsableObjectInfo parent) : base(path, name, parent)
+            {
+                // Left empty.
+            }
+
+            protected sealed override BitmapSource TryGetBitmapSource(in int size) => TryGetBitmapSource(FolderIcon, Microsoft.WindowsAPICodePack.NativeAPI.Consts.DllNames.Shell32, size);
+        }
     }
 }

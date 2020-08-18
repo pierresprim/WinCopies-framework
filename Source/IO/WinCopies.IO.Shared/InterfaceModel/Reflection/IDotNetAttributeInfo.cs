@@ -16,11 +16,17 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using System.Reflection;
+using WinCopies.IO.Reflection;
 
 namespace WinCopies.IO.ObjectModel.Reflection
 {
-    public interface IDotNetAttributeInfo : IDotNetItemInfo
+    public interface IDotNetAttributeInfo : IDotNetItemInfo, IEncapsulatorBrowsableObjectInfo<CustomAttributeData>
     {
-        CustomAttributeData CustomAttributeData { get; }
+        // Left empty.
+    }
+
+    public interface IDotNetAttributeInfo<T> : IDotNetAttributeInfo, IDotNetItemInfo<T, CustomAttributeData> where T : IDotNetItemInfoProperties
+    {
+        // Left empty.
     }
 }

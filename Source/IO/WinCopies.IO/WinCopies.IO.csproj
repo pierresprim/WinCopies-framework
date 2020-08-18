@@ -45,7 +45,7 @@
     <PackageReference Include="WinCopies.WindowsAPICodePack.Consts" Version="2.0.1" />
     <PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="2.0.1" />
     <PackageReference Include="WinCopies.WindowsAPICodePack.PortableDevices" Version="2.0.1" />
-    <PackageReference Include="WinCopies.Util" Version="2.5.9" />
+    <PackageReference Include="WinCopies.Util" Version="2.6" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(Configuration)' == 'Debug'">

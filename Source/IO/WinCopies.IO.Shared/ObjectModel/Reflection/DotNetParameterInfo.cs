@@ -17,38 +17,37 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
-using WinCopies.Collections;
 using WinCopies.IO.Reflection;
-
-using static WinCopies.Util.Util;
+using WinCopies.Linq;
 
 namespace WinCopies.IO.ObjectModel.Reflection
 {
-    public sealed class DotNetMemberInfo : BrowsableDotNetItemInfo<IDotNetItemInfoProperties, MemberInfo>, IDotNetMemberInfo
+    public sealed class DotNetParameterInfo : BrowsableDotNetItemInfo<IDotNetItemInfoProperties, ParameterInfo>, IDotNetParameterInfo<IDotNetItemInfoProperties>
     {
-        public sealed override MemberInfo EncapsulatedObject { get; }
+        public override string ItemTypeName => ".Net parameter";
 
         public override DotNetItemType DotNetItemType { get; }
 
-        public override string ItemTypeName => ".Net member";
+        /// <summary>
+        /// Gets the inner <see cref="ParameterInfo"/>.
+        /// </summary>
+        public sealed override ParameterInfo EncapsulatedObject { get; }
 
         public sealed override IDotNetItemInfoProperties ObjectPropertiesGeneric { get; }
 
-        internal DotNetMemberInfo(in MemberInfo memberInfo, in DotNetItemType dotNetItemType, in IDotNetTypeInfo dotNetTypeInfo) : base($"{dotNetTypeInfo.Path}{IO.Path.PathSeparator}{memberInfo.Name}", memberInfo.Name, dotNetTypeInfo)
+        internal DotNetParameterInfo(in ParameterInfo parameterInfo, in DotNetItemType dotNetItemType, in IDotNetItemInfo parent) : base($"{parent.Path}{WinCopies.IO.Path.PathSeparator}{parameterInfo.Name}", parameterInfo.Name, parent)
         {
-            Debug.Assert(If(ComparisonType.And, ComparisonMode.Logical, Util.Util.Comparison.NotEqual, null, dotNetTypeInfo, dotNetTypeInfo.ParentDotNetAssemblyInfo));
-
-            EncapsulatedObject = memberInfo;
+            EncapsulatedObject = parameterInfo;
 
             DotNetItemType = dotNetItemType;
 
             ObjectPropertiesGeneric = new DotNetItemInfoProperties<IDotNetItemInfo>(this);
         }
 
-        public override IEnumerable<IBrowsableObjectInfo> GetItems() => GetItems(new DotNetItemType[] { DotNetItemType.Parameter, DotNetItemType.Attribute }, null);
+        public override IEnumerable<IBrowsableObjectInfo> GetItems() => GetItems(null);
 
-        public IEnumerable<IBrowsableObjectInfo> GetItems(IEnumerable<DotNetItemType> enumerable, Predicate<DotNetMemberInfoEnumeratorStruct> func) => new Enumerable<IBrowsableObjectInfo>(() => DotNetMemberInfoEnumerator.From(this, enumerable, func));
+        public IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<CustomAttributeData> func) => (func == null ? EncapsulatedObject.GetCustomAttributesData() : EncapsulatedObject.GetCustomAttributesData().WherePredicate(func)).Select(a => new DotNetAttributeInfo(a, this));
     }
 }

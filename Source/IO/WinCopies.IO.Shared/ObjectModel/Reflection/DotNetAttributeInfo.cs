@@ -27,23 +27,27 @@ using static WinCopies.Util.Util;
 
 namespace WinCopies.IO.ObjectModel.Reflection
 {
-    public sealed class DotNetAttributeInfo : DotNetItemInfo, IDotNetAttributeInfo
+    public sealed class DotNetAttributeInfo : DotNetItemInfo<IDotNetItemInfoProperties, CustomAttributeData>, IDotNetAttributeInfo<IDotNetItemInfoProperties>
     {
-        public CustomAttributeData CustomAttributeData { get; }
+        public sealed override CustomAttributeData EncapsulatedObject { get; }
 
-        public override bool IsBrowsable { get; } = false;
+        public override bool IsBrowsable => false;
 
         public override string ItemTypeName => ".Net attribute";
 
-        public override bool IsSpecialItem => false;
+        public override DotNetItemType DotNetItemType => DotNetItemType.Attribute;
+
+        public override IDotNetItemInfoProperties ObjectPropertiesGeneric { get; }
 
         protected sealed override BitmapSource TryGetBitmapSource(in int size) => TryGetBitmapSource(FileIcon, Microsoft.WindowsAPICodePack.NativeAPI.Consts.DllNames.Shell32, size);
 
-        internal DotNetAttributeInfo(in CustomAttributeData customAttributeData, in IDotNetItemInfo parent) : base($"{parent.Path}{IO.Path.PathSeparator}{customAttributeData.AttributeType.Name}", customAttributeData.AttributeType.Name, DotNetItemType.Attribute, parent)
+        internal DotNetAttributeInfo(in CustomAttributeData customAttributeData, in IDotNetItemInfo parent) : base($"{parent.Path}{IO.Path.PathSeparator}{customAttributeData.AttributeType.Name}", customAttributeData.AttributeType.Name, parent)
         {
             Debug.Assert(If(ComparisonType.And, ComparisonMode.Logical, Comparison.NotEqual, null, parent, parent.ParentDotNetAssemblyInfo, customAttributeData));
 
-            CustomAttributeData = customAttributeData;
+            EncapsulatedObject = customAttributeData;
+
+            ObjectPropertiesGeneric = new DotNetItemInfoProperties<IDotNetItemInfo>(this);
         }
 
         public override IEnumerable<IBrowsableObjectInfo> GetItems() => throw new NotSupportedException("This item does not support browsing.");

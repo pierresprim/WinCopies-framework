@@ -17,12 +17,23 @@
 
 using Microsoft.WindowsAPICodePack.PortableDevices;
 
-namespace WinCopies.IO.ObjectModel
+namespace WinCopies.IO
 {
-    public interface IPortableDeviceInfo : IFileSystemObjectInfo
+    public interface IPortableDeviceInfoProperties : IFileSystemObjectInfoProperties
     {
-        IPortableDevice PortableDevice { get; }
+        PortableDeviceOpeningOptions OpeningOptions { get; }
+    }
 
-        PortableDeviceOpeningOptions OpeningOptions { get; set; }
+    namespace ObjectModel
+    {
+        public interface IPortableDeviceInfo : IPortableDeviceInfoProperties, IFileSystemObjectInfo, IEncapsulatorBrowsableObjectInfo<IPortableDevice>
+        {
+            PortableDeviceOpeningOptions OpeningOptions { get; set; }
+        }
+
+        public interface IPortableDeviceInfo<T> : IPortableDeviceInfo, IFileSystemObjectInfo<T, IPortableDevice> where T : IPortableDeviceInfoProperties
+        {
+            // Left empty.
+        }
     }
 }

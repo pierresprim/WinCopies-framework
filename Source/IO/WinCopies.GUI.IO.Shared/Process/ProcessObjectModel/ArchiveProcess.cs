@@ -109,7 +109,7 @@ namespace WinCopies.GUI.IO.Process
 
             catch (SecurityException)
             {
-                return ProcessError.AccessDenied;
+                return ProcessError.ReadProtection;
             }
 
             catch (Exception ex) when (ex.Is(false, typeof(System.IO.IOException), typeof(SevenZipException)))

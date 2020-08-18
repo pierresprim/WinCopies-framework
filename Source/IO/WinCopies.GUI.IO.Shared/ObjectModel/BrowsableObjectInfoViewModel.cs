@@ -18,13 +18,14 @@
 using Microsoft.WindowsAPICodePack.PortableDevices;
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Windows.Media.Imaging;
-
+using WinCopies.Collections.Generic;
 using WinCopies.IO;
 using WinCopies.IO.ObjectModel;
 using WinCopies.Linq;
@@ -53,27 +54,29 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         public IBrowsableObjectInfoFactory Factory { get => _factory; set { _factory = value; OnPropertyChanged(nameof(_factory)); } }
 
-        public IBrowsableObjectInfo InnerBrowsableObjectInfo => ModelGeneric;
+        public bool IsSpecialItem => ModelGeneric.IsSpecialItem;
 
-        public bool IsSpecialItem => InnerBrowsableObjectInfo.IsSpecialItem;
+        public BitmapSource SmallBitmapSource => ModelGeneric.SmallBitmapSource;
 
-        public BitmapSource SmallBitmapSource => InnerBrowsableObjectInfo.SmallBitmapSource;
+        public BitmapSource MediumBitmapSource => ModelGeneric.MediumBitmapSource;
 
-        public BitmapSource MediumBitmapSource => InnerBrowsableObjectInfo.MediumBitmapSource;
+        public BitmapSource LargeBitmapSource => ModelGeneric.LargeBitmapSource;
 
-        public BitmapSource LargeBitmapSource => InnerBrowsableObjectInfo.LargeBitmapSource;
+        public BitmapSource ExtraLargeBitmapSource => ModelGeneric.ExtraLargeBitmapSource;
 
-        public BitmapSource ExtraLargeBitmapSource => InnerBrowsableObjectInfo.ExtraLargeBitmapSource;
+        public bool IsBrowsable => ModelGeneric.IsBrowsable;
 
-        public bool IsBrowsable => InnerBrowsableObjectInfo.IsBrowsable;
+        public string ItemTypeName => ModelGeneric.ItemTypeName;
 
-        public string ItemTypeName => InnerBrowsableObjectInfo.ItemTypeName;
+        public string Description => ModelGeneric.Description;
 
-        public string Description => InnerBrowsableObjectInfo.Description;
+        public Size? Size => ModelGeneric.Size;
 
-        public Size? Size => InnerBrowsableObjectInfo.Size;
+        public bool IsRecursivelyBrowsable => ModelGeneric.IsRecursivelyBrowsable;
 
-        public bool HasTransparency => InnerBrowsableObjectInfo.IsSpecialItem;
+        public IBrowsableObjectInfo Value => ModelGeneric.Value;
+
+        public bool HasTransparency => ModelGeneric.IsSpecialItem;
 
         private ObservableCollection<IBrowsableObjectInfoViewModel> _items;
 
@@ -91,11 +94,11 @@ namespace WinCopies.GUI.IO.ObjectModel
 
                     return _items;
 
-                if (InnerBrowsableObjectInfo.IsBrowsable)
+                if (ModelGeneric.IsBrowsable)
 
                     try
                     {
-                        IEnumerable<IBrowsableObjectInfo> items = _filter == null ? InnerBrowsableObjectInfo.GetItems() : InnerBrowsableObjectInfo.GetItems().WherePredicate(_filter);
+                        IEnumerable<IBrowsableObjectInfo> items = _filter == null ? ModelGeneric.GetItems() : ModelGeneric.GetItems().WherePredicate(_filter);
 
                         var __items = new List<IBrowsableObjectInfoViewModel>(items.Select(
 
@@ -107,6 +110,7 @@ namespace WinCopies.GUI.IO.ObjectModel
 
                         _items = new ObservableCollection<IBrowsableObjectInfoViewModel>(__items);
                     }
+
                     catch
 #if DEBUG
                     (Exception ex)
@@ -127,7 +131,7 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         private bool _parentLoaded = false;
 
-        IBrowsableObjectInfo IBrowsableObjectInfo.Parent => InnerBrowsableObjectInfo.Parent;
+        IBrowsableObjectInfo IBrowsableObjectInfo.Parent => ModelGeneric.Parent;
 
         public IBrowsableObjectInfoViewModel Parent
         {
@@ -137,9 +141,9 @@ namespace WinCopies.GUI.IO.ObjectModel
 
                     return _parent;
 
-                if (InnerBrowsableObjectInfo.Parent is object)
+                if (ModelGeneric.Parent is object)
 
-                    _parent = new BrowsableObjectInfoViewModel(InnerBrowsableObjectInfo.Parent);
+                    _parent = new BrowsableObjectInfoViewModel(ModelGeneric.Parent);
 
                 _parentLoaded = true;
 
@@ -147,19 +151,21 @@ namespace WinCopies.GUI.IO.ObjectModel
             }
         }
 
-        public string Path => InnerBrowsableObjectInfo.Path;
+        public string Path => ModelGeneric.Path;
 
-        public string LocalizedName => InnerBrowsableObjectInfo.LocalizedName;
+        public string LocalizedName => ModelGeneric.LocalizedName;
 
-        public string Name => InnerBrowsableObjectInfo.Name;
+        public string Name => ModelGeneric.Name;
 
         private bool _isSelected = false;
 
         public bool IsSelected { get => _isSelected; set { _isSelected = value; OnPropertyChanged(nameof(IsSelected)); } }
 
-        public FileSystemType ItemFileSystemType => InnerBrowsableObjectInfo.ItemFileSystemType;
+        public FileSystemType ItemFileSystemType => ModelGeneric.ItemFileSystemType;
 
-        public ClientVersion? ClientVersion => InnerBrowsableObjectInfo.ClientVersion;
+        public ClientVersion? ClientVersion => ModelGeneric.ClientVersion;
+
+        protected internal new IBrowsableObjectInfo ModelGeneric => base.ModelGeneric;
 
         public BrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo) : base(browsableObjectInfo ?? throw GetArgumentNullException(nameof(browsableObjectInfo))) =>
 
@@ -172,31 +178,39 @@ namespace WinCopies.GUI.IO.ObjectModel
             _filter = filter;
         }
 
+        IEnumerator<IBrowsableObjectInfo> IEnumerable<IBrowsableObjectInfo>.GetEnumerator() => ((IEnumerable<IBrowsableObjectInfo>)ModelGeneric).GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)ModelGeneric).GetEnumerator();
+
+        public RecursiveEnumerator<IBrowsableObjectInfo> GetEnumerator() => ((WinCopies.IO.IRecursiveEnumerable<IBrowsableObjectInfo>)ModelGeneric).GetEnumerator();
+
+        public IEnumerator<Collections.Generic.IRecursiveEnumerable<IBrowsableObjectInfo>> GetRecursiveEnumerator() => ((WinCopies.IO.IRecursiveEnumerable<IBrowsableObjectInfo>)ModelGeneric).GetRecursiveEnumerator();
+
         public int CompareTo(
 #if !NETFRAMEWORK
             [AllowNull]
         #endif
-        IFileSystemObject other) => InnerBrowsableObjectInfo.CompareTo(other);
+        IFileSystemObject other) => ModelGeneric.CompareTo(other);
 
         public bool Equals(
 #if !NETFRAMEWORK
             [AllowNull]
         #endif
-        IFileSystemObject other) => InnerBrowsableObjectInfo.Equals(other);
+        IFileSystemObject other) => ModelGeneric.Equals(other);
 
-        public Collections.IEqualityComparer<IFileSystemObject> GetDefaultEqualityComparer() => InnerBrowsableObjectInfo.GetDefaultEqualityComparer();
+        public Collections.IEqualityComparer<IFileSystemObject> GetDefaultEqualityComparer() => ModelGeneric.GetDefaultEqualityComparer();
 
-        public IComparer<IFileSystemObject> GetDefaultComparer() => InnerBrowsableObjectInfo.GetDefaultComparer();
+        public IComparer<IFileSystemObject> GetDefaultComparer() => ModelGeneric.GetDefaultComparer();
 
         #region IDisposable Support
 
-        public bool IsDisposed => InnerBrowsableObjectInfo.IsDisposed;
+        public bool IsDisposed => ModelGeneric.IsDisposed;
 
         protected virtual void Dispose(in bool disposing)
         {
             if (disposing)
 
-                InnerBrowsableObjectInfo.Dispose();
+                ModelGeneric.Dispose();
         }
 
         public void Dispose()
@@ -206,9 +220,11 @@ namespace WinCopies.GUI.IO.ObjectModel
             GC.SuppressFinalize(this);
         }
 
-        public override bool Equals(object obj) => ReferenceEquals(this, obj) ? true : obj is null ? false : InnerBrowsableObjectInfo.Equals(obj);
+        public override bool Equals(object obj) => ReferenceEquals(this, obj) ? true : obj is null ? false : ModelGeneric.Equals(obj);
 
-        public override int GetHashCode() => InnerBrowsableObjectInfo.GetHashCode();
+        public override int GetHashCode() => ModelGeneric.GetHashCode();
+
+        public Type GetInnerBrowsableObjectInfoType() => ModelGeneric.GetType();
 
         public static bool operator ==(BrowsableObjectInfoViewModel left, BrowsableObjectInfoViewModel right) => left is null ? right is null : left.Equals(right);
 

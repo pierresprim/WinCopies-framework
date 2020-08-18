@@ -19,14 +19,16 @@ using SevenZip;
 
 namespace WinCopies.IO.ObjectModel
 {
+    public interface IArchiveItemInfo : IArchiveItemInfoProvider, IEncapsulatorBrowsableObjectInfo<ArchiveFileInfo?>
+    {
+        // Left empty.
+    }
+
     /// <summary>
     /// Represents an archive item.
     /// </summary>
-    public interface IArchiveItemInfo : IArchiveItemInfoProvider
+    public interface IArchiveItemInfo<T> : IArchiveItemInfo, IArchiveItemInfoProvider<T, ArchiveFileInfo?> where T : IFileSystemObjectInfoProperties
     {
-        /// <summary>
-        /// The <see cref="SevenZip.ArchiveFileInfo"/> that this <see cref="IArchiveItemInfo"/> represents.
-        /// </summary>
-        ArchiveFileInfo? ArchiveFileInfo { get; }
+        // Left empty.
     }
 }

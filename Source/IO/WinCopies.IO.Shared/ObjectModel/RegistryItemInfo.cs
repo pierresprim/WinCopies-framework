@@ -26,7 +26,7 @@ using System.Security;
 using System.Security.AccessControl;
 using System.Text;
 using System.Windows.Media.Imaging;
-
+using WinCopies.IO.ObjectModel;
 using WinCopies.Linq;
 using WinCopies.Util;
 
@@ -71,23 +71,40 @@ namespace WinCopies.IO
         Value
     }
 
+    public class RegistryItemInfoProperties : BrowsableObjectInfoProperties<IRegistryItemInfo>, IRegistryItemInfoProperties
+    {
+        public RegistryItemType RegistryItemType => BrowsableObjectInfo.RegistryItemType;
+
+        public RegistryItemInfoProperties(in IRegistryItemInfo browsableObjectInfo) : base(browsableObjectInfo)
+        {
+            // Left empty.
+        }
+    }
+
     namespace ObjectModel
     {
         /// <summary>
         /// Represents a Windows registry item.
         /// </summary>
-        public class RegistryItemInfo/*<TItems, TFactory>*/ : BrowsableObjectInfo/*<TItems, TFactory>*/, IRegistryItemInfo // where TItems : BrowsableObjectInfo, IRegistryItemInfo where TFactory : IRegistryItemInfoFactory
+        public class RegistryItemInfo/*<TItems, TFactory>*/ : BrowsableObjectInfo<IRegistryItemInfoProperties, RegistryKey>/*<TItems, TFactory>*/, IRegistryItemInfo<IRegistryItemInfoProperties> // where TItems : BrowsableObjectInfo, IRegistryItemInfo where TFactory : IRegistryItemInfoFactory
         {
             // public override bool IsRenamingSupported => false;
 
             #region Fields
-            private RegistryKey _registryKey;
+            internal RegistryKey _registryKey;
             private IBrowsableObjectInfo _parent;
             private bool? _isBrowsable;
-
             #endregion
 
             #region Properties
+            /// <summary>
+            /// The Windows registry item type of this <see cref="RegistryItemInfo"/>.
+            /// </summary>
+            public RegistryItemType RegistryItemType { get; }
+
+            public sealed override bool HasProperties => true;
+
+            public sealed override IRegistryItemInfoProperties ObjectPropertiesGeneric { get; }
 
             ///// <summary>
             ///// Gets a value that indicates whether this object needs to reconstruct objects on deep cloning.
@@ -110,7 +127,7 @@ namespace WinCopies.IO
 
                     if (string.IsNullOrEmpty(_itemTypeName))
 
-                        switch (RegistryItemType)
+                        switch (ObjectPropertiesGeneric.RegistryItemType)
                         {
                             case RegistryItemType.Root:
                                 _itemTypeName = "Registry root";
@@ -130,26 +147,6 @@ namespace WinCopies.IO
             }
 
             public override string Description => NotApplicable;
-
-            /// <summary>
-            /// The Windows registry item type of this <see cref="RegistryItemInfo"/>.
-            /// </summary>
-            public RegistryItemType RegistryItemType { get; }
-
-            /// <summary>
-            /// The <see cref="Microsoft.Win32.RegistryKey"/> that this <see cref="RegistryItemInfo"/> represents.
-            /// </summary>
-            public RegistryKey RegistryKey
-            {
-                get
-                {
-                    if (_registryKey == null && RegistryItemType == RegistryItemType.Key)
-
-                        OpenKey();
-
-                    return _registryKey;
-                }
-            }
 
             /// <summary>
             /// Gets the localized path of this <see cref="RegistryItemInfo"/>.
@@ -192,7 +189,7 @@ namespace WinCopies.IO
 
                         return _isBrowsable.Value;
 
-                    switch (RegistryItemType)
+                    switch (ObjectPropertiesGeneric.RegistryItemType)
                     {
                         case RegistryItemType.Root:
                         case RegistryItemType.Key:
@@ -224,6 +221,21 @@ namespace WinCopies.IO
 
 #endif
 
+            ///// <summary>
+            ///// The <see cref="RegistryKey"/> that this <see cref="RegistryItemInfo"/> represents.
+            ///// </summary>
+            public sealed override RegistryKey EncapsulatedObject
+            {
+                get
+                {
+                    if (_registryKey == null && ObjectPropertiesGeneric.RegistryItemType == RegistryItemType.Key)
+
+                        OpenKey();
+
+                    return _registryKey;
+                }
+            }
+
             public override FileSystemType ItemFileSystemType => FileSystemType.Registry;
 
             #endregion
@@ -235,20 +247,19 @@ namespace WinCopies.IO
             ///// </summary>
             public RegistryItemInfo() : base(ShellObject.FromParsingName(KnownFolders.Computer.ParsingName).GetDisplayName(DisplayNameType.Default))
             {
-
                 Name = Path;
 
                 RegistryItemType = RegistryItemType.Root;
 
+                ObjectPropertiesGeneric = new RegistryItemInfoProperties(this);
             }
 
             ///// <summary>
             ///// Initializes a new instance of the <see cref="RegistryItemInfo"/> class using a custom factory for <see cref="RegistryItemInfo"/>s.
             ///// </summary>
             ///// <param name="registryKey">The <see cref="Microsoft.Win32.RegistryKey"/> that the new <see cref="RegistryItemInfo"/> represents.</param>
-            public RegistryItemInfo(RegistryKey registryKey) : base((registryKey ?? throw GetArgumentNullException(nameof(registryKey))).Name)
+            public RegistryItemInfo(in RegistryKey registryKey) : base((registryKey ?? throw GetArgumentNullException(nameof(registryKey))).Name)
             {
-
                 string[] name = registryKey.Name.Split(WinCopies.IO.Path.PathSeparator);
 
                 Name =
@@ -265,17 +276,17 @@ namespace WinCopies.IO
 
                 RegistryItemType = RegistryItemType.Key;
 
-                _registryKey = registryKey;
+                ObjectPropertiesGeneric = new RegistryItemInfoProperties(this);
 
+                _registryKey = registryKey;
             }
 
             ///// <summary>
             ///// Initializes a new instance of the <see cref="RegistryItemInfo"/> class using a custom factory for <see cref="RegistryItemInfo"/>s.
             ///// </summary>
             ///// <param name="path">The path of the <see cref="Microsoft.Win32.RegistryKey"/> that the new <see cref="RegistryItemInfo"/> represents.</param>
-            public RegistryItemInfo(string path) : base(path)
+            public RegistryItemInfo(in string path) : base(path)
             {
-
                 ThrowIfNullEmptyOrWhiteSpace(path);
 
                 string[] name = path.Split(WinCopies.IO.Path.PathSeparator);
@@ -283,19 +294,16 @@ namespace WinCopies.IO
                 Name =
 
 #if NETFRAMEWORK
-                
-                name[name.Length-1];
-                
+                        name[name.Length-1];
 #else
-
-                    name[^1];
-
+                        name[^1];
 #endif
 
                 RegistryItemType = RegistryItemType.Key;
 
-                _registryKey = Registry.OpenRegistryKey(path);
+                ObjectPropertiesGeneric = new RegistryItemInfoProperties(this);
 
+                _registryKey = Registry.OpenRegistryKey(path);
             }
 
             ///// <summary>
@@ -303,15 +311,15 @@ namespace WinCopies.IO
             ///// </summary>
             ///// <param name="registryKey">The <see cref="Microsoft.Win32.RegistryKey"/> that the new <see cref="RegistryItemInfo"/> represents.</param>
             ///// <param name="valueName">The name of the value that the new <see cref="RegistryItemInfo"/> represents.</param>
-            public RegistryItemInfo(RegistryKey registryKey, string valueName) : base(registryKey.Name)
+            public RegistryItemInfo(in RegistryKey registryKey, in string valueName) : base(registryKey.Name)
             {
-
                 Name = valueName;
 
                 RegistryItemType = RegistryItemType.Value;
 
-                _registryKey = registryKey;
+                ObjectPropertiesGeneric = new RegistryItemInfoProperties(this);
 
+                _registryKey = registryKey;
             }
 
             ///// <summary>
@@ -319,7 +327,10 @@ namespace WinCopies.IO
             ///// </summary>
             ///// <param name="registryKeyPath">The path of the <see cref="Microsoft.Win32.RegistryKey"/> that the new <see cref="RegistryItemInfo"/> represents.</param>
             ///// <param name="valueName">The name of the value that the new <see cref="RegistryItemInfo"/> represents.</param>
-            public RegistryItemInfo(string registryKeyPath, string valueName) : this(Registry.OpenRegistryKey(registryKeyPath), valueName) { }
+            public RegistryItemInfo(in string registryKeyPath, in string valueName) : this(Registry.OpenRegistryKey(registryKeyPath), valueName)
+            {
+                // Left empty.
+            }
 
             #endregion
 
@@ -363,13 +374,11 @@ namespace WinCopies.IO
             /// </summary>
             public void OpenKey()
             {
-
-                if (RegistryItemType != RegistryItemType.Key)
+                if (ObjectPropertiesGeneric.RegistryItemType != RegistryItemType.Key)
 
                     throw new InvalidOperationException("This item does not represent a registry key.");
 
                 _registryKey = Registry.OpenRegistryKey(Path);
-
             }
 
             /// <summary>
@@ -391,11 +400,11 @@ namespace WinCopies.IO
             /// <returns>The parent of this <see cref="RegistryItemInfo"/>.</returns>
             private IBrowsableObjectInfo GetParent()
             {
-                switch (RegistryItemType)
+                switch (ObjectPropertiesGeneric.RegistryItemType)
                 {
                     case RegistryItemType.Key:
 
-                        string[] path = RegistryKey.Name.Split(IO.Path.PathSeparator);
+                        string[] path = EncapsulatedObject.Name.Split(IO.Path.PathSeparator);
 
                         if (path.Length == 1)
 
@@ -411,12 +420,10 @@ namespace WinCopies.IO
 
                     case RegistryItemType.Value:
 
-                        return new RegistryItemInfo(RegistryKey);
-
-                    default:
-
-                        return null;
+                        return new RegistryItemInfo(EncapsulatedObject);
                 }
+
+                return null;
             }
 
             ///// <summary>
@@ -438,7 +445,7 @@ namespace WinCopies.IO
             {
                 int iconIndex = FileIcon;
 
-                switch (RegistryItemType)
+                switch (ObjectPropertiesGeneric.RegistryItemType)
                 {
                     case RegistryItemType.Root:
 
@@ -475,7 +482,7 @@ namespace WinCopies.IO
             }
         }
 #else
-            => RegistryItemType switch
+            => ObjectPropertiesGeneric.RegistryItemType switch
             {
                 RegistryItemType.Root => typeof(Microsoft.Win32.Registry).GetFields().Select(f => new RegistryItemInfo((RegistryKey)f.GetValue(null))),
                 RegistryItemType.Key => GetItems(null, false),
@@ -485,7 +492,7 @@ namespace WinCopies.IO
 
             public IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<RegistryKey> predicate)
             {
-                if (RegistryItemType == RegistryItemType.Root)
+                if (ObjectPropertiesGeneric.RegistryItemType == RegistryItemType.Root)
 
                     //{
 
@@ -547,7 +554,7 @@ namespace WinCopies.IO
 
                 //}
 
-                if (RegistryItemType == RegistryItemType.Key)
+                if (ObjectPropertiesGeneric.RegistryItemType == RegistryItemType.Key)
                 {
                     //string[] items;
 
@@ -559,16 +566,16 @@ namespace WinCopies.IO
                     {
                         if (predicate == null)
                         {
-                            keys = RegistryKey.GetSubKeyNames().Select(item => new RegistryItemInfo($"{Path}\\{item}"));
+                            keys = EncapsulatedObject.GetSubKeyNames().Select(item => new RegistryItemInfo($"{Path}\\{item}"));
 
-                            values = RegistryKey.GetValueNames().Select(s => new RegistryItemInfo(Path, s));
+                            values = _registryKey.GetValueNames().Select(s => new RegistryItemInfo(Path, s));
                         }
 
                         else
                         {
-                            keys = RegistryKey.GetSubKeyNames().Where(item => predicate(new RegistryItemInfoEnumeratorStruct(item, RegistryItemType.Key))).Select(item => new RegistryItemInfo($"{Path}\\{item}"));
+                            keys = EncapsulatedObject.GetSubKeyNames().Where(item => predicate(new RegistryItemInfoEnumeratorStruct(item, RegistryItemType.Key))).Select(item => new RegistryItemInfo($"{Path}\\{item}"));
 
-                            values = RegistryKey.GetValueNames().Where(s => predicate(new RegistryItemInfoEnumeratorStruct(s, RegistryItemType.Value))).Select(s => new RegistryItemInfo(Path, s));
+                            values = _registryKey.GetValueNames().Where(s => predicate(new RegistryItemInfoEnumeratorStruct(s, RegistryItemType.Value))).Select(s => new RegistryItemInfo(Path, s));
                         }
                     }
 

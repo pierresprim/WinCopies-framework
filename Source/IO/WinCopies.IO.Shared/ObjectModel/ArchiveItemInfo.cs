@@ -29,228 +29,236 @@ using WinCopies.Util;
 
 using static WinCopies.Util.Util;
 
-using IfComp = WinCopies.Util.Util.Comparison;
-using IfCM = WinCopies.Util.Util.ComparisonMode;
-using IfCT = WinCopies.Util.Util.ComparisonType;
-
-namespace WinCopies.IO.ObjectModel
+namespace WinCopies.IO
 {
-    /// <summary>
-    /// Represents an archive item.
-    /// </summary>
-    public class ArchiveItemInfo : ArchiveItemInfoProvider, IArchiveItemInfo
+    namespace ObjectModel
     {
-        private IBrowsableObjectInfo _parent;
-        private bool? _isBrowsable;
-
-        #region Properties
-        //IShellObjectInfo IArchiveItemInfoProvider.ArchiveShellObject => ArchiveShellObjectOverride;
-
         /// <summary>
-        /// The <see cref="SevenZip.ArchiveFileInfo"/> that this <see cref="IArchiveItemInfo"/> represents.
+        /// Represents an archive item.
         /// </summary>
-        public ArchiveFileInfo? ArchiveFileInfo { get; private set; }
-
-        #region Overrides
-        public override FileSystemType ItemFileSystemType => FileSystemType.Archive;
-
-        /// <summary>
-        /// Gets a value that indicates whether this <see cref="ArchiveItemInfo"/> is browsable.
-        /// </summary>
-        public override bool IsBrowsable
+        public class ArchiveItemInfo : ArchiveItemInfoProvider<IFileSystemObjectInfoProperties, ArchiveFileInfo?>, IArchiveItemInfo<IFileSystemObjectInfoProperties>
         {
-            get
+            private ArchiveFileInfo? _encapsulatedObject;
+            private IBrowsableObjectInfo _parent;
+            private bool? _isBrowsable;
+
+            #region Properties
+            //IShellObjectInfo IArchiveItemInfoProvider.ArchiveShellObject => ArchiveShellObjectOverride;
+
+            #region Overrides
+            public override FileType FileType { get; }
+
+            /// <summary>
+            /// The <see cref="SevenZip.ArchiveFileInfo"/> that this <see cref="ArchiveItemInfo"/> represents.
+            /// </summary>
+            public sealed override ArchiveFileInfo? EncapsulatedObject => _encapsulatedObject;
+
+            public sealed override IFileSystemObjectInfoProperties ObjectPropertiesGeneric { get; }
+
+            public override FileSystemType ItemFileSystemType => FileSystemType.Archive;
+
+            /// <summary>
+            /// Gets a value that indicates whether this <see cref="ArchiveItemInfo"/> is browsable.
+            /// </summary>
+            public override bool IsBrowsable
             {
-                if (_isBrowsable.HasValue)
+                get
+                {
+                    if (_isBrowsable.HasValue)
+
+                        return _isBrowsable.Value;
+
+                    switch (ObjectPropertiesGeneric.FileType)
+                    {
+                        case FileType.Folder:
+                        case FileType.Drive:
+                            // case FileType.Archive:
+
+                            _isBrowsable = true;
+
+                            break;
+
+                        default:
+
+                            _isBrowsable = false;
+
+                            break;
+                    }
 
                     return _isBrowsable.Value;
-
-                switch (FileType)
-                {
-                    case FileType.Folder:
-                    case FileType.Drive:
-                        // case FileType.Archive:
-
-                        _isBrowsable = true;
-
-                        break;
-
-                    default:
-
-                        _isBrowsable = false;
-
-                        break;
                 }
-
-                return _isBrowsable.Value;
             }
-        }
 
 #if NETFRAMEWORK
         public override IBrowsableObjectInfo Parent => _parent ?? (_parent=GetParent());
 #else
-        public override IBrowsableObjectInfo Parent => _parent ??= GetParent();
+            public override IBrowsableObjectInfo Parent => _parent ??= GetParent();
 #endif
 
-        /// <summary>
-        /// Returns the same value as <see cref="Name"/>.
-        /// </summary>
-        public override string LocalizedName => Name;
+            /// <summary>
+            /// Returns the same value as <see cref="Name"/>.
+            /// </summary>
+            public override string LocalizedName => Name;
 
-        /// <summary>
-        /// Gets the name of this <see cref="ArchiveItemInfo"/>.
-        /// </summary>
-        public override string Name => System.IO.Path.GetFileName(Path);
+            /// <summary>
+            /// Gets the name of this <see cref="ArchiveItemInfo"/>.
+            /// </summary>
+            public override string Name => System.IO.Path.GetFileName(Path);
 
-        #region BitmapSources
-        /// <summary>
-        /// Gets the small <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
-        /// </summary>
-        public override BitmapSource SmallBitmapSource => TryGetBitmapSource(SmallIconSize);
+            #region BitmapSources
+            /// <summary>
+            /// Gets the small <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
+            /// </summary>
+            public override BitmapSource SmallBitmapSource => TryGetBitmapSource(SmallIconSize);
 
-        /// <summary>
-        /// Gets the medium <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
-        /// </summary>
-        public override BitmapSource MediumBitmapSource => TryGetBitmapSource(MediumIconSize);
+            /// <summary>
+            /// Gets the medium <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
+            /// </summary>
+            public override BitmapSource MediumBitmapSource => TryGetBitmapSource(MediumIconSize);
 
-        /// <summary>
-        /// Gets the large <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
-        /// </summary>
-        public override BitmapSource LargeBitmapSource => TryGetBitmapSource(LargeIconSize);
+            /// <summary>
+            /// Gets the large <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
+            /// </summary>
+            public override BitmapSource LargeBitmapSource => TryGetBitmapSource(LargeIconSize);
 
-        /// <summary>
-        /// Gets the extra large <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
-        /// </summary>
-        public override BitmapSource ExtraLargeBitmapSource => TryGetBitmapSource(ExtraLargeIconSize);
-        #endregion
+            /// <summary>
+            /// Gets the extra large <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
+            /// </summary>
+            public override BitmapSource ExtraLargeBitmapSource => TryGetBitmapSource(ExtraLargeIconSize);
+            #endregion
 
-        public override string ItemTypeName => GetItemTypeName(System.IO.Path.GetExtension(Path), FileType);
+            public override string ItemTypeName => GetItemTypeName(System.IO.Path.GetExtension(Path), ObjectPropertiesGeneric.FileType);
 
-        /// <summary>
-        /// Not applicable for this item kind.
-        /// </summary>
-        public override string Description => "N/A";
+            /// <summary>
+            /// Not applicable for this item kind.
+            /// </summary>
+            public override string Description => "N/A";
 
-        /// <summary>
-        /// If <see cref="ArchiveFileInfo"/> has value, gets the size of the inner <see cref="SevenZip.ArchiveFileInfo"/>; otherwise, returns <see langword="null"/>.
-        /// </summary>
-        public override Size? Size
-        {
-            get
+            /// <summary>
+            /// If <see cref="EncapsulatedObject"/> has value, gets the size of the inner <see cref="SevenZip.ArchiveFileInfo"/>; otherwise, returns <see langword="null"/>.
+            /// </summary>
+            public override Size? Size
             {
-                if (ArchiveFileInfo.HasValue)
-
-                    return new Size(ArchiveFileInfo.Value.Size);
-
-                else
-
-                    return null;
-            }
-        }
-
-        /// <summary>
-        /// Gets a value that indicates whether this item is a hidden or system item.
-        /// </summary>
-        public override bool IsSpecialItem
-        {
-            get
-            {
-                if (ArchiveFileInfo.HasValue)
+                get
                 {
-                    var value = (FileAttributes)ArchiveFileInfo.Value.Attributes;
+                    if (_encapsulatedObject.HasValue)
 
-                    return value.HasFlag(FileAttributes.Hidden) || value.HasFlag(FileAttributes.System);
+                        return new Size(_encapsulatedObject.Value.Size);
+
+                    else
+
+                        return null;
+                }
+            }
+
+            /// <summary>
+            /// Gets a value that indicates whether this item is a hidden or system item.
+            /// </summary>
+            public override bool IsSpecialItem
+            {
+                get
+                {
+                    if (_encapsulatedObject.HasValue)
+                    {
+                        var value = (FileAttributes)_encapsulatedObject.Value.Attributes;
+
+                        return value.HasFlag(FileAttributes.Hidden) || value.HasFlag(FileAttributes.System);
+                    }
+
+                    else
+
+                        return false;
+                }
+            }
+
+            /// <summary>
+            /// The parent <see cref="IShellObjectInfo"/> of the current archive item.
+            /// </summary>
+            public override IShellObjectInfo ArchiveShellObject { get; }
+            #endregion
+            #endregion
+
+            private ArchiveItemInfo(in string path, in FileType fileType, in IShellObjectInfo archiveShellObject, in ArchiveFileInfo? archiveFileInfo/*, DeepClone<ArchiveFileInfo?> archiveFileInfoDelegate*/) : base(path)
+            {
+                FileType = fileType;
+
+                ObjectPropertiesGeneric = new FileSystemObjectInfoProperties<IFileSystemObjectInfo>(this);
+
+                ArchiveShellObject = archiveShellObject;
+
+                _encapsulatedObject = archiveFileInfo;
+            }
+
+            #region Methods
+            #region Construction helpers
+            ///// <summary>
+            ///// Initializes a new instance of the <see cref="ArchiveItemInfo"/> class using a custom factory for <see cref="ArchiveItemInfo"/>s.
+            ///// </summary>
+            ///// <param name="archiveShellObject">The <see cref="IShellObjectInfo"/> that correspond to the root path of the archive</param>
+            ///// <param name="path">The full path to this archive item</param>
+            ///// <param name="fileType">The file type of this archive item</param>
+            public static ArchiveItemInfo From(in IShellObjectInfo archiveShellObjectInfo, in ArchiveFileInfo archiveFileInfo)
+            {
+                ThrowIfNull(archiveShellObjectInfo, nameof(archiveShellObjectInfo));
+
+                string extension = System.IO.Path.GetExtension(archiveFileInfo.FileName);
+
+                return new ArchiveItemInfo(System.IO.Path.Combine(archiveShellObjectInfo.Path, archiveFileInfo.FileName), archiveFileInfo.IsDirectory ? FileType.Folder : extension == ".lnk" ? FileType.Link : extension == ".library.ms" ? FileType.Library : FileType.File, archiveShellObjectInfo, archiveFileInfo);
+            }
+
+            public static ArchiveItemInfo From(in IShellObjectInfo archiveShellObjectInfo, in string archiveFilePath)
+            {
+                ThrowIfNull(archiveShellObjectInfo, nameof(archiveShellObjectInfo));
+
+                return new ArchiveItemInfo(System.IO.Path.Combine(archiveShellObjectInfo.Path, archiveFilePath), FileType.Folder, archiveShellObjectInfo, null);
+            }
+            #endregion
+
+            private IBrowsableObjectInfo GetParent()
+            {
+                IBrowsableObjectInfo result;
+
+                if (Path.Length > ArchiveShellObject.Path.Length)
+                {
+                    string path = Path.Substring(0, Path.LastIndexOf(WinCopies.IO.Path.PathSeparator));
+
+                    ArchiveFileInfo? archiveFileInfo = null;
+
+                    using (var extractor = new SevenZipExtractor(ArchiveShellObject.ArchiveFileStream))
+
+                        archiveFileInfo = extractor.ArchiveFileData.FirstOrDefault(item => string.Compare(item.FileName, path, StringComparison.OrdinalIgnoreCase) == 0);
+
+                    result = new ArchiveItemInfo(path, FileType.Folder, ArchiveShellObject, archiveFileInfo);
                 }
 
                 else
 
-                    return false;
+                    result = ArchiveShellObject;
+
+                return result;
             }
-        }
 
-        /// <summary>
-        /// The parent <see cref="IShellObjectInfo"/> of the current archive item.
-        /// </summary>
-        public override IShellObjectInfo ArchiveShellObject { get; }
-        #endregion
-        #endregion
+            #region GetItems
+            public IEnumerable<IBrowsableObjectInfo> GetItems(in Predicate<ArchiveFileInfoEnumeratorStruct> func) => func is null ? throw GetArgumentNullException(nameof(func)) : GetArchiveItemInfoItems(func);
 
-        private ArchiveItemInfo(in string path, in FileType fileType, in IShellObjectInfo archiveShellObject, in ArchiveFileInfo? archiveFileInfo/*, DeepClone<ArchiveFileInfo?> archiveFileInfoDelegate*/) : base(path, fileType)
-        {
-            ArchiveShellObject = archiveShellObject;
+            /// <summary>
+            /// Returns the items of this <see cref="ArchiveItemInfo"/>.
+            /// </summary>
+            /// <returns>An <see cref="IEnumerable{IBrowsableObjectInfo}"/> that enumerates through the items of this <see cref="ArchiveItemInfo"/>.</returns>
+            public override IEnumerable<IBrowsableObjectInfo> GetItems() => GetArchiveItemInfoItems(null);
 
-            ArchiveFileInfo = archiveFileInfo;
-        }
+            private IEnumerable<IBrowsableObjectInfo> GetArchiveItemInfoItems(Predicate<ArchiveFileInfoEnumeratorStruct> func) => new Enumerable<IBrowsableObjectInfo>(() => new ArchiveItemInfoEnumerator(this, func));
+            #endregion
 
-        #region Methods
-        #region Construction helpers
-        ///// <summary>
-        ///// Initializes a new instance of the <see cref="ArchiveItemInfo"/> class using a custom factory for <see cref="ArchiveItemInfo"/>s.
-        ///// </summary>
-        ///// <param name="archiveShellObject">The <see cref="IShellObjectInfo"/> that correspond to the root path of the archive</param>
-        ///// <param name="path">The full path to this archive item</param>
-        ///// <param name="fileType">The file type of this archive item</param>
-        public static ArchiveItemInfo From(in IShellObjectInfo archiveShellObjectInfo, in ArchiveFileInfo archiveFileInfo)
-        {
-            ThrowIfNull(archiveShellObjectInfo, nameof(archiveShellObjectInfo));
-
-            string extension = System.IO.Path.GetExtension(archiveFileInfo.FileName);
-
-            return new ArchiveItemInfo(System.IO.Path.Combine(archiveShellObjectInfo.Path, archiveFileInfo.FileName), archiveFileInfo.IsDirectory ? FileType.Folder : extension == ".lnk" ? FileType.Link : extension == ".library.ms" ? FileType.Library : FileType.File, archiveShellObjectInfo, archiveFileInfo);
-        }
-
-        public static ArchiveItemInfo From(in IShellObjectInfo archiveShellObjectInfo, in string archiveFilePath)
-        {
-            ThrowIfNull(archiveShellObjectInfo, nameof(archiveShellObjectInfo));
-
-            return new ArchiveItemInfo(System.IO.Path.Combine(archiveShellObjectInfo.Path, archiveFilePath), FileType.Folder, archiveShellObjectInfo, null);
-        }
-        #endregion
-
-        private IBrowsableObjectInfo GetParent()
-        {
-            IBrowsableObjectInfo result;
-
-            if (Path.Length > ArchiveShellObject.Path.Length)
+            protected override void Dispose(in bool disposing)
             {
-                string path = Path.Substring(0, Path.LastIndexOf(WinCopies.IO.Path.PathSeparator));
+                base.Dispose(disposing);
 
-                ArchiveFileInfo? archiveFileInfo = null;
+                if (disposing)
 
-                using (var extractor = new SevenZipExtractor(ArchiveShellObject.ArchiveFileStream))
-
-                    archiveFileInfo = extractor.ArchiveFileData.FirstOrDefault(item => string.Compare(item.FileName, path, StringComparison.OrdinalIgnoreCase) == 0);
-
-                result = new ArchiveItemInfo(path, FileType.Folder, ArchiveShellObject, archiveFileInfo);
+                    _encapsulatedObject = null;
             }
-
-            else
-
-                result = ArchiveShellObject;
-
-            return result;
+            #endregion
         }
-
-        #region GetItems
-        public IEnumerable<IBrowsableObjectInfo> GetItems(in Predicate<ArchiveFileInfoEnumeratorStruct> func) => func is null ? throw GetArgumentNullException(nameof(func)) : GetArchiveItemInfoItems(func);
-
-        /// <summary>
-        /// Returns the items of this <see cref="ArchiveItemInfo"/>.
-        /// </summary>
-        /// <returns>An <see cref="IEnumerable{IBrowsableObjectInfo}"/> that enumerates through the items of this <see cref="ArchiveItemInfo"/>.</returns>
-        public override IEnumerable<IBrowsableObjectInfo> GetItems() => GetArchiveItemInfoItems(null);
-
-        private IEnumerable<IBrowsableObjectInfo> GetArchiveItemInfoItems(Predicate<ArchiveFileInfoEnumeratorStruct> func) => new Enumerable<IBrowsableObjectInfo>(() => new ArchiveItemInfoEnumerator(this, func));
-        #endregion
-
-        protected override void Dispose(in bool disposing)
-        {
-            base.Dispose(disposing);
-
-            if (disposing)
-
-                ArchiveFileInfo = null;
-        }
-        #endregion
     }
 }

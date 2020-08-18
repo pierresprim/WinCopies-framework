@@ -15,12 +15,32 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+using System;
+using System.Collections.Generic;
 using System.Reflection;
 
-namespace WinCopies.IO.ObjectModel.Reflection
+using WinCopies.IO.Reflection;
+
+namespace WinCopies.IO
 {
-    public interface IDotNetTypeInfo : IDotNetItemInfo
+    namespace Reflection
     {
-        TypeInfo TypeInfo { get; }
+        public interface IDotNetTypeInfoProperties : IDotNetItemInfoProperties
+        {
+            bool? IsRootType { get; }
+        }
+    }
+
+    namespace ObjectModel.Reflection
+    {
+        public interface IDotNetTypeInfo : IDotNetTypeInfoProperties, IDotNetItemInfo, IEncapsulatorBrowsableObjectInfo<TypeInfo>
+        {
+            IEnumerable<IBrowsableObjectInfo> GetItems(IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetTypeInfoEnumeratorStruct> func);
+        }
+
+        public interface IDotNetTypeInfo<T> : IDotNetTypeInfo, IDotNetItemInfo<T, TypeInfo> where T : IDotNetTypeInfoProperties
+        {
+            // Left empty.
+        }
     }
 }

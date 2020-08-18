@@ -20,36 +20,34 @@ using Microsoft.WindowsAPICodePack.PortableDevices;
 namespace WinCopies.IO.ObjectModel
 {
     /// <summary>
-    /// The base class for <see cref="ArchiveItemInfoProvider"/> objects.
+    /// The base class for archive item info provider objects.
     /// </summary>
-    public abstract class ArchiveItemInfoProvider : FileSystemObjectInfo, IArchiveItemInfoProvider
+    public abstract class ArchiveItemInfoProvider<TObjectProperties, TEncapsulatedObject> : FileSystemObjectInfo<TObjectProperties, TEncapsulatedObject>, IArchiveItemInfoProvider<TObjectProperties, TEncapsulatedObject> where TObjectProperties : IFileSystemObjectInfoProperties
     {
-        /// <summary>
-        /// The <see cref="IO.FileType"/> of this item.
-        /// </summary>
-        public override FileType FileType { get; }
-
         /// <summary>
         /// The parent <see cref="IShellObjectInfo"/> of this item. For <see cref="ShellObjectInfo"/> items, this property returns the current object.
         /// </summary>
         public abstract IShellObjectInfo ArchiveShellObject { get; }
 
+        IShellObjectInfo IArchiveItemInfoProvider.ArchiveShellObject => ArchiveShellObject;
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="ArchiveItemInfoProvider"/> class.
+        /// Initializes a new instance of the <see cref="ArchiveItemInfoProvider{TObjectProperties, TEncapsulatedObject}"/> class.
         /// </summary>
         /// <param name="path">The path of the new item.</param>
-        /// <param name="fileType">The <see cref="IO.FileType"/> of the new item.</param>
-        protected ArchiveItemInfoProvider(in string path, in FileType fileType) : this(path, fileType, null)
+        protected ArchiveItemInfoProvider(in string path) : this(path, null)
         {
             // Left empty.
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ArchiveItemInfoProvider"/> class.
+        /// Initializes a new instance of the <see cref="ArchiveItemInfoProvider{TObjectProperties, TEncapsulatedObject}"/> class.
         /// </summary>
-        /// <param name="path">The path of this <see cref="ArchiveItemInfoProvider"/>.</param>
-        /// <param name="fileType">The <see cref="IO.FileType"/> of this <see cref="ArchiveItemInfoProvider"/>.</param>
+        /// <param name="path">The path of this <see cref="ArchiveItemInfoProvider{TObjectProperties, TEncapsulatedObject}"/>.</param>
         /// <param name="clientVersion">The <see cref="ClientVersion"/> that will be used for <see cref="PortableDeviceInfo"/> and <see cref="PortableDeviceObjectInfo"/> initialization.</param>
-        protected ArchiveItemInfoProvider(in string path, in FileType fileType, ClientVersion? clientVersion) : base(path, clientVersion) => FileType = fileType;
+        protected ArchiveItemInfoProvider(in string path, in ClientVersion? clientVersion) : base(path, clientVersion)
+        {
+            // Left empty.
+        }
     }
 }

@@ -15,15 +15,30 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-namespace WinCopies.IO.ObjectModel
+using System;
+using System.Collections.Generic;
+using WinCopies.IO.Reflection;
+
+namespace WinCopies.IO
 {
-    public interface IArchiveItemInfoProvider : IFileSystemObjectInfo
+    namespace Reflection
     {
-        IShellObjectInfo ArchiveShellObject { get; }
+        public interface IDotNetNamespaceInfoProperties : IDotNetItemInfoProperties
+        {
+            bool IsRootNamespace { get; }
+        }
     }
 
-    public interface IArchiveItemInfoProvider<TObjectProperties, TEncapsulatedObject> : IArchiveItemInfoProvider, IFileSystemObjectInfo<TObjectProperties, TEncapsulatedObject> where TObjectProperties : IFileSystemObjectInfoProperties
+    namespace ObjectModel.Reflection
     {
-        // Left empty.
+        public interface IDotNetNamespaceInfo : IDotNetNamespaceInfoProperties, IDotNetItemInfo
+        {
+            IEnumerable<IBrowsableObjectInfo> GetItems(IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetNamespaceInfoEnumeratorStruct> func);
+        }
+
+        public interface IDotNetNamespaceInfo<T> : IDotNetNamespaceInfo, IDotNetItemInfo<T, object> where T : IDotNetNamespaceInfoProperties
+        {
+            // Left empty.
+        }
     }
 }

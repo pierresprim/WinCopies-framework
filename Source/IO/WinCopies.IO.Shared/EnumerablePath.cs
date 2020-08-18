@@ -437,7 +437,7 @@ namespace WinCopies.IO
 #endif
                 );
 
-        System.Collections.Generic.IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator(null, null
+        protected virtual System.Collections.Generic.IEnumerator<T> GetEnumerator() => GetEnumerator(null, null
 #if NETCORE
             , null
 #endif
@@ -446,6 +446,8 @@ namespace WinCopies.IO
             , null
 #endif
             );
+
+        System.Collections.Generic.IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator(null, null
 #if NETCORE
@@ -470,7 +472,7 @@ namespace WinCopies.IO
 
             public bool IsCompleted { get; private set; }
 
-            public T Current => _Util.IsEnumeratorNotStartedOrDisposed(this) ? throw _ThrowHelper.GetEnumeratorNotStartedOrDisposedException() : _current;
+            public T Current => this.IsEnumeratorNotStartedOrDisposed() ? throw ThrowHelper.GetEnumeratorNotStartedOrDisposedException() : _current;
 
             object IEnumerator.Current => Current;
 
@@ -735,9 +737,9 @@ namespace WinCopies.IO
                 );
         }
 
-        public IEnumerator<IRecursiveEnumerable<T>> GetRecursiveEnumerator() => _getRecursiveEnumeratorDelegate();
+        IEnumerator<WinCopies.Collections.Generic.IRecursiveEnumerable<T>> IRecursiveEnumerableProviderEnumerable<T>.GetRecursiveEnumerator() => _getRecursiveEnumeratorDelegate();
 
-        public RecursiveEnumerator<T> GetEnumerator() => new RecursiveEnumerator<T>(this);
+        RecursiveEnumerator<T> IRecursiveEnumerable<T>.GetEnumerator() => new RecursiveEnumerator<T>(this);
 
         IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
 

@@ -16,19 +16,28 @@
  * along with the WinCopies Framework.If not, see<https://www.gnu.org/licenses/>. */
 
 using System;
+using System.Collections.Generic;
 using System.Management;
 
-namespace WinCopies.IO.ObjectModel
+namespace WinCopies.IO
 {
-    public interface IWMIItemInfo : IBrowsableObjectInfo, IComparable<IFileSystemObject>, IEquatable<IFileSystemObject>
+    public interface IWMIItemInfoProperties
     {
-        ManagementBaseObject ManagementObject { get; }
-
-        /// <summary>
-        /// Gets a value that indicates whether this <see cref="WMIItemInfo"/> represents a root node.
-        /// </summary>
         bool IsRootNode { get; }
 
         WMIItemType WMIItemType { get; }
+    }
+
+    namespace ObjectModel
+    {
+        public interface IWMIItemInfo : IWMIItemInfoProperties, IBrowsableObjectInfo, IEncapsulatorBrowsableObjectInfo<ManagementBaseObject>
+        {
+            IEnumerable<IBrowsableObjectInfo> GetItems(IWMIItemInfoFactory factory, Predicate<ManagementBaseObject> predicate, bool catchExceptionsDuringEnumeration);
+        }
+
+        public interface IWMIItemInfo<T> : IWMIItemInfo, IBrowsableObjectInfo<T, ManagementBaseObject> where T : IWMIItemInfoProperties
+        {
+            // Left empty.
+        }
     }
 }

@@ -19,8 +19,13 @@ using Microsoft.WindowsAPICodePack.PortableDevices;
 
 namespace WinCopies.IO.ObjectModel
 {
-    public interface IPortableDeviceObjectInfo : IFileSystemObjectInfo
+    public interface IPortableDeviceObjectInfo : IFileSystemObjectInfo, IEncapsulatorBrowsableObjectInfo<IPortableDeviceObject>
     {
-        IPortableDeviceObject PortableDeviceObject { get; }
+        // Left empty.
+    }
+
+    public interface IPortableDeviceObjectInfo<T> : IPortableDeviceObjectInfo, IFileSystemObjectInfo<T, IPortableDeviceObject> where T : IFileSystemObjectInfoProperties
+    {
+        // Left empty.
     }
 }

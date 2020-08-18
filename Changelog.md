@@ -12,7 +12,7 @@ Updates
 ??/??/???? 2.6-preview
 ======================
 
-Depends on WinCopies.Util 2.5.9 and WinCopies.WindowsAPICodePack 2.0.1.
+Depends on WinCopies.Util 2.6 and WinCopies.WindowsAPICodePack 2.0.1.
 
 WinCopies.GUI.IO 2.6-preview
 ----------------------------
@@ -26,6 +26,7 @@ WinCopies.GUI.IO 2.6-preview
 	- See Removals section.
 - Removals:
 	- ProcessError.AccessDenied has been removed -- the values of the next enumeration constants have changed consequently.
+	- (I)BrowsableObjectInfoViewModel.InnerBrowsableObjectInfo property.
 - Additions:
 	- Add new processes
 	- Add ThrowIfIsBusy protected method to Process class.
@@ -37,13 +38,15 @@ WinCopies.IO 2.6-preview
 - Changes:
 	- WinCopies.IO.Directory.Enumerate methods are now generic.
 	- RegistryItemInfoEnumeratorStruct, RegistryItemType and WMIItemType have moved to the WinCopies.IO namespace.
-	- IBrowsableObjectInfo now implements the new WinCopies.Collections.Generic.ITreeEnumerable interface.
+	- IBrowsableObjectInfo now implements the new WinCopies.IO.IRecursiveEnumerable interface.
 	- Improved performance of the WinCopies.IO.File.IsDuplicate methods.
 	- ArchiveItemInfo.IsBrowsable returns false when the FileType property is set to Archive.
+	- The enumerator-relative methods of the BrowsableObjectInfo class are now explicitly implemented.
 - Removals:
 	- FileSystemEntryEnumerator
 	- PathInfoFileSystemEntryEnumerator
 - Additions:
+	- WinCopies.IO.IRecursiveEnumerable
 	- IBrowsableObjectInfo.IsRecursivelyBrowsable property.
 	- .Net reflection browsing using the IBrowsableObjectInfo interface.
 	- ShellObjectInfoEnumerator

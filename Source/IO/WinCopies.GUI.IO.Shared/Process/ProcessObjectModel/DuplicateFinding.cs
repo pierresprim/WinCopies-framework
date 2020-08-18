@@ -15,6 +15,8 @@
 * You should have received a copy of the GNU General Public License
 * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+#if DUPLICATEFINDING
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -63,13 +65,13 @@ namespace WinCopies.GUI.IO.Process
 
         protected virtual void OnPropertyChanged(in string propertyName) => OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
 
-        #region IPathInfo implementation
+#region IPathInfo implementation
         Size? IPathInfo.Size => PathInfo.Size;
 
         string WinCopies.IO.IPathInfo.Path => PathInfo.Path;
 
         bool WinCopies.IO.IPathInfo.IsDirectory => PathInfo.IsDirectory;
-        #endregion
+#endregion
     }
 
     public class DuplicateFindingDoWorkEventArgs : DoWorkEventArgs
@@ -97,16 +99,16 @@ namespace WinCopies.GUI.IO.Process
 #endif
         >
     {
-        #region Private fields
+#region Private fields
         private int _bufferLength = 4096;
         private DuplicateFindingStep _step = 0;
         private IPathInfo _currentDuplicateCheckPath;
         private byte _currentDuplicateCheckPathProgressPercentage;
         //private bool _ignoreOnError = true;
         private readonly ObservableQueueCollection<DuplicateFindingReadOnlyObservableLinkedCollection> _checkedPaths = new ObservableQueueCollection<DuplicateFindingReadOnlyObservableLinkedCollection>();
-        #endregion
+#endregion
 
-        #region Public properties
+#region Public properties
         /// <summary>
         /// Gets or sets the buffer length for content duplicate checking.
         /// </summary>
@@ -195,7 +197,7 @@ namespace WinCopies.GUI.IO.Process
         //}
 
         public ReadOnlyObservableQueueCollection<DuplicateFindingReadOnlyObservableLinkedCollection> CheckedPaths { get; }
-        #endregion
+#endregion
 
         public DuplicateFinding(DuplicateFindingOptions options)
         {
@@ -293,7 +295,7 @@ namespace WinCopies.GUI.IO.Process
                 }
             }
 
-            #region Array checks
+#region Array checks
 
             if (ignoreOptions.Paths != null && ignoreOptions.Paths.Count > 0)
 
@@ -336,7 +338,7 @@ namespace WinCopies.GUI.IO.Process
                     }
             }
 
-            #endregion
+#endregion
 
             result = false;
 
@@ -761,3 +763,5 @@ namespace WinCopies.GUI.IO.Process
         protected override ProcessError OnProcessDoWork(DoWorkEventArgs e) => e is DuplicateFindingDoWorkEventArgs _e ? _e.Func() : ProcessError.None;
     }
 }
+
+#endif

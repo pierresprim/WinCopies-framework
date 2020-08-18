@@ -19,7 +19,6 @@ using Microsoft.WindowsAPICodePack.Shell;
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 
 using WinCopies.Collections;
@@ -27,13 +26,15 @@ using WinCopies.IO.Reflection;
 
 namespace WinCopies.IO.ObjectModel.Reflection
 {
-    public class DotNetAssemblyInfo : ShellObjectInfo, IDotNetAssemblyInfo
+    public class DotNetAssemblyInfo : ShellObjectInfo, IDotNetAssemblyInfo<IFileSystemObjectInfoProperties>
     {
         public override bool IsBrowsable { get; } = true;
 
         public sealed override bool IsRecursivelyBrowsable { get; } = false;
 
         public Assembly Assembly { get; }
+
+        Assembly IEncapsulatorBrowsableObjectInfo<Assembly>.EncapsulatedObject => Assembly;
 
         protected DotNetAssemblyInfo(in string path, in ShellObject shellObject) : base(path, FileType.File, shellObject, null) => Assembly = Assembly.LoadFrom(path);
 
@@ -50,6 +51,6 @@ namespace WinCopies.IO.ObjectModel.Reflection
 
         public override IEnumerable<IBrowsableObjectInfo> GetItems() => GetItems(new DotNetItemType[] { DotNetItemType.Namespace, DotNetItemType.Struct, DotNetItemType.Enum, DotNetItemType.Class, DotNetItemType.Interface, DotNetItemType.Delegate }, null);
 
-        public virtual IEnumerable<IBrowsableObjectInfo> GetItems(IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetNamespaceEnumeratorStruct> func) => new Enumerable<IDotNetItemInfo>(() => new DotNetNamespaceInfoEnumerator(this, Assembly.DefinedTypes, typesToEnumerate, func));
+        public virtual IEnumerable<IBrowsableObjectInfo> GetItems(IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetNamespaceInfoEnumeratorStruct> func) => new Enumerable<IDotNetItemInfo>(() => new DotNetNamespaceInfoEnumerator(this, Assembly.DefinedTypes, typesToEnumerate, func));
     }
 }

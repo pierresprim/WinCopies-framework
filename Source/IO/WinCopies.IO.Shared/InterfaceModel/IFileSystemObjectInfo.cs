@@ -18,19 +18,30 @@
 using System.Drawing;
 using System.Windows.Media.Imaging;
 
-namespace WinCopies.IO.ObjectModel
+namespace WinCopies.IO
 {
-    // public interface IFileSystemObjectInfoFactory : IBrowsableObjectInfoFactory { }
-
-    public interface IFileSystemObjectInfo : IBrowsableObjectInfo
+    public interface IFileSystemObjectInfoProperties
     {
-        /// <summary>
-        /// Gets the <see cref="WinCopies.IO.FileType"/> of this <see cref="IFileSystemObject"/>.
-        /// </summary>
+        ///// <summary>
+        ///// Gets the <see cref="WinCopies.IO.FileType"/> of this <see cref="IFileSystemObject"/>.
+        ///// </summary>
         FileType FileType { get; }
+    }
 
-        Icon TryGetIcon(in int size);
+    namespace ObjectModel
+    {
+        // public interface IFileSystemObjectInfoFactory : IBrowsableObjectInfoFactory { }
 
-        BitmapSource TryGetBitmapSource(in int size);
+        public interface IFileSystemObjectInfo : IFileSystemObjectInfoProperties, IBrowsableObjectInfo
+        {
+            Icon TryGetIcon(in int size);
+
+            BitmapSource TryGetBitmapSource(in int size);
+        }
+
+        public interface IFileSystemObjectInfo<TObjectProperties, TEncapsulatedObject> : IFileSystemObjectInfo, IBrowsableObjectInfo<TObjectProperties, TEncapsulatedObject> where TObjectProperties : IFileSystemObjectInfoProperties
+        {
+            // Left empty.
+        }
     }
 }

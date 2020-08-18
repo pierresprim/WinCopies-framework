@@ -16,6 +16,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\IPortableDeviceObjectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\Reflection\IDotNetAssemblyInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\Reflection\IDotNetAttributeInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\Reflection\IDotNetMemberInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\Reflection\IDotNetNamespaceInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\Reflection\IDotNetParameterInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\Reflection\IDotNetTypeInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\Enumeration\ArchiveFileInfoEnumeratorStruct.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FileInfoLoader.cs" />
@@ -35,6 +38,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\Reflection\DotNetItemType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\Reflection\DotNetMemberInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\Reflection\DotNetNamespaceInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\Reflection\DotNetParameterInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\Reflection\DotNetTypeInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\Reflection\Enumeration\DotNetMemberInfoEnumerator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\Reflection\Enumeration\DotNetNamespaceInfoEnumerator.cs" />
