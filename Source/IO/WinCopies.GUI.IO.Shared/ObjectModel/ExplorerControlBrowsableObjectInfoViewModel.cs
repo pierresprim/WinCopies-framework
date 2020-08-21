@@ -74,7 +74,7 @@ namespace WinCopies.GUI.IO.ObjectModel
 
             ItemClickCommand = new DelegateCommand<IBrowsableObjectInfoViewModel>(browsableObjectInfo => true, browsableObjectInfo =>
             {
-                if (browsableObjectInfo.EncapsulatedObject is ShellObject && browsableObjectInfo.FileType == FileType.File)
+                if (browsableObjectInfo.EncapsulatedObject is ShellObject && browsableObjectInfo.ObjectProperties is IFileSystemObjectInfoProperties properties &&   properties.FileType == FileType.File)
 
                     _ = System.Diagnostics.Process.Start(new ProcessStartInfo(browsableObjectInfo.Path) { UseShellExecute = true });
 

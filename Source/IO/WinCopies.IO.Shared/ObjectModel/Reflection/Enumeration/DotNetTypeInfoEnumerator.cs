@@ -51,6 +51,7 @@ namespace WinCopies.IO.Reflection
 
     public struct DotNetTypeInfoEnumeratorStruct
     {
+        #region Properties
         public TypeInfo TypeInfo { get; }
 
         public MemberInfo MemberInfo { get; }
@@ -58,7 +59,9 @@ namespace WinCopies.IO.Reflection
         public CustomAttributeData CustomAttributeData { get; }
 
         public DotNetTypeInfoEnumeratorGenericTypeStruct? GenericTypeInfo { get; }
+        #endregion
 
+        #region Constructors
         public DotNetTypeInfoEnumeratorStruct(TypeInfo typeInfo)
         {
             TypeInfo = typeInfo;
@@ -102,6 +105,7 @@ namespace WinCopies.IO.Reflection
 
             CustomAttributeData = null;
         }
+        #endregion
     }
 
     public sealed class DotNetTypeInfoEnumerator : IEnumerator<IDotNetItemInfo>

@@ -31,14 +31,16 @@ namespace WinCopies.IO.ObjectModel
 {
     public class PortableDeviceObjectInfo : FileSystemObjectInfo<IFileSystemObjectInfoProperties, IPortableDeviceObject>, IPortableDeviceObjectInfo<IFileSystemObjectInfoProperties>
     {
+        #region Private fields
         private bool? _isBrowsable;
         private bool _isSizeLoaded;
         private Size? _size;
         private bool _isNameLoaded;
         private string _name;
+        #endregion
 
         #region Properties
-        public sealed override IPortableDeviceObject EncapsulatedObject { get; }
+        public sealed override IPortableDeviceObject EncapsulatedObjectGeneric { get; }
 
         private bool? _isSpecialItem;
 
@@ -50,7 +52,7 @@ namespace WinCopies.IO.ObjectModel
 
                     return _isSpecialItem.Value;
 
-                bool result = (EncapsulatedObject.Properties.TryGetValue(IsSystem, out Property value) && value.TryGetValue(out bool _value) && _value) || (EncapsulatedObject.Properties.TryGetValue(IsHidden, out Property __value) && __value.TryGetValue(out bool ___value) && ___value);
+                bool result = (EncapsulatedObjectGeneric.Properties.TryGetValue(IsSystem, out Property value) && value.TryGetValue(out bool _value) && _value) || (EncapsulatedObjectGeneric.Properties.TryGetValue(IsHidden, out Property __value) && __value.TryGetValue(out bool ___value) && ___value);
 
                 _isSpecialItem = result;
 
@@ -94,7 +96,7 @@ namespace WinCopies.IO.ObjectModel
 
                     return _size;
 
-                if (EncapsulatedObject.Properties.TryGetValue(Microsoft.WindowsAPICodePack.PortableDevices.PropertySystem.Properties.Legacy.Object.Common.Size, out Property value) && value.TryGetValue(out ulong _value))
+                if (EncapsulatedObjectGeneric.Properties.TryGetValue(Microsoft.WindowsAPICodePack.PortableDevices.PropertySystem.Properties.Legacy.Object.Common.Size, out Property value) && value.TryGetValue(out ulong _value))
 
                     _size = new Size(_value);
 
@@ -116,7 +118,7 @@ namespace WinCopies.IO.ObjectModel
 
                     return _name;
 
-                _name = EncapsulatedObject.Name;
+                _name = EncapsulatedObjectGeneric.Name;
 
                 _isNameLoaded = true;
 
@@ -138,7 +140,7 @@ namespace WinCopies.IO.ObjectModel
 
         private PortableDeviceObjectInfo(in string path, in IPortableDeviceObject portableDeviceObject) : base(path)
         {
-            EncapsulatedObject = portableDeviceObject;
+            EncapsulatedObjectGeneric = portableDeviceObject;
 
             FileType = GetFileType(portableDeviceObject.FileType, Path);
 
@@ -146,6 +148,7 @@ namespace WinCopies.IO.ObjectModel
         }
         #endregion
 
+        #region Methods
         private static FileType GetFileType(in PortableDeviceFileType portableDeviceFileType, in string path)
         {
             string extension = System.IO.Path.GetExtension(path);
@@ -163,5 +166,6 @@ namespace WinCopies.IO.ObjectModel
 
             return null;
         }
+        #endregion
     }
 }

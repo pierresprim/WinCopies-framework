@@ -22,6 +22,7 @@ using System.Windows.Media.Imaging;
 
 using WinCopies.Collections.Generic;
 using WinCopies.IO.ObjectModel;
+
 using IDisposable = WinCopies.Util.DotNetFix.IDisposable;
 
 namespace WinCopies.IO
@@ -65,11 +66,16 @@ namespace WinCopies.IO
         public interface IBrowsableObjectInfo : IFileSystemObject, IRecursiveEnumerable<IBrowsableObjectInfo>, IDisposable
         {
             /// <summary>
-            /// Gets a value that indicates whether this <see cref="IBrowsableObjectInfo"/> is browsable.
+            /// Gets a value indicating whether this <see cref="IBrowsableObjectInfo"/> is browsable.
             /// </summary>
             bool IsBrowsable { get; }
 
+            /// <summary>
+            /// Gets a value indicating whether this <see cref="IBrowsableObjectInfo"/> is recursively browsable.
+            /// </summary>
             bool IsRecursivelyBrowsable { get; }
+
+            object EncapsulatedObject { get; }    
 
             object ObjectProperties { get; }
 

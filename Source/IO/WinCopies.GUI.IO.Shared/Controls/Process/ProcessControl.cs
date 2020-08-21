@@ -21,7 +21,7 @@ using WinCopies.GUI.Controls;
 
 using Size = WinCopies.IO.Size;
 
-namespace WinCopies.GUI.IO.Process
+namespace WinCopies.GUI.IO.Controls.Process
 {
     public enum ProcessStatus : sbyte
     {
@@ -130,15 +130,5 @@ namespace WinCopies.GUI.IO.Process
         public sbyte CurrentPathProgressPercentage { get => (sbyte)GetValue(CurrentPathProgressPercentageProperty); set => SetValue(CurrentPathProgressPercentageProperty, value); }
 
         static ProcessControl() => DefaultStyleKeyProperty.OverrideMetadata(typeof(ProcessControl), new FrameworkPropertyMetadata(typeof(ProcessControl)));
-    }
-
-    public class CopyProcessControl : ProcessControl
-    {
-        /// <summary>
-        /// Identifies the <see cref="DestPath"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty DestPathProperty = DependencyProperty.Register(nameof(DestPath), typeof(string), typeof(CopyProcessControl));
-
-        public string DestPath { get => (string)GetValue(DestPathProperty); set => SetValue(DestPathProperty, value); }
     }
 }

@@ -15,21 +15,17 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
+using System.Windows;
 
-using WinCopies.IO.Reflection;
-
-namespace WinCopies.IO.ObjectModel.Reflection
+namespace WinCopies.GUI.IO.Controls.Process
 {
-    public interface IDotNetMemberInfo : IDotNetItemInfo, IEncapsulatorBrowsableObjectInfo<MemberInfo>
+    public class CopyProcessControl : ProcessControl
     {
-        IEnumerable<IBrowsableObjectInfo> GetItems(IEnumerable<DotNetItemType> enumerable, Predicate<DotNetMemberInfoEnumeratorStruct> func);
-    }
+        /// <summary>
+        /// Identifies the <see cref="DestPath"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty DestPathProperty = DependencyProperty.Register(nameof(DestPath), typeof(string), typeof(CopyProcessControl));
 
-    public interface IDotNetMemberInfo<T> : IDotNetMemberInfo, IDotNetItemInfo<T, MemberInfo> where T : IDotNetItemInfoProperties
-    {
-        // Left empty.
+        public string DestPath { get => (string)GetValue(DestPathProperty); set => SetValue(DestPathProperty, value); }
     }
 }

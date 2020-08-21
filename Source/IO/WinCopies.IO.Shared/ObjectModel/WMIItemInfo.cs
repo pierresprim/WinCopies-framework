@@ -219,7 +219,7 @@ namespace WinCopies.IO
             /// <summary>
             /// Gets the <see cref="ManagementBaseObject"/> that this <see cref="WMIItemInfo"/> represents.
             /// </summary>
-            public sealed override ManagementBaseObject EncapsulatedObject => _managementObject;
+            public sealed override ManagementBaseObject EncapsulatedObjectGeneric => _managementObject;
 
             public sealed override bool HasProperties => true;
 

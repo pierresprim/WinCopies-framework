@@ -2,13 +2,14 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:WinCopies.GUI.IO"
+    xmlns:localControls="clr-namespace:WinCopies.GUI.IO.Controls"
     xmlns:localObjectModel="clr-namespace:WinCopies.GUI.IO.ObjectModel"
     xmlns:localProcess="clr-namespace:WinCopies.GUI.IO.Process"
+    xmlns:localProcessControls="clr-namespace:WinCopies.GUI.IO.Controls.Process"
     xmlns:controls="clr-namespace:WinCopies.GUI.Controls;assembly=WinCopies.GUI.Controls"
     xmlns:converters="clr-namespace:WinCopies.Util.Data;assembly=WinCopies.Util.Desktop"
     xmlns:icons="clr-namespace:WinCopies.GUI.Icons.Properties;assembly=WinCopies.GUI.Icons"
     xmlns:data="clr-namespace:WinCopies.Util.Data;assembly=WinCopies.Util.Desktop"
-    xmlns:guiData="clr-namespace:WinCopies.GUI.IO.Data"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     >
     <ResourceDictionary.MergedDictionaries>
@@ -39,7 +40,7 @@
 
             <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
             <data:IconToImageSourceConverter x:Key="IconToImageSourceConverter" />
-            <guiData:MultiStringConverter x:Key="MultiStringConverter" />
+            <data:MultiStringConverter x:Key="MultiStringConverter" />
         </ResourceDictionary>
     </ResourceDictionary.MergedDictionaries>
 
@@ -95,7 +96,7 @@
         </Setter>
     </Style>-->
 
-    <ControlTemplate x:Key="ExplorerControlTemplate" TargetType="{x:Type local:ExplorerControl}" x:Shared="false">
+    <ControlTemplate x:Key="ExplorerControlTemplate" TargetType="{x:Type localControls:ExplorerControl}" x:Shared="false">
         <!--<DataTemplate DataType="{x:Type local:BrowsableObjectInfo}">-->
         <Grid>
             <Grid.ColumnDefinitions>
@@ -129,7 +130,7 @@
                     </Button.Content>
                 </Button>
             </Grid>
-            <local:ExplorerControlTreeView Grid.Row="1" Style="{TemplateBinding TreeViewStyle}">
+            <localControls:ExplorerControlTreeView Grid.Row="1" Style="{TemplateBinding TreeViewStyle}">
                 <!--<TreeView.ItemTemplate>
                     <DataTemplate DataType="{x:Type local:BrowsableObjectInfoViewModel}">
                         <Grid>
@@ -142,8 +143,8 @@
                         </Grid>
                     </DataTemplate>
                 </TreeView.ItemTemplate>-->
-            </local:ExplorerControlTreeView>
-            <local:ExplorerControlListView Grid.Column="1" Grid.Row="1" Style="{TemplateBinding ListViewStyle}">
+            </localControls:ExplorerControlTreeView>
+            <localControls:ExplorerControlListView Grid.Column="1" Grid.Row="1" Style="{TemplateBinding ListViewStyle}">
                 <!--<Style TargetType="{x:Type ListView}" BasedOn="{StaticResource {x:Type ListView}}">-->
                 <!--<Setter Property="ItemTemplate" Value="{StaticResource ExplorerControlSizeThreeListViewItemTemplate}" />-->
                 <!--<Setter Property="ItemsPanel">
@@ -164,12 +165,12 @@
                                     </DataTrigger>
                                 </Style.Triggers>-->
                 <!--</Style>-->
-            </local:ExplorerControlListView>
+            </localControls:ExplorerControlListView>
             <GridSplitter Grid.Column="1" Grid.Row="1" Width="5" HorizontalAlignment="Left" />
         </Grid>
     </ControlTemplate>
 
-    <Style TargetType="{x:Type local:ExplorerControl}">
+    <Style TargetType="{x:Type localControls:ExplorerControl}">
         <Setter Property="Template" Value="{StaticResource ExplorerControlTemplate}" />
         <!--<Setter.Value>-->
         <!--</DataTemplate>-->
@@ -178,34 +179,34 @@
     </Style>
 
     <DataTemplate x:Key="TreeViewItemHeaderDataTemplate" DataType="{x:Type localObjectModel:IBrowsableObjectInfoViewModel}" x:Shared="false">
-        <local:ExplorerControlTreeViewItemHeader>
-            <local:ExplorerControlTreeViewItemHeader.Style>
-                <Style TargetType="{x:Type local:ExplorerControlTreeViewItemHeader}" >
+        <localControls:ExplorerControlTreeViewItemHeader>
+            <localControls:ExplorerControlTreeViewItemHeader.Style>
+                <Style TargetType="{x:Type localControls:ExplorerControlTreeViewItemHeader}" >
                     <Setter Property="Icon" Value="{Binding SmallBitmapSource}" />
                     <Setter Property="ItemName" Value="{Binding LocalizedName}" />
                 </Style>
-            </local:ExplorerControlTreeViewItemHeader.Style>
-        </local:ExplorerControlTreeViewItemHeader>
+            </localControls:ExplorerControlTreeViewItemHeader.Style>
+        </localControls:ExplorerControlTreeViewItemHeader>
     </DataTemplate>
 
     <DataTemplate x:Key="ListViewItemContentDataTemplate" DataType="{x:Type localObjectModel:IBrowsableObjectInfoViewModel}" x:Shared="false">
-        <local:ExplorerControlListViewItemContent>
-            <local:ExplorerControlListViewItemContent.Style>
-                <Style TargetType="{x:Type local:ExplorerControlListViewItemContent}" >
+        <localControls:ExplorerControlListViewItemContent>
+            <localControls:ExplorerControlListViewItemContent.Style>
+                <Style TargetType="{x:Type localControls:ExplorerControlListViewItemContent}" >
                     <Setter Property="SmallIcon" Value="{Binding SmallBitmapSource}" />
                     <Setter Property="LargeIcon" Value="{Binding LargeBitmapSource}" />
                     <Setter Property="ItemName" Value="{Binding LocalizedName}" />
                     <Setter Property="HasTransparency" Value="{Binding IsSpecialItem}" />
-                    <Setter Property="IsCheckBoxVisible" Value="{Binding IsCheckBoxVisible, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ExplorerControl}}}" />
+                    <Setter Property="IsCheckBoxVisible" Value="{Binding IsCheckBoxVisible, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type localControls:ExplorerControl}}}" />
                 </Style>
-            </local:ExplorerControlListViewItemContent.Style>
-        </local:ExplorerControlListViewItemContent>
+            </localControls:ExplorerControlListViewItemContent.Style>
+        </localControls:ExplorerControlListViewItemContent>
     </DataTemplate>
 
-    <Style TargetType="{x:Type local:ExplorerControlTreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
+    <Style TargetType="{x:Type localControls:ExplorerControlTreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="{x:Type local:ExplorerControlTreeViewItem}">
+                <ControlTemplate TargetType="{x:Type localControls:ExplorerControlTreeViewItem}">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition MinWidth="19" Width="Auto"/>
@@ -250,23 +251,23 @@
         </Setter>
     </Style>
 
-    <Style x:Key="ExplorerControlTreeViewItemStyle" TargetType="{x:Type local:ExplorerControlTreeViewItem}" BasedOn="{StaticResource {x:Type local:ExplorerControlTreeViewItem}}">
+    <Style x:Key="ExplorerControlTreeViewItemStyle" TargetType="{x:Type localControls:ExplorerControlTreeViewItem}" BasedOn="{StaticResource {x:Type localControls:ExplorerControlTreeViewItem}}">
         <Setter Property="HeaderTemplate" Value="{StaticResource TreeViewItemHeaderDataTemplate}" />
         <Setter Property="ItemsSource" Value="{Binding Items}" />
         <Setter Property="IsSelected" Value="{Binding IsSelected}" />
-        <Setter Property="Command" Value="{Binding DataContext.ItemClickCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ExplorerControl}}}" />
+        <Setter Property="Command" Value="{Binding DataContext.ItemClickCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type localControls:ExplorerControl}}}" />
         <Setter Property="CommandParameter" Value="{Binding}" />
     </Style>
 
-    <Style x:Key="ExplorerControlTreeViewStyle" TargetType="{x:Type local:ExplorerControlTreeView}" BasedOn="{StaticResource {x:Type TreeView}}">
+    <Style x:Key="ExplorerControlTreeViewStyle" TargetType="{x:Type localControls:ExplorerControlTreeView}" BasedOn="{StaticResource {x:Type TreeView}}">
         <Setter Property="ItemsSource" Value="{Binding TreeViewItems}" />
         <Setter Property="ItemContainerStyle" Value="{StaticResource ExplorerControlTreeViewItemStyle}" />
     </Style>
 
-    <Style x:Key="ExplorerControlListViewItemStyle" TargetType="{x:Type local:ExplorerControlListViewItem}" BasedOn="{StaticResource {x:Type ListBoxItem}}">
+    <Style x:Key="ExplorerControlListViewItemStyle" TargetType="{x:Type localControls:ExplorerControlListViewItem}" BasedOn="{StaticResource {x:Type ListBoxItem}}">
         <Setter Property="ContentTemplate" Value="{StaticResource ListViewItemContentDataTemplate}" />
         <Setter Property="IsSelected" Value="{Binding IsSelected}" />
-        <Setter Property="Command" Value="{Binding DataContext.ItemClickCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ExplorerControl}}}" />
+        <Setter Property="Command" Value="{Binding DataContext.ItemClickCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type localControls:ExplorerControl}}}" />
         <Setter Property="CommandParameter" Value="{Binding}" />
     </Style>
 
@@ -286,13 +287,13 @@
     </Style>
 
     <DataTemplate DataType="{x:Type localObjectModel:IExplorerControlBrowsableObjectInfoViewModel}" x:Shared="false">
-        <local:ExplorerControl Path="{Binding Path.Path}" Text="{Binding Text, Mode=TwoWay}" TreeViewStyle="{StaticResource ExplorerControlTreeViewStyle}" ListViewStyle="{StaticResource ExplorerControlListViewStyle}" GoButtonCommand="{x:Static localObjectModel:ExplorerControlBrowsableObjectInfoViewModel.GoCommand}" GoButtonCommandParameter="{Binding}" IsCheckBoxVisible="{Binding IsCheckBoxVisible}" />
+        <localControls:ExplorerControl Path="{Binding Path.Path}" Text="{Binding Text, Mode=TwoWay}" TreeViewStyle="{StaticResource ExplorerControlTreeViewStyle}" ListViewStyle="{StaticResource ExplorerControlListViewStyle}" GoButtonCommand="{x:Static localObjectModel:ExplorerControlBrowsableObjectInfoViewModel.GoCommand}" GoButtonCommandParameter="{Binding}" IsCheckBoxVisible="{Binding IsCheckBoxVisible}" />
     </DataTemplate>
 
-    <Style TargetType="{x:Type local:ExplorerControlTreeViewItemHeader}">
+    <Style TargetType="{x:Type localControls:ExplorerControlTreeViewItemHeader}">
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="{x:Type local:ExplorerControlTreeViewItemHeader}">
+                <ControlTemplate TargetType="{x:Type localControls:ExplorerControlTreeViewItemHeader}">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="16" />
@@ -307,7 +308,7 @@
     </Style>
 
     <!--<DataTemplate x:Key="ExplorerControlSizeOneListViewItemTemplate">
-        <local:ExplorerControlListViewItem>
+        <localControls:ExplorerControlListViewItem>
             <StackPanel Orientation="Horizontal" Height="16" Width="300" >
                 <CheckBox Visibility="{Binding IsCheckBoxVisible, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource Mode=TemplatedParent}}" IsChecked="{Binding IsSelected, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
                 <Image Source="{Binding SmallIcon, RelativeSource={RelativeSource Mode=TemplatedParent}}" Height="16" Style="{StaticResource ExplorerControlImageStyle}" />
@@ -316,7 +317,7 @@
     <!--
                 <TextBlock TextWrapping="Wrap" Style="{StaticResource ExplorerControlListViewItemTextBlockStyle}" />
             </StackPanel>
-        </local:ExplorerControlListViewItem>
+        </localControls:ExplorerControlListViewItem>
     </DataTemplate>
 
     <DataTemplate x:Key="ExplorerControlSizeTwoListViewItemContentTemplate">
@@ -440,7 +441,7 @@
         </Grid>
     </ControlTemplate>
 
-    <Style TargetType="{x:Type local:ExplorerControlListViewItemContent}" >
+    <Style TargetType="{x:Type localControls:ExplorerControlListViewItemContent}" >
         <Setter Property="Template" Value="{StaticResource ExplorerControlSizeThreeListViewItemContentTemplate}" />
     </Style>
 
@@ -462,7 +463,7 @@
 
     <DataTemplate x:Key="ExplorerControlListListViewItemContentTemplate" x:Shared="false">
         <StackPanel Orientation="Horizontal" >
-            <CheckBox Visibility="{Binding IsCheckBoxVisible, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ExplorerControlListViewItem}}}" IsChecked="{Binding IsSelected}" />
+            <CheckBox Visibility="{Binding IsCheckBoxVisible, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type localControls:ExplorerControlListViewItem}}}" IsChecked="{Binding IsSelected}" />
             <Image Source="{Binding SmallBitmapSource}" Height="16" Width="16" Style="{StaticResource ExplorerControlImageStyle}" />
             -->
     <!--, Converter={local:ImageSourceConverter}}-->
@@ -473,14 +474,14 @@
 
     <DataTemplate x:Key="ExplorerControlTilesListViewItemContentTemplate" x:Shared="false">
         <StackPanel Orientation="Horizontal" >
-            <CheckBox Visibility="{Binding IsCheckBoxVisible, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ExplorerControlListViewItem}}}" IsChecked="{Binding IsSelected}" VerticalAlignment="Center" />
+            <CheckBox Visibility="{Binding IsCheckBoxVisible, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type localControls:ExplorerControlListViewItem}}}" IsChecked="{Binding IsSelected}" VerticalAlignment="Center" />
             <Image Source="{Binding MediumBitmapSource}" Height="48" Width="48" >
                 <Image.Opacity>
                     <MultiBinding Converter="{StaticResource FileSystemInfoAttributesToOpacityConverter}" >
                         <Binding />
                         <Binding Path="FileSystemInfoProperties.Attributes" />
-                        <Binding Path="ShowHiddenItems" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ExplorerControl}}" />
-                        <Binding Path="ShowSystemItems" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ExplorerControl}}" />
+                        <Binding Path="ShowHiddenItems" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type localControls:ExplorerControl}}" />
+                        <Binding Path="ShowSystemItems" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type localControls:ExplorerControl}}" />
                     </MultiBinding>
                 </Image.Opacity>
             </Image>
@@ -508,7 +509,7 @@
     </Style>-->
 
 
-    <ControlTemplate x:Key="CopyProcessControlTemplate" TargetType="{x:Type local:ProcessControl}">
+    <ControlTemplate x:Key="CopyProcessControlTemplate" TargetType="{x:Type localProcessControls:ProcessControl}">
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto" />
@@ -556,28 +557,28 @@
         </Grid>
 
         <ControlTemplate.Triggers>
-            <DataTrigger Binding="{Binding ArePathsLoaded, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ProcessControl}}}" Value="true">
+            <DataTrigger Binding="{Binding ArePathsLoaded, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type localProcessControls:ProcessControl}}}" Value="true">
                 <Setter TargetName="PART_ProgressBar" Property="IsIndeterminate" Value="false" />
                 <Setter TargetName="PART_ProgressBar" Property="Maximum" Value="100" />
-                <Setter TargetName="PART_ProgressBar" Property="Value" Value="{Binding ProgressPercentage, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:CopyProcessControl}}}" />
+                <Setter TargetName="PART_ProgressBar" Property="Value" Value="{Binding ProgressPercentage, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type localProcessControls:CopyProcessControl}}}" />
             </DataTrigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
 
-    <Style TargetType="{x:Type local:ProcessControl}">
+    <Style TargetType="{x:Type localProcessControls:ProcessControl}">
         <Setter Property="Template" Value="{StaticResource CopyProcessControlTemplate}" />
     </Style>
 
-    <DataTemplate DataType="{x:Type local:Copy}" x:Shared="false">
-        <localProcess:CopyProcessControl SourcePath="{Binding SourcePath}" DestPath="{Binding DestPath}" InitialItemCount="{Binding InitialItemCount}" InitialItemSize="{Binding InitialItemSize}" RemainingItemCount="{Binding Paths.Count}" RemainingItemSize="{Binding Paths.Size}" ArePathsLoaded="{Binding ArePathsLoaded}" ProgressPercentage="{Binding ProgressPercentage}">
-            <localProcess:ProcessControl.Header>
+    <DataTemplate DataType="{x:Type localProcess:Copy}" x:Shared="false">
+        <localProcessControls:CopyProcessControl SourcePath="{Binding SourcePath}" DestPath="{Binding DestPath}" InitialItemCount="{Binding InitialItemCount}" InitialItemSize="{Binding InitialItemSize}" RemainingItemCount="{Binding Paths.Count}" RemainingItemSize="{Binding Paths.Size}" ArePathsLoaded="{Binding ArePathsLoaded}" ProgressPercentage="{Binding ProgressPercentage}">
+            <localProcessControls:ProcessControl.Header>
                 <MultiBinding StringFormat="{}{0} {1} {2} {3}">
                     <Binding Source="{StaticResource CopyingFrom}" />
-                    <Binding Path="SourcePath" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ProcessControl}}" />
+                    <Binding Path="SourcePath" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type localProcessControls:ProcessControl}}" />
                     <Binding Source="{StaticResource To}" />
-                    <Binding Path="DestPath" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ProcessControl}}" />
+                    <Binding Path="DestPath" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type localProcessControls:ProcessControl}}" />
                 </MultiBinding>
-            </localProcess:ProcessControl.Header>
-        </localProcess:CopyProcessControl>
+            </localProcessControls:ProcessControl.Header>
+        </localProcessControls:CopyProcessControl>
     </DataTemplate>
 </ResourceDictionary>

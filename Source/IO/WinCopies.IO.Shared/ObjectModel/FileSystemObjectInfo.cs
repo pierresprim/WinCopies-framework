@@ -58,11 +58,13 @@ namespace WinCopies.IO
     {
         public abstract class FileSystemObjectInfo<TObjectProperties, TEncapsulatedObject> : BrowsableObjectInfo<TObjectProperties, TEncapsulatedObject>, IFileSystemObjectInfo<TObjectProperties, TEncapsulatedObject> where TObjectProperties : IFileSystemObjectInfoProperties
         {
+            #region Properties
             public override bool IsRecursivelyBrowsable { get; } = true;
 
             public sealed override bool HasProperties => true;
 
             public abstract FileType FileType { get; }
+            #endregion
 
             protected FileSystemObjectInfo(in string path) : base(path)
             {

@@ -16,6 +16,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AssemblyInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\Process\CopyProcessControl.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\BrowsableObjectInfoViewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\DuplicateFindingOptions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessCollections\IProcessCollections.cs" />
@@ -51,12 +52,11 @@
     <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\MoveToSameDrive.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\PathToPathProcess.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\Process.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Controls\ProcessControl.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\Process\ProcessControl.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\Recycling.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Temp.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="$(MSBuildThisFileDirectory)Controls\" />
     <Folder Include="$(MSBuildThisFileDirectory)Process\ProcessSimulationParameters\" />
   </ItemGroup>
 </Project>

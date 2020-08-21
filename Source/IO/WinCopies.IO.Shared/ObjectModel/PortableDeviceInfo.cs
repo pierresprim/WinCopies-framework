@@ -51,9 +51,10 @@ namespace WinCopies.IO
             private const int PortableDeviceIcon = 42;
             private const string PortableDeviceIconDllName = "imageres.dll";
 
+            #region Properties
             public override FileType FileType => FileType.Folder;
 
-            public sealed override IPortableDevice EncapsulatedObject { get; }
+            public sealed override IPortableDevice EncapsulatedObjectGeneric { get; }
 
             public sealed override IPortableDeviceInfoProperties ObjectPropertiesGeneric { get; }
 
@@ -79,11 +80,12 @@ namespace WinCopies.IO
 
             public override string LocalizedName => Name;
 
-            public override string Name => EncapsulatedObject.DeviceFriendlyName;
+            public override string Name => EncapsulatedObjectGeneric.DeviceFriendlyName;
 
             public override FileSystemType ItemFileSystemType => FileSystemType.PortableDevice;
 
             public PortableDeviceOpeningOptions OpeningOptions { get; set; }
+            #endregion
 
             public PortableDeviceInfo(in IPortableDevice portableDevice, in ClientVersion clientVersion) : this(portableDevice, clientVersion, new PortableDeviceOpeningOptions(GenericRights.Read, FileShareOptions.Read, true))
             {
@@ -92,7 +94,7 @@ namespace WinCopies.IO
 
             public PortableDeviceInfo(in IPortableDevice portableDevice, in ClientVersion clientVersion, in PortableDeviceOpeningOptions openingOptions) : base((portableDevice ?? throw GetArgumentNullException(nameof(portableDevice))).DeviceFriendlyName, clientVersion)
             {
-                EncapsulatedObject = portableDevice;
+                EncapsulatedObjectGeneric = portableDevice;
 
                 OpeningOptions = openingOptions;
 
@@ -127,9 +129,9 @@ namespace WinCopies.IO
 
             public IEnumerable<IBrowsableObjectInfo> GetItems(in Predicate<IPortableDeviceObject> predicate)
             {
-                EncapsulatedObject.Open(ClientVersion.Value, OpeningOptions);
+                EncapsulatedObjectGeneric.Open(ClientVersion.Value, OpeningOptions);
 
-                return (predicate == null ? EncapsulatedObject : EncapsulatedObject.WherePredicate(predicate)).Select(portableDeviceObject => new PortableDeviceObjectInfo(portableDeviceObject, this));
+                return (predicate == null ? EncapsulatedObjectGeneric : EncapsulatedObjectGeneric.WherePredicate(predicate)).Select(portableDeviceObject => new PortableDeviceObjectInfo(portableDeviceObject, this));
             }
         }
     }
