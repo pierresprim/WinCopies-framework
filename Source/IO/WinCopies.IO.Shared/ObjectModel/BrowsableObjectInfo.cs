@@ -49,7 +49,9 @@ namespace WinCopies.IO.ObjectModel
         #endregion
 
         #region Properties
-        IBrowsableObjectInfo WinCopies.Collections.Generic.IRecursiveEnumerable<IBrowsableObjectInfo>.Value => this;
+        IBrowsableObjectInfo Collections.Generic.IRecursiveEnumerable<IBrowsableObjectInfo>.Value => this;
+
+        public abstract object EncapsulatedObject { get; }
 
         public abstract object ObjectProperties { get; }
 
@@ -101,6 +103,7 @@ namespace WinCopies.IO.ObjectModel
         public ClientVersion? ClientVersion { get; private set; }
         #endregion
 
+        #region Constructors
         /// <summary>
         /// Initializes a new instance of the <see cref="BrowsableObjectInfo"/> class.
         /// </summary>
@@ -113,6 +116,7 @@ namespace WinCopies.IO.ObjectModel
         /// <param name="path">The path of the new item.</param>
         /// <param name="clientVersion">The <see cref="Microsoft.WindowsAPICodePack.PortableDevices.ClientVersion"/> that will be used to initialize new <see cref="PortableDeviceInfo"/>s and <see cref="PortableDeviceObjectInfo"/>s.</param>
         protected BrowsableObjectInfo(in string path, in ClientVersion? clientVersion) : base(path) => ClientVersion = clientVersion;
+        #endregion
 
         #region Methods
         internal static Icon TryGetIcon(in int iconIndex, in string dll, in System.Drawing.Size size) => new IconExtractor(IO.Path.GetRealPathFromEnvironmentVariables(IO.Path.System32Path + dll)).GetIcon(iconIndex).Split()?.TryGetIcon(size, 32, true, true);
@@ -197,12 +201,15 @@ namespace WinCopies.IO.ObjectModel
 
     public abstract class BrowsableObjectInfo<T> : BrowsableObjectInfo, IBrowsableObjectInfo<T>
     {
+        #region Properties
         public abstract T ObjectPropertiesGeneric { get; }
 
         public sealed override object ObjectProperties => ObjectPropertiesGeneric;
 
         T IBrowsableObjectInfo<T>.ObjectProperties => ObjectPropertiesGeneric;
+        #endregion
 
+        #region Constructors
         /// <summary>
         /// Initializes a new instance of the <see cref="BrowsableObjectInfo"/> class.
         /// </summary>
@@ -221,13 +228,20 @@ namespace WinCopies.IO.ObjectModel
         {
             // Left empty.
         }
+        #endregion
     }
 
     public abstract class BrowsableObjectInfo<TObjectProperties, TEncapsulatedObject> : BrowsableObjectInfo<TObjectProperties>, IBrowsableObjectInfo<TObjectProperties, TEncapsulatedObject>
     {
-        public abstract TEncapsulatedObject EncapsulatedObject { get; }
+        #region Properties
+        public abstract TEncapsulatedObject EncapsulatedObjectGeneric { get; }
+
+        TEncapsulatedObject IEncapsulatorBrowsableObjectInfo<TEncapsulatedObject>.EncapsulatedObject => EncapsulatedObjectGeneric;
+
+        public sealed override object EncapsulatedObject => EncapsulatedObjectGeneric;
 
         public abstract bool HasProperties { get; }
+        #endregion
 
         protected BrowsableObjectInfo(in string path) : base(path)
         {

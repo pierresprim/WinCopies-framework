@@ -28,6 +28,7 @@ namespace WinCopies.IO.Reflection
 {
     public struct DotNetMemberInfoEnumeratorStruct
     {
+        #region Properties
         public ParameterInfo ParameterInfo { get; }
 
         public Type ReturnType { get; }
@@ -35,7 +36,9 @@ namespace WinCopies.IO.Reflection
         public CustomAttributeData CustomAttributeData { get; }
 
         public DotNetTypeInfoEnumeratorGenericTypeStruct? GenericTypeInfo { get; }
+        #endregion
 
+        #region Constructors
         public DotNetMemberInfoEnumeratorStruct(in ParameterInfo parameterInfo)
         {
             ParameterInfo = parameterInfo;
@@ -79,6 +82,7 @@ namespace WinCopies.IO.Reflection
 
             CustomAttributeData = null;
         }
+        #endregion
     }
 
     public class DotNetEnumerator<T> : Enumerator<IEnumerator<T>, T> where T : IDotNetItemInfo

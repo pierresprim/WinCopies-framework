@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
+
 using WinCopies.Collections;
 using WinCopies.IO.Reflection;
 
@@ -28,19 +29,21 @@ namespace WinCopies.IO.ObjectModel.Reflection
 {
     public sealed class DotNetMemberInfo : BrowsableDotNetItemInfo<IDotNetItemInfoProperties, MemberInfo>, IDotNetMemberInfo
     {
-        public sealed override MemberInfo EncapsulatedObject { get; }
+        #region Properties
+        public sealed override MemberInfo EncapsulatedObjectGeneric { get; }
 
         public override DotNetItemType DotNetItemType { get; }
 
         public override string ItemTypeName => ".Net member";
 
         public sealed override IDotNetItemInfoProperties ObjectPropertiesGeneric { get; }
+        #endregion
 
         internal DotNetMemberInfo(in MemberInfo memberInfo, in DotNetItemType dotNetItemType, in IDotNetTypeInfo dotNetTypeInfo) : base($"{dotNetTypeInfo.Path}{IO.Path.PathSeparator}{memberInfo.Name}", memberInfo.Name, dotNetTypeInfo)
         {
             Debug.Assert(If(ComparisonType.And, ComparisonMode.Logical, Util.Util.Comparison.NotEqual, null, dotNetTypeInfo, dotNetTypeInfo.ParentDotNetAssemblyInfo));
 
-            EncapsulatedObject = memberInfo;
+            EncapsulatedObjectGeneric = memberInfo;
 
             DotNetItemType = dotNetItemType;
 

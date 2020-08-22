@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
+
 using WinCopies.Collections;
 using WinCopies.IO.ObjectModel.Reflection;
 using WinCopies.IO.Reflection;
@@ -44,7 +45,8 @@ namespace WinCopies.IO
     {
         public sealed class DotNetTypeInfo : BrowsableDotNetItemInfo<IDotNetTypeInfoProperties, TypeInfo>, IDotNetTypeInfo
         {
-            public sealed override TypeInfo EncapsulatedObject { get; }
+            #region Properties
+            public sealed override TypeInfo EncapsulatedObjectGeneric { get; }
 
             public override DotNetItemType DotNetItemType { get; }
 
@@ -53,6 +55,7 @@ namespace WinCopies.IO
             public override string ItemTypeName => ".Net type";
 
             public sealed override IDotNetTypeInfoProperties ObjectPropertiesGeneric { get; }
+            #endregion
 
             internal DotNetTypeInfo(TypeInfo typeInfo, in DotNetItemType itemType, in bool? isRootType, in IBrowsableObjectInfo parent) : base(isRootType.HasValue && isRootType.Value ? typeInfo.Name : $"{parent.Path}{PathSeparator}{typeInfo.Name}", typeInfo.Name, parent)
             {
@@ -100,7 +103,7 @@ namespace WinCopies.IO
                 }
 #endif
 
-                EncapsulatedObject = typeInfo;
+                EncapsulatedObjectGeneric = typeInfo;
 
                 DotNetItemType = itemType;
 

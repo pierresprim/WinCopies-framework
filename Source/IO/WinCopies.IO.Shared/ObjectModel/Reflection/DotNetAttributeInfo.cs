@@ -29,7 +29,8 @@ namespace WinCopies.IO.ObjectModel.Reflection
 {
     public sealed class DotNetAttributeInfo : DotNetItemInfo<IDotNetItemInfoProperties, CustomAttributeData>, IDotNetAttributeInfo<IDotNetItemInfoProperties>
     {
-        public sealed override CustomAttributeData EncapsulatedObject { get; }
+        #region Properties
+        public sealed override CustomAttributeData EncapsulatedObjectGeneric { get; }
 
         public override bool IsBrowsable => false;
 
@@ -38,18 +39,21 @@ namespace WinCopies.IO.ObjectModel.Reflection
         public override DotNetItemType DotNetItemType => DotNetItemType.Attribute;
 
         public override IDotNetItemInfoProperties ObjectPropertiesGeneric { get; }
-
-        protected sealed override BitmapSource TryGetBitmapSource(in int size) => TryGetBitmapSource(FileIcon, Microsoft.WindowsAPICodePack.NativeAPI.Consts.DllNames.Shell32, size);
+        #endregion
 
         internal DotNetAttributeInfo(in CustomAttributeData customAttributeData, in IDotNetItemInfo parent) : base($"{parent.Path}{IO.Path.PathSeparator}{customAttributeData.AttributeType.Name}", customAttributeData.AttributeType.Name, parent)
         {
             Debug.Assert(If(ComparisonType.And, ComparisonMode.Logical, Comparison.NotEqual, null, parent, parent.ParentDotNetAssemblyInfo, customAttributeData));
 
-            EncapsulatedObject = customAttributeData;
+            EncapsulatedObjectGeneric = customAttributeData;
 
             ObjectPropertiesGeneric = new DotNetItemInfoProperties<IDotNetItemInfo>(this);
         }
 
+        #region Methods
+        protected sealed override BitmapSource TryGetBitmapSource(in int size) => TryGetBitmapSource(FileIcon, Microsoft.WindowsAPICodePack.NativeAPI.Consts.DllNames.Shell32, size);
+
         public override IEnumerable<IBrowsableObjectInfo> GetItems() => throw new NotSupportedException("This item does not support browsing.");
+        #endregion
     }
 }

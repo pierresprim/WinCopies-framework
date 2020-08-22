@@ -38,9 +38,11 @@ namespace WinCopies.IO
         /// </summary>
         public class ArchiveItemInfo : ArchiveItemInfoProvider<IFileSystemObjectInfoProperties, ArchiveFileInfo?>, IArchiveItemInfo<IFileSystemObjectInfoProperties>
         {
+            #region Private fields
             private ArchiveFileInfo? _encapsulatedObject;
             private IBrowsableObjectInfo _parent;
             private bool? _isBrowsable;
+            #endregion
 
             #region Properties
             //IShellObjectInfo IArchiveItemInfoProvider.ArchiveShellObject => ArchiveShellObjectOverride;
@@ -49,9 +51,9 @@ namespace WinCopies.IO
             public override FileType FileType { get; }
 
             /// <summary>
-            /// The <see cref="SevenZip.ArchiveFileInfo"/> that this <see cref="ArchiveItemInfo"/> represents.
+            /// The <see cref="ArchiveFileInfo"/> that this <see cref="ArchiveItemInfo"/> represents.
             /// </summary>
-            public sealed override ArchiveFileInfo? EncapsulatedObject => _encapsulatedObject;
+            public sealed override ArchiveFileInfo? EncapsulatedObjectGeneric => _encapsulatedObject;
 
             public sealed override IFileSystemObjectInfoProperties ObjectPropertiesGeneric { get; }
 

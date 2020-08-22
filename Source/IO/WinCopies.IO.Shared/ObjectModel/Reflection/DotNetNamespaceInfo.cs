@@ -44,15 +44,17 @@ namespace WinCopies.IO
     {
         public sealed class DotNetNamespaceInfo : BrowsableDotNetItemInfo<IDotNetNamespaceInfoProperties, object>, IDotNetNamespaceInfo<IDotNetNamespaceInfoProperties>
         {
+            #region Properties
             public bool IsRootNamespace { get; }
 
             public override string ItemTypeName { get; } = ".Net namespace";
 
-            public sealed override object EncapsulatedObject => null;
+            public sealed override object EncapsulatedObjectGeneric => null;
 
             public override DotNetItemType DotNetItemType => DotNetItemType.Namespace;
 
             public override IDotNetNamespaceInfoProperties ObjectPropertiesGeneric { get; }
+            #endregion
 
             internal DotNetNamespaceInfo(in string name, bool isRootNamespace, IBrowsableObjectInfo parent) : base(isRootNamespace ? name : $"{parent.Path}{IO.Path.PathSeparator}{name}", name, parent)
             {

@@ -16,6 +16,7 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using System.Reflection;
+
 using WinCopies.IO.Reflection;
 
 namespace WinCopies.IO.ObjectModel.Reflection

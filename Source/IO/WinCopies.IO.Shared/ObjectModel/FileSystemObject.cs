@@ -27,6 +27,7 @@ namespace WinCopies.IO.ObjectModel
     /// </summary>
     public abstract class FileSystemObject : IFileSystemObject
     {
+        #region Properties
         /// <summary>
         /// Gets the path of this <see cref="FileSystemObject"/>.
         /// </summary>
@@ -43,6 +44,7 @@ namespace WinCopies.IO.ObjectModel
         public abstract string Name { get; }
 
         public abstract FileSystemType ItemFileSystemType { get; }
+        #endregion
 
         /// <summary>
         /// When called from a derived class, initializes a new instance of the <see cref="FileSystemObject"/> class.
@@ -50,6 +52,7 @@ namespace WinCopies.IO.ObjectModel
         /// <param name="path">The path of this <see cref="FileSystemObject"/>.</param>
         protected FileSystemObject(string path) => Path = path;
 
+        #region Methods
         public virtual Collections.IEqualityComparer<IFileSystemObject> GetDefaultEqualityComparer() => new FileSystemObjectEqualityComparer<IFileSystemObject>();
 
         ///// <summary>
@@ -77,6 +80,16 @@ namespace WinCopies.IO.ObjectModel
         /// </summary>
         /// <returns>The <see cref="LocalizedName"/> of this <see cref="FileSystemObject"/>.</returns>
         public override string ToString() => IsNullEmptyOrWhiteSpace(LocalizedName) ? Path : LocalizedName;
+
+        public virtual IComparer<IFileSystemObject> GetDefaultComparer() => new FileSystemObjectComparer<IFileSystemObject>();
+
+        /// <summary>
+        /// Compares the current object to a given <see cref="FileSystemObject"/>.
+        /// </summary>
+        /// <param name="fileSystemObject">The <see cref="FileSystemObject"/> to compare with.</param>
+        /// <returns>The comparison result. See <see cref="IComparable{T}.CompareTo(T)"/> for more details.</returns>
+        public virtual int CompareTo(IFileSystemObject fileSystemObject) => GetDefaultComparer().Compare(this, fileSystemObject);
+        #endregion
 
         #region Operators
         /// <summary>
@@ -127,14 +140,5 @@ namespace WinCopies.IO.ObjectModel
         /// <returns>A <see cref="bool"/> value that indicates whether the given <see cref="FileSystemObject"/> is greater or equal to the <see cref="FileSystemObject"/> to compare with.</returns>
         public static bool operator >=(FileSystemObject left, FileSystemObject right) => left is null ? right is null : left.CompareTo(right) >= 0;
         #endregion
-
-        public virtual IComparer<IFileSystemObject> GetDefaultComparer() => new FileSystemObjectComparer<IFileSystemObject>();
-
-        /// <summary>
-        /// Compares the current object to a given <see cref="FileSystemObject"/>.
-        /// </summary>
-        /// <param name="fileSystemObject">The <see cref="FileSystemObject"/> to compare with.</param>
-        /// <returns>The comparison result. See <see cref="IComparable{T}.CompareTo(T)"/> for more details.</returns>
-        public virtual int CompareTo(IFileSystemObject fileSystemObject) => GetDefaultComparer().Compare(this, fileSystemObject);
     }
 }

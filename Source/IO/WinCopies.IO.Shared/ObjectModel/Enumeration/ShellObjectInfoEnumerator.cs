@@ -47,9 +47,9 @@ namespace WinCopies.IO
             IEnumerable<ShellObject> shellObjects;
             IEnumerable<IPortableDevice> portableDevices;
 
-            shellObjects = (IEnumerable<ShellObject>)shellObjectInfo.ShellObject;
+            shellObjects = (IEnumerable<ShellObject>)shellObjectInfo.EncapsulatedObject;
 
-            if (shellObjectInfo.ShellObject.ParsingName == Computer.ParsingName)
+            if (shellObjectInfo.EncapsulatedObjectGeneric.ParsingName == Computer.ParsingName)
             {
                 var portableDeviceManager = new PortableDeviceManager();
 

@@ -64,7 +64,7 @@ namespace WinCopies.IO
             /// <summary>
             /// Gets a <see cref="ShellObject"/> that represents this <see cref="ShellObjectInfo"/>.
             /// </summary>
-            public sealed override ShellObject EncapsulatedObject => _shellObject;
+            public sealed override ShellObject EncapsulatedObjectGeneric => _shellObject;
 
             public sealed override IFileSystemObjectInfoProperties ObjectPropertiesGeneric { get; }
 

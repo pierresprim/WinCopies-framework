@@ -18,7 +18,7 @@
 using System;
 using System.Diagnostics;
 using System.Windows.Media.Imaging;
-using WinCopies.IO.ObjectModel;
+
 using WinCopies.IO.ObjectModel.Reflection;
 using WinCopies.IO.Reflection;
 
@@ -43,6 +43,7 @@ namespace WinCopies.IO
     {
         public abstract class DotNetItemInfo<TObjectProperties, TEncapsulatedObject> : BrowsableObjectInfo<TObjectProperties, TEncapsulatedObject>, IDotNetItemInfo<TObjectProperties, TEncapsulatedObject> where TObjectProperties : IDotNetItemInfoProperties
         {
+            #region Properties
             /// <summary>
             /// Gets the name of this <see cref="IDotNetItemInfo"/>.
             /// </summary>
@@ -138,6 +139,7 @@ namespace WinCopies.IO
             )
 #endif
             ;
+            #endregion
             #endregion
 
             protected DotNetItemInfo(in string path, in string name, in IBrowsableObjectInfo parent) : base(path)

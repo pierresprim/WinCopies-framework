@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+
 using WinCopies.IO.Reflection;
 using WinCopies.Linq;
 
@@ -26,6 +27,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
 {
     public sealed class DotNetParameterInfo : BrowsableDotNetItemInfo<IDotNetItemInfoProperties, ParameterInfo>, IDotNetParameterInfo<IDotNetItemInfoProperties>
     {
+        #region Properties
         public override string ItemTypeName => ".Net parameter";
 
         public override DotNetItemType DotNetItemType { get; }
@@ -33,13 +35,14 @@ namespace WinCopies.IO.ObjectModel.Reflection
         /// <summary>
         /// Gets the inner <see cref="ParameterInfo"/>.
         /// </summary>
-        public sealed override ParameterInfo EncapsulatedObject { get; }
+        public sealed override ParameterInfo EncapsulatedObjectGeneric { get; }
 
         public sealed override IDotNetItemInfoProperties ObjectPropertiesGeneric { get; }
+        #endregion
 
         internal DotNetParameterInfo(in ParameterInfo parameterInfo, in DotNetItemType dotNetItemType, in IDotNetItemInfo parent) : base($"{parent.Path}{WinCopies.IO.Path.PathSeparator}{parameterInfo.Name}", parameterInfo.Name, parent)
         {
-            EncapsulatedObject = parameterInfo;
+            EncapsulatedObjectGeneric = parameterInfo;
 
             DotNetItemType = dotNetItemType;
 
@@ -48,6 +51,6 @@ namespace WinCopies.IO.ObjectModel.Reflection
 
         public override IEnumerable<IBrowsableObjectInfo> GetItems() => GetItems(null);
 
-        public IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<CustomAttributeData> func) => (func == null ? EncapsulatedObject.GetCustomAttributesData() : EncapsulatedObject.GetCustomAttributesData().WherePredicate(func)).Select(a => new DotNetAttributeInfo(a, this));
+        public IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<CustomAttributeData> func) => (func == null ? EncapsulatedObjectGeneric.GetCustomAttributesData() : EncapsulatedObjectGeneric.GetCustomAttributesData().WherePredicate(func)).Select(a => new DotNetAttributeInfo(a, this));
     }
 }

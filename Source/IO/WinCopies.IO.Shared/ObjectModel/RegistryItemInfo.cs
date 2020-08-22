@@ -26,6 +26,7 @@ using System.Security;
 using System.Security.AccessControl;
 using System.Text;
 using System.Windows.Media.Imaging;
+
 using WinCopies.IO.ObjectModel;
 using WinCopies.Linq;
 using WinCopies.Util;
@@ -224,7 +225,7 @@ namespace WinCopies.IO
             ///// <summary>
             ///// The <see cref="RegistryKey"/> that this <see cref="RegistryItemInfo"/> represents.
             ///// </summary>
-            public sealed override RegistryKey EncapsulatedObject
+            public sealed override RegistryKey EncapsulatedObjectGeneric
             {
                 get
                 {
@@ -404,7 +405,7 @@ namespace WinCopies.IO
                 {
                     case RegistryItemType.Key:
 
-                        string[] path = EncapsulatedObject.Name.Split(IO.Path.PathSeparator);
+                        string[] path = EncapsulatedObjectGeneric.Name.Split(IO.Path.PathSeparator);
 
                         if (path.Length == 1)
 
@@ -420,7 +421,7 @@ namespace WinCopies.IO
 
                     case RegistryItemType.Value:
 
-                        return new RegistryItemInfo(EncapsulatedObject);
+                        return new RegistryItemInfo(EncapsulatedObjectGeneric);
                 }
 
                 return null;
@@ -566,14 +567,14 @@ namespace WinCopies.IO
                     {
                         if (predicate == null)
                         {
-                            keys = EncapsulatedObject.GetSubKeyNames().Select(item => new RegistryItemInfo($"{Path}\\{item}"));
+                            keys = EncapsulatedObjectGeneric.GetSubKeyNames().Select(item => new RegistryItemInfo($"{Path}\\{item}"));
 
                             values = _registryKey.GetValueNames().Select(s => new RegistryItemInfo(Path, s));
                         }
 
                         else
                         {
-                            keys = EncapsulatedObject.GetSubKeyNames().Where(item => predicate(new RegistryItemInfoEnumeratorStruct(item, RegistryItemType.Key))).Select(item => new RegistryItemInfo($"{Path}\\{item}"));
+                            keys = EncapsulatedObjectGeneric.GetSubKeyNames().Where(item => predicate(new RegistryItemInfoEnumeratorStruct(item, RegistryItemType.Key))).Select(item => new RegistryItemInfo($"{Path}\\{item}"));
 
                             values = _registryKey.GetValueNames().Where(s => predicate(new RegistryItemInfoEnumeratorStruct(s, RegistryItemType.Value))).Select(s => new RegistryItemInfo(Path, s));
                         }

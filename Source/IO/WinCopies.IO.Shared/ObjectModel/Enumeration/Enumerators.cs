@@ -2,35 +2,33 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Management;
 using System.Security;
+
 using WinCopies.Collections;
 using WinCopies.IO.ObjectModel;
 using WinCopies.Util;
+
 using static WinCopies.Util.Util;
 
 namespace WinCopies.IO
 {
-    public sealed class ArchiveItemInfoEnumerator : IEnumerator<ArchiveItemInfo>, WinCopies.Util.DotNetFix.IDisposable
+    public sealed class ArchiveItemInfoEnumerator : IEnumerator<ArchiveItemInfo>, Util.DotNetFix.IDisposable
     {
+        #region Private fields
         private int _index = -1;
-
-        private IArchiveItemInfoProvider _archiveItemInfoProvider;
-
-        private SevenZipExtractor _archiveExtractor;
-
-        private Queue<IFileSystemObject> _paths = new Queue<IFileSystemObject>();
+                private IArchiveItemInfoProvider _archiveItemInfoProvider;
+                private SevenZipExtractor _archiveExtractor;
+                private Queue<IFileSystemObject> _paths = new Queue<IFileSystemObject>();
+        private ArchiveItemInfo _current;
+        private Predicate<ArchiveFileInfoEnumeratorStruct> _func;
+        #endregion
 
         public bool IsDisposed { get; private set; }
-
-        private ArchiveItemInfo _current;
 
         public ArchiveItemInfo Current => IsDisposed ? throw GetExceptionForDispose(false) : _current;
 
         object IEnumerator.Current => Current;
-
-        private Predicate<ArchiveFileInfoEnumeratorStruct> _func;
 
         public Predicate<ArchiveFileInfoEnumeratorStruct> Func => IsDisposed ? throw GetExceptionForDispose(false) : _func;
 
@@ -41,9 +39,7 @@ namespace WinCopies.IO
 
             _archiveItemInfoProvider = archiveItemInfoProvider;
 
-            var extractor = new SevenZipExtractor(archiveItemInfoProvider.ArchiveShellObject.ArchiveFileStream);
-
-            _archiveExtractor = extractor;
+            _archiveExtractor = new SevenZipExtractor(archiveItemInfoProvider.ArchiveShellObject.ArchiveFileStream);
 
             _func = func;
         }
@@ -273,6 +269,8 @@ namespace WinCopies.IO
             _archiveExtractor = null;
 
             _paths = null;
+
+            _func = null;
         }
 
         #endregion
@@ -522,14 +520,14 @@ namespace WinCopies.IO
 
     public class FileSystemEntryEnumeratorProcessSimulation
     {
-        private InvalidOperationException GetInvalidOperationException() => new InvalidOperationException("Value cannot be null.");
-
         private Func<string, PathType, IEnumerable<string>> _enumerateFunc;
         private Action<string> _writeLogAction;
 
         public Func<string, PathType, IEnumerable<string>> EnumerateFunc { get => _enumerateFunc ?? throw GetInvalidOperationException(); set => _enumerateFunc = value ?? throw GetInvalidOperationException(); }
 
         public Action<string> WriteLogAction { get => _writeLogAction ?? throw GetInvalidOperationException(); set => _writeLogAction = value ?? throw GetInvalidOperationException(); }
+
+        private InvalidOperationException GetInvalidOperationException() => new InvalidOperationException("Value cannot be null.");
     }
 
 #endif
