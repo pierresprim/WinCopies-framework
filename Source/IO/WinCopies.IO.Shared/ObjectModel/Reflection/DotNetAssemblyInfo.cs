@@ -38,7 +38,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
 
         protected DotNetAssemblyInfo(in string path, in ShellObject shellObject) : base(path, FileType.File, shellObject, null) => Assembly = Assembly.LoadFrom(path);
 
-        public static ShellObjectInfo From(in ShellObject shellObject)
+        public static DotNetAssemblyInfo From(in ShellObject shellObject)
         {
             ShellObjectInitInfo initInfo = ShellObjectInfo.GetInitInfo(shellObject);
 
