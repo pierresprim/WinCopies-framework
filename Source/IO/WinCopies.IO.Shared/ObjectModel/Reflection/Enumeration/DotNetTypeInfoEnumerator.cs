@@ -24,7 +24,13 @@ using System.Reflection;
 using WinCopies.IO.ObjectModel.Reflection;
 using WinCopies.Linq;
 
-using static WinCopies.Util.Util;
+using static WinCopies.
+#if WinCopies2
+    Util.Util
+#else
+    ThrowHelper
+#endif
+    ;
 
 namespace WinCopies.IO.Reflection
 {

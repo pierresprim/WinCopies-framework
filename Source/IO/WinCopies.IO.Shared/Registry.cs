@@ -16,12 +16,22 @@
 // * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using Microsoft.Win32;
+
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Security.AccessControl;
+
+#if WinCopies2
 using WinCopies.Util;
+
 using static WinCopies.Util.Util;
+#else
+using WinCopies.Diagnostics;
+
+using static WinCopies.ThrowHelper;
+using static WinCopies.Diagnostics.IfHelpers;
+#endif
 
 namespace WinCopies.IO
 {

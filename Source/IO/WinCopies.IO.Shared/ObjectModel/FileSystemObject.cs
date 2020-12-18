@@ -18,7 +18,13 @@
 using System;
 using System.Collections.Generic;
 
-using static WinCopies.Util.Util;
+using static WinCopies.
+    #if WinCopies2
+    Util.Util
+#else
+    UtilHelpers
+    #endif
+    ;
 
 namespace WinCopies.IO.ObjectModel
 {
@@ -27,7 +33,7 @@ namespace WinCopies.IO.ObjectModel
     /// </summary>
     public abstract class FileSystemObject : IFileSystemObject
     {
-        #region Properties
+#region Properties
         /// <summary>
         /// Gets the path of this <see cref="FileSystemObject"/>.
         /// </summary>
@@ -44,7 +50,7 @@ namespace WinCopies.IO.ObjectModel
         public abstract string Name { get; }
 
         public abstract FileSystemType ItemFileSystemType { get; }
-        #endregion
+#endregion
 
         /// <summary>
         /// When called from a derived class, initializes a new instance of the <see cref="FileSystemObject"/> class.
@@ -52,7 +58,7 @@ namespace WinCopies.IO.ObjectModel
         /// <param name="path">The path of this <see cref="FileSystemObject"/>.</param>
         protected FileSystemObject(string path) => Path = path;
 
-        #region Methods
+#region Methods
         public virtual Collections.IEqualityComparer<IFileSystemObject> GetDefaultEqualityComparer() => new FileSystemObjectEqualityComparer<IFileSystemObject>();
 
         ///// <summary>
@@ -89,9 +95,9 @@ namespace WinCopies.IO.ObjectModel
         /// <param name="fileSystemObject">The <see cref="FileSystemObject"/> to compare with.</param>
         /// <returns>The comparison result. See <see cref="IComparable{T}.CompareTo(T)"/> for more details.</returns>
         public virtual int CompareTo(IFileSystemObject fileSystemObject) => GetDefaultComparer().Compare(this, fileSystemObject);
-        #endregion
+#endregion
 
-        #region Operators
+#region Operators
         /// <summary>
         /// Checks if two <see cref="FileSystemObject"/>s are equal.
         /// </summary>
@@ -139,6 +145,6 @@ namespace WinCopies.IO.ObjectModel
         /// <param name="right">Right operand.</param>
         /// <returns>A <see cref="bool"/> value that indicates whether the given <see cref="FileSystemObject"/> is greater or equal to the <see cref="FileSystemObject"/> to compare with.</returns>
         public static bool operator >=(FileSystemObject left, FileSystemObject right) => left is null ? right is null : left.CompareTo(right) >= 0;
-        #endregion
+#endregion
     }
 }

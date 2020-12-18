@@ -16,23 +16,17 @@
 // * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 //using Microsoft.WindowsAPICodePack.Shell;
-//using System;
-//using System.Collections.Generic;
-//using System.Diagnostics;
+
+//using System.Collections;
 //using System.IO;
-//using System.Text;
-//using WinCopies.Util;
-//using static WinCopies.Util.Util;
+//using System.Linq;
+//using System.Security;
+
+//using WinCopies.Collections;
+
 //using IfCT = WinCopies.Util.Util.ComparisonType;
 //using IfCM = WinCopies.Util.Util.ComparisonMode;
 //using IfComp = WinCopies.Util.Util.Comparison;
-//using System.Linq;
-//using WinCopies.Collections;
-//using System.Security;
-//using System.Reflection;
-//using SevenZip;
-//using System.Collections.ObjectModel;
-//using System.Collections;
 
 using Microsoft.Win32;
 
@@ -46,9 +40,13 @@ using System.Globalization;
 using System.Reflection;
 using System.Text;
 
+#if WinCopies2
 using WinCopies.Util;
 
 using static WinCopies.Util.Util;
+#else
+using static WinCopies.ThrowHelper;
+#endif
 
 namespace WinCopies.IO
 {

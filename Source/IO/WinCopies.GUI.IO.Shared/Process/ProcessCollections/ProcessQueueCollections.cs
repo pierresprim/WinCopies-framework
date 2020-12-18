@@ -19,7 +19,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using WinCopies.Collections.DotNetFix;
+
+using WinCopies.Collections.DotNetFix
+    #if !WinCopies2
+    .Generic
+#endif
+    ;
 using WinCopies.IO;
 
 namespace WinCopies.GUI.IO.Process

@@ -20,9 +20,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Security;
 
+#if WinCopies2
 using WinCopies.Util;
 
 using static WinCopies.Util.Util;
+#else
+using static WinCopies.ThrowHelper;
+#endif
 
 namespace WinCopies.GUI.IO.Process
 {

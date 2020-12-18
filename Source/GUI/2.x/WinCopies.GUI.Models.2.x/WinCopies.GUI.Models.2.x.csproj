@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <PackageId>WinCopies.GUI.Models</PackageId>
+    <AssemblyName>WinCopies.GUI.Models</AssemblyName>
+    <RootNamespace>WinCopies.GUI.Models</RootNamespace>
+    <Description>Models for the WinCopies framework.</Description>
+    <TargetFrameworks>netcoreapp3.0;netcoreapp3.1;net5.0-windows;net472;net48</TargetFrameworks>
+    <UseWPF>true</UseWPF>
+    <Copyright>Copyright © 2020 Pierre Sprimont</Copyright>
+    <PackageTags>WinCopies, GUI, WPF, Models</PackageTags>
+    <DocumentationFile>WinCopies.GUI.Models.xml</DocumentationFile>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>WinCopies.GUI.Models.snk</AssemblyOriginatorKeyFile>
+    <DefineConstants>WinCopies2;$(DefineConstants)</DefineConstants>
+    <VersionPrefix>2.5.10</VersionPrefix>
+    <VersionSuffix>preview</VersionSuffix>
+    <AssemblyVersion>2.5.10</AssemblyVersion>
+    <FileVersion>2.5.10</FileVersion>
+  </PropertyGroup>
+
+  <Import Project="..\..\WinCopies.GUI.Models.Shared\WinCopies.GUI.Models.Shared.projitems" Label="Shared" />
+
+  <ItemGroup>
+    <PackageReference Include="WinCopies.Util" Version="2.6" />
+    <PackageReference Include="WinCopies.Util.Desktop" Version="2.5.9" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WinCopies.GUI.2.x\WinCopies.GUI.2.x.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\..\LICENSE.md">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>

@@ -17,12 +17,22 @@
 
 using System.ComponentModel;
 
-using WinCopies.Collections.DotNetFix;
+using WinCopies.Collections.DotNetFix
+#if !WinCopies2
+    .Generic
+    #endif
+    ;
 using WinCopies.IO;
 
 namespace WinCopies.GUI.IO.Process
 {
-    public interface IProcessCollection<T> : ICountableEnumerable<T>, INotifyPropertyChanged, INotifySimpleLinkedCollectionChanged<T> where T : IPathInfo
+    public interface IProcessCollection<T> :
+        #if WinCopies2
+        ICountableEnumerable
+#else
+        IUIntCountableEnumerable
+#endif
+        <T>, INotifyPropertyChanged, INotifySimpleLinkedCollectionChanged<T> where T : IPathInfo
     {
         Size Size { get; }
 
@@ -41,7 +51,13 @@ namespace WinCopies.GUI.IO.Process
         // Left empty.
     }
 
-    public interface IReadOnlyProcessCollection : ICountableEnumerable<IPathInfo>, INotifyPropertyChanged, INotifySimpleLinkedCollectionChanged<IPathInfo>
+    public interface IReadOnlyProcessCollection :
+        #if WinCopies2
+        ICountableEnumerable
+#else
+        IUIntCountableEnumerable
+#endif
+        <IPathInfo>, INotifyPropertyChanged, INotifySimpleLinkedCollectionChanged<IPathInfo>
     {
         Size Size { get; }
     }
@@ -51,7 +67,13 @@ namespace WinCopies.GUI.IO.Process
         // Left empty.
     }
 
-    public interface IReadOnlyProcessErrorPathCollection : ICountableEnumerable<IErrorPathInfo>, INotifyPropertyChanged, INotifySimpleLinkedCollectionChanged<IErrorPathInfo>
+    public interface IReadOnlyProcessErrorPathCollection :
+        #if WinCopies2
+        ICountableEnumerable
+#else
+        IUIntCountableEnumerable
+#endif
+        <IErrorPathInfo>, INotifyPropertyChanged, INotifySimpleLinkedCollectionChanged<IErrorPathInfo>
     {
         // Left empty.
     }

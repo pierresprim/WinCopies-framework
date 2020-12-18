@@ -21,9 +21,18 @@ using System.Collections.Generic;
 using System.IO;
 
 using WinCopies.IO;
+using WinCopies.Collections.DotNetFix.Generic;
+
+#if WinCopies2
 using WinCopies.Util;
 
 using static WinCopies.Util.Util;
+#else
+using WinCopies;
+
+using static WinCopies.ThrowHelper;
+using static WinCopies.Collections.ThrowHelper;
+#endif
 
 namespace WinCopies.GUI.IO.Process
 {
@@ -73,7 +82,7 @@ namespace WinCopies.GUI.IO.Process
 
         protected virtual void ValidatePath(T item)
         {
-            ThrowIfNull(item, nameof(item));
+            if (item == null) throw GetArgumentNullException(nameof(item));
 
             if ((Path.Length > 1 && System.IO.Path.IsPathRooted(item.Path)) || (Path.Length == 0 && !System.IO.Path.IsPathRooted(item.Path)))
 
@@ -132,7 +141,7 @@ namespace WinCopies.GUI.IO.Process
 #endif
                     );
 
-        public IEnumerator<T> GetEnumerator(string searchPattern, SearchOption? searchOption
+        public System.Collections.Generic.IEnumerator<T> GetEnumerator(string searchPattern, SearchOption? searchOption
 #if NETCORE
             , EnumerationOptions enumerationOptions
 #endif
@@ -150,7 +159,7 @@ namespace WinCopies.GUI.IO.Process
 #endif
                 ).GetEnumerator();
 
-        IEnumerator<T> IEnumerable<T>.GetEnumerator() => WinCopies.IO.Directory.Enumerate(this, null, null
+        System.Collections.Generic.IEnumerator<T> IEnumerable<T>.GetEnumerator() => WinCopies.IO.Directory.Enumerate(this, null, null
 #if NETCORE
             , null
 #endif
@@ -176,55 +185,119 @@ namespace WinCopies.GUI.IO.Process
 
         public void RemoveAt(int index) => InnerList.RemoveAt(index);
 
-        public class PathCollectionEnumerator : WinCopies.Collections.Enumerator<T, T>
+        public class PathCollectionEnumerator : WinCopies.Collections.
+#if !WinCopies2
+            Generic.
+#endif
+            Enumerator<T, T>
         {
             private PathCollection<T> _pathCollection;
-            private bool _completed = false;
-            private Queue<T> _queue;
+            private
+#if WinCopies2
+IQueue
+#else
+                IQueueBase
+#endif
+                <T> _queue;
             private readonly FileSystemEntryEnumerationOrder _enumerationOrder;
             private Func<bool> _moveNext;
+#if WinCopies2
+            private bool _completed = false;
+#else
+            private T _current;
+
+            protected override T CurrentOverride => _current;
+
+            public override bool? IsResetSupported => null;
+#endif
 
             internal PathCollectionEnumerator(in PathCollection<T> pathCollection, in FileSystemEntryEnumerationOrder enumerationOrder) : base(pathCollection.InnerList)
             {
                 _pathCollection = pathCollection;
 
-                enumerationOrder.ThrowIfNotValidEnumValue(nameof(enumerationOrder));
+#if WinCopies2
+enumerationOrder.
+#endif
+                ThrowIfNotValidEnumValue(nameof(enumerationOrder)
+                    #if !WinCopies2
+                    , enumerationOrder
+                    #endif
+                    );
 
                 if ((_enumerationOrder = enumerationOrder) != FileSystemEntryEnumerationOrder.None)
 
-                    _queue = new Queue<T>();
+                    _queue =
+#if WinCopies2
+                        new WinCopies.Collections.Generic.Queue<T>
+#else
+                        WinCopies.Collections.Generic.EnumerableHelper<T>.GetQueue
+#endif
+                        ();
             }
 
             public static PathCollectionEnumerator From(in PathCollection<T> pathCollection, in FileSystemEntryEnumerationOrder enumerationOrder) => new PathCollectionEnumerator(pathCollection ?? throw GetArgumentNullException(nameof(pathCollection)), enumerationOrder);
 
+#if WinCopies2
             protected override void ResetOverride()
             {
                 base.ResetOverride();
 
                 _completed = false;
             }
+#endif
 
-            protected override void Dispose(bool disposing)
+            protected override void
+#if WinCopies2
+                Dispose(bool disposing)
+#else
+                DisposeManaged()
+#endif
             {
                 _pathCollection = null;
 
-                base.Dispose(disposing);
+                _queue = null;
+
+                _moveNext = null;
+
+                base.
+#if WinCopies2
+                    Dispose(disposing
+#else
+                DisposeManaged(
+#endif
+                    );
             }
 
             protected override bool MoveNextOverride()
             {
+#if WinCopies2
                 if (_completed) return false;
+#endif
 
                 if (_pathCollection.Count == 0)
                 {
-                    Current = _pathCollection.GetNewEmptyEnumeratorPathInfoDelegate();
 
+#if WinCopies2
+Current
+#else
+                    _current
+#endif
+                             = _pathCollection.GetNewEmptyEnumeratorPathInfoDelegate();
+
+#if WinCopies2
                     _completed = true;
+#endif
 
                     return true;
                 }
 
-                void updateCurrentWithInnerEnumeratorValue() => Current = _pathCollection.GetNewEnumeratorPathInfoDelegate(InnerEnumerator.Current);
+                void updateCurrentWithInnerEnumeratorValue() =>
+#if WinCopies2
+Current
+#else
+                        _current
+#endif
+                             = _pathCollection.GetNewEnumeratorPathInfoDelegate(InnerEnumerator.Current);
 
                 bool moveNextNone()
                 {
@@ -254,9 +327,20 @@ namespace WinCopies.GUI.IO.Process
                         }
                     }
 
-                    if (_queue.Count != 0)
+                    if (_queue.
+#if WinCopies2
+                        Count != 0
+#else
+                        HasItems
+#endif
+                        )
                     {
-                        Current = _pathCollection.GetNewEnumeratorPathInfoDelegate(_queue.Dequeue());
+#if WinCopies2
+Current
+#else
+                        _current
+#endif
+                            = _pathCollection.GetNewEnumeratorPathInfoDelegate(_queue.Dequeue());
 
                         return true;
                     }
@@ -287,7 +371,9 @@ namespace WinCopies.GUI.IO.Process
 
                 _moveNext = null;
 
+#if WinCopies2
                 _completed = true;
+#endif
 
                 return false;
             }

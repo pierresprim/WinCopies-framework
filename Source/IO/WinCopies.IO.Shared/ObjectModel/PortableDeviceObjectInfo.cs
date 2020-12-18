@@ -156,9 +156,9 @@ namespace WinCopies.IO.ObjectModel
             return portableDeviceFileType == PortableDeviceFileType.Folder ? FileType.Folder : extension == ".lnk" ? FileType.Link : extension == ".library.ms" ? FileType.Library : FileType.File;
         }
 
-        public override IEnumerable<IBrowsableObjectInfo> GetItems() => GetItems(null);
+        public override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems() => GetItems(null);
 
-        public IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<IPortableDeviceObject> predicate)
+        public System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<IPortableDeviceObject> predicate)
         {
             if (EncapsulatedObject is IEnumerablePortableDeviceObject enumerablePortableDeviceObject)
 

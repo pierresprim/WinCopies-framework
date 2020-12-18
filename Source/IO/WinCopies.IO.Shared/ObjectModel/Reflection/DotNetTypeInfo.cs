@@ -20,7 +20,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 
-using WinCopies.Collections;
+using WinCopies.Collections
+#if !WinCopies2
+    .Generic
+    #endif
+    ;
 using WinCopies.IO.ObjectModel.Reflection;
 using WinCopies.IO.Reflection;
 
@@ -112,9 +116,9 @@ namespace WinCopies.IO
                 ObjectPropertiesGeneric = new DotNetTypeInfoProperties<IDotNetTypeInfo>(this);
             }
 
-            public override IEnumerable<IBrowsableObjectInfo> GetItems() => GetItems(new DotNetItemType[] { DotNetItemType.GenericParameter, DotNetItemType.GenericArgument, DotNetItemType.Field, DotNetItemType.Property, DotNetItemType.Event, DotNetItemType.Constructor, DotNetItemType.Method, DotNetItemType.Struct, DotNetItemType.Enum, DotNetItemType.Class, DotNetItemType.Interface, DotNetItemType.Delegate, DotNetItemType.Attribute, DotNetItemType.ImplementedInterface }, null);
+            public override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems() => GetItems(new DotNetItemType[] { DotNetItemType.GenericParameter, DotNetItemType.GenericArgument, DotNetItemType.Field, DotNetItemType.Property, DotNetItemType.Event, DotNetItemType.Constructor, DotNetItemType.Method, DotNetItemType.Struct, DotNetItemType.Enum, DotNetItemType.Class, DotNetItemType.Interface, DotNetItemType.Delegate, DotNetItemType.Attribute, DotNetItemType.ImplementedInterface }, null);
 
-            public IEnumerable<IBrowsableObjectInfo> GetItems(IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetTypeInfoEnumeratorStruct> func) => new Enumerable<IBrowsableObjectInfo>(() => DotNetTypeInfoEnumerator.From(this, typesToEnumerate, func));
+            public System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(System.Collections.Generic.IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetTypeInfoEnumeratorStruct> func) => new Enumerable<IBrowsableObjectInfo>(() => DotNetTypeInfoEnumerator.From(this, typesToEnumerate, func));
         }
     }
 }

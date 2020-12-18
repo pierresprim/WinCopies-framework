@@ -1,51 +1,68 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
   <PropertyGroup>
-    <Description>WinCopies framework's assembly for basic i/o operations</Description>
+    <PackageId>WinCopies.IO</PackageId>
+    <AssemblyName>WinCopies.IO</AssemblyName>
+    <RootNamespace>WinCopies.IO</RootNamespace>
+    <TargetFrameworks>netcoreapp3.0;netcoreapp3.1;net5.0-windows;net472;net48</TargetFrameworks>
+    <UseWPF>true</UseWPF>
+    <Description>WinCopies framework's assembly for basic I/O operations</Description>
     <Copyright>Copyright © 2020 Pierre Sprimont</Copyright>
     <PackageTags>WinCopies, IO</PackageTags>
     <DocumentationFile>WinCopies.IO.xml</DocumentationFile>
-    <UseWPF>true</UseWPF>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>WinCopies.IO.snk</AssemblyOriginatorKeyFile>
-    <DefineConstants>WinCopies2;$(DefineConstants)</DefineConstants>
+    <DefineConstants>WinCopies3;$(DefineConstants)</DefineConstants>
+    <VersionPrefix>3.0.0</VersionPrefix>
+    <VersionSuffix>preview</VersionSuffix>
+    <AssemblyVersion>3.0.0</AssemblyVersion>
+    <FileVersion>3.0.0</FileVersion>
   </PropertyGroup>
 
   <Import Project="..\WinCopies.IO.Shared\WinCopies.IO.Shared.projitems" Label="Shared" />
 
-  <!--<ItemGroup Condition="'$(TargetFramework)'!='netcoreapp3.1'">
-    -->
-  <!--<PackageReference Include="Microsoft.Win32.Registry" Version="4.7.0" />-->
-  <!--
-    <PackageReference Include="System.Drawing.Common" Version="4.7.0" />
-    -->
-  <!--<PackageReference Include="System.Management" Version="4.7.0" />-->
-  <!--
-  </ItemGroup>-->
+  <ItemGroup>
+    <ProjectReference Include="..\..\GUI\WinCopies.GUI.Drawing\WinCopies.GUI.Drawing.csproj" />
+  </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789.`))'=='net'">
-    <!--<PackageReference Include="Microsoft.Win32.Registry" Version="4.7.0" />-->
-    <!--
-    <PackageReference Include="System.Drawing.Common" Version="4.7.0" />
-    -->
-    <!--<PackageReference Include="System.Management" Version="4.7.0" />-->
+  <ItemGroup Condition="'$(TargetFramework.TrimEnd(`-windows`))'=='net5.0'">
+    <!--<PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />-->
+    <!--<PackageReference Include="System.Drawing.Common" Version="5.0.0" />-->
+    <PackageReference Include="System.Management" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='net472'">
+    <!--<Reference Include="Microsoft.Win32.Registry" />
+    <Reference Include="System.Drawing.Common" />-->
     <Reference Include="System.Management" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789.`))'=='netcoreapp'">
+  <ItemGroup Condition="'$(TargetFramework)'=='net48'">
+    <!--<Reference Include="Microsoft.Win32.Registry" />
+    <Reference Include="System.Drawing.Common" />-->
+    <Reference Include="System.Management" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.1'">
+    <!--<PackageReference Include="Microsoft.Win32.Registry" Version="4.7.0" />-->
+    <!--<PackageReference Include="System.Drawing.Common" Version="4.7.0" />-->
+    <PackageReference Include="System.Management" Version="4.7.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.0'">
     <!--<PackageReference Include="Microsoft.Win32.Registry" Version="4.6.0" />-->
     <!--<PackageReference Include="System.Drawing.Common" Version="4.6.0" />-->
     <PackageReference Include="System.Management" Version="4.6.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WinCopies.IconExtractor" Version="1.0.3-rc" />
-    <PackageReference Include="WinCopies.IconLib" Version="0.75-rc" />
+    <PackageReference Include="WinCopies.Collections" Version="3.1.0.1-preview" />
+    <PackageReference Include="WinCopies.Util" Version="3.1.0.1-preview" />
+    <PackageReference Include="WinCopies.Util.Extensions" Version="3.1.0.1-preview" />
     <PackageReference Include="Squid-Box.SevenZipSharp" Version="1.2.231" />
-    <PackageReference Include="WinCopies.WindowsAPICodePack.Consts" Version="2.0.1" />
-    <PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="2.0.1" />
-    <PackageReference Include="WinCopies.WindowsAPICodePack.PortableDevices" Version="2.0.1" />
-    <PackageReference Include="WinCopies.Util" Version="2.6" />
+    <PackageReference Include="WinCopies.WindowsAPICodePack.Consts" Version="2.1.0" />
+    <PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="2.1.0" />
+    <PackageReference Include="WinCopies.WindowsAPICodePack.PortableDevices" Version="2.1.0" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(Configuration)' == 'Debug'">
@@ -74,7 +91,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\..\..\LICENSE">
+    <None Include="..\..\..\LICENSE.md">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>

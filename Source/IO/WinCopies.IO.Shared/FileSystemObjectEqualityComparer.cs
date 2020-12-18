@@ -16,26 +16,30 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+
 using WinCopies.Collections;
 using WinCopies.IO.ObjectModel;
+
+#if CS8
+using System.Diagnostics.CodeAnalysis;
+#endif
 
 namespace WinCopies.IO
 {
     public class FileSystemObjectEqualityComparer<T> : EqualityComparer<T>
-#if WinCopies2
+#if !WinCopies4
 , IEqualityComparer<T>
 #endif
         where T : IFileSystemObject
     {
-#if WinCopies2
+#if !WinCopies4
         public bool Equals(
-#if !CS7
+#if CS8
             [AllowNull]
 #endif
         T x,
-#if !CS7
+#if CS8
             [AllowNull]
 #endif
         object y) => base.Equals(x, y);
@@ -59,17 +63,17 @@ namespace WinCopies.IO
         public bool EqualityCompareLocalizedNames(in T x, in T y) => x.Path.ToLower(CultureInfo.CurrentCulture) == y.Path.ToLower(CultureInfo.CurrentCulture);
 
         protected override bool EqualsOverride(
-#if !CS7
+#if CS8
             [AllowNull]
 #endif
         T x,
-#if !CS7
+#if CS8
             [AllowNull]
 #endif
         T y) => Validate(x, y) && EqualityCompareLocalizedNames(x, y);
 
         public override int GetHashCode(
-#if !CS7
+#if CS8
             [DisallowNull]
 #endif
         T obj) => obj.Path.ToLower(CultureInfo.CurrentCulture).GetHashCode(
@@ -82,17 +86,17 @@ namespace WinCopies.IO
     public class FileSystemObjectInfoEqualityComparer<T> : FileSystemObjectEqualityComparer<T> where T : IFileSystemObject
     {
         protected override bool EqualsOverride(
-#if !CS7
+#if CS8
             [AllowNull]
 #endif
         T x,
-#if !CS7
+#if CS8
             [AllowNull]
 #endif
         T y) => !(x is IFileSystemObjectInfo _x && y is IFileSystemObjectInfo _y && _x.FileType == _y.FileType) && Validate(x, y) && EqualityCompareLocalizedNames(x, y);
 
         public override int GetHashCode(
-#if !CS7
+#if CS8
             [DisallowNull]
 #endif
         T obj) => obj is IFileSystemObjectInfo _obj ? _obj.FileType.GetHashCode() ^ _obj.Path.ToLower(CultureInfo.CurrentCulture).GetHashCode(
@@ -105,17 +109,17 @@ namespace WinCopies.IO
     public class RegistryItemInfoEqualityComparer<T> : FileSystemObjectEqualityComparer<T> where T : IFileSystemObject
     {
         protected override bool EqualsOverride(
-#if !CS7
+#if CS8
             [AllowNull]
 #endif
         T x,
-#if !CS7
+#if CS8
             [AllowNull]
 #endif
         T y) => !(x is IRegistryItemInfo _x && y is IRegistryItemInfo _y && _x.RegistryItemType == _y.RegistryItemType) && Validate(x, y) && EqualityCompareLocalizedNames(x, y);
 
         public override int GetHashCode(
-#if !CS7
+#if CS8
             [DisallowNull]
 #endif
         T obj) => obj is IFileSystemObjectInfo _obj ? _obj.FileType.GetHashCode() ^ _obj.Path.ToLower(CultureInfo.CurrentCulture).GetHashCode(
@@ -128,17 +132,17 @@ namespace WinCopies.IO
     public class WMIItemInfoEqualityComparer<T> : FileSystemObjectEqualityComparer<T> where T : IFileSystemObject
     {
         protected override bool EqualsOverride(
-#if !CS7
+#if CS8
             [AllowNull]
 #endif
         T x,
-#if !CS7
+#if CS8
             [AllowNull]
 #endif
         T y) => !(x is IWMIItemInfo _x && y is IWMIItemInfo _y && _x.WMIItemType == _y.WMIItemType) && Validate(x, y) && EqualityCompareLocalizedNames(x, y);
 
         public override int GetHashCode(
-#if !CS7
+#if CS8
             [DisallowNull]
 #endif
         T obj) => obj is IFileSystemObjectInfo _obj ? _obj.FileType.GetHashCode() ^ _obj.Path.ToLower(CultureInfo.CurrentCulture).GetHashCode(

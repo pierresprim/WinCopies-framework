@@ -16,7 +16,6 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -49,8 +48,8 @@ namespace WinCopies.IO.ObjectModel.Reflection
             ObjectPropertiesGeneric = new DotNetItemInfoProperties<IDotNetItemInfo>(this);
         }
 
-        public override IEnumerable<IBrowsableObjectInfo> GetItems() => GetItems(null);
+        public override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems() => GetItems(null);
 
-        public IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<CustomAttributeData> func) => (func == null ? EncapsulatedObjectGeneric.GetCustomAttributesData() : EncapsulatedObjectGeneric.GetCustomAttributesData().WherePredicate(func)).Select(a => new DotNetAttributeInfo(a, this));
+        public System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<CustomAttributeData> func) => (func == null ? EncapsulatedObjectGeneric.GetCustomAttributesData() : EncapsulatedObjectGeneric.GetCustomAttributesData().WherePredicate(func)).Select(a => new DotNetAttributeInfo(a, this));
     }
 }

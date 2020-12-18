@@ -1,0 +1,56 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <PackageId>WinCopies.GUI.Icons</PackageId>
+    <AssemblyName>WinCopies.GUI.Icons</AssemblyName>
+    <RootNamespace>WinCopies.GUI.Icons</RootNamespace>
+    <TargetFrameworks>netcoreapp3.0;netcoreapp3.1;net5.0-windows;net472;net48</TargetFrameworks>
+    <UseWPF>true</UseWPF>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>WinCopies.GUI.Icons.snk</AssemblyOriginatorKeyFile>
+    <DefineConstants>WinCopies2;$(DefineConstants)</DefineConstants>
+    <VersionPrefix>2.5.10</VersionPrefix>
+    <VersionSuffix>preview</VersionSuffix>
+    <AssemblyVersion>2.5.10</AssemblyVersion>
+    <FileVersion>2.5.10</FileVersion>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'!='netcoreapp3.1'">
+    <!--<PackageReference Include="Microsoft.Win32.Registry" Version="4.7.0" />-->
+    <PackageReference Include="System.Drawing.Common" Version="4.7.0" />
+    <!--<PackageReference Include="System.Management" Version="4.7.0" />-->
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'!='netcoreapp3.0'">
+    <!--<PackageReference Include="Microsoft.Win32.Registry" Version="4.6.0" />-->
+    <PackageReference Include="System.Drawing.Common" Version="4.6.0" />
+    <!--<PackageReference Include="System.Management" Version="4.6.0" />-->
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WinCopies.Util.Desktop" Version="2.5.9" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\..\LICENSE.md">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>

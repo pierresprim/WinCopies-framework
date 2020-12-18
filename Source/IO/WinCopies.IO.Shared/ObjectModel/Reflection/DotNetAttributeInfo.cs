@@ -23,7 +23,15 @@ using System.Windows.Media.Imaging;
 
 using WinCopies.IO.Reflection;
 
+#if DEBUG
+#if WinCopies2
 using static WinCopies.Util.Util;
+#else
+using WinCopies.Diagnostics;
+
+using static WinCopies.Diagnostics.IfHelpers;
+#endif
+#endif
 
 namespace WinCopies.IO.ObjectModel.Reflection
 {
@@ -43,7 +51,9 @@ namespace WinCopies.IO.ObjectModel.Reflection
 
         internal DotNetAttributeInfo(in CustomAttributeData customAttributeData, in IDotNetItemInfo parent) : base($"{parent.Path}{IO.Path.PathSeparator}{customAttributeData.AttributeType.Name}", customAttributeData.AttributeType.Name, parent)
         {
+#if DEBUG
             Debug.Assert(If(ComparisonType.And, ComparisonMode.Logical, Comparison.NotEqual, null, parent, parent.ParentDotNetAssemblyInfo, customAttributeData));
+#endif
 
             EncapsulatedObjectGeneric = customAttributeData;
 

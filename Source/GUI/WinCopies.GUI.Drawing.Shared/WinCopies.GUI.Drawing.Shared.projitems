@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>f96f9167-8d67-49f6-a4fb-cffd49725150</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>WinCopies.GUI.Drawing.Shared</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)IconExtractor\IconExtractor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IconExtractor\IconUtil.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IconLib\AuthorAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IconLib\BitmapEncoders\BMPEncoder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IconLib\BitmapEncoders\ImageEncoder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IconLib\BitmapEncoders\PNGEncoder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IconLib\ColorProcessing\EuclideanQuantizer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IconLib\ColorProcessing\FloydSteinbergDithering.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IconLib\ColorProcessing\IColorQuantizer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IconLib\ColorProcessing\IDithering.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IconLib\ColorProcessing\IPaletteQuantizer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IconLib\ColorProcessing\OctreeQuantizer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IconLib\Enums.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IconLib\Exceptions\IconNameAlreadyExistException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IconLib\Exceptions\ImageAlreadyExistsException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IconLib\Exceptions\ImageTooBigException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IconLib\Exceptions\InvalidFileException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IconLib\Exceptions\InvalidICLFileException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IconLib\Exceptions\InvalidIconFormatSelectionException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IconLib\Exceptions\InvalidIconSelectionException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IconLib\Exceptions\InvalidMultiIconFileException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IconLib\Exceptions\InvalidMultiIconMaskBitmap.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IconLib\Exceptions\InvalidPixelFormatException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IconLib\IconImage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IconLib\LibraryFormats\IconFormat.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IconLib\LibraryFormats\ILibraryFormat.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IconLib\LibraryFormats\NEFormat.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IconLib\LibraryFormats\PEFormat.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IconLib\MultiIcon.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IconLib\SingleIcon.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IconLib\Structs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IconLib\Tools.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IconLib\Util.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IconLib\Win32.cs" />
+  </ItemGroup>
+</Project>

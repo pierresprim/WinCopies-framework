@@ -22,7 +22,13 @@ using WinCopies.Collections;
 using WinCopies.IO.ObjectModel;
 using WinCopies.Util;
 
-using static WinCopies.Util.Util;
+using static WinCopies.
+    #if WinCopies2
+    Util.Util
+#else
+    UtilHelpers
+#endif
+    ;
 
 namespace WinCopies.IO
 {
@@ -113,7 +119,7 @@ namespace WinCopies.IO
 
                 if (_x.FileType.IsValidEnumValue())
                 {
-#if !CS7
+#if CS8
                     static
 #endif
                         FileType[] getFileItemTypes() => new FileType[] { FileType.File, FileType.Archive, FileType.Library, FileType.Link };

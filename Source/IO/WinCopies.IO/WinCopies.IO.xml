@@ -722,6 +722,11 @@
             The item is a .Net property.
             </summary>
         </member>
+        <member name="F:WinCopies.IO.Reflection.DotNetItemType.Event">
+            <summary>
+            The item is a .Net event.
+            </summary>
+        </member>
         <member name="F:WinCopies.IO.Reflection.DotNetItemType.Constructor">
             <summary>
             The item is a .Net constructor.

@@ -1,0 +1,53 @@
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFrameworks>netcoreapp3.1;net472</TargetFrameworks>
+    <UseWindowsForms>true</UseWindowsForms>
+    <Authors>Fanco, Gustavo</Authors>
+    <Company>Pierre Sprimont</Company>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageProjectUrl>https://wincopies.com/fwd.php?id=7</PackageProjectUrl>
+    <Copyright>Copyright © Fanco, Gustavo 2006</Copyright>
+    <RepositoryUrl>https://wincopies.com/fwd.php?id=7</RepositoryUrl>
+    <RepositoryType>Git</RepositoryType>
+    <PackageTags>Icons</PackageTags>
+    <AssemblyVersion>1.0.2.0</AssemblyVersion>
+    <FileVersion>1.0.2.0</FileVersion>
+    <PackageReleaseNotes>
+      See: https://wincopies.com/fwd.php?id=9
+    </PackageReleaseNotes>
+    <ApplicationIcon>video.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework.TrimEnd(`0123456789.`))' == 'netcoreapp'">
+    <DefineConstants>NETCORE;$(DefineConstants)</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Source\GUI\2.x\WinCopies.GUI.Drawing.2.x\WinCopies.GUI.Drawing.2.x.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="IconVista.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="library.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="library.icl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="video.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\LICENSE.md">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>

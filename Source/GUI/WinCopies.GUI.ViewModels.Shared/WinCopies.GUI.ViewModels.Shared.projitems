@@ -9,6 +9,16 @@
     <Import_RootNamespace>WinCopies.GUI.ViewModels</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)ViewModels.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\ContentControlViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\ContentViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\HeaderedContentControlViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\HeaderedItemsControlViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\ItemsControlViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\TextBoxViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\ViewModels.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Windows\ViewModels.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Windows\" />
   </ItemGroup>
 </Project>

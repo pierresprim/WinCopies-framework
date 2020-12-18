@@ -22,7 +22,12 @@ using System.Windows.Media.Imaging;
 using WinCopies.IO.ObjectModel.Reflection;
 using WinCopies.IO.Reflection;
 
+#if WinCopies2
 using static WinCopies.Util.Util;
+#else
+using static WinCopies.UtilHelpers;
+using static WinCopies.ThrowHelper;
+#endif
 
 namespace WinCopies.IO
 {

@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <PackageId>WinCopies.GUI.IO</PackageId>
+    <AssemblyName>WinCopies.GUI.IO</AssemblyName>
+    <RootNamespace>WinCopies.GUI.IO</RootNamespace>
+    <TargetFrameworks>netcoreapp3.0;netcoreapp3.1;net5.0-windows;net472;net48</TargetFrameworks>
+    <UseWPF>true</UseWPF>
+    <DocumentationFile>WinCopies.GUI.IO.xml</DocumentationFile>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>WinCopies.GUI.IO.snk</AssemblyOriginatorKeyFile>
+    <DefineConstants>WinCopies2;$(DefineConstants)</DefineConstants>
+    <VersionPrefix>2.5.10</VersionPrefix>
+    <VersionSuffix>preview</VersionSuffix>
+    <AssemblyVersion>2.5.10</AssemblyVersion>
+    <FileVersion>2.5.10</FileVersion>
+  </PropertyGroup>
+
+  <Import Project="..\WinCopies.GUI.IO.Shared\WinCopies.GUI.IO.Shared.projitems" Label="Shared" />
+
+  <ItemGroup>
+    <PackageReference Include="WinCopies.Util" Version="2.6.1.1" />
+    <PackageReference Include="WinCopies.Util.Desktop" Version="2.6.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\GUI\2.x\WinCopies.GUI.Controls.2.x\WinCopies.GUI.Controls.2.x.csproj" />
+    <ProjectReference Include="..\..\GUI\2.x\WinCopies.GUI.Icons.2.x\WinCopies.GUI.Icons.2.x.csproj" />
+    <ProjectReference Include="..\WinCopies.IO.2.x\WinCopies.IO.2.x.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\LICENSE.md">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>

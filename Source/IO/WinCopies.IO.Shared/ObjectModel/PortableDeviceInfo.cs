@@ -20,7 +20,6 @@ using Microsoft.WindowsAPICodePack.Shell;
 using Microsoft.WindowsAPICodePack.Win32Native;
 
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows;
@@ -30,7 +29,13 @@ using System.Windows.Media.Imaging;
 using WinCopies.IO.ObjectModel;
 using WinCopies.Linq;
 
-using static WinCopies.Util.Util;
+using static WinCopies.
+#if WinCopies2
+    Util.Util
+#else
+    ThrowHelper
+#endif
+    ;
 
 namespace WinCopies.IO
 {
@@ -125,9 +130,9 @@ namespace WinCopies.IO
                 return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
             }
 
-            public override IEnumerable<IBrowsableObjectInfo> GetItems() => GetItems(null);
+            public override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems() => GetItems(null);
 
-            public IEnumerable<IBrowsableObjectInfo> GetItems(in Predicate<IPortableDeviceObject> predicate)
+            public System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(in Predicate<IPortableDeviceObject> predicate)
             {
                 EncapsulatedObjectGeneric.Open(ClientVersion.Value, OpeningOptions);
 

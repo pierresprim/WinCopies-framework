@@ -17,7 +17,12 @@
 
 using System;
 using System.IO;
+
+#if WinCopies2
 using static WinCopies.Util.Util;
+#else
+using static WinCopies.ThrowHelper;
+#endif
 
 namespace WinCopies.IO
 {
@@ -105,7 +110,7 @@ namespace WinCopies.IO
 
                 return false;
 
-#if !CS7
+#if CS8
 
             callback ??= () => false;
 

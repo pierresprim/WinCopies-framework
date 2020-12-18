@@ -2,16 +2,17 @@
 
   <PropertyGroup>
     <PackageId>WinCopies.Util.Temp</PackageId>
+    <TargetFrameworks>netcoreapp3.0;netcoreapp3.1;net5.0-windows;net472;net48</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>WinCopies.Util.Temp.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="WinCopies.Util" Version="2.6" />
+    <PackageReference Include="WinCopies.Util" Version="2.6.1.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\..\LICENSE">
+    <None Include="..\..\LICENSE.md">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>

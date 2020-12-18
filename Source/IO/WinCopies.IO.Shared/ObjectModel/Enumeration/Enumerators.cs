@@ -1,34 +1,97 @@
-﻿using SevenZip;
+﻿/* Copyright © Pierre Sprimont, 2020
+*
+* This file is part of the WinCopies Framework.
+*
+* The WinCopies Framework is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* The WinCopies Framework is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
+
+using SevenZip;
+
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Management;
 using System.Security;
 
-using WinCopies.Collections;
 using WinCopies.IO.ObjectModel;
+
+#if WinCopies2
+using System.Collections;
+using System.Collections.Generic;
+
+using WinCopies.Collections;
+using WinCopies.Collections.DotNetFix.Generic;
 using WinCopies.Util;
 
 using static WinCopies.Util.Util;
+#else
+using WinCopies.Collections.Generic;
+
+using static WinCopies.ThrowHelper;
+#endif
 
 namespace WinCopies.IO
 {
-    public sealed class ArchiveItemInfoEnumerator : IEnumerator<ArchiveItemInfo>, Util.DotNetFix.IDisposable
+    public sealed class ArchiveItemInfoEnumerator :
+#if WinCopies2
+IEnumerator
+#else
+        Enumerator
+#endif
+        <ArchiveItemInfo>,
+#if WinCopies2
+        Util.
+#endif
+        DotNetFix.IDisposable
     {
         #region Private fields
         private int _index = -1;
-                private IArchiveItemInfoProvider _archiveItemInfoProvider;
-                private SevenZipExtractor _archiveExtractor;
-                private Queue<IFileSystemObject> _paths = new Queue<IFileSystemObject>();
+        private IArchiveItemInfoProvider _archiveItemInfoProvider;
+        private SevenZipExtractor _archiveExtractor;
+        private
+#if WinCopies2
+WinCopies.Collections.Generic.Queue
+#else
+            EnumerableHelper
+#endif
+            <IFileSystemObject>
+#if !WinCopies2
+            .IEnumerableQueue
+#endif
+            _paths =
+#if WinCopies2
+new WinCopies.Collections.Generic.Queue
+#else
+            EnumerableHelper
+#endif
+            <IFileSystemObject>
+#if !WinCopies2
+            .GetEnumerableQueue
+#endif
+            ();
         private ArchiveItemInfo _current;
         private Predicate<ArchiveFileInfoEnumeratorStruct> _func;
         #endregion
 
+#if WinCopies2
         public bool IsDisposed { get; private set; }
 
         public ArchiveItemInfo Current => IsDisposed ? throw GetExceptionForDispose(false) : _current;
 
         object IEnumerator.Current => Current;
+#else
+        protected override ArchiveItemInfo CurrentOverride => _current;
+
+        public override bool? IsResetSupported => true;
+#endif
 
         public Predicate<ArchiveFileInfoEnumeratorStruct> Func => IsDisposed ? throw GetExceptionForDispose(false) : _func;
 
@@ -44,7 +107,12 @@ namespace WinCopies.IO
             _func = func;
         }
 
-        public bool MoveNext()
+#if WinCopies2
+        public bool MoveNext
+#else
+        protected override bool MoveNextOverride
+#endif
+            ()
         {
             #region Old
 
@@ -247,8 +315,14 @@ namespace WinCopies.IO
             return false;
         }
 
+#if WinCopies2
         public void Reset()
         {
+#else
+        protected override void ResetOverride()
+        {
+            base.ResetOverride();
+#endif
             _index = -1;
 
             _current = null;
@@ -258,8 +332,14 @@ namespace WinCopies.IO
 
         #region IDisposable Support
 
+#if WinCopies2
         public void Dispose()
         {
+#else
+        protected override void DisposeManaged()
+        {
+            base.DisposeManaged();
+#endif
             Reset();
 
             _archiveItemInfoProvider = null;
@@ -297,11 +377,11 @@ namespace WinCopies.IO
 
         // }
 
-        // IEnumerable<PathInfo> pathInfos;
+        // System.Collections.Generic.IEnumerable<PathInfo> pathInfos;
 
         //if (FileSystemObjectComparer == null)
 
-        //    pathInfos = (IEnumerable<PathInfo>)paths;
+        //    pathInfos = (System.Collections.Generic.IEnumerable<PathInfo>)paths;
 
         //else
 
@@ -311,7 +391,7 @@ namespace WinCopies.IO
 
         //    sortedPaths.Sort(FileSystemObjectComparer);
 
-        //    pathInfos = (IEnumerable<PathInfo>)paths;
+        //    pathInfos = (System.Collections.Generic.IEnumerable<PathInfo>)paths;
 
         //}
 
@@ -338,13 +418,23 @@ namespace WinCopies.IO
 
     public sealed class WMIItemInfoEnumerator : Enumerator<ManagementBaseObject, WMIItemInfo>
     {
-        private bool _resetInnerEnumerator = false;
+        private readonly bool _resetInnerEnumerator = false;
 
         private Func<bool> _func;
 
+#if !WinCopies2
+        private WMIItemInfo _current = null;
+
+        protected override WMIItemInfo CurrentOverride => _current;
+
+        public override bool? IsResetSupported => _resetInnerEnumerator;
+
+        protected override void ResetCurrent() => _current = null;
+#endif
+
         public WMIItemType ItemWMIItemType { get; }
 
-        public WMIItemInfoEnumerator(IEnumerable<ManagementBaseObject> enumerable, bool resetEnumerator, WMIItemType itemWMIItemType, bool catchExceptions) : base(enumerable)
+        public WMIItemInfoEnumerator(System.Collections.Generic.IEnumerable<ManagementBaseObject> enumerable, bool resetEnumerator, WMIItemType itemWMIItemType, bool catchExceptions) : base(enumerable)
         {
             _resetInnerEnumerator = resetEnumerator;
 
@@ -386,7 +476,12 @@ namespace WinCopies.IO
 
             // if (CheckFilter(_path))
 
-            Current = new WMIItemInfo(ItemWMIItemType, InnerEnumerator.Current);
+#if WinCopies2
+Current 
+#else
+            _current
+#endif
+            = new WMIItemInfo(ItemWMIItemType, InnerEnumerator.Current);
 
         protected override bool MoveNextOverride() => _func();
 
@@ -401,11 +496,22 @@ namespace WinCopies.IO
 
         #region IDisposable Support
 
-        protected override void Dispose(bool disposing)
+        protected override void
+#if WinCopies2
+            Dispose(bool disposing)
+#else
+            DisposeManaged()
+#endif
         {
             Reset();
 
+            _func = null;
+
+#if WinCopies2
             base.Dispose(disposing);
+#else
+            base.DisposeManaged();
+#endif
         }
         #endregion
     }
@@ -431,7 +537,7 @@ namespace WinCopies.IO
     //#if DEBUG
     //            IPathInfo pathInfo,
     //#endif 
-    //            IEnumerable<string> directoryEnumerable, IEnumerable<string> fileEnumerable)
+    //            System.Collections.Generic.IEnumerable<string> directoryEnumerable, System.Collections.Generic.IEnumerable<string> fileEnumerable)
     //        {
     //#if DEBUG
     //            ThrowIfNull(pathInfo, nameof(pathInfo));
@@ -520,10 +626,10 @@ namespace WinCopies.IO
 
     public class FileSystemEntryEnumeratorProcessSimulation
     {
-        private Func<string, PathType, IEnumerable<string>> _enumerateFunc;
+        private Func<string, PathType, System.Collections.Generic.IEnumerable<string>> _enumerateFunc;
         private Action<string> _writeLogAction;
 
-        public Func<string, PathType, IEnumerable<string>> EnumerateFunc { get => _enumerateFunc ?? throw GetInvalidOperationException(); set => _enumerateFunc = value ?? throw GetInvalidOperationException(); }
+        public Func<string, PathType, System.Collections.Generic.IEnumerable<string>> EnumerateFunc { get => _enumerateFunc ?? throw GetInvalidOperationException(); set => _enumerateFunc = value ?? throw GetInvalidOperationException(); }
 
         public Action<string> WriteLogAction { get => _writeLogAction ?? throw GetInvalidOperationException(); set => _writeLogAction = value ?? throw GetInvalidOperationException(); }
 

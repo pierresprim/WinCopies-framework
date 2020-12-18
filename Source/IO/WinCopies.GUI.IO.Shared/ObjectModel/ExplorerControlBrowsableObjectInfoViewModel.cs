@@ -16,6 +16,7 @@
 * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using Microsoft.WindowsAPICodePack.Shell;
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -23,10 +24,17 @@ using System.Windows.Controls;
 
 using WinCopies.IO;
 using WinCopies.IO.ObjectModel;
-using WinCopies.Util.Commands;
 using WinCopies.Util.Data;
 
+#if WinCopies2
+using WinCopies.Util.Commands;
+
 using static WinCopies.Util.Util;
+#else
+using WinCopies.Commands;
+
+using static WinCopies.ThrowHelper;
+#endif
 
 namespace WinCopies.GUI.IO.ObjectModel
 {
