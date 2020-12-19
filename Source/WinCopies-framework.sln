@@ -60,6 +60,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinCopies.IO", "IO\WinCopie
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "WinCopies.IO.Shared", "IO\WinCopies.IO.Shared\WinCopies.IO.Shared.shproj", "{5C6A8E8F-21AB-4C80-B898-5FB090CB72BD}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OnlineDotNetXMLDocGenerator", "..\OnlineDotNetXMLDocGenerator\OnlineDotNetXMLDocGenerator.csproj", "{0F5B341F-9F5A-4BE7-9562-BD2F0C50677A}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		GUI\WinCopies.GUI.Shared\WinCopies.GUI.Shared.projitems*{0def65ea-68d9-4698-a552-a94c636c4098}*SharedItemsImports = 5
@@ -184,6 +186,14 @@ Global
 		{DBC6761D-3117-41CA-8B22-AD99C908F82E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DBC6761D-3117-41CA-8B22-AD99C908F82E}.Release|x64.ActiveCfg = Release|Any CPU
 		{DBC6761D-3117-41CA-8B22-AD99C908F82E}.Release|x64.Build.0 = Release|Any CPU
+		{0F5B341F-9F5A-4BE7-9562-BD2F0C50677A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F5B341F-9F5A-4BE7-9562-BD2F0C50677A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F5B341F-9F5A-4BE7-9562-BD2F0C50677A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{0F5B341F-9F5A-4BE7-9562-BD2F0C50677A}.Debug|x64.Build.0 = Debug|Any CPU
+		{0F5B341F-9F5A-4BE7-9562-BD2F0C50677A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F5B341F-9F5A-4BE7-9562-BD2F0C50677A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0F5B341F-9F5A-4BE7-9562-BD2F0C50677A}.Release|x64.ActiveCfg = Release|Any CPU
+		{0F5B341F-9F5A-4BE7-9562-BD2F0C50677A}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

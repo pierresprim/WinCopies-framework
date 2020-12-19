@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\WinCopies.GUI.Models\WinCopies.GUI.Models.csproj" />
+    <ProjectReference Include="..\WinCopies.GUI.ViewModels\WinCopies.GUI.ViewModels.csproj" />
   </ItemGroup>
 
   <ItemGroup>

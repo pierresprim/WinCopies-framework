@@ -65,33 +65,38 @@ namespace WinCopies.IO.Reflection
         Property = 9,
 
         /// <summary>
+        /// The item is a .Net event.
+        /// </summary>
+        Event = 10,
+
+        /// <summary>
         /// The item is a .Net constructor.
         /// </summary>
-        Constructor = 10,
+        Constructor = 11,
 
         /// <summary>
         /// The item is a .Net method.
         /// </summary>
-        Method = 11,
+        Method = 12,
 
         /// <summary>
         /// The item is a .Net implemented interfaces.
         /// </summary>
-        ImplementedInterface = 12,
+        ImplementedInterface = 13,
 
         /// <summary>
         /// The item is a .Net parameter.
         /// </summary>
-        Parameter = 13,
+        Parameter = 14,
 
         /// <summary>
         /// The item is a .Net generic parameter.
         /// </summary>
-        GenericParameter = 14,
+        GenericParameter = 15,
 
         /// <summary>
         /// The item is a .Net generic argument.
         /// </summary>
-        GenericArgument = 15
+        GenericArgument = 16
     }
 }
