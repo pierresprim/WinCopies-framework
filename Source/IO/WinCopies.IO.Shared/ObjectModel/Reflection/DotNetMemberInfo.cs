@@ -16,14 +16,25 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 
-using WinCopies.Collections;
+using WinCopies.Collections
+#if !WinCopies2
+    .Generic
+#endif
+    ;
 using WinCopies.IO.Reflection;
 
+#if DEBUG
+#if WinCopies2
 using static WinCopies.Util.Util;
+#else
+using WinCopies.Diagnostics;
+
+using static WinCopies.Diagnostics.IfHelpers;
+#endif
+#endif
 
 namespace WinCopies.IO.ObjectModel.Reflection
 {
@@ -41,7 +52,13 @@ namespace WinCopies.IO.ObjectModel.Reflection
 
         internal DotNetMemberInfo(in MemberInfo memberInfo, in DotNetItemType dotNetItemType, in IDotNetTypeInfo dotNetTypeInfo) : base($"{dotNetTypeInfo.Path}{IO.Path.PathSeparator}{memberInfo.Name}", memberInfo.Name, dotNetTypeInfo)
         {
-            Debug.Assert(If(ComparisonType.And, ComparisonMode.Logical, Util.Util.Comparison.NotEqual, null, dotNetTypeInfo, dotNetTypeInfo.ParentDotNetAssemblyInfo));
+#if DEBUG
+            Debug.Assert(If(ComparisonType.And, ComparisonMode.Logical,
+#if WinCopies2
+Util.Util.
+#endif
+                Comparison.NotEqual, null, dotNetTypeInfo, dotNetTypeInfo.ParentDotNetAssemblyInfo));
+#endif
 
             EncapsulatedObjectGeneric = memberInfo;
 
@@ -50,8 +67,8 @@ namespace WinCopies.IO.ObjectModel.Reflection
             ObjectPropertiesGeneric = new DotNetItemInfoProperties<IDotNetItemInfo>(this);
         }
 
-        public override IEnumerable<IBrowsableObjectInfo> GetItems() => GetItems(new DotNetItemType[] { DotNetItemType.Parameter, DotNetItemType.Attribute }, null);
+        public override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems() => GetItems(new DotNetItemType[] { DotNetItemType.Parameter, DotNetItemType.Attribute }, null);
 
-        public IEnumerable<IBrowsableObjectInfo> GetItems(IEnumerable<DotNetItemType> enumerable, Predicate<DotNetMemberInfoEnumeratorStruct> func) => new Enumerable<IBrowsableObjectInfo>(() => DotNetMemberInfoEnumerator.From(this, enumerable, func));
+        public System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(System.Collections.Generic.IEnumerable<DotNetItemType> enumerable, Predicate<DotNetMemberInfoEnumeratorStruct> func) => new Enumerable<IBrowsableObjectInfo>(() => DotNetMemberInfoEnumerator.From(this, enumerable, func));
     }
 }

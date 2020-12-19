@@ -140,15 +140,15 @@ namespace WinCopies.IO.ObjectModel
 
         RecursiveEnumerator<IBrowsableObjectInfo> IRecursiveEnumerable<IBrowsableObjectInfo>.GetEnumerator() => IsRecursivelyBrowsable ? new RecursiveEnumerator<IBrowsableObjectInfo>(this) : throw new NotSupportedException("The current BrowsableObjectInfo does not support recursive browsing.");
 
-        IEnumerator<IBrowsableObjectInfo> IEnumerable<IBrowsableObjectInfo>.GetEnumerator() => GetItems().GetEnumerator();
+        IEnumerator<IBrowsableObjectInfo> System.Collections.Generic.IEnumerable<IBrowsableObjectInfo>.GetEnumerator() => GetItems().GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetItems().GetEnumerator();
 
         /// <summary>
         /// When overridden in a derived class, returns the items of this <see cref="BrowsableObjectInfo"/>.
         /// </summary>
-        /// <returns>An <see cref="IEnumerable{IBrowsableObjectInfo}"/> that enumerates through the items of this <see cref="BrowsableObjectInfo"/>.</returns>
-        public abstract IEnumerable<IBrowsableObjectInfo> GetItems();
+        /// <returns>An <see cref="System.Collections.Generic.IEnumerable{IBrowsableObjectInfo}"/> that enumerates through the items of this <see cref="BrowsableObjectInfo"/>.</returns>
+        public abstract System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems();
 
         #region IDisposable
         /// <summary>

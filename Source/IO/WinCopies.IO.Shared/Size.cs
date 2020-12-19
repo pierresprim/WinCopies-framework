@@ -17,8 +17,16 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+
+#if WinCopies2
 using WinCopies.Util;
+
 using static WinCopies.Util.Util;
+#else
+using WinCopies;
+
+using static WinCopies.UtilHelpers;
+#endif
 
 namespace WinCopies.IO
 {
@@ -81,11 +89,22 @@ namespace WinCopies.IO
         /// <summary>
         /// The numeric value in bytes.
         /// </summary>
-        public WinCopies.Util.CheckedUInt64 ValueInBytes { get; }
+        public WinCopies.
+#if WinCopies2
+            Util.
+#endif
+            CheckedUInt64 ValueInBytes
+        { get; }
 
         public float GetFloatValueInUnit(in ByteUnit unit) => unit == ByteUnit.Byte
                 ? (float)ValueInBytes
-                : (float)ValueInBytes / Util.Math.Pow(1024f, (float)unit);
+                : (float)ValueInBytes /
+#if WinCopies2
+            Util
+#else
+            WinCopies
+#endif
+            .Math.Pow(1024f, (float)unit);
 
         public double GetDoubleValueInUnit(in ByteUnit unit) => unit == ByteUnit.Byte
                 ? (double)ValueInBytes
@@ -93,7 +112,13 @@ namespace WinCopies.IO
 
         public decimal GetDecimalValueInUnit(in ByteUnit unit) => unit == ByteUnit.Byte
                 ? (decimal)ValueInBytes
-                : (decimal)ValueInBytes / Util.Math.Pow(1024m, (decimal)unit);
+                : (decimal)ValueInBytes /
+            #if WinCopies2
+            Util
+#else
+            WinCopies
+            #endif
+            .Math.Pow(1024m, (decimal)unit);
 
         public float GetFloatValueInUnit() => GetFloatValueInUnit(Unit);
 
@@ -275,56 +300,56 @@ namespace WinCopies.IO
         public int CompareTo(
 #if NETCORE
             [AllowNull]
-        #endif
+#endif
         long other) => ValueInBytes.CompareTo(other);
 
         public int CompareTo(
 #if NETCORE
             [AllowNull]
-        #endif
+#endif
         int other) => ValueInBytes.CompareTo(other);
 
         public int CompareTo(
 #if NETCORE
             [AllowNull]
-        #endif
+#endif
         short other) => ValueInBytes.CompareTo(other);
 
         public int CompareTo(
 #if NETCORE
             [AllowNull]
-        #endif
+#endif
         sbyte other) => ValueInBytes.CompareTo(other);
 
         public int CompareTo(
 #if NETCORE
             [AllowNull]
-        #endif
+#endif
         ulong other) => ValueInBytes.CompareTo(other);
 
         public int CompareTo(
 #if NETCORE
             [AllowNull]
-        #endif
+#endif
         uint other) => ValueInBytes.CompareTo(other);
 
         public int CompareTo(
 #if NETCORE
             [AllowNull]
-        #endif
+#endif
         ushort other) => ValueInBytes.CompareTo(other);
 
         public int CompareTo(
 #if NETCORE
             [AllowNull]
-        #endif
+#endif
         byte other) => ValueInBytes.CompareTo(other);
 
-        #region Size operators
+#region Size operators
 
-        #region Equality operators 
+#region Equality operators 
 
-        #region Size operators
+#region Size operators
 
         /// <summary>
         /// Checks if <paramref name="s1"/> is less than <paramref name="s2"/>.
@@ -374,13 +399,13 @@ namespace WinCopies.IO
         /// <returns><see langword="true"/> if <paramref name="s1"/> is not equal to <paramref name="s2"/>, otherwise <see langword="false"/>.</returns>
         public static bool operator !=(in Size s1, in Size s2) => !(s1 == s2);
 
-        #endregion
+#endregion
 
 
 
-        #region Size, numeric operators
+#region Size, numeric operators
 
-        #region sbyte operators
+#region sbyte operators
 
         public static bool operator <(in Size s, in sbyte b) => b <= 0 ? false : s.ValueInBytes < (ulong)b;
 
@@ -394,11 +419,11 @@ namespace WinCopies.IO
 
         public static bool operator !=(in Size s, in sbyte b) => !(s == b);
 
-        #endregion
+#endregion
 
 
 
-        #region byte operators
+#region byte operators
 
         public static bool operator <(in Size s, in byte b) => s.ValueInBytes < (ulong)b;
 
@@ -412,11 +437,11 @@ namespace WinCopies.IO
 
         public static bool operator !=(in Size s, in byte b) => s.ValueInBytes != (ulong)b;
 
-        #endregion
+#endregion
 
 
 
-        #region short operators
+#region short operators
 
         /// <summary>
         /// Compares a <see cref="Size"/> to a <see cref="short"/> value.
@@ -472,11 +497,11 @@ namespace WinCopies.IO
         /// <remarks><paramref name="short"/> must be in byte unit.</remarks>
         public static bool operator !=(in Size s, in short @short) => !(s == @short);
 
-        #endregion
+#endregion
 
 
 
-        #region ushort operators
+#region ushort operators
 
         public static bool operator <(in Size s, in ushort @short) => s.ValueInBytes < (ulong)@short;
 
@@ -490,11 +515,11 @@ namespace WinCopies.IO
 
         public static bool operator !=(in Size s, in ushort @short) => s.ValueInBytes != (ulong)@short;
 
-        #endregion
+#endregion
 
 
 
-        #region int operators
+#region int operators
 
         /// <summary>
         /// Compares a <see cref="Size"/> to a <see cref="int"/> value.
@@ -550,11 +575,11 @@ namespace WinCopies.IO
         /// <remarks><paramref name="i"/> must be in byte unit.</remarks>
         public static bool operator !=(in Size s, in int i) => !(s == i);
 
-        #endregion
+#endregion
 
 
 
-        #region uint operators
+#region uint operators
 
         public static bool operator <(in Size s, in uint i) => s.ValueInBytes < (ulong)i;
 
@@ -568,11 +593,11 @@ namespace WinCopies.IO
 
         public static bool operator !=(in Size s, in uint i) => s.ValueInBytes != (ulong)i;
 
-        #endregion
+#endregion
 
 
 
-        #region long operators
+#region long operators
 
         /// <summary>
         /// Compares a <see cref="Size"/> to a <see cref="long"/> value.
@@ -628,11 +653,11 @@ namespace WinCopies.IO
         /// <remarks><paramref name="l"/> must be in byte unit.</remarks>
         public static bool operator !=(in Size s, in long l) => !(s == l);
 
-        #endregion
+#endregion
 
 
 
-        #region ulong operators
+#region ulong operators
 
         public static bool operator <(in Size s, in ulong l) => s.ValueInBytes < l;
 
@@ -646,11 +671,11 @@ namespace WinCopies.IO
 
         public static bool operator !=(in Size s, in ulong l) => s.ValueInBytes != l;
 
-        #endregion
+#endregion
 
 
 
-        #region float operators
+#region float operators
 
         /// <summary>
         /// Compares a <see cref="Size"/> to a <see cref="float"/> value.
@@ -706,11 +731,11 @@ namespace WinCopies.IO
         /// <remarks><paramref name="f"/> must be in byte unit.</remarks>
         public static bool operator !=(in Size s, in float f) => (float)s.ValueInBytes != f;
 
-        #endregion
+#endregion
 
 
 
-        #region double operators
+#region double operators
 
         /// <summary>
         /// Compares a <see cref="Size"/> to a <see cref="double"/> value.
@@ -766,11 +791,11 @@ namespace WinCopies.IO
         /// <remarks><paramref name="d"/> must be in byte unit.</remarks>
         public static bool operator !=(in Size s, in double d) => (double)s.ValueInBytes != d;
 
-        #endregion
+#endregion
 
 
 
-        #region decimal operators
+#region decimal operators
 
         /// <summary>
         /// Compares a <see cref="Size"/> to a <see cref="decimal"/> value.
@@ -826,15 +851,15 @@ namespace WinCopies.IO
         /// <remarks><paramref name="d"/> must be in byte unit.</remarks>
         public static bool operator !=(in Size s, in decimal d) => (decimal)s.ValueInBytes != d;
 
-        #endregion
+#endregion
 
-        #endregion
+#endregion
 
 
 
-        #region Numeric, Size operators
+#region Numeric, Size operators
 
-        #region sbyte operators
+#region sbyte operators
 
         public static bool operator <(in sbyte b, in Size s) => b < 0 || (b == 0 && s.ValueInBytes != 0) ? true : (ulong)b < s.ValueInBytes;
 
@@ -848,11 +873,11 @@ namespace WinCopies.IO
 
         public static bool operator !=(in sbyte b, in Size s) => !(b == s);
 
-        #endregion
+#endregion
 
 
 
-        #region byte operators
+#region byte operators
 
         public static bool operator <(in byte b, in Size s) => (ulong)b < s.ValueInBytes;
 
@@ -866,11 +891,11 @@ namespace WinCopies.IO
 
         public static bool operator !=(in byte b, in Size s) => (ulong)b != s.ValueInBytes;
 
-        #endregion
+#endregion
 
 
 
-        #region short operators
+#region short operators
 
         public static bool operator <(in short @short, in Size s) => @short < 0 || (@short == 0 && s.ValueInBytes != 0) ? true : (ulong)@short < s.ValueInBytes;
 
@@ -884,11 +909,11 @@ namespace WinCopies.IO
 
         public static bool operator !=(in short @short, in Size s) => !(@short == s);
 
-        #endregion
+#endregion
 
 
 
-        #region ushort operators
+#region ushort operators
 
         public static bool operator <(in ushort @short, in Size s) => (ulong)@short < s.ValueInBytes;
 
@@ -902,11 +927,11 @@ namespace WinCopies.IO
 
         public static bool operator !=(in ushort @short, in Size s) => (ulong)@short != s.ValueInBytes;
 
-        #endregion
+#endregion
 
 
 
-        #region int operators
+#region int operators
 
         public static bool operator <(in int i, in Size s) => i < 0 || (i == 0 && s.ValueInBytes != 0) ? true : (ulong)i < s.ValueInBytes;
 
@@ -920,11 +945,11 @@ namespace WinCopies.IO
 
         public static bool operator !=(in int i, in Size s) => !(i == s);
 
-        #endregion
+#endregion
 
 
 
-        #region uint operators
+#region uint operators
 
         public static bool operator <(in uint i, in Size s) => (ulong)i < s.ValueInBytes;
 
@@ -938,11 +963,11 @@ namespace WinCopies.IO
 
         public static bool operator !=(in uint i, in Size s) => (ulong)i != s.ValueInBytes;
 
-        #endregion
+#endregion
 
 
 
-        #region long operators
+#region long operators
 
         public static bool operator <(in long l, in Size s) => l < 0 || (l == 0 && s.ValueInBytes != 0) ? true : (ulong)l < s.ValueInBytes;
 
@@ -956,11 +981,11 @@ namespace WinCopies.IO
 
         public static bool operator !=(in long l, in Size s) => !(l == s);
 
-        #endregion
+#endregion
 
 
 
-        #region ulong operators
+#region ulong operators
 
         public static bool operator <(in ulong l, in Size s) => l < s.ValueInBytes;
 
@@ -974,11 +999,11 @@ namespace WinCopies.IO
 
         public static bool operator !=(in ulong l, in Size s) => l != s.ValueInBytes;
 
-        #endregion
+#endregion
 
 
 
-        #region float operators
+#region float operators
 
         public static bool operator <(in float f, in Size s) => f < (float)s.ValueInBytes;
 
@@ -992,11 +1017,11 @@ namespace WinCopies.IO
 
         public static bool operator !=(in float f, in Size s) => f != (float)s.ValueInBytes;
 
-        #endregion
+#endregion
 
 
 
-        #region double operators
+#region double operators
 
         public static bool operator <(in double d, in Size s) => d < (double)s.ValueInBytes;
 
@@ -1010,11 +1035,11 @@ namespace WinCopies.IO
 
         public static bool operator !=(in double d, in Size s) => d != (double)s.ValueInBytes;
 
-        #endregion
+#endregion
 
 
 
-        #region decimal operators
+#region decimal operators
 
         public static bool operator <(in decimal d, in Size s) => d < (decimal)s.ValueInBytes;
 
@@ -1028,19 +1053,19 @@ namespace WinCopies.IO
 
         public static bool operator !=(in decimal d, in Size s) => d != (decimal)s.ValueInBytes;
 
-        #endregion
+#endregion
 
-        #endregion
+#endregion
 
-        #endregion
+#endregion
 
 
 
-        #region Arithmetic operators
+#region Arithmetic operators
 
         // todo: modulos?
 
-        #region Size operators
+#region Size operators
 
         /// <summary>
         /// Returns a <see cref="Size"/> with the addition of <paramref name="s1"/> and <paramref name="s2"/>.
@@ -1082,13 +1107,13 @@ namespace WinCopies.IO
         /// <returns>A <see cref="Size"/> with the remainder of <paramref name="s1"/> by <paramref name="s2"/></returns>
         public static Size operator %(in Size s1, in Size s2) => new Size(s1.ValueInBytes.Value % s2.ValueInBytes.Value);
 
-        #endregion
+#endregion
 
 
 
-        #region Size, numeric operators
+#region Size, numeric operators
 
-        #region sbyte operators
+#region sbyte operators
 
         public static Size operator +(in Size s, in sbyte b) => b < 0 ? throw new ArgumentOutOfRangeException(nameof(b), b, $"{nameof(b)} must be equal or greater than 0.") : b == 0 ? s : new Size(s.ValueInBytes + (ulong)b);
 
@@ -1100,11 +1125,11 @@ namespace WinCopies.IO
 
         // public static Size operator %(in Size s, in sbyte b) => new Size(s.ValueInBytes % (ulong)b);
 
-        #endregion
+#endregion
 
 
 
-        #region byte operators
+#region byte operators
 
         public static Size operator +(in Size s, in byte b) => new Size(s.ValueInBytes + (ulong)b);
 
@@ -1116,11 +1141,11 @@ namespace WinCopies.IO
 
         public static Size operator %(in Size s, in byte b) => new Size(s.ValueInBytes.Value % (ulong)b);
 
-        #endregion
+#endregion
 
 
 
-        #region short operators
+#region short operators
 
         public static Size operator +(in Size s, in short @short) => @short < 0 ? throw new ArgumentOutOfRangeException(nameof(@short), @short, $"{nameof(@short)} must be equal or greater than 0.") : @short == 0 ? s : new Size(s.ValueInBytes + (ulong)@short);
 
@@ -1132,11 +1157,11 @@ namespace WinCopies.IO
 
         // public static Size operator %(in Size s, in short @short) => new Size(s.ValueInBytes % (ulong)@short);
 
-        #endregion
+#endregion
 
 
 
-        #region ushort operators
+#region ushort operators
 
         public static Size operator +(in Size s, in ushort @short) => new Size(s.ValueInBytes + (ulong)@short);
 
@@ -1148,11 +1173,11 @@ namespace WinCopies.IO
 
         public static Size operator %(in Size s, in ushort @short) => new Size(s.ValueInBytes.Value % (ulong)@short);
 
-        #endregion
+#endregion
 
 
 
-        #region int operators
+#region int operators
 
         public static Size operator +(in Size s, in int i) => i < 0 ? throw new ArgumentOutOfRangeException(nameof(i), i, $"{nameof(i)} must be equal or greater than 0.") : i == 0 ? s : new Size(s.ValueInBytes + (ulong)i);
 
@@ -1164,11 +1189,11 @@ namespace WinCopies.IO
 
         // public static Size operator %(in Size s, in int i) => new Size(s.ValueInBytes % (ulong)i);
 
-        #endregion
+#endregion
 
 
 
-        #region uint operators
+#region uint operators
 
         public static Size operator +(in Size s, in uint i) => new Size(s.ValueInBytes + (ulong)i);
 
@@ -1180,11 +1205,11 @@ namespace WinCopies.IO
 
         public static Size operator %(in Size s, in uint i) => new Size(s.ValueInBytes.Value % (ulong)i);
 
-        #endregion
+#endregion
 
 
 
-        #region long operators
+#region long operators
 
         public static Size operator +(in Size s, in long l) => l < 0 ? throw new ArgumentOutOfRangeException(nameof(l), l, $"{nameof(l)} must be equal or greater than 0.") : l == 0 ? s : new Size(s.ValueInBytes + (ulong)l);
 
@@ -1196,11 +1221,11 @@ namespace WinCopies.IO
 
         // public static Size operator %(in Size s, in long l) => new Size(s.ValueInBytes % (ulong)l);
 
-        #endregion
+#endregion
 
 
 
-        #region ulong operators
+#region ulong operators
 
         public static Size operator +(in Size s, in ulong l) => new Size(s.ValueInBytes + l);
 
@@ -1212,15 +1237,15 @@ namespace WinCopies.IO
 
         public static Size operator %(in Size s, in ulong l) => new Size(s.ValueInBytes.Value % l);
 
-        #endregion
+#endregion
 
-        #endregion
+#endregion
 
 
 
-        #region Numeric, Size operators
+#region Numeric, Size operators
 
-        #region sbyte operators
+#region sbyte operators
 
         public static Size operator +(in sbyte b, in Size s) => b < 0 ? throw new ArgumentOutOfRangeException(nameof(b), b, $"{nameof(b)} must be equal or greater than 0.") : b == 0 ? s : new Size((ulong)b + s.ValueInBytes);
 
@@ -1232,11 +1257,11 @@ namespace WinCopies.IO
 
         // public static Size operator %(in sbyte b, in Size s) => new Size((ulong)b % s.ValueInBytes);
 
-        #endregion
+#endregion
 
 
 
-        #region byte operators
+#region byte operators
 
         public static Size operator +(in byte b, in Size s) => new Size((ulong)b + s.ValueInBytes);
 
@@ -1248,11 +1273,11 @@ namespace WinCopies.IO
 
         public static Size operator %(in byte b, in Size s) => new Size((ulong)b % s.ValueInBytes.Value);
 
-        #endregion
+#endregion
 
 
 
-        #region short operators
+#region short operators
 
         public static Size operator +(in short @short, in Size s) => @short < 0 ? throw new ArgumentOutOfRangeException(nameof(@short), @short, $"{nameof(@short)} must be equal or greater than 0.") : @short == 0 ? s : new Size((ulong)@short + s.ValueInBytes);
 
@@ -1264,11 +1289,11 @@ namespace WinCopies.IO
 
         // public static Size operator %(in sbyte b, in Size s) => new Size((ulong)b % s.ValueInBytes);
 
-        #endregion
+#endregion
 
 
 
-        #region ushort operators
+#region ushort operators
 
         public static Size operator +(in ushort @short, in Size s) => new Size((ulong)@short + s.ValueInBytes);
 
@@ -1280,11 +1305,11 @@ namespace WinCopies.IO
 
         public static Size operator %(in ushort @short, in Size s) => new Size((ulong)@short % s.ValueInBytes.Value);
 
-        #endregion
+#endregion
 
 
 
-        #region int operators
+#region int operators
 
         public static Size operator +(in int i, in Size s) => i < 0 ? throw new ArgumentOutOfRangeException(nameof(i), i, $"{nameof(i)} must be equal or greater than 0.") : i == 0 ? s : new Size((ulong)i + s.ValueInBytes);
 
@@ -1296,11 +1321,11 @@ namespace WinCopies.IO
 
         // public static Size operator %(in sbyte b, in Size s) => new Size((ulong)b % s.ValueInBytes);
 
-        #endregion
+#endregion
 
 
 
-        #region uint operators
+#region uint operators
 
         public static Size operator +(in uint i, in Size s) => new Size((ulong)i + s.ValueInBytes);
 
@@ -1312,11 +1337,11 @@ namespace WinCopies.IO
 
         public static Size operator %(in uint i, in Size s) => new Size((ulong)i % s.ValueInBytes.Value);
 
-        #endregion
+#endregion
 
 
 
-        #region long operators
+#region long operators
 
         public static Size operator +(in long l, in Size s) => l < 0 ? throw new ArgumentOutOfRangeException(nameof(l), l, $"{nameof(l)} must be equal or greater than 0.") : l == 0 ? s : new Size((ulong)l + s.ValueInBytes);
 
@@ -1328,11 +1353,11 @@ namespace WinCopies.IO
 
         // public static Size operator %(in sbyte b, in Size s) => new Size((ulong)b % s.ValueInBytes);
 
-        #endregion
+#endregion
 
 
 
-        #region ulong operators
+#region ulong operators
 
         public static Size operator +(in ulong l, in Size s) => new Size(l + s.ValueInBytes);
 
@@ -1344,11 +1369,11 @@ namespace WinCopies.IO
 
         public static Size operator %(in ulong l, in Size s) => new Size(l % s.ValueInBytes.Value);
 
-        #endregion
+#endregion
 
-        #endregion
+#endregion
 
-        #endregion
+#endregion
 
 
 
@@ -1380,9 +1405,9 @@ namespace WinCopies.IO
 
 
 
-        #region Cast operators
+#region Cast operators
 
-        #region Numeric value to Size
+#region Numeric value to Size
 
         public static explicit operator Size(sbyte b) => b < 0 ? throw new ArgumentOutOfRangeException(nameof(b), b, $"{nameof(b)} must be equal or greater than 0.") : b == 0 ? new Size(0UL) : new Size((ulong)b);
 
@@ -1404,9 +1429,9 @@ namespace WinCopies.IO
 
         public static explicit operator Size(ulong l) => new Size(l);
 
-        #endregion
+#endregion
 
-        #region Size to numeric value
+#region Size to numeric value
 
         public static explicit operator sbyte(Size s) => (sbyte)s.ValueInBytes;
 
@@ -1434,10 +1459,10 @@ namespace WinCopies.IO
 
         public static explicit operator decimal(Size s) => (decimal)s.ValueInBytes;
 
-        #endregion
+#endregion
 
-        #endregion
+#endregion
 
-        #endregion
+#endregion
     }
 }

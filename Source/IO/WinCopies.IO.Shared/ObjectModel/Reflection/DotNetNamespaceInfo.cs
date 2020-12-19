@@ -19,11 +19,18 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-using WinCopies.Collections;
 using WinCopies.IO.ObjectModel.Reflection;
 using WinCopies.IO.Reflection;
 
+#if WinCopies2
+using WinCopies.Collections;
+
 using static WinCopies.Util.Util;
+#else
+using WinCopies.Collections.Generic;
+
+using static WinCopies.ThrowHelper;
+#endif
 
 namespace WinCopies.IO
 {
@@ -44,7 +51,7 @@ namespace WinCopies.IO
     {
         public sealed class DotNetNamespaceInfo : BrowsableDotNetItemInfo<IDotNetNamespaceInfoProperties, object>, IDotNetNamespaceInfo<IDotNetNamespaceInfoProperties>
         {
-            #region Properties
+#region Properties
             public bool IsRootNamespace { get; }
 
             public override string ItemTypeName { get; } = ".Net namespace";
@@ -54,7 +61,7 @@ namespace WinCopies.IO
             public override DotNetItemType DotNetItemType => DotNetItemType.Namespace;
 
             public override IDotNetNamespaceInfoProperties ObjectPropertiesGeneric { get; }
-            #endregion
+#endregion
 
             internal DotNetNamespaceInfo(in string name, bool isRootNamespace, IBrowsableObjectInfo parent) : base(isRootNamespace ? name : $"{parent.Path}{IO.Path.PathSeparator}{name}", name, parent)
             {
@@ -77,9 +84,9 @@ namespace WinCopies.IO
                 ObjectPropertiesGeneric = new DotNetNamespaceInfoProperties<IDotNetNamespaceInfo>(this);
             }
 
-            public override IEnumerable<IBrowsableObjectInfo> GetItems() => GetItems(new DotNetItemType[] { DotNetItemType.Namespace, DotNetItemType.Struct, DotNetItemType.Enum, DotNetItemType.Class, DotNetItemType.Interface, DotNetItemType.Delegate }, GetCommonPredicate<DotNetNamespaceInfoEnumeratorStruct>());
+            public override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems() => GetItems(new DotNetItemType[] { DotNetItemType.Namespace, DotNetItemType.Struct, DotNetItemType.Enum, DotNetItemType.Class, DotNetItemType.Interface, DotNetItemType.Delegate }, GetCommonPredicate<DotNetNamespaceInfoEnumeratorStruct>());
 
-            public IEnumerable<IBrowsableObjectInfo> GetItems(IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetNamespaceInfoEnumeratorStruct> func) => new Enumerable<IBrowsableObjectInfo>(() => new DotNetNamespaceInfoEnumerator(this, ParentDotNetAssemblyInfo.EncapsulatedObject.DefinedTypes, typesToEnumerate, func));
+            public System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(System.Collections.Generic.IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetNamespaceInfoEnumeratorStruct> func) => new Enumerable<IBrowsableObjectInfo>(() => new DotNetNamespaceInfoEnumerator(this, ParentDotNetAssemblyInfo.EncapsulatedObject.DefinedTypes, typesToEnumerate, func));
         }
     }
 }

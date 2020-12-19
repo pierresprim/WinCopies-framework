@@ -20,7 +20,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-using WinCopies.Collections;
+using WinCopies.Collections
+#if !WinCopies2
+    .Generic
+#endif
+    ;
 using WinCopies.IO.ObjectModel.Reflection;
 using WinCopies.Linq;
 
@@ -89,9 +93,17 @@ namespace WinCopies.IO.Reflection
     {
         private IEnumerator<T> _currentEnumerator;
 
-        public DotNetEnumerator(IEnumerable<IEnumerable<T>> enumerable) : this(enumerable.Select(_enumerable => _enumerable.GetEnumerator())) { }
+#if !WinCopies2
+        private T _current;
 
-        public DotNetEnumerator(IEnumerable<IEnumerator<T>> enumerable) : base(enumerable) { }
+        protected override T CurrentOverride => _current;
+
+        public override bool? IsResetSupported => null;
+#endif
+
+        public DotNetEnumerator(System.Collections.Generic.IEnumerable<System.Collections.Generic.IEnumerable<T>> enumerable) : this(enumerable.Select(_enumerable => _enumerable.GetEnumerator())) { }
+
+        public DotNetEnumerator(System.Collections.Generic.IEnumerable<IEnumerator<T>> enumerable) : base(enumerable) { }
 
         protected override void ResetOverride()
         {
@@ -110,7 +122,12 @@ namespace WinCopies.IO.Reflection
 
                     if (moveNext())
                     {
-                        Current = _currentEnumerator.Current;
+#if WinCopies2
+Current
+#else
+                        _current
+#endif
+                            = _currentEnumerator.Current;
 
                         return true;
                     }
@@ -124,23 +141,29 @@ namespace WinCopies.IO.Reflection
             return _currentEnumerator == null ? _moveNext() : moveNext() || _moveNext();
         }
 
-        protected override void Dispose(bool disposing)
+        protected override void
+#if WinCopies2
+            Dispose(bool disposing)
         {
             base.Dispose(disposing);
 
             if (disposing)
-
-                _currentEnumerator = null;
+#else
+            DisposeManaged()
+        {
+            base.DisposeManaged();
+#endif
+            _currentEnumerator = null;
         }
     }
 
     public static class DotNetMemberInfoEnumerator
     {
-        public static DotNetEnumerator<IDotNetItemInfo> From(IDotNetMemberInfo dotNetMemberInfo, IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetMemberInfoEnumeratorStruct> func)
+        public static DotNetEnumerator<IDotNetItemInfo> From(IDotNetMemberInfo dotNetMemberInfo, System.Collections.Generic.IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetMemberInfoEnumeratorStruct> func)
         {
             var dic = new Dictionary<DotNetItemType, IEnumerator<IDotNetItemInfo>>();
 
-            void add(in DotNetItemType itemType, in IEnumerable<IDotNetItemInfo> enumerable) => dic.Add(itemType, enumerable.GetEnumerator());
+            void add(in DotNetItemType itemType, in System.Collections.Generic.IEnumerable<IDotNetItemInfo> enumerable) => dic.Add(itemType, enumerable.GetEnumerator());
 
             foreach (DotNetItemType itemType in typesToEnumerate)
 

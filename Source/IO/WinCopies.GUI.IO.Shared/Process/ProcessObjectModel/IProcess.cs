@@ -28,7 +28,12 @@ namespace WinCopies.GUI.IO.Process
 
         WinCopies.IO.Size InitialItemSize { get; }
 
-        int InitialItemCount { get; }
+#if WinCopies2
+int 
+#else
+        uint
+#endif
+            InitialItemCount { get; }
 
         bool IsCompleted { get; }
 
@@ -57,15 +62,15 @@ namespace WinCopies.GUI.IO.Process
 #if DEBUG
         ProcessSimulationParameters SimulationParameters { get; }
 #endif
-        #endregion
+#endregion
 
-        #region Events
+#region Events
         event ProgressChangedEventHandler ProgressChanged;
 
         event RunWorkerCompletedEventHandler RunWorkerCompleted;
-        #endregion
+#endregion
 
-        #region Methods
+#region Methods
         string[] PathsToStringArray();
 
         void RunWorkerAsync();
@@ -75,6 +80,6 @@ namespace WinCopies.GUI.IO.Process
         void PauseAsync();
 
         void CancelAsync();
-        #endregion
+#endregion
     }
 }

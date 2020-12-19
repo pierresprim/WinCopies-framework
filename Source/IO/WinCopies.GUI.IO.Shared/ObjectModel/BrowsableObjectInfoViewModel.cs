@@ -32,7 +32,13 @@ using WinCopies.IO.ObjectModel;
 using WinCopies.Linq;
 using WinCopies.Util.Data;
 
-using static WinCopies.Util.Util;
+using static WinCopies.
+    #if WinCopies2
+    Util.Util
+#else
+    ThrowHelper
+    #endif
+    ;
 
 namespace WinCopies.GUI.IO.ObjectModel
 {
@@ -43,7 +49,7 @@ namespace WinCopies.GUI.IO.ObjectModel
 
     public class BrowsableObjectInfoViewModel : ViewModel<IBrowsableObjectInfo>, IBrowsableObjectInfoViewModel
     {
-        #region Private fields
+#region Private fields
         private Predicate<IBrowsableObjectInfo> _filter;
         private IBrowsableObjectInfoFactory _factory;
         private ObservableCollection<IBrowsableObjectInfoViewModel> _items;
@@ -51,9 +57,9 @@ namespace WinCopies.GUI.IO.ObjectModel
         private IBrowsableObjectInfoViewModel _parent;
         private bool _parentLoaded = false;
         private bool _isSelected = false;
-        #endregion
+#endregion
 
-        #region Properties
+#region Properties
         public static Predicate<IBrowsableObjectInfo> Predicate { get; } = browsableObjectInfo => browsableObjectInfo.IsBrowsable;
 
         public static Comparison<IBrowsableObjectInfo> DefaultComparison { get; } = (left, right) => left.CompareTo(right);
@@ -64,7 +70,7 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         public bool IsSpecialItem => ModelGeneric.IsSpecialItem;
 
-        #region Bitmap sources
+#region Bitmap sources
         public BitmapSource SmallBitmapSource => ModelGeneric.SmallBitmapSource;
 
         public BitmapSource MediumBitmapSource => ModelGeneric.MediumBitmapSource;
@@ -72,7 +78,7 @@ namespace WinCopies.GUI.IO.ObjectModel
         public BitmapSource LargeBitmapSource => ModelGeneric.LargeBitmapSource;
 
         public BitmapSource ExtraLargeBitmapSource => ModelGeneric.ExtraLargeBitmapSource;
-        #endregion
+#endregion
 
         public object EncapsulatedObject => ModelGeneric.EncapsulatedObject;
 
@@ -115,7 +121,7 @@ namespace WinCopies.GUI.IO.ObjectModel
 
                     try
                     {
-                        IEnumerable<IBrowsableObjectInfo> items = _filter == null ? ModelGeneric.GetItems() : ModelGeneric.GetItems().WherePredicate(_filter);
+                        System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> items = _filter == null ? ModelGeneric.GetItems() : ModelGeneric.GetItems().WherePredicate(_filter);
 
                         var __items = new List<IBrowsableObjectInfoViewModel>(items.Select(
 
@@ -189,9 +195,9 @@ namespace WinCopies.GUI.IO.ObjectModel
         /// The model for this view model instance.
         /// </summary>
         protected internal new IBrowsableObjectInfo ModelGeneric => base.ModelGeneric;
-        #endregion
+#endregion
 
-        #region Constructors
+#region Constructors
         public BrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo) : base(browsableObjectInfo ?? throw GetArgumentNullException(nameof(browsableObjectInfo))) =>
 
             Debug.Assert(!(browsableObjectInfo is IBrowsableObjectInfoViewModel));
@@ -202,12 +208,12 @@ namespace WinCopies.GUI.IO.ObjectModel
 
             _filter = filter;
         }
-        #endregion
+#endregion
 
-        #region Methods
-        public IEnumerable<IBrowsableObjectInfo> GetItems() => Items;
+#region Methods
+        public System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems() => Items;
 
-        IEnumerator<IBrowsableObjectInfo> IEnumerable<IBrowsableObjectInfo>.GetEnumerator() => ((IEnumerable<IBrowsableObjectInfo>)ModelGeneric).GetEnumerator();
+        IEnumerator<IBrowsableObjectInfo> System.Collections.Generic.IEnumerable<IBrowsableObjectInfo>.GetEnumerator() => ((System.Collections.Generic.IEnumerable<IBrowsableObjectInfo>)ModelGeneric).GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)ModelGeneric).GetEnumerator();
 
@@ -218,13 +224,13 @@ namespace WinCopies.GUI.IO.ObjectModel
         public int CompareTo(
 #if !NETFRAMEWORK
             [AllowNull]
-        #endif
+#endif
         IFileSystemObject other) => ModelGeneric.CompareTo(other);
 
         public bool Equals(
 #if !NETFRAMEWORK
             [AllowNull]
-        #endif
+#endif
         IFileSystemObject other) => ModelGeneric.Equals(other);
 
         public Collections.IEqualityComparer<IFileSystemObject> GetDefaultEqualityComparer() => ModelGeneric.GetDefaultEqualityComparer();
@@ -234,9 +240,9 @@ namespace WinCopies.GUI.IO.ObjectModel
         public override bool Equals(object obj) => ReferenceEquals(this, obj) ? true : obj is null ? false : ModelGeneric.Equals(obj);
 
         public override int GetHashCode() => ModelGeneric.GetHashCode();
-        #endregion
+#endregion
 
-        #region Operators
+#region Operators
         public static bool operator ==(BrowsableObjectInfoViewModel left, BrowsableObjectInfoViewModel right) => left is null ? right is null : left.Equals(right);
 
         public static bool operator !=(BrowsableObjectInfoViewModel left, BrowsableObjectInfoViewModel right) => !(left == right);
@@ -248,9 +254,9 @@ namespace WinCopies.GUI.IO.ObjectModel
         public static bool operator >(BrowsableObjectInfoViewModel left, BrowsableObjectInfoViewModel right) => left is object && left.CompareTo(right) > 0;
 
         public static bool operator >=(BrowsableObjectInfoViewModel left, BrowsableObjectInfoViewModel right) => left is null ? right is null : left.CompareTo(right) >= 0;
-        #endregion
+#endregion
 
-        #region IDisposable Support
+#region IDisposable Support
         public bool IsDisposed => ModelGeneric.IsDisposed;
 
         protected virtual void Dispose(in bool disposing)
@@ -266,6 +272,6 @@ namespace WinCopies.GUI.IO.ObjectModel
 
             GC.SuppressFinalize(this);
         }
-        #endregion
+#endregion
     }
 }

@@ -23,7 +23,11 @@ using System.Windows.Media.Imaging;
 using WinCopies.Collections.Generic;
 using WinCopies.IO.ObjectModel;
 
-using IDisposable = WinCopies.Util.DotNetFix.IDisposable;
+using IDisposable = WinCopies.
+#if WinCopies2
+    Util.
+#endif
+    DotNetFix.IDisposable;
 
 namespace WinCopies.IO
 {
@@ -75,7 +79,7 @@ namespace WinCopies.IO
             /// </summary>
             bool IsRecursivelyBrowsable { get; }
 
-            object EncapsulatedObject { get; }    
+            object EncapsulatedObject { get; }
 
             object ObjectProperties { get; }
 
@@ -135,7 +139,7 @@ namespace WinCopies.IO
             ///// </summary>
             //IReadOnlyCollection<IBrowsableObjectInfo> Items { get; }
 
-            IEnumerable<IBrowsableObjectInfo> GetItems();
+            System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems();
 
             // IBrowsableObjectInfo GetBrowsableObjectInfo(IBrowsableObjectInfo browsableObjectInfo);
 

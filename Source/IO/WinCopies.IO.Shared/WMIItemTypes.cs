@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with the WinCopies Framework.If not, see<https://www.gnu.org/licenses/>. */
+ * along with the WinCopies Framework. If not, see <https://www.gnu.org/licenses/>. */
 
 /*using System;
 

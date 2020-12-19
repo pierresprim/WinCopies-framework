@@ -21,15 +21,21 @@ using Microsoft.WindowsAPICodePack.PropertySystem;
 using Microsoft.WindowsAPICodePack.Shell;
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
 using WinCopies.Collections;
 using WinCopies.IO.ObjectModel;
-using WinCopies.Util;
 
 using static Microsoft.WindowsAPICodePack.Shell.KnownFolders;
+
+#if WinCopies2
+using System.Collections.Generic;
+
+using WinCopies.Util;
+#else
+using WinCopies.Collections.Generic;
+#endif
 
 namespace WinCopies.IO
 {
@@ -37,17 +43,17 @@ namespace WinCopies.IO
     {
         // private ShellObject _shellObject;
 
-        private ShellObjectInfoEnumerator(in IEnumerable<IBrowsableObjectInfo> enumerable) : base(enumerable)
+        private ShellObjectInfoEnumerator(in System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> enumerable) : base(enumerable)
         {
             // Left empty.
         }
 
         public static ShellObjectInfoEnumerator From(in ShellObjectInfo shellObjectInfo, in Predicate<ShellObjectInfoEnumeratorStruct> func, in ClientVersion clientVersion)
         {
-            IEnumerable<ShellObject> shellObjects;
-            IEnumerable<IPortableDevice> portableDevices;
+            System.Collections.Generic.IEnumerable<ShellObject> shellObjects;
+            System.Collections.Generic.IEnumerable<IPortableDevice> portableDevices;
 
-            shellObjects = (IEnumerable<ShellObject>)shellObjectInfo.EncapsulatedObject;
+            shellObjects = (System.Collections.Generic.IEnumerable<ShellObject>)shellObjectInfo.EncapsulatedObject;
 
             if (shellObjectInfo.EncapsulatedObjectGeneric.ParsingName == Computer.ParsingName)
             {
@@ -68,7 +74,7 @@ namespace WinCopies.IO
 
         }
 
-        private static IEnumerable<IBrowsableObjectInfo> GetShellObjects(in IEnumerable<ShellObject> shellObjects, IEnumerable<IPortableDevice> portableDevices, Predicate<ShellObjectInfoEnumeratorStruct> func, ClientVersion clientVersion) => shellObjects.Where(item =>
+        private static System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetShellObjects(in System.Collections.Generic.IEnumerable<ShellObject> shellObjects, System.Collections.Generic.IEnumerable<IPortableDevice> portableDevices, Predicate<ShellObjectInfoEnumeratorStruct> func, ClientVersion clientVersion) => shellObjects.Where(item =>
         {
             if (portableDevices != null)
 
@@ -135,7 +141,7 @@ namespace WinCopies.IO
             }
         }
 
-        private static IEnumerable<IBrowsableObjectInfo> GetPortableDevices(in IEnumerable<IPortableDevice> portableDevices, IEnumerable<ShellObject> shellObjects, Predicate<ShellObjectInfoEnumeratorStruct> func, ClientVersion clientVersion    ) => portableDevices.Where(item =>
+        private static System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetPortableDevices(in System.Collections.Generic.IEnumerable<IPortableDevice> portableDevices, System.Collections.Generic.IEnumerable<ShellObject> shellObjects, Predicate<ShellObjectInfoEnumeratorStruct> func, ClientVersion clientVersion    ) => portableDevices.Where(item =>
   {
       if (shellObjects != null)
       {

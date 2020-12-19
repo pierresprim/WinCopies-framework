@@ -23,14 +23,20 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Windows.Media.Imaging;
-
-using WinCopies.Collections;
-using WinCopies.Util;
-
 using static Microsoft.WindowsAPICodePack.Shell.KnownFolders;
 
 using static WinCopies.IO.Path;
+
+#if WinCopies2
+using WinCopies.Collections;
+using WinCopies.Util;
+
 using static WinCopies.Util.Util;
+#else
+using WinCopies.Collections.Generic;
+
+using static WinCopies.ThrowHelper;
+#endif
 
 namespace WinCopies.IO
 {
@@ -58,7 +64,7 @@ namespace WinCopies.IO
             private ShellObject _shellObject;
             private IBrowsableObjectInfo _parent;
 
-            #region Properties
+#region Properties
             public override FileType FileType { get; }
 
             /// <summary>
@@ -72,13 +78,13 @@ namespace WinCopies.IO
 
             public bool IsArchiveOpen => ArchiveFileStream is object;
 
-            #region Overrides
+#region Overrides
             public override FileSystemType ItemFileSystemType => FileSystemType.CurrentDeviceFileSystem;
 
             /// <summary>
             /// Gets a value that indicates whether this <see cref="ShellObjectInfo"/> is browsable.
             /// </summary>
-            public override bool IsBrowsable => _shellObject is IEnumerable<ShellObject>;
+            public override bool IsBrowsable => _shellObject is System.Collections.Generic.IEnumerable<ShellObject>;
 
 #if NETFRAMEWORK
 
@@ -100,7 +106,7 @@ namespace WinCopies.IO
             /// </summary>
             public override string Name => _shellObject.Name;
 
-            #region BitmapSources
+#region BitmapSources
             /// <summary>
             /// Gets the small <see cref="BitmapSource"/> of this <see cref="ShellObjectInfo"/>.
             /// </summary>
@@ -120,7 +126,7 @@ namespace WinCopies.IO
             /// Gets the extra large <see cref="BitmapSource"/> of this <see cref="ShellObjectInfo"/>.
             /// </summary>
             public override BitmapSource ExtraLargeBitmapSource => _shellObject.Thumbnail.ExtraLargeBitmapSource;
-            #endregion
+#endregion
 
             /// <summary>
             /// Gets the type name of the current <see cref="ShellObjectInfo"/>. This value corresponds to the description of the file's extension.
@@ -171,8 +177,8 @@ namespace WinCopies.IO
             /// The parent <see cref="IShellObjectInfo"/> of the current archive item. If the current <see cref="ShellObjectInfo"/> represents an archive file, this property returns the current <see cref="ShellObjectInfo"/>, or <see langword="null"/> otherwise.
             /// </summary>
             public override IShellObjectInfo ArchiveShellObject => ObjectPropertiesGeneric.FileType == FileType.Archive ? this : null;
-            #endregion
-            #endregion
+#endregion
+#endregion
 
             ///// <summary>
             ///// Initializes a new instance of the <see cref="ShellObjectInfo"/> class with a given <see cref="FileType"/> and <see cref="SpecialFolder"/> using custom factories for <see cref="ShellObjectInfo"/>s and <see cref="ArchiveItemInfo"/>s.
@@ -190,7 +196,7 @@ namespace WinCopies.IO
                 ObjectPropertiesGeneric = new FileSystemObjectInfoProperties<IShellObjectInfo>(this);
             }
 
-            #region Methods
+#region Methods
             public static ShellObjectInitInfo GetInitInfo(in ShellObject shellObject)
             {
                 if ((shellObject ?? throw GetArgumentNullException(nameof(shellObject))) is ShellFolder shellFolder)
@@ -232,7 +238,7 @@ namespace WinCopies.IO
                 return new ShellObjectInfo(initInfo.Path, initInfo.FileType, shellObject, clientVersion);
             }
 
-            #region Archive
+#region Archive
             public void OpenArchive(Stream stream)
             {
                 CloseArchive();
@@ -250,10 +256,10 @@ namespace WinCopies.IO
 
                 ArchiveFileStream = null;
             }
-            #endregion
+#endregion
 
-            #region GetItems
-            public virtual IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<ShellObjectInfoEnumeratorStruct> func)
+#region GetItems
+            public virtual System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<ShellObjectInfoEnumeratorStruct> func)
             {
                 ThrowIfNull(func, nameof(func));
 
@@ -270,7 +276,7 @@ namespace WinCopies.IO
                 else return null;
             }
 
-            public virtual IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<ArchiveFileInfoEnumeratorStruct> func)
+            public virtual System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<ArchiveFileInfoEnumeratorStruct> func)
             {
                 ThrowIfNull(func, nameof(func));
 
@@ -291,12 +297,12 @@ namespace WinCopies.IO
 #endif
             }
 
-            public override IEnumerable<IBrowsableObjectInfo> GetItems() => GetItems((Predicate<ShellObjectInfoEnumeratorStruct>)(obj => true));
+            public override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems() => GetItems((Predicate<ShellObjectInfoEnumeratorStruct>)(obj => true));
 
-            private IEnumerable<IBrowsableObjectInfo> GetArchiveItemInfoItems(Predicate<ArchiveFileInfoEnumeratorStruct> func) => new Enumerable<IBrowsableObjectInfo>(() => new ArchiveItemInfoEnumerator(this, func));
-            #endregion
+            private System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetArchiveItemInfoItems(Predicate<ArchiveFileInfoEnumeratorStruct> func) => new Enumerable<IBrowsableObjectInfo>(() => new ArchiveItemInfoEnumerator(this, func));
+#endregion
 
-            #region Overrides
+#region Overrides
             protected override void Dispose(in bool disposing)
             {
                 base.Dispose(disposing);
@@ -317,7 +323,7 @@ namespace WinCopies.IO
             /// </summary>
             /// <returns>The <see cref="LocalizedName"/> of this <see cref="ShellObjectInfo"/>.</returns>
             public override string ToString() => string.IsNullOrEmpty(Path) ? _shellObject.GetDisplayName(DisplayNameType.Default) : System.IO.Path.GetFileName(Path);
-            #endregion
+#endregion
 
             /// <summary>
             /// Returns the parent of this <see cref="ShellObjectInfo"/>.
@@ -352,7 +358,7 @@ namespace WinCopies.IO
 
                 else return null;
             }
-            #endregion
+#endregion
         }
     }
 }

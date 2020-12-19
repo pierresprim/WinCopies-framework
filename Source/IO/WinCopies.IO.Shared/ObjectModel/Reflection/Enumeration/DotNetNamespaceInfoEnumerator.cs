@@ -25,10 +25,19 @@ using WinCopies.Collections;
 using WinCopies.IO.ObjectModel;
 using WinCopies.IO.ObjectModel.Reflection;
 using WinCopies.Linq;
-using WinCopies.Util;
 
 using static WinCopies.IO.Path;
+
+#if WinCopies2
+using WinCopies.Util;
+
 using static WinCopies.Util.Util;
+#else
+using WinCopies.Collections.Generic;
+
+using static WinCopies.UtilHelpers;
+using static WinCopies.ThrowHelper;
+#endif
 
 namespace WinCopies.IO.Reflection
 {
@@ -55,7 +64,7 @@ namespace WinCopies.IO.Reflection
 
     public static class DotNetEnumeration
     {
-        internal static IEnumerator<IDotNetItemInfo> GetDotNetItemInfoEnumerator(in IEnumerable<TypeInfo> enumerable, DotNetItemType itemType, bool isRootType, IBrowsableObjectInfo parent, in Predicate<TypeInfo> func) => enumerable.WherePredicate(func).Select(t => new DotNetTypeInfo(t, itemType, isRootType, parent)).GetEnumerator();
+        internal static IEnumerator<IDotNetItemInfo> GetDotNetItemInfoEnumerator(in System.Collections.Generic.IEnumerable<TypeInfo> enumerable, DotNetItemType itemType, bool isRootType, IBrowsableObjectInfo parent, in Predicate<TypeInfo> func) => enumerable.WherePredicate(func).Select(t => new DotNetTypeInfo(t, itemType, isRootType, parent)).GetEnumerator();
 
         public static Predicate<TypeInfo> GetTypeInfoPredicate(in DotNetItemType typeToEnumerate, in string typeToEnumerateEnumerableName)
 #if CS7
@@ -102,38 +111,81 @@ namespace WinCopies.IO.Reflection
         public static InvalidEnumArgumentException GetInvalidEnumArgumentException(in string typeToEnumerateEnumerableName, in DotNetItemType typeToEnumerate) => new InvalidEnumArgumentException(typeToEnumerateEnumerableName, typeToEnumerate);
     }
 
-    public sealed class DotNetEnumerationMoveNext<T> : Util.DotNetFix.IDisposable
+    public sealed class DotNetEnumerationMoveNext<T> :
+#if WinCopies2
+        Util.DotNetFix.IDisposable
+#else
+        Enumerator<IEnumerator<T>, T>
+#endif
     {
         private Func<bool> _moveNext;
-        private IEnumerator<IEnumerator<T>> _enumerator;
         private T _current;
+
+#if WinCopies2
+        private IEnumerator<IEnumerator<T>> _enumerator;
 
         public T Current => IsDisposed ? throw GetExceptionForDispose(false) : _current;
 
         public bool IsDisposed { get; private set; }
+#else
+        protected override T CurrentOverride => _current;
+
+        public override bool? IsResetSupported => null;
+#endif
 
         public DotNetEnumerationMoveNext(in IEnumerator<IEnumerator<T>> enumerator)
+#if WinCopies2
         {
+#else
+            : base(enumerator) =>
+#endif
+#if WinCopies2
             _enumerator = enumerator;
+#endif
 
-            Reset();
+        Reset();
+#if WinCopies2
         }
+#endif
 
-        public bool MoveNext() => _moveNext();
+#if WinCopies2
+public bool MoveNext
+#else
+        protected override bool MoveNextOverride
+#endif
+            () => _moveNext();
 
         private void _Reset() =>
 
             _moveNext = () =>
             {
-                if (_enumerator.MoveNext())
+                if (
+#if WinCopies2
+                _enumerator
+#else
+                InnerEnumerator
+#endif
+                .MoveNext())
                 {
-                    bool _func() => _enumerator.Current.MoveNext();
+                    bool _func() =>
+#if WinCopies2
+                _enumerator
+#else
+                InnerEnumerator
+#endif
+                .Current.MoveNext();
 
                     bool func()
                     {
                         if (_func())
                         {
-                            _current = _enumerator.Current.Current;
+                            _current =
+#if WinCopies2
+                _enumerator
+#else
+                InnerEnumerator
+#endif
+                .Current.Current;
 
                             return true;
                         }
@@ -154,26 +206,43 @@ namespace WinCopies.IO.Reflection
                 return false;
             };
 
+#if WinCopies2
         public void Reset()
         {
             if (IsDisposed)
 
                 throw GetExceptionForDispose(false);
 
-            _enumerator.Reset();
+                _enumerator
+#else
+        protected override void ResetOverride()
+        {
+            base.ResetOverride();
+
+            InnerEnumerator
+#endif
+                .Reset();
 
             _Reset();
         }
 
+#if WinCopies2
         public void Dispose()
         {
             if (IsDisposed)
 
                 return;
+#else
+        protected override void DisposeManaged()
+        {
+            base.DisposeManaged();
+#endif
 
             _moveNext = null;
 
+#if WinCopies2
             _enumerator = null;
+#endif
 
             _current = default;
         }
@@ -182,14 +251,46 @@ namespace WinCopies.IO.Reflection
     public sealed class DotNetNamespaceInfoEnumerator : Enumerator<TypeInfo, IDotNetItemInfo>
     {
         #region Private fields
-        private Queue<string> _queue = new Queue<string>();
+        private
+#if WinCopies2
+WinCopies.Collections.Generic.Queue
+#else
+            EnumerableHelper
+#endif
+            <string>
+#if !WinCopies2
+            .IEnumerableQueue
+#endif
+            _queue =
+#if WinCopies2
+            new WinCopies.Collections.Generic.Queue
+#else
+           EnumerableHelper
+#endif
+            <string>
+#if !WinCopies2
+            .GetEnumerableQueue
+#endif
+            ();
         private DotNetEnumerationMoveNext<IDotNetItemInfo> _moveNext;
         private Predicate<DotNetNamespaceInfoEnumeratorStruct> _func;
         private IBrowsableObjectInfo _parent;
+#if WinCopies2
         private bool _isCompleted = false;
+#else
+        private IDotNetItemInfo _current;
+#endif
         #endregion
 
-        internal DotNetNamespaceInfoEnumerator(IBrowsableObjectInfo dotNetItemInfo, IEnumerable<TypeInfo> typeInfos, in IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetNamespaceInfoEnumeratorStruct> func) : base(typeInfos)
+#if !WinCopies2
+        protected override IDotNetItemInfo CurrentOverride => _current;
+
+        public override bool? IsResetSupported => false;
+
+        protected override void ResetCurrent() => _current = null;
+#endif
+
+        internal DotNetNamespaceInfoEnumerator(IBrowsableObjectInfo dotNetItemInfo, System.Collections.Generic.IEnumerable<TypeInfo> typeInfos, in System.Collections.Generic.IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetNamespaceInfoEnumeratorStruct> func) : base(typeInfos)
         {
             Debug.Assert(dotNetItemInfo.Is(false, typeof(IDotNetAssemblyInfo), typeof(IDotNetNamespaceInfo)));
 
@@ -197,7 +298,7 @@ namespace WinCopies.IO.Reflection
 
             _func = func;
 
-            IEnumerable<TypeInfo> enumerable = typeInfos;
+            System.Collections.Generic.IEnumerable<TypeInfo> enumerable = typeInfos;
 
             bool isRootType = dotNetItemInfo is IDotNetAssemblyInfo;
 
@@ -226,7 +327,7 @@ namespace WinCopies.IO.Reflection
         /// <param name="typesToEnumerate">An enumerable that enumerates through the <see cref="DotNetItemType"/>s to enumerate. If this parameter is <see langword="null"/>, it will be filled in with all the fields of the <see cref="DotNetItemType"/> enumeration.</param>
         /// <param name="func">A custom predicate. If this parameter is <see langword="null"/>, it will be filled in with <see cref="GetCommonPredicate{T}"/>.</param>
         /// <returns>A new instance of the <see cref="DotNetNamespaceInfoEnumerator"/> class.</returns>
-        public static DotNetNamespaceInfoEnumerator From(in IBrowsableObjectInfo dotNetItemInfo, in IEnumerable<DotNetItemType> typesToEnumerate, in Predicate<DotNetNamespaceInfoEnumeratorStruct> func) => new DotNetNamespaceInfoEnumerator((dotNetItemInfo ?? throw GetArgumentNullException(nameof(dotNetItemInfo))).Is(false, typeof(IDotNetAssemblyInfo), typeof(IDotNetTypeInfo)) ? dotNetItemInfo : throw new ArgumentException($"{nameof(dotNetItemInfo)} must be {nameof(DotNetAssemblyInfo)} or {nameof(DotNetNamespaceInfo)}."), (dotNetItemInfo is IDotNetNamespaceInfo dotNetNamespaceInfo ? dotNetNamespaceInfo.ParentDotNetAssemblyInfo : dotNetItemInfo is IDotNetAssemblyInfo dotNetAssemblyInfo ? dotNetAssemblyInfo : throw new ArgumentException($"{nameof(dotNetItemInfo)} must be an {nameof(IDotNetAssemblyInfo)} or an {nameof(IDotNetNamespaceInfo)}", nameof(dotNetItemInfo))).EncapsulatedObject.DefinedTypes, typesToEnumerate ?? typeof(DotNetItemType).GetFields().Select(f => (DotNetItemType)f.GetValue(null)), func ?? GetCommonPredicate<DotNetNamespaceInfoEnumeratorStruct>());
+        public static DotNetNamespaceInfoEnumerator From(in IBrowsableObjectInfo dotNetItemInfo, in System.Collections.Generic.IEnumerable<DotNetItemType> typesToEnumerate, in Predicate<DotNetNamespaceInfoEnumeratorStruct> func) => new DotNetNamespaceInfoEnumerator((dotNetItemInfo ?? throw GetArgumentNullException(nameof(dotNetItemInfo))).Is(false, typeof(IDotNetAssemblyInfo), typeof(IDotNetTypeInfo)) ? dotNetItemInfo : throw new ArgumentException($"{nameof(dotNetItemInfo)} must be {nameof(DotNetAssemblyInfo)} or {nameof(DotNetNamespaceInfo)}."), (dotNetItemInfo is IDotNetNamespaceInfo dotNetNamespaceInfo ? dotNetNamespaceInfo.ParentDotNetAssemblyInfo : dotNetItemInfo is IDotNetAssemblyInfo dotNetAssemblyInfo ? dotNetAssemblyInfo : throw new ArgumentException($"{nameof(dotNetItemInfo)} must be an {nameof(IDotNetAssemblyInfo)} or an {nameof(IDotNetNamespaceInfo)}", nameof(dotNetItemInfo))).EncapsulatedObject.DefinedTypes, typesToEnumerate ?? typeof(DotNetItemType).GetFields().Select(f => (DotNetItemType)f.GetValue(null)), func ?? GetCommonPredicate<DotNetNamespaceInfoEnumeratorStruct>());
 
         private IEnumerator<DotNetNamespaceInfo> GetNamespaceEnumerator()
         {
@@ -271,53 +372,67 @@ namespace WinCopies.IO.Reflection
 
         protected override bool MoveNextOverride()
         {
+#if WinCopies2
             if (_isCompleted)
 
                 return false;
+#endif
 
             if (_moveNext.MoveNext())
             {
-                Current = _moveNext.Current;
+#if WinCopies2
+Current
+#else
+                _current
+#endif
+                    = _moveNext.Current;
 
                 return true;
             }
 
+#if WinCopies2
             _isCompleted = true;
+#endif
 
             return false;
         }
 
-        protected override void ResetOverride()
-        {
-            throw new NotSupportedException("THis enumerator does not support reset.");
+#if WinCopies2
+        protected override void ResetOverride() => throw new NotSupportedException("THis enumerator does not support reset.");
+#endif
 
-            //base.ResetOverride();
+        //base.ResetOverride();
 
-            //_isCompleted = false;
+        //_isCompleted = false;
 
-            //_moveNext.Reset();
+        //_moveNext.Reset();
 
-            //bool replaceNamespaceEnumerator = false;
+        //bool replaceNamespaceEnumerator = false;
 
-            //foreach (KeyValuePair<DotNetItemType, IEnumerator<IDotNetItemInfo>> item in _dic)
+        //foreach (KeyValuePair<DotNetItemType, IEnumerator<IDotNetItemInfo>> item in _dic)
 
-            //    if (item.Key == DotNetItemType.Namespace)
+        //    if (item.Key == DotNetItemType.Namespace)
 
-            //        replaceNamespaceEnumerator = true;
+        //        replaceNamespaceEnumerator = true;
 
-            //    else
+        //    else
 
-            //        item.Value.Reset();
+        //        item.Value.Reset();
 
-            //if (replaceNamespaceEnumerator)
+        //if (replaceNamespaceEnumerator)
 
-            //    _dic[DotNetItemType.Namespace] = GetNamespaceEnumerator();
-        }
+        //    _dic[DotNetItemType.Namespace] = GetNamespaceEnumerator();
 
-        protected override void Dispose(bool disposing)
+        protected override void
+#if WinCopies2
+            Dispose(bool disposing)
         {
             base.Dispose(disposing);
-
+#else
+            DisposeManaged()
+        {
+            base.DisposeManaged();
+#endif
             _queue.Clear();
 
             _queue = null;

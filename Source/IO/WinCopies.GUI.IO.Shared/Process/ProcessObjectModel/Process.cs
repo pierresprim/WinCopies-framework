@@ -22,12 +22,20 @@ using System.IO;
 using System.Linq;
 
 using WinCopies.Util.Data;
-using WinCopies.Util.DotNetFix;
 
-using static WinCopies.Util.Util;
 using static WinCopies.Util.Desktop.ThrowHelper;
 
 using Size = WinCopies.IO.Size;
+
+#if WinCopies2
+using WinCopies.Util.DotNetFix;
+
+using static WinCopies.Util.Util;
+#else
+using WinCopies.DotNetFix;
+
+using static WinCopies.ThrowHelper;
+#endif
 
 namespace WinCopies.GUI.IO.Process
 {
@@ -66,7 +74,13 @@ namespace WinCopies.GUI.IO.Process
     {
         #region Private fields
         private Size _initialSize;
-        private int _initialItemCount;
+        private
+#if WinCopies2
+int
+#else
+            uint
+#endif
+            _initialItemCount;
         private bool _completed = false;
         private bool _pathsLoaded = false;
         private ProcessError _error;
@@ -108,7 +122,13 @@ namespace WinCopies.GUI.IO.Process
         /// <summary>
         /// Gets or sets (protected) the initial total item count.
         /// </summary>
-        public int InitialItemCount
+        public
+#if WinCopies2
+            int
+#else
+            uint
+#endif
+            InitialItemCount
         {
             get => _initialItemCount;
 
@@ -221,10 +241,22 @@ namespace WinCopies.GUI.IO.Process
             )
         {
             ThrowIfNullEmptyOrWhiteSpace(sourcePath, nameof(sourcePath));
+#if WinCopies2
             ThrowIfNull(pathCollection, nameof(pathCollection));
             ThrowIfNull(readOnlyPathCollection, nameof(readOnlyPathCollection));
             ThrowIfNull(errorPathCollection, nameof(errorPathCollection));
             ThrowIfNull(readOnlyErrorPathCollection, nameof(readOnlyErrorPathCollection));
+#else
+            void throwIfNull(object obj, string argumentName)
+            {
+                if (obj == null) throw GetArgumentNullException(argumentName);
+            }
+
+            throwIfNull(pathCollection, nameof(pathCollection));
+            throwIfNull(readOnlyPathCollection, nameof(readOnlyPathCollection));
+            throwIfNull(errorPathCollection, nameof(errorPathCollection));
+            throwIfNull(readOnlyErrorPathCollection, nameof(readOnlyErrorPathCollection));
+#endif
 
             SourcePath = sourcePath;
 

@@ -19,6 +19,9 @@ using System;
 using System.Collections.Specialized;
 
 using WinCopies.Collections.DotNetFix;
+#if !WinCopies2
+using WinCopies.Collections.DotNetFix.Generic;
+#endif
 using WinCopies.IO;
 
 namespace WinCopies.GUI.IO.Process
@@ -142,7 +145,7 @@ namespace WinCopies.GUI.IO.Process
         }
 
         public T Peek()
-#if !CS7
+#if CS8
             => AddMode switch
             {
                 ProcessLinkedCollectionAddMode.Ascending => First.Value,

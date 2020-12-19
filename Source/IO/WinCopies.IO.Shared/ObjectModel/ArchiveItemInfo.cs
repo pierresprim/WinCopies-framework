@@ -24,10 +24,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Media.Imaging;
 
-using WinCopies.Collections;
+using WinCopies.Collections
+#if !WinCopies2
+    .Generic
+#endif
+    ;
 using WinCopies.Util;
 
-using static WinCopies.Util.Util;
+using static WinCopies.
+#if WinCopies2
+    Util.Util
+#else
+    ThrowHelper
+#endif
+    ;
 
 namespace WinCopies.IO
 {
@@ -241,15 +251,15 @@ namespace WinCopies.IO
             }
 
             #region GetItems
-            public IEnumerable<IBrowsableObjectInfo> GetItems(in Predicate<ArchiveFileInfoEnumeratorStruct> func) => func is null ? throw GetArgumentNullException(nameof(func)) : GetArchiveItemInfoItems(func);
+            public System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(in Predicate<ArchiveFileInfoEnumeratorStruct> func) => func is null ? throw GetArgumentNullException(nameof(func)) : GetArchiveItemInfoItems(func);
 
             /// <summary>
             /// Returns the items of this <see cref="ArchiveItemInfo"/>.
             /// </summary>
-            /// <returns>An <see cref="IEnumerable{IBrowsableObjectInfo}"/> that enumerates through the items of this <see cref="ArchiveItemInfo"/>.</returns>
-            public override IEnumerable<IBrowsableObjectInfo> GetItems() => GetArchiveItemInfoItems(null);
+            /// <returns>An <see cref="System.Collections.Generic.IEnumerable{IBrowsableObjectInfo}"/> that enumerates through the items of this <see cref="ArchiveItemInfo"/>.</returns>
+            public override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems() => GetArchiveItemInfoItems(null);
 
-            private IEnumerable<IBrowsableObjectInfo> GetArchiveItemInfoItems(Predicate<ArchiveFileInfoEnumeratorStruct> func) => new Enumerable<IBrowsableObjectInfo>(() => new ArchiveItemInfoEnumerator(this, func));
+            private System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetArchiveItemInfoItems(Predicate<ArchiveFileInfoEnumeratorStruct> func) => new Enumerable<IBrowsableObjectInfo>(() => new ArchiveItemInfoEnumerator(this, func));
             #endregion
 
             protected override void Dispose(in bool disposing)

@@ -13,10 +13,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with the WinCopies Framework.If not, see<https://www.gnu.org/licenses/>. */
+ * along with the WinCopies Framework. If not, see <https://www.gnu.org/licenses/>. */
 
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
 using System.Management;
@@ -27,9 +26,19 @@ using System.Windows.Media.Imaging;
 using WinCopies.Collections;
 using WinCopies.IO.ObjectModel;
 using WinCopies.Linq;
+
+#if WinCopies2
+using System.Collections.Generic;
+
 using WinCopies.Util;
 
 using static WinCopies.Util.Util;
+#else
+using WinCopies.Collections.Generic;
+
+using static WinCopies.UtilHelpers;
+using static WinCopies.ThrowHelper;
+#endif
 
 namespace WinCopies.IO
 {
@@ -428,30 +437,30 @@ namespace WinCopies.IO
 
             // public override bool CheckFilter(string path) => throw new NotImplementedException();
 
-            private static IEnumerable<ManagementBaseObject> Enumerate(ManagementObjectCollection collection)
+            private static System.Collections.Generic.IEnumerable<ManagementBaseObject> Enumerate(ManagementObjectCollection collection)
             {
                 foreach (ManagementBaseObject value in collection)
 
                     yield return value;
             }
 
-            private static IEnumerable<ManagementBaseObject> EnumerateInstances(ManagementClass managementClass, IWMIItemInfoFactory factory)
+            private static System.Collections.Generic.IEnumerable<ManagementBaseObject> EnumerateInstances(ManagementClass managementClass, IWMIItemInfoFactory factory)
             {
                 ManagementObjectCollection collection = factory.Options?.EnumerationOptions == null ? managementClass.GetInstances() : managementClass.GetInstances(factory.Options?.EnumerationOptions);
 
                 return collection == null || collection.Count == 0 ? null : Enumerate(collection);
             }
 
-            private static IEnumerable<ManagementBaseObject> EnumerateSubClasses(ManagementClass managementClass, IWMIItemInfoFactory factory)
+            private static System.Collections.Generic.IEnumerable<ManagementBaseObject> EnumerateSubClasses(ManagementClass managementClass, IWMIItemInfoFactory factory)
             {
                 ManagementObjectCollection collection = factory?.Options?.EnumerationOptions == null ? managementClass.GetSubclasses() : managementClass.GetSubclasses(factory?.Options?.EnumerationOptions);
 
                 return collection == null || collection.Count == 0 ? null : Enumerate(collection);
             }
 
-            public override IEnumerable<IBrowsableObjectInfo> GetItems() => GetItems(new WMIItemInfoFactory(), null, false);
+            public override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems() => GetItems(new WMIItemInfoFactory(), null, false);
 
-            public IEnumerable<IBrowsableObjectInfo> GetItems(IWMIItemInfoFactory factory, Predicate<ManagementBaseObject> predicate, bool catchExceptionsDuringEnumeration)
+            public System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(IWMIItemInfoFactory factory, Predicate<ManagementBaseObject> predicate, bool catchExceptionsDuringEnumeration)
             {
                 // var paths = new ArrayBuilder<PathInfo>();
 
@@ -478,9 +487,9 @@ namespace WinCopies.IO
                 {
                     if (ObjectPropertiesGeneric.WMIItemType == WMIItemType.Namespace)
                     {
-                        IEnumerable<ManagementBaseObject> namespaces = EnumerateInstances(managementClass, factory);
+                        System.Collections.Generic.IEnumerable<ManagementBaseObject> namespaces = EnumerateInstances(managementClass, factory);
 
-                        IEnumerable<ManagementBaseObject> classes = EnumerateSubClasses(managementClass, factory);
+                        System.Collections.Generic.IEnumerable<ManagementBaseObject> classes = EnumerateSubClasses(managementClass, factory);
 
                         if (predicate != null)
                         {
@@ -504,7 +513,7 @@ namespace WinCopies.IO
                     {
                         managementClass.Get();
 
-                        IEnumerable<ManagementBaseObject> items = predicate == null ? EnumerateInstances(managementClass, factory) : EnumerateInstances(managementClass, factory).WherePredicate(predicate);
+                        System.Collections.Generic.IEnumerable<ManagementBaseObject> items = predicate == null ? EnumerateInstances(managementClass, factory) : EnumerateInstances(managementClass, factory).WherePredicate(predicate);
 
                         return items == null ? null : new Enumerable<IBrowsableObjectInfo>(() => new WMIItemInfoEnumerator(items, false, WMIItemType.Instance, catchExceptionsDuringEnumeration));
                     }
@@ -520,7 +529,7 @@ namespace WinCopies.IO
                 }
             }
 
-            public override Collections.IEqualityComparer<IFileSystemObject> GetDefaultEqualityComparer() => new WMIItemInfoEqualityComparer<IFileSystemObject>();
+            public override System.Collections.Generic.IEqualityComparer<IFileSystemObject> GetDefaultEqualityComparer() => new WMIItemInfoEqualityComparer<IFileSystemObject>();
 
             public override System.Collections.Generic.IComparer<IFileSystemObject> GetDefaultComparer() => new WMIItemInfoComparer<IFileSystemObject>();
 

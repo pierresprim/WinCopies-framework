@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with the WinCopies Framework.If not, see<https://www.gnu.org/licenses/>. */
+ * along with the WinCopies Framework. If not, see <https://www.gnu.org/licenses/>. */
 
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.COMNative.Shell;
@@ -29,11 +29,16 @@ using System.Windows.Media.Imaging;
 
 using WinCopies.IO.ObjectModel;
 using WinCopies.Linq;
-using WinCopies.Util;
 
 using static Microsoft.WindowsAPICodePack.NativeAPI.Consts.DllNames;
 
+#if WinCopies2
+using WinCopies.Util;
+
 using static WinCopies.Util.Util;
+#else
+using static WinCopies.ThrowHelper;
+#endif
 
 namespace WinCopies.IO
 {
@@ -91,13 +96,13 @@ namespace WinCopies.IO
         {
             // public override bool IsRenamingSupported => false;
 
-            #region Fields
+#region Fields
             internal RegistryKey _registryKey;
             private IBrowsableObjectInfo _parent;
             private bool? _isBrowsable;
-            #endregion
+#endregion
 
-            #region Properties
+#region Properties
             /// <summary>
             /// The Windows registry item type of this <see cref="RegistryItemInfo"/>.
             /// </summary>
@@ -122,29 +127,33 @@ namespace WinCopies.IO
 
             public override string ItemTypeName
             {
-
                 get
                 {
-
                     if (string.IsNullOrEmpty(_itemTypeName))
 
                         switch (ObjectPropertiesGeneric.RegistryItemType)
                         {
                             case RegistryItemType.Root:
+
                                 _itemTypeName = "Registry root";
+
                                 break;
+
                             case RegistryItemType.Key:
+
                                 _itemTypeName = "Registry key";
+
                                 break;
+
                             case RegistryItemType.Value:
+
                                 _itemTypeName = "Registry value";
+
                                 break;
                         }
 
                     return _itemTypeName;
-
                 }
-
             }
 
             public override string Description => NotApplicable;
@@ -239,9 +248,9 @@ namespace WinCopies.IO
 
             public override FileSystemType ItemFileSystemType => FileSystemType.Registry;
 
-            #endregion
+#endregion
 
-            #region Constructors
+#region Constructors
 
             ///// <summary>
             ///// Initializes a new instance of the <see cref="RegistryItemInfo"/> class using a custom factory for <see cref="RegistryItemInfo"/>s.
@@ -333,9 +342,9 @@ namespace WinCopies.IO
                 // Left empty.
             }
 
-            #endregion
+#endregion
 
-            #region Methods
+#region Methods
 
             ///// <summary>
             ///// Gets a default comparer for <see cref="FileSystemObject"/>s.
@@ -464,7 +473,7 @@ namespace WinCopies.IO
                 return TryGetBitmapSource(iconIndex, Shell32, size);
             }
 
-            public override IEnumerable<IBrowsableObjectInfo> GetItems()
+            public override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems()
 #if NETFRAMEWORK
         {
             switch (RegistryItemType)
@@ -491,7 +500,7 @@ namespace WinCopies.IO
             };
 #endif
 
-            public IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<RegistryKey> predicate)
+            public System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<RegistryKey> predicate)
             {
                 if (ObjectPropertiesGeneric.RegistryItemType == RegistryItemType.Root)
 
@@ -524,7 +533,7 @@ namespace WinCopies.IO
                     throw new ArgumentException("The given predicate is not valid for the current RegistryItemInfo.");
             }
 
-            public IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<RegistryItemInfoEnumeratorStruct> predicate, bool catchExceptions)
+            public System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<RegistryItemInfoEnumeratorStruct> predicate, bool catchExceptions)
             {
                 //protected override void OnDoWork(DoWorkEventArgs e)
                 //{
@@ -559,9 +568,9 @@ namespace WinCopies.IO
                 {
                     //string[] items;
 
-                    IEnumerable<RegistryItemInfo> keys;
+                    System.Collections.Generic.IEnumerable<RegistryItemInfo> keys;
 
-                    IEnumerable<RegistryItemInfo> values;
+                    System.Collections.Generic.IEnumerable<RegistryItemInfo> values;
 
                     void enumerate()
                     {
@@ -606,13 +615,13 @@ namespace WinCopies.IO
 
 
 
-                //IEnumerable<PathInfo> pathInfos;
+                //System.Collections.Generic.IEnumerable<PathInfo> pathInfos;
 
 
 
                 //if (FileSystemObjectComparer == null)
 
-                //    pathInfos = (IEnumerable<PathInfo>)paths;
+                //    pathInfos = (System.Collections.Generic.IEnumerable<PathInfo>)paths;
 
                 //else
 
@@ -622,7 +631,7 @@ namespace WinCopies.IO
 
                 //    _paths.Sort(FileSystemObjectComparer);
 
-                //    pathInfos = (IEnumerable<PathInfo>)_paths;
+                //    pathInfos = (System.Collections.Generic.IEnumerable<PathInfo>)_paths;
 
                 //}
 
@@ -657,7 +666,7 @@ namespace WinCopies.IO
 
             public override IComparer<IFileSystemObject> GetDefaultComparer() => new RegistryItemInfoComparer<IFileSystemObject>();
 
-            #endregion
+#endregion
         }
     }
 }
