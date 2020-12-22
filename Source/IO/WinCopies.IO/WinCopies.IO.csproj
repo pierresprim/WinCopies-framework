@@ -56,13 +56,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WinCopies.Collections" Version="3.1.0.1-preview" />
     <PackageReference Include="WinCopies.Util" Version="3.1.0.1-preview" />
+    <PackageReference Include="WinCopies.Collections" Version="3.1.0.1-preview" />
     <PackageReference Include="WinCopies.Util.Extensions" Version="3.1.0.1-preview" />
     <PackageReference Include="Squid-Box.SevenZipSharp" Version="1.2.231" />
-    <PackageReference Include="WinCopies.WindowsAPICodePack.Consts" Version="2.1.0" />
-    <PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="2.1.0" />
-    <PackageReference Include="WinCopies.WindowsAPICodePack.PortableDevices" Version="2.1.0" />
+    <PackageReference Include="WinCopies.WindowsAPICodePack.Consts" Version="3.0.0-preview" />
+    <PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="3.0.0-preview" />
+    <PackageReference Include="WinCopies.WindowsAPICodePack.PortableDevices" Version="3.0.0-preview" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(Configuration)' == 'Debug'">

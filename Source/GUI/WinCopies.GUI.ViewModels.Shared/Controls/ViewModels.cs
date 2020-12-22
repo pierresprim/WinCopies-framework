@@ -51,22 +51,16 @@ namespace WinCopies.GUI.Controls.ViewModels
 
     //[TypeForDataTemplate(typeof(IPropertyTabItemModel))]
     //public class PropertyTabItemViewModel<T> : HeaderedItemsControlViewModel<T, object, IGroupBoxModel>, IPropertyTabItemModel where T : IPropertyTabItemModel
-
     //{
-
     //    public PropertyTabItemViewModel(T model) : base(model) { }
-
     //}
 
     //[TypeForDataTemplate(typeof(IPropertyTabItemModel))]
     //public class PropertyTabItemViewModel<TModel, TItemHeader, TGroupBoxHeader, TGroupBoxContent> : HeaderedItemsControlViewModel<TModel, TItemHeader, IGroupBoxModel<TGroupBoxHeader, TGroupBoxContent>>, IPropertyTabItemModel<TItemHeader, TGroupBoxHeader, TGroupBoxContent> where TModel : IPropertyTabItemModel<TItemHeader, TGroupBoxHeader, TGroupBoxContent>
-
     //{
-
     //    IEnumerable<IGroupBoxModel> IPropertyTabItemModel.Items { get => Items; set => Items = GetOrThrowIfNotType<IEnumerable<IGroupBoxModel<TGroupBoxHeader, TGroupBoxContent>>>(value, nameof(value)); }
 
     //    public PropertyTabItemViewModel(TModel model) : base(model) { }
-
     //}
 
     [TypeForDataTemplate(typeof(IButtonModel))]

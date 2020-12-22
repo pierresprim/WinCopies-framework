@@ -22,7 +22,7 @@ using System.Windows.Media.Imaging;
 
 using WinCopies.Collections.Generic;
 using WinCopies.IO.ObjectModel;
-
+using WinCopies.IO.PropertySystem;
 using IDisposable = WinCopies.
 #if WinCopies2
     Util.
@@ -31,11 +31,7 @@ using IDisposable = WinCopies.
 
 namespace WinCopies.IO
 {
-    public interface IRecursiveEnumerable<T> : WinCopies.Collections.Generic.IRecursiveEnumerable<T>
-    {
-        RecursiveEnumerator<T> GetEnumerator();
-    }
-
+#if WinCopies2
     public interface IBrowsableObjectEncapsulator
     {
         object EncapsulatedObject { get; }
@@ -53,6 +49,12 @@ namespace WinCopies.IO
         object IBrowsableObjectEncapsulator.EncapsulatedObject => EncapsulatedObject;
 
         public BrowsableObjectEncapsulator(T obj) => EncapsulatedObject = obj;
+    }
+#endif
+
+    public interface IRecursiveEnumerable<T> : WinCopies.Collections.Generic.IRecursiveEnumerable<T>
+    {
+        RecursiveEnumerator<T> GetEnumerator();
     }
 
     public abstract class BrowsableObjectInfoProperties<T> where T : IBrowsableObjectInfo
@@ -82,6 +84,10 @@ namespace WinCopies.IO
             object EncapsulatedObject { get; }
 
             object ObjectProperties { get; }
+
+#if WinCopies3
+            IPropertySystemCollection ObjectPropertySystem { get; }
+#endif
 
             /// <summary>
             /// Gets the <see cref="IBrowsableObjectInfo"/> parent of this <see cref="IBrowsableObjectInfo"/>. Returns <see langword="null"/> if this object is the root object of a hierarchy.
@@ -185,9 +191,20 @@ namespace WinCopies.IO
             T ObjectProperties { get; }
         }
 
-        public interface IEncapsulatorBrowsableObjectInfo<TEncapsulatedObject> : IBrowsableObjectInfo
+        public interface IEncapsulatorBrowsableObjectInfo<
+#if WinCopies3
+            T
+#else
+            TEncapsulatedObject
+#endif
+            > : IBrowsableObjectInfo
         {
-            TEncapsulatedObject EncapsulatedObject { get; }
+#if WinCopies3
+            T
+#else
+TEncapsulatedObject
+#endif
+                EncapsulatedObject { get; }
 
             bool HasProperties { get; }
         }
@@ -198,10 +215,8 @@ namespace WinCopies.IO
         }
 
         //public interface IBrowsableObjectInfo<TFactory> : IBrowsableObjectInfo where TFactory : IBrowsableObjectInfoFactory
-
         //{
 
         //}
-
     }
 }

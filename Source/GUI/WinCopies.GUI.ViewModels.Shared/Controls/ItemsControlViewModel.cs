@@ -19,10 +19,15 @@ using System.Collections;
 using System.Collections.Generic;
 
 using WinCopies.GUI.Controls.Models;
-using WinCopies.Util;
 using WinCopies.Util.Data;
 
-using static WinCopies.Util.Util;
+using static WinCopies.
+    #if WinCopies2
+    Util.Util
+#else
+    ThrowHelper
+    #endif
+    ;
 
 namespace WinCopies.GUI.Controls.ViewModels
 {

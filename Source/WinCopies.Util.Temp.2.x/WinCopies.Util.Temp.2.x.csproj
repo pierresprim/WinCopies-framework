@@ -5,12 +5,11 @@
 		<TargetFrameworks>netcoreapp3.0;netcoreapp3.1;net5.0-windows;net472;net48</TargetFrameworks>
 		<SignAssembly>true</SignAssembly>
 		<AssemblyOriginatorKeyFile>WinCopies.Util.Temp.snk</AssemblyOriginatorKeyFile>
-		<DefineConstants>WinCopies3;$(DefineConstants)</DefineConstants>
+		<DefineConstants>WinCopies2;$(DefineConstants)</DefineConstants>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="WinCopies.Util" Version="3.1.0.1-preview" />
-		<PackageReference Include="WinCopies.Collections" Version="3.1.0.1-preview" />
+		<PackageReference Include="WinCopies.Util" Version="2.6.1.1" />
 	</ItemGroup>
 
 	<ItemGroup>

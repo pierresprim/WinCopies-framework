@@ -18,7 +18,13 @@
 using WinCopies.GUI.Controls.Models;
 using WinCopies.Util;
 
-using static WinCopies.Util.Util;
+using static WinCopies.
+    #if WinCopies2
+    Util.Util
+#else
+    ThrowHelper
+    #endif
+    ;
 
 namespace WinCopies.GUI.Controls.ViewModels
 {
