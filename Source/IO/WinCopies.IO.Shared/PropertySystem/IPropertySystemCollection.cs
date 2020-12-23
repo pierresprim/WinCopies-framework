@@ -25,19 +25,9 @@ using WinCopies.Collections.Generic;
 
 namespace WinCopies.IO.PropertySystem
 {
-    public interface IProperty
+    public interface IProperty:Temp.IProperty<PropertyGroup>
     {
-        string Name { get; }
-
-        string DisplayName { get; }
-
-        PropertyGroup PropertyGroup { get; }
-
-        object Value { get; }
-
-        Type Type { get; }
-
-        // string GetDisplayGroupName();
+        // Left empty.
     }
 
     public struct PropertyId : IEquatable<PropertyId>
@@ -61,7 +51,11 @@ namespace WinCopies.IO.PropertySystem
 
         public override bool Equals(object obj) => obj is PropertyId _obj && Equals(_obj);
 
-        public override int GetHashCode() => PropertyGroup.GetHashCode() ^ Name.GetHashCode();
+        public override int GetHashCode() => PropertyGroup.GetHashCode() ^ Name.GetHashCode(
+            #if CS8
+             StringComparison.CurrentCulture
+            #endif
+            );
 
         public override string ToString() => $"{PropertyGroup}.{Name}";
 

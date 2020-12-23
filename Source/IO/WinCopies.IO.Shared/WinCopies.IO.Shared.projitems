@@ -50,7 +50,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\FileSystemObjectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FileTypes.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FolderLoader.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)GlobalSuppressions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\IBrowsableObjectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\IFileSystemObject.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IFileSystemObjectComparer.cs" />

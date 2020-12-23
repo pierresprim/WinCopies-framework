@@ -6,10 +6,12 @@
 		<SignAssembly>true</SignAssembly>
 		<AssemblyOriginatorKeyFile>WinCopies.Util.Temp.snk</AssemblyOriginatorKeyFile>
 		<DefineConstants>WinCopies2;$(DefineConstants)</DefineConstants>
+		<UseWPF>true</UseWPF>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="WinCopies.Util" Version="2.6.1.1" />
+		<PackageReference Include="WinCopies.Util.Desktop" Version="2.6.1.1" />
 	</ItemGroup>
 
 	<ItemGroup>

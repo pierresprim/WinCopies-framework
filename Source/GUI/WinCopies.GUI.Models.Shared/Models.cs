@@ -194,10 +194,20 @@ namespace WinCopies.GUI.Controls.Models
         }
     }
 
+#if WinCopies3
+    public interface IControlModel
+    {
+        bool IsEnabled { get; } 
+    }
+#endif
+
     /// <summary>
     /// Represents a model that corresponds to a default view for <see cref="ContentControl"/>s.
     /// </summary>
     public interface IContentControlModel
+#if WinCopies3
+        : IControlModel
+#endif
     {
         /// <summary>
         /// Gets or sets the content of this <see cref="IContentControlModel"/>.
@@ -212,6 +222,8 @@ namespace WinCopies.GUI.Controls.Models
     public class ContentControlModel : IContentControlModel, IDataTemplateSelectorsModel
     {
         private object _content;
+
+        public bool IsEnabled { get; } = true;
 
         /// <summary>
         /// Gets or sets the content of this <see cref="ContentControlModel"/>.
@@ -268,6 +280,8 @@ namespace WinCopies.GUI.Controls.Models
 
     {
         private T _content;
+
+        public bool IsEnabled { get; } = true;
 
         /// <summary>
         /// Gets or sets the content of this <see cref="ContentControlModel{T}"/>.
@@ -427,6 +441,9 @@ namespace WinCopies.GUI.Controls.Models
     /// Represents a model that corresponds to a default view for <see cref="ItemsControl"/>s.
     /// </summary>
     public interface IItemsControlModel
+#if WinCopies3
+        : IControlModel
+#endif
     {
         /// <summary>
         /// Gets or sets the items of this <see cref="IItemsControlModel"/>.
@@ -441,6 +458,8 @@ namespace WinCopies.GUI.Controls.Models
     public class ItemsControlModel : IItemsControlModel, IDataTemplateSelectorsModel
     {
         private IEnumerable _items;
+
+        public bool IsEnabled { get; } = true;
 
         /// <summary>
         /// Gets or sets the items of this <see cref="ItemsControlModel"/>.
@@ -499,6 +518,8 @@ namespace WinCopies.GUI.Controls.Models
     public class ItemsControlModel<T> : IItemsControlModel<T>, IDataTemplateSelectorsModel
     {
         private IEnumerable<T> _items;
+
+        public bool IsEnabled { get; } = true;
 
         /// <summary>
         /// Gets or sets the items of this <see cref="ItemsControlModel{T}"/>.
@@ -1131,6 +1152,9 @@ namespace WinCopies.GUI.Controls.Models
     /// Represents a model that corresponds to a default view for <see cref="TextBox"/>'s.
     /// </summary>
     public interface ITextBoxModelTextOriented
+#if WinCopies3
+        : IControlModel
+#endif
     {
         /// <summary>
         /// Gets or sets the text of this <see cref="ITextBoxModelTextOriented"/>.
@@ -1149,6 +1173,8 @@ namespace WinCopies.GUI.Controls.Models
     [TypeForDataTemplate(typeof(ITextBoxModelTextOriented))]
     public class TextBoxModelTextOriented : ITextBoxModelTextOriented
     {
+        public bool IsEnabled { get; } = true;
+
         /// <summary>
         /// Gets or sets the text of this <see cref="TextBoxModelTextOriented"/>.
         /// </summary>
@@ -1346,7 +1372,6 @@ namespace WinCopies.GUI.Controls.Models
     /// </summary>
     [TypeForDataTemplate(typeof(IRadioButtonCollection))]
     public class RadioButtonCollection : System.Collections.Generic.List<IRadioButtonModel>, IRadioButtonCollection
-
     {
         public string GroupName { get; set; }
     }

@@ -15,6 +15,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Link.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)LinkRun.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)LinkUnderliningMode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PropertyGrid.cs" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="$(MSBuildThisFileDirectory)Themes\Generic.xaml">

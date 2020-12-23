@@ -127,10 +127,15 @@ namespace WinCopies.IO.ObjectModel
 
         internal static BitmapSource TryGetBitmapSource(in int iconIndex, in string dllName, in int size)
         {
-#if NETFRAMEWORK
-            using (Icon icon = TryGetIcon(iconIndex, dllName, new System.Drawing.Size(size, size)))
+            using
+#if !CS8
+            (
+#endif
+                Icon icon = TryGetIcon(iconIndex, dllName, new System.Drawing.Size(size, size))
+#if CS8
+            ;
 #else
-            using Icon icon = TryGetIcon(iconIndex, dllName, new System.Drawing.Size(size, size));
+            )
 #endif
 
             return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
@@ -162,12 +167,28 @@ namespace WinCopies.IO.ObjectModel
 
                 return;
 
+            DisposeManaged();
+
             Dispose(true);
 
             GC.SuppressFinalize(this);
 
+#if !WinCopies3
             IsDisposed = true;
+#endif
         }
+
+        /// <summary>
+        /// In WinCopies 3, sets <see cref="IsDisposed"/> to <see langword="true"/>. This method does nothing in WinCopies 2. This method is called from the <see cref="Dispose()"/> method.
+        /// </summary>
+        protected virtual void DisposeManaged()
+#if WinCopies3
+            => IsDisposed = true;
+#else
+        {
+            // Left empty.
+        }
+#endif
 
         /// <summary>
         /// Not used in this class.

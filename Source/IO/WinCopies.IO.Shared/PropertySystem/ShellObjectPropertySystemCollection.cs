@@ -35,12 +35,31 @@ namespace WinCopies.IO.PropertySystem
     public class ShellProperty : IProperty
     {
         private readonly IShellProperty _shellProperty;
+        private PropertyGroup? _propertyGroup;
+
+        public bool IsEnabled => ! _shellProperty.Description.TypeFlags.HasFlag(Microsoft.WindowsAPICodePack.COMNative.Shell.PropertySystem.PropertyTypeOptions.IsInnate);
 
         public string Name => _shellProperty.CanonicalName;
 
         public string DisplayName => _shellProperty.Description.DisplayName;
 
-        public PropertyGroup PropertyGroup { get; }
+        public string Description => _shellProperty.Description.DisplayType.ToString();
+
+        public string EditInvitation => _shellProperty.Description.EditInvitation;
+
+        public PropertyGroup PropertyGroup => _propertyGroup
+#if CS8
+            ??=
+#else
+            (_propertyGroup =
+#endif
+            GetPropertyGroup(_shellProperty)
+#if !CS8
+            )
+#endif
+            ;
+
+        object Temp.IProperty.PropertyGroup => PropertyGroup;
 
         public object Value => _shellProperty.ValueAsObject;
 
@@ -49,8 +68,6 @@ namespace WinCopies.IO.PropertySystem
         public ShellProperty(in IShellProperty shellProperty)
         {
             _shellProperty = shellProperty;
-
-            PropertyGroup = GetPropertyGroup(shellProperty);
         }
 
         public static PropertyGroup GetPropertyGroup(in IShellProperty shellProperty)
@@ -82,7 +99,7 @@ namespace WinCopies.IO.PropertySystem
 
     public class ShellObjectPropertySystemCollection : PropertySystemCollection
     {
-        private ShellPropertyCollection _nativeProperties;
+        private readonly ShellPropertyCollection _nativeProperties;
         private IReadOnlyList<KeyValuePair<PropertyId, IProperty>> _properties;
         private Temp.ReadOnlyList<KeyValuePair<PropertyId, IProperty>, PropertyId> _keys;
         private Temp.ReadOnlyList<KeyValuePair<PropertyId, IProperty>, IProperty> _values;
@@ -116,9 +133,29 @@ namespace WinCopies.IO.PropertySystem
             _properties = properties.AsReadOnly();
         }
 
-        public override IReadOnlyList<PropertyId> Keys => new Temp.ReadOnlyList<KeyValuePair<PropertyId, IProperty>, PropertyId>(_Properties, keyValuePair => keyValuePair.Key);
+        public override IReadOnlyList<PropertyId> Keys => _keys
+#if CS8
+            ??=
+#else
+            ?? (_keys =
+#endif
+            new Temp.ReadOnlyList<KeyValuePair<PropertyId, IProperty>, PropertyId>(_Properties, keyValuePair => keyValuePair.Key)
+#if !CS8
+            )
+#endif
+            ;
 
-        public override IReadOnlyList<IProperty> Values => new Temp.ReadOnlyList<KeyValuePair<PropertyId, IProperty>, IProperty>(_Properties, keyValuePair => keyValuePair.Value);
+        public override IReadOnlyList<IProperty> Values => _values
+#if CS8
+            ??=
+#else
+            ?? (_values =
+#endif
+            new Temp.ReadOnlyList<KeyValuePair<PropertyId, IProperty>, IProperty>(_Properties, keyValuePair => keyValuePair.Value)
+#if !CS8
+            )
+#endif
+            ;
 
         private ShellObjectPropertySystemCollection(in ShellPropertyCollection shellProperties) => _nativeProperties = shellProperties;
 

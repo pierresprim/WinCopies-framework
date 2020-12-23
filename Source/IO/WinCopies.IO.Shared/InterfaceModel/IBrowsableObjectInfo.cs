@@ -23,11 +23,6 @@ using System.Windows.Media.Imaging;
 using WinCopies.Collections.Generic;
 using WinCopies.IO.ObjectModel;
 using WinCopies.IO.PropertySystem;
-using IDisposable = WinCopies.
-#if WinCopies2
-    Util.
-#endif
-    DotNetFix.IDisposable;
 
 namespace WinCopies.IO
 {
@@ -69,7 +64,12 @@ namespace WinCopies.IO
         /// <summary>
         /// Provides interoperability for interacting with browsable items.
         /// </summary>
-        public interface IBrowsableObjectInfo : IFileSystemObject, IRecursiveEnumerable<IBrowsableObjectInfo>, IDisposable
+        public interface IBrowsableObjectInfo : IFileSystemObject, IRecursiveEnumerable<IBrowsableObjectInfo>,
+WinCopies.
+#if WinCopies2
+    Util.
+#endif
+    DotNetFix.IDisposable
         {
             /// <summary>
             /// Gets a value indicating whether this <see cref="IBrowsableObjectInfo"/> is browsable.
@@ -81,11 +81,20 @@ namespace WinCopies.IO
             /// </summary>
             bool IsRecursivelyBrowsable { get; }
 
+            /// <summary>
+            /// Gets the underlying object of this abstraction interface.
+            /// </summary>
             object EncapsulatedObject { get; }
 
+            /// <summary>
+            /// Gets the common properties of <see cref="EncapsulatedObject"/>. These properties may be specific to the underlying object type.
+            /// </summary>
             object ObjectProperties { get; }
 
 #if WinCopies3
+            /// <summary>
+            /// Gets the specific properties of <see cref="EncapsulatedObject"/>. These properties are specific to this object.
+            /// </summary>
             IPropertySystemCollection ObjectPropertySystem { get; }
 #endif
 

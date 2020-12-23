@@ -20,14 +20,12 @@ using Microsoft.WindowsAPICodePack.PortableDevices;
 using Microsoft.WindowsAPICodePack.Shell;
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Windows.Media.Imaging;
 
 using static Microsoft.WindowsAPICodePack.Shell.KnownFolders;
 
 using static WinCopies.IO.Path;
-using WinCopies.IO.PropertySystem;
 
 #if WinCopies2
 using WinCopies.Collections;
@@ -36,6 +34,7 @@ using WinCopies.Util;
 using static WinCopies.Util.Util;
 #else
 using WinCopies.Collections.Generic;
+using WinCopies.IO.PropertySystem;
 
 using static WinCopies.ThrowHelper;
 #endif
