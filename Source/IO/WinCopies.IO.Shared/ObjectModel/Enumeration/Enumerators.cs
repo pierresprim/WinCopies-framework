@@ -208,7 +208,12 @@ new WinCopies.Collections.Generic.Queue
 
                 string fileName;
 
-                string relativePath = _archiveItemInfoProvider.Path.Substring(_archiveItemInfoProvider.ArchiveShellObject.Path.Length + 1);
+                string relativePath = _archiveItemInfoProvider.Path
+#if CS8
+                    [(_archiveItemInfoProvider.ArchiveShellObject.Path.Length + 1)..];
+#else
+                    .Substring(_archiveItemInfoProvider.ArchiveShellObject.Path.Length + 1);
+#endif
 
                 // PathInfo path;
 
@@ -245,11 +250,21 @@ new WinCopies.Collections.Generic.Queue
 
                     if (archiveFileInfo.FileName.StartsWith(relativePath, StringComparison.OrdinalIgnoreCase) && archiveFileInfo.FileName.Length > relativePath.Length)
                     {
-                        fileName = archiveFileInfo.FileName.Substring(relativePath.Length);
+                        fileName = archiveFileInfo.FileName
+#if CS8
+                            [relativePath.Length..];
+#else
+                            .Substring(relativePath.Length);
+#endif
 
                         if (fileName.StartsWith(WinCopies.IO.Path.PathSeparator))
 
-                            fileName = fileName.Substring(1);
+                            fileName = fileName
+#if CS8
+                            [1..];
+#else
+                            .Substring(1);
+#endif
 
                         if (fileName.Contains(WinCopies.IO.Path.PathSeparator, StringComparison.OrdinalIgnoreCase))
 

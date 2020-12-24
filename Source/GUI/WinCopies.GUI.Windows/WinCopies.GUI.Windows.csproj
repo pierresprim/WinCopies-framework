@@ -19,7 +19,7 @@
   <Import Project="..\WinCopies.GUI.Windows.Shared\WinCopies.GUI.Windows.Shared.projitems" Label="Shared" />
 
   <ItemGroup>
-    <PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="2.0.1" />
+    <PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="3.0.0-preview" />
     <PackageReference Include="WinCopies.Util.Desktop" Version="3.1.0.1-preview" />
   </ItemGroup>
 
