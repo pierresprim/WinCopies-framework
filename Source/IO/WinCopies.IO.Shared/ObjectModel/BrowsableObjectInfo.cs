@@ -26,9 +26,9 @@ using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 
-using TsudaKageyu;
-
 using WinCopies.Collections.Generic;
+using WinCopies.GUI.Drawing;
+using WinCopies.IO.PropertySystem;
 
 namespace WinCopies.IO.ObjectModel
 {
@@ -52,6 +52,10 @@ namespace WinCopies.IO.ObjectModel
         IBrowsableObjectInfo Collections.Generic.IRecursiveEnumerable<IBrowsableObjectInfo>.Value => this;
 
         public abstract object EncapsulatedObject { get; }
+
+#if WinCopies3
+        public abstract IPropertySystemCollection ObjectPropertySystem { get; }
+#endif
 
         public abstract object ObjectProperties { get; }
 
@@ -123,14 +127,15 @@ namespace WinCopies.IO.ObjectModel
 
         internal static BitmapSource TryGetBitmapSource(in int iconIndex, in string dllName, in int size)
         {
-#if NETFRAMEWORK
-
-            using (Icon icon = TryGetIcon(iconIndex, dllName, new System.Drawing.Size(size, size)))
-
+            using
+#if !CS8
+            (
+#endif
+                Icon icon = TryGetIcon(iconIndex, dllName, new System.Drawing.Size(size, size))
+#if CS8
+            ;
 #else
-
-            using Icon icon = TryGetIcon(iconIndex, dllName, new System.Drawing.Size(size, size));
-
+            )
 #endif
 
             return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
@@ -142,7 +147,7 @@ namespace WinCopies.IO.ObjectModel
 
         IEnumerator<IBrowsableObjectInfo> System.Collections.Generic.IEnumerable<IBrowsableObjectInfo>.GetEnumerator() => GetItems().GetEnumerator();
 
-        IEnumerator IEnumerable.GetEnumerator() => GetItems().GetEnumerator();
+        IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetItems().GetEnumerator();
 
         /// <summary>
         /// When overridden in a derived class, returns the items of this <see cref="BrowsableObjectInfo"/>.
@@ -162,12 +167,28 @@ namespace WinCopies.IO.ObjectModel
 
                 return;
 
+            DisposeManaged();
+
             Dispose(true);
 
             GC.SuppressFinalize(this);
 
+#if !WinCopies3
             IsDisposed = true;
+#endif
         }
+
+        /// <summary>
+        /// In WinCopies 3, sets <see cref="IsDisposed"/> to <see langword="true"/>. This method does nothing in WinCopies 2. This method is called from the <see cref="Dispose()"/> method.
+        /// </summary>
+        protected virtual void DisposeManaged()
+#if WinCopies3
+            => IsDisposed = true;
+#else
+        {
+            // Left empty.
+        }
+#endif
 
         /// <summary>
         /// Not used in this class.
@@ -243,11 +264,20 @@ namespace WinCopies.IO.ObjectModel
         public abstract bool HasProperties { get; }
         #endregion
 
+        /// <summary>
+        /// When called from a derived class, initializes a new instance of the <see cref="BrowsableObjectInfo{TObjectProperties, TEncapsulatedObject}"/> class.
+        /// </summary>
+        /// <param name="path">The path of the new <see cref="BrowsableObjectInfo{TObjectProperties, TEncapsulatedObject}"/>.</param>
         protected BrowsableObjectInfo(in string path) : base(path)
         {
             // Left empty.
         }
 
+        /// <summary>
+        /// When called from a derived class, initializes a new instance of the <see cref="BrowsableObjectInfo{TObjectProperties, TEncapsulatedObject}"/> class with a custom <see cref="ClientVersion"/>.
+        /// </summary>
+        /// <param name="path">The path of the new <see cref="BrowsableObjectInfo{TObjectProperties, TEncapsulatedObject}"/>.</param>
+        /// <param name="clientVersion">A custom <see cref="ClientVersion"/>. This parameter can be null for non-file system and portable devices-related types.</param>
         protected BrowsableObjectInfo(in string path, in ClientVersion? clientVersion) : base(path, clientVersion)
         {
             // Left empty.

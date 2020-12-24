@@ -78,21 +78,25 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinCopies.GUI.Drawing.2.x",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IconLib", "IconLib", "{EBDF6371-DCFB-42CF-AED7-EFFFEDE0CF1C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiIcon", "..\Samples\IconLib\MultiIcon\MultiIcon.csproj", "{540431B2-6804-48D9-BA96-02B483E00202}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MultiIcon", "..\Samples\IconLib\MultiIcon\MultiIcon.csproj", "{540431B2-6804-48D9-BA96-02B483E00202}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinCopies.GUI.Controls.2.x", "GUI\2.x\WinCopies.GUI.Controls.2.x\WinCopies.GUI.Controls.2.x.csproj", "{013665C8-9A0D-421F-BF7B-185EBE5DCFE5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinCopies.GUI.Controls.2.x", "GUI\2.x\WinCopies.GUI.Controls.2.x\WinCopies.GUI.Controls.2.x.csproj", "{013665C8-9A0D-421F-BF7B-185EBE5DCFE5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinCopies.GUI.2.x", "GUI\2.x\WinCopies.GUI.2.x\WinCopies.GUI.2.x.csproj", "{048ACFCE-B352-4DA8-AB38-6349F907F1CC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinCopies.GUI.Icons.2.x", "GUI\2.x\WinCopies.GUI.Icons.2.x\WinCopies.GUI.Icons.2.x.csproj", "{34ADCBBE-0FD4-48BD-81DF-B6C70DD5E88D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinCopies.GUI.Icons.2.x", "GUI\2.x\WinCopies.GUI.Icons.2.x\WinCopies.GUI.Icons.2.x.csproj", "{34ADCBBE-0FD4-48BD-81DF-B6C70DD5E88D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinCopies.GUI.Models.2.x", "GUI\2.x\WinCopies.GUI.Models.2.x\WinCopies.GUI.Models.2.x.csproj", "{6D1A7A40-9F3D-49E3-B488-A2208A964247}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinCopies.GUI.Models.2.x", "GUI\2.x\WinCopies.GUI.Models.2.x\WinCopies.GUI.Models.2.x.csproj", "{6D1A7A40-9F3D-49E3-B488-A2208A964247}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinCopies.GUI.Templates.2.x", "GUI\2.x\WinCopies.GUI.Templates.2.x\WinCopies.GUI.Templates.2.x.csproj", "{3CEB01F0-1F29-4C79-B6DB-029F986DADCF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinCopies.GUI.Templates.2.x", "GUI\2.x\WinCopies.GUI.Templates.2.x\WinCopies.GUI.Templates.2.x.csproj", "{3CEB01F0-1F29-4C79-B6DB-029F986DADCF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinCopies.GUI.ViewModels.2.x", "GUI\2.x\WinCopies.GUI.ViewModels.2.x\WinCopies.GUI.ViewModels.2.x.csproj", "{D4B2D9CB-818D-4A41-8C0F-A64B501678C1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinCopies.GUI.ViewModels.2.x", "GUI\2.x\WinCopies.GUI.ViewModels.2.x\WinCopies.GUI.ViewModels.2.x.csproj", "{D4B2D9CB-818D-4A41-8C0F-A64B501678C1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinCopies.GUI.Windows.2.x", "GUI\2.x\WinCopies.GUI.Windows.2.x\WinCopies.GUI.Windows.2.x.csproj", "{30BAAFEE-C5F4-460F-A254-74C5BAB7DFCA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinCopies.GUI.Windows.2.x", "GUI\2.x\WinCopies.GUI.Windows.2.x\WinCopies.GUI.Windows.2.x.csproj", "{30BAAFEE-C5F4-460F-A254-74C5BAB7DFCA}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "WinCopies.Util.Temp.Shared", "WinCopies.Util.Temp.Shared\WinCopies.Util.Temp.Shared.shproj", "{971FCA65-9999-4B74-BDDE-947BC38435F0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinCopies.Util.Temp.2.x", "WinCopies.Util.Temp.2.x\WinCopies.Util.Temp.2.x.csproj", "{4243D5E1-AE30-4B3D-8D0A-06F3FCBDA26C}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -109,6 +113,7 @@ Global
 		GUI\WinCopies.GUI.Shared\WinCopies.GUI.Shared.projitems*{3aaf402a-7c4a-455f-8f42-6f4f13c5e185}*SharedItemsImports = 13
 		GUI\WinCopies.GUI.Templates.Shared\WinCopies.GUI.Templates.Shared.projitems*{3ceb01f0-1f29-4c79-b6db-029f986dadcf}*SharedItemsImports = 5
 		GUI\WinCopies.GUI.Windows.Shared\WinCopies.GUI.Windows.Shared.projitems*{3fa63940-0513-455d-a3d1-fba954c22869}*SharedItemsImports = 13
+		WinCopies.Util.Temp.Shared\WinCopies.Util.Temp.Shared.projitems*{4243d5e1-ae30-4b3d-8d0a-06f3fcbda26c}*SharedItemsImports = 5
 		GUI\WinCopies.GUI.Models.Shared\WinCopies.GUI.Models.Shared.projitems*{4a0c3a48-7f9c-4a7d-b23b-80a9d2404e01}*SharedItemsImports = 5
 		GUI\WinCopies.GUI.Templates.Shared\WinCopies.GUI.Templates.Shared.projitems*{5499ce56-bb88-474b-af00-ae7a57e4d2a9}*SharedItemsImports = 5
 		GUI\WinCopies.GUI.ViewModels.Shared\WinCopies.GUI.ViewModels.Shared.projitems*{589fcd51-85a1-46ff-ab94-3cdd133f92de}*SharedItemsImports = 13
@@ -116,8 +121,10 @@ Global
 		IO\WinCopies.GUI.IO.Shared\WinCopies.GUI.IO.Shared.projitems*{690260b7-f85d-481e-9527-0a6034e39053}*SharedItemsImports = 13
 		GUI\WinCopies.GUI.Models.Shared\WinCopies.GUI.Models.Shared.projitems*{6d1a7a40-9f3d-49e3-b488-a2208a964247}*SharedItemsImports = 5
 		GUI\WinCopies.GUI.Controls.Shared\WinCopies.GUI.Controls.Shared.projitems*{8e59282e-c7fb-44dc-8617-a1b2a932c5a9}*SharedItemsImports = 13
+		WinCopies.Util.Temp.Shared\WinCopies.Util.Temp.Shared.projitems*{971fca65-9999-4b74-bdde-947bc38435f0}*SharedItemsImports = 13
 		GUI\WinCopies.GUI.Models.Shared\WinCopies.GUI.Models.Shared.projitems*{a43aee04-0665-4d64-a4b9-7ff1e471bf29}*SharedItemsImports = 13
 		GUI\WinCopies.GUI.Drawing.Shared\WinCopies.GUI.Drawing.Shared.projitems*{abf2fbe7-3ad4-4a53-bdd1-fb2752eff9b7}*SharedItemsImports = 5
+		WinCopies.Util.Temp.Shared\WinCopies.Util.Temp.Shared.projitems*{afb0d464-844b-4797-8539-35113326be32}*SharedItemsImports = 5
 		IO\WinCopies.IO.Shared\WinCopies.IO.Shared.projitems*{b77a3487-8866-463e-a30a-ae7439ac9f5a}*SharedItemsImports = 5
 		GUI\WinCopies.GUI.ViewModels.Shared\WinCopies.GUI.ViewModels.Shared.projitems*{d4b2d9cb-818d-4a41-8c0f-a64b501678c1}*SharedItemsImports = 5
 		GUI\WinCopies.GUI.ViewModels.Shared\WinCopies.GUI.ViewModels.Shared.projitems*{d5b59647-738b-4239-96f4-68cde29e8bee}*SharedItemsImports = 5
@@ -333,6 +340,14 @@ Global
 		{30BAAFEE-C5F4-460F-A254-74C5BAB7DFCA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{30BAAFEE-C5F4-460F-A254-74C5BAB7DFCA}.Release|x64.ActiveCfg = Release|Any CPU
 		{30BAAFEE-C5F4-460F-A254-74C5BAB7DFCA}.Release|x64.Build.0 = Release|Any CPU
+		{4243D5E1-AE30-4B3D-8D0A-06F3FCBDA26C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4243D5E1-AE30-4B3D-8D0A-06F3FCBDA26C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4243D5E1-AE30-4B3D-8D0A-06F3FCBDA26C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4243D5E1-AE30-4B3D-8D0A-06F3FCBDA26C}.Debug|x64.Build.0 = Debug|Any CPU
+		{4243D5E1-AE30-4B3D-8D0A-06F3FCBDA26C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4243D5E1-AE30-4B3D-8D0A-06F3FCBDA26C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4243D5E1-AE30-4B3D-8D0A-06F3FCBDA26C}.Release|x64.ActiveCfg = Release|Any CPU
+		{4243D5E1-AE30-4B3D-8D0A-06F3FCBDA26C}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

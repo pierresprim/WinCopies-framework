@@ -29,4 +29,9 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\WinCopies.Util.Temp.2.x\WinCopies.Util.Temp.2.x.csproj" />
+    <ProjectReference Include="..\WinCopies.GUI.Models.2.x\WinCopies.GUI.Models.2.x.csproj" />
+  </ItemGroup>
+
 </Project>

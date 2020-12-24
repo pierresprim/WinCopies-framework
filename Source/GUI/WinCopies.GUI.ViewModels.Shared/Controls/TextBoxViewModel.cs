@@ -20,7 +20,6 @@ using System.Windows.Controls;
 using System.Windows.Media;
 
 using WinCopies.GUI.Controls.Models;
-using WinCopies.Util;
 using WinCopies.Util.Data;
 
 namespace WinCopies.GUI.Controls.ViewModels

@@ -22,20 +22,11 @@ using System.Windows.Media.Imaging;
 
 using WinCopies.Collections.Generic;
 using WinCopies.IO.ObjectModel;
-
-using IDisposable = WinCopies.
-#if WinCopies2
-    Util.
-#endif
-    DotNetFix.IDisposable;
+using WinCopies.IO.PropertySystem;
 
 namespace WinCopies.IO
 {
-    public interface IRecursiveEnumerable<T> : WinCopies.Collections.Generic.IRecursiveEnumerable<T>
-    {
-        RecursiveEnumerator<T> GetEnumerator();
-    }
-
+#if WinCopies2
     public interface IBrowsableObjectEncapsulator
     {
         object EncapsulatedObject { get; }
@@ -54,6 +45,12 @@ namespace WinCopies.IO
 
         public BrowsableObjectEncapsulator(T obj) => EncapsulatedObject = obj;
     }
+#endif
+
+    public interface IRecursiveEnumerable<T> : WinCopies.Collections.Generic.IRecursiveEnumerable<T>
+    {
+        RecursiveEnumerator<T> GetEnumerator();
+    }
 
     public abstract class BrowsableObjectInfoProperties<T> where T : IBrowsableObjectInfo
     {
@@ -67,7 +64,12 @@ namespace WinCopies.IO
         /// <summary>
         /// Provides interoperability for interacting with browsable items.
         /// </summary>
-        public interface IBrowsableObjectInfo : IFileSystemObject, IRecursiveEnumerable<IBrowsableObjectInfo>, IDisposable
+        public interface IBrowsableObjectInfo : IFileSystemObject, IRecursiveEnumerable<IBrowsableObjectInfo>,
+WinCopies.
+#if WinCopies2
+    Util.
+#endif
+    DotNetFix.IDisposable
         {
             /// <summary>
             /// Gets a value indicating whether this <see cref="IBrowsableObjectInfo"/> is browsable.
@@ -79,9 +81,22 @@ namespace WinCopies.IO
             /// </summary>
             bool IsRecursivelyBrowsable { get; }
 
+            /// <summary>
+            /// Gets the underlying object of this abstraction interface.
+            /// </summary>
             object EncapsulatedObject { get; }
 
+            /// <summary>
+            /// Gets the common properties of <see cref="EncapsulatedObject"/>. These properties may be specific to the underlying object type.
+            /// </summary>
             object ObjectProperties { get; }
+
+#if WinCopies3
+            /// <summary>
+            /// Gets the specific properties of <see cref="EncapsulatedObject"/>. These properties are specific to this object.
+            /// </summary>
+            IPropertySystemCollection ObjectPropertySystem { get; }
+#endif
 
             /// <summary>
             /// Gets the <see cref="IBrowsableObjectInfo"/> parent of this <see cref="IBrowsableObjectInfo"/>. Returns <see langword="null"/> if this object is the root object of a hierarchy.
@@ -185,9 +200,20 @@ namespace WinCopies.IO
             T ObjectProperties { get; }
         }
 
-        public interface IEncapsulatorBrowsableObjectInfo<TEncapsulatedObject> : IBrowsableObjectInfo
+        public interface IEncapsulatorBrowsableObjectInfo<
+#if WinCopies3
+            T
+#else
+            TEncapsulatedObject
+#endif
+            > : IBrowsableObjectInfo
         {
-            TEncapsulatedObject EncapsulatedObject { get; }
+#if WinCopies3
+            T
+#else
+TEncapsulatedObject
+#endif
+                EncapsulatedObject { get; }
 
             bool HasProperties { get; }
         }
@@ -198,10 +224,8 @@ namespace WinCopies.IO
         }
 
         //public interface IBrowsableObjectInfo<TFactory> : IBrowsableObjectInfo where TFactory : IBrowsableObjectInfoFactory
-
         //{
 
         //}
-
     }
 }

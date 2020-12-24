@@ -110,21 +110,15 @@ namespace WinCopies.IO
             {
                 using
 #if NETFRAMEWORK
-
             (
-
 #endif
 
                 Icon icon = TryGetIcon(PortableDeviceIcon, PortableDeviceIconDllName, new System.Drawing.Size(size, size))
 
 #if NETFRAMEWORK
-            
             )
-            
 #else
-
                 ;
-
 #endif
 
                 return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());

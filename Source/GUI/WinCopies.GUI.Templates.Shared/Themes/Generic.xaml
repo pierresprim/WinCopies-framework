@@ -26,11 +26,14 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary>
             <local:ModelToBooleanConverter x:Key="DefaultModelToBooleanConverter" />
-            <Style x:Key="ToggleButtonStyle" TargetType="{x:Type ToggleButton}" x:Shared="false">
+            <Style x:Key="ControlStyle" TargetType="{x:Type Control}" x:Shared="false">
+                <Setter Property="IsEnabled" Value="{Binding IsEnabled}" />
+            </Style>
+            <Style x:Key="ToggleButtonStyle" TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource ControlStyle}" x:Shared="false">
                 <Setter Property="IsChecked" Value="{Binding IsChecked}" />
                 <Setter Property="IsThreeState" Value="{Binding IsThreeState}" />
             </Style>
-            <Style x:Key="ContentControlStyle" TargetType="{x:Type ContentControl}" x:Shared="false">
+            <Style x:Key="ContentControlStyle" TargetType="{x:Type ContentControl}" BasedOn="{StaticResource ControlStyle}" x:Shared="false">
                 <Setter Property="Content" Value="{Binding Content}" />
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding Converter={StaticResource DefaultModelToBooleanConverter}, ConverterParameter={x:Static local:ModelToBooleanConverterParameter.Content}}" Value="true">
@@ -38,7 +41,7 @@
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
-            <Style x:Key="ItemsControlStyle" TargetType="{x:Type ItemsControl}" x:Shared="false">
+            <Style x:Key="ItemsControlStyle" TargetType="{x:Type ItemsControl}" BasedOn="{StaticResource ControlStyle}" x:Shared="false">
                 <Setter Property="ItemsSource" Value="{Binding Items}" />
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding Converter={StaticResource DefaultModelToBooleanConverter}, ConverterParameter={x:Static local:ModelToBooleanConverterParameter.Items}}" Value="true" >
@@ -62,21 +65,21 @@
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
-            <Style x:Key="ButtonStyle" TargetType="{x:Type Button}" x:Shared="false">
+            <Style x:Key="ButtonStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource ControlStyle}" x:Shared="false">
                 <Setter Property="Command" Value="{Binding Command}" />
                 <Setter Property="CommandParameter" Value="{Binding CommandParameter}" />
                 <Setter Property="CommandTarget" Value="{Binding CommandTarget}" />
             </Style>
-            <Style x:Key="MenuItemStyle" TargetType="{x:Type MenuItem}" x:Shared="false">
+            <Style x:Key="MenuItemStyle" TargetType="{x:Type MenuItem}" BasedOn="{StaticResource ControlStyle}" x:Shared="false">
                 <Setter Property="Command" Value="{Binding Command}" />
                 <Setter Property="CommandParameter" Value="{Binding CommandParameter}" />
                 <Setter Property="CommandTarget" Value="{Binding CommandTarget}" />
             </Style>
-            <Style x:Key="TextBoxStyleTextOriented" TargetType="{x:Type TextBox}" x:Shared="false">
+            <Style x:Key="TextBoxStyleTextOriented" TargetType="{x:Type TextBox}" BasedOn="{StaticResource ControlStyle}" x:Shared="false">
                 <Setter Property="Text" Value="{Binding Text}" />
                 <Setter Property="IsReadOnly" Value="{Binding IsReadOnly}" />
             </Style>
-            <Style x:Key="TextBoxStyleSelectionOriented" TargetType="{x:Type TextBox}" x:Shared="false">
+            <Style x:Key="TextBoxStyleSelectionOriented" TargetType="{x:Type TextBox}" BasedOn="{StaticResource ControlStyle}" x:Shared="false">
                 <Setter Property="IsReadOnlyCaretVisible" Value="{Binding IsReadOnlyCaretVisible}" />
                 <Setter Property="AutoWordSelection" Value="{Binding AutoWordSelection}" />
                 <Setter Property="SelectionBrush" Value="{Binding SelectionBrush}" />
@@ -85,7 +88,7 @@
                 <Setter Property="CaretBrush" Value="{Binding CaretBrush}" />
                 <Setter Property="IsInactiveSelectionHighlightEnabled" Value="{Binding IsInactiveSelectionHighlightEnabled}" />
             </Style>
-            <Style x:Key="TextBoxStyleTextEditingOriented" TargetType="{x:Type TextBox}" x:Shared="false">
+            <Style x:Key="TextBoxStyleTextEditingOriented" TargetType="{x:Type TextBox}" BasedOn="{StaticResource ControlStyle}" x:Shared="false">
                 <Setter Property="MinLines" Value="{Binding MinLines}" />
                 <Setter Property="MaxLines" Value="{Binding MaxLines}" />
                 <Setter Property="CharacterCasing" Value="{Binding CharacterCasing}" />
@@ -99,7 +102,7 @@
                 <Setter Property="UndoLimit" Value="{Binding UndoLimit}" />
             </Style>
             <!--todo: add a RadioButtonItemsControl control-->
-            <Style x:Key="RadioButtonStyle" TargetType="{x:Type RadioButton}" x:Shared="false">
+            <Style x:Key="RadioButtonStyle" TargetType="{x:Type RadioButton}" BasedOn="{StaticResource ControlStyle}" x:Shared="false">
                 <Setter Property="GroupName" Value="{Binding GroupName}" />
             </Style>
         </ResourceDictionary>

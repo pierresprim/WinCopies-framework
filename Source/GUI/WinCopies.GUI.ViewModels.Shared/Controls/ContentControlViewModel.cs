@@ -16,10 +16,15 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using WinCopies.GUI.Controls.Models;
-using WinCopies.Util;
 using WinCopies.Util.Data;
 
-using static WinCopies.Util.Util;
+using static WinCopies.
+    #if WinCopies2
+    Util.Util
+#else
+    ThrowHelper
+    #endif
+    ;
 
 namespace WinCopies.GUI.Controls.ViewModels
 {
@@ -96,6 +101,7 @@ namespace WinCopies.GUI.Controls.ViewModels
             OnPropertyChanged(nameof(Content));
         }
     }
+
     [TypeForDataTemplate(typeof(IContentControlModel))]
     public class ContentControlViewModel<TModel, TContent> : ViewModel<TModel>, IContentControlModel<TContent>, IDataTemplateSelectorsModel where TModel : IContentControlModel<TContent>
     {

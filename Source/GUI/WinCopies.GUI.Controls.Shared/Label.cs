@@ -21,7 +21,6 @@ namespace WinCopies.GUI.Controls
 {
     public class Label : System.Windows.Controls.Label
     {
-
         /// <summary>
         /// Identifies the <see cref="RecognizesAccessKey"/> dependency property.
         /// </summary>
@@ -32,6 +31,5 @@ namespace WinCopies.GUI.Controls
 
 
         static Label() => DefaultStyleKeyProperty.OverrideMetadata(typeof(Label), new FrameworkPropertyMetadata(typeof(Label)));
-
     }
 }

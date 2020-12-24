@@ -20,6 +20,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\Reflection\IDotNetNamespaceInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\Reflection\IDotNetParameterInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\Reflection\IDotNetTypeInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\IPropertySystemCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\Enumeration\ArchiveFileInfoEnumeratorStruct.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FileInfoLoader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FileSystemObjectEqualityComparer.cs" />
@@ -49,7 +50,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\FileSystemObjectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FileTypes.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FolderLoader.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)GlobalSuppressions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\IBrowsableObjectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\IFileSystemObject.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IFileSystemObjectComparer.cs" />
@@ -67,6 +67,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)Path.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\PortableDeviceInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\PortableDeviceObjectInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\PropertyGroup.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\PropertySystemCollection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\ShellObjectPropertySystemCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Registry.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exceptions\RegistryException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\RegistryItemInfo.cs" />
