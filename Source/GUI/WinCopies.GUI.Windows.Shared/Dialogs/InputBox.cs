@@ -1,35 +1,40 @@
-﻿/* Copyright © Pierre Sprimont, 2019
- *
- * This file is part of the WinCopies Framework.
- *
- * The WinCopies Framework is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * The WinCopies Framework is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
+﻿//* Copyright © Pierre Sprimont, 2019
+// *
+// * This file is part of the WinCopies Framework.
+// *
+// * The WinCopies Framework is free software: you can redistribute it and/or modify
+// * it under the terms of the GNU General Public License as published by
+// * the Free Software Foundation, either version 3 of the License, or
+// * (at your option) any later version.
+// *
+// * The WinCopies Framework is distributed in the hope that it will be useful,
+// * but WITHOUT ANY WARRANTY; without even the implied warranty of
+// * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// * GNU General Public License for more details.
+// *
+// * You should have received a copy of the GNU General Public License
+// * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-using System.Diagnostics;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-using WinCopies.Util;
-using static WinCopies.Util.Util;
+//using System.Diagnostics;
+//using System.Windows;
+//using System.Windows.Controls;
+//using System.Windows.Input;
 
-//namespace WinCopies.GUI.Windows.Dialogs
+//#if WinCopies3
+//using static WinCopies.ThrowHelper;
+//#else
+//using WinCopies.Util;
+
+//using static WinCopies.Util.Util;
+//#endif
+
+//namespace WinCopies.GUI.Windows
 //{
 //    /// <summary>
 //    /// Interaction logic for InputBox.xaml
 //    /// </summary>
 //    public partial class InputBox : DialogWindow
 //    {
-
 //        /// <summary>
 //        /// Identifies the <see cref="Orientation"/> dependency property.
 //        /// </summary>
@@ -108,13 +113,10 @@ using static WinCopies.Util.Util;
 //        /// This event occurs when the text changes and it does not take care of the formatting.
 //        /// </remarks>
 //        public event TextChangedEventHandler TextChanged
-
 //        {
-
 //            add => AddHandler(TextChangedEvent, value);
 
 //            remove => RemoveHandler(TextChangedEvent, value);
-
 //        }
 
 //        static InputBox() =>
@@ -143,37 +145,25 @@ using static WinCopies.Util.Util;
 //        /// This method raises a <see cref="TextChanged"/> event.
 //        /// </remarks>
 //        protected virtual void OnTextChanged(TextChangedEventArgs e)
-
 //        {
-
 //            ThrowIfNull(e, nameof(e));
 
 //            _ = Command?.CanExecute(CommandParameter, CommandTarget);
 
-//#pragma warning disable CA1062 // Validate arguments of public methods
 //            e.RoutedEvent = TextChangedEvent;
-//#pragma warning restore CA1062 // Validate arguments of public methods
 
 //            RaiseEvent(e);
-
 //        }
 
 //        protected override void OnCommandExecuted(ExecutedRoutedEventArgs e)
-
 //        {
-
-//            ThrowIfNull(e, nameof(e));
-
-//#pragma warning disable CA1062 // Validate arguments of public methods
-//            if (e.Parameter is TextChangedEventArgs _e)
-//#pragma warning restore CA1062 // Validate arguments of public methods
+//            if ((e??throw GetArgumentNullException(nameof(e))).Parameter is TextChangedEventArgs _e)
 
 //                OnTextChanged(_e);
 
 //            else
 
 //                base.OnCommandExecuted(e);
-
 //        }
 //    }
 //}

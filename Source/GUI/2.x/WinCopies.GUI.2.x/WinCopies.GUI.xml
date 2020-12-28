@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>WinCopies.GUI</name>
+    </assembly>
+    <members>
+        <member name="F:WinCopies.GUI.Windows.Dialogs.DialogButton.OK">
+            <summary>
+            This field corresponds to the Win32 MB_OK flag.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.Dialogs.DialogButton.OKCancel">
+            <summary>
+            This field corresponds to the Win32 MB_OKCANCEL flag.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.Dialogs.DialogButton.AbortRetryIgnore">
+            <summary>
+            This field corresponds to the Win32 MB_ABORTRETRYIGNORE flag.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.Dialogs.DialogButton.YesNoCancel">
+            <summary>
+            This field corresponds to the Win32 MB_YESNOCANCEL flag.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.Dialogs.DialogButton.YesNo">
+            <summary>
+            This field corresponds to the Win32 MB_YESNO flag.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.Dialogs.DialogButton.RetryCancel">
+            <summary>
+            This field corresponds to the Win32 MB_RETRYCANCEL flag.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.Dialogs.DialogButton.CancelTryContinue">
+            <summary>
+            This field corresponds to the Win32 MB_CANCELTRYCONTINUE flag.
+            </summary>
+        </member>
+    </members>
+</doc>

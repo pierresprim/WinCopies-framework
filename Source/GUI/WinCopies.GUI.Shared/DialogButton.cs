@@ -15,11 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-namespace WinCopies.GUI.Windows.Dialogs
+namespace WinCopies.GUI.Windows
+#if !WinCopies3
+    .Dialogs
+#endif
 {
     public enum DialogButton : uint
     {
-
         /// <summary>
         /// This field corresponds to the Win32 MB_OK flag.
         /// </summary>
@@ -68,12 +70,10 @@ namespace WinCopies.GUI.Windows.Dialogs
         YesToAllNoToAllCancel = 0x000011,
 
         YesToAllNoToAll = 0x000012
-
     }
 
     public enum DefaultButton
     {
-
         None = 0,
 
         OK = 1,
@@ -97,13 +97,10 @@ namespace WinCopies.GUI.Windows.Dialogs
         Apply = 10,
 
         Continue = 11
-
     }
 
     public enum MessageBoxResult
-
     {
-
         None = 0,
 
         OK = 1,
@@ -125,6 +122,5 @@ namespace WinCopies.GUI.Windows.Dialogs
         NoToAll=9,
 
         Continue=10
-
     }
 }

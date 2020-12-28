@@ -18,7 +18,6 @@
 using System.Collections;
 using System.Windows;
 using System.Windows.Input;
-using static WinCopies.Util.Util;
 
 //namespace WinCopies.GUI.Windows.Dialogs
 //{

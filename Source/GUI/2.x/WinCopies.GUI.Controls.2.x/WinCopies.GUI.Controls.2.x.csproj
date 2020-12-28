@@ -19,7 +19,7 @@
   <Import Project="..\..\WinCopies.GUI.Controls.Shared\WinCopies.GUI.Controls.Shared.projitems" Label="Shared" />
 
   <ItemGroup>
-    <PackageReference Include="WinCopies.Util" Version="2.6" />
+    <PackageReference Include="WinCopies.Util" Version="2.6.1.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -31,6 +31,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\WinCopies.Util.Temp.2.x\WinCopies.Util.Temp.2.x.csproj" />
+    <ProjectReference Include="..\WinCopies.GUI.Icons.2.x\WinCopies.GUI.Icons.2.x.csproj" />
     <ProjectReference Include="..\WinCopies.GUI.Models.2.x\WinCopies.GUI.Models.2.x.csproj" />
   </ItemGroup>
 

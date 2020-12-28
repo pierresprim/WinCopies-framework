@@ -43,11 +43,5 @@ along with the WinCopies Framework.  If not, see<https://www.gnu.org/licenses/>.
                 <MenuItem Header="CopyProcessTest" Click="MenuItem_Click_2" />
             </MenuItem>
         </Menu>
-        <StackPanel Grid.Row="1">
-            <controls:Label Content="_Label" Padding="50" RecognizesAccessKey="True" />
-            <controls:Label Content="_Label" Padding="50" RecognizesAccessKey="False" />
-            <controls:Label Content="_Label" Padding="50" RecognizesAccessKey="True" IsEnabled="False" />
-            <controls:Label Content="_Label" Padding="50" RecognizesAccessKey="False" IsEnabled="False" />
-        </StackPanel>
     </Grid>
 </windows:Window>

@@ -17,11 +17,10 @@
 
 #if DEBUG
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 
 using WinCopies.Util.Data;
-using WinCopies.Collections;
 using WinCopies.Collections.DotNetFix
 #if WinCopies3
     .Generic
@@ -33,13 +32,35 @@ using static WinCopies.
 #if WinCopies3
     ThrowHelper
 #else
-    Util.Util
+    Util.Util;
+
+using static WinCopies.Util.ThrowHelper
 #endif
     ;
-using System.Globalization;
+using System.Diagnostics;
+using WinCopies.Collections.Generic;
+
+#if !WinCopies3
+using System.Collections;
+
+using WinCopies.Collections;
+#endif
 
 namespace WinCopies
 {
+    public static class Extensions
+    {
+        // Already implemented in WinCopies.Util.
+
+        public static
+#if WinCopies2
+System.Collections.Generic.IEnumerator
+#else
+            IEnumeratorInfo2
+#endif
+            <TDestination> Select<TSource, TDestination>(this System.Collections.Generic.IEnumerator<TSource> enumerator, Converter<TSource, TDestination> func) => new SelectEnumerator<TSource, TDestination>(enumerator, value => func(value));
+    }
+
     namespace Collections.Abstract.Generic
     {
         public abstract class Countable<TEnumerable, TItems> : ICountable where TEnumerable : IReadOnlyCollection<TItems>
@@ -83,7 +104,7 @@ namespace WinCopies
 
         public class List<T> : IList<T>
         {
-            #region Properties
+#region Properties
             protected System.Collections.Generic.IList<T> InnerList { get; }
 
             public int Count => InnerList.Count;
@@ -91,11 +112,11 @@ namespace WinCopies
             public T this[int index] { get => InnerList[index]; set => InnerList[index] = value; }
 
             public bool IsReadOnly => InnerList.IsReadOnly;
-            #endregion
+#endregion
 
             public List(System.Collections.Generic.IList<T> innerList) => InnerList = innerList;
 
-            #region Methods
+#region Methods
             public void Add(T item) => InnerList.Add(item);
 
             public bool Contains(T item) => InnerList.Contains(item);
@@ -115,12 +136,23 @@ namespace WinCopies
             public bool Remove(T item) => InnerList.Remove(item);
 
             public void Clear() => InnerList.Clear();
-            #endregion
+#endregion
         }
     }
 
     public static class Temp
     {
+        // https://brockallen.com/2016/09/24/process-start-for-urls-on-net-core/
+
+        // Already implemented in WinCopies.Util.
+
+        public static Process StartProcessNetCore(in string url) =>
+
+             // hack because of this: https://github.com/dotnet/corefx/issues/10361
+             // if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+
+             Process.Start(new ProcessStartInfo("cmd", $"/c start {url.Replace("&", "^&")}") { CreateNoWindow = true });
+
         public static TValue GetValue<TKey, TValue>(KeyValuePair<TKey, TValue> keyValuePair) => keyValuePair.Value;
 
         public static TDestination[] ToArray<TSource, TDestination>(this TSource[] array, Converter<TSource, TDestination> selector) => ToArray(array, 0, array.Length, selector);
@@ -142,11 +174,50 @@ namespace WinCopies
 
         public static TDestination[] ToArray<TSource, TDestination>(this IReadOnlyList<TSource> list, Converter<TSource, TDestination> selector) => ToArray(list, 0, list.Count, selector);
 
+        // Already implemented in WinCopies.Util.
+
+        public static ArgumentException GetArrayHasNotEnoughSpaceException(in string arrayArgumentName) => new ArgumentException("", arrayArgumentName);
+
+        // Already implemented in WinCopies.Util.
+
+        public static void ThrowIfArrayHasNotEnoughSpace<T>(in IReadOnlyCollection<T> array, in int arrayIndex, in int count, in string arrayArgumentName)
+        {
+            if (count <= array.Count - arrayIndex)
+
+                throw GetArrayHasNotEnoughSpaceException(arrayArgumentName);
+        }
+
+        public static void ThrowIfIndexIsLowerThanZero(in int index, in string indexArgumentName)
+        {
+            if (index < 0)
+
+                throw new
+#if WinCopies2
+                    ArgumentOutOfRangeException
+#else
+                    IndexOutOfRangeException
+#endif
+                    (indexArgumentName);
+        }
+
+        public static void ThrowOnInvalidCopyToArrayOperation<T>(in IReadOnlyCollection<T> array, in int arrayIndex, in int count, in string arrayArgumentName, in string arrayIndexArgumentName)
+        {
+            ThrowIfNull(array, nameof(array));
+
+            ThrowIfIndexIsLowerThanZero(arrayIndex, arrayIndexArgumentName);
+
+            //if (array.GetLowerBound(0) != 0)
+
+            //    throw GetArrayHasNonZeroLowerBoundException(arrayArgumentName);
+
+            ThrowIfArrayHasNotEnoughSpace(array, arrayIndex, count, arrayArgumentName);
+        }
+
         public static TDestination[] ToArray<TSource, TDestination>(this IReadOnlyList<TSource> list, int startIndex, int length, Converter<TSource, TDestination> selector)
         {
             ThrowIfNull(list, nameof(list));
             ThrowIfNull(selector, nameof(selector));
-            ThrowOnInvalidCopyToArrayOperation(array, startIndex, length, nameof(array), nameof(startIndex));
+            ThrowOnInvalidCopyToArrayOperation(list, startIndex, length, nameof(list), nameof(startIndex));
 
             var result = new TDestination[list.Count];
 
@@ -240,23 +311,9 @@ namespace WinCopies
 
                 TDestination convert(in TSource _value, in TParam _parameter) => Convert(_value, _parameter, culture);
 
-                if (value == null)
-
-                    if (parameter == null)
-
-                        return convert(default, default);
-
-                    else
-
-                        return convert(default, (TParam)parameter);
-
-                else if (parameter == null)
-
-                    return convert((TSource)value, default);
-
-                else
-
-                    return convert((TSource)value, (TParam)parameter);
+                return value == null
+                    ? parameter == null ? convert(default, default) : (object)convert(default, (TParam)parameter)
+                    : parameter == null ? convert((TSource)value, default) : (object)convert((TSource)value, (TParam)parameter);
             }
 
             public sealed override object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -271,23 +328,9 @@ namespace WinCopies
 
                 TSource convertBack(in TDestination _value, in TParam _parameter) => ConvertBack(_value, _parameter, culture);
 
-                if (value == null)
-
-                    if (parameter == null)
-
-                        return convertBack(default, default);
-
-                    else
-
-                        return convertBack(default, (TParam)parameter);
-
-                else if (parameter == null)
-
-                    return convertBack((TDestination)value, default);
-
-                else
-
-                    return convertBack((TDestination)value, (TParam)parameter);
+                return value == null
+                    ? parameter == null ? convertBack(default, default) : (object)convertBack(default, (TParam)parameter)
+                    : parameter == null ? convertBack((TDestination)value, default) : (object)convertBack((TDestination)value, (TParam)parameter);
             }
         }
     }

@@ -16,34 +16,53 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using System;
+using System.Collections;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
+
+#if WinCopies3
+using WinCopies.Commands;
+using WinCopies.Desktop;
+
+using static WinCopies.Diagnostics.IfHelpers;
+
+using IfCT = WinCopies.Diagnostics.ComparisonType;
+using IfCM = WinCopies.Diagnostics.ComparisonMode;
+using IfComp = WinCopies.Diagnostics.Comparison;
+#else
 using WinCopies.Util;
 using WinCopies.Util.Commands;
+
 using static WinCopies.Util.Util;
+
 using IfCT = WinCopies.Util.Util.ComparisonType;
 using IfCM = WinCopies.Util.Util.ComparisonMode;
 using IfComp = WinCopies.Util.Util.Comparison;
-using System.Windows.Controls;
-using System.Collections.Generic;
-using System.Collections;
+#endif
 
-namespace WinCopies.GUI.Windows.Dialogs
+namespace WinCopies.GUI.Windows
+#if !WinCopies3
+.Dialogs
+#endif
 {
     /// <summary>
     /// Represents a common dialog window for WPF.
     /// </summary>
     public partial class DialogWindow : Window, ICommandSource
     {
-
         /// <summary>
         /// Identifies the <see cref="DialogButton"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty DialogButtonProperty = DependencyProperty.Register(nameof(DialogButton), typeof(DialogButton?), typeof(DialogWindow), new PropertyMetadata(WinCopies.GUI.Windows.Dialogs.DialogButton.OK, (DependencyObject sender, DependencyPropertyChangedEventArgs e) => ((DialogWindow)sender).OnDialogButtonChanged((DialogButton?)e.OldValue, (DialogButton?)e.NewValue)
+        public static readonly DependencyProperty DialogButtonProperty = DependencyProperty.Register(nameof(DialogButton), typeof(DialogButton?), typeof(DialogWindow), new PropertyMetadata(WinCopies.GUI.Windows.
+#if !WinCopies3
+            Dialogs.
+#endif
+            DialogButton.OK, (DependencyObject sender, DependencyPropertyChangedEventArgs e) => ((DialogWindow)sender).OnDialogButtonChanged((DialogButton?)e.OldValue, (DialogButton?)e.NewValue)
         ));
 
         /// <summary>
-        /// Gets or sets the <see cref="Dialogs.DialogButton"/>. <see cref="Command"/> will not be executed if this property is set to <see cref="DialogButton.OK"/>, or if the user clicks on one of the following buttons: Cancel, Ignore, Abort. This is a dependency property.
+        /// Gets or sets the <see cref="WinCopies.GUI.Windows.DialogButton"/>. <see cref="Command"/> will not be executed if this property is set to <see cref="DialogButton.OK"/>, or if the user clicks on one of the following buttons: Cancel, Ignore, Abort. This is a dependency property.
         /// </summary>
         public DialogButton? DialogButton { get => (DialogButton?)GetValue(DialogButtonProperty); set => SetValue(DialogButtonProperty, value); }
 
@@ -110,7 +129,7 @@ namespace WinCopies.GUI.Windows.Dialogs
         public bool ShowHelpButtonAsCommandButton { get => (bool)GetValue(ShowHelpButtonAsCommandButtonProperty); set => SetValue(ShowHelpButtonAsCommandButtonProperty, value); }
 
         /// <summary>
-        /// Gets the <see cref="WinCopies.GUI.Windows.Dialogs.MessageBoxResult"/>.
+        /// Gets the <see cref="WinCopies.GUI.Windows.MessageBoxResult"/>.
         /// </summary>
         public MessageBoxResult MessageBoxResult { get; private set; } = MessageBoxResult.None;
 
@@ -219,9 +238,7 @@ namespace WinCopies.GUI.Windows.Dialogs
         //}
 
         protected virtual void OnDialogButtonChanged(DialogButton? oldValue, DialogButton? newValue)
-
         {
-
             // MessageBox.Show(e.NewValue.ToString());
 
             if (DefaultButton != DefaultButton.None) throw new InvalidOperationException($"{nameof(DefaultButton)} must be set to {nameof(DefaultButton.None)} in order to perform this action.");
@@ -233,16 +250,22 @@ namespace WinCopies.GUI.Windows.Dialogs
             if (!(newValue is null))
 
                 switch (newValue)
-
                 {
-
-                    case Dialogs.DialogButton.OK:
+                    case WinCopies.GUI.Windows.
+#if !WinCopies3
+            Dialogs.
+#endif
+          DialogButton.OK:
 
                         _ = CommandBindings.Add(new CommandBinding(DialogCommands.Ok, Command_Executed, Command_CanExecute));
 
                         break;
 
-                    case Dialogs.DialogButton.OKCancel:
+                    case WinCopies.GUI.Windows.
+#if !WinCopies3
+            Dialogs.
+#endif
+          DialogButton.OKCancel:
 
                         _ = CommandBindings.Add(new CommandBinding(DialogCommands.Ok, Command_Executed, Command_CanExecute));
 
@@ -250,7 +273,11 @@ namespace WinCopies.GUI.Windows.Dialogs
 
                         break;
 
-                    case Dialogs.DialogButton.AbortRetryIgnore:
+                    case WinCopies.GUI.Windows.
+#if !WinCopies3
+            Dialogs.
+#endif
+          DialogButton.AbortRetryIgnore:
 
                         _ = CommandBindings.Add(new CommandBinding(DialogCommands.Abort, Command_Executed, Command_CanExecute));
 
@@ -260,7 +287,11 @@ namespace WinCopies.GUI.Windows.Dialogs
 
                         break;
 
-                    case Dialogs.DialogButton.YesNoCancel:
+                    case WinCopies.GUI.Windows.
+#if !WinCopies3
+            Dialogs.
+#endif
+          DialogButton.YesNoCancel:
 
                         _ = CommandBindings.Add(new CommandBinding(DialogCommands.Yes, Command_Executed, Command_CanExecute));
 
@@ -270,7 +301,11 @@ namespace WinCopies.GUI.Windows.Dialogs
 
                         break;
 
-                    case Dialogs.DialogButton.YesNo:
+                    case WinCopies.GUI.Windows.
+#if !WinCopies3
+            Dialogs.
+#endif
+          DialogButton.YesNo:
 
                         _ = CommandBindings.Add(new CommandBinding(DialogCommands.Yes, Command_Executed, Command_CanExecute));
 
@@ -278,7 +313,11 @@ namespace WinCopies.GUI.Windows.Dialogs
 
                         break;
 
-                    case Dialogs.DialogButton.RetryCancel:
+                    case WinCopies.GUI.Windows.
+#if !WinCopies3
+            Dialogs.
+#endif
+          DialogButton.RetryCancel:
 
                         _ = CommandBindings.Add(new CommandBinding(DialogCommands.Retry, Command_Executed, Command_CanExecute));
 
@@ -286,7 +325,11 @@ namespace WinCopies.GUI.Windows.Dialogs
 
                         break;
 
-                    case Dialogs.DialogButton.CancelTryContinue:
+                    case WinCopies.GUI.Windows.
+#if !WinCopies3
+            Dialogs.
+#endif
+          DialogButton.CancelTryContinue:
 
                         _ = CommandBindings.Add(new CommandBinding(DialogCommands.Cancel, Command_Executed, Command_CanExecute));
 
@@ -296,7 +339,11 @@ namespace WinCopies.GUI.Windows.Dialogs
 
                         break;
 
-                    case Dialogs.DialogButton.ContinueIgnoreCancel:
+                    case WinCopies.GUI.Windows.
+#if !WinCopies3
+            Dialogs.
+#endif
+          DialogButton.ContinueIgnoreCancel:
 
                         _ = CommandBindings.Add(new CommandBinding(DialogCommands.Continue, Command_Executed, Command_CanExecute));
 
@@ -306,7 +353,11 @@ namespace WinCopies.GUI.Windows.Dialogs
 
                         break;
 
-                    case Dialogs.DialogButton.OKApplyCancel:
+                    case WinCopies.GUI.Windows.
+#if !WinCopies3
+            Dialogs.
+#endif
+          DialogButton.OKApplyCancel:
 
                         _ = CommandBindings.Add(new CommandBinding(DialogCommands.Ok, Command_Executed, Command_CanExecute));
 
@@ -316,7 +367,11 @@ namespace WinCopies.GUI.Windows.Dialogs
 
                         break;
 
-                    case Dialogs.DialogButton.RetryIgnoreCancel:
+                    case WinCopies.GUI.Windows.
+#if !WinCopies3
+            Dialogs.
+#endif
+          DialogButton.RetryIgnoreCancel:
 
                         _ = CommandBindings.Add(new CommandBinding(DialogCommands.Retry, Command_Executed, Command_CanExecute));
 
@@ -326,7 +381,11 @@ namespace WinCopies.GUI.Windows.Dialogs
 
                         break;
 
-                    case Dialogs.DialogButton.IgnoreCancel:
+                    case WinCopies.GUI.Windows.
+#if !WinCopies3
+            Dialogs.
+#endif
+          DialogButton.IgnoreCancel:
 
                         _ = CommandBindings.Add(new CommandBinding(DialogCommands.Ignore, Command_Executed, Command_CanExecute));
 
@@ -334,7 +393,11 @@ namespace WinCopies.GUI.Windows.Dialogs
 
                         break;
 
-                    case Dialogs.DialogButton.YesToAllNoToAllCancel:
+                    case WinCopies.GUI.Windows.
+#if !WinCopies3
+            Dialogs.
+#endif
+          DialogButton.YesToAllNoToAllCancel:
 
                         _ = CommandBindings.Add(new CommandBinding(DialogCommands.YesToAll, Command_Executed, Command_CanExecute));
 
@@ -344,24 +407,24 @@ namespace WinCopies.GUI.Windows.Dialogs
 
                         break;
 
-                    case Dialogs.DialogButton.YesToAllNoToAll:
+                    case WinCopies.GUI.Windows.
+#if !WinCopies3
+            Dialogs.
+#endif
+          DialogButton.YesToAllNoToAll:
 
                         _ = CommandBindings.Add(new CommandBinding(DialogCommands.YesToAll, Command_Executed, Command_CanExecute));
 
                         _ = CommandBindings.Add(new CommandBinding(DialogCommands.NoToAll, Command_Executed, Command_CanExecute));
 
                         break;
-
                 }
 
             // ((DialogWindow)d).DefaultButton = DefaultButton.None;
-
         }
 
         protected virtual void OnDefaultButtonChanged(DefaultButton oldValue, DefaultButton newValue)
-
         {
-
             if (newValue == DefaultButton.None) return;
 
 #if !NETFRAMEWORK
@@ -373,107 +436,155 @@ namespace WinCopies.GUI.Windows.Dialogs
                 void throwArgumentException() => throw new ArgumentException("DefaultButton must be included in DialogButton value.");
 
             switch (DialogButton)
-
             {
-
-                case Dialogs.DialogButton.OK:
+                case WinCopies.GUI.Windows.
+#if !WinCopies3
+            Dialogs.
+#endif
+          DialogButton.OK:
 
                     if (newValue != DefaultButton.OK) throwArgumentException();
 
                     break;
 
-                case Dialogs.DialogButton.OKCancel:
+                case WinCopies.GUI.Windows.
+#if !WinCopies3
+            Dialogs.
+#endif
+          DialogButton.OKCancel:
 
                     if (If(IfCT.And, IfCM.Logical, IfComp.NotEqual, newValue, DefaultButton.OK, DefaultButton.Cancel)) throwArgumentException();
 
                     break;
 
-                case Dialogs.DialogButton.AbortRetryIgnore:
+                case WinCopies.GUI.Windows.
+#if !WinCopies3
+            Dialogs.
+#endif
+          DialogButton.AbortRetryIgnore:
 
                     if (If(IfCT.And, IfCM.Binary, IfComp.Equal, newValue, DefaultButton.Abort, DefaultButton.Retry, DefaultButton.Ignore)) throwArgumentException();
 
                     break;
 
-                case Dialogs.DialogButton.YesNoCancel:
+                case WinCopies.GUI.Windows.
+#if !WinCopies3
+            Dialogs.
+#endif
+          DialogButton.YesNoCancel:
 
                     if (If(IfCT.And, IfCM.Logical, IfComp.NotEqual, newValue, DefaultButton.Yes, DefaultButton.No, DefaultButton.Cancel)) throwArgumentException();
 
                     break;
 
-                case Dialogs.DialogButton.YesNo:
+                case WinCopies.GUI.Windows.
+#if !WinCopies3
+            Dialogs.
+#endif
+          DialogButton.YesNo:
 
                     if (If(IfCT.And, IfCM.Logical, IfComp.NotEqual, newValue, DefaultButton.Yes, DefaultButton.No)) throwArgumentException();
 
                     break;
 
-                case Dialogs.DialogButton.RetryCancel:
+                case WinCopies.GUI.Windows.
+#if !WinCopies3
+            Dialogs.
+#endif
+          DialogButton.RetryCancel:
 
                     if (If(IfCT.And, IfCM.Logical, IfComp.NotEqual, newValue, DefaultButton.Retry, DefaultButton.Cancel)) throwArgumentException();
 
                     break;
 
-                case Dialogs.DialogButton.CancelTryContinue:
+                case WinCopies.GUI.Windows.
+#if !WinCopies3
+            Dialogs.
+#endif
+          DialogButton.CancelTryContinue:
 
                     if (If(IfCT.And, IfCM.Logical, IfComp.NotEqual, newValue, DefaultButton.Cancel, DefaultButton.Retry, DefaultButton.Continue)) throwArgumentException();
 
                     break;
 
-                case Dialogs.DialogButton.ContinueIgnoreCancel:
+                case WinCopies.GUI.Windows.
+#if !WinCopies3
+            Dialogs.
+#endif
+          DialogButton.ContinueIgnoreCancel:
 
                     if (If(IfCT.And, IfCM.Logical, IfComp.NotEqual, newValue, DefaultButton.Continue, DefaultButton.Ignore, DefaultButton.Cancel)) throwArgumentException();
 
                     break;
 
-                case Dialogs.DialogButton.OKApplyCancel:
+                case WinCopies.GUI.Windows.
+#if !WinCopies3
+            Dialogs.
+#endif
+          DialogButton.OKApplyCancel:
 
                     if (If(IfCT.And, IfCM.Logical, IfComp.NotEqual, newValue, DefaultButton.OK, DefaultButton.Apply, DefaultButton.Cancel)) throwArgumentException();
 
                     break;
 
-                case Dialogs.DialogButton.RetryIgnoreCancel:
+                case WinCopies.GUI.Windows.
+#if !WinCopies3
+            Dialogs.
+#endif
+          DialogButton.RetryIgnoreCancel:
 
                     if (If(IfCT.And, IfCM.Logical, IfComp.NotEqual, newValue, DefaultButton.Retry, DefaultButton.Ignore, DefaultButton.Cancel)) throwArgumentException();
 
                     break;
 
-                case Dialogs.DialogButton.IgnoreCancel:
+                case WinCopies.GUI.Windows.
+#if !WinCopies3
+            Dialogs.
+#endif
+          DialogButton.IgnoreCancel:
 
                     if (If(IfCT.And, IfCM.Logical, IfComp.NotEqual, newValue, DefaultButton.Ignore, DefaultButton.Cancel)) throwArgumentException();
 
                     break;
 
-                case Dialogs.DialogButton.YesToAllNoToAllCancel:
+                case WinCopies.GUI.Windows.
+#if !WinCopies3
+            Dialogs.
+#endif
+          DialogButton.YesToAllNoToAllCancel:
 
                     if (If(IfCT.And, IfCM.Logical, IfComp.NotEqual, newValue, DefaultButton.YesToAll, DefaultButton.NoToAll, DefaultButton.Cancel)) throwArgumentException();
 
                     break;
 
-                case Dialogs.DialogButton.YesToAllNoToAll:
+                case WinCopies.GUI.Windows.
+#if !WinCopies3
+            Dialogs.
+#endif
+          DialogButton.YesToAllNoToAll:
 
                     if (If(IfCT.And, IfCM.Logical, IfComp.NotEqual, newValue, DefaultButton.YesToAll, DefaultButton.NoToAll)) throwArgumentException();
 
                     break;
-
             }
-
         }
 
         protected virtual void OnCustomButtonsSourceChanged(IEnumerable oldValue, IEnumerable newValue)
-
         {
-
             if (!(DialogButton is null)) throw new InvalidOperationException("DialogButton is not null.");
-
         }
 
         private void Command_CanExecute(object sender, CanExecuteRoutedEventArgs e) => OnCommandCanExecute(e);
 
         protected virtual void OnCommandCanExecute(CanExecuteRoutedEventArgs e)
         {
-
             if (e.Command == DialogCommands.Ok)
 
-                e.CanExecute = DialogButton == Dialogs.DialogButton.OK || Command == null || Command.CanExecute(CommandParameter, CommandTarget);
+                e.CanExecute = DialogButton == WinCopies.GUI.Windows.
+#if !WinCopies3
+            Dialogs.
+#endif
+          DialogButton.OK || Command == null || Command.CanExecute(CommandParameter, CommandTarget);
 
             else if (e.Command == DialogCommands.Apply)
 
@@ -486,15 +597,12 @@ namespace WinCopies.GUI.Windows.Dialogs
             else if (If(IfCT.Or, IfCM.Logical, IfComp.Equal, e.Command, DialogCommands.No, DialogCommands.YesToAll, DialogCommands.NoToAll, DialogCommands.Cancel, DialogCommands.Abort, DialogCommands.Ignore))
 
                 e.CanExecute = true;
-
         }
 
         private void Command_Executed(object sender, ExecutedRoutedEventArgs e) => OnCommandExecuted(e);
 
         protected virtual void OnCommandExecuted(ExecutedRoutedEventArgs e)
-
         {
-
             if (e.Command == DialogCommands.Ok)
 
                 CloseWindowWithDialogResult(true, MessageBoxResult.OK);
@@ -538,31 +646,28 @@ namespace WinCopies.GUI.Windows.Dialogs
             else if (e.Command == DialogCommands.Continue)
 
                 CloseWindowWithDialogResult(true, MessageBoxResult.Continue);
-
         }
 
         protected void CloseWindowWithDialogResult(bool dialogResult, MessageBoxResult messageBoxResult)
-
         {
-
             try
-
             {
-
                 DialogResult = dialogResult;
-
             }
+
             catch (InvalidOperationException ex) when (ex.HResult == -2146233079) { }
 
             MessageBoxResult = messageBoxResult;
 
-            if (dialogResult && Command != null && DialogButton != Dialogs.DialogButton.OK)
+            if (dialogResult && Command != null && DialogButton != WinCopies.GUI.Windows.
+#if !WinCopies3
+            Dialogs.
+#endif
+         DialogButton.OK)
 
                 Command.Execute(CommandParameter, CommandTarget);
 
             Close();
-
         }
-
     }
 }

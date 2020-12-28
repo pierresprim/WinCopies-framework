@@ -20,7 +20,7 @@
 
   <ItemGroup>
     <PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="2.0.1" />
-    <PackageReference Include="WinCopies.Util.Desktop" Version="2.5.9" />
+    <PackageReference Include="WinCopies.Util.Desktop" Version="2.6.1.1" />
   </ItemGroup>
 
   <ItemGroup>

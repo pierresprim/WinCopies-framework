@@ -22,8 +22,8 @@
   <Import Project="..\..\WinCopies.GUI.Shared\WinCopies.GUI.Shared.projitems" Label="Shared" />
 
   <ItemGroup>
-    <PackageReference Include="WinCopies.Util" Version="2.6" />
-    <PackageReference Include="WinCopies.Util.Desktop" Version="2.5.9" />
+    <PackageReference Include="WinCopies.Util" Version="2.6.1.1" />
+    <PackageReference Include="WinCopies.Util.Desktop" Version="2.6.1.1" />
   </ItemGroup>
 
   <ItemGroup>

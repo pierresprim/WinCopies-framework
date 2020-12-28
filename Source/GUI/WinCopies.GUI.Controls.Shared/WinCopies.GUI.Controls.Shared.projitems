@@ -10,12 +10,15 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AssemblyInfo.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)HeaderedControl.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Label.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Link.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)LinkRun.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\HeaderedControl.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\Label.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\Link.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\LinkRun.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\PlaceholderTextBox.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)LinkUnderliningMode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)PropertyGrid.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\InlineTextEditor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\PropertyGrid.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\TextBox.cs" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="$(MSBuildThisFileDirectory)Themes\Generic.xaml">
