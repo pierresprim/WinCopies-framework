@@ -61,22 +61,97 @@ namespace WinCopies
 
     public class InterfaceDataTemplateSelector : DataTemplateSelector
     {
-        private static System.Collections.Generic.IEnumerable<Type> GetDirectInterfaces(in Type t, bool ignoreGenerics)
+        public static System.Collections.Generic.IEnumerable<Type> GetDirectInterfaces( Type t, bool ignoreGenerics, bool directTypeOnly)
         {
             var interfaces = new ArrayBuilder<Type>();
             var subInterfaces = new ArrayBuilder<Type>();
 
-            foreach (Type i in t.GetInterfaces())
+            void _addInterface(in Type i) => _ = interfaces.AddLast(i);
+
+            void _addSubInterface(in Type i) => _ = subInterfaces.AddLast(i);
+
+            void addNonGenericSubInterfaces(Type _t)
             {
-                if (!i.IsGenericType)
+                foreach (Type i in _t.GetInterfaces())
+
+                    if (!i.IsGenericType)
+
+                        _addSubInterface(i);
+            }
+
+            void addNonGenericInterfaces()
+            {
+                foreach (Type i in t.GetInterfaces())
+
+                    if (!i.IsGenericType)
+                    {
+                        _addInterface(i);
+
+                        addNonGenericSubInterfaces(i);
+                    }
+            }
+
+            void addSubInterfaces(Type _t)
+            {
+                foreach (Type i in _t.GetInterfaces())
+
+                    _addSubInterface(i);
+            }
+
+            void addInterfaces()
+            {
+                foreach (Type i in t.GetInterfaces())
                 {
-                    _ = interfaces.AddLast(i);
+                    _addInterface(i);
 
-                    foreach (Type _i in i.GetInterfaces())
-
-                        _ = subInterfaces.AddLast(_i);
+                    addSubInterfaces(i);
                 }
             }
+
+            void addBaseTypesInterfaces(Action<Type> _action)
+            {
+                Type _t = t.BaseType;
+
+                while (_t != null)
+                {
+                    _action(_t);
+
+                    _t = _t.BaseType;
+                }
+            }
+
+            Action action;
+
+            if (ignoreGenerics)
+
+                if (directTypeOnly)
+
+                    action = () =>
+                    {
+                        addNonGenericInterfaces();
+
+                        addBaseTypesInterfaces(addNonGenericSubInterfaces);
+                    };
+
+                else
+
+                    action = addNonGenericInterfaces;
+
+            else if (directTypeOnly)
+
+                action = () =>
+                {
+                    addInterfaces();
+
+                    addBaseTypesInterfaces(addSubInterfaces);
+                };
+
+
+            else
+
+                action = addInterfaces;
+
+            action();
 
             return ((System.Collections.Generic.IEnumerable<Type>)interfaces).Except(subInterfaces);
         }
@@ -101,11 +176,11 @@ namespace WinCopies
 
             Type itemType = item.GetType();
 
-            foreach (var i in GetDirectInterfaces(itemType, true))
+            foreach (var i in GetDirectInterfaces(itemType, true,true))
 
             Debug.WriteLine(item.GetType().ToString()+" "+i.Name);
 
-            return System.Linq.Enumerable.Repeat(itemType, 1).Concat(GetDirectInterfaces(itemType, true))
+            return System.Linq.Enumerable.Repeat(itemType, 1).Concat(GetDirectInterfaces(itemType, true,true))
                     .FirstOrDefault<DataTemplate>(t => containerElement.TryFindResource(new DataTemplateKey(t))) ?? base.SelectTemplate(item, container);
         }
     }

@@ -53,8 +53,50 @@
         </ResourceDictionary>
     </ResourceDictionary.MergedDictionaries>
 
-    <Style BasedOn="{StaticResource {x:Type TextBox}}" TargetType="{x:Type local:PlaceholderTextBox}">
+    <Style BasedOn="{StaticResource {x:Type TextBox}}" TargetType="{x:Type local:TextBox}">
         <Setter Property="ContextMenu" Value="{StaticResource TextBoxContextMenu}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:TextBox}">
+                    <Border x:Name="border" Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}" SnapsToDevicePixels="True">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="auto" />
+                            </Grid.ColumnDefinitions>
+                            <ItemsControl ItemsSource="{TemplateBinding LeftItems}" ItemContainerStyle="{TemplateBinding LeftItemsStyle}" ItemTemplateSelector="{TemplateBinding LeftItemsTemplateSelector}" HorizontalAlignment="Left">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+                            <ScrollViewer x:Name="PART_ContentHost" Grid.Column="1" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" />
+                            <ItemsControl Grid.Column="2" ItemsSource="{TemplateBinding RightItems}" ItemContainerStyle="{TemplateBinding RightItemsStyle}" ItemTemplateSelector="{TemplateBinding RightItemsTemplateSelector}" HorizontalAlignment="Right">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+                        </Grid>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style BasedOn="{StaticResource {x:Type local:TextBox}}" TargetType="{x:Type local:ButtonTextBox}">
+        <Setter Property="RightItems" Value="{Binding Buttons, RelativeSource={RelativeSource Self}}" />
+        <Setter Property="RightItemsTemplateSelector">
+            <Setter.Value>
+                <temp:InterfaceDataTemplateSelector />
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style BasedOn="{StaticResource {x:Type local:ButtonTextBox}}" TargetType="{x:Type local:PlaceholderTextBox}">
         <Style.Triggers>
             <DataTrigger Binding="{Binding PlaceholderStyle, Converter={StaticResource IsNullConverter}, RelativeSource={RelativeSource Self}}" Value="false">
                 <Setter Property="Template">
@@ -62,14 +104,33 @@
                         <ControlTemplate TargetType="{x:Type local:PlaceholderTextBox}">
                             <Border x:Name="border" Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}" SnapsToDevicePixels="True">
                                 <Grid>
-                                    <TextBox IsReadOnly="True" IsReadOnlyCaretVisible="False" Style="{TemplateBinding PlaceholderStyle}" Focusable="False" Visibility="{TemplateBinding IsPlaceholderVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="auto" />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <ItemsControl ItemsSource="{TemplateBinding LeftItems}" ItemContainerStyle="{TemplateBinding LeftItemsStyle}" ItemTemplateSelector="{TemplateBinding LeftItemsTemplateSelector}" HorizontalAlignment="Left">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <StackPanel Orientation="Horizontal" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                    </ItemsControl>
+                                    <TextBox Grid.Column="1" IsReadOnly="True" IsReadOnlyCaretVisible="False" Style="{TemplateBinding PlaceholderStyle}" Focusable="False" Visibility="{TemplateBinding IsPlaceholderVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
                                         <TextBox.Template>
                                             <ControlTemplate TargetType="{x:Type TextBox}">
                                                 <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
                                             </ControlTemplate>
                                         </TextBox.Template>
                                     </TextBox>
-                                    <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
+                                    <ScrollViewer x:Name="PART_ContentHost" Grid.Column="1" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
+                                    <ItemsControl Grid.Column="2" ItemsSource="{TemplateBinding RightItems}" ItemContainerStyle="{TemplateBinding RightItemsStyle}" ItemTemplateSelector="{TemplateBinding RightItemsTemplateSelector}" HorizontalAlignment="Right">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <StackPanel Orientation="Horizontal" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                    </ItemsControl>
                                 </Grid>
                             </Border>
                             <ControlTemplate.Triggers>
@@ -92,23 +153,6 @@
 
     <Style BasedOn="{StaticResource {x:Type TextBox}}" TargetType="{x:Type local:CommandableTextBox}">
         <Setter Property="ContextMenu" Value="{StaticResource TextBoxContextMenu}" />
-    </Style>
-
-    <Style BasedOn="{StaticResource {x:Type Label}}" TargetType="{x:Type local:Label}">
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type local:Label}">
-                    <Border Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}" Padding="{TemplateBinding Padding}" SnapsToDevicePixels="true">
-                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" RecognizesAccessKey="{TemplateBinding RecognizesAccessKey}" />
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsEnabled" Value="false">
-                            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
     </Style>
 
     <!--<Style TargetType="{x:Type local:InlineTextEditor}">
