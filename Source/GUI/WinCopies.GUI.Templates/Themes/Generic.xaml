@@ -20,12 +20,16 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:WinCopies.GUI.Templates"
     xmlns:media="clr-namespace:System.Windows.Media;assembly=PresentationCore"
+    xmlns:drawing="clr-namespace:System.Drawing;assembly=System.Drawing"
     xmlns:controls="clr-namespace:WinCopies.GUI.Controls.Models;assembly=WinCopies.GUI.Models"
     xmlns:controlViewModels="clr-namespace:WinCopies.GUI.Controls.ViewModels;assembly=WinCopies.GUI.ViewModels"
-    xmlns:util="clr-namespace:WinCopies.Util;assembly=WinCopies.Util.Desktop">
+    xmlns:util="clr-namespace:WinCopies.Util;assembly=WinCopies.Util.Desktop"
+    xmlns:converters="clr-namespace:WinCopies.Util.Data;assembly=WinCopies.Util.Desktop">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary>
             <local:ModelToBooleanConverter x:Key="DefaultModelToBooleanConverter" />
+            <local:BitmapToImageSourceConverter x:Key="BitmapToImageSourceConverter" />
+            <local:IconToImageSourceConverter x:Key="IconToImageSourceConverter" />
             <Style x:Key="ControlStyle" TargetType="{x:Type Control}" x:Shared="false">
                 <Setter Property="IsEnabled" Value="{Binding IsEnabled}" />
             </Style>
@@ -109,6 +113,12 @@
     </ResourceDictionary.MergedDictionaries>
     <DataTemplate DataType="{x:Type media:ImageSource}" x:Shared="false">
         <Image Source="{Binding}" />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type drawing:Bitmap}" x:Shared="false">
+        <Image Source="{Binding Mode=OneWay, Converter={StaticResource BitmapToImageSourceConverter}}" />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type drawing:Icon}" x:Shared="false">
+        <Image Source="{Binding Mode=OneWay, Converter={StaticResource IconToImageSourceConverter}}" />
     </DataTemplate>
     <DataTemplate DataType="{x:Type controls:IContentControlModel}" x:Shared="false">
         <ContentControl Style="{StaticResource ContentControlStyle}" />

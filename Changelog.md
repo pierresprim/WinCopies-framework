@@ -31,6 +31,7 @@ WinCopies.GUI.IO 2.6-preview
 	- Add new processes
 	- Add ThrowIfIsBusy protected method to Process class.
 	- Process helper methods.
+	- New TextBox controls.
 
 WinCopies.IO 2.6-preview
 ------------------------

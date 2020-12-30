@@ -22,6 +22,10 @@ using System.Windows.Media;
 using WinCopies.GUI.Controls.Models;
 using WinCopies.Util.Data;
 
+#if !WinCopies3
+using WinCopies.Util;
+#endif
+
 namespace WinCopies.GUI.Controls.ViewModels
 {
     [TypeForDataTemplate(typeof(ITextBoxModelTextOriented))]

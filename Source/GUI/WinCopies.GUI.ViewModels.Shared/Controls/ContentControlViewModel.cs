@@ -19,10 +19,12 @@ using WinCopies.GUI.Controls.Models;
 using WinCopies.Util.Data;
 
 using static WinCopies.
-    #if WinCopies2
-    Util.Util
-#else
+#if WinCopies3
     ThrowHelper
+#else
+    Util.Util;
+
+using WinCopies.Util
     #endif
     ;
 

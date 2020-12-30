@@ -119,7 +119,7 @@ namespace WinCopies.GUI.Controls
     }
 
     //    [System.Windows.TemplatePart(Name = PART_TextBox, Type = typeof(PlaceholderSubTextBox))]
-    public class PlaceholderTextBox : System.Windows.Controls.TextBox /*Control, IAddChild*/
+    public class PlaceholderTextBox : ButtonTextBox /*Control, IAddChild*/
     {
         public static readonly DependencyProperty PlaceholderStyleProperty = DependencyProperty.Register(nameof(PlaceholderStyle), typeof(Style), typeof(PlaceholderTextBox), new PropertyMetadata(null, (DependencyObject d, DependencyPropertyChangedEventArgs e) =>
         {

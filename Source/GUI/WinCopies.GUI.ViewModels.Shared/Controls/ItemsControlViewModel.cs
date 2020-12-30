@@ -21,6 +21,10 @@ using System.Collections.Generic;
 using WinCopies.GUI.Controls.Models;
 using WinCopies.Util.Data;
 
+#if !WinCopies3
+using WinCopies.Util;
+#endif
+
 using static WinCopies.
     #if WinCopies2
     Util.Util

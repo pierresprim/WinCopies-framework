@@ -26,6 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\WinCopies.Util\WinCopies.Util.Temp.csproj" />
     <ProjectReference Include="..\WinCopies.GUI.Models\WinCopies.GUI.Models.csproj" />
     <ProjectReference Include="..\WinCopies.GUI.ViewModels\WinCopies.GUI.ViewModels.csproj" />
   </ItemGroup>
@@ -35,6 +36,12 @@
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
 
 </Project>

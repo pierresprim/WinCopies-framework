@@ -40,6 +40,7 @@
         <TabItem Header="_TextBox">
             <StackPanel>
                 <TextBox>Normal TextBox</TextBox>
+                <controls:PlaceholderTextBox>No placeholder TextBox</controls:PlaceholderTextBox>
                 <controls:PlaceholderTextBox PlaceholderMode="OnTextChanged">
                     <controls:PlaceholderTextBox.PlaceholderStyle>
                         <Style TargetType="{x:Type TextBox}">

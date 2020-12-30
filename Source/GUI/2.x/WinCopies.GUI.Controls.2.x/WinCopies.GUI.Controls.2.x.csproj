@@ -33,6 +33,14 @@
     <ProjectReference Include="..\..\..\WinCopies.Util.Temp.2.x\WinCopies.Util.Temp.2.x.csproj" />
     <ProjectReference Include="..\WinCopies.GUI.Icons.2.x\WinCopies.GUI.Icons.2.x.csproj" />
     <ProjectReference Include="..\WinCopies.GUI.Models.2.x\WinCopies.GUI.Models.2.x.csproj" />
+    <ProjectReference Include="..\WinCopies.GUI.Templates.2.x\WinCopies.GUI.Templates.2.x.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Themes\Generic.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
 
 </Project>

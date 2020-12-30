@@ -16,6 +16,7 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using WinCopies.GUI.Windows.Dialogs.Models;
+
 using WinCopies.Util.Data;
 
 namespace WinCopies.GUI.Windows.Dialogs.ViewModels

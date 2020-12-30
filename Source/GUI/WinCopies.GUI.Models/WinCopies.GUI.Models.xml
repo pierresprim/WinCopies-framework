@@ -16,12 +16,12 @@
         </member>
         <member name="P:WinCopies.GUI.Windows.Dialogs.Models.IDialogModel.DialogButton">
             <summary>
-            Gets or sets the <see cref="T:WinCopies.GUI.Windows.Dialogs.DialogButton"/> value of this <see cref="T:WinCopies.GUI.Windows.Dialogs.Models.IDialogModel"/>.
+            Gets or sets the <see cref="!:Dialogs.DialogButton"/> value of this <see cref="T:WinCopies.GUI.Windows.Dialogs.Models.IDialogModel"/>.
             </summary>
         </member>
         <member name="P:WinCopies.GUI.Windows.Dialogs.Models.IDialogModel.DefaultButton">
             <summary>
-            Gets or sets the <see cref="T:WinCopies.GUI.Windows.Dialogs.DefaultButton"/> value of this <see cref="T:WinCopies.GUI.Windows.Dialogs.Models.IDialogModel"/>.
+            Gets or sets the <see cref="!:Dialogs.DefaultButton"/> value of this <see cref="T:WinCopies.GUI.Windows.Dialogs.Models.IDialogModel"/>.
             </summary>
         </member>
         <member name="T:WinCopies.GUI.Windows.Dialogs.Models.DialogModel">
@@ -36,12 +36,12 @@
         </member>
         <member name="P:WinCopies.GUI.Windows.Dialogs.Models.DialogModel.DialogButton">
             <summary>
-            Gets or sets the <see cref="T:WinCopies.GUI.Windows.Dialogs.DialogButton"/> value of this <see cref="T:WinCopies.GUI.Windows.Dialogs.Models.DialogModel"/>.
+            Gets or sets the <see cref="!:Dialogs.DialogButton"/> value of this <see cref="T:WinCopies.GUI.Windows.Dialogs.Models.DialogModel"/>.
             </summary>
         </member>
         <member name="P:WinCopies.GUI.Windows.Dialogs.Models.DialogModel.DefaultButton">
             <summary>
-            Gets or sets the <see cref="T:WinCopies.GUI.Windows.Dialogs.DefaultButton"/> value of this <see cref="T:WinCopies.GUI.Windows.Dialogs.Models.DialogModel"/>.
+            Gets or sets the <see cref="!:Dialogs.DefaultButton"/> value of this <see cref="T:WinCopies.GUI.Windows.Dialogs.Models.DialogModel"/>.
             </summary>
         </member>
         <member name="T:WinCopies.GUI.Controls.Models.IContentControlModel">

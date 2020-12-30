@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>WinCopies.GUI.ViewModels</name>
+    </assembly>
+    <members>
+        <member name="P:WinCopies.GUI.Windows.Dialogs.ViewModels.DialogViewModel`1.Title">
+            <summary>
+            Gets or sets the title of this <see cref="T:WinCopies.GUI.Windows.Dialogs.ViewModels.DialogViewModel`1"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.Dialogs.ViewModels.DialogViewModel`1.DialogButton">
+            <summary>
+            Gets or sets the <see cref="T:WinCopies.GUI.Windows.Dialogs.DialogButton"/> value of this <see cref="T:WinCopies.GUI.Windows.Dialogs.ViewModels.DialogViewModel`1"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.Dialogs.ViewModels.DialogViewModel`1.DefaultButton">
+            <summary>
+            Gets or sets the <see cref="T:WinCopies.GUI.Windows.Dialogs.DefaultButton"/> value of this <see cref="T:WinCopies.GUI.Windows.Dialogs.ViewModels.DialogViewModel`1"/>.
+            </summary>
+        </member>
+        <member name="M:WinCopies.GUI.Windows.Dialogs.ViewModels.DialogViewModel`1.#ctor(`0)">
+            <summary>
+            Initializes a new instance of the <see cref="T:WinCopies.GUI.Windows.Dialogs.ViewModels.DialogViewModel`1"/> class.
+            </summary>
+            <param name="model">The <typeparamref name="T"/> model to wrap in this <see cref="T:WinCopies.Util.Data.ViewModel`1"/>.</param>
+        </member>
+    </members>
+</doc>

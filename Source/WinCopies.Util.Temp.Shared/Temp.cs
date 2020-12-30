@@ -39,15 +39,77 @@ using static WinCopies.Util.ThrowHelper
     ;
 using System.Diagnostics;
 using WinCopies.Collections.Generic;
+using System.Drawing;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Interop;
+using System.Windows;
+using System.Runtime.InteropServices;
+using System.Windows.Controls;
+using System.Linq;
+
+using WinCopies.Collections;
 
 #if !WinCopies3
 using System.Collections;
-
-using WinCopies.Collections;
+using WinCopies.Util;
 #endif
 
 namespace WinCopies
 {
+    // Already implemented in WinCopies.Util.
+
+    public class InterfaceDataTemplateSelector : DataTemplateSelector
+    {
+        private static System.Collections.Generic.IEnumerable<Type> GetDirectInterfaces(in Type t, bool ignoreGenerics)
+        {
+            var interfaces = new ArrayBuilder<Type>();
+            var subInterfaces = new ArrayBuilder<Type>();
+
+            foreach (Type i in t.GetInterfaces())
+            {
+                if (!i.IsGenericType)
+                {
+                    _ = interfaces.AddLast(i);
+
+                    foreach (Type _i in i.GetInterfaces())
+
+                        _ = subInterfaces.AddLast(_i);
+                }
+            }
+
+            return ((System.Collections.Generic.IEnumerable<Type>)interfaces).Except(subInterfaces);
+        }
+
+        public override DataTemplate SelectTemplate(object item, DependencyObject container)
+        {
+            if (item == null ||
+#if !CS9
+                !(
+#endif
+                container is
+#if CS9
+                not
+#endif
+                FrameworkElement containerElement
+#if !CS9
+                )
+#endif
+                )
+
+                return base.SelectTemplate(item, container);
+
+            Type itemType = item.GetType();
+
+            foreach (var i in GetDirectInterfaces(itemType, true))
+
+            Debug.WriteLine(item.GetType().ToString()+" "+i.Name);
+
+            return System.Linq.Enumerable.Repeat(itemType, 1).Concat(GetDirectInterfaces(itemType, true))
+                    .FirstOrDefault<DataTemplate>(t => containerElement.TryFindResource(new DataTemplateKey(t))) ?? base.SelectTemplate(item, container);
+        }
+    }
+
     public static class Extensions
     {
         // Already implemented in WinCopies.Util.
@@ -59,6 +121,94 @@ System.Collections.Generic.IEnumerator
             IEnumeratorInfo2
 #endif
             <TDestination> Select<TSource, TDestination>(this System.Collections.Generic.IEnumerator<TSource> enumerator, Converter<TSource, TDestination> func) => new SelectEnumerator<TSource, TDestination>(enumerator, value => func(value));
+    }
+
+    namespace Util
+    {
+        public static class Extensions
+        {
+            // Already implemented in WinCopies.Util.
+
+            [DllImport("gdi32.dll", CharSet = CharSet.Auto)]
+            [return: MarshalAs(UnmanagedType.Bool)]
+            private static extern bool DeleteObject([In] IntPtr hObject);
+
+            // Already implemented in WinCopies.Util.
+
+            private static ImageSource _ToImageSource(Bitmap bitmap)
+            {
+                bitmap.MakeTransparent();
+
+                IntPtr hBitmap = bitmap.GetHbitmap();
+
+                ImageSource wpfBitmap = Imaging.CreateBitmapSourceFromHBitmap(
+                    hBitmap,
+                    IntPtr.Zero,
+                    Int32Rect.Empty,
+                    BitmapSizeOptions.FromEmptyOptions());
+
+                if (!DeleteObject(hBitmap))
+
+                    Marshal.ThrowExceptionForHR(Marshal.GetHRForLastWin32Error());
+
+                return wpfBitmap;
+
+                //            //using (MemoryStream stream = new MemoryStream())
+                //            //{
+                //            //    bitmap.Save(stream, ImageFormat.Png); // Was .Bmp, but this did not show a transparent background.
+
+                //            //    stream.Position = 0;
+                //            //    BitmapImage result = new BitmapImage();
+                //            //    result.BeginInit();
+                //            //    // According to MSDN, "The default OnDemand cache option retains access to the stream until the image is needed."
+                //            //    // Force the bitmap to load right now so we can dispose the stream.
+                //            //    result.CacheOption = BitmapCacheOption.OnLoad;
+                //            //    result.StreamSource = stream;
+                //            //    result.EndInit();
+                //            //    result.Freeze();
+                //            //    return result;
+                //            //}
+
+                //            return wpfBitmap;
+            }
+
+            // Already implemented in WinCopies.Util.
+
+            public static ImageSource ToImageSource(this Icon icon) => _ToImageSource((icon ?? throw GetArgumentNullException(nameof(icon))).ToBitmap());
+
+            // https://stackoverflow.com/questions/5689674/c-sharp-convert-wpf-image-source-to-a-system-drawing-bitmap
+
+            // Already implemented in WinCopies.Util.
+
+            public static Bitmap ToBitmap(this BitmapSource bitmapSource)
+            {
+                ThrowIfNull(bitmapSource, nameof(bitmapSource));
+
+                int width = bitmapSource.PixelWidth;
+                int height = bitmapSource.PixelHeight;
+                int stride = width * ((bitmapSource.Format.BitsPerPixel + 7) / 8);
+                IntPtr ptr = IntPtr.Zero;
+
+                try
+                {
+                    ptr = Marshal.AllocHGlobal(height * stride);
+                    bitmapSource.CopyPixels(new Int32Rect(0, 0, width, height), ptr, height * stride, stride);
+
+                    using (var bitmap = new Bitmap(width, height, stride, System.Drawing.Imaging.PixelFormat.Format1bppIndexed, ptr))
+
+                        // Clone the bitmap so that we can dispose it and
+                        // release the unmanaged memory at ptr
+                        return new Bitmap(bitmap);
+                }
+
+                finally
+                {
+                    if (ptr != IntPtr.Zero)
+
+                        Marshal.FreeHGlobal(ptr);
+                }
+            }
+        }
     }
 
     namespace Collections.Abstract.Generic
@@ -104,7 +254,7 @@ System.Collections.Generic.IEnumerator
 
         public class List<T> : IList<T>
         {
-#region Properties
+            #region Properties
             protected System.Collections.Generic.IList<T> InnerList { get; }
 
             public int Count => InnerList.Count;
@@ -112,11 +262,11 @@ System.Collections.Generic.IEnumerator
             public T this[int index] { get => InnerList[index]; set => InnerList[index] = value; }
 
             public bool IsReadOnly => InnerList.IsReadOnly;
-#endregion
+            #endregion
 
             public List(System.Collections.Generic.IList<T> innerList) => InnerList = innerList;
 
-#region Methods
+            #region Methods
             public void Add(T item) => InnerList.Add(item);
 
             public bool Contains(T item) => InnerList.Contains(item);
@@ -136,7 +286,7 @@ System.Collections.Generic.IEnumerator
             public bool Remove(T item) => InnerList.Remove(item);
 
             public void Clear() => InnerList.Clear();
-#endregion
+            #endregion
         }
     }
 
