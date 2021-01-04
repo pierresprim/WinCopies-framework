@@ -197,7 +197,7 @@ namespace WinCopies.GUI.Controls.Models
 #if WinCopies3
     public interface IControlModel
     {
-        bool IsEnabled { get; } 
+        bool IsEnabled { get; }
     }
 #endif
 
@@ -236,10 +236,7 @@ namespace WinCopies.GUI.Controls.Models
 
         public BindingDirection BindingDirection { get; } = Models.BindingDirection.OneWay;
 
-        public ContentControlModel()
-        {
-            // Left empty.
-        }
+        public ContentControlModel() { /* Left empty. */ }
 
         public ContentControlModel(object content) => Content = content;
 
@@ -299,10 +296,7 @@ namespace WinCopies.GUI.Controls.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="ContentControlModel"/> class.
         /// </summary>
-        public ContentControlModel()
-        {
-            // Left empty.
-        }
+        public ContentControlModel() { /* Left empty. */ }
 
         public ContentControlModel(T content) => Content = content;
 
@@ -358,17 +352,11 @@ namespace WinCopies.GUI.Controls.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="HeaderedContentControlModel"/> class.
         /// </summary>
-        public HeaderedContentControlModel()
-        {
-            // Left empty.
-        }
+        public HeaderedContentControlModel() { /* Left empty. */ }
 
         public HeaderedContentControlModel(object header, object content) : base(content) => Header = header;
 
-        public HeaderedContentControlModel(BindingDirection bindingDirection) : base(bindingDirection)
-        {
-            // Left empty.
-        }
+        public HeaderedContentControlModel(BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
 
         public HeaderedContentControlModel(object header, object content, BindingDirection bindingDirection) : base(content, bindingDirection) => Header = header;
 
@@ -418,10 +406,7 @@ namespace WinCopies.GUI.Controls.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="HeaderedContentControlModel{THeader, TContent}"/> class.
         /// </summary>
-        public HeaderedContentControlModel()
-        {
-            // Left empty.
-        }
+        public HeaderedContentControlModel() { /* Left empty. */ }
 
         public HeaderedContentControlModel(THeader header, TContent content) : base(content) => Header = header;
 
@@ -475,10 +460,7 @@ namespace WinCopies.GUI.Controls.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="ItemsControlModel"/> class.
         /// </summary>
-        public ItemsControlModel()
-        {
-            // Left empty.
-        }
+        public ItemsControlModel() { /* Left empty. */ }
 
         public ItemsControlModel(IEnumerable items) => Items = items;
 
@@ -537,10 +519,7 @@ namespace WinCopies.GUI.Controls.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="ItemsControlModel{T}"/> class.
         /// </summary>
-        public ItemsControlModel()
-        {
-            // Left empty.
-        }
+        public ItemsControlModel() { /* Left empty. */ }
 
         public ItemsControlModel(IEnumerable<T> items) => Items = items;
 
@@ -585,17 +564,11 @@ namespace WinCopies.GUI.Controls.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="HeaderedItemsControlModel"/> class.
         /// </summary>
-        public HeaderedItemsControlModel()
-        {
-            // Left empty.
-        }
+        public HeaderedItemsControlModel() { /* Left empty. */ }
 
         public HeaderedItemsControlModel(object header, IEnumerable items) : base(items) => Header = header;
 
-        public HeaderedItemsControlModel(BindingDirection bindingDirection) : base(bindingDirection)
-        {
-            // Left empty.
-        }
+        public HeaderedItemsControlModel(BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
 
         public HeaderedItemsControlModel(object header, IEnumerable items, BindingDirection bindingDirection) : base(items, bindingDirection) => Header = header;
 
@@ -633,17 +606,11 @@ namespace WinCopies.GUI.Controls.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="HeaderedItemsControlModel{THeader, TItems}"/> class.
         /// </summary>
-        public HeaderedItemsControlModel()
-        {
-            // Left empty.
-        }
+        public HeaderedItemsControlModel() { /* Left empty. */ }
 
         public HeaderedItemsControlModel(THeader header, IEnumerable<TItems> items) : base(items) => Header = header;
 
-        public HeaderedItemsControlModel(BindingDirection bindingDirection) : base(bindingDirection)
-        {
-            // Left empty.
-        }
+        public HeaderedItemsControlModel(BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
 
         public HeaderedItemsControlModel(THeader header, IEnumerable<TItems> items, BindingDirection bindingDirection) : base(items, bindingDirection) => Header = header;
 
@@ -680,25 +647,13 @@ namespace WinCopies.GUI.Controls.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="GroupBoxModel"/> class.
         /// </summary>
-        public GroupBoxModel()
-        {
-            // Left empty.
-        }
+        public GroupBoxModel() { /* Left empty. */ }
 
-        public GroupBoxModel(object header, object content) : base(header, content)
-        {
-            // Left empty.
-        }
+        public GroupBoxModel(object header, object content) : base(header, content) { /* Left empty. */ }
 
-        public GroupBoxModel(BindingDirection bindingDirection) : base(bindingDirection)
-        {
-            // Left empty.
-        }
+        public GroupBoxModel(BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
 
-        public GroupBoxModel(object header, object content, BindingDirection bindingDirection) : base(header, content, bindingDirection)
-        {
-            // Left empty.
-        }
+        public GroupBoxModel(object header, object content, BindingDirection bindingDirection) : base(header, content, bindingDirection) { /* Left empty. */ }
     }
 
     /// <summary>
@@ -710,25 +665,13 @@ namespace WinCopies.GUI.Controls.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="GroupBoxModel{THeader, TContent}"/> class.
         /// </summary>
-        public GroupBoxModel()
-        {
-            // Left empty.
-        }
+        public GroupBoxModel() { /* Left empty. */ }
 
-        public GroupBoxModel(THeader header, TContent content) : base(header, content)
-        {
-            // Left empty.
-        }
+        public GroupBoxModel(THeader header, TContent content) : base(header, content) { /* Left empty. */ }
 
-        public GroupBoxModel(BindingDirection bindingDirection) : base(bindingDirection)
-        {
-            // Left empty.
-        }
+        public GroupBoxModel(BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
 
-        public GroupBoxModel(THeader header, TContent content, BindingDirection bindingDirection) : base(header, content, bindingDirection)
-        {
-            // Left empty.
-        }
+        public GroupBoxModel(THeader header, TContent content, BindingDirection bindingDirection) : base(header, content, bindingDirection) { /* Left empty. */ }
     }
 
     /// <summary>
@@ -756,25 +699,13 @@ namespace WinCopies.GUI.Controls.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="TabItemModel"/> class.
         /// </summary>
-        public TabItemModel()
-        {
-            // Left empty.
-        }
+        public TabItemModel() { /* Left empty. */ }
 
-        public TabItemModel(object header, object content) : base(header, content)
-        {
-            // Left empty.
-        }
+        public TabItemModel(object header, object content) : base(header, content) { /* Left empty. */ }
 
-        public TabItemModel(BindingDirection bindingDirection) : base(bindingDirection)
-        {
-            // Left empty.
-        }
+        public TabItemModel(BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
 
-        public TabItemModel(object header, object content, BindingDirection bindingDirection) : base(header, content, bindingDirection)
-        {
-            // Left empty.
-        }
+        public TabItemModel(object header, object content, BindingDirection bindingDirection) : base(header, content, bindingDirection) { /* Left empty. */ }
     }
 
     /// <summary>
@@ -786,25 +717,13 @@ namespace WinCopies.GUI.Controls.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="TabItemModel{THeader, TContent}"/> class.
         /// </summary>
-        public TabItemModel()
-        {
-            // Left empty.
-        }
+        public TabItemModel() { /* Left empty. */ }
 
-        public TabItemModel(THeader header, TContent content) : base(header, content)
-        {
-            // Left empty.
-        }
+        public TabItemModel(THeader header, TContent content) : base(header, content) { /* Left empty. */ }
 
-        public TabItemModel(BindingDirection bindingDirection) : base(bindingDirection)
-        {
-            // Left empty.
-        }
+        public TabItemModel(BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
 
-        public TabItemModel(THeader header, TContent content, BindingDirection bindingDirection) : base(header, content, bindingDirection)
-        {
-            // Left empty.
-        }
+        public TabItemModel(THeader header, TContent content, BindingDirection bindingDirection) : base(header, content, bindingDirection) { /* Left empty. */ }
     }
 
     ///// <summary>
@@ -906,25 +825,22 @@ namespace WinCopies.GUI.Controls.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="ButtonModel"/> class.
         /// </summary>
-        public ButtonModel()
-        {
-            // Left empty.
-        }
+        public ButtonModel() { /* Left empty. */ }
 
-        public ButtonModel(object content) : base(content)
-        {
-            // Left empty.
-        }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ButtonModel"/> class with a custom content.
+        /// </summary>
+        public ButtonModel(object content) : base(content) { /* Left empty. */ }
 
-        public ButtonModel(BindingDirection bindingDirection) : base(bindingDirection)
-        {
-            // Left empty.
-        }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ButtonModel"/> class with a custom <see cref="BindingDirection"/>.
+        /// </summary>
+        public ButtonModel(BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
 
-        public ButtonModel(object content, BindingDirection bindingDirection) : base(content, bindingDirection)
-        {
-            // Left empty.
-        }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ButtonModel"/> class with a custom content and <see cref="BindingDirection"/>.
+        /// </summary>
+        public ButtonModel(object content, BindingDirection bindingDirection) : base(content, bindingDirection) { /* Left empty. */ }
     }
 
     /// <summary>
@@ -959,25 +875,13 @@ namespace WinCopies.GUI.Controls.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="ButtonModel{T}"/> class.
         /// </summary>
-        public ButtonModel()
-        {
-            // Left empty.
-        }
+        public ButtonModel() { /* Left empty. */ }
 
-        public ButtonModel(T content) : base(content)
-        {
-            // Left empty.
-        }
+        public ButtonModel(T content) : base(content) { /* Left empty. */ }
 
-        public ButtonModel(BindingDirection bindingDirection) : base(bindingDirection)
-        {
-            // Left empty.
-        }
+        public ButtonModel(BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
 
-        public ButtonModel(T content, BindingDirection bindingDirection) : base(content, bindingDirection)
-        {
-            // Left empty.
-        }
+        public ButtonModel(T content, BindingDirection bindingDirection) : base(content, bindingDirection) { /* Left empty. */ }
     }
 
     /// <summary>
@@ -1015,25 +919,13 @@ namespace WinCopies.GUI.Controls.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="ToggleButtonModel"/> class.
         /// </summary>
-        public ToggleButtonModel()
-        {
-            // Left empty.
-        }
+        public ToggleButtonModel() { /* Left empty. */ }
 
-        public ToggleButtonModel(object content) : base(content)
-        {
-            // Left empty.
-        }
+        public ToggleButtonModel(object content) : base(content) { /* Left empty. */ }
 
-        public ToggleButtonModel(BindingDirection bindingDirection) : base(bindingDirection)
-        {
-            // Left empty.
-        }
+        public ToggleButtonModel(BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
 
-        public ToggleButtonModel(object content, BindingDirection bindingDirection) : base(content, bindingDirection)
-        {
-            // Left empty.
-        }
+        public ToggleButtonModel(object content, BindingDirection bindingDirection) : base(content, bindingDirection) { /* Left empty. */ }
     }
 
     /// <summary>
@@ -1063,25 +955,13 @@ namespace WinCopies.GUI.Controls.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="ToggleButtonModel{T}"/> class.
         /// </summary>
-        public ToggleButtonModel()
-        {
-            // Left empty.
-        }
+        public ToggleButtonModel() { /* Left empty. */ }
 
-        public ToggleButtonModel(T content) : base(content)
-        {
-            // Left empty.
-        }
+        public ToggleButtonModel(T content) : base(content) { /* Left empty. */ }
 
-        public ToggleButtonModel(BindingDirection bindingDirection) : base(bindingDirection)
-        {
-            // Left empty.
-        }
+        public ToggleButtonModel(BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
 
-        public ToggleButtonModel(T content, BindingDirection bindingDirection) : base(content, bindingDirection)
-        {
-            // Left empty.
-        }
+        public ToggleButtonModel(T content, BindingDirection bindingDirection) : base(content, bindingDirection) { /* Left empty. */ }
     }
 
     /// <summary>
@@ -1101,25 +981,13 @@ namespace WinCopies.GUI.Controls.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="CheckBoxModel"/> class.
         /// </summary>
-        public CheckBoxModel()
-        {
-            // Left empty.
-        }
+        public CheckBoxModel() { /* Left empty. */ }
 
-        public CheckBoxModel(object content) : base(content)
-        {
-            // Left empty.
-        }
+        public CheckBoxModel(object content) : base(content) { /* Left empty. */ }
 
-        public CheckBoxModel(BindingDirection bindingDirection) : base(bindingDirection)
-        {
-            // Left empty.
-        }
+        public CheckBoxModel(BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
 
-        public CheckBoxModel(object content, BindingDirection bindingDirection) : base(content, bindingDirection)
-        {
-            // Left empty.
-        }
+        public CheckBoxModel(object content, BindingDirection bindingDirection) : base(content, bindingDirection) { /* Left empty. */ }
     }
 
     /// <summary>
@@ -1139,13 +1007,13 @@ namespace WinCopies.GUI.Controls.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="CheckBoxModel{T}"/> class.
         /// </summary>
-        public CheckBoxModel() { }
+        public CheckBoxModel() { /* Left empty. */ }
 
-        public CheckBoxModel(T content) : base(content) { }
+        public CheckBoxModel(T content) : base(content) { /* Left empty. */ }
 
-        public CheckBoxModel(BindingDirection bindingDirection) : base(bindingDirection) { }
+        public CheckBoxModel(BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
 
-        public CheckBoxModel(T content, BindingDirection bindingDirection) : base(content, bindingDirection) { }
+        public CheckBoxModel(T content, BindingDirection bindingDirection) : base(content, bindingDirection) { /* Left empty. */ }
     }
 
     /// <summary>
@@ -1412,25 +1280,13 @@ namespace WinCopies.GUI.Controls.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="RadioButtonModel"/> class.
         /// </summary>
-        public RadioButtonModel()
-        {
-            // Left empty.
-        }
+        public RadioButtonModel() { /* Left empty. */ }
 
-        public RadioButtonModel(object content) : base(content)
-        {
-            // Left empty.
-        }
+        public RadioButtonModel(object content) : base(content) { /* Left empty. */ }
 
-        public RadioButtonModel(BindingDirection bindingDirection) : base(bindingDirection)
-        {
-            // Left empty.
-        }
+        public RadioButtonModel(BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
 
-        public RadioButtonModel(object content, BindingDirection bindingDirection) : base(content, bindingDirection)
-        {
-            // Left empty.
-        }
+        public RadioButtonModel(object content, BindingDirection bindingDirection) : base(content, bindingDirection) { /* Left empty. */ }
     }
 
     /// <summary>
@@ -1450,25 +1306,13 @@ namespace WinCopies.GUI.Controls.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="RadioButtonModel{T}"/> class.
         /// </summary>
-        public RadioButtonModel()
-        {
-            // Left empty.
-        }
+        public RadioButtonModel() { /* Left empty. */ }
 
-        public RadioButtonModel(T content) : base(content)
-        {
-            // Left empty.
-        }
+        public RadioButtonModel(T content) : base(content) { /* Left empty. */ }
 
-        public RadioButtonModel(BindingDirection bindingDirection) : base(bindingDirection)
-        {
-            // Left empty.
-        }
+        public RadioButtonModel(BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
 
-        public RadioButtonModel(T content, BindingDirection bindingDirection) : base(content, bindingDirection)
-        {
-            // Left empty.
-        }
+        public RadioButtonModel(T content, BindingDirection bindingDirection) : base(content, bindingDirection) { /* Left empty. */ }
     }
 
     /// <summary>
@@ -1498,25 +1342,13 @@ namespace WinCopies.GUI.Controls.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="GroupingRadioButtonModel"/> class.
         /// </summary>
-        public GroupingRadioButtonModel()
-        {
-            // Left empty.
-        }
+        public GroupingRadioButtonModel() { /* Left empty. */ }
 
-        public GroupingRadioButtonModel(object content) : base(content)
-        {
-            // Left empty.
-        }
+        public GroupingRadioButtonModel(object content) : base(content) { /* Left empty. */ }
 
-        public GroupingRadioButtonModel(BindingDirection bindingDirection) : base(bindingDirection)
-        {
-            // Left empty.
-        }
+        public GroupingRadioButtonModel(BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
 
-        public GroupingRadioButtonModel(object content, BindingDirection bindingDirection) : base(content, bindingDirection)
-        {
-            // Left empty.
-        }
+        public GroupingRadioButtonModel(object content, BindingDirection bindingDirection) : base(content, bindingDirection) { /* Left empty. */ }
     }
 
     /// <summary>
@@ -1530,24 +1362,12 @@ namespace WinCopies.GUI.Controls.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="GroupingRadioButtonModel{T}"/> class.
         /// </summary>
-        public GroupingRadioButtonModel()
-        {
-            // Left empty.
-        }
+        public GroupingRadioButtonModel() { /* Left empty. */ }
 
-        public GroupingRadioButtonModel(T content) : base(content)
-        {
-            // Left empty.
-        }
+        public GroupingRadioButtonModel(T content) : base(content) { /* Left empty. */ }
 
-        public GroupingRadioButtonModel(BindingDirection bindingDirection) : base(bindingDirection)
-        {
-            // Left empty.
-        }
+        public GroupingRadioButtonModel(BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
 
-        public GroupingRadioButtonModel(T content, BindingDirection bindingDirection) : base(content, bindingDirection)
-        {
-            // Left empty.
-        }
+        public GroupingRadioButtonModel(T content, BindingDirection bindingDirection) : base(content, bindingDirection) { /* Left empty. */ }
     }
 }

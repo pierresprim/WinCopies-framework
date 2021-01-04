@@ -28,7 +28,7 @@ using static WinCopies.
 #if WinCopies3
     UtilHelpers;
 
-    using WinCopies.Commands;
+    using WinCopies.Commands
 #else
     Util.Util;
 
@@ -248,7 +248,7 @@ namespace WinCopies.GUI.Controls
 
         protected virtual void OnHasBeenSeen()
         {
-            BindingOperations.SetBinding(this, ForegroundProperty, new Binding(nameof(SeenForeground)) { Source = this, Mode = BindingMode.TwoWay });
+            _ = BindingOperations.SetBinding(this, ForegroundProperty, new Binding(nameof(SeenForeground)) { Source = this, Mode = BindingMode.TwoWay });
 
             OnChangeUnderlining(UnderliningMode);
         }

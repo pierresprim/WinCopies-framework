@@ -129,10 +129,6 @@
         </Style.Triggers>
     </Style>
 
-    <Style BasedOn="{StaticResource {x:Type TextBox}}" TargetType="{x:Type local:CommandableTextBox}">
-        <Setter Property="ContextMenu" Value="{StaticResource TextBoxContextMenu}" />
-    </Style>
-
     <Style BasedOn="{StaticResource {x:Type Label}}" TargetType="{x:Type local:Label}">
         <Setter Property="Template">
             <Setter.Value>

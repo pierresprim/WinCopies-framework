@@ -28,7 +28,6 @@ namespace WinCopies.GUI.Controls
     /// </summary>
     public enum LinkUnderliningMode 
     {
-
         /// <summary>
         /// No underline.
         /// </summary>
@@ -48,6 +47,5 @@ namespace WinCopies.GUI.Controls
         /// Always underline.
         /// </summary>
         AlwaysUnderline = 3
-
     }
 }

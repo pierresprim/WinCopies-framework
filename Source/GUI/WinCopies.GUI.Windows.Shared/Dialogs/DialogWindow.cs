@@ -77,14 +77,14 @@ namespace WinCopies.GUI.Windows
         public HorizontalAlignment ButtonAlignment { get => (HorizontalAlignment)GetValue(ButtonAlignmentProperty); set => SetValue(ButtonAlignmentProperty, value); }
 
         /// <summary>
-        /// Indentifies the <see cref="DefaultButton"/> dependency property.
+        /// Identifies the <see cref="DefaultButton"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty DefaultButtonProperty = DependencyProperty.Register(nameof(DefaultButton), typeof(DefaultButton), typeof(DialogWindow), new PropertyMetadata(DefaultButton.None, (DependencyObject d, DependencyPropertyChangedEventArgs e) => ((DialogWindow)d).OnDefaultButtonChanged((DefaultButton)e.OldValue, (DefaultButton)e.NewValue)));
 
         public DefaultButton DefaultButton { get => (DefaultButton)GetValue(DefaultButtonProperty); set => SetValue(DefaultButtonProperty, value); }
 
         /// <summary>
-        /// Indentifies the <see cref="CustomButtonsSource"/> dependency property.
+        /// Identifies the <see cref="CustomButtonsSource"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty CustomButtonsSourceProperty = DependencyProperty.Register(nameof(CustomButtonsSource), typeof(IEnumerable), typeof(DialogWindow), new PropertyMetadata(null, (DependencyObject d, DependencyPropertyChangedEventArgs e) => ((DialogWindow)d).OnCustomButtonsSourceChanged((IEnumerable)e.OldValue, (IEnumerable)e.NewValue)));
 
@@ -108,21 +108,21 @@ namespace WinCopies.GUI.Windows
         //}
 
         /// <summary>
-        /// Indentifies the <see cref="CustomButtonTemplate"/> dependency property.
+        /// Identifies the <see cref="CustomButtonTemplate"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty CustomButtonTemplateProperty = DependencyProperty.Register(nameof(CustomButtonTemplate), typeof(DataTemplate), typeof(DialogWindow));
 
         public DataTemplate CustomButtonTemplate { get => (DataTemplate)GetValue(CustomButtonTemplateProperty); set => SetValue(CustomButtonTemplateProperty, value); }
 
         /// <summary>
-        /// Indentifies the <see cref="CustomButtonTemplateSelector"/> dependency property.
+        /// Identifies the <see cref="CustomButtonTemplateSelector"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty CustomButtonTemplateSelectorProperty = DependencyProperty.Register(nameof(CustomButtonTemplateSelector), typeof(DataTemplateSelector), typeof(DialogWindow));
 
         public DataTemplateSelector CustomButtonTemplateSelector { get => (DataTemplateSelector)GetValue(CustomButtonTemplateSelectorProperty); set => SetValue(CustomButtonTemplateSelectorProperty, value); }
 
         /// <summary>
-        /// Indentifies the <see cref="ShowHelpButtonAsCommandButton"/> dependency property.
+        /// Identifies the <see cref="ShowHelpButtonAsCommandButton"/> dependency property.
         /// </summary>
         public readonly static DependencyProperty ShowHelpButtonAsCommandButtonProperty = DependencyProperty.Register(nameof(ShowHelpButtonAsCommandButton), typeof(bool), typeof(DialogWindow));
 

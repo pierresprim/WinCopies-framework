@@ -53,10 +53,6 @@ namespace WinCopies.GUI.Controls
 
 
 
-        static CommandableTextBox() => DefaultStyleKeyProperty.OverrideMetadata(typeof(CommandableTextBox), new FrameworkPropertyMetadata(typeof(CommandableTextBox)));
-
-
-
         protected override void OnKeyDown(KeyEventArgs e)
         {
             base.OnKeyDown(e);
