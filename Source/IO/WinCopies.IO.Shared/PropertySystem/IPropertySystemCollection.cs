@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+
 using WinCopies.Collections.DotNetFix.Generic;
 using WinCopies.Collections.Generic;
 

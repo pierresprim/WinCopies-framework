@@ -189,6 +189,38 @@ namespace WinCopies
     {
         // Already implemented in WinCopies.Util.
 
+        public static bool IsAssignableFrom<T>(this Type t)
+        {
+            ThrowIfNull(t, nameof(t));
+
+            Type from = typeof(T);
+
+            if (from == t)
+
+                return true;
+
+            if (t.IsInterface)
+
+                return t.IsType(from.GetInterfaces());
+
+            if (from.IsInterface)
+
+                return false;
+
+            from = from.BaseType;
+
+            while (from != null)
+            {
+                if (from == t)
+
+                    return true;
+
+                from = from.BaseType;
+            }
+
+            return false;
+        }
+
         public static
 #if WinCopies2
 System.Collections.Generic.IEnumerator
@@ -453,7 +485,7 @@ System.Collections.Generic.IEnumerator
             return result;
         }
 
-        public interface IProperty
+        public interface IReadOnlyProperty
         {
             bool IsEnabled { get; }
 
@@ -474,7 +506,19 @@ System.Collections.Generic.IEnumerator
             // string GetDisplayGroupName();
         }
 
-        public interface IProperty<T> : IProperty
+        public interface IProperty: IReadOnlyProperty
+        {
+            bool IsReadOnly { get; }
+
+            new object Value { get; set; }
+        }
+
+        public interface IReadOnlyProperty<T> : IReadOnlyProperty
+        {
+            new T PropertyGroup { get; }
+        }
+
+        public interface IProperty<T> : IReadOnlyProperty<T>,IProperty
         {
             new T PropertyGroup { get; }
         }
