@@ -51,11 +51,11 @@ namespace WinCopies.IO.PropertySystem
 #if CS8
             ??=
 #else
-            (_propertyGroup =
+            .HasValue ? _propertyGroup.Value : (_propertyGroup =
 #endif
             GetPropertyGroup(_shellProperty)
 #if !CS8
-            )
+            ).Value
 #endif
             ;
 
