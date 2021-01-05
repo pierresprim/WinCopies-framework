@@ -329,6 +329,21 @@
             Initializes a new instance of the <see cref="T:WinCopies.GUI.Controls.Models.ButtonModel"/> class.
             </summary>
         </member>
+        <member name="M:WinCopies.GUI.Controls.Models.ButtonModel.#ctor(System.Object)">
+            <summary>
+            Initializes a new instance of the <see cref="T:WinCopies.GUI.Controls.Models.ButtonModel"/> class with a custom content.
+            </summary>
+        </member>
+        <member name="M:WinCopies.GUI.Controls.Models.ButtonModel.#ctor(WinCopies.GUI.Controls.Models.BindingDirection)">
+            <summary>
+            Initializes a new instance of the <see cref="T:WinCopies.GUI.Controls.Models.ButtonModel"/> class with a custom <see cref="T:WinCopies.GUI.Controls.Models.BindingDirection"/>.
+            </summary>
+        </member>
+        <member name="M:WinCopies.GUI.Controls.Models.ButtonModel.#ctor(System.Object,WinCopies.GUI.Controls.Models.BindingDirection)">
+            <summary>
+            Initializes a new instance of the <see cref="T:WinCopies.GUI.Controls.Models.ButtonModel"/> class with a custom content and <see cref="T:WinCopies.GUI.Controls.Models.BindingDirection"/>.
+            </summary>
+        </member>
         <member name="T:WinCopies.GUI.Controls.Models.IButtonModel`1">
             <summary>
             Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.Button"/>s.

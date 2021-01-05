@@ -20,6 +20,5 @@
     <Compile Include="$(MSBuildThisFileDirectory)LinkUnderliningMode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\InlineTextEditor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\PropertyGrid.cs" />
-    <Compile Include="..\..\WinCopies.GUI.Controls.Shared\Controls\CommandableTextBox.cs" />
   </ItemGroup>
 </Project>

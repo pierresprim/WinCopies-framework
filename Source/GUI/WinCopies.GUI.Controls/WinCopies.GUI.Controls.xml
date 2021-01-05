@@ -4,6 +4,21 @@
         <name>WinCopies.GUI.Controls</name>
     </assembly>
     <members>
+        <member name="F:WinCopies.GUI.Controls.CommandableTextBox.CommandProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.CommandableTextBox.Command"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.CommandableTextBox.CommandParameterProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.CommandableTextBox.CommandParameter"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.CommandableTextBox.CommandTargetProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.CommandableTextBox.CommandTarget"/> dependency property.
+            </summary>
+        </member>
         <member name="T:WinCopies.GUI.Controls.HeaderedControl">
             <summary>
             Represents a WPF control that can display a header.
@@ -150,36 +165,6 @@
         <member name="F:WinCopies.GUI.Controls.LinkUnderliningMode.AlwaysUnderline">
             <summary>
             Always underline.
-            </summary>
-        </member>
-        <member name="F:WinCopies.GUI.Controls.InlineTextEditor.IsEditingProperty">
-            <summary>
-            Identifies the <see cref="P:WinCopies.GUI.Controls.InlineTextEditor.IsEditing"/> dependency property.
-            </summary>
-        </member>
-        <member name="F:WinCopies.GUI.Controls.InlineTextEditor.EditProperty">
-            <summary>
-            Identifies the <see cref="P:WinCopies.GUI.Controls.InlineTextEditor.Edit"/> dependency property.
-            </summary>
-        </member>
-        <member name="F:WinCopies.GUI.Controls.InlineTextEditor.TextProperty">
-            <summary>
-            Identifies the <see cref="P:WinCopies.GUI.Controls.InlineTextEditor.Text"/> dependency property.
-            </summary>
-        </member>
-        <member name="F:WinCopies.GUI.Controls.TextBox.CommandProperty">
-            <summary>
-            Identifies the <see cref="P:WinCopies.GUI.Controls.TextBox.Command"/> dependency property.
-            </summary>
-        </member>
-        <member name="F:WinCopies.GUI.Controls.TextBox.CommandParameterProperty">
-            <summary>
-            Identifies the <see cref="P:WinCopies.GUI.Controls.TextBox.CommandParameter"/> dependency property.
-            </summary>
-        </member>
-        <member name="F:WinCopies.GUI.Controls.TextBox.CommandTargetProperty">
-            <summary>
-            Identifies the <see cref="P:WinCopies.GUI.Controls.TextBox.CommandTarget"/> dependency property.
             </summary>
         </member>
         <member name="T:XamlGeneratedNamespace.GeneratedInternalTypeHelper">

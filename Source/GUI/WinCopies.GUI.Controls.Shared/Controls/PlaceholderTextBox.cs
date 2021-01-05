@@ -21,6 +21,7 @@
 //using System.Drawing;
 using System.Windows;
 using System.Windows.Controls;
+using WinCopies.GUI.Controls.Models;
 //using System.Windows.Automation.Peers;
 //using System.Windows.Controls;
 //using System.Windows.Controls.Primitives;
@@ -1327,4 +1328,82 @@ namespace WinCopies.GUI.Controls
         //        internal void _OnPropertyChanged(DependencyPropertyChangedEventArgs e) => OnPropertyChanged(e);
         //        #endregion
     }
+
+    #region (View)Models
+    public interface IPlaceholderTextBoxModel : IButtonTextBoxModel
+    {
+        string Placeholder { get; set; }
+
+        PlaceholderMode PlaceholderMode { get; set; }
+    }
+
+    public class PlaceholderTextBoxModelTextOriented : ButtonTextBoxModelTextOriented, IPlaceholderTextBoxModel
+    {
+        public string Placeholder { get; set; }
+
+        public PlaceholderMode PlaceholderMode { get; set; }
+    }
+
+    public class PlaceholderTextBoxViewModelTextOriented<T> : ButtonTextBoxViewModelTextOriented<T>, IPlaceholderTextBoxModel where T : IPlaceholderTextBoxModel, ITextBoxModelTextOriented
+    {
+        public string Placeholder { get => ModelGeneric.Placeholder; set { ModelGeneric.Placeholder = value; OnPropertyChanged(nameof(Placeholder)); } }
+
+        public PlaceholderMode PlaceholderMode { get => ModelGeneric.PlaceholderMode; set { ModelGeneric.PlaceholderMode = value; OnPropertyChanged(nameof(PlaceholderMode)); } }
+
+        public PlaceholderTextBoxViewModelTextOriented(T model) : base(model) { /* Left empty. */ }
+    }
+
+    public class PlaceholderTextBoxModelSelectionOriented : ButtonTextBoxModelSelectionOriented, IPlaceholderTextBoxModel
+    {
+        public string Placeholder { get; set; }
+
+        public PlaceholderMode PlaceholderMode { get; set; }
+    }
+
+    public class PlaceholderTextBoxViewModelSelectionOriented<T> : ButtonTextBoxViewModelSelectionOriented<T>, IPlaceholderTextBoxModel where T : IPlaceholderTextBoxModel, ITextBoxModelSelectionOriented
+    {
+        public string Placeholder { get => ModelGeneric.Placeholder; set { ModelGeneric.Placeholder = value; OnPropertyChanged(nameof(Placeholder)); } }
+
+        public PlaceholderMode PlaceholderMode { get => ModelGeneric.PlaceholderMode; set { ModelGeneric.PlaceholderMode = value; OnPropertyChanged(nameof(PlaceholderMode)); } }
+
+        public PlaceholderTextBoxViewModelSelectionOriented(T model) : base(model) { /* Left empty. */ }
+    }
+
+    public class PlaceholderTextBoxModelTextEditingOriented : ButtonTextBoxModelTextEditingOriented, IPlaceholderTextBoxModel
+    {
+        public string Placeholder { get; set; }
+
+        public PlaceholderMode PlaceholderMode { get; set; }
+    }
+
+    public class PlaceholderTextBoxViewModelTextEditingOriented<T> : ButtonTextBoxViewModelTextEditingOriented<T>, IPlaceholderTextBoxModel where T : IPlaceholderTextBoxModel, ITextBoxModelTextEditingOriented
+    {
+        public string Placeholder { get => ModelGeneric.Placeholder; set { ModelGeneric.Placeholder = value; OnPropertyChanged(nameof(Placeholder)); } }
+
+        public PlaceholderMode PlaceholderMode { get => ModelGeneric.PlaceholderMode; set { ModelGeneric.PlaceholderMode = value; OnPropertyChanged(nameof(PlaceholderMode)); } }
+
+        public PlaceholderTextBoxViewModelTextEditingOriented(T model) : base(model) { /* Left empty. */ }
+    }
+
+    public class PlaceholderTextBoxModel : ButtonTextBoxModel, IPlaceholderTextBoxModel
+    {
+        public string Placeholder { get; set; }
+
+        public PlaceholderMode PlaceholderMode { get; set; }
+    }
+
+    public class PlaceholderTextBoxViewModel<T> : ButtonTextBoxViewModel<T>, IPlaceholderTextBoxModel where T : ITextBoxModel, IPlaceholderTextBoxModel, Models.ITextBoxModel
+    {
+        public string Placeholder { get => ModelGeneric.Placeholder; set { ModelGeneric.Placeholder = value; OnPropertyChanged(nameof(Placeholder)); } }
+
+        public PlaceholderMode PlaceholderMode { get => ModelGeneric.PlaceholderMode; set { ModelGeneric.PlaceholderMode = value; OnPropertyChanged(nameof(PlaceholderMode)); } }
+
+        public PlaceholderTextBoxViewModel(T model) : base(model) { /* Left empty. */ }
+    }
+
+    public interface IPlaceholderTextBoxModel2:IPlaceholderTextBoxModel, IButtonTextBoxModel2
+    {
+        // Left empty.
+    }
+    #endregion
 }

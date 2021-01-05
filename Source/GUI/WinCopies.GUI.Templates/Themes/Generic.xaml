@@ -23,7 +23,7 @@
     xmlns:drawing="clr-namespace:System.Drawing;assembly=System.Drawing"
     xmlns:controls="clr-namespace:WinCopies.GUI.Controls.Models;assembly=WinCopies.GUI.Models"
     xmlns:controlViewModels="clr-namespace:WinCopies.GUI.Controls.ViewModels;assembly=WinCopies.GUI.ViewModels"
-    xmlns:util="clr-namespace:WinCopies.Util;assembly=WinCopies.Util.Desktop"
+    xmlns:util="clr-namespace:WinCopies;assembly=WinCopies.Util.Desktop"
     xmlns:converters="clr-namespace:WinCopies.Util.Data;assembly=WinCopies.Util.Desktop">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary>
@@ -88,7 +88,7 @@
                 <Setter Property="AutoWordSelection" Value="{Binding AutoWordSelection}" />
                 <Setter Property="SelectionBrush" Value="{Binding SelectionBrush}" />
                 <Setter Property="SelectionOpacity" Value="{Binding SelectionOpacity}" />
-                <Setter Property="SelectionTextBrush" Value="{Binding SelectionTextBrush}" />
+                <!--<Setter Property="SelectionTextBrush" Value="{Binding SelectionTextBrush}" />-->
                 <Setter Property="CaretBrush" Value="{Binding CaretBrush}" />
                 <Setter Property="IsInactiveSelectionHighlightEnabled" Value="{Binding IsInactiveSelectionHighlightEnabled}" />
             </Style>
@@ -112,7 +112,7 @@
         </ResourceDictionary>
     </ResourceDictionary.MergedDictionaries>
     <DataTemplate DataType="{x:Type media:ImageSource}" x:Shared="false">
-        <Image Source="{Binding}" />
+        <Image Source="{Binding Mode=OneWay}" />
     </DataTemplate>
     <DataTemplate DataType="{x:Type drawing:Bitmap}" x:Shared="false">
         <Image Source="{Binding Mode=OneWay, Converter={StaticResource BitmapToImageSourceConverter}}" />
@@ -290,13 +290,6 @@
                 </util:MergedStyles>
             </RadioButton.Style>
         </RadioButton>
-    </DataTemplate>
-
-    <DataTemplate DataType="{x:Type controlViewModels:IContentViewModel}" x:Shared="false">
-        <Grid>
-            <ContentControl Content="{Binding Content}" />
-            <ContentControl Content="{Binding Dialog}" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" />
-        </Grid>
     </DataTemplate>
 </ResourceDictionary>
 

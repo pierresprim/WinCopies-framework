@@ -16,15 +16,17 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using System.Collections;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Drawing;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
+using WinCopies.Commands;
 using WinCopies.GUI.Controls.Models;
-using WinCopies.Util.Commands;
+
+using static WinCopies.GUI.Controls.ButtonTextBoxModel;
 
 namespace WinCopies.GUI.Controls
 {
@@ -84,23 +86,110 @@ namespace WinCopies.GUI.Controls
         /// <summary>
         /// Identifies the <see cref="Buttons"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty ButtonsProperty = DependencyProperty.Register(nameof(Buttons), typeof(IEnumerable<IButtonModel>), typeof(ButtonTextBox));
+        public static readonly DependencyProperty ButtonsProperty = DependencyProperty.Register(nameof(Buttons), typeof(System.Collections.Generic.IEnumerable<IButtonModel>), typeof(ButtonTextBox), new PropertyMetadata(GetDefaultButtons(), (DependencyObject d, DependencyPropertyChangedEventArgs e) => ((ButtonTextBox)d).OnButtonsChanged(e)));
 
-        public IEnumerable<IButtonModel> Buttons { get => (IEnumerable<IButtonModel>)GetValue(ButtonsProperty); set => SetValue(ButtonsProperty, value); }
+        public System.Collections.Generic.IEnumerable<IButtonModel> Buttons { get => (System.Collections.Generic.IEnumerable<IButtonModel>)GetValue(ButtonsProperty); set => SetValue(ButtonsProperty, value); }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ButtonTextBox"/>.
         /// </summary>
         public ButtonTextBox() => AddButtons();
 
+        protected virtual void OnButtonsChanged(DependencyPropertyChangedEventArgs e)
+        {
+            if (e.OldValue != null)
+
+                OnButtonCollectionRemoved((System.Collections.Generic.IEnumerable<IButtonModel>)e.OldValue);
+
+            if (e.NewValue != null)
+
+                OnButtonCollectionAdded((System.Collections.Generic.IEnumerable<IButtonModel>)e.NewValue);
+        }
+
+        protected virtual void OnButtonCollectionAdded(System.Collections.Generic.IEnumerable<IButtonModel> buttons)
+        {
+            OnButtonsAdded(buttons);
+
+            if (buttons is INotifyCollectionChanged collection)
+
+                collection.CollectionChanged += Buttons_CollectionChanged;
+        }
+
+        protected virtual void OnButtonCollectionRemoved(System.Collections.Generic.IEnumerable<IButtonModel> buttons)
+        {
+            OnButtonsRemoved(buttons);
+
+            if (buttons is INotifyCollectionChanged collection)
+
+                collection.CollectionChanged -= Buttons_CollectionChanged;
+        }
+
+        protected virtual void OnButtonsAdded(System.Collections.Generic.IEnumerable<IButtonModel> buttons)
+        {
+            foreach (IButtonModel button in buttons)
+
+                OnButtonAdded(button);
+        }
+
+        protected virtual void OnButtonsRemoved(System.Collections.Generic.IEnumerable<IButtonModel> buttons)
+        {
+            foreach (IButtonModel button in buttons)
+
+                OnButtonRemoved(button);
+        }
+
+        private void Buttons_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => OnButtonsCollectionChanged(e);
+
+        protected virtual void OnButtonsCollectionChanged(NotifyCollectionChangedEventArgs e)
+        {
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+
+                    OnButtonsAdded(e.NewItems.To<IButtonModel>());
+
+                    break;
+
+                case NotifyCollectionChangedAction.Replace:
+
+                    OnButtonsRemoved(e.OldItems.To<IButtonModel>());
+
+                    OnButtonsAdded(e.NewItems.To<IButtonModel>());
+
+                    break;
+
+                case NotifyCollectionChangedAction.Remove:
+
+                    OnButtonsRemoved(e.OldItems.To<IButtonModel>());
+
+                    break;
+            }
+        }
+
         /// <summary>
         /// Adds the default buttons to the <see cref="Buttons"/> property.
         /// </summary>
         protected virtual void AddButtons()
         {
-            Buttons = new ObservableCollection<IButtonModel>() { new ButtonModel<Bitmap>(Icons.Properties.Resources.cancel) { Command = DialogCommands.Cancel, CommandTarget = this } };
+            if (Buttons != null)
+
+                OnButtonCollectionAdded(Buttons);
 
             _ = CommandBindings.Add(new CommandBinding(DialogCommands.Cancel, (object sender, ExecutedRoutedEventArgs e) => OnCancel(e), (object sender, CanExecuteRoutedEventArgs e) => OnCanCancel(e)));
+        }
+
+        protected virtual void OnButtonAdded(IButtonModel button)
+        {
+            if (button.CommandTarget == null)
+
+                button.CommandTarget = this;
+        }
+
+        protected virtual void OnButtonRemoved(IButtonModel button)
+        {
+            if (button.CommandTarget == this)
+
+                button.CommandTarget = null;
         }
 
         /// <summary>
@@ -125,4 +214,158 @@ namespace WinCopies.GUI.Controls
             e.Handled = true;
         }
     }
+
+    #region (View)Models
+    public interface ITextBoxModel : IControlModel
+    {
+        IEnumerable LeftItems { get; set; }
+
+        IEnumerable RightItems { get; set; }
+    }
+
+    public class TextBoxModelTextOriented : Models.TextBoxModelTextOriented, ITextBoxModel
+    {
+        public IEnumerable LeftItems { get; set; }
+
+        public IEnumerable RightItems { get; set; }
+    }
+
+    public class TextBoxViewModelTextOriented<T> : ViewModels.TextBoxViewModelTextOriented<T>, ITextBoxModel where T : ITextBoxModel, ITextBoxModelTextOriented
+    {
+        public IEnumerable LeftItems { get => ModelGeneric.LeftItems; set { ModelGeneric.LeftItems = value; OnPropertyChanged(nameof(LeftItems)); } }
+
+        public IEnumerable RightItems { get => ModelGeneric.RightItems; set { ModelGeneric.RightItems = value; OnPropertyChanged(nameof(RightItems)); } }
+
+        public TextBoxViewModelTextOriented(T model) : base(model) { /* Left empty. */ }
+    }
+
+    public class TextBoxModelSelectionOriented : Models.TextBoxModelSelectionOriented, ITextBoxModel
+    {
+        public IEnumerable LeftItems { get; set; }
+
+        public IEnumerable RightItems { get; set; }
+    }
+
+    public class TextBoxViewModelSelectionOriented<T> : ViewModels.TextBoxViewModelSelectionOriented<T>, ITextBoxModel where T : ITextBoxModel, ITextBoxModelSelectionOriented
+    {
+        public IEnumerable LeftItems { get => ModelGeneric.LeftItems; set { ModelGeneric.LeftItems = value; OnPropertyChanged(nameof(LeftItems)); } }
+
+        public IEnumerable RightItems { get => ModelGeneric.RightItems; set { ModelGeneric.RightItems = value; OnPropertyChanged(nameof(RightItems)); } }
+
+        public TextBoxViewModelSelectionOriented(T model) : base(model) { /* Left empty. */ }
+    }
+
+    public class TextBoxModelTextEditingOriented : Models.TextBoxModelTextEditingOriented, ITextBoxModel
+    {
+        public IEnumerable LeftItems { get; set; }
+
+        public IEnumerable RightItems { get; set; }
+    }
+
+    public class TextBoxViewModelTextEditingOriented<T> : ViewModels.TextBoxViewModelTextEditingOriented<T>, ITextBoxModel where T : ITextBoxModel, ITextBoxModelTextEditingOriented
+    {
+        public IEnumerable LeftItems { get => ModelGeneric.LeftItems; set { ModelGeneric.LeftItems = value; OnPropertyChanged(nameof(LeftItems)); } }
+
+        public IEnumerable RightItems { get => ModelGeneric.RightItems; set { ModelGeneric.RightItems = value; OnPropertyChanged(nameof(RightItems)); } }
+
+        public TextBoxViewModelTextEditingOriented(T model) : base(model) { /* Left empty. */ }
+    }
+
+    public class TextBoxModel : Models.TextBoxModel, ITextBoxModel
+    {
+        public IEnumerable LeftItems { get; set; }
+
+        public IEnumerable RightItems { get; set; }
+    }
+
+    public class TextBoxViewModel<T> : ViewModels.TextBoxViewModel<T>, ITextBoxModel where T : ITextBoxModel, Models.ITextBoxModel
+    {
+        public IEnumerable LeftItems { get => ModelGeneric.LeftItems; set { ModelGeneric.LeftItems = value; OnPropertyChanged(nameof(LeftItems)); } }
+
+        public IEnumerable RightItems { get => ModelGeneric.RightItems; set { ModelGeneric.RightItems = value; OnPropertyChanged(nameof(RightItems)); } }
+
+        public TextBoxViewModel(T model) : base(model) { /* Left empty. */ }
+    }
+
+    public interface ITextBoxModel2 : ITextBoxModel, Models.ITextBoxModel
+    {
+        // Left empty.
+    }
+
+    public interface IButtonTextBoxModel : ITextBoxModel
+    {
+        System.Collections.Generic.IEnumerable<IButtonModel> Buttons { get; set; }
+    }
+
+    public class ButtonTextBoxModelTextOriented : TextBoxModelTextOriented, IButtonTextBoxModel
+    {
+        public System.Collections.Generic.IEnumerable<IButtonModel> Buttons { get; set; }
+
+        public ButtonTextBoxModelTextOriented() => Buttons = GetDefaultButtons();
+
+        public ButtonTextBoxModelTextOriented(System.Collections.Generic.IEnumerable<IButtonModel> buttons) => Buttons = buttons;
+    }
+
+    public class ButtonTextBoxViewModelTextOriented<T> : TextBoxViewModelTextOriented<T>, IButtonTextBoxModel where T : IButtonTextBoxModel, ITextBoxModelTextOriented
+    {
+        public System.Collections.Generic.IEnumerable<IButtonModel> Buttons { get => ModelGeneric.Buttons; set { ModelGeneric.Buttons = value; OnPropertyChanged(nameof(Buttons)); } }
+
+        public ButtonTextBoxViewModelTextOriented(T model) : base(model) { /* Left empty. */ }
+    }
+
+    public class ButtonTextBoxModelSelectionOriented : TextBoxModelSelectionOriented, IButtonTextBoxModel
+    {
+        public System.Collections.Generic.IEnumerable<IButtonModel> Buttons { get; set; }
+
+        public ButtonTextBoxModelSelectionOriented() => Buttons = GetDefaultButtons();
+
+        public ButtonTextBoxModelSelectionOriented(System.Collections.Generic.IEnumerable<IButtonModel> buttons) => Buttons = buttons;
+    }
+
+    public class ButtonTextBoxViewModelSelectionOriented<T> : TextBoxViewModelSelectionOriented<T>, IButtonTextBoxModel where T : IButtonTextBoxModel, ITextBoxModelSelectionOriented
+    {
+        public System.Collections.Generic.IEnumerable<IButtonModel> Buttons { get => ModelGeneric.Buttons; set { ModelGeneric.Buttons = value; OnPropertyChanged(nameof(Buttons)); } }
+
+        public ButtonTextBoxViewModelSelectionOriented(T model) : base(model) { /* Left empty. */ }
+    }
+
+    public class ButtonTextBoxModelTextEditingOriented : TextBoxModelTextEditingOriented, IButtonTextBoxModel
+    {
+        public System.Collections.Generic.IEnumerable<IButtonModel> Buttons { get; set; }
+
+        public ButtonTextBoxModelTextEditingOriented() => Buttons = GetDefaultButtons();
+
+        public ButtonTextBoxModelTextEditingOriented(System.Collections.Generic.IEnumerable<IButtonModel> buttons) => Buttons = buttons;
+    }
+
+    public class ButtonTextBoxViewModelTextEditingOriented<T> : TextBoxViewModelTextEditingOriented<T>, IButtonTextBoxModel where T : IButtonTextBoxModel, ITextBoxModelTextEditingOriented
+    {
+        public System.Collections.Generic.IEnumerable<IButtonModel> Buttons { get => ModelGeneric.Buttons; set { ModelGeneric.Buttons = value; OnPropertyChanged(nameof(Buttons)); } }
+
+        public ButtonTextBoxViewModelTextEditingOriented(T model) : base(model) { /* Left empty. */ }
+    }
+
+    public class ButtonTextBoxModel : TextBoxModel, IButtonTextBoxModel
+    {
+        public System.Collections.Generic.IEnumerable<IButtonModel> Buttons { get; set; }
+
+        public static ObservableCollection<IButtonModel> GetDefaultButtons() => new ObservableCollection<IButtonModel>() { new ButtonModel<Bitmap>(Icons.Properties.Resources.cancel) { Command = DialogCommands.Cancel } };
+
+        public ButtonTextBoxModel() => Buttons = GetDefaultButtons();
+
+        public ButtonTextBoxModel(System.Collections.Generic.IEnumerable<IButtonModel> buttons) => Buttons = buttons;
+    }
+
+    public class ButtonTextBoxViewModel<T> : TextBoxViewModel<T>, IButtonTextBoxModel where T : ITextBoxModel, IButtonTextBoxModel, Models.ITextBoxModel
+    {
+        public System.Collections.Generic.IEnumerable<IButtonModel> Buttons { get => ModelGeneric.Buttons; set { ModelGeneric.Buttons = value; OnPropertyChanged(nameof(Buttons)); } }
+
+        public ButtonTextBoxViewModel(T model) : base(model) { /* Left empty. */ }
+    }
+
+    public interface IButtonTextBoxModel2 : IButtonTextBoxModel, ITextBoxModel2
+    {
+        // Left empty.
+    }
+    #endregion
 }

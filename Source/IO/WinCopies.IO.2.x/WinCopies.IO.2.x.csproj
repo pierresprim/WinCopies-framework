@@ -88,7 +88,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\GUI\2.x\WinCopies.GUI.Drawing.2.x\WinCopies.GUI.Drawing.2.x.csproj" />
     <ProjectReference Include="..\..\WinCopies.Util.Temp.2.x\WinCopies.Util.Temp.2.x.csproj" />
   </ItemGroup>
 

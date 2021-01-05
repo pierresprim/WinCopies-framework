@@ -61,7 +61,7 @@ namespace WinCopies
 
     public class InterfaceDataTemplateSelector : DataTemplateSelector
     {
-        public static System.Collections.Generic.IEnumerable<Type> GetDirectInterfaces( Type t, bool ignoreGenerics, bool directTypeOnly)
+        public static System.Collections.Generic.IEnumerable<Type> GetDirectInterfaces(Type t, bool ignoreGenerics, bool directTypeOnly)
         {
             var interfaces = new ArrayBuilder<Type>();
             var subInterfaces = new ArrayBuilder<Type>();
@@ -176,17 +176,24 @@ namespace WinCopies
 
             Type itemType = item.GetType();
 
-            foreach (var i in GetDirectInterfaces(itemType, true,true))
+            foreach (var i in GetDirectInterfaces(itemType, true, true))
 
-            Debug.WriteLine(item.GetType().ToString()+" "+i.Name);
+                Debug.WriteLine(item.GetType().ToString() + " " + i.Name);
 
-            return System.Linq.Enumerable.Repeat(itemType, 1).Concat(GetDirectInterfaces(itemType, true,true))
+            return System.Linq.Enumerable.Repeat(itemType, 1).Concat(GetDirectInterfaces(itemType, true, true))
                     .FirstOrDefault<DataTemplate>(t => containerElement.TryFindResource(new DataTemplateKey(t))) ?? base.SelectTemplate(item, container);
         }
     }
 
     public static class Extensions
     {
+        public static System.Collections.Generic. IEnumerable<T> To<T>(this System.Collections. IEnumerable enumerable)
+        {
+            foreach (object value in enumerable)
+
+                yield return (T)value;
+        }
+
         // Already implemented in WinCopies.Util.
 
         public static bool IsAssignableFrom<T>(this Type t)
@@ -506,7 +513,7 @@ System.Collections.Generic.IEnumerator
             // string GetDisplayGroupName();
         }
 
-        public interface IProperty: IReadOnlyProperty
+        public interface IProperty : IReadOnlyProperty
         {
             bool IsReadOnly { get; }
 
@@ -518,7 +525,7 @@ System.Collections.Generic.IEnumerator
             new T PropertyGroup { get; }
         }
 
-        public interface IProperty<T> : IReadOnlyProperty<T>,IProperty
+        public interface IProperty<T> : IReadOnlyProperty<T>, IProperty
         {
             new T PropertyGroup { get; }
         }

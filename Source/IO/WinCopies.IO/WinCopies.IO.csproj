@@ -65,10 +65,6 @@
     <PackageReference Include="WinCopies.WindowsAPICodePack.PortableDevices" Version="3.0.0-preview" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(Configuration)' == 'Debug'">
-    <ProjectReference Include="..\..\WinCopies.Util\WinCopies.Util.Temp.csproj" />
-  </ItemGroup>
-
   <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">
       <DesignTime>True</DesignTime>

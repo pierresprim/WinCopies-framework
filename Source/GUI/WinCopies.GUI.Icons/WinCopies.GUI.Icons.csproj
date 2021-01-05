@@ -15,12 +15,6 @@
     <FileVersion>3.0.0</FileVersion>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(TargetFramework.TrimEnd(`-windows`)'!='net5.0'">
-    <!--<PackageReference Include="Microsoft.Win32.Registry" Version="4.7.0" />-->
-    <PackageReference Include="System.Drawing.Common" Version="5.0.0" />
-    <!--<PackageReference Include="System.Management" Version="4.7.0" />-->
-  </ItemGroup>
-
   <ItemGroup Condition="'$(TargetFramework)'!='netcoreapp3.1'">
     <!--<PackageReference Include="Microsoft.Win32.Registry" Version="4.7.0" />-->
     <PackageReference Include="System.Drawing.Common" Version="4.7.0" />

@@ -25,7 +25,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Source\GUI\2.x\WinCopies.GUI.Drawing.2.x\WinCopies.GUI.Drawing.2.x.csproj" />
+    <ProjectReference Include="..\..\..\Source\GUI\WinCopies.GUI.Drawing\WinCopies.GUI.Drawing.csproj" />
   </ItemGroup>
 
   <ItemGroup>
