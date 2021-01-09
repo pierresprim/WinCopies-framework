@@ -19,7 +19,7 @@ using System;
 using System.Collections.Generic;
 
 using static WinCopies.
-    #if WinCopies2
+    #if !WinCopies3
     Util.Util
 #else
     UtilHelpers

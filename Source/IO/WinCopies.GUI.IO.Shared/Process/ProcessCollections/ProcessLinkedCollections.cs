@@ -19,7 +19,7 @@ using System;
 using System.Collections.Specialized;
 
 using WinCopies.Collections.DotNetFix;
-#if !WinCopies2
+#if WinCopies3
 using WinCopies.Collections.DotNetFix.Generic;
 #endif
 using WinCopies.IO;

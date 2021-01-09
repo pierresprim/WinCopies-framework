@@ -23,7 +23,7 @@ using System.Security;
 
 using WinCopies.IO.ObjectModel;
 
-#if WinCopies2
+#if !WinCopies3
 using System.Collections;
 using System.Collections.Generic;
 
@@ -41,13 +41,13 @@ using static WinCopies.ThrowHelper;
 namespace WinCopies.IO
 {
     public sealed class ArchiveItemInfoEnumerator :
-#if WinCopies2
+#if !WinCopies3
 IEnumerator
 #else
         Enumerator
 #endif
         <ArchiveItemInfo>,
-#if WinCopies2
+#if !WinCopies3
         Util.
 #endif
         DotNetFix.IDisposable
@@ -57,23 +57,23 @@ IEnumerator
         private IArchiveItemInfoProvider _archiveItemInfoProvider;
         private SevenZipExtractor _archiveExtractor;
         private
-#if WinCopies2
+#if !WinCopies3
 WinCopies.Collections.Generic.Queue
 #else
             EnumerableHelper
 #endif
             <IFileSystemObject>
-#if !WinCopies2
+#if WinCopies3
             .IEnumerableQueue
 #endif
             _paths =
-#if WinCopies2
+#if !WinCopies3
 new WinCopies.Collections.Generic.Queue
 #else
             EnumerableHelper
 #endif
             <IFileSystemObject>
-#if !WinCopies2
+#if WinCopies3
             .GetEnumerableQueue
 #endif
             ();
@@ -81,7 +81,7 @@ new WinCopies.Collections.Generic.Queue
         private Predicate<ArchiveFileInfoEnumeratorStruct> _func;
         #endregion
 
-#if WinCopies2
+#if !WinCopies3
         public bool IsDisposed { get; private set; }
 
         public ArchiveItemInfo Current => IsDisposed ? throw GetExceptionForDispose(false) : _current;
@@ -107,7 +107,7 @@ new WinCopies.Collections.Generic.Queue
             _func = func;
         }
 
-#if WinCopies2
+#if !WinCopies3
         public bool MoveNext
 #else
         protected override bool MoveNextOverride
@@ -266,10 +266,14 @@ new WinCopies.Collections.Generic.Queue
                             .Substring(1);
 #endif
 
-                        if (fileName.Contains(WinCopies.IO.Path.PathSeparator, StringComparison.OrdinalIgnoreCase))
+                        if (fileName.Contains(WinCopies.IO.Path.PathSeparator
+#if CS8
+                            , StringComparison.OrdinalIgnoreCase
+#endif
+                            ))
 
                             fileName = fileName.Substring(0, fileName.IndexOf(WinCopies.IO.Path.PathSeparator
-#if !NETFRAMEWORK
+#if CS8
                                 , StringComparison.OrdinalIgnoreCase
 #endif
                                 ));
@@ -330,7 +334,7 @@ new WinCopies.Collections.Generic.Queue
             return false;
         }
 
-#if WinCopies2
+#if !WinCopies3
         public void Reset()
         {
 #else
@@ -347,7 +351,7 @@ new WinCopies.Collections.Generic.Queue
 
         #region IDisposable Support
 
-#if WinCopies2
+#if !WinCopies3
         public void Dispose()
         {
 #else
@@ -437,7 +441,7 @@ new WinCopies.Collections.Generic.Queue
 
         private Func<bool> _func;
 
-#if !WinCopies2
+#if WinCopies3
         private WMIItemInfo _current = null;
 
         protected override WMIItemInfo CurrentOverride => _current;
@@ -491,7 +495,7 @@ new WinCopies.Collections.Generic.Queue
 
             // if (CheckFilter(_path))
 
-#if WinCopies2
+#if !WinCopies3
 Current 
 #else
             _current
@@ -512,7 +516,7 @@ Current
         #region IDisposable Support
 
         protected override void
-#if WinCopies2
+#if !WinCopies3
             Dispose(bool disposing)
 #else
             DisposeManaged()
@@ -522,7 +526,7 @@ Current
 
             _func = null;
 
-#if WinCopies2
+#if !WinCopies3
             base.Dispose(disposing);
 #else
             base.DisposeManaged();

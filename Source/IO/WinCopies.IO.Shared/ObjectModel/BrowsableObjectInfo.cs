@@ -97,11 +97,6 @@ namespace WinCopies.IO.ObjectModel
 
         public abstract string Description { get; }
 
-        /// <summary>
-        /// When overridden in a derived class, gets the size for this <see cref="IBrowsableObjectInfo"/>.
-        /// </summary>
-        public abstract Size? Size { get; }
-
         public abstract bool IsSpecialItem { get; }
 
         public ClientVersion? ClientVersion { get; private set; }

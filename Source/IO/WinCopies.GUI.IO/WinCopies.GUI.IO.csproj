@@ -9,7 +9,7 @@
     <DocumentationFile>WinCopies.GUI.IO.xml</DocumentationFile>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>WinCopies.GUI.IO.snk</AssemblyOriginatorKeyFile>
-    <DefineConstants>WinCopies2;$(DefineConstants)</DefineConstants>
+    <DefineConstants>WinCopies2;WinCopies3;$(DefineConstants)</DefineConstants>
     <VersionPrefix>2.5.10</VersionPrefix>
     <VersionSuffix>preview</VersionSuffix>
     <AssemblyVersion>2.5.10</AssemblyVersion>
@@ -19,13 +19,14 @@
   <Import Project="..\WinCopies.GUI.IO.Shared\WinCopies.GUI.IO.Shared.projitems" Label="Shared" />
 
   <ItemGroup>
-    <PackageReference Include="WinCopies.Util" Version="2.6.1.1" />
-    <PackageReference Include="WinCopies.Util.Desktop" Version="2.6.1.1" />
+    <PackageReference Include="WinCopies.Util" Version="3.1.0.1-preview" />
+    <PackageReference Include="WinCopies.Util.Desktop" Version="3.1.0.1-preview" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\GUI\2.x\WinCopies.GUI.Icons.2.x\WinCopies.GUI.Icons.csproj" />
-    <ProjectReference Include="..\WinCopies.IO.2.x\WinCopies.IO.2.x.csproj" />
+    <ProjectReference Include="..\..\GUI\WinCopies.GUI.Controls\WinCopies.GUI.Controls.csproj" />
+    <ProjectReference Include="..\..\GUI\WinCopies.GUI.Icons\WinCopies.GUI.Icons.csproj" />
+    <ProjectReference Include="..\WinCopies.IO\WinCopies.IO.csproj" />
   </ItemGroup>
 
   <ItemGroup>

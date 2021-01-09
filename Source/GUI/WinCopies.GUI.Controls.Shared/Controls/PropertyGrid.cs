@@ -42,13 +42,14 @@ namespace WinCopies.GUI.Controls
     public class PropertyViewModel : ViewModel<Temp.IProperty>, Temp.IProperty
     {
         private object _value;
-        private bool _isValueUpdated;
+
+        public bool IsValueUpdated { get; private set; }
 
         internal new Temp.IProperty Model => ModelGeneric;
 
         public bool IsReadOnly => ModelGeneric.IsReadOnly;
 
-        public bool IsEnabled => ModelGeneric.IsEnabled;
+        public bool IsEnabled { get => ModelGeneric.IsEnabled; set => throw new InvalidOperationException(); }
 
         public string Name => ModelGeneric.Name;
 
@@ -60,7 +61,7 @@ namespace WinCopies.GUI.Controls
 
         public object PropertyGroup => ModelGeneric.PropertyGroup;
 
-        public virtual object Value { get => _isValueUpdated ? _value : ModelGeneric.Value; set { _value = value; _isValueUpdated = true; } }
+        public virtual object Value { get => IsValueUpdated ? _value : ModelGeneric.Value; set { _value = value; IsValueUpdated = true; } }
 
         public Type Type => ModelGeneric.Type;
 
@@ -87,7 +88,7 @@ namespace WinCopies.GUI.Controls
 
                 return new CheckBoxProperty(property);
 
-            if (type == typeof(string))
+            // if (type == typeof(string))
 
                 return new TextBoxProperty(property);
         }
@@ -103,7 +104,17 @@ namespace WinCopies.GUI.Controls
 
             public bool IsReadOnly => _innerProperty.IsReadOnly;
 
-            public object Value { get => _value ??= ((Array)_innerProperty.Value).GetValue(_index); set => _value = value; }
+            public object Value { get => _value
+#if CS8
+                    ??=
+                    #else
+                    ?? (_value =
+#endif
+                    ((Array)_innerProperty.Value).GetValue(_index)
+                    #if !CS8
+                    )
+#endif
+                    ; set => _value = value; }
 
             public bool IsEnabled => _innerProperty.IsEnabled;
 
@@ -139,7 +150,13 @@ namespace WinCopies.GUI.Controls
 
         private static ArgumentException GetArgumentException() => new ArgumentException($"The given parameter must be an instance of {nameof(ArrayPropertyViewModel)}.");
 
-        private static ICommand DefaultCommand { get; } = _defaultCommand ??= new DelegateCommand(value => value == null ? throw GetArgumentNullException() : value is ArrayPropertyViewModel parameter ? !parameter.ModelGeneric.IsReadOnly : throw GetArgumentException(), _value =>
+        private static ICommand DefaultCommand { get; } = _defaultCommand
+#if CS8
+            ??=
+#else
+            ?? (_defaultCommand =
+#endif
+            new DelegateCommand(value => value == null ? throw GetArgumentNullException() : value is ArrayPropertyViewModel parameter ? !parameter.ModelGeneric.IsReadOnly : throw GetArgumentException(), _value =>
                {
                    if (_value == null)
 
@@ -155,7 +172,11 @@ namespace WinCopies.GUI.Controls
 
                                _parameter._array.SetValue(_parameter._subProperties[i].Value, i);
                        }
-               });
+               })
+#if !CS8
+            )
+#endif
+            ;
 
         public PropertyViewModel[] SubProperties
         {
@@ -224,21 +245,7 @@ namespace WinCopies.GUI.Controls
     {
         public object Content { get => null; set => throw new InvalidOperationException(); }
 
-        private object _value;
-
-        public bool? IsChecked
-        {
-            get
-            {
-                if (_value == null)
-
-                    _value = ModelGeneric.Value;
-
-                return IsThreeState ? (bool?)_value : (bool)_value;
-            }
-
-            set => _value = value;
-        }
+        public bool? IsChecked { get => IsThreeState ? (bool?)Value : (bool)Value; set => Value = value; }
 
         public bool IsThreeState { get => ModelGeneric.Type == typeof(bool?); set => throw new InvalidOperationException(); }
 
@@ -255,7 +262,7 @@ namespace WinCopies.GUI.Controls
     {
         public new bool IsReadOnly { get => base.IsReadOnly; set => throw new InvalidOperationException(); }
 
-        public string Text { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public string Text { get => (string)Value; set => Value = value; }
 
         public string Placeholder { get => ModelGeneric.EditInvitation; set => throw new InvalidOperationException(); }
 
@@ -263,7 +270,17 @@ namespace WinCopies.GUI.Controls
 
         private System.Collections.Generic.IEnumerable<IButtonModel> _buttons;
 
-        public System.Collections.Generic.IEnumerable<IButtonModel> Buttons { get => _buttons ??= ButtonTextBoxModel.GetDefaultButtons(); set => throw new InvalidOperationException(); }
+        public System.Collections.Generic.IEnumerable<IButtonModel> Buttons { get => _buttons
+#if CS8
+                ??=
+                #else
+                ?? (_buttons =
+#endif
+                ButtonTextBoxModel.GetDefaultButtons()
+                #if !CS8
+                )
+#endif
+                ; set => throw new InvalidOperationException(); }
 
         public IEnumerable LeftItems { get => throw new InvalidOperationException(); set => throw new InvalidOperationException(); }
 

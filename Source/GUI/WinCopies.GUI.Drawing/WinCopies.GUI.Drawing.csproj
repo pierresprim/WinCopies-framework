@@ -9,7 +9,7 @@
     <AssemblyOriginatorKeyFile>WinCopies.GUI.Drawing.snk</AssemblyOriginatorKeyFile>
     <DocumentationFile>D:\repositories\WinCopies-framework\Source\GUI\WinCopies.GUI.Drawing\WinCopies.GUI.Drawing.xml</DocumentationFile>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DefineConstants>WinCopies3;$(DefineConstants)</DefineConstants>
+    <DefineConstants>WinCopies2;WinCopies3;$(DefineConstants)</DefineConstants>
     <VersionPrefix>3.0.0.0</VersionPrefix>
     <VersionSuffix>preview</VersionSuffix>
     <AssemblyVersion>3.0.0.0</AssemblyVersion>

@@ -42,7 +42,7 @@ namespace WinCopies.IO.ObjectModel
 
         FileSystemType ItemFileSystemType { get; }
 
-        WinCopies.Collections.IEqualityComparer<IFileSystemObject> GetDefaultEqualityComparer();
+        Collections.IEqualityComparer<IFileSystemObject> GetDefaultEqualityComparer();
 
         IComparer<IFileSystemObject> GetDefaultComparer();
     }

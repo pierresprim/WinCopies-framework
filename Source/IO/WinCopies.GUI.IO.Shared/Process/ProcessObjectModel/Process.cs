@@ -27,7 +27,7 @@ using static WinCopies.Util.Desktop.ThrowHelper;
 
 using Size = WinCopies.IO.Size;
 
-#if WinCopies2
+#if !WinCopies3
 using WinCopies.Util.DotNetFix;
 
 using static WinCopies.Util.Util;
@@ -75,7 +75,7 @@ namespace WinCopies.GUI.IO.Process
         #region Private fields
         private Size _initialSize;
         private
-#if WinCopies2
+#if !WinCopies3
 int
 #else
             uint
@@ -123,7 +123,7 @@ int
         /// Gets or sets (protected) the initial total item count.
         /// </summary>
         public
-#if WinCopies2
+#if !WinCopies3
             int
 #else
             uint
@@ -241,7 +241,7 @@ int
             )
         {
             ThrowIfNullEmptyOrWhiteSpace(sourcePath, nameof(sourcePath));
-#if WinCopies2
+#if !WinCopies3
             ThrowIfNull(pathCollection, nameof(pathCollection));
             ThrowIfNull(readOnlyPathCollection, nameof(readOnlyPathCollection));
             ThrowIfNull(errorPathCollection, nameof(errorPathCollection));

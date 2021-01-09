@@ -26,7 +26,7 @@ using WinCopies.IO.PropertySystem;
 
 namespace WinCopies.IO
 {
-#if WinCopies2
+#if !WinCopies3
     public interface IBrowsableObjectEncapsulator
     {
         object EncapsulatedObject { get; }
@@ -66,7 +66,7 @@ namespace WinCopies.IO
         /// </summary>
         public interface IBrowsableObjectInfo : IFileSystemObject, IRecursiveEnumerable<IBrowsableObjectInfo>,
 WinCopies.
-#if WinCopies2
+#if !WinCopies3
     Util.
 #endif
     DotNetFix.IDisposable
@@ -126,11 +126,6 @@ WinCopies.
             string ItemTypeName { get; }
 
             string Description { get; }
-
-            /// <summary>
-            /// Gets the size for this <see cref="IBrowsableObjectInfo"/>.
-            /// </summary>
-            Size? Size { get; }
 
             bool IsSpecialItem { get; }
 

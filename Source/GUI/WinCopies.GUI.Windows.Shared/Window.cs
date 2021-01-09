@@ -18,6 +18,7 @@
 using Microsoft.WindowsAPICodePack.Win32Native.Shell;
 using Microsoft.WindowsAPICodePack.Shell;
 using Microsoft.WindowsAPICodePack.Win32Native.Shell.DesktopWindowManager;
+
 using System;
 using System.Runtime.InteropServices;
 using System.Windows;

@@ -13,6 +13,7 @@
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     >
     <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/wincopies.gui.controls;component/Themes/Generic.xaml" />
         <ResourceDictionary>
             <!--Colors-->
 
@@ -29,17 +30,15 @@
 
             <!--Strings-->
 
-            <sys:String x:Key="Name">Name:</sys:String>
-            <sys:String x:Key="Status">Status:</sys:String>
-            <sys:String x:Key="TotalItemCount">Total item count:</sys:String>
-            <sys:String x:Key="Remaining">Remaining:</sys:String>
-            <sys:String x:Key="CopyingFrom">Copying from</sys:String>
-            <sys:String x:Key="To">To</sys:String>
+            <sys:String x:Key="WinCopies.Static.GUI.IO.Name">Name:</sys:String>
+            <sys:String x:Key="WinCopies.Static.GUI.IO.Status">Status:</sys:String>
+            <sys:String x:Key="WinCopies.Static.GUI.IO.TotalItemCount">Total item count:</sys:String>
+            <sys:String x:Key="WinCopies.Static.GUI.IO.Remaining">Remaining:</sys:String>
+            <sys:String x:Key="WinCopies.Static.GUI.IO.CopyingFrom">Copying from</sys:String>
+            <sys:String x:Key="WinCopies.Static.GUI.IO.To">To</sys:String>
 
             <!--Data converters-->
 
-            <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-            <data:IconToImageSourceConverter x:Key="IconToImageSourceConverter" />
             <data:MultiStringConverter x:Key="MultiStringConverter" />
         </ResourceDictionary>
     </ResourceDictionary.MergedDictionaries>

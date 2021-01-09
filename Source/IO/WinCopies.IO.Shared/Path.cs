@@ -40,11 +40,15 @@ using System.Globalization;
 using System.Reflection;
 using System.Text;
 
-#if WinCopies2
+using WinCopies.Collections;
+
+#if !WinCopies3
 using WinCopies.Util;
 
 using static WinCopies.Util.Util;
 #else
+using static WinCopies.UtilHelpers;
+
 using static WinCopies.ThrowHelper;
 #endif
 

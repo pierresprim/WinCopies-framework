@@ -24,7 +24,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 
 using static WinCopies.
-    #if WinCopies2
+    #if !WinCopies3
     Util.Util
 #else
     ThrowHelper
@@ -62,7 +62,7 @@ namespace WinCopies.GUI.Drawing.ColorProcessing
             if ((outputFormat & PixelFormat.Indexed) != PixelFormat.Indexed)
 
                 throw new WinCopies.
-#if WinCopies2
+#if !WinCopies3
 Util.
 #endif
                     InvalidEnumArgumentException("Output format must be one of the indexed formats", nameof(outputFormat), outputFormat);
@@ -92,7 +92,7 @@ Util.
                     break;
                 default:
                     throw new WinCopies.
-#if WinCopies2
+#if !WinCopies3
                         Util.
 #endif
                         InvalidEnumArgumentException("Indexed format not supported", nameof(outputFormat), outputFormat);

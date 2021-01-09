@@ -21,7 +21,7 @@ using System.Linq;
 using System.Reflection;
 
 using WinCopies.Collections
-#if !WinCopies2
+#if WinCopies3
     .Generic
 #endif
     ;
@@ -93,7 +93,7 @@ namespace WinCopies.IO.Reflection
     {
         private IEnumerator<T> _currentEnumerator;
 
-#if !WinCopies2
+#if WinCopies3
         private T _current;
 
         protected override T CurrentOverride => _current;
@@ -122,7 +122,7 @@ namespace WinCopies.IO.Reflection
 
                     if (moveNext())
                     {
-#if WinCopies2
+#if !WinCopies3
 Current
 #else
                         _current
@@ -142,7 +142,7 @@ Current
         }
 
         protected override void
-#if WinCopies2
+#if !WinCopies3
             Dispose(bool disposing)
         {
             base.Dispose(disposing);

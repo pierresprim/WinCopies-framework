@@ -23,12 +23,12 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 
-#if WinCopies2
+#if WinCopies3
+using static WinCopies.ThrowHelper;
+#else
 using WinCopies.Util;
 using WinCopies.Util.Data;
 using static WinCopies.Util.Util;
-#else
-using static WinCopies.ThrowHelper;
 #endif
 
 namespace WinCopies.GUI.Windows.Dialogs.Models
@@ -197,7 +197,7 @@ namespace WinCopies.GUI.Controls.Models
 #if WinCopies3
     public interface IControlModel
     {
-        bool IsEnabled { get; }
+        bool IsEnabled { get; set; }
     }
 #endif
 
@@ -223,7 +223,7 @@ namespace WinCopies.GUI.Controls.Models
     {
         private object _content;
 
-        public bool IsEnabled { get; } = true;
+        public bool IsEnabled { get; set; } = true;
 
         /// <summary>
         /// Gets or sets the content of this <see cref="ContentControlModel"/>.
@@ -274,11 +274,10 @@ namespace WinCopies.GUI.Controls.Models
     /// </summary>
     [TypeForDataTemplate(typeof(IContentControlModel))]
     public class ContentControlModel<T> : IContentControlModel<T>, IDataTemplateSelectorsModel
-
     {
         private T _content;
 
-        public bool IsEnabled { get; } = true;
+        public bool IsEnabled { get; set; } = true;
 
         /// <summary>
         /// Gets or sets the content of this <see cref="ContentControlModel{T}"/>.
@@ -444,7 +443,7 @@ namespace WinCopies.GUI.Controls.Models
     {
         private IEnumerable _items;
 
-        public bool IsEnabled { get; } = true;
+        public bool IsEnabled { get; set; } = true;
 
         /// <summary>
         /// Gets or sets the items of this <see cref="ItemsControlModel"/>.
@@ -501,7 +500,7 @@ namespace WinCopies.GUI.Controls.Models
     {
         private IEnumerable<T> _items;
 
-        public bool IsEnabled { get; } = true;
+        public bool IsEnabled { get; set; } = true;
 
         /// <summary>
         /// Gets or sets the items of this <see cref="ItemsControlModel{T}"/>.
@@ -1041,7 +1040,7 @@ namespace WinCopies.GUI.Controls.Models
     [TypeForDataTemplate(typeof(ITextBoxModelTextOriented))]
     public class TextBoxModelTextOriented : ITextBoxModelTextOriented
     {
-        public bool IsEnabled { get; } = true;
+        public bool IsEnabled { get; set; } = true;
 
         /// <summary>
         /// Gets or sets the text of this <see cref="TextBoxModelTextOriented"/>.

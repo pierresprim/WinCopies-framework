@@ -27,9 +27,11 @@
     xmlns:converters="clr-namespace:WinCopies.Util.Data;assembly=WinCopies.Util.Desktop">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary>
+            <!--Data converters-->
             <local:ModelToBooleanConverter x:Key="DefaultModelToBooleanConverter" />
             <local:BitmapToImageSourceConverter x:Key="BitmapToImageSourceConverter" />
             <local:IconToImageSourceConverter x:Key="IconToImageSourceConverter" />
+            <!--End of Data Converters Section-->
             <Style x:Key="ControlStyle" TargetType="{x:Type Control}" x:Shared="false">
                 <Setter Property="IsEnabled" Value="{Binding IsEnabled}" />
             </Style>

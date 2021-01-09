@@ -20,14 +20,14 @@ using System.Diagnostics;
 using System.Reflection;
 
 using WinCopies.Collections
-#if !WinCopies2
+#if WinCopies3
     .Generic
 #endif
     ;
 using WinCopies.IO.Reflection;
 
 #if DEBUG
-#if WinCopies2
+#if !WinCopies3
 using static WinCopies.Util.Util;
 #else
 using WinCopies.Diagnostics;
@@ -54,7 +54,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
         {
 #if DEBUG
             Debug.Assert(If(ComparisonType.And, ComparisonMode.Logical,
-#if WinCopies2
+#if !WinCopies3
 Util.Util.
 #endif
                 Comparison.NotEqual, null, dotNetTypeInfo, dotNetTypeInfo.ParentDotNetAssemblyInfo));

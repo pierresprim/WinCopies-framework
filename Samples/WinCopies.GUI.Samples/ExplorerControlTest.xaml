@@ -23,7 +23,7 @@ along with the WinCopies Framework.  If not, see<https://www.gnu.org/licenses/>.
         xmlns:local="clr-namespace:WinCopies.GUI.Samples"
         xmlns:explorer="clr-namespace:WinCopies.GUI.IO;assembly=WinCopies.GUI.IO"
         xmlns:controls="clr-namespace:WinCopies.GUI.Controls;assembly=WinCopies.GUI.Controls"
-        xmlns:util="clr-namespace:WinCopies.Util;assembly=WinCopies.Util.Desktop"
+        xmlns:util="clr-namespace:WinCopies;assembly=WinCopies.Util.Desktop"
         mc:Ignorable="d"
         Title="ExplorerControlTest" Height="450" Width="800">
     <DockPanel>

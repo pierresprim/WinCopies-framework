@@ -25,7 +25,7 @@ using WinCopies.GUI.Drawing.EncodingFormats;
 using WinCopies.GUI.Drawing.Exceptions;
 
 using static WinCopies.
-#if WinCopies2
+#if !WinCopies3
     Util.Util
 #else
     ThrowHelper

@@ -11,7 +11,7 @@
     <PackageTags>WinCopies, GUI, WPF, ViewModels</PackageTags>
     <DocumentationFile>WinCopies.GUI.ViewModels.xml</DocumentationFile>
     <SignAssembly>true</SignAssembly>
-    <DefineConstants>WinCopies3;$(DefineConstants)</DefineConstants>
+    <DefineConstants>WinCopies2;WinCopies3;$(DefineConstants)</DefineConstants>
     <VersionPrefix>3.0.0</VersionPrefix>
     <VersionSuffix>preview</VersionSuffix>
     <AssemblyVersion>3.0.0</AssemblyVersion>

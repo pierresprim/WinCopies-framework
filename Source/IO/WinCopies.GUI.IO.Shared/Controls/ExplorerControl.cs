@@ -117,6 +117,6 @@ namespace WinCopies.GUI.IO.Controls
 
         //protected virtual void OnPathChange(ExecutedRoutedEventArgs e) => path.Path = new BrowsableObjectInfoViewModel(ShellObjectInfo.From(ShellObject.FromParsingName(browsableObjectInfo.Text)));
 
-        //protected virtual void OnPathChanged(IBrowsableObjectInfoViewModel oldPath, IBrowsableObjectInfoViewModel newPath ) =>            browsableObjectInfo.Text = Path; 
+        //protected virtual void OnPathChanged(IBrowsableObjectInfoViewModel oldPath, IBrowsableObjectInfoViewModel newPath ) => browsableObjectInfo.Text = Path; 
     }
 }

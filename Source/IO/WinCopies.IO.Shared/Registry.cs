@@ -22,15 +22,16 @@ using System.Linq;
 using System.Reflection;
 using System.Security.AccessControl;
 
-#if WinCopies2
-using WinCopies.Util;
-
-using static WinCopies.Util.Util;
-#else
+#if WinCopies3
+using WinCopies.Collections;
 using WinCopies.Diagnostics;
 
 using static WinCopies.ThrowHelper;
 using static WinCopies.Diagnostics.IfHelpers;
+#else
+using WinCopies.Util;
+
+using static WinCopies.Util.Util;
 #endif
 
 namespace WinCopies.IO
@@ -522,7 +523,11 @@ namespace WinCopies.IO
                 registryKeys[i] = new KeyValuePair<RegistryKey, string>(item, item.Name);
             }
 
-            if (If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equal, out RegistryKey registryKey, registryKeyName, registryKeys))
+            if (If(ComparisonType.Or, ComparisonMode.Logical,
+#if WinCopies3
+            Diagnostics.
+#endif
+                Comparison.Equal, out RegistryKey registryKey, registryKeyName, registryKeys))
 
                 return name.Length > 0 ? registryKey.OpenSubKey(name, registryKeyPermissionCheck, registryRights) : registryKey;
 

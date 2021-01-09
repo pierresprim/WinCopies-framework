@@ -31,6 +31,8 @@ namespace WinCopies.GUI.Controls.ViewModels
     [TypeForDataTemplate(typeof(ITextBoxModelTextOriented))]
     public class TextBoxViewModelTextOriented<T> : ViewModel<T>, ITextBoxModelTextOriented where T : ITextBoxModelTextOriented
     {
+        public bool IsEnabled { get => ModelGeneric.IsEnabled; set { ModelGeneric.IsEnabled = value; OnPropertyChanged(nameof(IsEnabled)); } }
+
         public string Text { get => ModelGeneric.Text; set => Update(nameof(Text), value, typeof(ITextBoxModelTextOriented)); }
 
         public bool IsReadOnly { get => ModelGeneric.IsReadOnly; set => Update(nameof(IsReadOnly), value, typeof(ITextBoxModelTextOriented)); }

@@ -18,7 +18,7 @@
 using System;
 using System.IO;
 using System.Linq;
-#if WinCopies2
+#if !WinCopies3
 using WinCopies.Collections;
 #endif
 using WinCopies.Collections.Generic;

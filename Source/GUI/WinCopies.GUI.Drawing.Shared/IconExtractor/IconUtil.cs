@@ -31,7 +31,7 @@ using System.Drawing;
 using System.IO;
 
 using static WinCopies.
-    #if WinCopies2
+    #if !WinCopies3
     Util.Util
 #else
     ThrowHelper

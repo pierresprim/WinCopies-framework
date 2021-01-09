@@ -21,7 +21,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 
 using WinCopies.Collections.DotNetFix
-    #if !WinCopies2
+    #if WinCopies3
     .Generic
 #endif
     ;

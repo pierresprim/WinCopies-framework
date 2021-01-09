@@ -49,6 +49,7 @@ using System.Windows.Controls;
 using System.Linq;
 
 using WinCopies.Collections;
+using System.Windows.Markup;
 
 #if !WinCopies3
 using System.Collections;
@@ -58,6 +59,36 @@ using WinCopies.Util;
 namespace WinCopies
 {
     // Already implemented in WinCopies.Util.
+
+    namespace Markup
+    {
+        public abstract class ValueMarkupExtension<T> : MarkupExtension
+        {
+            public T Value { get; }
+
+            public ValueMarkupExtension(in T value) => Value = value;
+
+            public override object ProvideValue(IServiceProvider serviceProvider) => Value;
+        }
+
+        public class Boolean : ValueMarkupExtension<bool>
+        {
+            public Boolean(in bool value) : base(value) { /* Left empty. */ }
+
+            public Boolean(in string value) : base(bool.Parse(value)) { /* Left empty. */ }
+        }
+
+        public class TrueValue : Boolean
+        {
+            public TrueValue() : base(true) { /* Left empty. */ }
+        }
+
+        public class FalseValue : Boolean
+        {
+            public FalseValue() : base(false) { /* Left empty. */ }
+        }
+    }
+
 
     public class InterfaceDataTemplateSelector : DataTemplateSelector
     {
@@ -187,7 +218,7 @@ namespace WinCopies
 
     public static class Extensions
     {
-        public static System.Collections.Generic. IEnumerable<T> To<T>(this System.Collections. IEnumerable enumerable)
+        public static System.Collections.Generic.IEnumerable<T> To<T>(this System.Collections.IEnumerable enumerable)
         {
             foreach (object value in enumerable)
 
@@ -229,7 +260,7 @@ namespace WinCopies
         }
 
         public static
-#if WinCopies2
+#if !WinCopies3
 System.Collections.Generic.IEnumerator
 #else
             IEnumeratorInfo2
@@ -239,7 +270,7 @@ System.Collections.Generic.IEnumerator
 
     namespace Util
     {
-        public static class Extensions
+        public static class ExtensionsTemp
         {
             // Already implemented in WinCopies.Util.
 
@@ -456,7 +487,7 @@ System.Collections.Generic.IEnumerator
             if (index < 0)
 
                 throw new
-#if WinCopies2
+#if !WinCopies3
                     ArgumentOutOfRangeException
 #else
                     IndexOutOfRangeException
@@ -494,7 +525,7 @@ System.Collections.Generic.IEnumerator
 
         public interface IReadOnlyProperty
         {
-            bool IsEnabled { get; }
+            // bool IsEnabled { get; }
 
             string Name { get; }
 
@@ -516,8 +547,6 @@ System.Collections.Generic.IEnumerator
         public interface IProperty : IReadOnlyProperty
         {
             bool IsReadOnly { get; }
-
-            new object Value { get; set; }
         }
 
         public interface IReadOnlyProperty<T> : IReadOnlyProperty

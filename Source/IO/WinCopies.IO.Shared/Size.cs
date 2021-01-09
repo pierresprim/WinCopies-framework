@@ -18,7 +18,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 
-#if WinCopies2
+#if !WinCopies3
 using WinCopies.Util;
 
 using static WinCopies.Util.Util;
@@ -90,7 +90,7 @@ namespace WinCopies.IO
         /// The numeric value in bytes.
         /// </summary>
         public WinCopies.
-#if WinCopies2
+#if !WinCopies3
             Util.
 #endif
             CheckedUInt64 ValueInBytes
@@ -99,7 +99,7 @@ namespace WinCopies.IO
         public float GetFloatValueInUnit(in ByteUnit unit) => unit == ByteUnit.Byte
                 ? (float)ValueInBytes
                 : (float)ValueInBytes /
-#if WinCopies2
+#if !WinCopies3
             Util
 #else
             WinCopies
@@ -113,7 +113,7 @@ namespace WinCopies.IO
         public decimal GetDecimalValueInUnit(in ByteUnit unit) => unit == ByteUnit.Byte
                 ? (decimal)ValueInBytes
                 : (decimal)ValueInBytes /
-            #if WinCopies2
+            #if !WinCopies3
             Util
 #else
             WinCopies

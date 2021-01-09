@@ -23,15 +23,15 @@ using System.IO;
 using WinCopies.IO;
 using WinCopies.Collections.DotNetFix.Generic;
 
-#if WinCopies2
-using WinCopies.Util;
-
-using static WinCopies.Util.Util;
-#else
+#if WinCopies3
 using WinCopies;
 
 using static WinCopies.ThrowHelper;
 using static WinCopies.Collections.ThrowHelper;
+#else
+using WinCopies.Util;
+
+using static WinCopies.Util.Util;
 #endif
 
 namespace WinCopies.GUI.IO.Process
@@ -186,14 +186,14 @@ namespace WinCopies.GUI.IO.Process
         public void RemoveAt(int index) => InnerList.RemoveAt(index);
 
         public class PathCollectionEnumerator : WinCopies.Collections.
-#if !WinCopies2
+#if WinCopies3
             Generic.
 #endif
             Enumerator<T, T>
         {
             private PathCollection<T> _pathCollection;
             private
-#if WinCopies2
+#if !WinCopies3
 IQueue
 #else
                 IQueueBase
@@ -201,7 +201,7 @@ IQueue
                 <T> _queue;
             private readonly FileSystemEntryEnumerationOrder _enumerationOrder;
             private Func<bool> _moveNext;
-#if WinCopies2
+#if !WinCopies3
             private bool _completed = false;
 #else
             private T _current;
@@ -215,11 +215,11 @@ IQueue
             {
                 _pathCollection = pathCollection;
 
-#if WinCopies2
+#if !WinCopies3
 enumerationOrder.
 #endif
                 ThrowIfNotValidEnumValue(nameof(enumerationOrder)
-                    #if !WinCopies2
+                    #if WinCopies3
                     , enumerationOrder
                     #endif
                     );
@@ -227,7 +227,7 @@ enumerationOrder.
                 if ((_enumerationOrder = enumerationOrder) != FileSystemEntryEnumerationOrder.None)
 
                     _queue =
-#if WinCopies2
+#if !WinCopies3
                         new WinCopies.Collections.Generic.Queue<T>
 #else
                         WinCopies.Collections.Generic.EnumerableHelper<T>.GetQueue
@@ -237,7 +237,7 @@ enumerationOrder.
 
             public static PathCollectionEnumerator From(in PathCollection<T> pathCollection, in FileSystemEntryEnumerationOrder enumerationOrder) => new PathCollectionEnumerator(pathCollection ?? throw GetArgumentNullException(nameof(pathCollection)), enumerationOrder);
 
-#if WinCopies2
+#if !WinCopies3
             protected override void ResetOverride()
             {
                 base.ResetOverride();
@@ -247,7 +247,7 @@ enumerationOrder.
 #endif
 
             protected override void
-#if WinCopies2
+#if !WinCopies3
                 Dispose(bool disposing)
 #else
                 DisposeManaged()
@@ -260,7 +260,7 @@ enumerationOrder.
                 _moveNext = null;
 
                 base.
-#if WinCopies2
+#if !WinCopies3
                     Dispose(disposing
 #else
                 DisposeManaged(
@@ -270,21 +270,21 @@ enumerationOrder.
 
             protected override bool MoveNextOverride()
             {
-#if WinCopies2
+#if !WinCopies3
                 if (_completed) return false;
 #endif
 
                 if (_pathCollection.Count == 0)
                 {
 
-#if WinCopies2
+#if !WinCopies3
 Current
 #else
                     _current
 #endif
                              = _pathCollection.GetNewEmptyEnumeratorPathInfoDelegate();
 
-#if WinCopies2
+#if !WinCopies3
                     _completed = true;
 #endif
 
@@ -292,7 +292,7 @@ Current
                 }
 
                 void updateCurrentWithInnerEnumeratorValue() =>
-#if WinCopies2
+#if !WinCopies3
 Current
 #else
                         _current
@@ -328,14 +328,14 @@ Current
                     }
 
                     if (_queue.
-#if WinCopies2
+#if !WinCopies3
                         Count != 0
 #else
                         HasItems
 #endif
                         )
                     {
-#if WinCopies2
+#if !WinCopies3
 Current
 #else
                         _current
@@ -371,7 +371,7 @@ Current
 
                 _moveNext = null;
 
-#if WinCopies2
+#if !WinCopies3
                 _completed = true;
 #endif
 

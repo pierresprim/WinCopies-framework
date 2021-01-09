@@ -35,6 +35,7 @@ using static WinCopies.
 using WinCopies.Util
 #endif
     ;
+using WinCopies.Desktop;
 
 namespace WinCopies.GUI.Controls
 {

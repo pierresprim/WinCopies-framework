@@ -20,7 +20,10 @@ using System.Globalization;
 using System.Windows.Data;
 using WinCopies.Util.Data;
 
-namespace WinCopies.GUI.Windows.Dialogs
+namespace WinCopies.GUI.Windows
+#if !WinCopies3
+Dialogs
+#endif
 {
     [ValueConversion(typeof(HorizontalAlignment), typeof(System.Windows.HorizontalAlignment))]
     public class ButtonAlignmentToHorizontalAlignmentConverter : ConverterBase

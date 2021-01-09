@@ -24,22 +24,131 @@ using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 
-using TsudaKageyu;
+using WinCopies.GUI.Drawing;
 
 using WinCopies.Collections;
 using WinCopies.IO.ObjectModel;
+using System;
+using System.IO;
 
 namespace WinCopies.IO
 {
-
-    public class FileSystemObjectInfoProperties<T> : BrowsableObjectInfoProperties<T>, IFileSystemObjectInfoProperties where T : IFileSystemObjectInfo
+    public abstract class FileSystemObjectInfoProperties<T> : BrowsableObjectInfoProperties<T>, IFileSystemObjectInfoProperties where T : IFileSystemObjectInfo
     {
         ///// <summary>
         ///// The file type of this <see cref="FileSystemObject"/>.
         ///// </summary>
-        public FileType FileType => BrowsableObjectInfo.FileType;
+        public FileType FileType { get; }
 
-        public FileSystemObjectInfoProperties(T fileSystemObjectInfo) : base(fileSystemObjectInfo)
+        public abstract Size? Size { get; }
+
+        protected FileSystemObjectInfoProperties(in T fileSystemObjectInfo, in FileType fileType) : base(fileSystemObjectInfo) => FileType = fileType;
+    }
+
+    public abstract class FileSystemObjectInfoProperties<TBrowsableObjectInfo, TInnerProperties> : FileSystemObjectInfoProperties<TBrowsableObjectInfo> where TBrowsableObjectInfo : IFileSystemObjectInfo
+    {
+        protected TInnerProperties InnerProperties { get; }
+
+        protected FileSystemObjectInfoProperties(in TBrowsableObjectInfo fileSystemObjectInfo, in FileType fileType, in TInnerProperties innerProperties) : base(fileSystemObjectInfo, fileType) => InnerProperties = innerProperties;
+    }
+
+    public abstract class FileOrFolderShellObjectInfoProperties<TBrowsableObjectInfo, TInnerProperties> : FileSystemObjectInfoProperties<TBrowsableObjectInfo, TInnerProperties>, IFileSystemObjectInfoProperties2 where TBrowsableObjectInfo : IShellObjectInfo2 where TInnerProperties : FileSystemInfo
+    {
+        public DateTime LastWriteTime => InnerProperties.LastWriteTime;
+
+        public DateTime LastAccessTimeUtc => InnerProperties.LastAccessTimeUtc;
+
+        public DateTime LastAccessTime => InnerProperties.LastAccessTime;
+
+        public string FullName => InnerProperties.FullName;
+
+        public string Extension => InnerProperties.Extension;
+
+        public bool Exists => InnerProperties.Exists;
+
+        public DateTime CreationTime => InnerProperties.CreationTime;
+
+        public DateTime LastWriteTimeUtc => InnerProperties.LastWriteTimeUtc;
+
+        public System.IO.FileAttributes Attributes => InnerProperties.Attributes;
+
+        public DateTime CreationTimeUtc => InnerProperties.CreationTimeUtc;
+
+        public string Name => InnerProperties.Name;
+
+        protected FileOrFolderShellObjectInfoProperties(in TBrowsableObjectInfo shellObjectInfo, in FileType fileType, in TInnerProperties innerProperties) : base(shellObjectInfo, fileType, innerProperties)
+        {
+            // Left empty.
+        }
+    }
+
+    public class FolderShellObjectInfoProperties<T> : FileOrFolderShellObjectInfoProperties<T, DirectoryInfo> where T : IShellObjectInfo2
+    {
+        public string ParentName => InnerProperties.Parent.FullName;
+
+        public string RootName => InnerProperties.Root.FullName;
+
+        public sealed override Size? Size => null;
+
+        public FolderShellObjectInfoProperties(in T shellObjectInfo, in FileType fileType) : base(shellObjectInfo, fileType, new DirectoryInfo(shellObjectInfo.Path))
+        {
+            // Left empty.
+        }
+    }
+
+    public class FileShellObjectInfoProperties<T> : FileOrFolderShellObjectInfoProperties<T, System.IO.FileInfo> where T : IShellObjectInfo2
+    {
+        public bool IsReadOnly => InnerProperties.IsReadOnly;
+
+        public string? DirectoryName => InnerProperties.DirectoryName;
+
+        public sealed override Size? Size => new IO.Size((ulong)InnerProperties.Length);
+
+        public FileShellObjectInfoProperties(in T shellObjectInfo, in FileType fileType) : base(shellObjectInfo, fileType, new System.IO.FileInfo(shellObjectInfo.Path))
+        {
+            // Left empty.
+        }
+    }
+
+    public class DriveShellObjectInfoProperties<T> : FileSystemObjectInfoProperties<T, DriveInfo> where T : IShellObjectInfo2
+    {
+        public Size AvailableFreeSpace => new IO.Size((ulong)InnerProperties.AvailableFreeSpace);
+
+        public string DriveFormat => InnerProperties.DriveFormat;
+
+        public DriveType DriveType => InnerProperties.DriveType;
+
+        public bool IsReady => InnerProperties.IsReady;
+
+        public string RootDirectoryName => InnerProperties.RootDirectory.FullName;
+
+        public Size TotalFreeSpace => new IO.Size((ulong)InnerProperties.TotalFreeSpace);
+
+        public Size TotalSize => new Size((ulong)InnerProperties.TotalSize);
+
+        public string VolumeLabel => InnerProperties.VolumeLabel;
+
+        public sealed override Size? Size => new IO.Size((ulong)(InnerProperties.TotalSize - InnerProperties.TotalFreeSpace));
+
+        public DriveShellObjectInfoProperties(in T shellObjectInfo, in FileType fileType) : base(shellObjectInfo, fileType, new DriveInfo(shellObjectInfo.Path))
+        {
+            // Left empty.
+        }
+    }
+
+    public class ArchiveItemInfoProperties<T> : FileSystemObjectInfoProperties<T>, IFileSystemObjectInfoProperties2 where T : IArchiveItemInfo
+    {
+        public DateTime CreationTime => BrowsableObjectInfo.EncapsulatedObject.Value.CreationTime;
+
+        public DateTime LastAccessTime => BrowsableObjectInfo.EncapsulatedObject.Value.LastAccessTime;
+
+        public DateTime LastWriteTime => BrowsableObjectInfo.EncapsulatedObject.Value.LastWriteTime;
+
+        public System.IO.FileAttributes Attributes => (System.IO.FileAttributes)BrowsableObjectInfo.EncapsulatedObject.Value.Attributes;
+
+        public sealed override Size? Size => new IO.Size(BrowsableObjectInfo.EncapsulatedObject.Value.Size);
+
+        public ArchiveItemInfoProperties(in T fileSystemObjectInfo, in FileType fileType) : base(fileSystemObjectInfo, fileType)
         {
             // Left empty.
         }
@@ -62,8 +171,6 @@ namespace WinCopies.IO
             public override bool IsRecursivelyBrowsable { get; } = true;
 
             public sealed override bool HasProperties => true;
-
-            public abstract FileType FileType { get; }
             #endregion
 
             protected FileSystemObjectInfo(in string path) : base(path)
@@ -86,8 +193,8 @@ namespace WinCopies.IO
             public static FileSystemObjectInfoComparer<IFileSystemObjectInfo> GetDefaultComparer() => new FileSystemObjectInfoComparer<IFileSystemObjectInfo>();*/
 
             public static string GetItemTypeName(string extension, FileType fileType) => fileType == FileType.Folder
-                        ? FileOperation.GetFileInfo(string.Empty, FileAttributes.Directory, GetFileInfoOptions.TypeName).TypeName
-                        : FileOperation.GetFileInfo(extension, FileAttributes.Normal, GetFileInfoOptions.TypeName).TypeName;
+                        ? FileOperation.GetFileInfo(string.Empty, Microsoft.WindowsAPICodePack.Win32Native.Shell.FileAttributes.Directory, GetFileInfoOptions.TypeName).TypeName
+                        : FileOperation.GetFileInfo(extension, Microsoft.WindowsAPICodePack.Win32Native.Shell.FileAttributes.Normal, GetFileInfoOptions.TypeName).TypeName;
             #endregion
 
             #region TryGetIcon/BitmapSource
@@ -98,7 +205,7 @@ namespace WinCopies.IO
 
                // if (System.IO.Path.HasExtension(Path))
 
-               fileType == FileType.Folder ? TryGetIcon(3, size) : FileOperation.GetFileInfo(extension, FileAttributes.Normal, GetFileInfoOptions.Icon | GetFileInfoOptions.UseFileAttributes).Icon?.TryGetIcon(size, 32, true, true) ?? TryGetIcon(0, size);// else// return TryGetIcon(FileType == FileType.Folder ? 3 : 0, "SHELL32.dll", size);
+               fileType == FileType.Folder ? TryGetIcon(3, size) : FileOperation.GetFileInfo(extension, Microsoft.WindowsAPICodePack.Win32Native.Shell.FileAttributes.Normal, GetFileInfoOptions.Icon | GetFileInfoOptions.UseFileAttributes).Icon?.TryGetIcon(size, 32, true, true) ?? TryGetIcon(0, size);// else// return TryGetIcon(FileType == FileType.Folder ? 3 : 0, "SHELL32.dll", size);
 
             public static BitmapSource TryGetBitmapSource(in string extension, in FileType fileType, in int size)
             {

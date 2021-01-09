@@ -38,7 +38,7 @@ using System.Text;
 using static Microsoft.WindowsAPICodePack.NativeAPI.Consts.Shell;
 
 using static WinCopies.
-    #if WinCopies2
+    #if !WinCopies3
     Util.Util
 #else
     ThrowHelper

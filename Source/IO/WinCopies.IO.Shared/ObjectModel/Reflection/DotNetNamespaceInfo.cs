@@ -22,7 +22,7 @@ using System.Diagnostics;
 using WinCopies.IO.ObjectModel.Reflection;
 using WinCopies.IO.Reflection;
 
-#if WinCopies2
+#if !WinCopies3
 using WinCopies.Collections;
 
 using static WinCopies.Util.Util;

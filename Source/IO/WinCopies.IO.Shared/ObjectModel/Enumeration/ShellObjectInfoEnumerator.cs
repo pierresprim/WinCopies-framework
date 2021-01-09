@@ -29,27 +29,24 @@ using WinCopies.IO.ObjectModel;
 
 using static Microsoft.WindowsAPICodePack.Shell.KnownFolders;
 
-#if WinCopies2
+#if WinCopies3
+using WinCopies.Collections.Generic;
+
+using static WinCopies.ThrowHelper;
+#else
 using System.Collections.Generic;
 
 using WinCopies.Util;
-#else
-using WinCopies.Collections.Generic;
 #endif
 
 namespace WinCopies.IO
 {
-    public sealed class ShellObjectInfoEnumerator : Enumerator<IBrowsableObjectInfo, IBrowsableObjectInfo>
+    public static class ShellObjectInfoEnumerator
     {
-        // private ShellObject _shellObject;
-
-        private ShellObjectInfoEnumerator(in System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> enumerable) : base(enumerable)
+        public static System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> From(in ShellObjectInfo shellObjectInfo, in Predicate<ShellObjectInfoEnumeratorStruct> func, in ClientVersion clientVersion)
         {
-            // Left empty.
-        }
+            ThrowIfNull(shellObjectInfo, nameof(shellObjectInfo));
 
-        public static ShellObjectInfoEnumerator From(in ShellObjectInfo shellObjectInfo, in Predicate<ShellObjectInfoEnumeratorStruct> func, in ClientVersion clientVersion)
-        {
             System.Collections.Generic.IEnumerable<ShellObject> shellObjects;
             System.Collections.Generic.IEnumerable<IPortableDevice> portableDevices;
 
@@ -63,14 +60,14 @@ namespace WinCopies.IO
 
                 portableDevices = portableDeviceManager.PortableDevices;
 
-                if (shellObjects == null) return new ShellObjectInfoEnumerator(GetPortableDevices(portableDevices, shellObjects,func,clientVersion));
+                if (shellObjects == null) return GetPortableDevices(portableDevices, shellObjects, func, clientVersion);
 
-                else if (portableDevices == null) return new ShellObjectInfoEnumerator(GetShellObjects(shellObjects, null, func, clientVersion));
+                else if (portableDevices == null) return GetShellObjects(shellObjects, null, func, clientVersion);
 
-                return new ShellObjectInfoEnumerator(GetShellObjects(shellObjects, portableDevices, func, clientVersion).AppendValues(GetPortableDevices(portableDevices, shellObjects,func,clientVersion)));
+                return GetShellObjects(shellObjects, portableDevices, func, clientVersion).AppendValues(GetPortableDevices(portableDevices, shellObjects, func, clientVersion));
             }
 
-            else return new ShellObjectInfoEnumerator(GetShellObjects(shellObjects, null, func, clientVersion));
+            else return GetShellObjects(shellObjects, null, func, clientVersion);
 
         }
 
@@ -141,33 +138,21 @@ namespace WinCopies.IO
             }
         }
 
-        private static System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetPortableDevices(in System.Collections.Generic.IEnumerable<IPortableDevice> portableDevices, System.Collections.Generic.IEnumerable<ShellObject> shellObjects, Predicate<ShellObjectInfoEnumeratorStruct> func, ClientVersion clientVersion    ) => portableDevices.Where(item =>
-  {
-      if (shellObjects != null)
-      {
-          foreach (ShellObject shellObject in shellObjects)
+        private static System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetPortableDevices(in System.Collections.Generic.IEnumerable<IPortableDevice> portableDevices, System.Collections.Generic.IEnumerable<ShellObject> shellObjects, Predicate<ShellObjectInfoEnumeratorStruct> func, ClientVersion clientVersion) => portableDevices.Where(item =>
+{
+    if (shellObjects != null)
+    {
+        foreach (ShellObject shellObject in shellObjects)
 
-              if (shellObject.ParsingName.EndsWith(item.DeviceId, StringComparison.InvariantCultureIgnoreCase))
+            if (shellObject.ParsingName.EndsWith(item.DeviceId, StringComparison.InvariantCultureIgnoreCase))
 
-                  return PortableDevicePredicate(item, func,clientVersion);
+                return PortableDevicePredicate(item, func, clientVersion);
 
-          return false;
-      }
+        return false;
+    }
 
-      return PortableDevicePredicate(item, func, clientVersion);
+    return PortableDevicePredicate(item, func, clientVersion);
 
-  }).Select(portableDevice => new PortableDeviceInfo(portableDevice, clientVersion));
-
-        protected override bool MoveNextOverride()
-        {
-            if (InnerEnumerator.MoveNext())
-            {
-                Current = InnerEnumerator.Current;
-
-                return true;
-            }
-
-            return false;
-        }
+}).Select(portableDevice => new PortableDeviceInfo(portableDevice, clientVersion));
     }
 }
