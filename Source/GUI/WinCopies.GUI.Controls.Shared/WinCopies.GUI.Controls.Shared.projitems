@@ -20,5 +20,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)LinkUnderliningMode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\InlineTextEditor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\PropertyGrid.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\UpDownButton.cs" />
   </ItemGroup>
 </Project>

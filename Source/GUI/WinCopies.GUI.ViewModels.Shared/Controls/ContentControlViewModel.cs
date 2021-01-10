@@ -25,13 +25,20 @@ using static WinCopies.
     Util.Util;
 
 using WinCopies.Util
-    #endif
+#endif
     ;
 
 namespace WinCopies.GUI.Controls.ViewModels
 {
+    public class ControlViewModel<T> : ViewModel<T>, IControlModel where T : IControlModel
+    {
+        public bool IsEnabled => ModelGeneric.IsEnabled;
+
+        public ControlViewModel(T model) : base(model) { /* Left empty. */ }
+    }
+
     [TypeForDataTemplate(typeof(IContentControlModel))]
-    public class ContentControlViewModel<T> : ViewModel<T>, IContentControlModel, IDataTemplateSelectorsModel where T : IContentControlModel
+    public class ContentControlViewModel<T> : ControlViewModel<T>, IContentControlModel, IDataTemplateSelectorsModel where T : IContentControlModel
     {
         private IModelDataTemplateSelectors _modelDataTemplateSelectors;
 
@@ -105,7 +112,7 @@ namespace WinCopies.GUI.Controls.ViewModels
     }
 
     [TypeForDataTemplate(typeof(IContentControlModel))]
-    public class ContentControlViewModel<TModel, TContent> : ViewModel<TModel>, IContentControlModel<TContent>, IDataTemplateSelectorsModel where TModel : IContentControlModel<TContent>
+    public class ContentControlViewModel<TModel, TContent> : ControlViewModel<TModel>, IContentControlModel<TContent>, IDataTemplateSelectorsModel where TModel : IContentControlModel<TContent>
     {
         private IModelDataTemplateSelectors _modelDataTemplateSelectors;
 

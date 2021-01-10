@@ -199,6 +199,11 @@ namespace WinCopies.GUI.Controls.Models
     {
         bool IsEnabled { get; }
     }
+
+    public class ControlModel:IControlModel
+    {
+        public bool IsEnabled { get; } = true;
+    }
 #endif
 
     /// <summary>
@@ -219,11 +224,9 @@ namespace WinCopies.GUI.Controls.Models
     /// Represents a model that corresponds to a default view for <see cref="ContentControl"/>s.
     /// </summary>
     [TypeForDataTemplate(typeof(IContentControlModel))]
-    public class ContentControlModel : IContentControlModel, IDataTemplateSelectorsModel
+    public class ContentControlModel : ControlModel, IDataTemplateSelectorsModel
     {
         private object _content;
-
-        public bool IsEnabled { get; } = true;
 
         /// <summary>
         /// Gets or sets the content of this <see cref="ContentControlModel"/>.
@@ -273,12 +276,9 @@ namespace WinCopies.GUI.Controls.Models
     /// Represents a model that corresponds to a default view for <see cref="ContentControl"/>s.
     /// </summary>
     [TypeForDataTemplate(typeof(IContentControlModel))]
-    public class ContentControlModel<T> : IContentControlModel<T>, IDataTemplateSelectorsModel
-
+    public class ContentControlModel<T> : ControlModel, IContentControlModel<T>, IDataTemplateSelectorsModel
     {
         private T _content;
-
-        public bool IsEnabled { get; } = true;
 
         /// <summary>
         /// Gets or sets the content of this <see cref="ContentControlModel{T}"/>.
@@ -440,11 +440,9 @@ namespace WinCopies.GUI.Controls.Models
     /// Represents a model that corresponds to a default view for <see cref="ItemsControl"/>s.
     /// </summary>
     [TypeForDataTemplate(typeof(IItemsControlModel))]
-    public class ItemsControlModel : IItemsControlModel, IDataTemplateSelectorsModel
+    public class ItemsControlModel : Control, IItemsControlModel, IDataTemplateSelectorsModel
     {
         private IEnumerable _items;
-
-        public bool IsEnabled { get; } = true;
 
         /// <summary>
         /// Gets or sets the items of this <see cref="ItemsControlModel"/>.
