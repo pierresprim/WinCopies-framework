@@ -27,7 +27,7 @@ using WinCopies.Collections;
 using WinCopies.IO.ObjectModel;
 using WinCopies.Linq;
 
-#if WinCopies2
+#if !WinCopies3
 using System.Collections.Generic;
 
 using WinCopies.Util;
@@ -529,7 +529,7 @@ namespace WinCopies.IO
                 }
             }
 
-            public override System.Collections.Generic.IEqualityComparer<IFileSystemObject> GetDefaultEqualityComparer() => new WMIItemInfoEqualityComparer<IFileSystemObject>();
+            public override Collections.IEqualityComparer<IFileSystemObject> GetDefaultEqualityComparer() => new WMIItemInfoEqualityComparer<IFileSystemObject>();
 
             public override System.Collections.Generic.IComparer<IFileSystemObject> GetDefaultComparer() => new WMIItemInfoComparer<IFileSystemObject>();
 

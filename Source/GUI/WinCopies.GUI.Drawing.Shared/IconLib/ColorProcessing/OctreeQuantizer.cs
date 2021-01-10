@@ -22,7 +22,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 
 using static WinCopies.
-    #if WinCopies2
+    #if !WinCopies3
     Util.Util
 #else
     ThrowHelper

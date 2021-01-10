@@ -26,7 +26,7 @@ using WinCopies.Util;
 #endif
 
 using static WinCopies.
-    #if WinCopies2
+    #if !WinCopies3
     Util.Util
 #else
     ThrowHelper
@@ -39,8 +39,9 @@ namespace WinCopies.GUI.Controls.ViewModels
     public class ItemsControlViewModel<T> : ViewModel<T>, IItemsControlModel, IDataTemplateSelectorsModel where T : IItemsControlModel
     {
         private IModelDataTemplateSelectors _modelDataTemplateSelectors;
-
         private bool _autoAddDataTemplateSelectors;
+
+        public bool IsEnabled { get => ModelGeneric.IsEnabled; set { ModelGeneric.IsEnabled = value; OnPropertyChanged(nameof(IsEnabled)); } }
 
         public IEnumerable Items
         {
@@ -113,8 +114,9 @@ namespace WinCopies.GUI.Controls.ViewModels
     public class ItemsControlViewModel<TModel, TItems> : ViewModel<TModel>, IItemsControlModel<TItems>, IDataTemplateSelectorsModel where TModel : IItemsControlModel<TItems>
     {
         private IModelDataTemplateSelectors _modelDataTemplateSelectors;
-
         private bool _autoAddDataTemplateSelectors;
+
+        public bool IsEnabled { get => ModelGeneric.IsEnabled; set { ModelGeneric.IsEnabled = value; OnPropertyChanged(nameof(IsEnabled)); } }
 
         public IEnumerable<TItems> Items
         {

@@ -27,7 +27,7 @@ using static Microsoft.WindowsAPICodePack.Shell.KnownFolders;
 
 using static WinCopies.IO.Path;
 
-#if WinCopies2
+#if !WinCopies3
 using WinCopies.Collections;
 using WinCopies.Util;
 
@@ -88,13 +88,9 @@ namespace WinCopies.IO
             public override bool IsBrowsable => _shellObject is System.Collections.Generic.IEnumerable<ShellObject>;
 
 #if NETFRAMEWORK
-
             public override IBrowsableObjectInfo Parent => _parent ?? (_parent = GetParent());
-
 #else
-
             public override IBrowsableObjectInfo Parent => _parent ??= GetParent();
-
 #endif
 
             /// <summary>
@@ -179,9 +175,11 @@ namespace WinCopies.IO
             /// </summary>
             public override IShellObjectInfo ArchiveShellObject => ObjectPropertiesGeneric.FileType == FileType.Archive ? this : null;
 
+#if WinCopies3
             public override IPropertySystemCollection ObjectPropertySystem => ShellObjectPropertySystemCollection._GetShellObjectPropertySystemCollection(this);
-            #endregion
-            #endregion
+#endif
+#endregion
+#endregion
 
             ///// <summary>
             ///// Initializes a new instance of the <see cref="ShellObjectInfo"/> class with a given <see cref="FileType"/> and <see cref="SpecialFolder"/> using custom factories for <see cref="ShellObjectInfo"/>s and <see cref="ArchiveItemInfo"/>s.
@@ -196,7 +194,7 @@ namespace WinCopies.IO
 
                 FileType = fileType;
 
-                ObjectPropertiesGeneric = new FileSystemObjectInfoProperties<IShellObjectInfo>(this);
+                ObjectPropertiesGeneric = new FileSystemObjectInfoProperties<IShellObjectInfo>(this, fileType);
             }
 
             #region Methods
@@ -274,7 +272,7 @@ namespace WinCopies.IO
 
                     else
 
-                        return new Enumerable<IBrowsableObjectInfo>(() => ShellObjectInfoEnumerator.From(this, func, ClientVersion.Value));
+                        return ShellObjectInfoEnumerator.From(this, func, ClientVersion.Value);
 
                 else return null;
             }

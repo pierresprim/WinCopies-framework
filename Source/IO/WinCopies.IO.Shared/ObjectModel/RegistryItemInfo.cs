@@ -32,7 +32,7 @@ using WinCopies.Linq;
 
 using static Microsoft.WindowsAPICodePack.NativeAPI.Consts.DllNames;
 
-#if WinCopies2
+#if !WinCopies3
 using WinCopies.Util;
 
 using static WinCopies.Util.Util;

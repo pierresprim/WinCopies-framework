@@ -33,12 +33,14 @@ using WinCopies.Linq;
 using WinCopies.Util.Data;
 
 using static WinCopies.
-    #if WinCopies2
+    #if !WinCopies3
     Util.Util
 #else
     ThrowHelper
     #endif
     ;
+
+using IEnumerable = System.Collections.IEnumerable;
 
 namespace WinCopies.GUI.IO.ObjectModel
 {

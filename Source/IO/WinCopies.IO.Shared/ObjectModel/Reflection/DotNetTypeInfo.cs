@@ -21,7 +21,7 @@ using System.Diagnostics;
 using System.Reflection;
 
 using WinCopies.Collections
-#if !WinCopies2
+#if WinCopies3
     .Generic
     #endif
     ;

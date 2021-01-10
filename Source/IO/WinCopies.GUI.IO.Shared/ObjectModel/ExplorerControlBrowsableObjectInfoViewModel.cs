@@ -26,7 +26,7 @@ using WinCopies.IO;
 using WinCopies.IO.ObjectModel;
 using WinCopies.Util.Data;
 
-#if WinCopies2
+#if !WinCopies3
 using WinCopies.Util.Commands;
 
 using static WinCopies.Util.Util;

@@ -30,7 +30,7 @@ using WinCopies.IO.ObjectModel;
 using WinCopies.Linq;
 
 using static WinCopies.
-#if WinCopies2
+#if !WinCopies3
     Util.Util
 #else
     ThrowHelper

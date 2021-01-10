@@ -17,6 +17,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Controls\LinkRun.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\PlaceholderTextBox.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\TextBox.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\MenuButton.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)LinkUnderliningMode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\InlineTextEditor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\PropertyGrid.cs" />

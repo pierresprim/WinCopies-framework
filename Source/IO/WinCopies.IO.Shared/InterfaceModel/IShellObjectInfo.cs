@@ -30,7 +30,12 @@ namespace WinCopies.IO.ObjectModel
         void CloseArchive();
     }
 
-    public interface IShellObjectInfo<T> : IShellObjectInfo, IArchiveItemInfoProvider<T, ShellObject> where T : IFileSystemObjectInfoProperties
+    public interface IShellObjectInfo2 : IShellObjectInfo, IEncapsulatorBrowsableObjectInfo<ShellObject>
+    {
+        // Left empty.
+    }
+
+    public interface IShellObjectInfo<T> : IShellObjectInfo, IShellObjectInfo2 where T : IFileSystemObjectInfoProperties
     {
         ///// <summary>
         ///// Gets a <see cref="FileSystemInfo"/> object that provides info for the folders and files. This property returns <see langword="null"/> when this <see cref="IShellObjectInfo"/> is not a folder, drive or file. See the <see cref="IFileSystemObjectInfo.FileType"/> property for more details.

@@ -389,13 +389,13 @@ namespace WinCopies.GUI.Drawing
         #region Helper Classes
         [Serializable, StructLayout(LayoutKind.Sequential)]
         public
-#if WinCopies2
+#if !WinCopies3
 struct
 #else
             class
 #endif
             Enumerator :
-#if WinCopies2
+#if !WinCopies3
             IEnumerator<IconImage>, IDisposable, IEnumerator
 #else
             WinCopies.Collections.Generic.Enumerator<IconImage>
@@ -414,14 +414,14 @@ struct
             {
                 mList = list;
                 mIndex = 0;
-#if WinCopies2
+#if !WinCopies3
                 Current = null;
 #endif
             }
             #endregion
 
             #region Properties
-#if WinCopies2
+#if !WinCopies3
             public IconImage Current { get; private set; }
 
             object IEnumerator.Current => Current;
@@ -433,7 +433,7 @@ struct
             #endregion
 
             #region Methods
-#if WinCopies2
+#if !WinCopies3
             public void Dispose() { }
 
             public bool MoveNext()
@@ -443,7 +443,7 @@ struct
             {
                 if (mIndex < mList.Count)
                 {
-#if WinCopies2
+#if !WinCopies3
                     Current
 #else
 _current 
@@ -460,20 +460,20 @@ _current
                 return false;
             }
 
-#if WinCopies2
+#if !WinCopies3
             private
 #else
             protected override 
 #endif
                 void ResetCurrent() =>
-#if WinCopies2
+#if !WinCopies3
                 Current
 #else
                 _current 
 #endif
                 = null;
 
-#if WinCopies2
+#if !WinCopies3
             void IEnumerator.Reset()
             {
                 mIndex = 0;

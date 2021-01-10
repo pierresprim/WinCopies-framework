@@ -54,9 +54,11 @@ namespace WinCopies.GUI.Windows
         /// <summary>
         /// Identifies the <see cref="DialogButton"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty DialogButtonProperty = DependencyProperty.Register(nameof(DialogButton), typeof(DialogButton?), typeof(DialogWindow), new PropertyMetadata(WinCopies.GUI.Windows.
-#if !WinCopies3
-            Dialogs.
+        public static readonly DependencyProperty DialogButtonProperty = DependencyProperty.Register(nameof(DialogButton), typeof(DialogButton?), typeof(DialogWindow), new PropertyMetadata(
+#if WinCopies3
+            Windows.
+#else
+            WinCopies.GUI.Windows.Dialogs.
 #endif
             DialogButton.OK, (DependencyObject sender, DependencyPropertyChangedEventArgs e) => ((DialogWindow)sender).OnDialogButtonChanged((DialogButton?)e.OldValue, (DialogButton?)e.NewValue)
         ));
@@ -69,7 +71,7 @@ namespace WinCopies.GUI.Windows
         /// <summary>
         /// Identifies the <see cref="ButtonAlignment"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty ButtonAlignmentProperty = DependencyProperty.Register(nameof(ButtonAlignment), typeof(HorizontalAlignment), typeof(DialogWindow), new PropertyMetadata(Dialogs.HorizontalAlignment.Left));
+        public static readonly DependencyProperty ButtonAlignmentProperty = DependencyProperty.Register(nameof(ButtonAlignment), typeof(HorizontalAlignment), typeof(DialogWindow), new PropertyMetadata(Windows.HorizontalAlignment.Left));
 
         /// <summary>
         /// Gets or sets the <see cref="HorizontalAlignment"/> for the button alignment. This is a dependency property.
@@ -462,7 +464,7 @@ namespace WinCopies.GUI.Windows
             Dialogs.
 #endif
           DialogButton.AbortRetryIgnore:
-
+                    
                     if (If(IfCT.And, IfCM.Binary, IfComp.Equal, newValue, DefaultButton.Abort, DefaultButton.Retry, DefaultButton.Ignore)) throwArgumentException();
 
                     break;

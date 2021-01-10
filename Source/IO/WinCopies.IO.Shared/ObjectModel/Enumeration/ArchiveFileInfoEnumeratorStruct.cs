@@ -18,7 +18,7 @@
 using SevenZip;
 
 using static WinCopies.
-#if WinCopies2
+#if !WinCopies3
     Util.Util
 #else
     ThrowHelper

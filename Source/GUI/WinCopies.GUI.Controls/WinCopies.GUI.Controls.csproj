@@ -1,49 +1,53 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
-  <PropertyGroup>
-    <PackageId>WinCopies.GUI.Controls</PackageId>
-    <AssemblyName>WinCopies.GUI.Controls</AssemblyName>
-    <RootNamespace>WinCopies.GUI.Controls</RootNamespace>
-    <TargetFrameworks>netcoreapp3.0;netcoreapp3.1;net5.0-windows;net472;net48</TargetFrameworks>
-    <UseWPF>true</UseWPF>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>WinCopies.GUI.Controls.snk</AssemblyOriginatorKeyFile>
-    <DocumentationFile>WinCopies.GUI.Controls.xml</DocumentationFile>
-    <DefineConstants>WinCopies3;$(DefineConstants)</DefineConstants>
-    <VersionPrefix>3.0.0</VersionPrefix>
-    <VersionSuffix>preview</VersionSuffix>
-    <AssemblyVersion>3.0.0</AssemblyVersion>
-    <FileVersion>3.0.0</FileVersion>
-  </PropertyGroup>
+	<PropertyGroup>
+		<PackageId>WinCopies.GUI.Controls</PackageId>
+		<AssemblyName>WinCopies.GUI.Controls</AssemblyName>
+		<RootNamespace>WinCopies.GUI.Controls</RootNamespace>
+		<TargetFrameworks>netcoreapp3.0;netcoreapp3.1;net5.0-windows;net472;net48</TargetFrameworks>
+		<UseWPF>true</UseWPF>
+		<SignAssembly>true</SignAssembly>
+		<AssemblyOriginatorKeyFile>WinCopies.GUI.Controls.snk</AssemblyOriginatorKeyFile>
+		<DocumentationFile>WinCopies.GUI.Controls.xml</DocumentationFile>
+		<DefineConstants>WinCopies2;WinCopies3;$(DefineConstants)</DefineConstants>
+		<VersionPrefix>3.0.0</VersionPrefix>
+		<VersionSuffix>preview</VersionSuffix>
+		<AssemblyVersion>3.0.0</AssemblyVersion>
+		<FileVersion>3.0.0</FileVersion>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="WinCopies.Util" Version="3.1.0.1-preview" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="WinCopies.Util" Version="3.1.0.1-preview" />
+		<PackageReference Include="WinCopies.Util.Extensions" Version="3.1.0.1-preview" />
+		<PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="3.0.0-preview" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Include="..\..\..\LICENSE.md">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
-  </ItemGroup>
+	<ItemGroup>
+		<None Include="..\..\..\LICENSE.md">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\WinCopies.Util.Temp\WinCopies.Util.Temp.csproj" />
-    <ProjectReference Include="..\WinCopies.GUI.Icons\WinCopies.GUI.Icons.csproj" />
-    <ProjectReference Include="..\WinCopies.GUI.Models\WinCopies.GUI.Models.csproj" />
-    <ProjectReference Include="..\WinCopies.GUI.Templates\WinCopies.GUI.Templates.csproj" />
-    <ProjectReference Include="..\WinCopies.GUI.ViewModels\WinCopies.GUI.ViewModels.csproj" />
-  </ItemGroup>
+	<ItemGroup Condition="'$(Configuration)'=='Debug'">
+		<ProjectReference Include="..\..\WinCopies.Util.Temp\WinCopies.Util.Temp.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Page Update="Themes\Generic.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\WinCopies.GUI.Icons\WinCopies.GUI.Icons.csproj" />
+		<ProjectReference Include="..\WinCopies.GUI.Models\WinCopies.GUI.Models.csproj" />
+		<ProjectReference Include="..\WinCopies.GUI.Templates\WinCopies.GUI.Templates.csproj" />
+		<ProjectReference Include="..\WinCopies.GUI.ViewModels\WinCopies.GUI.ViewModels.csproj" />
+	</ItemGroup>
 
-  <Import Project="..\WinCopies.GUI.Controls.Shared\WinCopies.GUI.Controls.Shared.projitems" Label="Shared" />
+	<ItemGroup>
+		<Page Update="Themes\Generic.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+	</ItemGroup>
 
-  <Import Project="..\WinCopies.GUI.Windows.Shared\WinCopies.GUI.Windows.Shared.projitems" Label="Shared" />
+	<Import Project="..\WinCopies.GUI.Controls.Shared\WinCopies.GUI.Controls.Shared.projitems" Label="Shared" />
+	<Import Project="..\WinCopies.GUI.Windows.Shared\WinCopies.GUI.Windows.Shared.projitems" Label="Shared" />
 
 </Project>

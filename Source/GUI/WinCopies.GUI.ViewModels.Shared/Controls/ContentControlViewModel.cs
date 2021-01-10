@@ -41,8 +41,9 @@ namespace WinCopies.GUI.Controls.ViewModels
     public class ContentControlViewModel<T> : ControlViewModel<T>, IContentControlModel, IDataTemplateSelectorsModel where T : IContentControlModel
     {
         private IModelDataTemplateSelectors _modelDataTemplateSelectors;
-
         private bool _autoAddDataTemplateSelectors;
+
+        public bool IsEnabled { get => ModelGeneric.IsEnabled; set { ModelGeneric.IsEnabled = value; OnPropertyChanged(nameof(IsEnabled)); } }
 
         public object Content
         {
@@ -115,8 +116,9 @@ namespace WinCopies.GUI.Controls.ViewModels
     public class ContentControlViewModel<TModel, TContent> : ControlViewModel<TModel>, IContentControlModel<TContent>, IDataTemplateSelectorsModel where TModel : IContentControlModel<TContent>
     {
         private IModelDataTemplateSelectors _modelDataTemplateSelectors;
-
         private bool _autoAddDataTemplateSelectors;
+
+        public bool IsEnabled { get => ModelGeneric.IsEnabled; set { ModelGeneric.IsEnabled = value; OnPropertyChanged(nameof(IsEnabled)); } }
 
         public TContent Content
         {

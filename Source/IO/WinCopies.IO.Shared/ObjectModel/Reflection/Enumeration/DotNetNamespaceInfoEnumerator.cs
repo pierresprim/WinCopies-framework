@@ -28,7 +28,7 @@ using WinCopies.Linq;
 
 using static WinCopies.IO.Path;
 
-#if WinCopies2
+#if !WinCopies3
 using WinCopies.Util;
 
 using static WinCopies.Util.Util;
@@ -112,7 +112,7 @@ namespace WinCopies.IO.Reflection
     }
 
     public sealed class DotNetEnumerationMoveNext<T> :
-#if WinCopies2
+#if !WinCopies3
         Util.DotNetFix.IDisposable
 #else
         Enumerator<IEnumerator<T>, T>
@@ -121,7 +121,7 @@ namespace WinCopies.IO.Reflection
         private Func<bool> _moveNext;
         private T _current;
 
-#if WinCopies2
+#if !WinCopies3
         private IEnumerator<IEnumerator<T>> _enumerator;
 
         public T Current => IsDisposed ? throw GetExceptionForDispose(false) : _current;
@@ -134,21 +134,21 @@ namespace WinCopies.IO.Reflection
 #endif
 
         public DotNetEnumerationMoveNext(in IEnumerator<IEnumerator<T>> enumerator)
-#if WinCopies2
+#if !WinCopies3
         {
 #else
             : base(enumerator) =>
 #endif
-#if WinCopies2
+#if !WinCopies3
             _enumerator = enumerator;
 #endif
 
         Reset();
-#if WinCopies2
+#if !WinCopies3
         }
 #endif
 
-#if WinCopies2
+#if !WinCopies3
 public bool MoveNext
 #else
         protected override bool MoveNextOverride
@@ -160,7 +160,7 @@ public bool MoveNext
             _moveNext = () =>
             {
                 if (
-#if WinCopies2
+#if !WinCopies3
                 _enumerator
 #else
                 InnerEnumerator
@@ -168,7 +168,7 @@ public bool MoveNext
                 .MoveNext())
                 {
                     bool _func() =>
-#if WinCopies2
+#if !WinCopies3
                 _enumerator
 #else
                 InnerEnumerator
@@ -180,7 +180,7 @@ public bool MoveNext
                         if (_func())
                         {
                             _current =
-#if WinCopies2
+#if !WinCopies3
                 _enumerator
 #else
                 InnerEnumerator
@@ -206,7 +206,7 @@ public bool MoveNext
                 return false;
             };
 
-#if WinCopies2
+#if !WinCopies3
         public void Reset()
         {
             if (IsDisposed)
@@ -226,7 +226,7 @@ public bool MoveNext
             _Reset();
         }
 
-#if WinCopies2
+#if !WinCopies3
         public void Dispose()
         {
             if (IsDisposed)
@@ -240,7 +240,7 @@ public bool MoveNext
 
             _moveNext = null;
 
-#if WinCopies2
+#if !WinCopies3
             _enumerator = null;
 #endif
 
@@ -252,37 +252,37 @@ public bool MoveNext
     {
         #region Private fields
         private
-#if WinCopies2
+#if !WinCopies3
 WinCopies.Collections.Generic.Queue
 #else
             EnumerableHelper
 #endif
             <string>
-#if !WinCopies2
+#if WinCopies3
             .IEnumerableQueue
 #endif
             _queue =
-#if WinCopies2
+#if !WinCopies3
             new WinCopies.Collections.Generic.Queue
 #else
            EnumerableHelper
 #endif
             <string>
-#if !WinCopies2
+#if WinCopies3
             .GetEnumerableQueue
 #endif
             ();
         private DotNetEnumerationMoveNext<IDotNetItemInfo> _moveNext;
         private Predicate<DotNetNamespaceInfoEnumeratorStruct> _func;
         private IBrowsableObjectInfo _parent;
-#if WinCopies2
+#if !WinCopies3
         private bool _isCompleted = false;
 #else
         private IDotNetItemInfo _current;
 #endif
         #endregion
 
-#if !WinCopies2
+#if WinCopies3
         protected override IDotNetItemInfo CurrentOverride => _current;
 
         public override bool? IsResetSupported => false;
@@ -372,7 +372,7 @@ WinCopies.Collections.Generic.Queue
 
         protected override bool MoveNextOverride()
         {
-#if WinCopies2
+#if !WinCopies3
             if (_isCompleted)
 
                 return false;
@@ -380,7 +380,7 @@ WinCopies.Collections.Generic.Queue
 
             if (_moveNext.MoveNext())
             {
-#if WinCopies2
+#if !WinCopies3
 Current
 #else
                 _current
@@ -390,14 +390,14 @@ Current
                 return true;
             }
 
-#if WinCopies2
+#if !WinCopies3
             _isCompleted = true;
 #endif
 
             return false;
         }
 
-#if WinCopies2
+#if !WinCopies3
         protected override void ResetOverride() => throw new NotSupportedException("THis enumerator does not support reset.");
 #endif
 
@@ -424,7 +424,7 @@ Current
         //    _dic[DotNetItemType.Namespace] = GetNamespaceEnumerator();
 
         protected override void
-#if WinCopies2
+#if !WinCopies3
             Dispose(bool disposing)
         {
             base.Dispose(disposing);

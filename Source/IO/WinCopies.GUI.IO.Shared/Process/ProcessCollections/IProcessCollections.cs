@@ -18,7 +18,7 @@
 using System.ComponentModel;
 
 using WinCopies.Collections.DotNetFix
-#if !WinCopies2
+#if WinCopies3
     .Generic
     #endif
     ;
@@ -27,7 +27,7 @@ using WinCopies.IO;
 namespace WinCopies.GUI.IO.Process
 {
     public interface IProcessCollection<T> :
-        #if WinCopies2
+        #if !WinCopies3
         ICountableEnumerable
 #else
         IUIntCountableEnumerable
@@ -52,7 +52,7 @@ namespace WinCopies.GUI.IO.Process
     }
 
     public interface IReadOnlyProcessCollection :
-        #if WinCopies2
+        #if !WinCopies3
         ICountableEnumerable
 #else
         IUIntCountableEnumerable
@@ -68,7 +68,7 @@ namespace WinCopies.GUI.IO.Process
     }
 
     public interface IReadOnlyProcessErrorPathCollection :
-        #if WinCopies2
+        #if !WinCopies3
         ICountableEnumerable
 #else
         IUIntCountableEnumerable

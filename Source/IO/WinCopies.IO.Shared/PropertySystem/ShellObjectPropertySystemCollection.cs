@@ -37,7 +37,9 @@ namespace WinCopies.IO.PropertySystem
         private readonly IShellProperty _shellProperty;
         private PropertyGroup? _propertyGroup;
 
-        public bool IsEnabled => ! _shellProperty.Description.TypeFlags.HasFlag(Microsoft.WindowsAPICodePack.COMNative.Shell.PropertySystem.PropertyTypeOptions.IsInnate);
+        public bool IsReadOnly => _shellProperty.Description.TypeFlags.HasFlag(Microsoft.WindowsAPICodePack.COMNative.Shell.PropertySystem.PropertyTypeOptions.IsInnate);
+
+        // public bool IsEnabled => !IsReadOnly;
 
         public string Name => _shellProperty.CanonicalName;
 
@@ -59,7 +61,7 @@ namespace WinCopies.IO.PropertySystem
 #endif
             ;
 
-        object Temp.IProperty.PropertyGroup => PropertyGroup;
+        object Temp.IReadOnlyProperty.PropertyGroup => PropertyGroup;
 
         public object Value => _shellProperty.ValueAsObject;
 

@@ -25,7 +25,7 @@ using WinCopies.IO.ObjectModel.Reflection;
 using WinCopies.Linq;
 
 using static WinCopies.
-#if WinCopies2
+#if !WinCopies3
     Util.Util
 #else
     ThrowHelper

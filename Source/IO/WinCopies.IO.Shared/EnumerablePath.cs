@@ -23,7 +23,7 @@ using System.IO;
 
 using WinCopies.Collections.Generic;
 
-#if WinCopies2
+#if !WinCopies3
 using WinCopies.Util;
 
 using static WinCopies.Util.Util;
@@ -83,7 +83,7 @@ namespace WinCopies.IO
 #endif
             );
 
-#if WinCopies2
+#if !WinCopies3
         WinCopies.Collections.Generic.IDisposableEnumeratorInfo
 #else
         Collections.Generic.IEnumeratorInfo2
@@ -430,7 +430,7 @@ namespace WinCopies.IO
 #endif
 );
 
-#if WinCopies2
+#if !WinCopies3
         IDisposableEnumeratorInfo
 #else
         Collections.Generic.IEnumeratorInfo2
@@ -476,7 +476,7 @@ namespace WinCopies.IO
             );
 
         public sealed class Enumerator :
-#if WinCopies2
+#if !WinCopies3
             IDisposableEnumeratorInfo
 #else
             WinCopies.Collections.Generic.Enumerator
@@ -490,7 +490,9 @@ namespace WinCopies.IO
             internal const bool _isResetSupported = false;
             private Func<IPathInfo, T> _func;
 
-#if WinCopies2
+#if WinCopies3
+            protected override T CurrentOverride => _current;
+#else
             public T Current => this.IsEnumeratorNotStartedOrDisposed() ? throw ThrowHelper.GetEnumeratorNotStartedOrDisposedException() : _current;
 
             public bool IsStarted { get; private set; }
@@ -500,12 +502,10 @@ namespace WinCopies.IO
             object IEnumerator.Current => Current;
 
             public bool IsDisposed { get; private set; }
-#else
-            protected override T CurrentOverride => _current;
 #endif
 
             public
-#if !WinCopies2
+#if WinCopies3
                 override
 #endif
                 bool? IsResetSupported => _isResetSupported;
@@ -544,11 +544,11 @@ namespace WinCopies.IO
             {
                 Debug.Assert(enumerablePath != null);
 
-#if WinCopies2
+#if !WinCopies3
 enumerationOrder.
 #endif
                 ThrowIfNotValidEnumValue(
-#if !WinCopies2
+#if WinCopies3
                     nameof(enumerationOrder), enumerationOrder
 #endif
                     );
@@ -681,7 +681,7 @@ enumerationOrder.
 #endif
                     );
 
-#if WinCopies2
+#if !WinCopies3
             public bool MoveNext
 #else
             protected override bool MoveNextOverride
@@ -696,7 +696,7 @@ enumerationOrder.
 
                     return false;
 
-#if WinCopies2
+#if !WinCopies3
                 IsStarted = true;
 #endif
 
@@ -706,14 +706,14 @@ enumerationOrder.
 
                 _Reset();
 
-#if WinCopies2
+#if !WinCopies3
                 IsCompleted = true;
 #endif
 
                 return false;
             }
 
-#if WinCopies2
+#if !WinCopies3
             public void Reset() => throw new NotSupportedException();
 #endif
 
@@ -723,12 +723,12 @@ enumerationOrder.
                 _moveNext = null;
                 _current = default;
                 _func = null;
-#if WinCopies2
+#if !WinCopies3
                 IsStarted = false;
 #endif
             }
 
-#if WinCopies2
+#if !WinCopies3
             public void Dispose()
             {
 #else
@@ -736,7 +736,7 @@ enumerationOrder.
             {
                 base.DisposeManaged();
 #endif
-#if WinCopies2
+#if !WinCopies3
                 if (IsDisposed)
 
                     return;
@@ -744,7 +744,7 @@ enumerationOrder.
 
                 _Reset();
 
-#if WinCopies2
+#if !WinCopies3
                 IsCompleted = false;
 
                 IsDisposed = true;
@@ -804,7 +804,7 @@ enumerationOrder.
         IEnumerator<T> System.Collections.Generic.IEnumerable<T>.GetEnumerator() => GetEnumerator();
 
         public sealed class Enumerator :
-#if WinCopies2
+#if !WinCopies3
             IDisposableEnumeratorInfo<IRecursivelyEnumerablePath<T>>
 #else
             Enumerator<T, IRecursivelyEnumerablePath<T>>
@@ -814,7 +814,9 @@ enumerationOrder.
             private IRecursivelyEnumerablePath<T> _current;
             private readonly Func<RecursivelyEnumerablePath<T>> _getNewRecursivelyEnumerablePathDelegate;
 
-#if WinCopies2
+#if WinCopies3
+            protected override IRecursivelyEnumerablePath<T> CurrentOverride => _current;
+#else
             private IEnumeratorInfo<T> _enumerator;
 
             public bool IsDisposed { get; private set; }
@@ -826,12 +828,10 @@ enumerationOrder.
             public bool IsStarted => _enumerator.IsStarted;
 
             public bool IsCompleted { get; private set; }
-#else
-            protected override IRecursivelyEnumerablePath<T> CurrentOverride => _current;
 #endif
 
             public
-#if !WinCopies2
+#if WinCopies3
                 override
 #endif
                 bool? IsResetSupported => EnumerablePath<T>.Enumerator._isResetSupported;
@@ -845,7 +845,7 @@ enumerationOrder.
             , FileSystemEntryEnumeratorProcessSimulation simulationParameters
 #endif
                 )
-#if !WinCopies2
+#if WinCopies3
                 : base(
 
                 ((IRecursivelyEnumerablePath<T>)enumerablePath).GetEnumerator(searchPattern, searchOption
@@ -861,7 +861,7 @@ enumerationOrder.
             {
                 _path = enumerablePath;
 
-#if WinCopies2
+#if !WinCopies3
                 _enumerator = ((IRecursivelyEnumerablePath<T>)enumerablePath).GetEnumerator(searchPattern, searchOption
 #if NETCORE
                     , enumerationOptions
@@ -874,7 +874,7 @@ enumerationOrder.
 #endif
 
                 _getNewRecursivelyEnumerablePathDelegate = () => new RecursivelyEnumerablePath<T>(
-#if WinCopies2
+#if !WinCopies3
                     _enumerator
 #else
                     InnerEnumerator
@@ -908,7 +908,7 @@ enumerationOrder.
 #endif
                     );
 
-#if WinCopies2
+#if !WinCopies3
             public bool MoveNext()
             {
                 if (IsDisposed)
@@ -923,7 +923,7 @@ enumerationOrder.
             {
 #endif
                 if (_path.Value.IsDirectory &&
-#if WinCopies2
+#if !WinCopies3
                     _enumerator
 #else
                     InnerEnumerator
@@ -937,14 +937,14 @@ enumerationOrder.
 
                 _current = null;
 
-#if WinCopies2
+#if !WinCopies3
                 IsCompleted = true;
 #endif
 
                 return false;
             }
 
-#if WinCopies2
+#if !WinCopies3
             public void Reset() => throw new InvalidOperationException("Reset is not supported.");
 
             public void Dispose()
@@ -959,13 +959,13 @@ enumerationOrder.
 #endif
                 _current = null;
 
-#if WinCopies2
+#if !WinCopies3
                 _enumerator = null;
 #endif
 
                 _path = null;
 
-#if WinCopies2
+#if !WinCopies3
                 IsCompleted = false;
 
                 IsDisposed = true;

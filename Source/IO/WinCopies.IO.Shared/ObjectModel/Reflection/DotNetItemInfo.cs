@@ -22,7 +22,7 @@ using System.Windows.Media.Imaging;
 using WinCopies.IO.ObjectModel.Reflection;
 using WinCopies.IO.Reflection;
 
-#if WinCopies2
+#if !WinCopies3
 using static WinCopies.Util.Util;
 #else
 using static WinCopies.UtilHelpers;

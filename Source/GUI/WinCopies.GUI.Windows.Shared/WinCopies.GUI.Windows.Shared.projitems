@@ -23,15 +23,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Dialogs\PropertyDialogViewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Dialogs\DialogWindow.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ResourcesHelper.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Themes\Generic.xaml.cs">
-      <DependentUpon>Generic.xaml</DependentUpon>
-    </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)Window.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="$(MSBuildThisFileDirectory)Themes\Generic.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
   </ItemGroup>
 </Project>

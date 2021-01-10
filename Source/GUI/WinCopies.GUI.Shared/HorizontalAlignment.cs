@@ -15,7 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-namespace WinCopies.GUI.Windows.Dialogs
+namespace WinCopies.GUI.Windows
+#if !WinCopies3
+.Dialogs
+#endif
 {
     public enum HorizontalAlignment
     {

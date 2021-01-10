@@ -11,12 +11,12 @@
         </member>
         <member name="P:WinCopies.GUI.Windows.Dialogs.ViewModels.DialogViewModel`1.DialogButton">
             <summary>
-            Gets or sets the <see cref="T:WinCopies.GUI.Windows.Dialogs.DialogButton"/> value of this <see cref="T:WinCopies.GUI.Windows.Dialogs.ViewModels.DialogViewModel`1"/>.
+            Gets or sets the <see cref="!:Dialogs.DialogButton"/> value of this <see cref="T:WinCopies.GUI.Windows.Dialogs.ViewModels.DialogViewModel`1"/>.
             </summary>
         </member>
         <member name="P:WinCopies.GUI.Windows.Dialogs.ViewModels.DialogViewModel`1.DefaultButton">
             <summary>
-            Gets or sets the <see cref="T:WinCopies.GUI.Windows.Dialogs.DefaultButton"/> value of this <see cref="T:WinCopies.GUI.Windows.Dialogs.ViewModels.DialogViewModel`1"/>.
+            Gets or sets the <see cref="!:Dialogs.DefaultButton"/> value of this <see cref="T:WinCopies.GUI.Windows.Dialogs.ViewModels.DialogViewModel`1"/>.
             </summary>
         </member>
         <member name="M:WinCopies.GUI.Windows.Dialogs.ViewModels.DialogViewModel`1.#ctor(`0)">

@@ -18,7 +18,7 @@
 using System;
 using System.IO;
 
-#if WinCopies2
+#if !WinCopies3
 using static WinCopies.Util.Util;
 #else
 using static WinCopies.ThrowHelper;

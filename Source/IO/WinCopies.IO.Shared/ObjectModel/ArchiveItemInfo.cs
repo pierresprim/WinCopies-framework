@@ -25,14 +25,14 @@ using System.Linq;
 using System.Windows.Media.Imaging;
 
 using WinCopies.Collections
-#if !WinCopies2
+#if WinCopies3
     .Generic
 #endif
     ;
 using WinCopies.Util;
 
 using static WinCopies.
-#if WinCopies2
+#if !WinCopies3
     Util.Util
 #else
     ThrowHelper
@@ -58,8 +58,6 @@ namespace WinCopies.IO
             //IShellObjectInfo IArchiveItemInfoProvider.ArchiveShellObject => ArchiveShellObjectOverride;
 
             #region Overrides
-            public override FileType FileType { get; }
-
             /// <summary>
             /// The <see cref="ArchiveFileInfo"/> that this <see cref="ArchiveItemInfo"/> represents.
             /// </summary>
@@ -73,6 +71,13 @@ namespace WinCopies.IO
             /// Gets a value that indicates whether this <see cref="ArchiveItemInfo"/> is browsable.
             /// </summary>
             public override bool IsBrowsable
+#if CS8
+                => _isBrowsable ?? (_isBrowsable = ObjectPropertiesGeneric.FileType switch
+                {
+                    FileType.Folder or FileType.Drive => true,// case FileType.Archive:
+                    _ => false,
+                }).Value;
+#else
             {
                 get
                 {
@@ -100,6 +105,7 @@ namespace WinCopies.IO
                     return _isBrowsable.Value;
                 }
             }
+#endif
 
 #if NETFRAMEWORK
         public override IBrowsableObjectInfo Parent => _parent ?? (_parent=GetParent());
@@ -147,23 +153,6 @@ namespace WinCopies.IO
             public override string Description => "N/A";
 
             /// <summary>
-            /// If <see cref="EncapsulatedObject"/> has value, gets the size of the inner <see cref="SevenZip.ArchiveFileInfo"/>; otherwise, returns <see langword="null"/>.
-            /// </summary>
-            public override Size? Size
-            {
-                get
-                {
-                    if (_encapsulatedObject.HasValue)
-
-                        return new Size(_encapsulatedObject.Value.Size);
-
-                    else
-
-                        return null;
-                }
-            }
-
-            /// <summary>
             /// Gets a value that indicates whether this item is a hidden or system item.
             /// </summary>
             public override bool IsSpecialItem
@@ -192,9 +181,7 @@ namespace WinCopies.IO
 
             private ArchiveItemInfo(in string path, in FileType fileType, in IShellObjectInfo archiveShellObject, in ArchiveFileInfo? archiveFileInfo/*, DeepClone<ArchiveFileInfo?> archiveFileInfoDelegate*/) : base(path)
             {
-                FileType = fileType;
-
-                ObjectPropertiesGeneric = new FileSystemObjectInfoProperties<IFileSystemObjectInfo>(this);
+                ObjectPropertiesGeneric = archiveFileInfo.HasValue ? new ArchiveItemInfoProperties<IArchiveItemInfo>(this, fileType) : new FileSystemObjectInfoProperties<IFileSystemObjectInfo>(this, fileType, null);
 
                 ArchiveShellObject = archiveShellObject;
 

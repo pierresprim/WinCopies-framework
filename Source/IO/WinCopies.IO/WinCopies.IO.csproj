@@ -1,96 +1,100 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
-  <PropertyGroup>
-    <PackageId>WinCopies.IO</PackageId>
-    <AssemblyName>WinCopies.IO</AssemblyName>
-    <RootNamespace>WinCopies.IO</RootNamespace>
-    <TargetFrameworks>netcoreapp3.0;netcoreapp3.1;net5.0-windows;net472;net48</TargetFrameworks>
-    <UseWPF>true</UseWPF>
-    <Description>WinCopies framework's assembly for basic I/O operations</Description>
-    <Copyright>Copyright © 2020 Pierre Sprimont</Copyright>
-    <PackageTags>WinCopies, IO</PackageTags>
-    <DocumentationFile>WinCopies.IO.xml</DocumentationFile>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>WinCopies.IO.snk</AssemblyOriginatorKeyFile>
-    <DefineConstants>WinCopies3;$(DefineConstants)</DefineConstants>
-    <VersionPrefix>3.0.0</VersionPrefix>
-    <VersionSuffix>preview</VersionSuffix>
-    <AssemblyVersion>3.0.0</AssemblyVersion>
-    <FileVersion>3.0.0</FileVersion>
-  </PropertyGroup>
+	<PropertyGroup>
+		<PackageId>WinCopies.IO</PackageId>
+		<AssemblyName>WinCopies.IO</AssemblyName>
+		<RootNamespace>WinCopies.IO</RootNamespace>
+		<TargetFrameworks>netcoreapp3.0;netcoreapp3.1;net5.0-windows;net472;net48</TargetFrameworks>
+		<UseWPF>true</UseWPF>
+		<Description>WinCopies framework's assembly for basic I/O operations</Description>
+		<Copyright>Copyright © 2020 Pierre Sprimont</Copyright>
+		<PackageTags>WinCopies, IO</PackageTags>
+		<DocumentationFile>WinCopies.IO.xml</DocumentationFile>
+		<SignAssembly>true</SignAssembly>
+		<AssemblyOriginatorKeyFile>WinCopies.IO.snk</AssemblyOriginatorKeyFile>
+		<DefineConstants>WinCopies2;WinCopies3;$(DefineConstants)</DefineConstants>
+		<VersionPrefix>3.0.0</VersionPrefix>
+		<VersionSuffix>preview</VersionSuffix>
+		<AssemblyVersion>3.0.0</AssemblyVersion>
+		<FileVersion>3.0.0</FileVersion>
+	</PropertyGroup>
 
-  <Import Project="..\WinCopies.IO.Shared\WinCopies.IO.Shared.projitems" Label="Shared" />
+	<Import Project="..\WinCopies.IO.Shared\WinCopies.IO.Shared.projitems" Label="Shared" />
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\GUI\WinCopies.GUI.Drawing\WinCopies.GUI.Drawing.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\GUI\WinCopies.GUI.Drawing\WinCopies.GUI.Drawing.csproj" />
+	</ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework.TrimEnd(`-windows`))'=='net5.0'">
-    <!--<PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />-->
-    <!--<PackageReference Include="System.Drawing.Common" Version="5.0.0" />-->
-    <PackageReference Include="System.Management" Version="5.0.0" />
-  </ItemGroup>
+	<ItemGroup Condition="'$(Configuration)'=='Debug'">
+		<ProjectReference Include="..\..\WinCopies.Util.Temp\WinCopies.Util.Temp.csproj" />
+	</ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'=='net472'">
-    <!--<Reference Include="Microsoft.Win32.Registry" />
+	<ItemGroup Condition="'$(TargetFramework.TrimEnd(`-windows`))'=='net5.0'">
+		<!--<PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />-->
+		<!--<PackageReference Include="System.Drawing.Common" Version="5.0.0" />-->
+		<PackageReference Include="System.Management" Version="5.0.0" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)'=='net472'">
+		<!--<Reference Include="Microsoft.Win32.Registry" />
     <Reference Include="System.Drawing.Common" />-->
-    <Reference Include="System.Management" />
-  </ItemGroup>
+		<Reference Include="System.Management" />
+	</ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'=='net48'">
-    <!--<Reference Include="Microsoft.Win32.Registry" />
+	<ItemGroup Condition="'$(TargetFramework)'=='net48'">
+		<!--<Reference Include="Microsoft.Win32.Registry" />
     <Reference Include="System.Drawing.Common" />-->
-    <Reference Include="System.Management" />
-  </ItemGroup>
+		<Reference Include="System.Management" />
+	</ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.1'">
-    <!--<PackageReference Include="Microsoft.Win32.Registry" Version="4.7.0" />-->
-    <!--<PackageReference Include="System.Drawing.Common" Version="4.7.0" />-->
-    <PackageReference Include="System.Management" Version="4.7.0" />
-  </ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.1'">
+		<!--<PackageReference Include="Microsoft.Win32.Registry" Version="4.7.0" />-->
+		<!--<PackageReference Include="System.Drawing.Common" Version="4.7.0" />-->
+		<PackageReference Include="System.Management" Version="4.7.0" />
+	</ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.0'">
-    <!--<PackageReference Include="Microsoft.Win32.Registry" Version="4.6.0" />-->
-    <!--<PackageReference Include="System.Drawing.Common" Version="4.6.0" />-->
-    <PackageReference Include="System.Management" Version="4.6.0" />
-  </ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.0'">
+		<!--<PackageReference Include="Microsoft.Win32.Registry" Version="4.6.0" />-->
+		<!--<PackageReference Include="System.Drawing.Common" Version="4.6.0" />-->
+		<PackageReference Include="System.Management" Version="4.6.0" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="WinCopies.Util" Version="3.1.0.1-preview" />
-    <PackageReference Include="WinCopies.Collections" Version="3.1.0.1-preview" />
-    <PackageReference Include="WinCopies.Util.Extensions" Version="3.1.0.1-preview" />
-    <PackageReference Include="Squid-Box.SevenZipSharp" Version="1.2.231" />
-    <PackageReference Include="WinCopies.WindowsAPICodePack.Consts" Version="3.0.0-preview" />
-    <PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="3.0.0-preview" />
-    <PackageReference Include="WinCopies.WindowsAPICodePack.PortableDevices" Version="3.0.0-preview" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="WinCopies.Util" Version="3.1.0.1-preview" />
+		<PackageReference Include="WinCopies.Collections" Version="3.1.0.1-preview" />
+		<PackageReference Include="WinCopies.Util.Extensions" Version="3.1.0.1-preview" />
+		<PackageReference Include="Squid-Box.SevenZipSharp" Version="1.2.231" />
+		<PackageReference Include="WinCopies.WindowsAPICodePack.Consts" Version="3.0.0-preview" />
+		<PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="3.0.0-preview" />
+		<PackageReference Include="WinCopies.WindowsAPICodePack.PortableDevices" Version="3.0.0-preview" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Compile Update="Properties\Resources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Update="Properties\Resources.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Resources.resx</DependentUpon>
+		</Compile>
+	</ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Update="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Update="Properties\Resources.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Update="7z.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
+	<ItemGroup>
+		<None Update="7z.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Include="..\..\..\LICENSE.md">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
-  </ItemGroup>
+	<ItemGroup>
+		<None Include="..\..\..\LICENSE.md">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+	</ItemGroup>
 
 </Project>

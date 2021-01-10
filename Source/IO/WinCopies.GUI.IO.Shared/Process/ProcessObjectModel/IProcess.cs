@@ -28,7 +28,7 @@ namespace WinCopies.GUI.IO.Process
 
         WinCopies.IO.Size InitialItemSize { get; }
 
-#if WinCopies2
+#if !WinCopies3
 int 
 #else
         uint

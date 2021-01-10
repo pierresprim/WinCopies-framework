@@ -24,7 +24,7 @@ using System.Windows.Media.Imaging;
 using WinCopies.IO.Reflection;
 
 #if DEBUG
-#if WinCopies2
+#if !WinCopies3
 using static WinCopies.Util.Util;
 #else
 using WinCopies.Diagnostics;
