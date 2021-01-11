@@ -19,14 +19,6 @@ using WinCopies.IO.Reflection;
 
 namespace WinCopies.IO
 {
-    namespace Reflection
-    {
-        public interface IDotNetItemInfoProperties
-        {
-            DotNetItemType DotNetItemType { get; }
-        }
-    }
-
     namespace ObjectModel.Reflection
     {
         public interface IDotNetItemInfo : IDotNetItemInfoProperties, IBrowsableObjectInfo

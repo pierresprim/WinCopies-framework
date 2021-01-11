@@ -24,6 +24,7 @@ using System.Linq;
 
 using WinCopies.Collections.Generic;
 using WinCopies.Linq;
+using static WinCopies.Temp;
 
 namespace WinCopies.IO.PropertySystem
 {
@@ -35,9 +36,9 @@ namespace WinCopies.IO.PropertySystem
 
         public abstract int Count { get; }
 
-        public abstract IReadOnlyList<PropertyId> Keys { get; }
+        public abstract System.Collections.Generic.IReadOnlyList<PropertyId> Keys { get; }
 
-        public abstract IReadOnlyList<IProperty> Values { get; }
+        public abstract System.Collections.Generic.IReadOnlyList<IProperty> Values { get; }
 
         System.Collections.Generic.IEnumerable<PropertyId> IReadOnlyDictionary<PropertyId, IProperty>.Keys => Keys;
 

@@ -25,7 +25,7 @@ using System.Drawing;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
-
+using WinCopies.Collections;
 using WinCopies.Collections.Generic;
 using WinCopies.GUI.Drawing;
 using WinCopies.IO.PropertySystem;
@@ -49,6 +49,8 @@ namespace WinCopies.IO.ObjectModel
         #endregion
 
         #region Properties
+        public IBrowsableObjectInfoSelector ItemSelector { get; }
+
         IBrowsableObjectInfo Collections.Generic.IRecursiveEnumerable<IBrowsableObjectInfo>.Value => this;
 
         public abstract object EncapsulatedObject { get; }
@@ -59,12 +61,22 @@ namespace WinCopies.IO.ObjectModel
 
         public abstract object ObjectProperties { get; }
 
+#if WinCopies3
+        protected abstract bool IsBrowsableOverride { get; }
+
+        public bool IsBrowsable => ItemSelector == null ? IsBrowsableOverride : ItemSelector.IsBrowsable(this);
+
+        protected abstract bool IsRecursivelyBrowsableOverride { get; }
+
+        public bool IsRecursivelyBrowsable => ItemSelector == null ? IsRecursivelyBrowsableOverride : ItemSelector.IsRecursivelyBrowsable(this);
+#else
         /// <summary>
         /// When overridden in a derived class, gets a value that indicates whether this <see cref="BrowsableObjectInfo"/> is browsable.
         /// </summary>
         public abstract bool IsBrowsable { get; }
 
         public abstract bool IsRecursivelyBrowsable { get; }
+#endif
 
         /// <summary>
         /// Gets the <see cref="IBrowsableObjectInfo"/> parent of this <see cref="BrowsableObjectInfo"/>. Returns <see langword="null"/> if this object is the root object of a hierarchy.
@@ -107,14 +119,28 @@ namespace WinCopies.IO.ObjectModel
         /// Initializes a new instance of the <see cref="BrowsableObjectInfo"/> class.
         /// </summary>
         /// <param name="path">The path of the new item.</param>
-        protected BrowsableObjectInfo(in string path) : this(path, null) { }
+        protected BrowsableObjectInfo(in string path) : this(path,
+#if WinCopies3
+            null,
+#endif
+            null)
+        { /* Left empty. */ }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BrowsableObjectInfo"/> class.
         /// </summary>
         /// <param name="path">The path of the new item.</param>
         /// <param name="clientVersion">The <see cref="Microsoft.WindowsAPICodePack.PortableDevices.ClientVersion"/> that will be used to initialize new <see cref="PortableDeviceInfo"/>s and <see cref="PortableDeviceObjectInfo"/>s.</param>
-        protected BrowsableObjectInfo(in string path, in ClientVersion? clientVersion) : base(path) => ClientVersion = clientVersion;
+        protected BrowsableObjectInfo(in string path,
+#if WinCopies3
+            IBrowsableObjectInfoSelector itemSelector,
+#endif
+            in ClientVersion? clientVersion) : base(path)
+        {
+            ItemSelector = itemSelector;
+
+            ClientVersion = clientVersion;
+        }
         #endregion
 
         #region Methods
@@ -144,11 +170,15 @@ namespace WinCopies.IO.ObjectModel
 
         IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetItems().GetEnumerator();
 
+#if WinCopies3
+        public abstract IBrowsableObjectInfoSelector GetDefaultItemSelector();
+#endif
+
         /// <summary>
         /// When overridden in a derived class, returns the items of this <see cref="BrowsableObjectInfo"/>.
         /// </summary>
         /// <returns>An <see cref="System.Collections.Generic.IEnumerable{IBrowsableObjectInfo}"/> that enumerates through the items of this <see cref="BrowsableObjectInfo"/>.</returns>
-        public abstract System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems();
+        public System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems() => ItemSelector == null ? GetDefaultItemSelector().GetItems() : ItemSelector.GetItems();
 
         #region IDisposable
         /// <summary>
@@ -230,17 +260,22 @@ namespace WinCopies.IO.ObjectModel
         /// Initializes a new instance of the <see cref="BrowsableObjectInfo"/> class.
         /// </summary>
         /// <param name="path">The path of the new item.</param>
-        protected BrowsableObjectInfo(in string path) : base(path, null)
-        {
-            // Left empty.
-        }
+        protected BrowsableObjectInfo(in string path) : base(path) { /* Left empty. */ }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BrowsableObjectInfo"/> class.
         /// </summary>
         /// <param name="path">The path of the new item.</param>
         /// <param name="clientVersion">The <see cref="ClientVersion"/> that will be used to initialize new <see cref="PortableDeviceInfo"/>s and <see cref="PortableDeviceObjectInfo"/>s.</param>
-        protected BrowsableObjectInfo(in string path, in ClientVersion? clientVersion) : base(path, clientVersion)
+        protected BrowsableObjectInfo(in string path,
+#if WinCopies3
+            in IBrowsableObjectInfoSelector itemSelector,
+#endif
+            in ClientVersion? clientVersion) : base(path,
+#if WinCopies3
+                itemSelector,
+#endif
+                clientVersion)
         {
             // Left empty.
         }
@@ -263,19 +298,22 @@ namespace WinCopies.IO.ObjectModel
         /// When called from a derived class, initializes a new instance of the <see cref="BrowsableObjectInfo{TObjectProperties, TEncapsulatedObject}"/> class.
         /// </summary>
         /// <param name="path">The path of the new <see cref="BrowsableObjectInfo{TObjectProperties, TEncapsulatedObject}"/>.</param>
-        protected BrowsableObjectInfo(in string path) : base(path)
-        {
-            // Left empty.
-        }
+        protected BrowsableObjectInfo(in string path) : base(path) { /* Left empty. */ }
 
         /// <summary>
         /// When called from a derived class, initializes a new instance of the <see cref="BrowsableObjectInfo{TObjectProperties, TEncapsulatedObject}"/> class with a custom <see cref="ClientVersion"/>.
         /// </summary>
         /// <param name="path">The path of the new <see cref="BrowsableObjectInfo{TObjectProperties, TEncapsulatedObject}"/>.</param>
         /// <param name="clientVersion">A custom <see cref="ClientVersion"/>. This parameter can be null for non-file system and portable devices-related types.</param>
-        protected BrowsableObjectInfo(in string path, in ClientVersion? clientVersion) : base(path, clientVersion)
-        {
-            // Left empty.
-        }
+        protected BrowsableObjectInfo(in string path,
+#if WinCopies3
+            in IBrowsableObjectInfoSelector itemSelector,
+#endif
+            in ClientVersion? clientVersion) : base(path,
+#if WinCopies3
+                itemSelector,
+#endif
+                clientVersion)
+        { /* Left empty. */ }
     }
 }

@@ -17,6 +17,21 @@
 
 namespace WinCopies.IO.Reflection
 {
+    public enum AccessModifier : byte
+    {
+        Public = 1,
+
+        Protected = 2,
+
+        ProtectedInternal = 3,
+
+        Internal = 4,
+
+        PrivateProtected = 5,
+
+        Private = 6
+    }
+
     public enum DotNetItemType : byte
     {
         /// <summary>
@@ -97,6 +112,8 @@ namespace WinCopies.IO.Reflection
         /// <summary>
         /// The item is a .Net generic argument.
         /// </summary>
-        GenericArgument = 16
+        GenericArgument = 16,
+
+        ReturnParameter=17
     }
 }

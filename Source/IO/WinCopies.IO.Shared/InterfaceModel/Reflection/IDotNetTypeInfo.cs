@@ -23,17 +23,9 @@ using WinCopies.IO.Reflection;
 
 namespace WinCopies.IO
 {
-    namespace Reflection
-    {
-        public interface IDotNetTypeInfoProperties : IDotNetItemInfoProperties
-        {
-            bool? IsRootType { get; }
-        }
-    }
-
     namespace ObjectModel.Reflection
     {
-        public interface IDotNetTypeInfo : IDotNetTypeInfoProperties, IDotNetItemInfo, IEncapsulatorBrowsableObjectInfo<TypeInfo>
+        public interface IDotNetTypeInfo :  IDotNetItemInfo, IEncapsulatorBrowsableObjectInfo<TypeInfo>
         {
             IEnumerable<IBrowsableObjectInfo> GetItems(IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetTypeInfoEnumeratorStruct> func);
         }

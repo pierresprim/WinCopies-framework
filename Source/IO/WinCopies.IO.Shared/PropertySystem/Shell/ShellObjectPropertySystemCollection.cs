@@ -27,15 +27,15 @@ using System.Reflection;
 
 using WinCopies.Collections.Generic;
 using WinCopies.IO.ObjectModel;
-
+using static WinCopies.Temp;
 using static WinCopies.ThrowHelper;
 
 namespace WinCopies.IO.PropertySystem
 {
-    public class ShellProperty : IProperty
+    public class ShellProperty : IShellProperty
     {
-        private readonly IShellProperty _shellProperty;
-        private PropertyGroup? _propertyGroup;
+        private readonly Microsoft.WindowsAPICodePack.Shell.PropertySystem.IShellProperty _shellProperty;
+        private ShellPropertyGroup? _propertyGroup;
 
         public bool IsReadOnly => _shellProperty.Description.TypeFlags.HasFlag(Microsoft.WindowsAPICodePack.COMNative.Shell.PropertySystem.PropertyTypeOptions.IsInnate);
 
@@ -49,7 +49,7 @@ namespace WinCopies.IO.PropertySystem
 
         public string EditInvitation => _shellProperty.Description.EditInvitation;
 
-        public PropertyGroup PropertyGroup => _propertyGroup
+        public ShellPropertyGroup PropertyGroup => _propertyGroup
 #if CS8
             ??=
 #else
@@ -67,12 +67,12 @@ namespace WinCopies.IO.PropertySystem
 
         public Type Type => _shellProperty.ValueType;
 
-        public ShellProperty(in IShellProperty shellProperty)
+        public ShellProperty(in Microsoft.WindowsAPICodePack.Shell.PropertySystem. IShellProperty shellProperty)
         {
             _shellProperty = shellProperty;
         }
 
-        public static PropertyGroup GetPropertyGroup(in IShellProperty shellProperty)
+        public static ShellPropertyGroup GetPropertyGroup(in Microsoft.WindowsAPICodePack.Shell.PropertySystem. IShellProperty shellProperty)
         {
             ThrowIfNull(shellProperty, nameof(shellProperty));
 
@@ -90,23 +90,23 @@ namespace WinCopies.IO.PropertySystem
             {
                 propertyNamespace = propertyNamespace.Remove(propertyNamespace.LastIndexOf('.'));
 
-                System.Collections.Generic.IEnumerable<FieldInfo> propertyGroups = typeof(PropertyGroup).GetTypeInfo().DeclaredFields;
+                System.Collections.Generic.IEnumerable<FieldInfo> propertyGroups = typeof(ShellPropertyGroup).GetTypeInfo().DeclaredFields;
 
-                return (PropertyGroup?)propertyGroups.FirstOrDefault(fieldInfo => propertyNamespace.StartsWith(fieldInfo.Name, StringComparison.OrdinalIgnoreCase))?.GetValue(null) ?? PropertyGroup.Default;
+                return (ShellPropertyGroup?)propertyGroups.FirstOrDefault(fieldInfo => propertyNamespace.StartsWith(fieldInfo.Name, StringComparison.OrdinalIgnoreCase))?.GetValue(null) ?? ShellPropertyGroup.Default;
             }
 
-            return PropertyGroup.Default;
+            return ShellPropertyGroup.Default;
         }
     }
 
     public class ShellObjectPropertySystemCollection : PropertySystemCollection
     {
         private readonly ShellPropertyCollection _nativeProperties;
-        private IReadOnlyList<KeyValuePair<PropertyId, IProperty>> _properties;
+        private System.Collections.Generic.IReadOnlyList<KeyValuePair<PropertyId, IProperty>> _properties;
         private Temp.ReadOnlyList<KeyValuePair<PropertyId, IProperty>, PropertyId> _keys;
         private Temp.ReadOnlyList<KeyValuePair<PropertyId, IProperty>, IProperty> _values;
 
-        private IReadOnlyList<KeyValuePair<PropertyId, IProperty>> _Properties
+        private System.Collections.Generic.IReadOnlyList<KeyValuePair<PropertyId, IProperty>> _Properties
         {
             get
             {
@@ -128,14 +128,14 @@ namespace WinCopies.IO.PropertySystem
         {
             var properties = new List<KeyValuePair<PropertyId, IProperty>>(Count);
 
-            foreach (IShellProperty property in _nativeProperties)
+            foreach (Microsoft.WindowsAPICodePack.Shell.PropertySystem.IShellProperty property in _nativeProperties)
 
                 properties.Add(new KeyValuePair<PropertyId, IProperty>(new PropertyId(property.CanonicalName.Substring(property.CanonicalName.LastIndexOf('.') + 1), ShellProperty.GetPropertyGroup(property)), new ShellProperty(property)));
 
             _properties = properties.AsReadOnly();
         }
 
-        public override IReadOnlyList<PropertyId> Keys => _keys
+        public override System.Collections.Generic.IReadOnlyList<PropertyId> Keys => _keys
 #if CS8
             ??=
 #else
@@ -147,7 +147,7 @@ namespace WinCopies.IO.PropertySystem
 #endif
             ;
 
-        public override IReadOnlyList<IProperty> Values => _values
+        public override System.Collections.Generic.IReadOnlyList<IProperty> Values => _values
 #if CS8
             ??=
 #else
@@ -186,7 +186,7 @@ namespace WinCopies.IO.PropertySystem
 
         public class ReversedEnumerator : Enumerator<KeyValuePair<PropertyId, IProperty>>
         {
-            private IReadOnlyList<KeyValuePair<PropertyId, IProperty>> _properties;
+            private System.Collections.Generic.IReadOnlyList<KeyValuePair<PropertyId, IProperty>> _properties;
             private int _index = -1;
             private Func<bool> _moveNext;
 

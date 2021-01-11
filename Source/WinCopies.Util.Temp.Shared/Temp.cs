@@ -50,6 +50,8 @@ using System.Linq;
 
 using WinCopies.Collections;
 using System.Windows.Markup;
+using WinCopies.Collections.DotNetFix.Generic;
+using System.Collections;
 
 #if !WinCopies3
 using System.Collections;
@@ -59,6 +61,11 @@ using WinCopies.Util;
 namespace WinCopies
 {
     // Already implemented in WinCopies.Util.
+
+    public interface IReadOnlyList<out T> : System.Collections.Generic.IReadOnlyList<T>, ICountableEnumerable<T>
+    {
+        // Left empty.
+    }
 
     namespace Markup
     {
@@ -223,6 +230,28 @@ namespace WinCopies
             foreach (object value in enumerable)
 
                 yield return (T)value;
+        }
+
+        public static bool EndsWith(this string s, params char[] values)
+        {
+            foreach (char value in values)
+
+                if (s.EndsWith(value))
+
+                    return true;
+
+            return false;
+        }
+
+        public static bool EndsWith(this string s, params string[] values)
+        {
+            foreach (string value in values)
+
+                if (s.EndsWith(value))
+
+                    return true;
+
+            return false;
         }
 
         // Already implemented in WinCopies.Util.
@@ -392,7 +421,7 @@ System.Collections.Generic.IEnumerator
             public override System.Collections.Generic.IEnumerator<TDestinationItems> GetEnumerator() => InnerEnumerable.GetEnumerator().Select(Selector);
         }
 
-        public interface IList<T> : IReadOnlyList<T>, System.Collections.Generic.IList<T>, ICountableEnumerable<T>, IReadOnlyCollection<T>
+        public interface IList<T> : System.Collections.Generic.IReadOnlyList<T>, System.Collections.Generic.IList<T>, ICountableEnumerable<T>, IReadOnlyCollection<T>
         {
             new T this[int index] { get; set; }
         }
@@ -467,7 +496,7 @@ System.Collections.Generic.IEnumerator
             return result;
         }
 
-        public static TDestination[] ToArray<TSource, TDestination>(this IReadOnlyList<TSource> list, Converter<TSource, TDestination> selector) => ToArray(list, 0, list.Count, selector);
+        public static TDestination[] ToArray<TSource, TDestination>(this System.Collections.Generic.IReadOnlyList<TSource> list, Converter<TSource, TDestination> selector) => ToArray(list, 0, list.Count, selector);
 
         // Already implemented in WinCopies.Util.
 
@@ -508,7 +537,7 @@ System.Collections.Generic.IEnumerator
             ThrowIfArrayHasNotEnoughSpace(array, arrayIndex, count, arrayArgumentName);
         }
 
-        public static TDestination[] ToArray<TSource, TDestination>(this IReadOnlyList<TSource> list, int startIndex, int length, Converter<TSource, TDestination> selector)
+        public static TDestination[] ToArray<TSource, TDestination>(this System.Collections.Generic.IReadOnlyList<TSource> list, int startIndex, int length, Converter<TSource, TDestination> selector)
         {
             ThrowIfNull(list, nameof(list));
             ThrowIfNull(selector, nameof(selector));
@@ -559,16 +588,16 @@ System.Collections.Generic.IEnumerator
             new T PropertyGroup { get; }
         }
 
-        public class ReadOnlyList<TEnumerable, TSource, TDestination> : CountableEnumerableSelector<TEnumerable, TSource, TDestination>, IReadOnlyList<TDestination> where TEnumerable : IReadOnlyList<TSource>
+        public class ReadOnlyList<TEnumerable, TSource, TDestination> : CountableEnumerableSelector<TEnumerable, TSource, TDestination>, System.Collections.Generic.IReadOnlyList<TDestination> where TEnumerable : System.Collections.Generic.IReadOnlyList<TSource>
         {
             public TDestination this[int index] => Selector(InnerEnumerable[index]);
 
             public ReadOnlyList(TEnumerable innerList, Converter<TSource, TDestination> selector) : base(innerList, selector) { /* Left empty. */ }
         }
 
-        public class ReadOnlyList<TSource, TDestination> : ReadOnlyList<IReadOnlyList<TSource>, TSource, TDestination>
+        public class ReadOnlyList<TSource, TDestination> : ReadOnlyList<System.Collections.Generic.IReadOnlyList<TSource>, TSource, TDestination>
         {
-            public ReadOnlyList(IReadOnlyList<TSource> innerList, Converter<TSource, TDestination> selector) : base(innerList, selector) { /* Left empty. */ }
+            public ReadOnlyList(System.Collections.Generic.IReadOnlyList<TSource> innerList, Converter<TSource, TDestination> selector) : base(innerList, selector) { /* Left empty. */ }
         }
 
         public class List<TSource, TDestination> : ReadOnlyList<WinCopies.Collections.Abstract.Generic.IList<TSource>, TSource, TDestination>, System.Collections.Generic.IList<TDestination>
@@ -637,6 +666,13 @@ System.Collections.Generic.IEnumerator
                     ? parameter == null ? convertBack(default, default) : (object)convertBack(default, (TParam)parameter)
                     : parameter == null ? convertBack((TDestination)value, default) : (object)convertBack((TDestination)value, (TParam)parameter);
             }
+        }
+
+        public static class ThrowHelper
+        {
+            public static ArgumentException GetArgumentException(in object obj, in string argumentName, in Type t) => new ArgumentException($"{argumentName} must be an instance of {t.Name}. {argumentName} is {(obj == null ? "null" : obj.GetType().Name}.");
+
+            public static ArgumentException GetArgumentException<T>(in object obj, in string argumentName) => GetArgumentException(obj, argumentName, typeof(T));
         }
     }
 }

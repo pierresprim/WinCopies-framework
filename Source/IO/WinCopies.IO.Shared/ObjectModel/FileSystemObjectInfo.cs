@@ -30,130 +30,12 @@ using WinCopies.Collections;
 using WinCopies.IO.ObjectModel;
 using System;
 using System.IO;
+using WinCopies.IO.Reflection;
+using WinCopies.IO.ObjectModel.Reflection;
+using WinCopies.IO.PropertySystem;
 
 namespace WinCopies.IO
 {
-    public abstract class FileSystemObjectInfoProperties<T> : BrowsableObjectInfoProperties<T>, IFileSystemObjectInfoProperties where T : IFileSystemObjectInfo
-    {
-        ///// <summary>
-        ///// The file type of this <see cref="FileSystemObject"/>.
-        ///// </summary>
-        public FileType FileType { get; }
-
-        public abstract Size? Size { get; }
-
-        protected FileSystemObjectInfoProperties(in T fileSystemObjectInfo, in FileType fileType) : base(fileSystemObjectInfo) => FileType = fileType;
-    }
-
-    public abstract class FileSystemObjectInfoProperties<TBrowsableObjectInfo, TInnerProperties> : FileSystemObjectInfoProperties<TBrowsableObjectInfo> where TBrowsableObjectInfo : IFileSystemObjectInfo
-    {
-        protected TInnerProperties InnerProperties { get; }
-
-        protected FileSystemObjectInfoProperties(in TBrowsableObjectInfo fileSystemObjectInfo, in FileType fileType, in TInnerProperties innerProperties) : base(fileSystemObjectInfo, fileType) => InnerProperties = innerProperties;
-    }
-
-    public abstract class FileOrFolderShellObjectInfoProperties<TBrowsableObjectInfo, TInnerProperties> : FileSystemObjectInfoProperties<TBrowsableObjectInfo, TInnerProperties>, IFileSystemObjectInfoProperties2 where TBrowsableObjectInfo : IShellObjectInfo2 where TInnerProperties : FileSystemInfo
-    {
-        public DateTime LastWriteTime => InnerProperties.LastWriteTime;
-
-        public DateTime LastAccessTimeUtc => InnerProperties.LastAccessTimeUtc;
-
-        public DateTime LastAccessTime => InnerProperties.LastAccessTime;
-
-        public string FullName => InnerProperties.FullName;
-
-        public string Extension => InnerProperties.Extension;
-
-        public bool Exists => InnerProperties.Exists;
-
-        public DateTime CreationTime => InnerProperties.CreationTime;
-
-        public DateTime LastWriteTimeUtc => InnerProperties.LastWriteTimeUtc;
-
-        public System.IO.FileAttributes Attributes => InnerProperties.Attributes;
-
-        public DateTime CreationTimeUtc => InnerProperties.CreationTimeUtc;
-
-        public string Name => InnerProperties.Name;
-
-        protected FileOrFolderShellObjectInfoProperties(in TBrowsableObjectInfo shellObjectInfo, in FileType fileType, in TInnerProperties innerProperties) : base(shellObjectInfo, fileType, innerProperties)
-        {
-            // Left empty.
-        }
-    }
-
-    public class FolderShellObjectInfoProperties<T> : FileOrFolderShellObjectInfoProperties<T, DirectoryInfo> where T : IShellObjectInfo2
-    {
-        public string ParentName => InnerProperties.Parent.FullName;
-
-        public string RootName => InnerProperties.Root.FullName;
-
-        public sealed override Size? Size => null;
-
-        public FolderShellObjectInfoProperties(in T shellObjectInfo, in FileType fileType) : base(shellObjectInfo, fileType, new DirectoryInfo(shellObjectInfo.Path))
-        {
-            // Left empty.
-        }
-    }
-
-    public class FileShellObjectInfoProperties<T> : FileOrFolderShellObjectInfoProperties<T, System.IO.FileInfo> where T : IShellObjectInfo2
-    {
-        public bool IsReadOnly => InnerProperties.IsReadOnly;
-
-        public string? DirectoryName => InnerProperties.DirectoryName;
-
-        public sealed override Size? Size => new IO.Size((ulong)InnerProperties.Length);
-
-        public FileShellObjectInfoProperties(in T shellObjectInfo, in FileType fileType) : base(shellObjectInfo, fileType, new System.IO.FileInfo(shellObjectInfo.Path))
-        {
-            // Left empty.
-        }
-    }
-
-    public class DriveShellObjectInfoProperties<T> : FileSystemObjectInfoProperties<T, DriveInfo> where T : IShellObjectInfo2
-    {
-        public Size AvailableFreeSpace => new IO.Size((ulong)InnerProperties.AvailableFreeSpace);
-
-        public string DriveFormat => InnerProperties.DriveFormat;
-
-        public DriveType DriveType => InnerProperties.DriveType;
-
-        public bool IsReady => InnerProperties.IsReady;
-
-        public string RootDirectoryName => InnerProperties.RootDirectory.FullName;
-
-        public Size TotalFreeSpace => new IO.Size((ulong)InnerProperties.TotalFreeSpace);
-
-        public Size TotalSize => new Size((ulong)InnerProperties.TotalSize);
-
-        public string VolumeLabel => InnerProperties.VolumeLabel;
-
-        public sealed override Size? Size => new IO.Size((ulong)(InnerProperties.TotalSize - InnerProperties.TotalFreeSpace));
-
-        public DriveShellObjectInfoProperties(in T shellObjectInfo, in FileType fileType) : base(shellObjectInfo, fileType, new DriveInfo(shellObjectInfo.Path))
-        {
-            // Left empty.
-        }
-    }
-
-    public class ArchiveItemInfoProperties<T> : FileSystemObjectInfoProperties<T>, IFileSystemObjectInfoProperties2 where T : IArchiveItemInfo
-    {
-        public DateTime CreationTime => BrowsableObjectInfo.EncapsulatedObject.Value.CreationTime;
-
-        public DateTime LastAccessTime => BrowsableObjectInfo.EncapsulatedObject.Value.LastAccessTime;
-
-        public DateTime LastWriteTime => BrowsableObjectInfo.EncapsulatedObject.Value.LastWriteTime;
-
-        public System.IO.FileAttributes Attributes => (System.IO.FileAttributes)BrowsableObjectInfo.EncapsulatedObject.Value.Attributes;
-
-        public sealed override Size? Size => new IO.Size(BrowsableObjectInfo.EncapsulatedObject.Value.Size);
-
-        public ArchiveItemInfoProperties(in T fileSystemObjectInfo, in FileType fileType) : base(fileSystemObjectInfo, fileType)
-        {
-            // Left empty.
-        }
-    }
-
     //public class FileSystemObjectInfoPropertiesCommon : FileSystemObjectInfoProperties
     //{
     //    private IFileSystemObjectInfo _fileSystemObjectInfo;
@@ -168,21 +50,29 @@ namespace WinCopies.IO
         public abstract class FileSystemObjectInfo<TObjectProperties, TEncapsulatedObject> : BrowsableObjectInfo<TObjectProperties, TEncapsulatedObject>, IFileSystemObjectInfo<TObjectProperties, TEncapsulatedObject> where TObjectProperties : IFileSystemObjectInfoProperties
         {
             #region Properties
-            public override bool IsRecursivelyBrowsable { get; } = true;
+#if WinCopies3
+            protected override bool IsRecursivelyBrowsableOverride
+#else
+            public override bool IsRecursivelyBrowsable
+#endif
+            => true;
 
             public sealed override bool HasProperties => true;
             #endregion
 
-            protected FileSystemObjectInfo(in string path) : base(path)
-            {
-                // Left empty.
-            }
+            protected FileSystemObjectInfo(in string path) : base(path) { /* Left empty. */ }
 
             // /// <param name="fileType">The <see cref="FileType"/> of this <see cref="BrowsableObjectInfo"/>.</param>
-            protected FileSystemObjectInfo(in string path, in ClientVersion? clientVersion) : base(path, clientVersion)
-            {
-                // Left empty.
-            }
+            protected FileSystemObjectInfo(in string path,
+#if WinCopies3
+                IBrowsableObjectInfoSelector itemSelector,
+#endif
+                in ClientVersion? clientVersion) : base(path,
+#if WinCopies3
+                    itemSelector,
+#endif
+                    clientVersion)
+            { /* Left empty. */ }
 
             #region Methods
             #region Helpers
@@ -236,7 +126,7 @@ namespace WinCopies.IO
             public virtual bool Equals(IFileSystemObjectInfo fileSystemObjectInfo) => fileSystemObjectInfo is null ? false : ReferenceEquals(this, fileSystemObjectInfo) || (FileType == fileSystemObjectInfo.FileType && Path.ToLower(CultureInfo.CurrentCulture) == fileSystemObjectInfo.Path.ToLower(CultureInfo.CurrentCulture));
 
             public override bool Equals(IFileSystemObject fileSystemObject) => fileSystemObject is IFileSystemObjectInfo fileSystemObjectInfo && Equals(fileSystemObjectInfo) ;
-            #endregion
+#endregion
 
             /// <summary>
             /// Compares the current object to a given <see cref="FileSystemObjectInfo{T}"/>.

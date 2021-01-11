@@ -52,13 +52,6 @@ namespace WinCopies.IO
         RecursiveEnumerator<T> GetEnumerator();
     }
 
-    public abstract class BrowsableObjectInfoProperties<T> where T : IBrowsableObjectInfo
-    {
-        protected T BrowsableObjectInfo { get; }
-
-        protected BrowsableObjectInfoProperties(T browsableObjectInfo) => BrowsableObjectInfo = browsableObjectInfo;
-    }
-
     namespace ObjectModel
     {
         /// <summary>
@@ -71,6 +64,10 @@ WinCopies.
 #endif
     DotNetFix.IDisposable
         {
+#if WinCopies3
+            IBrowsableObjectInfoSelector ItemSelector { get; }
+#endif
+
             /// <summary>
             /// Gets a value indicating whether this <see cref="IBrowsableObjectInfo"/> is browsable.
             /// </summary>
@@ -151,6 +148,10 @@ WinCopies.
 
             System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems();
 
+#if WinCopies3
+            IBrowsableObjectInfoSelector GetDefaultItemSelector();
+#endif
+
             // IBrowsableObjectInfo GetBrowsableObjectInfo(IBrowsableObjectInfo browsableObjectInfo);
 
             // IPathModifier<IBrowsableObjectInfo, IBrowsableObjectInfo> RegisterLoader(IBrowsableObjectInfoLoader browsableObjectInfoLoader);
@@ -208,7 +209,8 @@ WinCopies.
 #else
 TEncapsulatedObject
 #endif
-                EncapsulatedObject { get; }
+                EncapsulatedObject
+            { get; }
 
             bool HasProperties { get; }
         }

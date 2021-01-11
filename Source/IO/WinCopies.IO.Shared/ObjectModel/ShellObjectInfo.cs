@@ -23,9 +23,13 @@ using System;
 using System.IO;
 using System.Windows.Media.Imaging;
 
+using WinCopies.IO.ObjectModel;
+
 using static Microsoft.WindowsAPICodePack.Shell.KnownFolders;
 
 using static WinCopies.IO.Path;
+using SevenZip;
+using WinCopies.IO.ObjectModel.Reflection;
 
 #if !WinCopies3
 using WinCopies.Collections;
@@ -55,6 +59,42 @@ namespace WinCopies.IO
         }
     }
 
+    public abstract class BrowsableObjectInfoSelector<TItem, TIn, TOut> : IBrowsableObjectInfoSelector<TItem, TIn, TOut> where TItem : IBrowsableObjectInfo where TOut : IBrowsableObjectInfo
+    {
+        public abstract bool Predicate(TIn item);
+
+        public abstract TOut Select(TIn item);
+
+        public abstract System.Collections.Generic.IEnumerable<TOut> GetItems(TItem item);
+
+        public bool Predicate(object item) => item is TIn _item ? Predicate(_item) : throw Temp.ThrowHelper.GetArgumentException<TIn>(item, nameof(item));
+
+        public IBrowsableObjectInfo Select(object item) => item is TIn _item ? Select(_item) : throw Temp.ThrowHelper.GetArgumentException<TIn>(item, nameof(item));
+
+        public System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(IBrowsableObjectInfo browsableObjectInfo) => browsableObjectInfo is TItem _browsableObjectInfo ? GetItems(_browsableObjectInfo) : throw Temp.ThrowHelper.GetArgumentException<TItem>(browsableObjectInfo, nameof(browsableObjectInfo));
+    }
+
+    public interface IArchiveItemInfoItemSelector : IBrowsableObjectInfoSelector<IArchiveItemInfoProvider, ArchiveFileInfoEnumeratorStruct, IBrowsableObjectInfo>
+    {
+        IBrowsableObjectInfo Select(IShellObjectInfo shellObject, ArchiveFileInfo archiveFileInfo);
+
+        IBrowsableObjectInfo Select(IShellObjectInfo shellObject, string archiveFilePath);
+    }
+
+    public class ShellObjectInfoItemSelector : BrowsableObjectInfoSelector<ShellObjectInfo, ShellObject, IBrowsableObjectInfo>, IArchiveItemInfoItemSelector
+    {
+        public override IBrowsableObjectInfo Select(ShellObject shellObject) => item.ShellObject is ShellFile shellFile && shellFile.Name.EndsWith(".dll", ".exe") ? DotNetAssemblyInfo.From(shellObject):; 
+
+        public override System.Collections.Generic.IEnumerable<TOut> GetItems(ShellObjectInfo item,
+#if WinCopies3
+                out bool result
+#endif
+                )
+        {
+            item.GetItems(this).Select(;
+        }
+    }
+
     namespace ObjectModel
     {
         /// <summary>
@@ -66,8 +106,6 @@ namespace WinCopies.IO
             private IBrowsableObjectInfo _parent;
 
             #region Properties
-            public override FileType FileType { get; }
-
             /// <summary>
             /// Gets a <see cref="ShellObject"/> that represents this <see cref="ShellObjectInfo"/>.
             /// </summary>
@@ -85,7 +123,7 @@ namespace WinCopies.IO
             /// <summary>
             /// Gets a value that indicates whether this <see cref="ShellObjectInfo"/> is browsable.
             /// </summary>
-            public override bool IsBrowsable => _shellObject is System.Collections.Generic.IEnumerable<ShellObject>;
+            protected override bool IsBrowsableOverride => GetDefaultIsBrowsableValue(this);
 
 #if NETFRAMEWORK
             public override IBrowsableObjectInfo Parent => _parent ?? (_parent = GetParent());
@@ -178,8 +216,8 @@ namespace WinCopies.IO
 #if WinCopies3
             public override IPropertySystemCollection ObjectPropertySystem => ShellObjectPropertySystemCollection._GetShellObjectPropertySystemCollection(this);
 #endif
-#endregion
-#endregion
+            #endregion
+            #endregion
 
             ///// <summary>
             ///// Initializes a new instance of the <see cref="ShellObjectInfo"/> class with a given <see cref="FileType"/> and <see cref="SpecialFolder"/> using custom factories for <see cref="ShellObjectInfo"/>s and <see cref="ArchiveItemInfo"/>s.
@@ -192,12 +230,41 @@ namespace WinCopies.IO
             {
                 _shellObject = shellObject;
 
-                FileType = fileType;
+                switch (fileType)
+                {
+                    case FileType.Folder:
+                    case FileType.KnownFolder:
 
-                ObjectPropertiesGeneric = new FileSystemObjectInfoProperties<IShellObjectInfo>(this, fileType);
+                        ObjectPropertiesGeneric = new FolderShellObjectInfoProperties<IShellObjectInfo2>(this, fileType);
+
+                        break;
+
+                    case FileType.File:
+                    case FileType.Archive:
+                    case FileType.Library:
+                    case FileType.Link:
+
+                        ObjectPropertiesGeneric = new FileShellObjectInfoProperties<IShellObjectInfo2>(this, fileType);
+
+                        break;
+
+                    case FileType.Drive:
+
+                        ObjectPropertiesGeneric = new DriveShellObjectInfoProperties<IShellObjectInfo2>(this, fileType);
+
+                        break;
+
+                    default:
+
+                        ObjectPropertiesGeneric = new FileSystemObjectInfoProperties(this, fileType);
+
+                        break;
+                }
             }
 
             #region Methods
+            public static bool GetDefaultIsBrowsableValue(in IShellObjectInfo shellObjectInfo) => shellObjectInfo.EncapsulatedObject is System.Collections.Generic.IEnumerable<ShellObject>;
+
             public static ShellObjectInitInfo GetInitInfo(in ShellObject shellObject)
             {
                 if ((shellObject ?? throw GetArgumentNullException(nameof(shellObject))) is ShellFolder shellFolder)
@@ -260,24 +327,20 @@ namespace WinCopies.IO
             #endregion
 
             #region GetItems
-            public virtual System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<ShellObjectInfoEnumeratorStruct> func)
+            public virtual System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(ShellObjectInfoItemSelector selector)
             {
                 ThrowIfNull(func, nameof(func));
 
                 if (IsBrowsable)
 
-                    if (ObjectPropertiesGeneric.FileType == FileType.Archive)
-
-                        return GetItems(item => func(new ShellObjectInfoEnumeratorStruct(item)));
-
-                    else
-
-                        return ShellObjectInfoEnumerator.From(this, func, ClientVersion.Value);
+                    return ObjectPropertiesGeneric.FileType == FileType.Archive
+                        ? GetItems(item => func(new ShellObjectInfoEnumeratorStruct(item)))
+                        : ShellObjectInfoEnumerator.From(this, func, ClientVersion.Value);
 
                 else return null;
             }
 
-            public virtual System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<ArchiveFileInfoEnumeratorStruct> func)
+            public virtual System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(IArchiveItemInfoItemSelector selector)
             {
                 ThrowIfNull(func, nameof(func));
 
@@ -298,9 +361,9 @@ namespace WinCopies.IO
 #endif
             }
 
-            public override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems() => GetItems((Predicate<ShellObjectInfoEnumeratorStruct>)(obj => true));
+            public override IBrowsableObjectInfoSelector GetDefaultItemSelector() => new ShellObjectInfoItemSelector();
 
-            private System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetArchiveItemInfoItems(Predicate<ArchiveFileInfoEnumeratorStruct> func) => new Enumerable<IBrowsableObjectInfo>(() => new ArchiveItemInfoEnumerator(this, func));
+            private System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetArchiveItemInfoItems(IArchiveItemInfoItemSelector selector, Predicate<ArchiveFileInfoEnumeratorStruct> predicate) => new Enumerable<IBrowsableObjectInfo>(() => new ArchiveItemInfoEnumerator(this, selector, predicate));
             #endregion
 
             #region Overrides

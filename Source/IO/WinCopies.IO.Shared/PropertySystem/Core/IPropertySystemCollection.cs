@@ -23,21 +23,18 @@ using System.Diagnostics.CodeAnalysis;
 
 using WinCopies.Collections.DotNetFix.Generic;
 using WinCopies.Collections.Generic;
+using static WinCopies.Temp;
 
 namespace WinCopies.IO.PropertySystem
 {
-    public interface IProperty:Temp.IProperty<PropertyGroup>
-    {
-        // Left empty.
-    }
 
     public struct PropertyId : IEquatable<PropertyId>
     {
         public string Name { get; }
 
-        public PropertyGroup PropertyGroup { get; }
+        public ShellPropertyGroup PropertyGroup { get; }
 
-        public PropertyId(in string name, in PropertyGroup propertyGroup)
+        public PropertyId(in string name, in ShellPropertyGroup propertyGroup)
         {
             Name = name;
 
@@ -65,7 +62,7 @@ namespace WinCopies.IO.PropertySystem
         public static bool operator !=(PropertyId x, PropertyId y) => !(x == y);
     }
 
-    public interface IPropertySystemCollection : IReadOnlyCollection<IProperty>, IReadOnlyList<IProperty>, IReadOnlyDictionary<PropertyId, IProperty>, ICountableEnumerable<IProperty>, IEnumerableInfo<KeyValuePair<PropertyId, IProperty>>, IEnumerableInfo<IProperty>
+    public interface IPropertySystemCollection : IReadOnlyCollection<IProperty>, System.Collections.Generic.IReadOnlyList<IProperty>, IReadOnlyDictionary<PropertyId, IProperty>, ICountableEnumerable<IProperty>, IEnumerableInfo<KeyValuePair<PropertyId, IProperty>>, IEnumerableInfo<IProperty>
     {
         // Left empty.
     }

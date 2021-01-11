@@ -9,6 +9,7 @@
     <Import_RootNamespace>WinCopies.IO.Shared</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectInfoSelector.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\IArchiveItemInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\IArchiveItemInfoProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\IFileSystemObjectInfo.cs" />
@@ -20,7 +21,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\Reflection\IDotNetNamespaceInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\Reflection\IDotNetParameterInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\Reflection\IDotNetTypeInfo.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\IPropertySystemCollection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\Core\IPropertySystemCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\Enumeration\ArchiveFileInfoEnumeratorStruct.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FileInfoLoader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FileSystemObjectEqualityComparer.cs" />
@@ -67,9 +68,15 @@
     <Compile Include="$(MSBuildThisFileDirectory)Path.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\PortableDeviceInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\PortableDeviceObjectInfo.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\PropertyGroup.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\PropertySystemCollection.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\ShellObjectPropertySystemCollection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\Shell\ShellPropertyGroup.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\Core\PropertySystemCollection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\Shell\ShellObjectPropertySystemCollection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\TypeCommonProperties\BrowsableObjectInfoProperties.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\TypeCommonProperties\InterfaceModel\ReflectionProperties.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\TypeCommonProperties\InterfaceModel\ShellProperties.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\TypeCommonProperties\ObjectModel\ArchiveItemInfoProperties.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\TypeCommonProperties\ObjectModel\ReflectionProperties.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\TypeCommonProperties\ObjectModel\ShellProperties.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Registry.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exceptions\RegistryException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\RegistryItemInfo.cs" />
@@ -79,5 +86,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\WMIItemInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\WMIItemInfoFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)WMIItemTypes.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)PropertySystem\Core\" />
+    <Folder Include="$(MSBuildThisFileDirectory)PropertySystem\Shell\" />
   </ItemGroup>
 </Project>

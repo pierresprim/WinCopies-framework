@@ -17,12 +17,14 @@
 
 #if WinCopies3
 
+using static WinCopies.Temp;
+
 namespace WinCopies.IO.PropertySystem
 {
     /// <summary>
     /// The property group of an <see cref="IProperty"/>.
     /// </summary>
-    public enum PropertyGroup
+    public enum ShellPropertyGroup
     {
         /// <summary>
         /// Default property group. This the group for the common properties.
@@ -168,6 +170,11 @@ namespace WinCopies.IO.PropertySystem
         /// Task-related properties.
         /// </summary>
         Task
+    }
+
+    public interface IShellProperty : Temp.IProperty<ShellPropertyGroup>
+    {
+        // Left empty.
     }
 }
 

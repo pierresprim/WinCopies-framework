@@ -24,6 +24,14 @@ using WinCopies.Linq;
 
 namespace WinCopies.IO.ObjectModel.Reflection
 {
+    public sealed class DotNetGenericArgumentInfo : BrowsableObjectInfo<idotnetiteminfoproperties, Type>,IDotNetItemInfo
+    {
+        internal DotNetGenericArgumentInfo(Type type, IDotNetItemInfo parent) : base($"{parent.Path}{WinCopies.IO.Path.PathSeparator}{type.Name}")
+        {
+
+        }
+    }
+
     public sealed class DotNetParameterInfo : BrowsableDotNetItemInfo<IDotNetItemInfoProperties, ParameterInfo>, IDotNetParameterInfo<IDotNetItemInfoProperties>
     {
         #region Properties

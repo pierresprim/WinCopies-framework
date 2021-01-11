@@ -46,7 +46,7 @@ IEnumerator
 #else
         Enumerator
 #endif
-        <ArchiveItemInfo>,
+        <IBrowsableObjectInfo>,
 #if !WinCopies3
         Util.
 #endif
@@ -77,8 +77,9 @@ new WinCopies.Collections.Generic.Queue
             .GetEnumerableQueue
 #endif
             ();
-        private ArchiveItemInfo _current;
-        private Predicate<ArchiveFileInfoEnumeratorStruct> _func;
+        private IBrowsableObjectInfo _current;
+        private IArchiveItemInfoItemSelector _selector;
+        private Predicate<ArchiveFileInfoEnumeratorStruct> _predicate;
         #endregion
 
 #if !WinCopies3
@@ -88,23 +89,33 @@ new WinCopies.Collections.Generic.Queue
 
         object IEnumerator.Current => Current;
 #else
-        protected override ArchiveItemInfo CurrentOverride => _current;
+        protected override IBrowsableObjectInfo CurrentOverride => _current;
 
         public override bool? IsResetSupported => true;
 #endif
 
-        public Predicate<ArchiveFileInfoEnumeratorStruct> Func => IsDisposed ? throw GetExceptionForDispose(false) : _func;
+        public IArchiveItemInfoItemSelector Selector => IsDisposed ? throw GetExceptionForDispose(false) : _selector;
 
-        public ArchiveItemInfoEnumerator(IArchiveItemInfoProvider archiveItemInfoProvider, Predicate<ArchiveFileInfoEnumeratorStruct> func)
+        public Predicate<ArchiveFileInfoEnumeratorStruct> Predicate => IsDisposed ? throw GetExceptionForDispose(false) : _predicate;
+
+        public ArchiveItemInfoEnumerator(in IArchiveItemInfoProvider archiveItemInfoProvider, in IArchiveItemInfoItemSelector selector, in Predicate<ArchiveFileInfoEnumeratorStruct> predicate)
         {
             ThrowIfNull(archiveItemInfoProvider, nameof(archiveItemInfoProvider));
-            ThrowIfNull(func, nameof(func));
+            ThrowIfNull(selector, nameof(selector));
 
             _archiveItemInfoProvider = archiveItemInfoProvider;
 
             _archiveExtractor = new SevenZipExtractor(archiveItemInfoProvider.ArchiveShellObject.ArchiveFileStream);
 
-            _func = func;
+            _selector = selector;
+
+            if (predicate == null)
+
+                _predicate = item => true;
+
+            else
+
+                _predicate = predicate;
         }
 
 #if !WinCopies3
@@ -184,11 +195,11 @@ new WinCopies.Collections.Generic.Queue
 
                     // string __path = string.Copy(_path);
 
-                    _current = ArchiveItemInfo.From(_archiveItemInfoProvider.ArchiveShellObject, _archiveFileInfo);
+                    _current = Selector.Select(_archiveItemInfoProvider.ArchiveShellObject, _archiveFileInfo);
 
                 void AddPath(in string archiveFilePath) =>
 
-                    _current = ArchiveItemInfo.From(_archiveItemInfoProvider.ArchiveShellObject, archiveFilePath);
+                    _current = Selector.Select(_archiveItemInfoProvider.ArchiveShellObject, archiveFilePath);
 
                 //void AddDirectory(string _path, ArchiveFileInfo? archiveFileInfo) =>
 
@@ -227,7 +238,7 @@ new WinCopies.Collections.Generic.Queue
 
                 bool addPath(ArchiveFileInfoEnumeratorStruct archiveFileInfoEnumeratorStruct)
                 {
-                    if (Func is object && !Func(archiveFileInfoEnumeratorStruct))
+                    if (!_selector.Predicate(archiveFileInfoEnumeratorStruct, _predicate))
 
                         return false;
 
@@ -369,7 +380,7 @@ new WinCopies.Collections.Generic.Queue
 
             _paths = null;
 
-            _func = null;
+            _selector = null;
         }
 
         #endregion

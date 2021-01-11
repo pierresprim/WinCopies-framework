@@ -181,7 +181,9 @@ Current
 
                             case MethodInfo methodInfo:
 
-                                add(DotNetItemType.Parameter, methodInfo.GetParameters().WherePredicate(p => func(new DotNetMemberInfoEnumeratorStruct(p))).Select(p => new DotNetParameterInfo(p, DotNetItemType.Parameter, dotNetMemberInfo)));
+                                add(DotNetItemType.Parameter, methodInfo.GetParameters().WherePredicate(p => func(new DotNetMemberInfoEnumeratorStruct(p))).Select(p => new DotNetParameterInfo(p, DotNetItemType.Parameter, dotNetMemberInfo)).Append(new DotNetParameterInfo(methodInfo.ReturnParameter, DotNetItemType.ReturnParameter, dotNetMemberInfo)));
+
+                                add(DotNetItemType.GenericArgument, methodInfo.GetGenericArguments().WherePredicate(p => func(new DotNetMemberInfoEnumeratorStruct(p))).Select(p => new DotNetGenericArgumentInfo(p, dotNetMemberInfo)));
 
                                 break;
 

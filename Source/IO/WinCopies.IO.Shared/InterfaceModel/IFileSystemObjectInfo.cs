@@ -19,30 +19,10 @@ using System;
 using System.Drawing;
 using System.IO;
 using System.Windows.Media.Imaging;
+using WinCopies.IO.Reflection;
 
 namespace WinCopies.IO
 {
-    public interface IFileSystemObjectInfoProperties
-    {
-        ///// <summary>
-        ///// Gets the <see cref="WinCopies.IO.FileType"/> of this <see cref="IFileSystemObject"/>.
-        ///// </summary>
-        FileType FileType { get; }
-
-        Size? Size { get; }
-    }
-
-    public interface IFileSystemObjectInfoProperties2: IFileSystemObjectInfoProperties
-    {
-        DateTime CreationTime { get; }
-
-        DateTime LastAccessTime { get; }
-
-        DateTime LastWriteTime { get; }
-
-        FileAttributes Attributes { get; }
-    }
-
     namespace ObjectModel
     {
         // public interface IFileSystemObjectInfoFactory : IBrowsableObjectInfoFactory { }
