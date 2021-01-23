@@ -31,7 +31,7 @@ namespace WinCopies.IO
 #if !WinCopies4
 , IEqualityComparer<T>
 #endif
-        where T : IFileSystemObject
+        where T : IBrowsableObjectInfoBase
     {
 #if !WinCopies4
         public bool Equals(
@@ -83,7 +83,7 @@ namespace WinCopies.IO
             );
     }
 
-    public class FileSystemObjectInfoEqualityComparer<T> : FileSystemObjectEqualityComparer<T> where T : IFileSystemObject
+    public class FileSystemObjectInfoEqualityComparer<T> : FileSystemObjectEqualityComparer<T> where T : IBrowsableObjectInfoBase
     {
         protected override bool EqualsOverride(
 #if CS8
@@ -106,7 +106,7 @@ namespace WinCopies.IO
             ) : base.GetHashCode(obj);
     }
 
-    public class RegistryItemInfoEqualityComparer<T> : FileSystemObjectEqualityComparer<T> where T : IFileSystemObject
+    public class RegistryItemInfoEqualityComparer<T> : FileSystemObjectEqualityComparer<T> where T : IBrowsableObjectInfoBase
     {
         protected override bool EqualsOverride(
 #if CS8
@@ -129,7 +129,7 @@ namespace WinCopies.IO
             ) : base.GetHashCode(obj);
     }
 
-    public class WMIItemInfoEqualityComparer<T> : FileSystemObjectEqualityComparer<T> where T : IFileSystemObject
+    public class WMIItemInfoEqualityComparer<T> : FileSystemObjectEqualityComparer<T> where T : IBrowsableObjectInfoBase
     {
         protected override bool EqualsOverride(
 #if CS8

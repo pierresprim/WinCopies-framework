@@ -17,20 +17,21 @@
 
 using System;
 using System.Reflection;
+
 using WinCopies.Collections.Generic;
 using WinCopies.IO.ObjectModel.Reflection;
 using WinCopies.IO.PropertySystem;
 
 namespace WinCopies.IO.Reflection.PropertySystem
 {
-    public class DotNetItemInfoProperties<T> : BrowsableObjectInfoProperties<T>, IDotNetItemInfoProperties where T : IDotNetItemInfo
+    public class DotNetItemInfoProperties<T> : BrowsableObjectInfoProperties<T>, IDotNetItemInfoProperties where T : IDotNetItemInfoBase
     {
         public DotNetItemType ItemType { get; }
 
         public DotNetItemInfoProperties(in T dotNetItemInfo, in DotNetItemType itemType) : base(dotNetItemInfo) => ItemType = itemType;
     }
 
-    public abstract class DotNetTypeOrMemberInfoProperties<T> : DotNetItemInfoProperties<T>, IDotNetTypeOrMemberInfoProperties where T : IDotNetItemInfo
+    public abstract class DotNetTypeOrMemberInfoProperties<T> : DotNetItemInfoProperties<T>, IDotNetTypeOrMemberInfoProperties where T : IDotNetItemInfoBase
     {
         public abstract Type DeclaringType { get; }
 
@@ -40,7 +41,7 @@ namespace WinCopies.IO.Reflection.PropertySystem
         }
     }
 
-    public abstract class DotNetTypeOrMethodItemInfoProperties<T> : DotNetTypeOrMemberInfoProperties<T>, IDotNetTypeOrMethodItemInfoProperties where T : IDotNetItemInfo
+    public abstract class DotNetTypeOrMethodItemInfoProperties<T> : DotNetTypeOrMemberInfoProperties<T>, IDotNetTypeOrMethodItemInfoProperties where T : IDotNetItemInfoBase
     {
         public abstract bool IsAbstract { get; }
 

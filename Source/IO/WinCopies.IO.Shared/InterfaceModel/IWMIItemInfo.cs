@@ -19,25 +19,24 @@ using System;
 using System.Collections.Generic;
 using System.Management;
 
-namespace WinCopies.IO
-{
-    public interface IWMIItemInfoProperties
-    {
-        bool IsRootNode { get; }
+using WinCopies.IO.AbstractionInterop;
+using WinCopies.IO.PropertySystem;
+using WinCopies.IO.Selectors;
 
-        WMIItemType WMIItemType { get; }
+namespace WinCopies.IO.ObjectModel
+{
+    public interface IWMIItemInfoBase : IBrowsableObjectInfo, IEncapsulatorBrowsableObjectInfo<ManagementBaseObject>
+    {
+        // Left empty.
     }
 
-    namespace ObjectModel
+    public interface IWMIItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : IWMIItemInfoBase, IBrowsableObjectInfo<TObjectProperties, ManagementBaseObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IWMIItemInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
     {
-        public interface IWMIItemInfo : IWMIItemInfoProperties, IBrowsableObjectInfo, IEncapsulatorBrowsableObjectInfo<ManagementBaseObject>
-        {
-            IEnumerable<IBrowsableObjectInfo> GetItems(IWMIItemInfoFactory factory, Predicate<ManagementBaseObject> predicate, bool catchExceptionsDuringEnumeration);
-        }
+        // Left empty.
+    }
 
-        public interface IWMIItemInfo<T> : IWMIItemInfo, IBrowsableObjectInfo<T, ManagementBaseObject> where T : IWMIItemInfoProperties
-        {
-            // Left empty.
-        }
+    public interface IWMIItemInfo : IWMIItemInfo<IWMIItemInfoProperties, ManagementBaseObject, IBrowsableObjectInfoSelectorDictionary<WMIItemInfoItemProvider>, WMIItemInfoItemProvider>
+    {
+        IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<ManagementBaseObject> predicate);
     }
 }

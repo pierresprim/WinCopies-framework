@@ -28,7 +28,7 @@ using WinCopies.Collections
 using WinCopies.IO.ObjectModel.Reflection;
 using WinCopies.Linq;
 
-namespace WinCopies.IO.Reflection
+namespace WinCopies.IO.Enumeration.Reflection
 {
     public struct DotNetMemberInfoEnumeratorStruct
     {

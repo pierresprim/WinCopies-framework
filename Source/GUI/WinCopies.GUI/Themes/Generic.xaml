@@ -9,7 +9,6 @@
     xmlns:temp="clr-namespace:WinCopies;assembly=WinCopies.Util.Temp"
     xmlns:markup="clr-namespace:WinCopies.Markup;assembly=WinCopies.Util.Temp"
                     xmlns:guiDialogs="clr-namespace:WinCopies.GUI.Windows;assembly=WinCopies.GUI"
-    xmlns:dialogs="clr-namespace:WinCopies.GUI.Windows"
                     xmlns:windows="clr-namespace:WinCopies.GUI.Windows">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/wincopies.gui.templates;component/Themes/Generic.xaml" />
@@ -85,10 +84,10 @@
         </Style.Triggers>
     </Style>
 
-    <Style TargetType="{x:Type dialogs:DialogWindow}" BasedOn="{StaticResource {x:Type windows:Window}}">
+    <Style TargetType="{x:Type windows:DialogWindow}" BasedOn="{StaticResource {x:Type windows:Window}}">
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="{x:Type dialogs:DialogWindow}">
+                <ControlTemplate TargetType="{x:Type windows:DialogWindow}">
                     <Grid Background="White">
                         <Grid.RowDefinitions >
                             <RowDefinition />
@@ -104,7 +103,7 @@
                                                 <Setter Property="Template">
                                                     <Setter.Value>
                                                         <ControlTemplate>
-                                                            <Button Command="{x:Static commands:DialogCommands.Ok}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.OK}}" />
+                                                            <Button Command="{x:Static commands:DialogCommands.Ok}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.OK}}" />
                                                         </ControlTemplate>
                                                     </Setter.Value>
                                                 </Setter>
@@ -114,9 +113,9 @@
                                                 <Setter Property="Template">
                                                     <Setter.Value>
                                                         <ControlTemplate>
-                                                            <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type dialogs:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal" >
-                                                                <Button Command="{x:Static commands:DialogCommands.Ok}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.OK}}" />
-                                                                <Button Command="{x:Static commands:DialogCommands.Cancel}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Cancel}}" IsCancel="True" />
+                                                            <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type windows:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal" >
+                                                                <Button Command="{x:Static commands:DialogCommands.Ok}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.OK}}" />
+                                                                <Button Command="{x:Static commands:DialogCommands.Cancel}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Cancel}}" IsCancel="True" />
                                                             </StackPanel>
                                                         </ControlTemplate>
                                                     </Setter.Value>
@@ -127,10 +126,10 @@
                                                 <Setter Property="Template">
                                                     <Setter.Value>
                                                         <ControlTemplate>
-                                                            <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type dialogs:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal" >
-                                                                <Button Command="{x:Static commands:DialogCommands.Abort}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Abort}}" />
-                                                                <Button Command="{x:Static commands:DialogCommands.Retry}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Retry}}" />
-                                                                <Button Command="{x:Static commands:DialogCommands.Ignore}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Ignore}}" IsCancel="True" />
+                                                            <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type windows:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal" >
+                                                                <Button Command="{x:Static commands:DialogCommands.Abort}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Abort}}" />
+                                                                <Button Command="{x:Static commands:DialogCommands.Retry}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Retry}}" />
+                                                                <Button Command="{x:Static commands:DialogCommands.Ignore}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Ignore}}" IsCancel="True" />
                                                             </StackPanel>
                                                         </ControlTemplate>
                                                     </Setter.Value>
@@ -141,10 +140,10 @@
                                                 <Setter Property="Template">
                                                     <Setter.Value>
                                                         <ControlTemplate>
-                                                            <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type dialogs:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal" >
-                                                                <Button Command="{x:Static commands:DialogCommands.Yes}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Yes}}" IsEnabled="{Binding IsPredicateValid, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
-                                                                <Button Command="{x:Static commands:DialogCommands.No}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.No}}" />
-                                                                <Button Command="{x:Static commands:DialogCommands.Cancel}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Cancel}}" IsCancel="True" />
+                                                            <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type windows:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal" >
+                                                                <Button Command="{x:Static commands:DialogCommands.Yes}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Yes}}" IsEnabled="{Binding IsPredicateValid, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                                                                <Button Command="{x:Static commands:DialogCommands.No}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.No}}" />
+                                                                <Button Command="{x:Static commands:DialogCommands.Cancel}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Cancel}}" IsCancel="True" />
                                                             </StackPanel>
                                                         </ControlTemplate>
                                                     </Setter.Value>
@@ -155,9 +154,9 @@
                                                 <Setter Property="Template">
                                                     <Setter.Value>
                                                         <ControlTemplate>
-                                                            <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type dialogs:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal" >
-                                                                <Button Command="{x:Static commands:DialogCommands.Yes}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Yes}}" IsEnabled="{Binding IsPredicateValid, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
-                                                                <Button Command="{x:Static commands:DialogCommands.No}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.No}}" />
+                                                            <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type windows:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal" >
+                                                                <Button Command="{x:Static commands:DialogCommands.Yes}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Yes}}" IsEnabled="{Binding IsPredicateValid, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                                                                <Button Command="{x:Static commands:DialogCommands.No}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.No}}" />
                                                             </StackPanel>
                                                         </ControlTemplate>
                                                     </Setter.Value>
@@ -168,9 +167,9 @@
                                                 <Setter Property="Template">
                                                     <Setter.Value>
                                                         <ControlTemplate>
-                                                            <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type dialogs:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal" >
-                                                                <Button Command="{x:Static commands:DialogCommands.Retry}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Retry}}" />
-                                                                <Button Command="{x:Static commands:DialogCommands.Cancel}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Cancel}}" IsCancel="True" />
+                                                            <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type windows:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal" >
+                                                                <Button Command="{x:Static commands:DialogCommands.Retry}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Retry}}" />
+                                                                <Button Command="{x:Static commands:DialogCommands.Cancel}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Cancel}}" IsCancel="True" />
                                                             </StackPanel>
                                                         </ControlTemplate>
                                                     </Setter.Value>
@@ -181,10 +180,10 @@
                                                 <Setter Property="Template">
                                                     <Setter.Value>
                                                         <ControlTemplate>
-                                                            <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type dialogs:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal" >
-                                                                <Button Command="{x:Static commands:DialogCommands.Cancel}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Cancel}}" IsCancel="True" />
-                                                                <Button Command="{x:Static commands:DialogCommands.Retry}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Retry}}" />
-                                                                <Button Command="{x:Static commands:DialogCommands.Continue}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Continue}}" />
+                                                            <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type windows:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal" >
+                                                                <Button Command="{x:Static commands:DialogCommands.Cancel}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Cancel}}" IsCancel="True" />
+                                                                <Button Command="{x:Static commands:DialogCommands.Retry}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Retry}}" />
+                                                                <Button Command="{x:Static commands:DialogCommands.Continue}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Continue}}" />
                                                             </StackPanel>
                                                         </ControlTemplate>
                                                     </Setter.Value>
@@ -195,10 +194,10 @@
                                                 <Setter Property="Template">
                                                     <Setter.Value>
                                                         <ControlTemplate>
-                                                            <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type dialogs:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal" >
-                                                                <Button Command="{x:Static commands:DialogCommands.Continue}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Continue}}" />
-                                                                <Button Command="{x:Static commands:DialogCommands.Ignore}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Ignore}}" />
-                                                                <Button Command="{x:Static commands:DialogCommands.Cancel}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Cancel}}" IsCancel="True" />
+                                                            <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type windows:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal" >
+                                                                <Button Command="{x:Static commands:DialogCommands.Continue}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Continue}}" />
+                                                                <Button Command="{x:Static commands:DialogCommands.Ignore}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Ignore}}" />
+                                                                <Button Command="{x:Static commands:DialogCommands.Cancel}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Cancel}}" IsCancel="True" />
                                                             </StackPanel>
                                                         </ControlTemplate>
                                                     </Setter.Value>
@@ -209,10 +208,10 @@
                                                 <Setter Property="Template">
                                                     <Setter.Value>
                                                         <ControlTemplate>
-                                                            <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type dialogs:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal" >
-                                                                <Button Command="{x:Static commands:DialogCommands.Ok}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.OK}}" />
-                                                                <Button Command="{x:Static commands:DialogCommands.Apply}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Apply}}" />
-                                                                <Button Command="{x:Static commands:DialogCommands.Cancel}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Cancel}}" IsCancel="True" />
+                                                            <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type windows:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal" >
+                                                                <Button Command="{x:Static commands:DialogCommands.Ok}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.OK}}" />
+                                                                <Button Command="{x:Static commands:DialogCommands.Apply}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Apply}}" />
+                                                                <Button Command="{x:Static commands:DialogCommands.Cancel}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Cancel}}" IsCancel="True" />
                                                             </StackPanel>
                                                         </ControlTemplate>
                                                     </Setter.Value>
@@ -223,10 +222,10 @@
                                                 <Setter Property="Template">
                                                     <Setter.Value>
                                                         <ControlTemplate>
-                                                            <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type dialogs:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal" >
-                                                                <Button Command="{x:Static commands:DialogCommands.Retry}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Retry}}" />
-                                                                <Button Command="{x:Static commands:DialogCommands.Ignore}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Ignore}}" />
-                                                                <Button Command="{x:Static commands:DialogCommands.Cancel}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Cancel}}" IsCancel="True" />
+                                                            <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type windows:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal" >
+                                                                <Button Command="{x:Static commands:DialogCommands.Retry}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Retry}}" />
+                                                                <Button Command="{x:Static commands:DialogCommands.Ignore}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Ignore}}" />
+                                                                <Button Command="{x:Static commands:DialogCommands.Cancel}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Cancel}}" IsCancel="True" />
                                                             </StackPanel>
                                                         </ControlTemplate>
                                                     </Setter.Value>
@@ -237,9 +236,9 @@
                                                 <Setter Property="Template">
                                                     <Setter.Value>
                                                         <ControlTemplate>
-                                                            <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type dialogs:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal" >
-                                                                <Button Command="{x:Static commands:DialogCommands.Ignore}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Ignore}}" />
-                                                                <Button Command="{x:Static commands:DialogCommands.Cancel}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Cancel}}" IsCancel="True" />
+                                                            <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type windows:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal" >
+                                                                <Button Command="{x:Static commands:DialogCommands.Ignore}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Ignore}}" />
+                                                                <Button Command="{x:Static commands:DialogCommands.Cancel}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Cancel}}" IsCancel="True" />
                                                             </StackPanel>
                                                         </ControlTemplate>
                                                     </Setter.Value>
@@ -250,10 +249,10 @@
                                                 <Setter Property="Template">
                                                     <Setter.Value>
                                                         <ControlTemplate>
-                                                            <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type dialogs:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal" >
-                                                                <Button Command="{x:Static commands:DialogCommands.YesToAll}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.YesToAll}}" />
-                                                                <Button Command="{x:Static commands:DialogCommands.NoToAll}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.NoToAll}}" />
-                                                                <Button Command="{x:Static commands:DialogCommands.Cancel}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Cancel}}" IsCancel="True" />
+                                                            <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type windows:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal" >
+                                                                <Button Command="{x:Static commands:DialogCommands.YesToAll}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.YesToAll}}" />
+                                                                <Button Command="{x:Static commands:DialogCommands.NoToAll}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.NoToAll}}" />
+                                                                <Button Command="{x:Static commands:DialogCommands.Cancel}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Cancel}}" IsCancel="True" />
                                                             </StackPanel>
                                                         </ControlTemplate>
                                                     </Setter.Value>
@@ -264,9 +263,9 @@
                                                 <Setter Property="Template">
                                                     <Setter.Value>
                                                         <ControlTemplate>
-                                                            <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type dialogs:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal" >
-                                                                <Button Command="{x:Static commands:DialogCommands.YesToAll}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.YesToAll}}" />
-                                                                <Button Command="{x:Static commands:DialogCommands.NoToAll}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.NoToAll}}" />
+                                                            <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type windows:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal" >
+                                                                <Button Command="{x:Static commands:DialogCommands.YesToAll}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.YesToAll}}" />
+                                                                <Button Command="{x:Static commands:DialogCommands.NoToAll}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.NoToAll}}" />
                                                             </StackPanel>
                                                         </ControlTemplate>
                                                     </Setter.Value>
@@ -278,7 +277,7 @@
                                                     <Setter Property="Template">
                                                         <Setter.Value>
                                                             <ControlTemplate TargetType="{x:Type Control}" >
-                                                                <ItemsControl x:Name="PART_ItemsControl" ItemsSource="{Binding CustomButtonsSource, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:DialogWindow}}}" ItemTemplate="{Binding CustomButtonTemplate, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:DialogWindow}}}" ItemTemplateSelector="{Binding CustomButtonTemplateSelector, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:DialogWindow}}}">
+                                                                <ItemsControl x:Name="PART_ItemsControl" ItemsSource="{Binding CustomButtonsSource, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}}" ItemTemplate="{Binding CustomButtonTemplate, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}}" ItemTemplateSelector="{Binding CustomButtonTemplateSelector, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}}">
                                                                     <ItemsControl.Resources>
                                                                         <ResourceDictionary>
                                                                             <ResourceDictionary.MergedDictionaries>
@@ -639,6 +638,48 @@
         </Style.Triggers>
     </Style>
 
+    <Style TargetType="{x:Type local:Link}" BasedOn="{StaticResource {x:Type Button}}">
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template" >
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:Link}">
+                    <TextBlock>
+                        <local:LinkRun Text="{TemplateBinding Content}" Uri="{TemplateBinding Uri}" UnderliningMode="{TemplateBinding UnderliningMode}" NormalForeground="{TemplateBinding NormalForeground}" HighlightedForeground="{TemplateBinding HighlightedForeground}" ActiveForeground="{TemplateBinding ActiveForeground}" SeenForeground="{TemplateBinding SeenForeground}" Seen="{TemplateBinding Seen}" Command="{TemplateBinding Command}" CommandParameter="{TemplateBinding CommandParameter}" CommandTarget="{TemplateBinding CommandTarget}" />
+                    </TextBlock>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type local:DockControl}" BasedOn="{StaticResource {x:Type ContentControl}}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:DockControl}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <ContentPresenter x:Name="PART_Top" Grid.ColumnSpan="3" ContentSource="Top" ContentStringFormat="{TemplateBinding TopStringFormat}" ContentTemplate="{TemplateBinding TopTemplate}" ContentTemplateSelector="{TemplateBinding TopTemplateSelector}" />
+                        <ContentPresenter x:Name="PART_Left" Grid.Row="1" ContentSource="Left" ContentStringFormat="{TemplateBinding LeftStringFormat}" ContentTemplate="{TemplateBinding LeftTemplate}" ContentTemplateSelector="{TemplateBinding LeftTemplateSelector}" />
+                        <ContentPresenter Grid.Column="1" Grid.Row="1" />
+                        <ContentPresenter x:Name="PART_Right" Grid.Column="2" Grid.Row="1" ContentSource="Right" ContentStringFormat="{TemplateBinding RightStringFormat}" ContentTemplate="{TemplateBinding RightTemplate}" ContentTemplateSelector="{TemplateBinding RightTemplateSelector}" />
+                        <ContentPresenter x:Name="PART_Bottom" Grid.ColumnSpan="3" Grid.Row="2" ContentSource="Bottom" ContentStringFormat="{TemplateBinding BottomStringFormat}" ContentTemplate="{TemplateBinding BottomTemplate}" ContentTemplateSelector="{TemplateBinding BottomTemplateSelector}" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!--<Style TargetType="{x:Type local:InlineTextEditor}">
         <Setter Property="Template">
             <Setter.Value>
@@ -670,20 +711,6 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>-->
-
-    <Style TargetType="{x:Type local:Link}" BasedOn="{StaticResource {x:Type Button}}">
-        <Setter Property="Focusable" Value="False" />
-        <Setter Property="Cursor" Value="Hand" />
-        <Setter Property="Template" >
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type local:Link}">
-                    <TextBlock>
-                        <local:LinkRun Text="{TemplateBinding Content}" Uri="{TemplateBinding Uri}" UnderliningMode="{TemplateBinding UnderliningMode}" NormalForeground="{TemplateBinding NormalForeground}" HighlightedForeground="{TemplateBinding HighlightedForeground}" ActiveForeground="{TemplateBinding ActiveForeground}" SeenForeground="{TemplateBinding SeenForeground}" Seen="{TemplateBinding Seen}" Command="{TemplateBinding Command}" CommandParameter="{TemplateBinding CommandParameter}" CommandTarget="{TemplateBinding CommandTarget}" />
-                    </TextBlock>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
 
     <!--<Style TargetType="{x:Type local:PropertyGrid}">
         <Setter Property="Template">

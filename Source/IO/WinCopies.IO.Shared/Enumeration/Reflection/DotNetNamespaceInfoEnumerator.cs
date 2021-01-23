@@ -27,6 +27,8 @@ using WinCopies.IO.ObjectModel.Reflection;
 using WinCopies.Linq;
 
 using static WinCopies.IO.Path;
+using WinCopies.IO.Reflection;
+using WinCopies.IO.AbstractionInterop.Reflection;
 
 #if !WinCopies3
 using WinCopies.Util;
@@ -39,9 +41,9 @@ using static WinCopies.UtilHelpers;
 using static WinCopies.ThrowHelper;
 #endif
 
-namespace WinCopies.IO.Reflection
+namespace WinCopies.IO.Enumeration.Reflection
 {
-    public struct DotNetNamespaceInfoEnumeratorStruct
+    public class DotNetNamespaceInfoEnumeratorStruct
     {
         public string Namespace { get; }
 
@@ -64,7 +66,7 @@ namespace WinCopies.IO.Reflection
 
     public static class DotNetEnumeration
     {
-        internal static IEnumerator<IDotNetItemInfo> GetDotNetItemInfoEnumerator(in System.Collections.Generic.IEnumerable<TypeInfo> enumerable, DotNetItemType itemType, bool isRootType, IBrowsableObjectInfo parent, in Predicate<TypeInfo> func) => enumerable.WherePredicate(func).Select(t => new DotNetTypeInfo(t, itemType, isRootType, parent)).GetEnumerator();
+        internal static IEnumerator<DotNetAssemblyInfoItemProvider> GetDotNetItemInfoEnumerator(in System.Collections.Generic.IEnumerable<TypeInfo> enumerable, DotNetItemType itemType, bool isRootType, IBrowsableObjectInfo parent, in Predicate<TypeInfo> func) => enumerable.WherePredicate(func).GetEnumerator().Select(t => new DotNetAssemblyInfoItemProvider(new DotNetAssemblyInfoItemProvider.TypeInfoItemProviderClass(t, itemType), isRootType, parent));
 
         public static Predicate<TypeInfo> GetTypeInfoPredicate(in DotNetItemType typeToEnumerate, in string typeToEnumerateEnumerableName)
 #if CS7
@@ -72,27 +74,27 @@ namespace WinCopies.IO.Reflection
             switch (typeToEnumerate)
             {
                 case DotNetItemType.Struct:
-                
+
                     return t => t.IsValueType && !t.IsEnum;
 
                 case DotNetItemType.Enum:
-                
+
                     return t => t.IsEnum;
 
                 case DotNetItemType.Class:
-                
+
                     return t => t.IsClass;
 
                 case DotNetItemType.Interface:
-                
+
                     return t => t.IsInterface;
 
                 case DotNetItemType.Delegate:
-                
+
                     return t => typeof(Delegate).IsAssignableFrom(t);
 
                 default:
-                
+
                     throw GetInvalidEnumArgumentException(typeToEnumerateEnumerableName, typeToEnumerate);
             }
         }
@@ -248,7 +250,7 @@ public bool MoveNext
         }
     }
 
-    public sealed class DotNetNamespaceInfoEnumerator : Enumerator<TypeInfo, IDotNetItemInfo>
+    public sealed class DotNetNamespaceInfoEnumerator : Enumerator<TypeInfo, DotNetAssemblyInfoItemProvider>
     {
         #region Private fields
         private
@@ -272,18 +274,18 @@ WinCopies.Collections.Generic.Queue
             .GetEnumerableQueue
 #endif
             ();
-        private DotNetEnumerationMoveNext<IDotNetItemInfo> _moveNext;
+        private DotNetEnumerationMoveNext<DotNetAssemblyInfoItemProvider> _moveNext;
         private Predicate<DotNetNamespaceInfoEnumeratorStruct> _func;
         private IBrowsableObjectInfo _parent;
 #if !WinCopies3
         private bool _isCompleted = false;
 #else
-        private IDotNetItemInfo _current;
+        private DotNetAssemblyInfoItemProvider _current;
 #endif
         #endregion
 
 #if WinCopies3
-        protected override IDotNetItemInfo CurrentOverride => _current;
+        protected override DotNetAssemblyInfoItemProvider CurrentOverride => _current;
 
         public override bool? IsResetSupported => false;
 
@@ -302,7 +304,7 @@ WinCopies.Collections.Generic.Queue
 
             bool isRootType = dotNetItemInfo is IDotNetAssemblyInfo;
 
-            var _dic = new Dictionary<DotNetItemType, IEnumerator<IDotNetItemInfo>>();
+            var _dic = new Dictionary<DotNetItemType, IEnumerator<DotNetAssemblyInfoItemProvider>>();
 
             void addEnumerator(DotNetItemType dotNetItemType, Predicate<TypeInfo> __func) => _dic.Add(dotNetItemType, DotNetEnumeration.GetDotNetItemInfoEnumerator(enumerable, dotNetItemType, isRootType, dotNetItemInfo, t => __func(t) && func(new DotNetNamespaceInfoEnumeratorStruct(t))));
 
@@ -317,7 +319,7 @@ WinCopies.Collections.Generic.Queue
                     addEnumerator(typeToEnumerate, DotNetEnumeration.GetTypeInfoPredicate(typeToEnumerate, nameof(typesToEnumerate)));
             }
 
-            _moveNext = new DotNetEnumerationMoveNext<IDotNetItemInfo>(_dic.Values.GetEnumerator());
+            _moveNext = new DotNetEnumerationMoveNext<DotNetAssemblyInfoItemProvider>(_dic.Values.GetEnumerator());
         }
 
         /// <summary>
@@ -327,15 +329,15 @@ WinCopies.Collections.Generic.Queue
         /// <param name="typesToEnumerate">An enumerable that enumerates through the <see cref="DotNetItemType"/>s to enumerate. If this parameter is <see langword="null"/>, it will be filled in with all the fields of the <see cref="DotNetItemType"/> enumeration.</param>
         /// <param name="func">A custom predicate. If this parameter is <see langword="null"/>, it will be filled in with <see cref="GetCommonPredicate{T}"/>.</param>
         /// <returns>A new instance of the <see cref="DotNetNamespaceInfoEnumerator"/> class.</returns>
-        public static DotNetNamespaceInfoEnumerator From(in IBrowsableObjectInfo dotNetItemInfo, in System.Collections.Generic.IEnumerable<DotNetItemType> typesToEnumerate, in Predicate<DotNetNamespaceInfoEnumeratorStruct> func) => new DotNetNamespaceInfoEnumerator((dotNetItemInfo ?? throw GetArgumentNullException(nameof(dotNetItemInfo))).Is(false, typeof(IDotNetAssemblyInfo), typeof(IDotNetTypeInfo)) ? dotNetItemInfo : throw new ArgumentException($"{nameof(dotNetItemInfo)} must be {nameof(DotNetAssemblyInfo)} or {nameof(DotNetNamespaceInfo)}."), (dotNetItemInfo is IDotNetNamespaceInfo dotNetNamespaceInfo ? dotNetNamespaceInfo.ParentDotNetAssemblyInfo : dotNetItemInfo is IDotNetAssemblyInfo dotNetAssemblyInfo ? dotNetAssemblyInfo : throw new ArgumentException($"{nameof(dotNetItemInfo)} must be an {nameof(IDotNetAssemblyInfo)} or an {nameof(IDotNetNamespaceInfo)}", nameof(dotNetItemInfo))).EncapsulatedObject.DefinedTypes, typesToEnumerate ?? typeof(DotNetItemType).GetFields().Select(f => (DotNetItemType)f.GetValue(null)), func ?? GetCommonPredicate<DotNetNamespaceInfoEnumeratorStruct>());
+        public static DotNetNamespaceInfoEnumerator From(in IBrowsableObjectInfo dotNetItemInfo, in System.Collections.Generic.IEnumerable<DotNetItemType> typesToEnumerate, in Predicate<DotNetNamespaceInfoEnumeratorStruct> func) => new DotNetNamespaceInfoEnumerator((dotNetItemInfo ?? throw GetArgumentNullException(nameof(dotNetItemInfo))).Is(false, typeof(IDotNetAssemblyInfo), typeof(IDotNetTypeInfo)) ? dotNetItemInfo : throw new ArgumentException($"{nameof(dotNetItemInfo)} must be {nameof(DotNetAssemblyInfo)} or {nameof(DotNetNamespaceInfo)}."), (dotNetItemInfo is IDotNetNamespaceInfo dotNetNamespaceInfo ? dotNetNamespaceInfo.ParentDotNetAssemblyInfo : dotNetItemInfo is IDotNetAssemblyInfo dotNetAssemblyInfo ? dotNetAssemblyInfo : throw new ArgumentException($"{nameof(dotNetItemInfo)} must be an {nameof(IDotNetAssemblyInfo)} or an {nameof(IDotNetNamespaceInfo)}", nameof(dotNetItemInfo))).Assembly.DefinedTypes, typesToEnumerate ?? typeof(DotNetItemType).GetFields().Select(f => (DotNetItemType)f.GetValue(null)), func ?? GetCommonPredicate<DotNetNamespaceInfoEnumeratorStruct>());
 
-        private IEnumerator<DotNetNamespaceInfo> GetNamespaceEnumerator()
+        private IEnumerator<DotNetAssemblyInfoItemProvider> GetNamespaceEnumerator()
         {
             string _namespace = _parent is IDotNetNamespaceInfo ? _parent.Path.Replace(PathSeparator, '.') : null;
 
-            DotNetNamespaceInfo select(string ____namespace) => new DotNetNamespaceInfo(____namespace, false, _parent);
+            DotNetAssemblyInfoItemProvider select(string ____namespace) => new DotNetAssemblyInfoItemProvider(____namespace, false, _parent);
 
-            Func<string, DotNetNamespaceInfo> _select = ___namespace =>
+            Func<string, DotNetAssemblyInfoItemProvider> _select = ___namespace =>
             {
                 _select = select;
 

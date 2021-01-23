@@ -18,28 +18,19 @@
 using System;
 using System.Collections.Generic;
 
+using WinCopies.IO.Enumeration.Reflection;
 using WinCopies.IO.Reflection;
+using WinCopies.IO.Reflection.PropertySystem;
 
-namespace WinCopies.IO
+namespace WinCopies.IO.ObjectModel.Reflection
 {
-    namespace Reflection
+    public interface IDotNetNamespaceInfoBase : IDotNetItemInfoBase
     {
-        public interface IDotNetNamespaceInfoProperties : IDotNetItemInfoProperties
-        {
-            bool IsRootNamespace { get; }
-        }
+        IEnumerable<IBrowsableObjectInfo> GetItems(IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetNamespaceInfoEnumeratorStruct> func);
     }
 
-    namespace ObjectModel.Reflection
+    public interface IDotNetNamespaceInfo<TObjectProperties, TEncapsulatedObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : IDotNetNamespaceInfoBase, IDotNetItemInfo<T, object> where T : IDotNetNamespaceInfoProperties
     {
-        public interface IDotNetNamespaceInfo : IDotNetNamespaceInfoProperties, IDotNetItemInfo
-        {
-            IEnumerable<IBrowsableObjectInfo> GetItems(IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetNamespaceInfoEnumeratorStruct> func);
-        }
-
-        public interface IDotNetNamespaceInfo<T> : IDotNetNamespaceInfo, IDotNetItemInfo<T, object> where T : IDotNetNamespaceInfoProperties
-        {
-            // Left empty.
-        }
+        // Left empty.
     }
 }

@@ -25,12 +25,12 @@ using static WinCopies.
 #endif
     ;
 
-namespace WinCopies.IO
+namespace WinCopies.IO.Enumeration
 {
     /// <summary>
     /// Represents an archive item. This struct is used in enumeration methods.
     /// </summary>
-    public struct ArchiveFileInfoEnumeratorStruct
+    public class ArchiveFileInfoEnumeratorStruct
     {
         /// <summary>
         /// Gets the path of the current archive item. This property is set only when <see cref="ArchiveFileInfo"/> is <see langword="null"/>.
@@ -63,5 +63,7 @@ namespace WinCopies.IO
 
             ArchiveFileInfo = archiveFileInfo;
         }
+
+        public string GetArchiveRelativePath() => Path ?? ArchiveFileInfo.Value.FileName;
     }
 }

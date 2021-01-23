@@ -1,44 +1,32 @@
 ﻿/* Copyright © Pierre Sprimont, 2020
-*
-* This file is part of the WinCopies Framework.
-*
-* The WinCopies Framework is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* The WinCopies Framework is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
+ *
+ * This file is part of the WinCopies Framework.
+ *
+ * The WinCopies Framework is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * The WinCopies Framework is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using SevenZip;
 
 using System;
-using System.Management;
 using System.Security;
 
+using WinCopies.Collections.Generic;
+using WinCopies.IO.AbstractionInterop;
 using WinCopies.IO.ObjectModel;
 
-#if !WinCopies3
-using System.Collections;
-using System.Collections.Generic;
-
-using WinCopies.Collections;
-using WinCopies.Collections.DotNetFix.Generic;
-using WinCopies.Util;
-
-using static WinCopies.Util.Util;
-#else
-using WinCopies.Collections.Generic;
-
 using static WinCopies.ThrowHelper;
-#endif
 
-namespace WinCopies.IO
+namespace WinCopies.IO.Enumeration
 {
     public sealed class ArchiveItemInfoEnumerator :
 #if !WinCopies3
@@ -46,7 +34,7 @@ IEnumerator
 #else
         Enumerator
 #endif
-        <IBrowsableObjectInfo>,
+        <ArchiveItemInfoItemProvider>,
 #if !WinCopies3
         Util.
 #endif
@@ -62,7 +50,7 @@ WinCopies.Collections.Generic.Queue
 #else
             EnumerableHelper
 #endif
-            <IFileSystemObject>
+            <string>
 #if WinCopies3
             .IEnumerableQueue
 #endif
@@ -72,14 +60,13 @@ new WinCopies.Collections.Generic.Queue
 #else
             EnumerableHelper
 #endif
-            <IFileSystemObject>
+            <string>
 #if WinCopies3
             .GetEnumerableQueue
 #endif
             ();
-        private IBrowsableObjectInfo _current;
-        private IArchiveItemInfoItemSelector _selector;
-        private Predicate<ArchiveFileInfoEnumeratorStruct> _predicate;
+        private ArchiveItemInfoItemProvider _current;
+        private Predicate<ArchiveFileInfoEnumeratorStruct> _func;
         #endregion
 
 #if !WinCopies3
@@ -89,33 +76,28 @@ new WinCopies.Collections.Generic.Queue
 
         object IEnumerator.Current => Current;
 #else
-        protected override IBrowsableObjectInfo CurrentOverride => _current;
+        protected override ArchiveItemInfoItemProvider CurrentOverride => _current;
 
         public override bool? IsResetSupported => true;
 #endif
 
-        public IArchiveItemInfoItemSelector Selector => IsDisposed ? throw GetExceptionForDispose(false) : _selector;
+        public Predicate<ArchiveFileInfoEnumeratorStruct> Func => IsDisposed ? throw GetExceptionForDispose(false) : _func;
 
-        public Predicate<ArchiveFileInfoEnumeratorStruct> Predicate => IsDisposed ? throw GetExceptionForDispose(false) : _predicate;
-
-        public ArchiveItemInfoEnumerator(in IArchiveItemInfoProvider archiveItemInfoProvider, in IArchiveItemInfoItemSelector selector, in Predicate<ArchiveFileInfoEnumeratorStruct> predicate)
+        public ArchiveItemInfoEnumerator(in IArchiveItemInfoProvider archiveItemInfoProvider, in Predicate<ArchiveFileInfoEnumeratorStruct> func)
         {
             ThrowIfNull(archiveItemInfoProvider, nameof(archiveItemInfoProvider));
-            ThrowIfNull(selector, nameof(selector));
 
             _archiveItemInfoProvider = archiveItemInfoProvider;
 
             _archiveExtractor = new SevenZipExtractor(archiveItemInfoProvider.ArchiveShellObject.ArchiveFileStream);
 
-            _selector = selector;
+            if (func == null)
 
-            if (predicate == null)
-
-                _predicate = item => true;
+                _func = item => true;
 
             else
 
-                _predicate = predicate;
+                _func = func;
         }
 
 #if !WinCopies3
@@ -181,6 +163,10 @@ new WinCopies.Collections.Generic.Queue
 
             #endregion
 
+            if (!_archiveItemInfoProvider.IsBrowsable)
+
+                return false;
+
             try
             {
                 //try
@@ -195,11 +181,11 @@ new WinCopies.Collections.Generic.Queue
 
                     // string __path = string.Copy(_path);
 
-                    _current = Selector.Select(_archiveItemInfoProvider.ArchiveShellObject, _archiveFileInfo);
+                    _current = new ArchiveItemInfoItemProvider(_archiveItemInfoProvider.ArchiveShellObject, _archiveFileInfo); // ArchiveItemInfo.From(_archiveItemInfoProvider.ArchiveShellObject, _archiveFileInfo);
 
                 void AddPath(in string archiveFilePath) =>
 
-                    _current = Selector.Select(_archiveItemInfoProvider.ArchiveShellObject, archiveFilePath);
+                    _current = new ArchiveItemInfoItemProvider(_archiveItemInfoProvider.ArchiveShellObject, archiveFilePath); // ArchiveItemInfo.From(_archiveItemInfoProvider.ArchiveShellObject, archiveFilePath);
 
                 //void AddDirectory(string _path, ArchiveFileInfo? archiveFileInfo) =>
 
@@ -236,17 +222,25 @@ new WinCopies.Collections.Generic.Queue
 
                 //#endif
 
-                bool addPath(ArchiveFileInfoEnumeratorStruct archiveFileInfoEnumeratorStruct)
+                Action addValue;
+
+                bool addPath(in ArchiveFileInfoEnumeratorStruct archiveFileInfoEnumeratorStruct, in int _i)
                 {
-                    if (!_selector.Predicate(archiveFileInfoEnumeratorStruct, _predicate))
+                    if (Func is object && !Func(archiveFileInfoEnumeratorStruct))
 
                         return false;
 
-                    foreach (IFileSystemObject pathInfo in _paths)
+                    foreach (string path in _paths)
 
-                        if (pathInfo.Path == fileName)
+                        if (path == fileName)
 
                             return false;
+
+                    addValue();
+
+                    _index = _i;
+
+                    _paths.Enqueue(archiveFileInfoEnumeratorStruct.GetArchiveRelativePath());
 
                     return true;
                 }
@@ -293,8 +287,6 @@ new WinCopies.Collections.Generic.Queue
 
                         // {
 
-                        Action addValue;
-
                         ArchiveFileInfoEnumeratorStruct archiveFileInfoEnumeratorStruct;
 
                         if (fileName.ToUpperInvariant() == archiveFileInfo.FileName.ToUpperInvariant())
@@ -311,8 +303,8 @@ new WinCopies.Collections.Generic.Queue
                             addValue = () => AddPath(archiveFileInfoEnumeratorStruct.Path);
                         }
 
-                        if (addPath(archiveFileInfoEnumeratorStruct))
-                        {
+                        if (addPath(archiveFileInfoEnumeratorStruct, i))
+                            //{
                             //if (archiveFileInfo.IsDirectory)
 
                             //    AddDirectory(fileName, archiveFileInfo);
@@ -321,14 +313,8 @@ new WinCopies.Collections.Generic.Queue
 
                             //    AddFile(fileName, archiveFileInfo);
 
-                            addValue();
-
-                            _index = i;
-
-                            _paths.Enqueue(Current);
-
                             return true;
-                        }
+                        //}
                         // }
                     }
                 }
@@ -380,7 +366,7 @@ new WinCopies.Collections.Generic.Queue
 
             _paths = null;
 
-            _selector = null;
+            _func = null;
         }
 
         #endregion
@@ -445,226 +431,4 @@ new WinCopies.Collections.Generic.Queue
 
         // files.Sort(comp);
     }
-
-    public sealed class WMIItemInfoEnumerator : Enumerator<ManagementBaseObject, WMIItemInfo>
-    {
-        private readonly bool _resetInnerEnumerator = false;
-
-        private Func<bool> _func;
-
-#if WinCopies3
-        private WMIItemInfo _current = null;
-
-        protected override WMIItemInfo CurrentOverride => _current;
-
-        public override bool? IsResetSupported => _resetInnerEnumerator;
-
-        protected override void ResetCurrent() => _current = null;
-#endif
-
-        public WMIItemType ItemWMIItemType { get; }
-
-        public WMIItemInfoEnumerator(System.Collections.Generic.IEnumerable<ManagementBaseObject> enumerable, bool resetEnumerator, WMIItemType itemWMIItemType, bool catchExceptions) : base(enumerable)
-        {
-            _resetInnerEnumerator = resetEnumerator;
-
-            ItemWMIItemType = itemWMIItemType;
-
-            if (catchExceptions)
-
-                _func = () =>
-                  {
-                      while (InnerEnumerator.MoveNext())
-
-                          try
-                          {
-                              _MoveNext();
-
-                              return true;
-                          }
-                          catch (Exception) { }
-
-                      return false;
-                  };
-
-            else
-
-                _func = () =>
-                  {
-                      if (InnerEnumerator.MoveNext())
-                      {
-                          _MoveNext();
-
-                          return true;
-                      }
-
-                      return false;
-                  };
-        }
-
-        private void _MoveNext() =>
-
-            // if (CheckFilter(_path))
-
-#if !WinCopies3
-Current 
-#else
-            _current
-#endif
-            = new WMIItemInfo(ItemWMIItemType, InnerEnumerator.Current);
-
-        protected override bool MoveNextOverride() => _func();
-
-        protected override void ResetOverride()
-        {
-            base.ResetOverride();
-
-            if (_resetInnerEnumerator)
-
-                InnerEnumerator.Reset();
-        }
-
-        #region IDisposable Support
-
-        protected override void
-#if !WinCopies3
-            Dispose(bool disposing)
-#else
-            DisposeManaged()
-#endif
-        {
-            Reset();
-
-            _func = null;
-
-#if !WinCopies3
-            base.Dispose(disposing);
-#else
-            base.DisposeManaged();
-#endif
-        }
-        #endregion
-    }
-
-    //    public sealed class RecursiveSubEnumerator<T> : IEnumerator<T>
-    //    {
-    //        private IEnumerator<IEnumerator<T>> _enumerator;
-    //        // private EmptyCheckEnumerator<string> _fileEnumerable;
-
-    //        private bool _completed = false;
-
-    //        private T _current;
-
-    //        public T Current => IsDisposed ? throw GetExceptionForDispose(false) : _current;
-
-    //        object IEnumerator.Current => Current;
-
-    //#if DEBUG
-    //        public IPathInfo PathInfo { get; }
-    //#endif 
-
-    //        public FileSystemEntryEnumerator(
-    //#if DEBUG
-    //            IPathInfo pathInfo,
-    //#endif 
-    //            System.Collections.Generic.IEnumerable<string> directoryEnumerable, System.Collections.Generic.IEnumerable<string> fileEnumerable)
-    //        {
-    //#if DEBUG
-    //            ThrowIfNull(pathInfo, nameof(pathInfo));
-
-    //            PathInfo = pathInfo;
-    //#endif
-    //            ThrowIfNull(directoryEnumerable, nameof(directoryEnumerable));
-    //            ThrowIfNull(fileEnumerable, nameof(fileEnumerable));
-
-    //            _directoryEnumerable = directoryEnumerable.GetEnumerator();
-
-    //            _fileEnumerable = new EmptyCheckEnumerator<string>(fileEnumerable.GetEnumerator());
-    //        }
-
-    //        public bool MoveNext()
-    //        {
-    //            if (_completed) return false;
-
-    //                if (_enumerator.MoveNext())
-    //                {
-    //                    _current = new PathInfo(_enumerator.Current, true);
-
-    //                    return true;
-    //                }
-
-    //                _directoryEnumerable = null;
-
-    //                _completed = true;
-
-    //                return false;
-    //        }
-
-    //        public void Reset() => throw new NotSupportedException();
-
-    //        public void Dispose()
-    //        {
-    //            if (_completed)
-
-    //                _current = null;
-
-    //            else
-    //            {
-    //                if (_directoryEnumerable != null)
-    //                {
-    //                    _directoryEnumerable.Dispose();
-
-    //                    _directoryEnumerable = null;
-    //                }
-
-    //                if (_fileEnumerable != null)
-    //                {
-    //                    _fileEnumerable.Dispose();
-
-    //                    _fileEnumerable = null;
-    //                }
-    //            }
-
-    //            _current = null;
-
-    //            IsDisposed = true;
-    //        }
-
-    //        public bool IsDisposed { get; private set; }
-    //    }
-
-#if DEBUG
-
-    public
-
-#else
-        
-        internal 
-        
-#endif
-
-        enum PathType
-    {
-        All = 1,
-
-        Directories = 2,
-
-        Files = 3
-    }
-
-#if DEBUG
-
-    public class FileSystemEntryEnumeratorProcessSimulation
-    {
-        private Func<string, PathType, System.Collections.Generic.IEnumerable<string>> _enumerateFunc;
-        private Action<string> _writeLogAction;
-
-        public Func<string, PathType, System.Collections.Generic.IEnumerable<string>> EnumerateFunc { get => _enumerateFunc ?? throw GetInvalidOperationException(); set => _enumerateFunc = value ?? throw GetInvalidOperationException(); }
-
-        public Action<string> WriteLogAction { get => _writeLogAction ?? throw GetInvalidOperationException(); set => _writeLogAction = value ?? throw GetInvalidOperationException(); }
-
-        private InvalidOperationException GetInvalidOperationException() => new InvalidOperationException("Value cannot be null.");
-    }
-
-#endif
 }

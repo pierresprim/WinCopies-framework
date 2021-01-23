@@ -22,5 +22,5 @@ using WinCopies.Util;
 
 namespace WinCopies.IO
 {
-    public interface IFileSystemObjectComparer<in T> : IComparer<T> where T : IFileSystemObject { }
+    public interface IFileSystemObjectComparer<in T> : IComparer<T> where T : IBrowsableObjectInfoBase { }
 }

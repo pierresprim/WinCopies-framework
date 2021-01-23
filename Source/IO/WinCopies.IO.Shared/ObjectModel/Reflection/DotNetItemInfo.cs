@@ -19,20 +19,15 @@ using System;
 using System.Diagnostics;
 using System.Windows.Media.Imaging;
 
-using WinCopies.IO.ObjectModel.Reflection;
-using WinCopies.IO.Reflection;
 using WinCopies.IO.Reflection.PropertySystem;
+using WinCopies.IO.Selectors;
 
-#if !WinCopies3
-using static WinCopies.Util.Util;
-#else
 using static WinCopies.UtilHelpers;
 using static WinCopies.ThrowHelper;
-#endif
 
 namespace WinCopies.IO.ObjectModel.Reflection
 {
-    public abstract class DotNetItemInfo<TObjectProperties, TEncapsulatedObject> : BrowsableObjectInfo<TObjectProperties, TEncapsulatedObject>, IDotNetItemInfo<TObjectProperties, TEncapsulatedObject> where TObjectProperties : IDotNetItemInfoProperties
+    public abstract class DotNetItemInfo<TObjectProperties, TEncapsulatedObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : BrowsableObjectInfo<TObjectProperties, TEncapsulatedObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IDotNetItemInfo<TObjectProperties, TEncapsulatedObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IDotNetItemInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
     {
         #region Properties
         /// <summary>
@@ -55,18 +50,11 @@ namespace WinCopies.IO.ObjectModel.Reflection
         /// </summary>
         public override bool IsSpecialItem => false;
 
-        public sealed override FileSystemType ItemFileSystemType => FileSystemType.None;
-
-        /// <summary>
-        /// Gets the parent of this <see cref="IDotNetItemInfo"/>.
-        /// </summary>
         public sealed override IBrowsableObjectInfo Parent { get; }
 
         public IDotNetAssemblyInfo ParentDotNetAssemblyInfo { get; }
 
         public sealed override bool IsRecursivelyBrowsable => IsBrowsable;
-
-        public override bool HasProperties => true;
 
         #region BitmapSources
         protected abstract BitmapSource TryGetBitmapSource(in int size);
@@ -126,7 +114,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
         #endregion
         #endregion
 
-        protected DotNetItemInfo(in string path, in string name, in IBrowsableObjectInfo parent) : base(path)
+        protected DotNetItemInfo(in string path, in string name, in IBrowsableObjectInfo parent) : base(path, parent.ClientVersion)
         {
             Debug.Assert(!(IsNullEmptyOrWhiteSpace(Path) || IsNullEmptyOrWhiteSpace(name)));
 
@@ -138,13 +126,13 @@ namespace WinCopies.IO.ObjectModel.Reflection
 
             // todo: provide two constructors:
 
-            ParentDotNetAssemblyInfo = parent is IDotNetItemInfo dotNetItemInfo ? dotNetItemInfo.ParentDotNetAssemblyInfo ?? throw new ArgumentException($"{nameof(dotNetItemInfo)} has no parent IDotNetAssemblyInfo.") : parent is IDotNetAssemblyInfo dotNetAssemblyInfo ? dotNetAssemblyInfo : throw new ArgumentException($"{nameof(parent)} must be an {nameof(IDotNetAssemblyInfo)} or an {nameof(IDotNetItemInfo)}.", nameof(parent));
+            ParentDotNetAssemblyInfo = parent is IDotNetItemInfoBase dotNetItemInfo ? dotNetItemInfo.ParentDotNetAssemblyInfo ?? throw new ArgumentException($"{nameof(dotNetItemInfo)} has no parent IDotNetAssemblyInfo.") : parent is IDotNetAssemblyInfo dotNetAssemblyInfo ? dotNetAssemblyInfo : throw new ArgumentException($"{nameof(parent)} must be an {nameof(IDotNetAssemblyInfo)} or an {nameof(IDotNetItemInfoBase)}.", nameof(parent));
         }
     }
 
-    public abstract class BrowsableDotNetItemInfo<TObjectProperties, TEncapsulatedObject> : DotNetItemInfo<TObjectProperties, TEncapsulatedObject> where TObjectProperties : IDotNetItemInfoProperties
+    public abstract class BrowsableDotNetItemInfo<TObjectProperties, TEncapsulatedObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : DotNetItemInfo<TObjectProperties, TEncapsulatedObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IDotNetItemInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
     {
-        public override sealed bool IsBrowsable { get; } = true;
+        public sealed override bool IsBrowsable => true;
 
         protected BrowsableDotNetItemInfo(in string path, in string name, in IBrowsableObjectInfo parent) : base(path, name, parent)
         {

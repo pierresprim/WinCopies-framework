@@ -18,15 +18,15 @@
 using Microsoft.WindowsAPICodePack.PortableDevices;
 using Microsoft.WindowsAPICodePack.Shell;
 
-namespace WinCopies.IO
+namespace WinCopies.IO.Enumeration
 {
-    public struct ShellObjectInfoEnumeratorStruct
+    public class ShellObjectInfoEnumeratorStruct
     {
         public ShellObject ShellObject { get; }
 
         public IPortableDevice PortableDevice { get; }
 
-        public ArchiveFileInfoEnumeratorStruct? ArchiveFileInfoEnumeratorStruct { get; }
+        public ArchiveFileInfoEnumeratorStruct ArchiveFileInfoEnumeratorStruct { get; }
 
         internal ShellObjectInfoEnumeratorStruct(ShellObject shellObject)
         {

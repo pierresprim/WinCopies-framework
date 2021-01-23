@@ -16,13 +16,14 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using Microsoft.WindowsAPICodePack.PortableDevices;
-
+using System;
 using System.Collections.Generic;
 using System.Windows.Media.Imaging;
 
 using WinCopies.Collections.Generic;
 using WinCopies.IO.ObjectModel;
 using WinCopies.IO.PropertySystem;
+using WinCopies.IO.Selectors;
 
 namespace WinCopies.IO
 {
@@ -57,17 +58,13 @@ namespace WinCopies.IO
         /// <summary>
         /// Provides interoperability for interacting with browsable items.
         /// </summary>
-        public interface IBrowsableObjectInfo : IFileSystemObject, IRecursiveEnumerable<IBrowsableObjectInfo>,
+        public interface IBrowsableObjectInfo : IBrowsableObjectInfoBase, IRecursiveEnumerable<IBrowsableObjectInfo>,
 WinCopies.
 #if !WinCopies3
     Util.
 #endif
     DotNetFix.IDisposable
         {
-#if WinCopies3
-            IBrowsableObjectInfoSelector ItemSelector { get; }
-#endif
-
             /// <summary>
             /// Gets a value indicating whether this <see cref="IBrowsableObjectInfo"/> is browsable.
             /// </summary>
@@ -77,6 +74,11 @@ WinCopies.
             /// Gets a value indicating whether this <see cref="IBrowsableObjectInfo"/> is recursively browsable.
             /// </summary>
             bool IsRecursivelyBrowsable { get; }
+
+            /// <summary>
+            /// Gets a value indicating whether this <see cref="IBrowsableObjectInfo"/> is browsable by default.
+            /// </summary>
+            bool IsBrowsableByDefault { get; }
 
             /// <summary>
             /// Gets the underlying object of this abstraction interface.
@@ -126,7 +128,7 @@ WinCopies.
 
             bool IsSpecialItem { get; }
 
-            ClientVersion? ClientVersion { get; }
+            ClientVersion ClientVersion { get; }
 
             ///// <summary>
             ///// Gets or sets the factory for this <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>. This factory is used to create new <see cref="IBrowsableObjectInfo"/>s from the current <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>.
@@ -147,10 +149,6 @@ WinCopies.
             //IReadOnlyCollection<IBrowsableObjectInfo> Items { get; }
 
             System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems();
-
-#if WinCopies3
-            IBrowsableObjectInfoSelector GetDefaultItemSelector();
-#endif
 
             // IBrowsableObjectInfo GetBrowsableObjectInfo(IBrowsableObjectInfo browsableObjectInfo);
 
@@ -211,13 +209,13 @@ TEncapsulatedObject
 #endif
                 EncapsulatedObject
             { get; }
-
-            bool HasProperties { get; }
         }
 
-        public interface IBrowsableObjectInfo<TObjectProperties, TEncapsulatedObject> : IBrowsableObjectInfo<TObjectProperties>, IEncapsulatorBrowsableObjectInfo<TEncapsulatedObject>
+        public interface IBrowsableObjectInfo<TObjectProperties, TEncapsulatedObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : IBrowsableObjectInfo<TObjectProperties>, IEncapsulatorBrowsableObjectInfo<TEncapsulatedObject> where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
         {
-            // Left empty.
+            System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<TPredicateTypeParameter> predicate);
+
+            TSelectorDictionary GetSelectorDictionary();
         }
 
         //public interface IBrowsableObjectInfo<TFactory> : IBrowsableObjectInfo where TFactory : IBrowsableObjectInfoFactory

@@ -19,17 +19,20 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
+using WinCopies.IO.Enumeration.Reflection;
 using WinCopies.IO.Reflection;
 
 namespace WinCopies.IO.ObjectModel.Reflection
 {
-    public interface IDotNetAssemblyInfo : IShellObjectInfo, IEncapsulatorBrowsableObjectInfo<Assembly>
+    public interface IDotNetAssemblyInfo : IShellObjectInfoBase
     {
+        Assembly Assembly { get; }
+
         IEnumerable<IBrowsableObjectInfo> GetItems(IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetNamespaceInfoEnumeratorStruct> func);
     }
 
-    public interface IDotNetAssemblyInfo<T> : IDotNetAssemblyInfo, IBrowsableObjectInfo<T, Assembly>, IShellObjectInfo<T> where T : IFileSystemObjectInfoProperties
-    {
-        // Left empty.
-    }
+    //public interface IDotNetAssemblyInfo<T> : IDotNetAssemblyInfo, IBrowsableObjectInfo<T, Assembly>, IShellObjectInfoBase<T> where T : IFileSystemObjectInfoProperties
+    //{
+    //    // Left empty.
+    //}
 }

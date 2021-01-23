@@ -8,10 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Source\GUI\WinCopies.GUI.Controls\WinCopies.GUI.Controls.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="WinCopies.Util.Desktop" Version="3.1.0.1-preview" />
   </ItemGroup>
 

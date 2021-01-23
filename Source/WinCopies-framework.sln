@@ -66,13 +66,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MultiIcon", "..\Samples\Ico
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "WinCopies.Util.Temp.Shared", "WinCopies.Util.Temp.Shared\WinCopies.Util.Temp.Shared.shproj", "{971FCA65-9999-4B74-BDDE-947BC38435F0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinCopies.Util.Temp.2.x", "WinCopies.Util.Temp.2.x\WinCopies.Util.Temp.2.x.csproj", "{4243D5E1-AE30-4B3D-8D0A-06F3FCBDA26C}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3.x", "3.x", "{BE3312BD-508F-4831-BCEC-C97150B2EF90}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinCopies.GUI.Icons", "GUI\WinCopies.GUI.Icons\WinCopies.GUI.Icons.csproj", "{A5D7C0EB-D8FD-450A-A87B-B0B80CB080E4}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinCopies.GUI.Controls", "GUI\WinCopies.GUI.Controls\WinCopies.GUI.Controls.csproj", "{15459B9A-C8A3-4342-9B4E-E360927A6605}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinCopies.Util.Temp", "WinCopies.Util.Temp\WinCopies.Util.Temp.csproj", "{DE307A15-A22B-44EC-B769-1AFB568E0C79}"
 EndProject
@@ -82,15 +78,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinCopies.GUI.IO", "IO\WinC
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		GUI\WinCopies.GUI.Controls.Shared\WinCopies.GUI.Controls.Shared.projitems*{0def65ea-68d9-4698-a552-a94c636c4098}*SharedItemsImports = 5
 		GUI\WinCopies.GUI.Shared\WinCopies.GUI.Shared.projitems*{0def65ea-68d9-4698-a552-a94c636c4098}*SharedItemsImports = 5
+		GUI\WinCopies.GUI.Windows.Shared\WinCopies.GUI.Windows.Shared.projitems*{0def65ea-68d9-4698-a552-a94c636c4098}*SharedItemsImports = 5
 		WinCopies.Data.Shared\WinCopies.Data.Shared.projitems*{0ea8f0f5-12a8-4f14-bf17-5422e25ed835}*SharedItemsImports = 13
-		GUI\WinCopies.GUI.Controls.Shared\WinCopies.GUI.Controls.Shared.projitems*{15459b9a-c8a3-4342-9b4e-e360927a6605}*SharedItemsImports = 5
-		GUI\WinCopies.GUI.Windows.Shared\WinCopies.GUI.Windows.Shared.projitems*{15459b9a-c8a3-4342-9b4e-e360927a6605}*SharedItemsImports = 5
 		GUI\WinCopies.GUI.Templates.Shared\WinCopies.GUI.Templates.Shared.projitems*{1af939a9-d753-48e4-b114-fb59e5f3f7fb}*SharedItemsImports = 13
 		WinCopies.Data.Shared\WinCopies.Data.Shared.projitems*{2dca5922-4c4c-418b-8320-dde70e7d6e73}*SharedItemsImports = 5
 		GUI\WinCopies.GUI.Shared\WinCopies.GUI.Shared.projitems*{3aaf402a-7c4a-455f-8f42-6f4f13c5e185}*SharedItemsImports = 13
 		GUI\WinCopies.GUI.Windows.Shared\WinCopies.GUI.Windows.Shared.projitems*{3fa63940-0513-455d-a3d1-fba954c22869}*SharedItemsImports = 13
-		WinCopies.Util.Temp.Shared\WinCopies.Util.Temp.Shared.projitems*{4243d5e1-ae30-4b3d-8d0a-06f3fcbda26c}*SharedItemsImports = 5
 		GUI\WinCopies.GUI.Models.Shared\WinCopies.GUI.Models.Shared.projitems*{4a0c3a48-7f9c-4a7d-b23b-80a9d2404e01}*SharedItemsImports = 5
 		GUI\WinCopies.GUI.Templates.Shared\WinCopies.GUI.Templates.Shared.projitems*{5499ce56-bb88-474b-af00-ae7a57e4d2a9}*SharedItemsImports = 5
 		GUI\WinCopies.GUI.ViewModels.Shared\WinCopies.GUI.ViewModels.Shared.projitems*{589fcd51-85a1-46ff-ab94-3cdd133f92de}*SharedItemsImports = 13
@@ -202,14 +197,6 @@ Global
 		{540431B2-6804-48D9-BA96-02B483E00202}.Release|Any CPU.Build.0 = Release|Any CPU
 		{540431B2-6804-48D9-BA96-02B483E00202}.Release|x64.ActiveCfg = Release|Any CPU
 		{540431B2-6804-48D9-BA96-02B483E00202}.Release|x64.Build.0 = Release|Any CPU
-		{4243D5E1-AE30-4B3D-8D0A-06F3FCBDA26C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4243D5E1-AE30-4B3D-8D0A-06F3FCBDA26C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4243D5E1-AE30-4B3D-8D0A-06F3FCBDA26C}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{4243D5E1-AE30-4B3D-8D0A-06F3FCBDA26C}.Debug|x64.Build.0 = Debug|Any CPU
-		{4243D5E1-AE30-4B3D-8D0A-06F3FCBDA26C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4243D5E1-AE30-4B3D-8D0A-06F3FCBDA26C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4243D5E1-AE30-4B3D-8D0A-06F3FCBDA26C}.Release|x64.ActiveCfg = Release|Any CPU
-		{4243D5E1-AE30-4B3D-8D0A-06F3FCBDA26C}.Release|x64.Build.0 = Release|Any CPU
 		{A5D7C0EB-D8FD-450A-A87B-B0B80CB080E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A5D7C0EB-D8FD-450A-A87B-B0B80CB080E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A5D7C0EB-D8FD-450A-A87B-B0B80CB080E4}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -218,14 +205,6 @@ Global
 		{A5D7C0EB-D8FD-450A-A87B-B0B80CB080E4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A5D7C0EB-D8FD-450A-A87B-B0B80CB080E4}.Release|x64.ActiveCfg = Release|Any CPU
 		{A5D7C0EB-D8FD-450A-A87B-B0B80CB080E4}.Release|x64.Build.0 = Release|Any CPU
-		{15459B9A-C8A3-4342-9B4E-E360927A6605}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{15459B9A-C8A3-4342-9B4E-E360927A6605}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{15459B9A-C8A3-4342-9B4E-E360927A6605}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{15459B9A-C8A3-4342-9B4E-E360927A6605}.Debug|x64.Build.0 = Debug|Any CPU
-		{15459B9A-C8A3-4342-9B4E-E360927A6605}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{15459B9A-C8A3-4342-9B4E-E360927A6605}.Release|Any CPU.Build.0 = Release|Any CPU
-		{15459B9A-C8A3-4342-9B4E-E360927A6605}.Release|x64.ActiveCfg = Release|Any CPU
-		{15459B9A-C8A3-4342-9B4E-E360927A6605}.Release|x64.Build.0 = Release|Any CPU
 		{DE307A15-A22B-44EC-B769-1AFB568E0C79}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DE307A15-A22B-44EC-B769-1AFB568E0C79}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DE307A15-A22B-44EC-B769-1AFB568E0C79}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -278,7 +257,6 @@ Global
 		{540431B2-6804-48D9-BA96-02B483E00202} = {EBDF6371-DCFB-42CF-AED7-EFFFEDE0CF1C}
 		{BE3312BD-508F-4831-BCEC-C97150B2EF90} = {ADE78BF5-47C3-4D29-B4F3-C088935960FD}
 		{A5D7C0EB-D8FD-450A-A87B-B0B80CB080E4} = {BE3312BD-508F-4831-BCEC-C97150B2EF90}
-		{15459B9A-C8A3-4342-9B4E-E360927A6605} = {BE3312BD-508F-4831-BCEC-C97150B2EF90}
 		{53EA99CB-91E0-4EB9-8806-F5AA5833365F} = {B43D9434-F1F2-483C-BF76-7C6A4F062594}
 		{8B708007-39F3-4325-863C-A84F8E57E9EC} = {22EAF32C-9029-42A6-8040-2E3338937ED7}
 	EndGlobalSection

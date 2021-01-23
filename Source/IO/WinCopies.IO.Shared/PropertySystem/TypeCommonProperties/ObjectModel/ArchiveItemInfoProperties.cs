@@ -21,7 +21,7 @@ using WinCopies.IO.ObjectModel;
 
 namespace WinCopies.IO.PropertySystem
 {
-    public class ArchiveItemInfoProperties<T> : FileSystemObjectInfoPropertiesAbstract<T>, IFileSystemObjectInfoProperties2 where T : IArchiveItemInfo
+    public class ArchiveItemInfoProperties<T> : FileSystemObjectInfoProperties<T>, IFileSystemObjectInfoProperties2 where T : IArchiveItemInfoBase
     {
         public DateTime CreationTime => BrowsableObjectInfo.EncapsulatedObject.Value.CreationTime;
 

@@ -114,6 +114,6 @@ namespace WinCopies.IO.Reflection
         /// </summary>
         GenericArgument = 16,
 
-        ReturnParameter=17
+        ReturnParameter = 17
     }
 }

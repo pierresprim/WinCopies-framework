@@ -15,18 +15,18 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-using System;
 using System.Drawing;
-using System.IO;
 using System.Windows.Media.Imaging;
-using WinCopies.IO.Reflection;
+
+using WinCopies.IO.PropertySystem;
+using WinCopies.IO.Selectors;
 
 namespace WinCopies.IO
 {
+    // public interface IFileSystemObjectInfoFactory : IBrowsableObjectInfoFactory { }
+
     namespace ObjectModel
     {
-        // public interface IFileSystemObjectInfoFactory : IBrowsableObjectInfoFactory { }
-
         public interface IFileSystemObjectInfo : IBrowsableObjectInfo
         {
             Icon TryGetIcon(in int size);
@@ -34,7 +34,7 @@ namespace WinCopies.IO
             BitmapSource TryGetBitmapSource(in int size);
         }
 
-        public interface IFileSystemObjectInfo<TObjectProperties, TEncapsulatedObject> : IFileSystemObjectInfo, IBrowsableObjectInfo<TObjectProperties, TEncapsulatedObject> where TObjectProperties : IFileSystemObjectInfoProperties
+        public interface IFileSystemObjectInfo<TObjectProperties, TEncapsulatedObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : IFileSystemObjectInfo, IBrowsableObjectInfo<TObjectProperties, TEncapsulatedObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IFileSystemObjectInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
         {
             // Left empty.
         }

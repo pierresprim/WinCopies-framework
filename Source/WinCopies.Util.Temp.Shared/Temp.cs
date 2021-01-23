@@ -50,8 +50,7 @@ using System.Linq;
 
 using WinCopies.Collections;
 using System.Windows.Markup;
-using WinCopies.Collections.DotNetFix.Generic;
-using System.Collections;
+using System.Text;
 
 #if !WinCopies3
 using System.Collections;
@@ -60,6 +59,14 @@ using WinCopies.Util;
 
 namespace WinCopies
 {
+    namespace Linq
+    {
+        public static class Temp
+        {
+            public static System.Collections.Generic.IEnumerable<TOut> SelectConverter<TIn, TOut>(this System.Collections.Generic.IEnumerable<TIn> enumerable, Converter<TIn, TOut> selector) => enumerable.Select(() => selector());
+        }
+    }
+
     // Already implemented in WinCopies.Util.
 
     public interface IReadOnlyList<out T> : System.Collections.Generic.IReadOnlyList<T>, ICountableEnumerable<T>
@@ -95,7 +102,6 @@ namespace WinCopies
             public FalseValue() : base(false) { /* Left empty. */ }
         }
     }
-
 
     public class InterfaceDataTemplateSelector : DataTemplateSelector
     {
@@ -223,14 +229,103 @@ namespace WinCopies
         }
     }
 
+    public class TypeConverterEnumerator<T> : Enumerator<T>
+    {
+        private T _current;
+
+        protected System.Collections.IEnumerator InnerEnumerator { get; }
+
+        protected override T CurrentOverride => _current;
+
+        public override bool? IsResetSupported => null;
+
+        public TypeConverterEnumerator(in System.Collections.IEnumerator enumerator) => InnerEnumerator = enumerator;
+
+        public TypeConverterEnumerator(in System.Collections.IEnumerable enumerable) : this(enumerable.GetEnumerator()) { /* Left empty. */ }
+
+        protected override bool MoveNextOverride()
+        {
+            while (InnerEnumerator.MoveNext())
+
+                if (InnerEnumerator.Current is T current)
+                {
+                    _current = current;
+
+                    return true;
+                }
+
+            return false;
+        }
+    }
+
+    public delegate T Converter<T>(object obj);
+
     public static class Extensions
     {
-        public static System.Collections.Generic.IEnumerable<T> To<T>(this System.Collections.IEnumerable enumerable)
+        public static System.Collections.Generic.IEnumerable<T> AppendValues<T>(this System.Collections.Generic.IEnumerable<T> enumerable, System.Collections.Generic.IEnumerable<T> values)
+        {
+            foreach (T value in enumerable)
+
+                yield return value;
+
+            foreach (T _value in values)
+
+                yield return _value;
+        }
+
+        public static System.Collections.Generic.IEnumerable<T> AppendValues<T>(this System.Collections.Generic.IEnumerable<T> enumerable, params T[] values) => enumerable.AppendValues((System.Collections.Generic.IEnumerable<T>)values);
+
+        public static bool HasFlag(this Enum @enum, System.Collections.Generic.IEnumerable<Enum> values)
+        {
+            foreach (Enum value in values)
+
+                if (@enum.HasFlag(value))
+
+                    return true;
+
+            return false;
+        }
+
+        public static bool HasFlag(this Enum @enum, params Enum[] values) => @enum.HasFlag((System.Collections.Generic.IEnumerable<Enum>)values);
+
+        public static bool HasAllFlags(this Enum @enum, System.Collections.Generic.IEnumerable<Enum> values)
+        {
+            foreach (Enum value in values)
+
+                if (!@enum.HasFlag(value))
+
+                    return false;
+
+            return true;
+        }
+
+        public static bool HasAllFlags(this Enum @enum, params Enum[] values) => @enum.HasAllFlags((System.Collections.Generic.IEnumerable<Enum>)values);
+
+        /// <summary>
+        /// Iterates through a given <see cref="System.Collections.IEnumerable"/> and tries to convert the items to a given generic type parameter. If an item cannot be converted, it is ignored in the resulting enumerable.
+        /// </summary>
+        /// <typeparam name="T">The generic type parameter for the resulting enumerable. Only the items that can be converted to this type will be present in the resulting enumerable.</typeparam>
+        /// <param name="enumerable">The source enumerable.</param>
+        /// <returns>An enumerable containing all the items from <paramref name="enumerable"/> that could be converted to <typeparamref name="T"/>.</returns>
+        /// <seealso cref="To{T}(System.Collections.IEnumerable)"/>
+        public static System.Collections.Generic.IEnumerable<T> As<T>(this System.Collections.IEnumerable enumerable) => new Enumerable<T>(() => new TypeConverterEnumerator<T>(enumerable));
+
+        public static System.Collections.Generic.IEnumerable<T> SelectConverter<T>(this System.Collections.IEnumerable enumerable, Converter<T> converter)
         {
             foreach (object value in enumerable)
 
-                yield return (T)value;
+                yield return converter(value);
         }
+
+        /// <summary>
+        /// Iterates through a given <see cref="System.Collections.IEnumerable"/> and directly converts the items to a given generic type parameter. An <see cref="InvalidCastException"/> is thrown when an item cannot be converted.
+        /// </summary>
+        /// <typeparam name="T">The generic type parameter for the resulting enumerable. All items in <paramref name="enumerable"/> will be converted to this type.</typeparam>
+        /// <param name="enumerable">The source enumerable.</param>
+        /// <returns>An enumerable containing the same items as they from <paramref name="enumerable"/>, with these items converted to <typeparamref name="T"/>.</returns>
+        /// <exception cref="InvalidCastException">An item could not be converted.</exception>
+        /// <seealso cref="As{T}(System.Collections.IEnumerable)"/>
+        public static System.Collections.Generic.IEnumerable<T> To<T>(this System.Collections.IEnumerable enumerable) => SelectConverter(enumerable, value => (T)value);
 
         public static bool EndsWith(this string s, params char[] values)
         {
@@ -466,6 +561,8 @@ System.Collections.Generic.IEnumerator
 
     public static class Temp
     {
+        public static System.Collections.Generic.IEnumerable<T> GetEmptyEnumerable<T>() => new WinCopies.Collections.Generic.Enumerable<T>(() => new EmptyEnumerator<T>());
+
         // https://brockallen.com/2016/09/24/process-start-for-urls-on-net-core/
 
         // Already implemented in WinCopies.Util.
@@ -670,7 +767,7 @@ System.Collections.Generic.IEnumerator
 
         public static class ThrowHelper
         {
-            public static ArgumentException GetArgumentException(in object obj, in string argumentName, in Type t) => new ArgumentException($"{argumentName} must be an instance of {t.Name}. {argumentName} is {(obj == null ? "null" : obj.GetType().Name}.");
+            public static ArgumentException GetArgumentException(in object obj, in string argumentName, in Type t) => new ArgumentException($"{argumentName} must be an instance of {t.Name}. {argumentName} is {(obj == null ? "null" : obj.GetType().Name)}.");
 
             public static ArgumentException GetArgumentException<T>(in object obj, in string argumentName) => GetArgumentException(obj, argumentName, typeof(T));
         }

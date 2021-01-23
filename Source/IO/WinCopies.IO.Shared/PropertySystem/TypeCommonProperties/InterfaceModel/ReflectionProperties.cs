@@ -24,12 +24,12 @@ namespace WinCopies.IO.Reflection.PropertySystem
         DotNetItemType ItemType { get; }
     }
 
-    public interface IDotNetTypeOrMemberInfoProperties: IDotNetItemInfoProperties
+    public interface IDotNetTypeOrMemberInfoProperties : IDotNetItemInfoProperties
     {
         abstract Type? DeclaringType { get; }
     }
 
-    public interface IDotNetTypeOrMethodItemInfoProperties: IDotNetTypeOrMemberInfoProperties
+    public interface IDotNetTypeOrMethodItemInfoProperties : IDotNetTypeOrMemberInfoProperties
     {
         bool IsAbstract { get; }
 
@@ -47,7 +47,7 @@ namespace WinCopies.IO.Reflection.PropertySystem
         bool? IsRootType { get; }
     }
 
-    public interface IDotNetPropertyInfoProperties:IDotNetTypeOrMethodItemInfoProperties
+    public interface IDotNetPropertyInfoProperties : IDotNetTypeOrMethodItemInfoProperties
     {
         Type PropertyType { get; }
     }

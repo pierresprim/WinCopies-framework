@@ -15,18 +15,19 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-using WinCopies.IO.Reflection;
+using WinCopies.IO.Reflection.PropertySystem;
+using WinCopies.IO.Selectors;
 
 namespace WinCopies.IO
 {
     namespace ObjectModel.Reflection
     {
-        public interface IDotNetItemInfo : IDotNetItemInfoProperties, IBrowsableObjectInfo
+        public interface IDotNetItemInfoBase : IBrowsableObjectInfo
         {
             IDotNetAssemblyInfo ParentDotNetAssemblyInfo { get; }
         }
 
-        public interface IDotNetItemInfo<TObjectProperties, TEncapsulatedObject> : IDotNetItemInfo, IBrowsableObjectInfo<TObjectProperties, TEncapsulatedObject> where TObjectProperties : IDotNetItemInfoProperties
+        public interface IDotNetItemInfo<TObjectProperties, TEncapsulatedObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : IDotNetItemInfoBase, IBrowsableObjectInfo<TObjectProperties, TEncapsulatedObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IDotNetItemInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
         {
             // Left empty.
         }
