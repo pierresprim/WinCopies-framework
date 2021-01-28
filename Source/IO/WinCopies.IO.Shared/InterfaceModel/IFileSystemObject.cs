@@ -20,30 +20,25 @@ using System.Collections.Generic;
 
 namespace WinCopies.IO.ObjectModel
 {
-    /// <summary>
-    /// Provides data about file system items.
-    /// </summary>
-    public interface IFileSystemObject : IComparable<IFileSystemObject>, IEquatable<IFileSystemObject>
+    public interface IBrowsableObjectInfoBase : IComparable<IBrowsableObjectInfoBase>, IEquatable<IBrowsableObjectInfoBase>
     {
         /// <summary>
-        /// Gets the path of this <see cref="IFileSystemObject"/>.
+        /// Gets the path of this <see cref="IBrowsableObjectInfoBase"/>.
         /// </summary>
         string Path { get; }
 
         /// <summary>
-        /// Gets the localized name of this <see cref="IFileSystemObject"/>.
+        /// Gets the localized name of this <see cref="IBrowsableObjectInfoBase"/>.
         /// </summary>
         string LocalizedName { get; }
 
         /// <summary>
-        /// Gets the name of this <see cref="IFileSystemObject"/>.
+        /// Gets the name of this <see cref="IBrowsableObjectInfoBase"/>.
         /// </summary>
         string Name { get; }
 
-        FileSystemType ItemFileSystemType { get; }
+        Collections.IEqualityComparer<IBrowsableObjectInfoBase> GetDefaultEqualityComparer();
 
-        Collections.IEqualityComparer<IFileSystemObject> GetDefaultEqualityComparer();
-
-        IComparer<IFileSystemObject> GetDefaultComparer();
+        IComparer<IBrowsableObjectInfoBase> GetDefaultComparer();
     }
 }

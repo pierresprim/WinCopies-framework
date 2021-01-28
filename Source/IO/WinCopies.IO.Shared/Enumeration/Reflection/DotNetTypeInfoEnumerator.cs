@@ -22,6 +22,7 @@ using System.Linq;
 using System.Reflection;
 
 using WinCopies.IO.ObjectModel.Reflection;
+using WinCopies.IO.Reflection;
 using WinCopies.Linq;
 
 using static WinCopies.
@@ -31,8 +32,9 @@ using static WinCopies.
     ThrowHelper
 #endif
     ;
+using static WinCopies.UtilHelpers;
 
-namespace WinCopies.IO.Reflection
+namespace WinCopies.IO.Enumeration.Reflection
 {
     public enum DotNetTypeInfoEnumeratorGenericTypeStructValue : byte
     {

@@ -16,6 +16,9 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using Microsoft.WindowsAPICodePack.PortableDevices;
+using WinCopies.IO.AbstractionInterop;
+using WinCopies.IO.PropertySystem;
+using WinCopies.IO.Selectors;
 
 using WinCopies.IO.AbstractionInterop;
 using WinCopies.IO.PropertySystem;

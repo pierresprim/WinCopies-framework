@@ -31,6 +31,12 @@ namespace WinCopies.IO
         }
 
         public interface IDotNetTypeInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : IDotNetTypeInfoBase, IDotNetItemInfo<TObjectProperties, TypeInfo, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IDotNetTypeInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
+    namespace ObjectModel.Reflection
+    {
+        public interface IDotNetTypeInfo : IDotNetTypeInfoProperties, IDotNetItemInfo, IEncapsulatorBrowsableObjectInfo<TypeInfo>
+    namespace ObjectModel.Reflection
+    {
+        public interface IDotNetTypeInfo : IDotNetTypeInfoProperties, IDotNetItemInfo, IEncapsulatorBrowsableObjectInfo<TypeInfo>
         {
             // Left empty.
         }

@@ -34,6 +34,10 @@ namespace WinCopies.IO.Reflection.PropertySystem
         bool IsAbstract { get; }
 
         bool IsSealed { get; }
+
+        IReadOnlyList<Type> GenericTypeParameters { get; }
+
+        IReadOnlyList<Type> GenericTypeArguments { get; }
     }
 
     public interface IDotNetTypeInfoProperties : IDotNetTypeOrMethodItemInfoProperties
@@ -41,5 +45,10 @@ namespace WinCopies.IO.Reflection.PropertySystem
         AccessModifier AccessModifier { get; }
 
         bool? IsRootType { get; }
+    }
+
+    public interface IDotNetPropertyInfoProperties : IDotNetTypeOrMethodItemInfoProperties
+    {
+        Type PropertyType { get; }
     }
 }

@@ -47,6 +47,10 @@ namespace WinCopies.IO.Reflection.PropertySystem
 
         public abstract bool IsSealed { get; }
 
+        public abstract IReadOnlyList<Type> GenericTypeParameters { get; }
+
+        public abstract IReadOnlyList<Type> GenericTypeArguments { get; }
+
         protected DotNetTypeOrMethodItemInfoProperties(in T dotNetItemInfo, in DotNetItemType itemType) : base(dotNetItemInfo, itemType)
         {
             // Left empty.
@@ -98,7 +102,7 @@ namespace WinCopies.IO.Reflection.PropertySystem
             }
         }
 
-        public bool? IsRootType { get; }
+        public bool? IsRootType { get; } 
 
         public override bool IsAbstract => BrowsableObjectInfo.InnerObject.IsAbstract;
 

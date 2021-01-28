@@ -18,7 +18,9 @@
 using System;
 using System.Collections.Generic;
 
+using WinCopies.IO.Enumeration.Reflection;
 using WinCopies.IO.Reflection;
+using WinCopies.IO.Reflection.PropertySystem;
 
 namespace WinCopies.IO.ObjectModel.Reflection
 {

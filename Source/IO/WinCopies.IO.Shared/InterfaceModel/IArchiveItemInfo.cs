@@ -16,6 +16,11 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using SevenZip;
+using System;
+using WinCopies.IO.AbstractionInterop;
+using WinCopies.IO.Enumeration;
+using WinCopies.IO.PropertySystem;
+using WinCopies.IO.Selectors;
 
 using System;
 

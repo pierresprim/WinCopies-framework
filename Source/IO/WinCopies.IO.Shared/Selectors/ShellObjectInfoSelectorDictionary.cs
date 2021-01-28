@@ -37,7 +37,7 @@ namespace WinCopies.IO.Selectors
                             : item.NonShellObjectRootItemType == NonShellObjectRootItemType.Registry
                                 ? new RegistryItemInfo(item.ClientVersion.Value)
                                 : (IBrowsableObjectInfo)(item.NonShellObjectRootItemType == NonShellObjectRootItemType.WMI
-                                    ? new WMIItemInfo(null, item.ClientVersion.Value)
+                ? new WMIItemInfo(null, item.ClientVersion.Value)
                                     : throw BrowsableObjectInfoSelectorDictionary.GetInvalidItemProviderException());
 
         protected override Converter<ShellObjectInfoItemProvider, IBrowsableObjectInfo> DefaultSelectorOverride => Convert;
