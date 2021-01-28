@@ -11,6 +11,7 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AssemblyInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\CommandableTextBox.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\DockControl.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\HeaderedControl.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\Label.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\Link.cs" />
@@ -21,5 +22,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)LinkUnderliningMode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\InlineTextEditor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\PropertyGrid.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\UpDownButton.cs" />
   </ItemGroup>
 </Project>

@@ -15,28 +15,23 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-using WinCopies.IO.Reflection;
+using WinCopies.IO.Reflection.PropertySystem;
+using WinCopies.IO.Selectors;
 
-namespace WinCopies.IO
+namespace WinCopies.IO.ObjectModel.Reflection
 {
-    namespace Reflection
+    public interface IDotNetItemInfo : IBrowsableObjectInfo
     {
-        public interface IDotNetItemInfoProperties
-        {
-            DotNetItemType DotNetItemType { get; }
-        }
+        IDotNetAssemblyInfo ParentDotNetAssemblyInfo { get; }
     }
 
-    namespace ObjectModel.Reflection
+    public interface IDotNetItemInfo<T> : IDotNetItemInfo, IEncapsulatorBrowsableObjectInfo<T>
     {
-        public interface IDotNetItemInfo : IDotNetItemInfoProperties, IBrowsableObjectInfo
-        {
-            IDotNetAssemblyInfo ParentDotNetAssemblyInfo { get; }
-        }
+        // Left empty.
+    }
 
-        public interface IDotNetItemInfo<TObjectProperties, TEncapsulatedObject> : IDotNetItemInfo, IBrowsableObjectInfo<TObjectProperties, TEncapsulatedObject> where TObjectProperties : IDotNetItemInfoProperties
-        {
-            // Left empty.
-        }
+    public interface IDotNetItemInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : IDotNetItemInfo<TInnerObject>, IBrowsableObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IDotNetItemInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
+    {
+        // Left empty.
     }
 }

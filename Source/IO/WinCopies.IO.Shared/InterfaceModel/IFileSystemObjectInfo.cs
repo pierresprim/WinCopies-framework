@@ -15,38 +15,18 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-using System;
 using System.Drawing;
-using System.IO;
 using System.Windows.Media.Imaging;
+
+using WinCopies.IO.PropertySystem;
+using WinCopies.IO.Selectors;
 
 namespace WinCopies.IO
 {
-    public interface IFileSystemObjectInfoProperties
-    {
-        ///// <summary>
-        ///// Gets the <see cref="WinCopies.IO.FileType"/> of this <see cref="IFileSystemObject"/>.
-        ///// </summary>
-        FileType FileType { get; }
-
-        Size? Size { get; }
-    }
-
-    public interface IFileSystemObjectInfoProperties2: IFileSystemObjectInfoProperties
-    {
-        DateTime CreationTime { get; }
-
-        DateTime LastAccessTime { get; }
-
-        DateTime LastWriteTime { get; }
-
-        FileAttributes Attributes { get; }
-    }
+    // public interface IFileSystemObjectInfoFactory : IBrowsableObjectInfoFactory { }
 
     namespace ObjectModel
     {
-        // public interface IFileSystemObjectInfoFactory : IBrowsableObjectInfoFactory { }
-
         public interface IFileSystemObjectInfo : IBrowsableObjectInfo
         {
             Icon TryGetIcon(in int size);
@@ -54,7 +34,7 @@ namespace WinCopies.IO
             BitmapSource TryGetBitmapSource(in int size);
         }
 
-        public interface IFileSystemObjectInfo<TObjectProperties, TEncapsulatedObject> : IFileSystemObjectInfo, IBrowsableObjectInfo<TObjectProperties, TEncapsulatedObject> where TObjectProperties : IFileSystemObjectInfoProperties
+        public interface IFileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : IFileSystemObjectInfo, IBrowsableObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IFileSystemObjectInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
         {
             // Left empty.
         }

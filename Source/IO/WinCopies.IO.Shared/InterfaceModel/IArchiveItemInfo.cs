@@ -17,9 +17,16 @@
 
 using SevenZip;
 
+using System;
+
+using WinCopies.IO.AbstractionInterop;
+using WinCopies.IO.Enumeration;
+using WinCopies.IO.PropertySystem;
+using WinCopies.IO.Selectors;
+
 namespace WinCopies.IO.ObjectModel
 {
-    public interface IArchiveItemInfo : IArchiveItemInfoProvider, IEncapsulatorBrowsableObjectInfo<ArchiveFileInfo?>
+    public interface IArchiveItemInfoBase : IArchiveItemInfoProvider, IEncapsulatorBrowsableObjectInfo<ArchiveFileInfo?>
     {
         // Left empty.
     }
@@ -27,8 +34,13 @@ namespace WinCopies.IO.ObjectModel
     /// <summary>
     /// Represents an archive item.
     /// </summary>
-    public interface IArchiveItemInfo<T> : IArchiveItemInfo, IArchiveItemInfoProvider<T, ArchiveFileInfo?> where T : IFileSystemObjectInfoProperties
+    public interface IArchiveItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : IArchiveItemInfoBase, IArchiveItemInfoProvider<TObjectProperties, ArchiveFileInfo?, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IFileSystemObjectInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
     {
         // Left empty.
+    }
+
+    public interface IArchiveItemInfo : IArchiveItemInfo<IFileSystemObjectInfoProperties, ArchiveFileInfoEnumeratorStruct, IBrowsableObjectInfoSelectorDictionary<ArchiveItemInfoItemProvider>, ArchiveItemInfoItemProvider>
+    {
+        System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<ArchiveFileInfoEnumeratorStruct> func);
     }
 }

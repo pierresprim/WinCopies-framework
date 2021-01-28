@@ -19,17 +19,25 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
+using WinCopies.IO.AbstractionInterop.Reflection;
 using WinCopies.IO.Reflection;
+using WinCopies.IO.Reflection.PropertySystem;
+using WinCopies.IO.Selectors;
 
 namespace WinCopies.IO.ObjectModel.Reflection
 {
-    public interface IDotNetMemberInfo : IDotNetItemInfo, IEncapsulatorBrowsableObjectInfo<MemberInfo>
-    {
-        IEnumerable<IBrowsableObjectInfo> GetItems(IEnumerable<DotNetItemType> enumerable, Predicate<DotNetMemberInfoEnumeratorStruct> func);
-    }
-
-    public interface IDotNetMemberInfo<T> : IDotNetMemberInfo, IDotNetItemInfo<T, MemberInfo> where T : IDotNetItemInfoProperties
+    public interface IDotNetMemberInfoBase : IDotNetItemInfo<MemberInfo>
     {
         // Left empty.
+    }
+
+    public interface IDotNetMemberInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : IDotNetMemberInfoBase, IDotNetItemInfo<TObjectProperties, MemberInfo, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IDotNetItemInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
+    {
+        // Left empty.
+    }
+
+    public interface IDotNetMemberInfo : IDotNetMemberInfo<IDotNetItemInfoProperties, DotNetMemberInfoItemProvider, IBrowsableObjectInfoSelectorDictionary<DotNetMemberInfoItemProvider>, DotNetMemberInfoItemProvider>
+    {
+        IEnumerable<IBrowsableObjectInfo> GetItems(IEnumerable<DotNetItemType> enumerable, Predicate<DotNetMemberInfoItemProvider> func);
     }
 }

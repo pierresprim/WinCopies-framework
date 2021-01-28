@@ -60,7 +60,7 @@
             Gets the parent of this <see cref="T:WinCopies.IO.ObjectModel.Reflection.IDotNetItemInfo"/>.
             </summary>
         </member>
-        <member name="P:WinCopies.IO.ObjectModel.Reflection.DotNetParameterInfo.EncapsulatedObjectGeneric">
+        <member name="P:WinCopies.IO.ObjectModel.Reflection.DotNetParameterInfo.InnerObjectGeneric">
             <summary>
             Gets the inner <see cref="T:System.Reflection.ParameterInfo"/>.
             </summary>
@@ -70,7 +70,7 @@
             Represents an archive item.
             </summary>
         </member>
-        <member name="P:WinCopies.IO.ObjectModel.ArchiveItemInfo.EncapsulatedObjectGeneric">
+        <member name="P:WinCopies.IO.ObjectModel.ArchiveItemInfo.InnerObjectGeneric">
             <summary>
             The <see cref="T:SevenZip.ArchiveFileInfo"/> that this <see cref="T:WinCopies.IO.ObjectModel.ArchiveItemInfo"/> represents.
             </summary>
@@ -117,7 +117,7 @@
         </member>
         <member name="P:WinCopies.IO.ObjectModel.ArchiveItemInfo.Size">
             <summary>
-            If <see cref="!:EncapsulatedObject"/> has value, gets the size of the inner <see cref="T:SevenZip.ArchiveFileInfo"/>; otherwise, returns <see langword="null"/>.
+            If <see cref="!:InnerObject"/> has value, gets the size of the inner <see cref="T:SevenZip.ArchiveFileInfo"/>; otherwise, returns <see langword="null"/>.
             </summary>
         </member>
         <member name="P:WinCopies.IO.ObjectModel.ArchiveItemInfo.IsSpecialItem">
@@ -522,7 +522,7 @@
             Represents a file system item.
             </summary>
         </member>
-        <member name="P:WinCopies.IO.ObjectModel.ShellObjectInfo.EncapsulatedObjectGeneric">
+        <member name="P:WinCopies.IO.ObjectModel.ShellObjectInfo.InnerObjectGeneric">
             <summary>
             Gets a <see cref="T:Microsoft.WindowsAPICodePack.Shell.ShellObject"/> that represents this <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/>.
             </summary>
@@ -629,7 +629,7 @@
             Gets a value that indicates whether this <see cref="T:WinCopies.IO.ObjectModel.WMIItemInfo"/> is browsable.
             </summary>
         </member>
-        <member name="P:WinCopies.IO.ObjectModel.WMIItemInfo.EncapsulatedObjectGeneric">
+        <member name="P:WinCopies.IO.ObjectModel.WMIItemInfo.InnerObjectGeneric">
             <summary>
             Gets the <see cref="T:System.Management.ManagementBaseObject"/> that this <see cref="T:WinCopies.IO.ObjectModel.WMIItemInfo"/> represents.
             </summary>

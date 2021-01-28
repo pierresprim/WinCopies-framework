@@ -18,27 +18,25 @@
 using Microsoft.Win32;
 
 using System;
-using System.Collections.Generic;
 
-namespace WinCopies.IO
+using WinCopies.IO.AbstractionInterop;
+using WinCopies.IO.PropertySystem;
+using WinCopies.IO.Selectors;
+
+namespace WinCopies.IO.ObjectModel
 {
-    public interface IRegistryItemInfoProperties
+    public interface IRegistryItemInfoBase : IEncapsulatorBrowsableObjectInfo<RegistryKey>
     {
-        RegistryItemType RegistryItemType { get; }
+        // Left empty.
     }
 
-    namespace ObjectModel
+    public interface IRegistryItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : IRegistryItemInfoBase, IBrowsableObjectInfo<TObjectProperties, RegistryKey, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IRegistryItemInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
     {
-        public interface IRegistryItemInfo : IRegistryItemInfoProperties, IBrowsableObjectInfo, IEncapsulatorBrowsableObjectInfo<RegistryKey>
-        {
-            IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<RegistryKey> predicate);
+        // Left empty.
+    }
 
-            IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<RegistryItemInfoEnumeratorStruct> predicate, bool catchExceptions);
-        }
-
-        public interface IRegistryItemInfo<T> : IRegistryItemInfo, IBrowsableObjectInfo<T, RegistryKey> where T : IRegistryItemInfoProperties
-        {
-            // Left empty.
-        }
+    public interface IRegistryItemInfo : IRegistryItemInfo<IRegistryItemInfoProperties, RegistryItemInfoItemProvider, IBrowsableObjectInfoSelectorDictionary<RegistryItemInfoItemProvider>, RegistryItemInfoItemProvider>
+    {
+        System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<RegistryItemInfoItemProvider> predicate);
     }
 }

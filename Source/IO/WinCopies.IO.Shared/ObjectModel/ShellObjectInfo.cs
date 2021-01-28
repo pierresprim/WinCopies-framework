@@ -21,23 +21,18 @@ using Microsoft.WindowsAPICodePack.Shell;
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Windows.Media.Imaging;
+
+using WinCopies.IO.AbstractionInterop;
+using WinCopies.IO.Enumeration;
+using WinCopies.IO.PropertySystem;
+using WinCopies.IO.Selectors;
 
 using static Microsoft.WindowsAPICodePack.Shell.KnownFolders;
 
 using static WinCopies.IO.Path;
-
-#if !WinCopies3
-using WinCopies.Collections;
-using WinCopies.Util;
-
-using static WinCopies.Util.Util;
-#else
-using WinCopies.Collections.Generic;
-using WinCopies.IO.PropertySystem;
-
 using static WinCopies.ThrowHelper;
-#endif
 
 namespace WinCopies.IO
 {
@@ -60,27 +55,23 @@ namespace WinCopies.IO
         /// <summary>
         /// Represents a file system item.
         /// </summary>
-        public class ShellObjectInfo : ArchiveItemInfoProvider<IFileSystemObjectInfoProperties, ShellObject>, IShellObjectInfo<IFileSystemObjectInfoProperties>
+        public abstract class ShellObjectInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : ArchiveItemInfoProvider<TObjectProperties, ShellObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IShellObjectInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IFileSystemObjectInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
         {
             private ShellObject _shellObject;
             private IBrowsableObjectInfo _parent;
 
             #region Properties
-            public override FileType FileType { get; }
-
             /// <summary>
             /// Gets a <see cref="ShellObject"/> that represents this <see cref="ShellObjectInfo"/>.
             /// </summary>
-            public sealed override ShellObject EncapsulatedObjectGeneric => _shellObject;
-
-            public sealed override IFileSystemObjectInfoProperties ObjectPropertiesGeneric { get; }
+            public sealed override ShellObject InnerObjectGeneric => _shellObject;
 
             public Stream ArchiveFileStream { get; private set; }
 
             public bool IsArchiveOpen => ArchiveFileStream is object;
 
             #region Overrides
-            public override FileSystemType ItemFileSystemType => FileSystemType.CurrentDeviceFileSystem;
+            // public override FileSystemType ItemFileSystemType => FileSystemType.CurrentDeviceFileSystem;
 
             /// <summary>
             /// Gets a value that indicates whether this <see cref="ShellObjectInfo"/> is browsable.
@@ -132,22 +123,6 @@ namespace WinCopies.IO
 
             public override string Description => _shellObject.Properties.System.FileDescription.Value;
 
-            public override Size? Size
-            {
-                get
-                {
-                    ulong? value = _shellObject.Properties.System.Size.Value;
-
-                    if (value.HasValue)
-
-                        return new Size(value.Value);
-
-                    else
-
-                        return null;
-                }
-            }
-
             /// <summary>
             /// Gets a value that indicates whether the current item has particularities.
             /// </summary>
@@ -171,15 +146,15 @@ namespace WinCopies.IO
             }
 
             /// <summary>
-            /// The parent <see cref="IShellObjectInfo"/> of the current archive item. If the current <see cref="ShellObjectInfo"/> represents an archive file, this property returns the current <see cref="ShellObjectInfo"/>, or <see langword="null"/> otherwise.
+            /// The parent <see cref="IShellObjectInfoBase"/> of the current archive item. If the current <see cref="ShellObjectInfo"/> represents an archive file, this property returns the current <see cref="ShellObjectInfo"/>, or <see langword="null"/> otherwise.
             /// </summary>
-            public override IShellObjectInfo ArchiveShellObject => ObjectPropertiesGeneric.FileType == FileType.Archive ? this : null;
+            public override IShellObjectInfoBase ArchiveShellObject => ObjectPropertiesGeneric.FileType == FileType.Archive ? this : null;
 
 #if WinCopies3
             public override IPropertySystemCollection ObjectPropertySystem => ShellObjectPropertySystemCollection._GetShellObjectPropertySystemCollection(this);
 #endif
-#endregion
-#endregion
+            #endregion
+            #endregion
 
             ///// <summary>
             ///// Initializes a new instance of the <see cref="ShellObjectInfo"/> class with a given <see cref="FileType"/> and <see cref="SpecialFolder"/> using custom factories for <see cref="ShellObjectInfo"/>s and <see cref="ArchiveItemInfo"/>s.
@@ -188,119 +163,40 @@ namespace WinCopies.IO
             ///// <param name="fileType">The file type of this <see cref="ShellObjectInfo"/>.</param>
             ///// <param name="specialFolder">The special folder type of this <see cref="ShellObjectInfo"/>. <see cref="WinCopies.IO.SpecialFolder.None"/> if this <see cref="ShellObjectInfo"/> is a casual file system item.</param>
             ///// <param name="shellObject">The <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> that this <see cref="ShellObjectInfo"/> represents.</param>
-            protected ShellObjectInfo(in string path, in FileType fileType, in ShellObject shellObject, in ClientVersion? clientVersion) : base(path, clientVersion)
-            {
-                _shellObject = shellObject;
-
-                FileType = fileType;
-
-                ObjectPropertiesGeneric = new FileSystemObjectInfoProperties<IShellObjectInfo>(this, fileType);
-            }
+            protected ShellObjectInfo(in string path, in ShellObject shellObject, in ClientVersion clientVersion) : base(path, clientVersion) => _shellObject = shellObject;
 
             #region Methods
-            public static ShellObjectInitInfo GetInitInfo(in ShellObject shellObject)
-            {
-                if ((shellObject ?? throw GetArgumentNullException(nameof(shellObject))) is ShellFolder shellFolder)
-                {
-                    if (shellObject is ShellFileSystemFolder shellFileSystemFolder)
-                    {
-                        (string path, FileType fileType) = shellFileSystemFolder is FileSystemKnownFolder ? (shellObject.ParsingName, FileType.KnownFolder) : (shellFileSystemFolder.Path, FileType.Folder);
-
-                        return new ShellObjectInitInfo(path, System.IO.Directory.GetParent(path) is null ? FileType.Drive : fileType);
-                    }
-
-                    switch (shellObject)
-                    {
-                        case NonFileSystemKnownFolder nonFileSystemKnownFolder:
-
-                            return new ShellObjectInitInfo(nonFileSystemKnownFolder.Path, FileType.KnownFolder);
-
-                        case ShellNonFileSystemFolder _:
-
-                            return new ShellObjectInitInfo(shellObject.ParsingName, FileType.Folder);
-                    }
-                }
-
-                if (shellObject is ShellLink shellLink)
-
-                    return new ShellObjectInitInfo(shellLink.Path, FileType.Link);
-
-                if (shellObject is ShellFile shellFile)
-
-                    return new ShellObjectInitInfo(shellFile.Path, IsSupportedArchiveFormat(System.IO.Path.GetExtension(shellFile.Path)) ? FileType.Archive : shellFile.IsLink ? FileType.Link : System.IO.Path.GetExtension(shellFile.Path) == ".library-ms" ? FileType.Library : FileType.File);
-
-                throw new ArgumentException($"The given {nameof(ShellObject)} is not supported.");
-            }
-
-            public static ShellObjectInfo From(in ShellObject shellObject, in ClientVersion clientVersion)
-            {
-                ShellObjectInitInfo initInfo = GetInitInfo(shellObject);
-
-                return new ShellObjectInfo(initInfo.Path, initInfo.FileType, shellObject, clientVersion);
-            }
-
             #region Archive
-            public void OpenArchive(Stream stream)
+            public void OpenArchive(FileMode fileMode, FileAccess fileAccess, FileShare fileShare, int? bufferSize, FileOptions fileOptions)
             {
-                CloseArchive();
+                if (ObjectPropertiesGeneric.FileType == FileType.Archive)
 
-                ObjectPropertiesGeneric.FileType.ThrowIfInvalidEnumValue(true, FileType.Archive);
+                    ArchiveFileStream = ArchiveFileStream == null
+                        ? (Stream)new FileStream(Path, fileMode, fileAccess, fileShare, bufferSize.HasValue ? bufferSize.Value : 4096, fileOptions)
+                        : throw new InvalidOperationException("The archive is not open.");
 
-                ArchiveFileStream = stream;
+                else
+
+                    throw new InvalidOperationException("The current item is not an archive.");
             }
 
             public void CloseArchive()
             {
-                ArchiveFileStream.Flush();
-
-                ArchiveFileStream.Dispose();
-
-                ArchiveFileStream = null;
-            }
-            #endregion
-
-            #region GetItems
-            public virtual System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<ShellObjectInfoEnumeratorStruct> func)
-            {
-                ThrowIfNull(func, nameof(func));
-
-                if (IsBrowsable)
-
-                    if (ObjectPropertiesGeneric.FileType == FileType.Archive)
-
-                        return GetItems(item => func(new ShellObjectInfoEnumeratorStruct(item)));
-
-                    else
-
-                        return ShellObjectInfoEnumerator.From(this, func, ClientVersion.Value);
-
-                else return null;
-            }
-
-            public virtual System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<ArchiveFileInfoEnumeratorStruct> func)
-            {
-                ThrowIfNull(func, nameof(func));
-
-#if NETFRAMEWORK
-            switch (ObjectPropertiesGeneric.FileType)
-            {
-                case FileType.Archive:
-                    return GetArchiveItemInfoItems(func);
-                default:
-                    return null;
-            }
-#else
-                return ObjectPropertiesGeneric.FileType switch
+                if (ObjectPropertiesGeneric.FileType == FileType.Archive)
                 {
-                    FileType.Archive => GetArchiveItemInfoItems(func),
-                    _ => null,
-                };
-#endif
+                    if (ArchiveFileStream == null)
+
+                        return;
+
+                    ArchiveFileStream.Dispose();
+
+                    ArchiveFileStream = null;
+                }
+
+                else
+
+                    throw new InvalidOperationException("The current item is not an archive.");
             }
-
-            public override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems() => GetItems((Predicate<ShellObjectInfoEnumeratorStruct>)(obj => true));
-
-            private System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetArchiveItemInfoItems(Predicate<ArchiveFileInfoEnumeratorStruct> func) => new Enumerable<IBrowsableObjectInfo>(() => new ArchiveItemInfoEnumerator(this, func));
             #endregion
 
             #region Overrides
@@ -349,17 +245,141 @@ namespace WinCopies.IO
                     return false;
                 }
 
-                if (equalsFileType())
-
-                    return From(_shellObject.Parent, ClientVersion.Value);
-
-                else if (ObjectPropertiesGeneric.FileType == FileType.Drive)
-
-                    return new ShellObjectInfo(Computer.Path, FileType.KnownFolder, ShellObject.FromParsingName(Computer.ParsingName), ClientVersion.Value);
-
-                else return null;
+                return equalsFileType()
+                    ? ShellObjectInfo.From(_shellObject.Parent, ClientVersion)
+                    : ObjectPropertiesGeneric.FileType == FileType.Drive
+                        ? new ShellObjectInfo(Computer.Path, FileType.KnownFolder, ShellObject.FromParsingName(Computer.ParsingName), ClientVersion)
+                        : null;
             }
             #endregion
+        }
+
+        public class ShellObjectInfo : ShellObjectInfo<IFileSystemObjectInfoProperties, ShellObjectInfoEnumeratorStruct, IBrowsableObjectInfoSelectorDictionary<ShellObjectInfoItemProvider>, ShellObjectInfoItemProvider>, IShellObjectInfo
+        {
+            #region Properties
+            public static IBrowsableObjectInfoSelectorDictionary<ShellObjectInfoItemProvider> DefaultItemSelectorDictionary { get; } = new ShellObjectInfoSelectorDictionary();
+
+            public override bool IsBrowsableByDefault => true;
+
+            public sealed override IFileSystemObjectInfoProperties ObjectPropertiesGeneric { get; }
+            #endregion // Properties
+
+            #region Constructors
+            public ShellObjectInfo(in string path, in FileType fileType, in ShellObject shellObject, in ClientVersion clientVersion) : base(path, shellObject, clientVersion)
+            {
+                switch (fileType)
+                {
+                    case FileType.Folder:
+                    case FileType.KnownFolder:
+
+                        ObjectPropertiesGeneric = new FolderShellObjectInfoProperties<IShellObjectInfoBase2>(this, fileType);
+
+                        break;
+
+                    case FileType.File:
+                    case FileType.Archive:
+                    case FileType.Library:
+                    case FileType.Link:
+
+                        ObjectPropertiesGeneric = new FileShellObjectInfoProperties<IShellObjectInfoBase2>(this, fileType);
+
+                        break;
+
+                    case FileType.Drive:
+
+                        ObjectPropertiesGeneric = new DriveShellObjectInfoProperties<IShellObjectInfoBase2>(this, fileType);
+
+                        break;
+
+                    default:
+
+                        ObjectPropertiesGeneric = new FileSystemObjectInfoProperties(this, fileType);
+
+                        break;
+                }
+            }
+
+            public ShellObjectInfo(in IKnownFolder knownFolder, in ClientVersion clientVersion) : this(knownFolder.Path, FileType.KnownFolder, ShellObject.FromParsingName(knownFolder.ParsingName), clientVersion)
+            {
+                // Left empty.
+            }
+            #endregion
+
+            #region Methods
+            public static ShellObjectInitInfo GetInitInfo(in ShellObject shellObject)
+            {
+                if ((shellObject ?? throw GetArgumentNullException(nameof(shellObject))) is ShellFolder shellFolder)
+                {
+                    if (shellObject is ShellFileSystemFolder shellFileSystemFolder)
+                    {
+                        (string path, FileType fileType) = shellFileSystemFolder is FileSystemKnownFolder ? (shellObject.ParsingName, FileType.KnownFolder) : (shellFileSystemFolder.Path, FileType.Folder);
+
+                        return new ShellObjectInitInfo(path, System.IO.Directory.GetParent(path) is null ? FileType.Drive : fileType);
+                    }
+
+                    switch (shellObject)
+                    {
+                        case NonFileSystemKnownFolder nonFileSystemKnownFolder:
+
+                            return new ShellObjectInitInfo(nonFileSystemKnownFolder.Path, FileType.KnownFolder);
+
+                        case ShellNonFileSystemFolder _:
+
+                            return new ShellObjectInitInfo(shellObject.ParsingName, FileType.Folder);
+                    }
+                }
+
+                if (shellObject is ShellLink shellLink)
+
+                    return new ShellObjectInitInfo(shellLink.Path, FileType.Link);
+
+                if (shellObject is ShellFile shellFile)
+
+                    return new ShellObjectInitInfo(shellFile.Path, IsSupportedArchiveFormat(System.IO.Path.GetExtension(shellFile.Path)) ? FileType.Archive : shellFile.IsLink ? FileType.Link : System.IO.Path.GetExtension(shellFile.Path) == ".library-ms" ? FileType.Library : FileType.File);
+
+                throw new ArgumentException($"The given {nameof(ShellObject)} is not supported.");
+            }
+
+            public static ShellObjectInfo From(in ShellObject shellObject, in ClientVersion clientVersion)
+            {
+                ShellObjectInitInfo initInfo = GetInitInfo(shellObject);
+
+                return new ShellObjectInfo(initInfo.Path, initInfo.FileType, shellObject, clientVersion);
+            }
+
+            public override IBrowsableObjectInfoSelectorDictionary<ShellObjectInfoItemProvider> GetSelectorDictionary() => DefaultItemSelectorDictionary;
+
+            #region GetItems
+            public System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<ArchiveFileInfoEnumeratorStruct> func) => func == null ? GetItems(GetItemProviders(item => true)) : GetItems(GetItemProviders(func));
+
+            protected override System.Collections.Generic.IEnumerable<ShellObjectInfoItemProvider> GetItemProviders(Predicate<ShellObjectInfoEnumeratorStruct> predicate) => IsBrowsable
+                ? ObjectPropertiesGeneric.FileType == FileType.Archive
+                    ? GetItemProviders(item => predicate(new ShellObjectInfoEnumeratorStruct(item)))
+                    : ShellObjectInfoEnumeration.From(this, ClientVersion, predicate)
+                : GetEmptyEnumerable();
+
+            protected virtual System.Collections.Generic.IEnumerable<ShellObjectInfoItemProvider> GetItemProviders(Predicate<ArchiveFileInfoEnumeratorStruct> func)
+#if NETFRAMEWORK
+            {
+                switch (ObjectPropertiesGeneric.FileType)
+                {
+                    case FileType.Archive:
+                        return GetArchiveItemInfoItems(func);
+                    default:
+                        return null;
+                }
+            }
+#else
+             => ObjectPropertiesGeneric.FileType switch
+             {
+                 FileType.Archive => ArchiveItemInfo.GetArchiveItemInfoItems(this, func).Select(ShellObjectInfoItemProvider.ToShellObjectInfoItemProvider),
+                 _ => GetEmptyEnumerable()
+             };
+#endif
+
+            protected override System.Collections.Generic.IEnumerable<ShellObjectInfoItemProvider> GetItemProviders() => GetItemProviders((Predicate<ShellObjectInfoEnumeratorStruct>)(obj => true));
+            #endregion // GetItems
+            #endregion // Methods
         }
     }
 }

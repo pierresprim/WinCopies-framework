@@ -16,34 +16,35 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using Microsoft.WindowsAPICodePack.PortableDevices;
-
+using System;
 using System.Collections.Generic;
 using System.Windows.Media.Imaging;
 
 using WinCopies.Collections.Generic;
 using WinCopies.IO.ObjectModel;
 using WinCopies.IO.PropertySystem;
+using WinCopies.IO.Selectors;
 
 namespace WinCopies.IO
 {
 #if !WinCopies3
     public interface IBrowsableObjectEncapsulator
     {
-        object EncapsulatedObject { get; }
+        object InnerObject { get; }
     }
 
     public interface IBrowsableObjectEncapsulator<T> : IBrowsableObjectEncapsulator
     {
-        T EncapsulatedObject { get; }
+        T InnerObject { get; }
     }
 
     public abstract class BrowsableObjectEncapsulator<T> : IBrowsableObjectEncapsulator<T>
     {
-        public T EncapsulatedObject { get; }
+        public T InnerObject { get; }
 
-        object IBrowsableObjectEncapsulator.EncapsulatedObject => EncapsulatedObject;
+        object IBrowsableObjectEncapsulator.InnerObject => InnerObject;
 
-        public BrowsableObjectEncapsulator(T obj) => EncapsulatedObject = obj;
+        public BrowsableObjectEncapsulator(T obj) => InnerObject = obj;
     }
 #endif
 
@@ -52,19 +53,12 @@ namespace WinCopies.IO
         RecursiveEnumerator<T> GetEnumerator();
     }
 
-    public abstract class BrowsableObjectInfoProperties<T> where T : IBrowsableObjectInfo
-    {
-        protected T BrowsableObjectInfo { get; }
-
-        protected BrowsableObjectInfoProperties(T browsableObjectInfo) => BrowsableObjectInfo = browsableObjectInfo;
-    }
-
     namespace ObjectModel
     {
         /// <summary>
         /// Provides interoperability for interacting with browsable items.
         /// </summary>
-        public interface IBrowsableObjectInfo : IFileSystemObject, IRecursiveEnumerable<IBrowsableObjectInfo>,
+        public interface IBrowsableObjectInfo : IBrowsableObjectInfoBase, IRecursiveEnumerable<IBrowsableObjectInfo>,
 WinCopies.
 #if !WinCopies3
     Util.
@@ -82,18 +76,23 @@ WinCopies.
             bool IsRecursivelyBrowsable { get; }
 
             /// <summary>
-            /// Gets the underlying object of this abstraction interface.
+            /// Gets a value indicating whether this <see cref="IBrowsableObjectInfo"/> is browsable by default.
             /// </summary>
-            object EncapsulatedObject { get; }
+            bool IsBrowsableByDefault { get; }
 
             /// <summary>
-            /// Gets the common properties of <see cref="EncapsulatedObject"/>. These properties may be specific to the underlying object type.
+            /// Gets the underlying object of this abstraction interface.
+            /// </summary>
+            object InnerObject { get; }
+
+            /// <summary>
+            /// Gets the common properties of <see cref="InnerObject"/>. These properties may be specific to the underlying object type.
             /// </summary>
             object ObjectProperties { get; }
 
 #if WinCopies3
             /// <summary>
-            /// Gets the specific properties of <see cref="EncapsulatedObject"/>. These properties are specific to this object.
+            /// Gets the specific properties of <see cref="InnerObject"/>. These properties are specific to this object.
             /// </summary>
             IPropertySystemCollection ObjectPropertySystem { get; }
 #endif
@@ -129,7 +128,9 @@ WinCopies.
 
             bool IsSpecialItem { get; }
 
-            ClientVersion? ClientVersion { get; }
+            ClientVersion ClientVersion { get; }
+
+            System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> RootItems { get; }
 
             ///// <summary>
             ///// Gets or sets the factory for this <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>. This factory is used to create new <see cref="IBrowsableObjectInfo"/>s from the current <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>.
@@ -199,23 +200,24 @@ WinCopies.
 #if WinCopies3
             T
 #else
-            TEncapsulatedObject
+            TInnerObject
 #endif
             > : IBrowsableObjectInfo
         {
 #if WinCopies3
             T
 #else
-TEncapsulatedObject
+TInnerObject
 #endif
-                EncapsulatedObject { get; }
-
-            bool HasProperties { get; }
+                InnerObject
+            { get; }
         }
 
-        public interface IBrowsableObjectInfo<TObjectProperties, TEncapsulatedObject> : IBrowsableObjectInfo<TObjectProperties>, IEncapsulatorBrowsableObjectInfo<TEncapsulatedObject>
+        public interface IBrowsableObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : IBrowsableObjectInfo<TObjectProperties>, IEncapsulatorBrowsableObjectInfo<TInnerObject> where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
         {
-            // Left empty.
+            System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<TPredicateTypeParameter> predicate);
+
+            TSelectorDictionary GetSelectorDictionary();
         }
 
         //public interface IBrowsableObjectInfo<TFactory> : IBrowsableObjectInfo where TFactory : IBrowsableObjectInfoFactory

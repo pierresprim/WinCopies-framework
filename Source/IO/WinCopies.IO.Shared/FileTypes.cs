@@ -63,20 +63,20 @@ namespace WinCopies.IO
         Library
     }
 
-    public enum FileSystemType
-    {
-        None,
+    //public enum FileSystemType
+    //{
+    //    None,
 
-        CurrentDeviceFileSystem,
+    //    CurrentDeviceFileSystem,
 
-        Archive,
+    //    Archive,
 
-        PortableDevice,
+    //    PortableDevice,
 
-        Registry,
+    //    Registry,
 
-        WMI
-    }
+    //    WMI
+    //}
 
     ///// <summary>
     ///// File types to load in the <see cref="FolderLoader"/> and <see cref="ArchiveLoader{TPath, TItems, TFactory}"/> classes.

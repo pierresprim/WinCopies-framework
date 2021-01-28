@@ -18,12 +18,20 @@
 using System;
 using System.Linq;
 using System.Reflection;
-
+using WinCopies.IO.AbstractionInterop.Reflection;
 using WinCopies.IO.Reflection;
 using WinCopies.Linq;
 
 namespace WinCopies.IO.ObjectModel.Reflection
 {
+    public sealed class DotNetGenericItemInfo : BrowsableObjectInfo<idotnetiteminfoproperties, Type>,IDotNetItemInfo
+    {
+        internal DotNetGenericArgumentInfo(in Type type, in DotNetTypeInfoProviderGenericTypeStructValue genericItemType, in IDotNetItemInfo parent) : base($"{parent.Path}{WinCopies.IO.Path.PathSeparator}{type.Name}")
+        {
+
+        }
+    }
+
     public sealed class DotNetParameterInfo : BrowsableDotNetItemInfo<IDotNetItemInfoProperties, ParameterInfo>, IDotNetParameterInfo<IDotNetItemInfoProperties>
     {
         #region Properties
@@ -34,14 +42,14 @@ namespace WinCopies.IO.ObjectModel.Reflection
         /// <summary>
         /// Gets the inner <see cref="ParameterInfo"/>.
         /// </summary>
-        public sealed override ParameterInfo EncapsulatedObjectGeneric { get; }
+        public sealed override ParameterInfo InnerObjectGeneric { get; }
 
         public sealed override IDotNetItemInfoProperties ObjectPropertiesGeneric { get; }
         #endregion
 
-        internal DotNetParameterInfo(in ParameterInfo parameterInfo, in DotNetItemType dotNetItemType, in IDotNetItemInfo parent) : base($"{parent.Path}{WinCopies.IO.Path.PathSeparator}{parameterInfo.Name}", parameterInfo.Name, parent)
+        internal DotNetParameterInfo(in ParameterInfo parameterInfo, in DotNetItemType dotNetItemType, in bool isReturnParameter, in IDotNetItemInfo parent) : base($"{parent.Path}{WinCopies.IO.Path.PathSeparator}{parameterInfo.Name}", parameterInfo.Name, parent)
         {
-            EncapsulatedObjectGeneric = parameterInfo;
+            InnerObjectGeneric = parameterInfo;
 
             DotNetItemType = dotNetItemType;
 
@@ -50,6 +58,6 @@ namespace WinCopies.IO.ObjectModel.Reflection
 
         public override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems() => GetItems(null);
 
-        public System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<CustomAttributeData> func) => (func == null ? EncapsulatedObjectGeneric.GetCustomAttributesData() : EncapsulatedObjectGeneric.GetCustomAttributesData().WherePredicate(func)).Select(a => new DotNetAttributeInfo(a, this));
+        public System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<CustomAttributeData> func) => (func == null ? InnerObjectGeneric.GetCustomAttributesData() : InnerObjectGeneric.GetCustomAttributesData().WherePredicate(func)).Select(a => new DotNetAttributeInfo(a, this));
     }
 }

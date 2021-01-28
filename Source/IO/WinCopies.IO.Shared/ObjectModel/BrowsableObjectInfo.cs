@@ -20,22 +20,26 @@ using Microsoft.WindowsAPICodePack.PortableDevices;
 
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Drawing;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 
 using WinCopies.Collections.Generic;
 using WinCopies.GUI.Drawing;
+using WinCopies.IO.ObjectModel.Reflection;
 using WinCopies.IO.PropertySystem;
+using WinCopies.IO.Selectors;
+
+using static WinCopies.Temp;
 
 namespace WinCopies.IO.ObjectModel
 {
     /// <summary>
     /// The base class for all IO browsable objects of the WinCopies framework.
     /// </summary>
-    public abstract class BrowsableObjectInfo : FileSystemObject, IBrowsableObjectInfo
+    public abstract class BrowsableObjectInfo : BrowsableObjectInfoBase, IBrowsableObjectInfo
     {
         #region Consts
         public const ushort SmallIconSize = 16;
@@ -49,9 +53,16 @@ namespace WinCopies.IO.ObjectModel
         #endregion
 
         #region Properties
+        public static Action RegisterDefaultSelectors { get; private set; } = () =>
+        {
+            DotNetAssemblyInfo.RegisterSelectors();
+
+            RegisterDefaultSelectors = () => { /* Left empty. */ };
+        };
+
         IBrowsableObjectInfo Collections.Generic.IRecursiveEnumerable<IBrowsableObjectInfo>.Value => this;
 
-        public abstract object EncapsulatedObject { get; }
+        public abstract object InnerObject { get; }
 
 #if WinCopies3
         public abstract IPropertySystemCollection ObjectPropertySystem { get; }
@@ -65,6 +76,8 @@ namespace WinCopies.IO.ObjectModel
         public abstract bool IsBrowsable { get; }
 
         public abstract bool IsRecursivelyBrowsable { get; }
+
+        public abstract bool IsBrowsableByDefault { get; }
 
         /// <summary>
         /// Gets the <see cref="IBrowsableObjectInfo"/> parent of this <see cref="BrowsableObjectInfo"/>. Returns <see langword="null"/> if this object is the root object of a hierarchy.
@@ -99,7 +112,11 @@ namespace WinCopies.IO.ObjectModel
 
         public abstract bool IsSpecialItem { get; }
 
-        public ClientVersion? ClientVersion { get; private set; }
+        public ClientVersion ClientVersion { get; }
+
+        public abstract System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> RootItems { get; }
+
+        public abstract Predicate<IBrowsableObjectInfo> RootItemsBrowsableObjectInfoPredicate { get; }
         #endregion
 
         #region Constructors
@@ -107,20 +124,25 @@ namespace WinCopies.IO.ObjectModel
         /// Initializes a new instance of the <see cref="BrowsableObjectInfo"/> class.
         /// </summary>
         /// <param name="path">The path of the new item.</param>
-        protected BrowsableObjectInfo(in string path) : this(path, null) { }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="BrowsableObjectInfo"/> class.
-        /// </summary>
-        /// <param name="path">The path of the new item.</param>
         /// <param name="clientVersion">The <see cref="Microsoft.WindowsAPICodePack.PortableDevices.ClientVersion"/> that will be used to initialize new <see cref="PortableDeviceInfo"/>s and <see cref="PortableDeviceObjectInfo"/>s.</param>
-        protected BrowsableObjectInfo(in string path, in ClientVersion? clientVersion) : base(path) => ClientVersion = clientVersion;
+        protected BrowsableObjectInfo(in string path, in ClientVersion clientVersion) : base(path) => ClientVersion = clientVersion;
         #endregion
 
         #region Methods
-        internal static Icon TryGetIcon(in int iconIndex, in string dll, in System.Drawing.Size size) => new IconExtractor(IO.Path.GetRealPathFromEnvironmentVariables(IO.Path.System32Path + dll)).GetIcon(iconIndex).Split()?.TryGetIcon(size, 32, true, true);
+        public static ClientVersion GetDefaultClientVersion()
+        {
+            AssemblyName assemblyName = Assembly.GetExecutingAssembly().GetName();
 
-        internal static BitmapSource TryGetBitmapSource(in int iconIndex, in string dllName, in int size)
+            Version assemblyVersion = assemblyName.Version;
+
+            // todo: use the new constructor
+
+            return new ClientVersion(assemblyName.Name, (uint)assemblyVersion.Major, (uint)assemblyVersion.Minor, (uint)assemblyVersion.Revision);
+        }
+
+        public static Icon TryGetIcon(in int iconIndex, in string dll, in System.Drawing.Size size) => new IconExtractor(IO.Path.GetRealPathFromEnvironmentVariables(IO.Path.System32Path + dll)).GetIcon(iconIndex).Split()?.TryGetIcon(size, 32, true, true);
+
+        public static BitmapSource TryGetBitmapSource(in int iconIndex, in string dllName, in int size)
         {
             using
 #if !CS8
@@ -136,11 +158,11 @@ namespace WinCopies.IO.ObjectModel
             return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
         }
 
-        IEnumerator<WinCopies.Collections.Generic.IRecursiveEnumerable<IBrowsableObjectInfo>> IRecursiveEnumerableProviderEnumerable<IBrowsableObjectInfo>.GetRecursiveEnumerator() => GetItems().GetEnumerator();
+        System.Collections.Generic.IEnumerator<Collections.Generic.IRecursiveEnumerable<IBrowsableObjectInfo>> IRecursiveEnumerableProviderEnumerable<IBrowsableObjectInfo>.GetRecursiveEnumerator() => GetItems().GetEnumerator();
 
         RecursiveEnumerator<IBrowsableObjectInfo> IRecursiveEnumerable<IBrowsableObjectInfo>.GetEnumerator() => IsRecursivelyBrowsable ? new RecursiveEnumerator<IBrowsableObjectInfo>(this) : throw new NotSupportedException("The current BrowsableObjectInfo does not support recursive browsing.");
 
-        IEnumerator<IBrowsableObjectInfo> System.Collections.Generic.IEnumerable<IBrowsableObjectInfo>.GetEnumerator() => GetItems().GetEnumerator();
+        System.Collections.Generic.IEnumerator<IBrowsableObjectInfo> System.Collections.Generic.IEnumerable<IBrowsableObjectInfo>.GetEnumerator() => GetItems().GetEnumerator();
 
         IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetItems().GetEnumerator();
 
@@ -230,52 +252,51 @@ namespace WinCopies.IO.ObjectModel
         /// Initializes a new instance of the <see cref="BrowsableObjectInfo"/> class.
         /// </summary>
         /// <param name="path">The path of the new item.</param>
-        protected BrowsableObjectInfo(in string path) : base(path, null)
-        {
-            // Left empty.
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="BrowsableObjectInfo"/> class.
-        /// </summary>
-        /// <param name="path">The path of the new item.</param>
         /// <param name="clientVersion">The <see cref="ClientVersion"/> that will be used to initialize new <see cref="PortableDeviceInfo"/>s and <see cref="PortableDeviceObjectInfo"/>s.</param>
-        protected BrowsableObjectInfo(in string path, in ClientVersion? clientVersion) : base(path, clientVersion)
-        {
-            // Left empty.
-        }
+        protected BrowsableObjectInfo(in string path, in ClientVersion clientVersion) : base(path, clientVersion) { /* Left empty. */ }
         #endregion
     }
 
-    public abstract class BrowsableObjectInfo<TObjectProperties, TEncapsulatedObject> : BrowsableObjectInfo<TObjectProperties>, IBrowsableObjectInfo<TObjectProperties, TEncapsulatedObject>
+    public abstract class BrowsableObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : BrowsableObjectInfo<TObjectProperties>, IBrowsableObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
     {
         #region Properties
-        public abstract TEncapsulatedObject EncapsulatedObjectGeneric { get; }
+        public abstract TInnerObject InnerObjectGeneric { get; }
 
-        TEncapsulatedObject IEncapsulatorBrowsableObjectInfo<TEncapsulatedObject>.EncapsulatedObject => EncapsulatedObjectGeneric;
+        TInnerObject IEncapsulatorBrowsableObjectInfo<TInnerObject>.InnerObject => InnerObjectGeneric;
 
-        public sealed override object EncapsulatedObject => EncapsulatedObjectGeneric;
+        public sealed override object InnerObject => InnerObjectGeneric;
 
-        public abstract bool HasProperties { get; }
+        public abstract Predicate<TPredicateTypeParameter> RootItemsPredicate { get; }
         #endregion
 
         /// <summary>
-        /// When called from a derived class, initializes a new instance of the <see cref="BrowsableObjectInfo{TObjectProperties, TEncapsulatedObject}"/> class.
+        /// When called from a derived class, initializes a new instance of the <see cref="BrowsableObjectInfo{TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/> class with a custom <see cref="ClientVersion"/>.
         /// </summary>
-        /// <param name="path">The path of the new <see cref="BrowsableObjectInfo{TObjectProperties, TEncapsulatedObject}"/>.</param>
-        protected BrowsableObjectInfo(in string path) : base(path)
+        /// <param name="path">The path of the new <see cref="BrowsableObjectInfo{TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/>.</param>
+        /// <param name="clientVersion">A custom <see cref="ClientVersion"/>. This parameter can be null for non-file system and portable devices-related types.</param>
+        protected BrowsableObjectInfo(in string path, in ClientVersion clientVersion) : base(path, clientVersion) { /* Left empty. */ }
+
+        public abstract TSelectorDictionary GetSelectorDictionary();
+
+        protected System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(System.Collections.Generic.IEnumerable<TDictionaryItems> items) => GetSelectorDictionary().Select(items);
+
+        protected abstract System.Collections.Generic.IEnumerable<TDictionaryItems> GetItemProviders();
+
+        public sealed override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems() => GetItems(GetItemProviders());
+
+        protected abstract System.Collections.Generic.IEnumerable<TDictionaryItems> GetItemProviders(Predicate<TPredicateTypeParameter> predicate);
+
+        public System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<TPredicateTypeParameter> predicate)
         {
-            // Left empty.
+            if (predicate == null)
+
+                return GetItems(GetItemProviders(item => true));
+
+            else
+
+                return GetItems(GetItemProviders(predicate));
         }
 
-        /// <summary>
-        /// When called from a derived class, initializes a new instance of the <see cref="BrowsableObjectInfo{TObjectProperties, TEncapsulatedObject}"/> class with a custom <see cref="ClientVersion"/>.
-        /// </summary>
-        /// <param name="path">The path of the new <see cref="BrowsableObjectInfo{TObjectProperties, TEncapsulatedObject}"/>.</param>
-        /// <param name="clientVersion">A custom <see cref="ClientVersion"/>. This parameter can be null for non-file system and portable devices-related types.</param>
-        protected BrowsableObjectInfo(in string path, in ClientVersion? clientVersion) : base(path, clientVersion)
-        {
-            // Left empty.
-        }
+        protected System.Collections.Generic.IEnumerable<TDictionaryItems> GetEmptyEnumerable() => GetEmptyEnumerable<TDictionaryItems>();
     }
 }

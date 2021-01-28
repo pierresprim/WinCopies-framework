@@ -484,11 +484,11 @@ namespace WinCopies.IO
 
         //        //}
 
-        public static RegistryKey OpenRegistryKey(string name) => OpenRegistryKey(name, RegistryKeyPermissionCheck.Default, RegistryRights.ReadKey);
+        public static RegistryKey OpenRegistryKey(in string name) => OpenRegistryKey(name, RegistryKeyPermissionCheck.Default, RegistryRights.ReadKey);
 
-        public static RegistryKey OpenRegistryKey(string name, bool writable) => writable ? OpenRegistryKey(name, RegistryKeyPermissionCheck.ReadWriteSubTree, RegistryRights.WriteKey) : OpenRegistryKey(name, RegistryKeyPermissionCheck.ReadSubTree, RegistryRights.ReadKey);
+        public static RegistryKey OpenRegistryKey(in string name, in bool writable) => writable ? OpenRegistryKey(name, RegistryKeyPermissionCheck.ReadWriteSubTree, RegistryRights.WriteKey) : OpenRegistryKey(name, RegistryKeyPermissionCheck.ReadSubTree, RegistryRights.ReadKey);
 
-        public static RegistryKey OpenRegistryKey(string name, RegistryKeyPermissionCheck registryKeyPermissionCheck, RegistryRights registryRights)
+        public static RegistryKey OpenRegistryKey(string name, in RegistryKeyPermissionCheck registryKeyPermissionCheck, in RegistryRights registryRights)
         {
             ThrowIfNullEmptyOrWhiteSpace(name, nameof(name));
 
@@ -500,14 +500,19 @@ namespace WinCopies.IO
             {
                 registryKeyName = name.Substring(0, result);
 
-                name = name.Length == 1 ? "" : name.Substring(result + 1);
+                name = name.Length == 1 ? string.Empty : name
+#if CS8
+                [(result + 1)..];
+#else
+                .Substring(result + 1);
+#endif
             }
 
             else
             {
                 registryKeyName = name;
 
-                name = "";
+                name = string.Empty;
             }
 
             FieldInfo[] fields = typeof(Microsoft.Win32.Registry).GetFields();
@@ -523,15 +528,11 @@ namespace WinCopies.IO
                 registryKeys[i] = new KeyValuePair<RegistryKey, string>(item, item.Name);
             }
 
-            if (If(ComparisonType.Or, ComparisonMode.Logical,
-#if WinCopies3
-            Diagnostics.
-#endif
-                Comparison.Equal, out RegistryKey registryKey, registryKeyName, registryKeys))
-
-                return name.Length > 0 ? registryKey.OpenSubKey(name, registryKeyPermissionCheck, registryRights) : registryKey;
-
-            else throw new RegistryException(string.Format(Properties.Resources.RegistryKeyNotExists, originalName), originalName);
+            return If(ComparisonType.Or, ComparisonMode.Logical, Diagnostics.Comparison.Equal, out RegistryKey registryKey, registryKeyName, registryKeys)
+                ? name.Length > 0
+                    ? registryKey.OpenSubKey(name, registryKeyPermissionCheck, registryRights)
+                    : registryKey
+                : throw new RegistryException(string.Format(Properties.Resources.RegistryKeyNotExists, originalName), originalName);
         }
 
         //        //public static Icon[] GetIconVariationsFromFileType(string fileType) => GetIconVariationsFromFileTypeRegistryKey(GetFileTypeRegistryKey(fileType));

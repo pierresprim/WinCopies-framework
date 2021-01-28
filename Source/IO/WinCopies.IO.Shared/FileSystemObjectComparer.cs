@@ -32,7 +32,7 @@ using static WinCopies.
 
 namespace WinCopies.IO
 {
-    public class FileSystemObjectComparer<T> : Comparer<T>, IFileSystemObjectComparer<T> where T : IFileSystemObject
+    public class FileSystemObjectComparer<T> : Comparer<T>, IFileSystemObjectComparer<T> where T : IBrowsableObjectInfoBase
     {
         //public virtual bool NeedsObjectsOrValuesReconstruction => true; // True because of the StirngComparer property.
 
@@ -80,7 +80,7 @@ namespace WinCopies.IO
         }
     }
 
-    public class FileSystemObjectInfoComparer<T> : FileSystemObjectComparer<T>, IFileSystemObjectComparer<T> where T : IFileSystemObject
+    public class FileSystemObjectInfoComparer<T> : FileSystemObjectComparer<T>, IFileSystemObjectComparer<T> where T : IBrowsableObjectInfoBase
     {
         //public virtual bool NeedsObjectsOrValuesReconstruction => true; // True because of the StirngComparer property.
 
@@ -149,7 +149,7 @@ namespace WinCopies.IO
         }
     }
 
-    public class RegistryItemInfoComparer<T> : FileSystemObjectComparer<T> where T : IFileSystemObject
+    public class RegistryItemInfoComparer<T> : FileSystemObjectComparer<T> where T : IBrowsableObjectInfoBase
     {
         protected override int CompareOverride(T x, T y)
         {
@@ -192,7 +192,7 @@ namespace WinCopies.IO
         }
     }
 
-    public class WMIItemInfoComparer<T> : FileSystemObjectComparer<T> where T : IFileSystemObject
+    public class WMIItemInfoComparer<T> : FileSystemObjectComparer<T> where T : IBrowsableObjectInfoBase
     {
         protected override int CompareOverride(T x, T y)
         {

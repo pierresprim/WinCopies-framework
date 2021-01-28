@@ -19,7 +19,9 @@ using Microsoft.WindowsAPICodePack.PortableDevices;
 using Microsoft.WindowsAPICodePack.Shell;
 using Microsoft.WindowsAPICodePack.Win32Native.Shell;
 
+using System;
 using System.Drawing;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
@@ -27,133 +29,12 @@ using System.Windows.Media.Imaging;
 using WinCopies.GUI.Drawing;
 
 using WinCopies.Collections;
-using WinCopies.IO.ObjectModel;
-using System;
-using System.IO;
+using WinCopies.IO.PropertySystem;
+using WinCopies.IO.Selectors;
+using WinCopies.Collections.Generic;
 
 namespace WinCopies.IO
 {
-    public abstract class FileSystemObjectInfoProperties<T> : BrowsableObjectInfoProperties<T>, IFileSystemObjectInfoProperties where T : IFileSystemObjectInfo
-    {
-        ///// <summary>
-        ///// The file type of this <see cref="FileSystemObject"/>.
-        ///// </summary>
-        public FileType FileType { get; }
-
-        public abstract Size? Size { get; }
-
-        protected FileSystemObjectInfoProperties(in T fileSystemObjectInfo, in FileType fileType) : base(fileSystemObjectInfo) => FileType = fileType;
-    }
-
-    public abstract class FileSystemObjectInfoProperties<TBrowsableObjectInfo, TInnerProperties> : FileSystemObjectInfoProperties<TBrowsableObjectInfo> where TBrowsableObjectInfo : IFileSystemObjectInfo
-    {
-        protected TInnerProperties InnerProperties { get; }
-
-        protected FileSystemObjectInfoProperties(in TBrowsableObjectInfo fileSystemObjectInfo, in FileType fileType, in TInnerProperties innerProperties) : base(fileSystemObjectInfo, fileType) => InnerProperties = innerProperties;
-    }
-
-    public abstract class FileOrFolderShellObjectInfoProperties<TBrowsableObjectInfo, TInnerProperties> : FileSystemObjectInfoProperties<TBrowsableObjectInfo, TInnerProperties>, IFileSystemObjectInfoProperties2 where TBrowsableObjectInfo : IShellObjectInfo2 where TInnerProperties : FileSystemInfo
-    {
-        public DateTime LastWriteTime => InnerProperties.LastWriteTime;
-
-        public DateTime LastAccessTimeUtc => InnerProperties.LastAccessTimeUtc;
-
-        public DateTime LastAccessTime => InnerProperties.LastAccessTime;
-
-        public string FullName => InnerProperties.FullName;
-
-        public string Extension => InnerProperties.Extension;
-
-        public bool Exists => InnerProperties.Exists;
-
-        public DateTime CreationTime => InnerProperties.CreationTime;
-
-        public DateTime LastWriteTimeUtc => InnerProperties.LastWriteTimeUtc;
-
-        public System.IO.FileAttributes Attributes => InnerProperties.Attributes;
-
-        public DateTime CreationTimeUtc => InnerProperties.CreationTimeUtc;
-
-        public string Name => InnerProperties.Name;
-
-        protected FileOrFolderShellObjectInfoProperties(in TBrowsableObjectInfo shellObjectInfo, in FileType fileType, in TInnerProperties innerProperties) : base(shellObjectInfo, fileType, innerProperties)
-        {
-            // Left empty.
-        }
-    }
-
-    public class FolderShellObjectInfoProperties<T> : FileOrFolderShellObjectInfoProperties<T, DirectoryInfo> where T : IShellObjectInfo2
-    {
-        public string ParentName => InnerProperties.Parent.FullName;
-
-        public string RootName => InnerProperties.Root.FullName;
-
-        public sealed override Size? Size => null;
-
-        public FolderShellObjectInfoProperties(in T shellObjectInfo, in FileType fileType) : base(shellObjectInfo, fileType, new DirectoryInfo(shellObjectInfo.Path))
-        {
-            // Left empty.
-        }
-    }
-
-    public class FileShellObjectInfoProperties<T> : FileOrFolderShellObjectInfoProperties<T, System.IO.FileInfo> where T : IShellObjectInfo2
-    {
-        public bool IsReadOnly => InnerProperties.IsReadOnly;
-
-        public string? DirectoryName => InnerProperties.DirectoryName;
-
-        public sealed override Size? Size => new IO.Size((ulong)InnerProperties.Length);
-
-        public FileShellObjectInfoProperties(in T shellObjectInfo, in FileType fileType) : base(shellObjectInfo, fileType, new System.IO.FileInfo(shellObjectInfo.Path))
-        {
-            // Left empty.
-        }
-    }
-
-    public class DriveShellObjectInfoProperties<T> : FileSystemObjectInfoProperties<T, DriveInfo> where T : IShellObjectInfo2
-    {
-        public Size AvailableFreeSpace => new IO.Size((ulong)InnerProperties.AvailableFreeSpace);
-
-        public string DriveFormat => InnerProperties.DriveFormat;
-
-        public DriveType DriveType => InnerProperties.DriveType;
-
-        public bool IsReady => InnerProperties.IsReady;
-
-        public string RootDirectoryName => InnerProperties.RootDirectory.FullName;
-
-        public Size TotalFreeSpace => new IO.Size((ulong)InnerProperties.TotalFreeSpace);
-
-        public Size TotalSize => new Size((ulong)InnerProperties.TotalSize);
-
-        public string VolumeLabel => InnerProperties.VolumeLabel;
-
-        public sealed override Size? Size => new IO.Size((ulong)(InnerProperties.TotalSize - InnerProperties.TotalFreeSpace));
-
-        public DriveShellObjectInfoProperties(in T shellObjectInfo, in FileType fileType) : base(shellObjectInfo, fileType, new DriveInfo(shellObjectInfo.Path))
-        {
-            // Left empty.
-        }
-    }
-
-    public class ArchiveItemInfoProperties<T> : FileSystemObjectInfoProperties<T>, IFileSystemObjectInfoProperties2 where T : IArchiveItemInfo
-    {
-        public DateTime CreationTime => BrowsableObjectInfo.EncapsulatedObject.Value.CreationTime;
-
-        public DateTime LastAccessTime => BrowsableObjectInfo.EncapsulatedObject.Value.LastAccessTime;
-
-        public DateTime LastWriteTime => BrowsableObjectInfo.EncapsulatedObject.Value.LastWriteTime;
-
-        public System.IO.FileAttributes Attributes => (System.IO.FileAttributes)BrowsableObjectInfo.EncapsulatedObject.Value.Attributes;
-
-        public sealed override Size? Size => new IO.Size(BrowsableObjectInfo.EncapsulatedObject.Value.Size);
-
-        public ArchiveItemInfoProperties(in T fileSystemObjectInfo, in FileType fileType) : base(fileSystemObjectInfo, fileType)
-        {
-            // Left empty.
-        }
-    }
-
     //public class FileSystemObjectInfoPropertiesCommon : FileSystemObjectInfoProperties
     //{
     //    private IFileSystemObjectInfo _fileSystemObjectInfo;
@@ -165,24 +46,20 @@ namespace WinCopies.IO
 
     namespace ObjectModel
     {
-        public abstract class FileSystemObjectInfo<TObjectProperties, TEncapsulatedObject> : BrowsableObjectInfo<TObjectProperties, TEncapsulatedObject>, IFileSystemObjectInfo<TObjectProperties, TEncapsulatedObject> where TObjectProperties : IFileSystemObjectInfoProperties
+        public abstract class FileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : BrowsableObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IFileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IFileSystemObjectInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
         {
             #region Properties
-            public override bool IsRecursivelyBrowsable { get; } = true;
+            public override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> RootItems => FileSystemObjectInfo.DefaultRootItems;
 
-            public sealed override bool HasProperties => true;
+            public override bool IsRecursivelyBrowsable => true;
+
+            public override Predicate<TPredicateTypeParameter> RootItemsPredicate => null;
+
+            public override Predicate<IBrowsableObjectInfo> RootItemsBrowsableObjectInfoPredicate => item => item.IsBrowsable && item.IsBrowsableByDefault;
             #endregion
 
-            protected FileSystemObjectInfo(in string path) : base(path)
-            {
-                // Left empty.
-            }
-
             // /// <param name="fileType">The <see cref="FileType"/> of this <see cref="BrowsableObjectInfo"/>.</param>
-            protected FileSystemObjectInfo(in string path, in ClientVersion? clientVersion) : base(path, clientVersion)
-            {
-                // Left empty.
-            }
+            protected FileSystemObjectInfo(in string path, in ClientVersion clientVersion) : base(path, clientVersion) { /* Left empty. */ }
 
             #region Methods
             #region Helpers
@@ -192,40 +69,12 @@ namespace WinCopies.IO
             /// <returns>A default comparer for <see cref="FileSystemObjectInfo{T}"/>s.</returns>
             public static FileSystemObjectInfoComparer<IFileSystemObjectInfo> GetDefaultComparer() => new FileSystemObjectInfoComparer<IFileSystemObjectInfo>();*/
 
-            public static string GetItemTypeName(string extension, FileType fileType) => fileType == FileType.Folder
-                        ? FileOperation.GetFileInfo(string.Empty, Microsoft.WindowsAPICodePack.Win32Native.Shell.FileAttributes.Directory, GetFileInfoOptions.TypeName).TypeName
-                        : FileOperation.GetFileInfo(extension, Microsoft.WindowsAPICodePack.Win32Native.Shell.FileAttributes.Normal, GetFileInfoOptions.TypeName).TypeName;
-            #endregion
-
             #region TryGetIcon/BitmapSource
-            #region Helpers
-            private static Icon TryGetIcon(in int index, in System.Drawing.Size size) => TryGetIcon(index, Microsoft.WindowsAPICodePack.NativeAPI.Consts.DllNames.Shell32, size);
+            public Icon TryGetIcon(in int size) => FileSystemObjectInfo.TryGetIcon(System.IO.Path.GetExtension(Path), ObjectPropertiesGeneric.FileType, new System.Drawing.Size(size, size));
 
-            public static Icon TryGetIcon(in string extension, in FileType fileType, in System.Drawing.Size size) =>
-
-               // if (System.IO.Path.HasExtension(Path))
-
-               fileType == FileType.Folder ? TryGetIcon(3, size) : FileOperation.GetFileInfo(extension, Microsoft.WindowsAPICodePack.Win32Native.Shell.FileAttributes.Normal, GetFileInfoOptions.Icon | GetFileInfoOptions.UseFileAttributes).Icon?.TryGetIcon(size, 32, true, true) ?? TryGetIcon(0, size);// else// return TryGetIcon(FileType == FileType.Folder ? 3 : 0, "SHELL32.dll", size);
-
-            public static BitmapSource TryGetBitmapSource(in string extension, in FileType fileType, in int size)
-            {
-#if NETFRAMEWORK
-
-            using (Icon icon = TryGetIcon(extension, fileType, new System.Drawing.Size(size, size)))
-
-#else
-
-                using Icon icon = TryGetIcon(extension, fileType, new System.Drawing.Size(size, size));
-
-#endif
-                return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
-            }
+            public BitmapSource TryGetBitmapSource(in int size) => FileSystemObjectInfo.TryGetBitmapSource(System.IO.Path.GetExtension(Path), ObjectPropertiesGeneric.FileType, size);
             #endregion
             #endregion
-
-            public Icon TryGetIcon(in int size) => TryGetIcon(System.IO.Path.GetExtension(Path), ObjectPropertiesGeneric.FileType, new System.Drawing.Size(size, size));
-
-            public BitmapSource TryGetBitmapSource(in int size) => TryGetBitmapSource(System.IO.Path.GetExtension(Path), ObjectPropertiesGeneric.FileType, size);
 
             /*#region Equatable methods
             /// <summary>
@@ -236,7 +85,7 @@ namespace WinCopies.IO
             public virtual bool Equals(IFileSystemObjectInfo fileSystemObjectInfo) => fileSystemObjectInfo is null ? false : ReferenceEquals(this, fileSystemObjectInfo) || (FileType == fileSystemObjectInfo.FileType && Path.ToLower(CultureInfo.CurrentCulture) == fileSystemObjectInfo.Path.ToLower(CultureInfo.CurrentCulture));
 
             public override bool Equals(IFileSystemObject fileSystemObject) => fileSystemObject is IFileSystemObjectInfo fileSystemObjectInfo && Equals(fileSystemObjectInfo) ;
-            #endregion
+#endregion
 
             /// <summary>
             /// Compares the current object to a given <see cref="FileSystemObjectInfo{T}"/>.
@@ -258,61 +107,113 @@ namespace WinCopies.IO
             /// <returns>The <see cref="FileSystemObject.LocalizedName"/> of this <see cref="FileSystemObjectInfo{T}"/>.</returns>
             public override string ToString() => IsNullEmptyOrWhiteSpace(LocalizedName) ? Path : LocalizedName;*/
 
-            public override IEqualityComparer<IFileSystemObject> GetDefaultEqualityComparer() => new FileSystemObjectInfoEqualityComparer<IFileSystemObject>();
+            public override IEqualityComparer<IBrowsableObjectInfoBase> GetDefaultEqualityComparer() => new FileSystemObjectInfoEqualityComparer<IBrowsableObjectInfoBase>();
 
-            public override System.Collections.Generic.IComparer<IFileSystemObject> GetDefaultComparer() => new FileSystemObjectInfoComparer<IFileSystemObject>();
+            public override System.Collections.Generic.IComparer<IBrowsableObjectInfoBase> GetDefaultComparer() => new FileSystemObjectInfoComparer<IBrowsableObjectInfoBase>();
             #endregion
             #endregion
 
             #region Operators
             /// <summary>
-            /// Checks if two <see cref="FileSystemObjectInfo{TObjectProperties, TEncapsulatedObject}"/>s are equal.
+            /// Checks if two <see cref="FileSystemObjectInfo{TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/>s are equal.
             /// </summary>
             /// <param name="left">Left operand.</param>
             /// <param name="right">Right operand.</param>
-            /// <returns>A <see cref="bool"/> value that indicates whether the two <see cref="FileSystemObjectInfo{TObjectProperties, TEncapsulatedObject}"/>s are equal.</returns>
-            public static bool operator ==(in FileSystemObjectInfo<TObjectProperties, TEncapsulatedObject> left, in FileSystemObjectInfo<TObjectProperties, TEncapsulatedObject> right) => left is null ? right is null : left.Equals(right);
+            /// <returns>A <see cref="bool"/> value that indicates whether the two <see cref="FileSystemObjectInfo{TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/>s are equal.</returns>
+            public static bool operator ==(in FileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> left, in FileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> right) => left is null ? right is null : left.Equals(right);
 
             /// <summary>
-            /// Checks if two <see cref="FileSystemObjectInfo{TObjectProperties, TEncapsulatedObject}"/>s are different.
+            /// Checks if two <see cref="FileSystemObjectInfo{TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/>s are different.
             /// </summary>
             /// <param name="left">Left operand.</param>
             /// <param name="right">Right operand.</param>
-            /// <returns>A <see cref="bool"/> value that indicates whether the two <see cref="FileSystemObjectInfo{TObjectProperties, TEncapsulatedObject}"/>s are different.</returns>
-            public static bool operator !=(in FileSystemObjectInfo<TObjectProperties, TEncapsulatedObject> left, in FileSystemObjectInfo<TObjectProperties, TEncapsulatedObject> right) => !(left == right);
+            /// <returns>A <see cref="bool"/> value that indicates whether the two <see cref="FileSystemObjectInfo{TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/>s are different.</returns>
+            public static bool operator !=(in FileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> left, in FileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> right) => !(left == right);
 
             /// <summary>
-            /// Checks if a given <see cref="FileSystemObjectInfo{TObjectProperties, TEncapsulatedObject}"/> is lesser than an other <see cref="FileSystemObjectInfo{TObjectProperties, TEncapsulatedObject}"/>.
+            /// Checks if a given <see cref="FileSystemObjectInfo{TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/> is lesser than an other <see cref="FileSystemObjectInfo{TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/>.
             /// </summary>
             /// <param name="left">Left operand.</param>
             /// <param name="right">Right operand.</param>
-            /// <returns>A <see cref="bool"/> value that indicates whether the given <see cref="FileSystemObjectInfo{TObjectProperties, TEncapsulatedObject}"/> is lesser than the <see cref="FileSystemObjectInfo{TObjectProperties, TEncapsulatedObject}"/> to compare with.</returns>
-            public static bool operator <(in FileSystemObjectInfo<TObjectProperties, TEncapsulatedObject> left, in FileSystemObjectInfo<TObjectProperties, TEncapsulatedObject> right) => left is null ? right is object : left.CompareTo(right) < 0;
+            /// <returns>A <see cref="bool"/> value that indicates whether the given <see cref="FileSystemObjectInfo{TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/> is lesser than the <see cref="FileSystemObjectInfo{TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/> to compare with.</returns>
+            public static bool operator <(in FileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> left, in FileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> right) => left is null ? right is object : left.CompareTo(right) < 0;
 
             /// <summary>
-            /// Checks if a given <see cref="FileSystemObjectInfo{TObjectProperties, TEncapsulatedObject}"/> is lesser or equal to an other <see cref="FileSystemObjectInfo{TObjectProperties, TEncapsulatedObject}"/>.
+            /// Checks if a given <see cref="FileSystemObjectInfo{TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/> is lesser or equal to an other <see cref="FileSystemObjectInfo{TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/>.
             /// </summary>
             /// <param name="left">Left operand.</param>
             /// <param name="right">Right operand.</param>
-            /// <returns>A <see cref="bool"/> value that indicates whether the given <see cref="FileSystemObjectInfo{TObjectProperties, TEncapsulatedObject}"/> is lesser or equal to the <see cref="FileSystemObjectInfo{TObjectProperties, TEncapsulatedObject}"/> to compare with.</returns>
-            public static bool operator <=(in FileSystemObjectInfo<TObjectProperties, TEncapsulatedObject> left, in FileSystemObjectInfo<TObjectProperties, TEncapsulatedObject> right) => left is null || left.CompareTo(right) <= 0;
+            /// <returns>A <see cref="bool"/> value that indicates whether the given <see cref="FileSystemObjectInfo{TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/> is lesser or equal to the <see cref="FileSystemObjectInfo{TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/> to compare with.</returns>
+            public static bool operator <=(in FileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> left, in FileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> right) => left is null || left.CompareTo(right) <= 0;
 
             /// <summary>
-            /// Checks if a given <see cref="FileSystemObjectInfo{TObjectProperties, TEncapsulatedObject}"/> is greater than an other <see cref="FileSystemObjectInfo{TObjectProperties, TEncapsulatedObject}"/>.
+            /// Checks if a given <see cref="FileSystemObjectInfo{TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/> is greater than an other <see cref="FileSystemObjectInfo{TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/>.
             /// </summary>
             /// <param name="left">Left operand.</param>
             /// <param name="right">Right operand.</param>
-            /// <returns>A <see cref="bool"/> value that indicates whether the given <see cref="FileSystemObjectInfo{TObjectProperties, TEncapsulatedObject}"/> is greater than the <see cref="FileSystemObjectInfo{TObjectProperties, TEncapsulatedObject}"/> to compare with.</returns>
-            public static bool operator >(in FileSystemObjectInfo<TObjectProperties, TEncapsulatedObject> left, in FileSystemObjectInfo<TObjectProperties, TEncapsulatedObject> right) => left is object && left.CompareTo(right) > 0;
+            /// <returns>A <see cref="bool"/> value that indicates whether the given <see cref="FileSystemObjectInfo{TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/> is greater than the <see cref="FileSystemObjectInfo{TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/> to compare with.</returns>
+            public static bool operator >(in FileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> left, in FileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> right) => left is object && left.CompareTo(right) > 0;
 
             /// <summary>
-            /// Checks if a given <see cref="FileSystemObjectInfo{TObjectProperties, TEncapsulatedObject}"/> is greater or equal to an other <see cref="FileSystemObjectInfo{TObjectProperties, TEncapsulatedObject}"/>.
+            /// Checks if a given <see cref="FileSystemObjectInfo{TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/> is greater or equal to an other <see cref="FileSystemObjectInfo{TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/>.
             /// </summary>
             /// <param name="left">Left operand.</param>
             /// <param name="right">Right operand.</param>
-            /// <returns>A <see cref="bool"/> value that indicates whether the given <see cref="FileSystemObjectInfo{TObjectProperties, TEncapsulatedObject}"/> is greater or equal to the <see cref="FileSystemObjectInfo{TObjectProperties, TEncapsulatedObject}"/> to compare with.</returns>
-            public static bool operator >=(in FileSystemObjectInfo<TObjectProperties, TEncapsulatedObject> left, in FileSystemObjectInfo<TObjectProperties, TEncapsulatedObject> right) => left is null ? right is null : left.CompareTo(right) >= 0;
+            /// <returns>A <see cref="bool"/> value that indicates whether the given <see cref="FileSystemObjectInfo{TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/> is greater or equal to the <see cref="FileSystemObjectInfo{TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/> to compare with.</returns>
+            public static bool operator >=(in FileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> left, in FileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> right) => left is null ? right is null : left.CompareTo(right) >= 0;
             #endregion
+        }
+
+        public static class FileSystemObjectInfo
+        {
+            private static System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> _defaultRootItems;
+
+            public static System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> DefaultRootItems => _defaultRootItems ??= GetRootItems();
+
+            public static System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetRootItems()
+            {
+                EnumerableHelper<IBrowsableObjectInfo>.IEnumerableQueue queue = EnumerableHelper<IBrowsableObjectInfo>.GetEnumerableQueue();
+
+                ClientVersion clientVersion = BrowsableObjectInfo.GetDefaultClientVersion();
+
+                void enqueue(in IKnownFolder knownFolder) => queue.Enqueue(new ShellObjectInfo(knownFolder, clientVersion));
+
+                enqueue(KnownFolders.UserPinned);
+                enqueue(KnownFolders.Desktop);
+                enqueue(KnownFolders.Libraries);
+                enqueue(KnownFolders.Profile);
+                enqueue(KnownFolders.Desktop);
+                enqueue(KnownFolders.Computer);
+                enqueue(KnownFolders.RecycleBin);
+
+                return queue;
+            }
+
+            private static Icon TryGetIcon(in int index, in System.Drawing.Size size) => BrowsableObjectInfo.TryGetIcon(index, Microsoft.WindowsAPICodePack.NativeAPI.Consts.DllNames.Shell32, size);
+
+            public static string GetItemTypeName(in string extension, in FileType fileType) => fileType == FileType.Folder
+                        ? FileOperation.GetFileInfo(string.Empty, Microsoft.WindowsAPICodePack.Win32Native.Shell.FileAttributes.Directory, GetFileInfoOptions.TypeName).TypeName
+                        : FileOperation.GetFileInfo(extension, Microsoft.WindowsAPICodePack.Win32Native.Shell.FileAttributes.Normal, GetFileInfoOptions.TypeName).TypeName;
+
+            public static Icon TryGetIcon(in string extension, in FileType fileType, in System.Drawing.Size size) =>
+
+               // if (System.IO.Path.HasExtension(Path))
+
+               fileType == FileType.Folder ? TryGetIcon(3, size) : FileOperation.GetFileInfo(extension, Microsoft.WindowsAPICodePack.Win32Native.Shell.FileAttributes.Normal, GetFileInfoOptions.Icon | GetFileInfoOptions.UseFileAttributes).Icon?.TryGetIcon(size, 32, true, true) ?? TryGetIcon(0, size);// else// return TryGetIcon(FileType == FileType.Folder ? 3 : 0, "SHELL32.dll", size);
+
+            public static BitmapSource TryGetBitmapSource(in string extension, in FileType fileType, in int size)
+            {
+#if NETFRAMEWORK
+
+            using (Icon icon = TryGetIcon(extension, fileType, new System.Drawing.Size(size, size)))
+
+#else
+
+                using Icon icon = TryGetIcon(extension, fileType, new System.Drawing.Size(size, size));
+
+#endif
+                return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+            }
         }
     }
 }

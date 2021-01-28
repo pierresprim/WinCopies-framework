@@ -19,11 +19,11 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-using WinCopies.IO.Reflection;
+using WinCopies.IO.Reflection.PropertySystem;
 
 namespace WinCopies.IO.ObjectModel.Reflection
 {
-    public interface IDotNetParameterInfo : IDotNetItemInfo, IEncapsulatorBrowsableObjectInfo<ParameterInfo>
+    public interface IDotNetParameterInfo : IDotNetItemInfo<ParameterInfo>
     {
         IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<CustomAttributeData> func);
     }

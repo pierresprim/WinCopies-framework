@@ -15,14 +15,17 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+using WinCopies.IO.PropertySystem;
+using WinCopies.IO.Selectors;
+
 namespace WinCopies.IO.ObjectModel
 {
     public interface IArchiveItemInfoProvider : IFileSystemObjectInfo
     {
-        IShellObjectInfo ArchiveShellObject { get; }
+        IShellObjectInfoBase ArchiveShellObject { get; }
     }
 
-    public interface IArchiveItemInfoProvider<TObjectProperties, TEncapsulatedObject> : IArchiveItemInfoProvider, IFileSystemObjectInfo<TObjectProperties, TEncapsulatedObject> where TObjectProperties : IFileSystemObjectInfoProperties
+    public interface IArchiveItemInfoProvider<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : IArchiveItemInfoProvider, IFileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IFileSystemObjectInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
     {
         // Left empty.
     }

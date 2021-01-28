@@ -19,23 +19,28 @@ using Microsoft.WindowsAPICodePack.Shell;
 
 using System.IO;
 
+using WinCopies.IO.AbstractionInterop;
+using WinCopies.IO.Enumeration;
+using WinCopies.IO.PropertySystem;
+using WinCopies.IO.Selectors;
+
 namespace WinCopies.IO.ObjectModel
 {
-    public interface IShellObjectInfo : IArchiveItemInfoProvider
+    public interface IShellObjectInfoBase : IArchiveItemInfoProvider
     {
         Stream ArchiveFileStream { get; }
 
-        void OpenArchive(Stream stream);
+        void OpenArchive(FileMode fileMode, FileAccess fileAccess, FileShare fileShare, int? bufferSize, FileOptions fileOptions);
 
         void CloseArchive();
     }
 
-    public interface IShellObjectInfo2 : IShellObjectInfo, IEncapsulatorBrowsableObjectInfo<ShellObject>
+    public interface IShellObjectInfoBase2 : IShellObjectInfoBase, IEncapsulatorBrowsableObjectInfo<ShellObject>
     {
         // Left empty.
     }
 
-    public interface IShellObjectInfo<T> : IShellObjectInfo, IShellObjectInfo2 where T : IFileSystemObjectInfoProperties
+    public interface IShellObjectInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : IShellObjectInfoBase2, IArchiveItemInfoProvider<TObjectProperties, ShellObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IFileSystemObjectInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
     {
         ///// <summary>
         ///// Gets a <see cref="FileSystemInfo"/> object that provides info for the folders and files. This property returns <see langword="null"/> when this <see cref="IShellObjectInfo"/> is not a folder, drive or file. See the <see cref="IFileSystemObjectInfo.FileType"/> property for more details.
@@ -66,5 +71,10 @@ namespace WinCopies.IO.ObjectModel
         ///// Gets the special folder type of this <see cref="IShellObjectInfo"/>. <see cref="SpecialFolder.None"/> if this <see cref="IShellObjectInfo"/> is a casual file system item.
         ///// </summary>
         //SpecialFolder SpecialFolder { get; }
+    }
+
+    public interface IShellObjectInfo : IShellObjectInfo<IFileSystemObjectInfoProperties, ShellObjectInfoEnumeratorStruct, IBrowsableObjectInfoSelectorDictionary<ShellObjectInfoItemProvider>, ShellObjectInfoItemProvider>
+    {
+        // Left empty.
     }
 }

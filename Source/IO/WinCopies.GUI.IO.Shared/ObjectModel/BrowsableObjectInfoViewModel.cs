@@ -173,17 +173,17 @@ namespace WinCopies.GUI.IO.ObjectModel
         }
 
         /// <summary>
-        /// Gets the path of this <see cref="IFileSystemObject"/>.
+        /// Gets the path of this <see cref="IBrowsableObjectInfoBase"/>.
         /// </summary>
         public string Path => ModelGeneric.Path;
 
         /// <summary>
-        /// Gets the localized name of this <see cref="IFileSystemObject"/>.
+        /// Gets the localized name of this <see cref="IBrowsableObjectInfoBase"/>.
         /// </summary>
         public string LocalizedName => ModelGeneric.LocalizedName;
 
         /// <summary>
-        /// Gets the name of this <see cref="IFileSystemObject"/>.
+        /// Gets the name of this <see cref="IBrowsableObjectInfoBase"/>.
         /// </summary>
         public string Name => ModelGeneric.Name;
 
@@ -227,17 +227,17 @@ namespace WinCopies.GUI.IO.ObjectModel
 #if !NETFRAMEWORK
             [AllowNull]
 #endif
-        IFileSystemObject other) => ModelGeneric.CompareTo(other);
+        IBrowsableObjectInfoBase other) => ModelGeneric.CompareTo(other);
 
         public bool Equals(
 #if !NETFRAMEWORK
             [AllowNull]
 #endif
-        IFileSystemObject other) => ModelGeneric.Equals(other);
+        IBrowsableObjectInfoBase other) => ModelGeneric.Equals(other);
 
-        public Collections.IEqualityComparer<IFileSystemObject> GetDefaultEqualityComparer() => ModelGeneric.GetDefaultEqualityComparer();
+        public Collections.IEqualityComparer<IBrowsableObjectInfoBase> GetDefaultEqualityComparer() => ModelGeneric.GetDefaultEqualityComparer();
 
-        public IComparer<IFileSystemObject> GetDefaultComparer() => ModelGeneric.GetDefaultComparer();
+        public IComparer<IBrowsableObjectInfoBase> GetDefaultComparer() => ModelGeneric.GetDefaultComparer();
 
         public override bool Equals(object obj) => ReferenceEquals(this, obj) ? true : obj is null ? false : ModelGeneric.Equals(obj);
 

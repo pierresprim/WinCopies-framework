@@ -20,10 +20,15 @@
   </PropertyGroup>
 
   <Import Project="..\WinCopies.GUI.Shared\WinCopies.GUI.Shared.projitems" Label="Shared" />
+  <Import Project="..\WinCopies.GUI.Windows.Shared\WinCopies.GUI.Windows.Shared.projitems" Label="Shared" />
+  <Import Project="..\WinCopies.GUI.Controls.Shared\WinCopies.GUI.Controls.Shared.projitems" Label="Shared" />
 
   <ItemGroup>
     <PackageReference Include="WinCopies.Util" Version="3.1.0.1-preview" />
+    <PackageReference Include="WinCopies.Util.Extensions" Version="3.1.0.1-preview" />
     <PackageReference Include="WinCopies.Util.Desktop" Version="3.1.0.1-preview" />
+    
+    <PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="3.0.0-preview" />
   </ItemGroup>
 
   <ItemGroup>
@@ -31,6 +36,13 @@
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Themes\Generic.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
 
 </Project>

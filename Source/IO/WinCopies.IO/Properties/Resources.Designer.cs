@@ -22,7 +22,7 @@ namespace WinCopies.IO.Properties {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    public class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace WinCopies.IO.Properties {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("WinCopies.IO.Properties.Resources", typeof(Resources).Assembly);
@@ -51,7 +51,7 @@ namespace WinCopies.IO.Properties {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -61,11 +61,101 @@ namespace WinCopies.IO.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The registry key does not exists. Registry key name: {0}.
+        ///   Looks up a localized string similar to .Net Attribute.
         /// </summary>
-        internal static string RegistryKeyNotExists {
+        public static string DotNetAttribute {
             get {
-                return ResourceManager.GetString("RegistryKeyNotExists", resourceCulture);
+                return ResourceManager.GetString("DotNetAttribute", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .Net Member.
+        /// </summary>
+        public static string DotNetMember {
+            get {
+                return ResourceManager.GetString("DotNetMember", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .Net Namespace.
+        /// </summary>
+        public static string DotNetNamespace {
+            get {
+                return ResourceManager.GetString("DotNetNamespace", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .Net Type.
+        /// </summary>
+        public static string DotNetType {
+            get {
+                return ResourceManager.GetString("DotNetType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Portable Device.
+        /// </summary>
+        public static string PortableDevice {
+            get {
+                return ResourceManager.GetString("PortableDevice", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Registry Key.
+        /// </summary>
+        public static string RegistryKey {
+            get {
+                return ResourceManager.GetString("RegistryKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Registry Root.
+        /// </summary>
+        public static string RegistryRoot {
+            get {
+                return ResourceManager.GetString("RegistryRoot", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Registry Value.
+        /// </summary>
+        public static string RegistryValue {
+            get {
+                return ResourceManager.GetString("RegistryValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to WMI Class.
+        /// </summary>
+        public static string WMIClass {
+            get {
+                return ResourceManager.GetString("WMIClass", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to WMI Instance.
+        /// </summary>
+        public static string WMIInstance {
+            get {
+                return ResourceManager.GetString("WMIInstance", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to WMI Namespace.
+        /// </summary>
+        public static string WMINamespace {
+            get {
+                return ResourceManager.GetString("WMINamespace", resourceCulture);
             }
         }
     }

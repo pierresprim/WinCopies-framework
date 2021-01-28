@@ -17,23 +17,24 @@
 
 using Microsoft.WindowsAPICodePack.PortableDevices;
 
-namespace WinCopies.IO
+using WinCopies.IO.AbstractionInterop;
+using WinCopies.IO.PropertySystem;
+using WinCopies.IO.Selectors;
+
+namespace WinCopies.IO.ObjectModel
 {
-    public interface IPortableDeviceInfoProperties : IFileSystemObjectInfoProperties
+    public interface IPortableDeviceInfoBase : IFileSystemObjectInfo, IEncapsulatorBrowsableObjectInfo<IPortableDevice>
     {
-        PortableDeviceOpeningOptions OpeningOptions { get; }
+        // Left empty.
     }
 
-    namespace ObjectModel
+    public interface IPortableDeviceInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : IPortableDeviceInfoBase, IFileSystemObjectInfo<TObjectProperties, IPortableDevice, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IPortableDeviceInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
     {
-        public interface IPortableDeviceInfo : IPortableDeviceInfoProperties, IFileSystemObjectInfo, IEncapsulatorBrowsableObjectInfo<IPortableDevice>
-        {
-            PortableDeviceOpeningOptions OpeningOptions { get; set; }
-        }
+        // Left empty.
+    }
 
-        public interface IPortableDeviceInfo<T> : IPortableDeviceInfo, IFileSystemObjectInfo<T, IPortableDevice> where T : IPortableDeviceInfoProperties
-        {
-            // Left empty.
-        }
+    public interface IPortableDeviceInfo : IPortableDeviceInfo<IPortableDeviceInfoProperties, IPortableDeviceObject, IBrowsableObjectInfoSelectorDictionary<PortableDeviceObjectInfoItemProvider>, PortableDeviceObjectInfoItemProvider>
+    {
+        // Left empty.
     }
 }

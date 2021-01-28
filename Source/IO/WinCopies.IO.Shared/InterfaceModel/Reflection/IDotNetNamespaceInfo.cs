@@ -20,26 +20,15 @@ using System.Collections.Generic;
 
 using WinCopies.IO.Reflection;
 
-namespace WinCopies.IO
+namespace WinCopies.IO.ObjectModel.Reflection
 {
-    namespace Reflection
+    public interface IDotNetNamespaceInfoBase : IDotNetItemInfo<string>
     {
-        public interface IDotNetNamespaceInfoProperties : IDotNetItemInfoProperties
-        {
-            bool IsRootNamespace { get; }
-        }
+        IEnumerable<IBrowsableObjectInfo> GetItems(IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetNamespaceInfoEnumeratorStruct> func);
     }
 
-    namespace ObjectModel.Reflection
+    public interface IDotNetNamespaceInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : IDotNetNamespaceInfoBase, IDotNetItemInfo<T, object> where T : IDotNetNamespaceInfoProperties
     {
-        public interface IDotNetNamespaceInfo : IDotNetNamespaceInfoProperties, IDotNetItemInfo
-        {
-            IEnumerable<IBrowsableObjectInfo> GetItems(IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetNamespaceInfoEnumeratorStruct> func);
-        }
-
-        public interface IDotNetNamespaceInfo<T> : IDotNetNamespaceInfo, IDotNetItemInfo<T, object> where T : IDotNetNamespaceInfoProperties
-        {
-            // Left empty.
-        }
+        // Left empty.
     }
 }
