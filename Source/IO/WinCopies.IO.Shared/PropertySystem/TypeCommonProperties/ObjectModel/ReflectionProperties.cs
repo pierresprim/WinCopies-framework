@@ -18,7 +18,6 @@
 using System;
 using System.Reflection;
 
-using WinCopies.Collections.Generic;
 using WinCopies.IO.ObjectModel.Reflection;
 using WinCopies.IO.PropertySystem;
 

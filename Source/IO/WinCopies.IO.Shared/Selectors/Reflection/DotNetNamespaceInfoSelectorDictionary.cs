@@ -23,24 +23,15 @@ using WinCopies.IO.ObjectModel.Reflection;
 
 namespace WinCopies.IO.Selectors.Reflection
 {
-    public class DotNetAssemblyInfoSelectorDictionary : BrowsableObjectInfoSelectorDictionary<DotNetAssemblyInfoItemProvider>
+    public class DotNetNamespaceInfoSelectorDictionary : BrowsableObjectInfoSelectorDictionary<DotNetNamespaceInfoItemProvider>
     {
-        public static IBrowsableObjectInfo Convert(DotNetAssemblyInfoItemProvider item)
-        {
-            if (item.TypeInfoItemProvider != null)
+        public static IBrowsableObjectInfo Convert(DotNetNamespaceInfoItemProvider item) => item.TypeInfoItemProvider != null
+                ? new DotNetTypeInfo(item.TypeInfoItemProvider.TypeInfo, item.TypeInfoItemProvider.ItemType, true, item.Parent)
+                : (IBrowsableObjectInfo)(item.NamespaceName == null
+                    ? throw BrowsableObjectInfoSelectorDictionary.GetInvalidItemProviderException()
+                    : new DotNetNamespaceInfo(item.NamespaceName, item.Parent));
 
-                return new DotNetTypeInfo(item.TypeInfoItemProvider.Type, item.TypeInfoItemProvider.ItemType, true, item.Parent);
-
-            if (item.NamespaceName != null)
-
-                return new DotNetNamespaceInfo(item.NamespaceName,  );
-
-            return item.PortableDevice == null
-                ? throw new ArgumentException("The given item provider or its current configuration is not supported.")
-                : new PortableDeviceInfo(item.PortableDevice, item.ClientVersion.Value);
-        }
-
-        protected override Converter<DotNetAssemblyInfoItemProvider, IBrowsableObjectInfo> DefaultSelectorOverride => Convert;
+        protected override Converter<DotNetNamespaceInfoItemProvider, IBrowsableObjectInfo> DefaultSelectorOverride => Convert;
 
         public DotNetAssemblyInfoSelectorDictionary() { /* Left empty. */ }
     }

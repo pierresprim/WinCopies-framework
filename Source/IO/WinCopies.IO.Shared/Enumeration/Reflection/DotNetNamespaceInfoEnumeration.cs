@@ -173,7 +173,7 @@ namespace WinCopies.IO.Enumeration.Reflection
 
     public static class DotNetNamespaceInfoEnumeration
     {
-        public static System.Collections.Generic.IEnumerable<DotNetAssemblyInfoItemProvider> From(IBrowsableObjectInfo dotNetItemInfo, System.Collections.Generic.IEnumerable<DotNetItemType> typesToEnumerate, in Predicate<DotNetAssemblyInfoItemProvider> func)
+        public static System.Collections.Generic.IEnumerable<DotNetNamespaceInfoItemProvider> From(IBrowsableObjectInfo dotNetItemInfo, System.Collections.Generic.IEnumerable<DotNetItemType> typesToEnumerate, in Predicate<DotNetNamespaceInfoItemProvider> func)
         {
             Debug.Assert(dotNetItemInfo.Is(false, typeof(IDotNetAssemblyInfo), typeof(IDotNetNamespaceInfoBase)));
 
@@ -205,7 +205,7 @@ namespace WinCopies.IO.Enumeration.Reflection
 
                     return null;
 
-                typePredicate = t => t.Namespace == dotNetNamespaceInfo.InnerObject;
+                typePredicate = t => t.Namespace == dotNetNamespaceInfo.Path.Replace(WinCopies.IO.Path.PathSeparator, '.');
             }
 
             else
@@ -228,9 +228,9 @@ namespace WinCopies.IO.Enumeration.Reflection
                 EnumerableHelper<string>.IEnumerableQueue _queue = EnumerableHelper<string>.GetEnumerableQueue();
                 string _namespace = parent is IDotNetNamespaceInfoBase ? parent.Path.Replace(PathSeparator, '.') : null;
 
-                // DotNetAssemblyInfoItemProvider select(string ____namespace) => new DotNetAssemblyInfoItemProvider(____namespace, false, parent);
+                // DotNetNamespaceInfoItemProvider select(string ____namespace) => new DotNetNamespaceInfoItemProvider(____namespace, false, parent);
 
-                //Func<string, DotNetAssemblyInfoItemProvider> _select = ___namespace =>
+                //Func<string, DotNetNamespaceInfoItemProvider> _select = ___namespace =>
                 //{
                 //    _select = select;
 
@@ -286,7 +286,7 @@ namespace WinCopies.IO.Enumeration.Reflection
                     addEnumerable(typeToEnumerate);
             }
 
-            return namespaces.Merge().Select(_namespace => new DotNetAssemblyInfoItemProvider(_namespace, dotNetItemInfo)).AppendValues(types.Merge().Select(type => new DotNetAssemblyInfoItemProvider(type, dotNetItemInfo)));
+            return namespaces.Merge().Select(_namespace => new DotNetNamespaceInfoItemProvider(_namespace, dotNetItemInfo)).AppendValues(types.Merge().Select(type => new DotNetNamespaceInfoItemProvider(type, dotNetItemInfo)));
         }
     }
 }

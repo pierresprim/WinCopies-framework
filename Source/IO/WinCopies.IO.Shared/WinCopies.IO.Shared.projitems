@@ -46,9 +46,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)File.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EnumerablePath.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\TypeCommonProperties\ObjectModel\PortableDeviceProperties.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\TypeCommonProperties\ObjectModel\Reflection\DotNetNamespaceInfoProperties.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\TypeCommonProperties\ObjectModel\WMIItemInfoProperties.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Selectors\PortableDeviceSelectorDictionaries.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Selectors\Reflection\DotNetNamespaceInfoSelectorDictionary.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Selectors\Reflection\DotNetMemberInfoSelectorDictionary.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Selectors\WMIItemInfoSelectorDictionary.cs" />
     <Compile Include="..\WinCopies.IO.Shared\Enumeration\ShellObjectInfoEnumeration.cs" />
@@ -94,7 +94,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\TypeCommonProperties\InterfaceModel\ReflectionProperties.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\TypeCommonProperties\InterfaceModel\ShellProperties.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\TypeCommonProperties\ObjectModel\ArchiveItemInfoProperties.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\TypeCommonProperties\ObjectModel\Reflection\ReflectionProperties.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\TypeCommonProperties\ObjectModel\ReflectionProperties.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\TypeCommonProperties\ObjectModel\RegistryItemInfoProperties.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\TypeCommonProperties\ObjectModel\ShellProperties.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Registry.cs" />
@@ -103,7 +103,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\ShellObjectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enumeration\ShellObjectInfoEnumeratorStruct.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Selectors\BrowsableObjectInfoSelectorDictionary.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Selectors\Reflection\DotNetAssemblyInfoSelectorDictionary.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Selectors\ArchiveItemInfoSelectorDictionary.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Selectors\RegistryItemInfoSelectorDictionary.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Selectors\ShellObjectInfoSelectorDictionary.cs" />
@@ -115,6 +114,5 @@
   <ItemGroup>
     <Folder Include="$(MSBuildThisFileDirectory)PropertySystem\Core\" />
     <Folder Include="$(MSBuildThisFileDirectory)PropertySystem\Shell\" />
-    <Folder Include="$(MSBuildThisFileDirectory)PropertySystem\TypeCommonProperties\ObjectModel\Reflection\" />
   </ItemGroup>
 </Project>

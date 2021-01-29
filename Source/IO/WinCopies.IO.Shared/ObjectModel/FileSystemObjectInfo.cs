@@ -55,7 +55,7 @@ namespace WinCopies.IO
 
             public override Predicate<TPredicateTypeParameter> RootItemsPredicate => null;
 
-            public override Predicate<IBrowsableObjectInfo> RootItemsBrowsableObjectInfoPredicate => item => item.IsBrowsable && item.IsBrowsableByDefault;
+            public override Predicate<IBrowsableObjectInfo> RootItemsBrowsableObjectInfoPredicate => item => item.Browsability?.Browsability == IO.Browsability.BrowsableByDefault;
             #endregion
 
             // /// <param name="fileType">The <see cref="FileType"/> of this <see cref="BrowsableObjectInfo"/>.</param>

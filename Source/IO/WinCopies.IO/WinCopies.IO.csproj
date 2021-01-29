@@ -17,6 +17,7 @@
 		<VersionSuffix>preview</VersionSuffix>
 		<AssemblyVersion>3.0.0</AssemblyVersion>
 		<FileVersion>3.0.0</FileVersion>
+		<PackageIcon>WinCopies.ico</PackageIcon>
 	</PropertyGroup>
 
 	<Import Project="..\WinCopies.IO.Shared\WinCopies.IO.Shared.projitems" Label="Shared" />
@@ -96,6 +97,10 @@
 	<ItemGroup>
 		<None Update="7z.dll">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Include="..\..\WinCopies.ico">
+		  <Pack>True</Pack>
+		  <PackagePath></PackagePath>
 		</None>
 	</ItemGroup>
 

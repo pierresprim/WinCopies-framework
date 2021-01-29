@@ -33,6 +33,7 @@ using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Selectors;
 
 using static WinCopies.Temp;
+using static WinCopies.ThrowHelper;
 
 namespace WinCopies.IO.ObjectModel
 {
@@ -124,6 +125,14 @@ namespace WinCopies.IO.ObjectModel
         #endregion
 
         #region Methods
+        private static bool _IsBrowsable(in IBrowsableObjectInfo browsableObjectInfo) => browsableObjectInfo.Browsability == null
+                ? false
+                : browsableObjectInfo.Browsability.Browsability == IO.Browsability.BrowsableByDefault || browsableObjectInfo.Browsability.Browsability == IO.Browsability.Browsable;
+
+        public static bool IsBrowsable(in IBrowsableObjectInfo browsableObjectInfo) => _IsBrowsable(browsableObjectInfo ?? throw GetArgumentNullException(nameof(browsableObjectInfo)));
+
+        public bool IsBrowsable() => _IsBrowsable(this);
+
         public static ClientVersion GetDefaultClientVersion()
         {
             AssemblyName assemblyName = Assembly.GetExecutingAssembly().GetName();

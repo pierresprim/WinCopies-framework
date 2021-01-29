@@ -61,7 +61,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
 
         public IDotNetAssemblyInfo ParentDotNetAssemblyInfo { get; }
 
-        public sealed override bool IsRecursivelyBrowsable => IsBrowsable;
+        public sealed override bool IsRecursivelyBrowsable => IsBrowsable();
 
         #region BitmapSources
         protected abstract BitmapSource TryGetBitmapSource(in int size);
@@ -139,7 +139,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
 
     public abstract class BrowsableDotNetItemInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : DotNetItemInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IDotNetItemInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
     {
-        public sealed override bool IsBrowsable => true;
+        public sealed override IBrowsabilityOptions Browsability => BrowsabilityOptions.BrowsableByDefault;
 
         protected BrowsableDotNetItemInfo(in string path, in string name, in IBrowsableObjectInfo parent) : base(path, name, parent)
         {

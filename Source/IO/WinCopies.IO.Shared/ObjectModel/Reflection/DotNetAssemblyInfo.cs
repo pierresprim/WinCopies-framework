@@ -45,10 +45,10 @@ namespace WinCopies.IO
 
 namespace WinCopies.IO.ObjectModel.Reflection
 {
-    public class DotNetAssemblyInfo : ShellObjectInfo<IFileSystemObjectInfoProperties2, DotNetAssemblyInfoItemProvider, IBrowsableObjectInfoSelectorDictionary<DotNetAssemblyInfoItemProvider>, DotNetAssemblyInfoItemProvider>, IDotNetAssemblyInfo // <IFileSystemObjectInfoProperties>
+    public class DotNetAssemblyInfo : ShellObjectInfo<IFileSystemObjectInfoProperties2, DotNetNamespaceInfoItemProvider, IBrowsableObjectInfoSelectorDictionary<DotNetNamespaceInfoItemProvider>, DotNetNamespaceInfoItemProvider>, IDotNetAssemblyInfo // <IFileSystemObjectInfoProperties>
     {
         #region Properties
-        public override Predicate<DotNetAssemblyInfoItemProvider> RootItemsPredicate => item => !IsNullEmptyOrWhiteSpace(item.NamespaceName);
+        public override Predicate<DotNetNamespaceInfoItemProvider> RootItemsPredicate => item => !IsNullEmptyOrWhiteSpace(item.NamespaceName);
 
         public override Predicate<IBrowsableObjectInfo> RootItemsBrowsableObjectInfoPredicate => null;
 
@@ -80,7 +80,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
             return initInfo.FileType == FileType.File ? initInfo.Path.EndsWith(".exe", ".dll") ? new DotNetAssemblyInfo(initInfo.Path, shellObject, clientVersion) : throw new ArgumentException($"{nameof(shellObject)} must be an exe (.exe) or a dll (.dll).") : throw new ArgumentException($"{nameof(shellObject)} is not a file.");
         }
 
-        public override IBrowsableObjectInfoSelectorDictionary<DotNetAssemblyInfoItemProvider> GetSelectorDictionary() => DefaultItemSelectorDictionary;
+        public override IBrowsableObjectInfoSelectorDictionary<DotNetNamespaceInfoItemProvider> GetSelectorDictionary() => DefaultItemSelectorDictionary;
 
         public void OpenAssembly()
         {
@@ -99,11 +99,11 @@ namespace WinCopies.IO.ObjectModel.Reflection
 
         public static System.Collections.Generic.IEnumerable<DotNetItemType> GetDefaultItemTypes() => new DotNetItemType[] { DotNetItemType.Namespace, DotNetItemType.Struct, DotNetItemType.Enum, DotNetItemType.Class, DotNetItemType.Interface, DotNetItemType.Delegate };
 
-        protected virtual System.Collections.Generic.IEnumerable<DotNetAssemblyInfoItemProvider> GetItemProviders(System.Collections.Generic.IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetAssemblyInfoItemProvider> func) => DotNetNamespaceInfoEnumeration.From(this, typesToEnumerate, func);
+        protected virtual System.Collections.Generic.IEnumerable<DotNetNamespaceInfoItemProvider> GetItemProviders(System.Collections.Generic.IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetNamespaceInfoItemProvider> func) => DotNetNamespaceInfoEnumeration.From(this, typesToEnumerate, func);
 
-        protected override System.Collections.Generic.IEnumerable<DotNetAssemblyInfoItemProvider> GetItemProviders(Predicate<DotNetAssemblyInfoItemProvider> predicate) => GetItemProviders(GetDefaultItemTypes(), predicate);
+        protected override System.Collections.Generic.IEnumerable<DotNetNamespaceInfoItemProvider> GetItemProviders(Predicate<DotNetNamespaceInfoItemProvider> predicate) => GetItemProviders(GetDefaultItemTypes(), predicate);
 
-        protected override System.Collections.Generic.IEnumerable<DotNetAssemblyInfoItemProvider> GetItemProviders() => GetItemProviders(GetDefaultItemTypes(), null);
+        protected override System.Collections.Generic.IEnumerable<DotNetNamespaceInfoItemProvider> GetItemProviders() => GetItemProviders(GetDefaultItemTypes(), null);
         #endregion
     }
 }

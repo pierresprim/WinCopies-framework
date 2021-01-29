@@ -39,7 +39,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
         public sealed override IDotNetTypeInfoProperties ObjectPropertiesGeneric { get; }
         #endregion
 
-        protected DotNetTypeInfo(in TypeInfo typeInfo,  in IBrowsableObjectInfo parent) : base(isRootType.HasValue && isRootType.Value ? typeInfo.Name : $"{parent.Path}{PathSeparator}{typeInfo.Name}", typeInfo.Name, parent)
+        protected DotNetTypeInfo(in TypeInfo typeInfo, in IBrowsableObjectInfo parent) : base(isRootType.HasValue && isRootType.Value ? typeInfo.Name : $"{parent.Path}{PathSeparator}{typeInfo.Name}", typeInfo.Name, parent)
         {
 #if DEBUG
             if (isRootType.HasValue && isRootType.Value)
@@ -89,9 +89,8 @@ namespace WinCopies.IO.ObjectModel.Reflection
 
             ObjectPropertiesGeneric = new DotNetTypeInfoProperties<IDotNetTypeInfo>(this, itemType, isRootType);
         }
-    }
 
-        protected DotNetTypeInfo(in Type type, in IBrowsableObjectInfo parent):this(type.GetTypeInfo(), parent)
+        protected DotNetTypeInfo(in Type type, in IBrowsableObjectInfo parent) : this(type.GetTypeInfo(), parent)
         {
             // Left empty.
         }
@@ -103,12 +102,12 @@ namespace WinCopies.IO.ObjectModel.Reflection
 
         public static DotNetItemType[] DefaultTypesToEnumerate => _defaultTypesToEnumerate ??= new DotNetItemType[] { DotNetItemType.GenericParameter, DotNetItemType.GenericArgument, DotNetItemType.Field, DotNetItemType.Property, DotNetItemType.Event, DotNetItemType.Constructor, DotNetItemType.Method, DotNetItemType.Struct, DotNetItemType.Enum, DotNetItemType.Class, DotNetItemType.Interface, DotNetItemType.Delegate, DotNetItemType.Attribute, DotNetItemType.ImplementedInterface };
 
-        protected internal DotNetTypeInfo(in TypeInfo type, in DotNetItemType itemType, in bool isRootType, in IBrowsableObjectInfo parent):base(type,parent)
+        protected internal DotNetTypeInfo(in TypeInfo type, in DotNetItemType itemType, in bool isRootType, in IBrowsableObjectInfo parent) : base(type, parent)
         {
 
         }
 
-        protected virtual    System.Collections.Generic.IEnumerable<DotNetTypeInfoItemProvider> GetItemProviders(System.Collections.Generic.IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetTypeInfoItemProvider> func) => new Enumerable<DotNetTypeInfoItemProvider>(() => DotNetTypeInfoEnumerator.From(this, typesToEnumerate, func));
+        protected virtual System.Collections.Generic.IEnumerable<DotNetTypeInfoItemProvider> GetItemProviders(System.Collections.Generic.IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetTypeInfoItemProvider> func) => new Enumerable<DotNetTypeInfoItemProvider>(() => DotNetTypeInfoEnumerator.From(this, typesToEnumerate, func));
 
         protected override System.Collections.Generic.IEnumerable<DotNetTypeInfoItemProvider> GetItemProviders(Predicate<DotNetTypeInfoItemProvider> predicate) => GetItemProviders(DefaultTypesToEnumerate, predicate);
 

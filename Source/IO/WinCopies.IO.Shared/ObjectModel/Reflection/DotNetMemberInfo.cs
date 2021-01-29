@@ -42,10 +42,10 @@ namespace WinCopies.IO.ObjectModel.Reflection
         public override string ItemTypeName => Properties.Resources.DotNetMember;
         #endregion
 
-        protected DotNetMemberInfo(in MemberInfo memberInfo, in IDotNetItemInfo parent) : base($"{(parent ?? throw GetArgumentNullException(nameof(parent))).Path}{IO.Path.PathSeparator}{(memberInfo ?? throw GetArgumentNullException(nameof(memberInfo))).Name}", memberInfo.Name, dotNetTypeInfo)
+        protected DotNetMemberInfo(in MemberInfo memberInfo, in IDotNetItemInfo parent) : base($"{(parent ?? throw GetArgumentNullException(nameof(parent))).Path}{IO.Path.PathSeparator}{(memberInfo ?? throw GetArgumentNullException(nameof(memberInfo))).Name}", memberInfo.Name, parent)
 #if DEBUG
         {
-            Debug.Assert(If(ComparisonType.And, ComparisonMode.Logical, Comparison.NotEqual, null, dotNetTypeInfo, dotNetTypeInfo.ParentDotNetAssemblyInfo));
+            Debug.Assert(If(ComparisonType.And, ComparisonMode.Logical, Comparison.NotEqual, null, parent, parent.ParentDotNetAssemblyInfo));
 #else
 =>
 #endif
@@ -63,12 +63,10 @@ namespace WinCopies.IO.ObjectModel.Reflection
 
         public sealed override IDotNetItemInfoProperties ObjectPropertiesGeneric { get; }
 
-        public override bool IsBrowsableByDefault => true;
-
         public override IPropertySystemCollection ObjectPropertySystem => null;
         #endregion
 
-        protected internal DotNetMemberInfo(in MemberInfo memberInfo, in DotNetItemType dotNetItemType, in bool isPropertyMethod, in IDotNetItemInfo parent) : base(memberInfo, dotNetItemType, parent) => ObjectPropertiesGeneric = new DotNetItemInfoProperties<IDotNetItemInfo>(this, dotNetItemType);
+        protected internal DotNetMemberInfo(in MemberInfo memberInfo, in DotNetItemType dotNetItemType, in bool isPropertyMethod, in IDotNetItemInfo parent) : base(memberInfo,  parent) => ObjectPropertiesGeneric = new DotNetItemInfoProperties<IDotNetItemInfo>(this, dotNetItemType);
 
         #region Methods
         public static System.Collections.Generic.IEnumerable<DotNetItemType> GetDefaultItemTypes() => new DotNetItemType[] { DotNetItemType.Parameter, DotNetItemType.Attribute };

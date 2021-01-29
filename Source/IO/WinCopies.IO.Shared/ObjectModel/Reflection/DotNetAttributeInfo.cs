@@ -39,9 +39,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
         #region Properties
         public sealed override CustomAttributeData InnerObjectGeneric { get; }
 
-        public override bool IsBrowsable => false;
-
-        public override bool IsBrowsableByDefault => false;
+        public override IBrowsabilityOptions Browsability => BrowsabilityOptions.NotBrowsable;
 
         public override string ItemTypeName => Properties.Resources.DotNetAttribute;
         #endregion

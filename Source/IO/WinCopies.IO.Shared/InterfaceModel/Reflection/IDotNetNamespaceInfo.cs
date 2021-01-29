@@ -18,17 +18,25 @@
 using System;
 using System.Collections.Generic;
 
+using WinCopies.IO.AbstractionInterop.Reflection;
 using WinCopies.IO.Reflection;
+using WinCopies.IO.Reflection.PropertySystem;
+using WinCopies.IO.Selectors;
 
 namespace WinCopies.IO.ObjectModel.Reflection
 {
-    public interface IDotNetNamespaceInfoBase : IDotNetItemInfo<string>
-    {
-        IEnumerable<IBrowsableObjectInfo> GetItems(IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetNamespaceInfoEnumeratorStruct> func);
-    }
-
-    public interface IDotNetNamespaceInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : IDotNetNamespaceInfoBase, IDotNetItemInfo<T, object> where T : IDotNetNamespaceInfoProperties
+    public interface IDotNetNamespaceInfoBase : IDotNetItemInfo<object>
     {
         // Left empty.
+    }
+
+    public interface IDotNetNamespaceInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : IDotNetNamespaceInfoBase, IDotNetItemInfo<TObjectProperties, object, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IDotNetItemInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
+    {
+        // Left empty.
+    }
+
+    public interface IDotNetNamespaceInfo : IDotNetNamespaceInfo<IDotNetItemInfoProperties, DotNetNamespaceInfoItemProvider, IBrowsableObjectInfoSelectorDictionary<DotNetNamespaceInfoItemProvider>, DotNetNamespaceInfoItemProvider>
+    {
+        IEnumerable<IBrowsableObjectInfo> GetItems(IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetNamespaceInfoItemProvider> func);
     }
 }

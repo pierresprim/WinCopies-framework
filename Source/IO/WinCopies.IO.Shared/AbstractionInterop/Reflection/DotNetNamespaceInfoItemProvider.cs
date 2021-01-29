@@ -41,7 +41,7 @@ namespace WinCopies.IO.AbstractionInterop.Reflection
             ItemType = itemType;
         }
 
-        public TypeInfoItemProvider(in Type type, in DotNetItemType itemType ) : this(type.GetTypeInfo(), itemType)
+        public TypeInfoItemProvider(in Type type, in DotNetItemType itemType) : this(type.GetTypeInfo(), itemType)
         {
             // Left empty.
         }
@@ -75,30 +75,18 @@ namespace WinCopies.IO.AbstractionInterop.Reflection
         }
     }
 
-    public class DotNetAssemblyInfoItemProvider : ITypeInfoItemProvider
+    public class DotNetNamespaceInfoItemProvider : ITypeInfoItemProvider
     {
         public string NamespaceName { get; }
 
         public TypeInfoItemProvider TypeInfoItemProvider { get; }
 
-        public bool IsRootItem { get; }
-
         public IBrowsableObjectInfo Parent { get; }
 
-        private DotNetAssemblyInfoItemProvider(in bool isRootItem, in IBrowsableObjectInfo parent)
-        {
-            IsRootItem = isRootItem;
+        private DotNetNamespaceInfoItemProvider(in IBrowsableObjectInfo parent) => Parent = parent;
 
-            Parent = parent;
-        }
+        public DotNetNamespaceInfoItemProvider(in string _namespace, in IBrowsableObjectInfo parent) : this(parent) => NamespaceName = _namespace;
 
-        public DotNetAssemblyInfoItemProvider(in string _namespace, in IBrowsableObjectInfo parent) : this(false, parent) => NamespaceName = _namespace;
-
-        public DotNetAssemblyInfoItemProvider(in TypeInfoItemProvider typeInfoItemProvider, in IBrowsableObjectInfo parent) : this(false, parent) => TypeInfoItemProvider = typeInfoItemProvider;
-
-        public DotNetAssemblyInfoItemProvider(in IBrowsableObjectInfo parent) : this(true, parent)
-        {
-            // Left empty.
-        }
+        public DotNetNamespaceInfoItemProvider(in TypeInfoItemProvider typeInfoItemProvider, in IBrowsableObjectInfo parent) : this(parent) => TypeInfoItemProvider = typeInfoItemProvider;
     }
 }

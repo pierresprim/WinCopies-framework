@@ -14,6 +14,7 @@
     <VersionSuffix>preview</VersionSuffix>
     <AssemblyVersion>2.5.10</AssemblyVersion>
     <FileVersion>2.5.10</FileVersion>
+    <PackageIcon>WinCopies.ico</PackageIcon>
   </PropertyGroup>
 
   <Import Project="..\WinCopies.GUI.IO.Shared\WinCopies.GUI.IO.Shared.projitems" Label="Shared" />
@@ -30,6 +31,10 @@
 
   <ItemGroup>
     <None Include="..\..\..\LICENSE.md">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+    <None Include="..\..\WinCopies.ico">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>

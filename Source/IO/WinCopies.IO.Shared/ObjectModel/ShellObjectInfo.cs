@@ -256,8 +256,6 @@ namespace WinCopies.IO
             #region Properties
             public static IBrowsableObjectInfoSelectorDictionary<ShellObjectInfoItemProvider> DefaultItemSelectorDictionary { get; } = new ShellObjectInfoSelectorDictionary();
 
-            public override bool IsBrowsableByDefault => true;
-
             public sealed override IFileSystemObjectInfoProperties ObjectPropertiesGeneric { get; }
             #endregion // Properties
 
