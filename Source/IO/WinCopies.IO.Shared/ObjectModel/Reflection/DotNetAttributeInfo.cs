@@ -68,7 +68,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
 
         public override IPropertySystemCollection ObjectPropertySystem => null;
 
-        protected DotNetAttributeInfo(in CustomAttributeData customAttributeData, in IDotNetItemInfo parent) : base(customAttributeData, parent) => ObjectPropertiesGeneric = new DotNetItemInfoProperties<IDotNetItemInfo>(this, DotNetItemType.Attribute);
+        protected internal DotNetAttributeInfo(in CustomAttributeData customAttributeData, in IDotNetItemInfo parent) : base(customAttributeData, parent) => ObjectPropertiesGeneric = new DotNetItemInfoProperties<IDotNetItemInfo>(this, DotNetItemType.Attribute);
 
         protected override IEnumerable<object> GetItemProviders() => null;
 

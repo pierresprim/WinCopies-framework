@@ -24,6 +24,8 @@ using WinCopies.IO.ObjectModel.Reflection;
 using WinCopies.IO.Reflection;
 using WinCopies.Linq;
 
+using static WinCopies.ThrowHelper;
+
 namespace WinCopies.IO.Enumeration.Reflection
 {
     //    public class DotNetEnumerator<T> : Enumerator<IEnumerator<T>, T> where T : IDotNetItemInfo
@@ -98,6 +100,10 @@ namespace WinCopies.IO.Enumeration.Reflection
     {
         public static System.Collections.Generic.IEnumerable<DotNetMemberInfoItemProvider> From(IDotNetMemberInfoBase dotNetMemberInfo, in System.Collections.Generic.IEnumerable<DotNetItemType> typesToEnumerate, in Predicate<DotNetMemberInfoItemProvider> func)
         {
+            MemberInfo memberInfo = (dotNetMemberInfo ?? throw GetArgumentNullException(nameof(dotNetMemberInfo))).InnerObject;
+
+            System.Collections.Generic.IEnumerator<DotNetItemType> typesToEnumerateEnumerator = (typesToEnumerate ?? DotNetMemberInfo.GetDefaultItemTypes()).GetEnumerator();
+
             EnumerableHelper<System.Collections.Generic.IEnumerable<DotNetMemberInfoItemProvider>>.IEnumerableQueue queue = EnumerableHelper<System.Collections.Generic.IEnumerable<DotNetMemberInfoItemProvider>>.GetEnumerableQueue();
 
             void add<T>(in System.Collections.Generic.IEnumerable<T> enumerable, in Converter<T, DotNetMemberInfoItemProvider> selector)
@@ -164,6 +170,10 @@ namespace WinCopies.IO.Enumeration.Reflection
                             case PropertyInfo propertyInfo:
 
                                 add(propertyInfo.GetIndexParameters(), p => select(p, false));
+
+                                if (propertyInfo.PropertyType != null)
+
+                                    queue.Enqueue(new DotNetMemberInfoItemProvider[] { new DotNetMemberInfoItemProvider(propertyInfo.PropertyType, dotNetMemberInfo) });
 
                                 break;
 

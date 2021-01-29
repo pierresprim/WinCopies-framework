@@ -21,17 +21,18 @@ using WinCopies.IO.AbstractionInterop;
 using WinCopies.IO.ObjectModel;
 
 using static WinCopies.UtilHelpers;
+using static WinCopies.ThrowHelper;
 
 namespace WinCopies.IO.Selectors
 {
     public class WMIItemInfoSelectorDictionary : BrowsableObjectInfoSelectorDictionary<WMIItemInfoItemProvider>
     {
-        public static IBrowsableObjectInfo Convert(WMIItemInfoItemProvider item) => IsNullEmptyOrWhiteSpace(item.Path)
+        public static IBrowsableObjectInfo Convert(WMIItemInfoItemProvider item) => IsNullEmptyOrWhiteSpace((item ?? throw GetArgumentNullException(nameof(item))).Path)
             ? new WMIItemInfo(item.ItemType, item.ManagementObject, item.Options, item.ClientVersion)
             : new WMIItemInfo(item.Path, item.ItemType, item.ManagementObject, item.Options, item.ClientVersion);
 
         protected override Converter<WMIItemInfoItemProvider, IBrowsableObjectInfo> DefaultSelectorOverride => Convert;
 
-        public WMIInfoSelectorDictionary() { /* Left empty. */ }
+        public WMIItemInfoSelectorDictionary() { /* Left empty. */ }
     }
 }

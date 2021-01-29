@@ -20,12 +20,13 @@ using System;
 using WinCopies.IO.AbstractionInterop;
 using WinCopies.IO.ObjectModel;
 
+using static WinCopies.ThrowHelper;
+
 namespace WinCopies.IO.Selectors
 {
     public class RegistryItemInfoSelectorDictionary : BrowsableObjectInfoSelectorDictionary<RegistryItemInfoItemProvider>
     {
-        public static IBrowsableObjectInfo Convert(RegistryItemInfoItemProvider item) =>
-            item.RegistryKey == null
+        public static IBrowsableObjectInfo Convert(RegistryItemInfoItemProvider item) => (item ?? throw GetArgumentNullException(nameof(item))).RegistryKey == null
             ? item.ValueName == null
                 ? new RegistryItemInfo(item.Path, item.ClientVersion)
                 : new RegistryItemInfo(item.Path, item.ValueName, item.ClientVersion)

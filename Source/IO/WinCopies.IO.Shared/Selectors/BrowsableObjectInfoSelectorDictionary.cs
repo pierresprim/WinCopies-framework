@@ -37,6 +37,11 @@ namespace WinCopies.IO.Selectors
         System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> Select(System.Collections.Generic.IEnumerable<T> items);
     }
 
+    public static class BrowsableObjectInfoSelectorDictionary
+    {
+        public static ArgumentException GetInvalidItemProviderException() => new ArgumentException(Resources.ExceptionMessages.ItemProviderNotSupported);
+    }
+
     public abstract class BrowsableObjectInfoSelectorDictionary<T> : IBrowsableObjectInfoSelectorDictionary<T>
     {
         private EnumerableStack<KeyValuePair<Predicate<T>, Converter<T, IBrowsableObjectInfo>>> _stack;
@@ -51,7 +56,7 @@ namespace WinCopies.IO.Selectors
         {
             ThrowIfDisposed(this);
 
-            _stack.Push(new KeyValuePair<Predicate<T>, Converter<T, IBrowsableObjectInfo>>(predicate, selector));
+            _stack.Push(new KeyValuePair<Predicate<T>, Converter<T, IBrowsableObjectInfo>>(predicate ?? throw GetArgumentNullException(nameof(predicate)), selector ?? throw GetArgumentNullException(nameof(selector))));
         }
 
         private IBrowsableObjectInfo _Select(T item)
@@ -69,7 +74,7 @@ namespace WinCopies.IO.Selectors
         {
             ThrowIfDisposed(this);
 
-            return _Select(item);
+            return _Select(item ?? throw GetArgumentNullException(nameof(item)));
         }
 
         public System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> Select(System.Collections.Generic.IEnumerable<T> items) => IsDisposed ? throw GetExceptionForDispose(false) : items.SelectConverter(_stack.Count == 0 ? DefaultSelectorOverride : _Select);

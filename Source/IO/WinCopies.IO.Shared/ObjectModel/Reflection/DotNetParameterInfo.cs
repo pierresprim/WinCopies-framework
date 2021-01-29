@@ -18,15 +18,15 @@
 using System;
 using System.Linq;
 using System.Reflection;
-
+using WinCopies.IO.AbstractionInterop.Reflection;
 using WinCopies.IO.Reflection;
 using WinCopies.Linq;
 
 namespace WinCopies.IO.ObjectModel.Reflection
 {
-    public sealed class DotNetGenericArgumentInfo : BrowsableObjectInfo<idotnetiteminfoproperties, Type>,IDotNetItemInfo
+    public sealed class DotNetGenericItemInfo : BrowsableObjectInfo<idotnetiteminfoproperties, Type>,IDotNetItemInfo
     {
-        internal DotNetGenericArgumentInfo(Type type, IDotNetItemInfo parent) : base($"{parent.Path}{WinCopies.IO.Path.PathSeparator}{type.Name}")
+        internal DotNetGenericArgumentInfo(in Type type, in DotNetTypeInfoProviderGenericTypeStructValue genericItemType, in IDotNetItemInfo parent) : base($"{parent.Path}{WinCopies.IO.Path.PathSeparator}{type.Name}")
         {
 
         }
@@ -47,7 +47,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
         public sealed override IDotNetItemInfoProperties ObjectPropertiesGeneric { get; }
         #endregion
 
-        internal DotNetParameterInfo(in ParameterInfo parameterInfo, in DotNetItemType dotNetItemType, in IDotNetItemInfo parent) : base($"{parent.Path}{WinCopies.IO.Path.PathSeparator}{parameterInfo.Name}", parameterInfo.Name, parent)
+        internal DotNetParameterInfo(in ParameterInfo parameterInfo, in DotNetItemType dotNetItemType, in bool isReturnParameter, in IDotNetItemInfo parent) : base($"{parent.Path}{WinCopies.IO.Path.PathSeparator}{parameterInfo.Name}", parameterInfo.Name, parent)
         {
             InnerObjectGeneric = parameterInfo;
 

@@ -24,6 +24,13 @@ using WinCopies.IO.Enumeration;
 using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Selectors;
 
+using System;
+
+using WinCopies.IO.AbstractionInterop;
+using WinCopies.IO.Enumeration;
+using WinCopies.IO.PropertySystem;
+using WinCopies.IO.Selectors;
+
 namespace WinCopies.IO.ObjectModel
 {
     public interface IArchiveItemInfoBase : IArchiveItemInfoProvider, IEncapsulatorBrowsableObjectInfo<ArchiveFileInfo?>

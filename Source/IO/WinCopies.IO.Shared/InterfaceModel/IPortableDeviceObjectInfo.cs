@@ -21,6 +21,10 @@ using WinCopies.IO.AbstractionInterop;
 using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Selectors;
 
+using WinCopies.IO.AbstractionInterop;
+using WinCopies.IO.PropertySystem;
+using WinCopies.IO.Selectors;
+
 namespace WinCopies.IO.ObjectModel
 {
     public interface IPortableDeviceObjectInfoBase : IFileSystemObjectInfo, IEncapsulatorBrowsableObjectInfo<IPortableDeviceObject>

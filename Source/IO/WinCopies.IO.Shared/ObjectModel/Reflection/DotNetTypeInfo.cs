@@ -21,7 +21,6 @@ using System.Reflection;
 
 using WinCopies.Collections.Generic;
 using WinCopies.IO.AbstractionInterop.Reflection;
-using WinCopies.IO.Enumeration.Reflection;
 using WinCopies.IO.Reflection;
 using WinCopies.IO.Reflection.PropertySystem;
 using WinCopies.IO.Selectors;
@@ -40,7 +39,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
         public sealed override IDotNetTypeInfoProperties ObjectPropertiesGeneric { get; }
         #endregion
 
-        internal DotNetTypeInfo(TypeInfo typeInfo, in DotNetItemType itemType, in bool? isRootType, in IBrowsableObjectInfo parent) : base(isRootType.HasValue && isRootType.Value ? typeInfo.Name : $"{parent.Path}{PathSeparator}{typeInfo.Name}", typeInfo.Name, parent)
+        protected DotNetTypeInfo(in TypeInfo typeInfo,  in IBrowsableObjectInfo parent) : base(isRootType.HasValue && isRootType.Value ? typeInfo.Name : $"{parent.Path}{PathSeparator}{typeInfo.Name}", typeInfo.Name, parent)
         {
 #if DEBUG
             if (isRootType.HasValue && isRootType.Value)
@@ -92,11 +91,22 @@ namespace WinCopies.IO.ObjectModel.Reflection
         }
     }
 
+        protected DotNetTypeInfo(in Type type, in IBrowsableObjectInfo parent):this(type.GetTypeInfo(), parent)
+        {
+            // Left empty.
+        }
+    }
+
     public sealed class DotNetTypeInfo : DotNetTypeInfo<IDotNetTypeInfoProperties, DotNetTypeInfoItemProvider, IBrowsableObjectInfoSelectorDictionary<DotNetTypeInfoItemProvider>, DotNetTypeInfoItemProvider>, IDotNetTypeInfo
     {
         private static DotNetItemType[] _defaultTypesToEnumerate;
 
         public static DotNetItemType[] DefaultTypesToEnumerate => _defaultTypesToEnumerate ??= new DotNetItemType[] { DotNetItemType.GenericParameter, DotNetItemType.GenericArgument, DotNetItemType.Field, DotNetItemType.Property, DotNetItemType.Event, DotNetItemType.Constructor, DotNetItemType.Method, DotNetItemType.Struct, DotNetItemType.Enum, DotNetItemType.Class, DotNetItemType.Interface, DotNetItemType.Delegate, DotNetItemType.Attribute, DotNetItemType.ImplementedInterface };
+
+        protected internal DotNetTypeInfo(in TypeInfo type, in DotNetItemType itemType, in bool isRootType, in IBrowsableObjectInfo parent):base(type,parent)
+        {
+
+        }
 
         protected virtual    System.Collections.Generic.IEnumerable<DotNetTypeInfoItemProvider> GetItemProviders(System.Collections.Generic.IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetTypeInfoItemProvider> func) => new Enumerable<DotNetTypeInfoItemProvider>(() => DotNetTypeInfoEnumerator.From(this, typesToEnumerate, func));
 

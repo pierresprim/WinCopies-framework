@@ -27,8 +27,10 @@ using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Reflection;
 using WinCopies.IO.Reflection.PropertySystem;
 using WinCopies.IO.Selectors;
+using WinCopies.IO.Selectors.Reflection;
 
 using static WinCopies.Diagnostics.IfHelpers;
+using static WinCopies.ThrowHelper;
 
 namespace WinCopies.IO.ObjectModel.Reflection
 {
@@ -40,7 +42,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
         public override string ItemTypeName => Properties.Resources.DotNetMember;
         #endregion
 
-        protected DotNetMemberInfo(in MemberInfo memberInfo, in DotNetItemType dotNetItemType, in IDotNetTypeInfo dotNetTypeInfo) : base($"{dotNetTypeInfo.Path}{IO.Path.PathSeparator}{memberInfo.Name}", memberInfo.Name, dotNetTypeInfo)
+        protected DotNetMemberInfo(in MemberInfo memberInfo, in IDotNetItemInfo parent) : base($"{(parent ?? throw GetArgumentNullException(nameof(parent))).Path}{IO.Path.PathSeparator}{(memberInfo ?? throw GetArgumentNullException(nameof(memberInfo))).Name}", memberInfo.Name, dotNetTypeInfo)
 #if DEBUG
         {
             Debug.Assert(If(ComparisonType.And, ComparisonMode.Logical, Comparison.NotEqual, null, dotNetTypeInfo, dotNetTypeInfo.ParentDotNetAssemblyInfo));
@@ -57,7 +59,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
     public class DotNetMemberInfo : DotNetMemberInfo<IDotNetItemInfoProperties, DotNetMemberInfoItemProvider, IBrowsableObjectInfoSelectorDictionary<DotNetMemberInfoItemProvider>, DotNetMemberInfoItemProvider>, IDotNetMemberInfo
     {
         #region Properties
-        public static IBrowsableObjectInfoSelectorDictionary<ShellObjectInfoItemProvider> DefaultItemSelectorDictionary { get; } = new ShellObjectInfoSelectorDictionary();
+        public static IBrowsableObjectInfoSelectorDictionary<DotNetMemberInfoItemProvider> DefaultItemSelectorDictionary { get; } = new DotNetMemberInfoSelectorDictionary();
 
         public sealed override IDotNetItemInfoProperties ObjectPropertiesGeneric { get; }
 
@@ -66,10 +68,12 @@ namespace WinCopies.IO.ObjectModel.Reflection
         public override IPropertySystemCollection ObjectPropertySystem => null;
         #endregion
 
-        protected DotNetMemberInfo(in MemberInfo memberInfo, in DotNetItemType dotNetItemType, in IDotNetTypeInfo dotNetTypeInfo) : base(memberInfo, dotNetItemType, dotNetTypeInfo) => ObjectPropertiesGeneric = new DotNetItemInfoProperties<IDotNetItemInfo>(this, dotNetItemType);
+        protected internal DotNetMemberInfo(in MemberInfo memberInfo, in DotNetItemType dotNetItemType, in bool isPropertyMethod, in IDotNetItemInfo parent) : base(memberInfo, dotNetItemType, parent) => ObjectPropertiesGeneric = new DotNetItemInfoProperties<IDotNetItemInfo>(this, dotNetItemType);
 
         #region Methods
         public static System.Collections.Generic.IEnumerable<DotNetItemType> GetDefaultItemTypes() => new DotNetItemType[] { DotNetItemType.Parameter, DotNetItemType.Attribute };
+
+        public override IBrowsableObjectInfoSelectorDictionary<DotNetMemberInfoItemProvider> GetSelectorDictionary() => DefaultItemSelectorDictionary;
 
         protected virtual System.Collections.Generic.IEnumerable<DotNetMemberInfoItemProvider> GetItemProviders(System.Collections.Generic.IEnumerable<DotNetItemType> enumerable, Predicate<DotNetMemberInfoItemProvider> func) => DotNetMemberInfoEnumeration.From(this, enumerable, func);
 

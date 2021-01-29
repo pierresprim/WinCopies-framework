@@ -20,11 +20,13 @@ using System;
 using WinCopies.IO.AbstractionInterop;
 using WinCopies.IO.ObjectModel;
 
+using static WinCopies.ThrowHelper;
+
 namespace WinCopies.IO.Selectors
 {
     public class PortableDeviceInfoSelectorDictionary : BrowsableObjectInfoSelectorDictionary<PortableDeviceObjectInfoItemProvider>
     {
-        public static IBrowsableObjectInfo Convert(PortableDeviceObjectInfoItemProvider item) => new PortableDeviceObjectInfo(item.PortableDeviceObject, item.ParentPortableDevice, item.ClientVersion);
+        public static IBrowsableObjectInfo Convert(PortableDeviceObjectInfoItemProvider item) => new PortableDeviceObjectInfo((item ?? throw GetArgumentNullException(nameof(item))).PortableDeviceObject, item.ParentPortableDevice, item.ClientVersion);
 
         protected override Converter<PortableDeviceObjectInfoItemProvider, IBrowsableObjectInfo> DefaultSelectorOverride => Convert;
 
@@ -33,7 +35,7 @@ namespace WinCopies.IO.Selectors
 
     public class PortableDeviceObjectInfoSelectorDictionary : BrowsableObjectInfoSelectorDictionary<PortableDeviceObjectInfoItemProvider>
     {
-        public static IBrowsableObjectInfo Convert(PortableDeviceObjectInfoItemProvider item) => new PortableDeviceObjectInfo(item.PortableDeviceObject, item.ParentPortableDeviceObject, item.ClientVersion);
+        public static IBrowsableObjectInfo Convert(PortableDeviceObjectInfoItemProvider item) => new PortableDeviceObjectInfo((item ?? throw GetArgumentNullException(nameof(item))).PortableDeviceObject, item.ParentPortableDeviceObject, item.ClientVersion);
 
         protected override Converter<PortableDeviceObjectInfoItemProvider, IBrowsableObjectInfo> DefaultSelectorOverride => Convert;
 
