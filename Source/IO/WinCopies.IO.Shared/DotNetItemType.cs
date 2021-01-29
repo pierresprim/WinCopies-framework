@@ -94,10 +94,7 @@ namespace WinCopies.IO.Reflection
         /// </summary>
         Method = 12,
 
-        /// <summary>
-        /// The item is a .Net implemented interfaces.
-        /// </summary>
-        ImplementedInterface = 13,
+        BaseTypeOrInterface = 13,
 
         /// <summary>
         /// The item is a .Net parameter.
@@ -112,8 +109,6 @@ namespace WinCopies.IO.Reflection
         /// <summary>
         /// The item is a .Net generic argument.
         /// </summary>
-        GenericArgument = 16,
-
-        ReturnParameter = 17
+        GenericArgument = 16
     }
 }

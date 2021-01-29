@@ -63,7 +63,91 @@ namespace WinCopies
     {
         public static class Temp
         {
-            public static System.Collections.Generic.IEnumerable<TOut> SelectConverter<TIn, TOut>(this System.Collections.Generic.IEnumerable<TIn> enumerable, Converter<TIn, TOut> selector) => enumerable.Select(() => selector());
+            public static System.Collections.Generic.IEnumerable<TOut> SelectConverter<TIn, TOut>(this System.Collections.Generic.IEnumerable<TIn> enumerable, Converter<TIn, TOut> selector) => enumerable.Select(item => selector(item));
+
+            public static System.Collections.Generic.IEnumerable<T> AppendValues<T>(this System.Collections.Generic.IEnumerable<T> enumerable, System.Collections.Generic.IEnumerable<T> values)
+            {
+                foreach (T value in enumerable)
+
+                    yield return value;
+
+                foreach (T _value in values)
+
+                    yield return _value;
+            }
+
+            public static System.Collections.Generic.IEnumerable<T> AppendValues<T>(this System.Collections.Generic.IEnumerable<T> enumerable, params T[] values) => enumerable.AppendValues((System.Collections.Generic.IEnumerable<T>)values);
+
+            public static System.Collections.Generic.IEnumerable<T> Merge<T>(this System.Collections.Generic.IEnumerable<System.Collections.Generic.IEnumerable<T>> enumerable)
+            {
+                foreach (System.Collections.Generic.IEnumerable<T> _enumerable in enumerable)
+
+                    foreach (T item in _enumerable)
+
+                        yield return item;
+            }
+
+            public static System.Collections.Generic.IEnumerable<T> PrependValues<T>(this System.Collections.Generic.IEnumerable<T> enumerable, System.Collections.Generic.IEnumerable<T> values)
+            {
+                foreach (T item in values)
+
+                    yield return item;
+
+                foreach (T item in enumerable)
+
+                    yield return item;
+            }
+
+            public static System.Collections.Generic.IEnumerable<T> PrependValues<T>(this System.Collections.Generic.IEnumerable<T> enumerable, params T[] values) => enumerable.PrependValues((System.Collections.Generic.IEnumerable<T>)values);
+
+            public static System.Collections.Generic.IEnumerable<T> PrependValues<T>(this System.Collections.Generic.IEnumerable<T> enumerable, System.Collections.Generic.IEnumerable<System.Collections.Generic.IEnumerable<T>> values)
+            {
+                foreach (System.Collections.Generic.IEnumerable<T> _values in values)
+
+                    foreach (T item in _values)
+
+                        yield return item;
+
+                foreach (T item in enumerable)
+
+                    yield return item;
+            }
+
+            public static System.Collections.Generic.IEnumerable<T> PrependValues<T>(this System.Collections.Generic.IEnumerable<T> enumerable, params System.Collections.Generic.IEnumerable<T>[] values) => enumerable.PrependValues((System.Collections.Generic.IEnumerable<System.Collections.Generic.IEnumerable<T>>)values);
+
+            public static System.Collections.Generic.IEnumerable<T> Surround<T>(this System.Collections.Generic.IEnumerable<T> enumerable, System.Collections.Generic.IEnumerable<T> firstItems, System.Collections.Generic.IEnumerable<T> lastItems)
+            {
+                foreach (T item in firstItems)
+
+                    yield return item;
+
+                foreach (T item in enumerable)
+
+                    yield return item;
+
+                foreach (T item in lastItems)
+
+                    yield return item;
+            }
+
+            public static System.Collections.Generic.IEnumerable<T> Surround<T>(this System.Collections.Generic.IEnumerable<T> enumerable, System.Collections.Generic.IEnumerable<System.Collections.Generic.IEnumerable<T>> firstItems, System.Collections.Generic.IEnumerable<System.Collections.Generic.IEnumerable<T>> lastItems)
+            {
+                foreach (System.Collections.Generic.IEnumerable<T> _firstItems in firstItems)
+
+                    foreach (T item in _firstItems)
+
+                        yield return item;
+
+                foreach (T item in enumerable)
+
+                    yield return item;
+
+                foreach (System.Collections.Generic.IEnumerable<T> _lastItems in lastItems)
+
+                    foreach (T item in _lastItems)
+
+                        yield return item;
+            }
         }
     }
 
@@ -262,19 +346,6 @@ namespace WinCopies
 
     public static class Extensions
     {
-        public static System.Collections.Generic.IEnumerable<T> AppendValues<T>(this System.Collections.Generic.IEnumerable<T> enumerable, System.Collections.Generic.IEnumerable<T> values)
-        {
-            foreach (T value in enumerable)
-
-                yield return value;
-
-            foreach (T _value in values)
-
-                yield return _value;
-        }
-
-        public static System.Collections.Generic.IEnumerable<T> AppendValues<T>(this System.Collections.Generic.IEnumerable<T> enumerable, params T[] values) => enumerable.AppendValues((System.Collections.Generic.IEnumerable<T>)values);
-
         public static bool HasFlag(this Enum @enum, System.Collections.Generic.IEnumerable<Enum> values)
         {
             foreach (Enum value in values)

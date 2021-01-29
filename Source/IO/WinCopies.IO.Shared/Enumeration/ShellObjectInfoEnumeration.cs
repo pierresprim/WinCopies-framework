@@ -51,9 +51,9 @@ namespace WinCopies.IO.Enumeration
             System.Collections.Generic.IEnumerable<ShellObject> shellObjects;
             System.Collections.Generic.IEnumerable<IPortableDevice> portableDevices;
 
-            shellObjects = (System.Collections.Generic.IEnumerable<ShellObject>)shellObjectInfo.EncapsulatedObjectGeneric;
+            shellObjects = (System.Collections.Generic.IEnumerable<ShellObject>)shellObjectInfo.InnerObjectGeneric;
 
-            if (shellObjectInfo.EncapsulatedObjectGeneric.ParsingName == Computer.ParsingName)
+            if (shellObjectInfo.InnerObjectGeneric.ParsingName == Computer.ParsingName)
             {
                 var portableDeviceManager = new PortableDeviceManager();
 

@@ -16,6 +16,7 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using Microsoft.WindowsAPICodePack.PortableDevices;
+
 using System;
 using System.Collections.Generic;
 using System.Windows.Media.Imaging;
@@ -30,27 +31,78 @@ namespace WinCopies.IO
 #if !WinCopies3
     public interface IBrowsableObjectEncapsulator
     {
-        object EncapsulatedObject { get; }
+        object InnerObject { get; }
     }
 
     public interface IBrowsableObjectEncapsulator<T> : IBrowsableObjectEncapsulator
     {
-        T EncapsulatedObject { get; }
+        T InnerObject { get; }
     }
 
     public abstract class BrowsableObjectEncapsulator<T> : IBrowsableObjectEncapsulator<T>
     {
-        public T EncapsulatedObject { get; }
+        public T InnerObject { get; }
 
-        object IBrowsableObjectEncapsulator.EncapsulatedObject => EncapsulatedObject;
+        object IBrowsableObjectEncapsulator.InnerObject => InnerObject;
 
-        public BrowsableObjectEncapsulator(T obj) => EncapsulatedObject = obj;
+        public BrowsableObjectEncapsulator(T obj) => InnerObject = obj;
     }
 #endif
 
     public interface IRecursiveEnumerable<T> : WinCopies.Collections.Generic.IRecursiveEnumerable<T>
     {
         RecursiveEnumerator<T> GetEnumerator();
+    }
+
+    /// <summary>
+    /// Indicates the browsing ability for an <see cref="IBrowsableObjectInfo"/>.
+    /// </summary>
+    public enum Browsability : byte
+    {
+        /// <summary>
+        /// The item is not browsable.
+        /// </summary>
+        NotBrowsable = 0,
+
+        /// <summary>
+        /// The item is browsable by default.
+        /// </summary>
+        BrowsableByDefault = 1,
+
+        /// <summary>
+        /// The item is browsable but browsing should not be the default action to perform on this item.
+        /// </summary>
+        Browsable = 2,
+
+        /// <summary>
+        /// The item redirects to an other item, with this item browsable.
+        /// </summary>
+        RedirectsToBrowsableItem = 3
+    }
+
+    public interface IBrowsabilityOptions
+    {
+        Browsability Browsability { get; }
+
+        IBrowsableObjectInfo RedirectToBrowsableItem();
+    }
+
+    public static class BrowsabilityOptions
+    {
+        private class _Browsability : IBrowsabilityOptions
+        {
+            public Browsability Browsability { get; }
+
+            public IBrowsableObjectInfo RedirectToBrowsableItem() => null;
+
+            internal _Browsability(Browsability browsability) => Browsability = browsability;
+        }
+
+        public static IBrowsabilityOptions NotBrowsable { get; } = new _Browsability(Browsability.NotBrowsable);
+
+        public static IBrowsabilityOptions BrowsableByDefault { get; } = new _Browsability(Browsability.BrowsableByDefault);
+
+        public static IBrowsabilityOptions Browsable { get; } = new _Browsability(Browsability.Browsable);
     }
 
     namespace ObjectModel
@@ -65,10 +117,7 @@ WinCopies.
 #endif
     DotNetFix.IDisposable
         {
-            /// <summary>
-            /// Gets a value indicating whether this <see cref="IBrowsableObjectInfo"/> is browsable.
-            /// </summary>
-            bool IsBrowsable { get; }
+            IBrowsabilityOptions Browsability { get; }
 
             /// <summary>
             /// Gets a value indicating whether this <see cref="IBrowsableObjectInfo"/> is recursively browsable.
@@ -76,23 +125,18 @@ WinCopies.
             bool IsRecursivelyBrowsable { get; }
 
             /// <summary>
-            /// Gets a value indicating whether this <see cref="IBrowsableObjectInfo"/> is browsable by default.
-            /// </summary>
-            bool IsBrowsableByDefault { get; }
-
-            /// <summary>
             /// Gets the underlying object of this abstraction interface.
             /// </summary>
-            object EncapsulatedObject { get; }
+            object InnerObject { get; }
 
             /// <summary>
-            /// Gets the common properties of <see cref="EncapsulatedObject"/>. These properties may be specific to the underlying object type.
+            /// Gets the common properties of <see cref="InnerObject"/>. These properties may be specific to the underlying object type.
             /// </summary>
             object ObjectProperties { get; }
 
 #if WinCopies3
             /// <summary>
-            /// Gets the specific properties of <see cref="EncapsulatedObject"/>. These properties are specific to this object.
+            /// Gets the specific properties of <see cref="InnerObject"/>. These properties are specific to this object.
             /// </summary>
             IPropertySystemCollection ObjectPropertySystem { get; }
 #endif
@@ -129,6 +173,8 @@ WinCopies.
             bool IsSpecialItem { get; }
 
             ClientVersion ClientVersion { get; }
+
+            System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> RootItems { get; }
 
             ///// <summary>
             ///// Gets or sets the factory for this <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>. This factory is used to create new <see cref="IBrowsableObjectInfo"/>s from the current <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>.
@@ -198,20 +244,20 @@ WinCopies.
 #if WinCopies3
             T
 #else
-            TEncapsulatedObject
+            TInnerObject
 #endif
             > : IBrowsableObjectInfo
         {
 #if WinCopies3
             T
 #else
-TEncapsulatedObject
+TInnerObject
 #endif
-                EncapsulatedObject
+                InnerObject
             { get; }
         }
 
-        public interface IBrowsableObjectInfo<TObjectProperties, TEncapsulatedObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : IBrowsableObjectInfo<TObjectProperties>, IEncapsulatorBrowsableObjectInfo<TEncapsulatedObject> where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
+        public interface IBrowsableObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : IBrowsableObjectInfo<TObjectProperties>, IEncapsulatorBrowsableObjectInfo<TInnerObject> where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
         {
             System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<TPredicateTypeParameter> predicate);
 

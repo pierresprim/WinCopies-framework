@@ -15,6 +15,8 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+using System.Management;
+
 using WinCopies.IO.ObjectModel;
 
 namespace WinCopies.IO.PropertySystem
@@ -38,6 +40,35 @@ namespace WinCopies.IO.PropertySystem
         /// The WMI item is an instance.
         /// </summary>
         Instance
+    }
+
+    public interface IWMIItemInfoOptions
+    {
+        ConnectionOptions ConnectionOptions { get; }
+
+        ObjectGetOptions ObjectGetOptions { get; }
+
+        EnumerationOptions EnumerationOptions { get; }
+    }
+
+    public class WMIItemInfoOptions : IWMIItemInfoOptions
+    {
+        public ConnectionOptions ConnectionOptions { get; }
+
+        public ObjectGetOptions ObjectGetOptions { get; }
+
+        public EnumerationOptions EnumerationOptions { get; }
+
+        public WMIItemInfoOptions() { /* Left empty. */ }
+
+        public WMIItemInfoOptions(ConnectionOptions connectionOptions, ObjectGetOptions objectGetOptions, EnumerationOptions enumerationOptions)
+        {
+            ConnectionOptions = connectionOptions;
+
+            ObjectGetOptions = objectGetOptions;
+
+            EnumerationOptions = enumerationOptions;
+        }
     }
 
     public interface IWMIItemInfoProperties

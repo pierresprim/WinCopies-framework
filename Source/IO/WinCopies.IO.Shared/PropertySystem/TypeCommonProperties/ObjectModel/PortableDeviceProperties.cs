@@ -48,7 +48,7 @@ namespace WinCopies.IO.PropertySystem
 
                     return _size;
 
-                if (BrowsableObjectInfo.EncapsulatedObject.Properties.TryGetValue(Microsoft.WindowsAPICodePack.PortableDevices.PropertySystem.Properties.Legacy.Object.Common.Size, out Property value) && value.TryGetValue(out ulong _value))
+                if (BrowsableObjectInfo.InnerObject.Properties.TryGetValue(Microsoft.WindowsAPICodePack.PortableDevices.PropertySystem.Properties.Legacy.Object.Common.Size, out Property value) && value.TryGetValue(out ulong _value))
 
                     _size = new Size(_value);
 
@@ -58,7 +58,7 @@ namespace WinCopies.IO.PropertySystem
             }
         }
 
-        public PortableDeviceObjectInfoProperties(in T browsableObjectInfo):base(browsableObjectInfo, GetFileType(browsableObjectInfo.EncapsulatedObject.FileType, browsableObjectInfo. Path))
+        public PortableDeviceObjectInfoProperties(in T browsableObjectInfo):base(browsableObjectInfo, GetFileType(browsableObjectInfo.InnerObject.FileType, browsableObjectInfo. Path))
         {
             // Left empty.
         }

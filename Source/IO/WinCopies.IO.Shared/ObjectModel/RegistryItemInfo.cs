@@ -44,15 +44,15 @@ namespace WinCopies.IO.ObjectModel
     /// </summary>
     public abstract class RegistryItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>/*<TItems, TFactory>*/ : BrowsableObjectInfo<TObjectProperties, RegistryKey, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>/*<TItems, TFactory>*/, IRegistryItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IRegistryItemInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems> // where TItems : BrowsableObjectInfo, IRegistryItemInfo where TFactory : IRegistryItemInfoFactory
     {
-        // public override bool IsRenamingSupported => false;
-
         #region Fields
         internal RegistryKey _registryKey;
         private IBrowsableObjectInfo _parent;
-        private bool? _isBrowsable;
+        private IBrowsabilityOptions _browsability;
         #endregion
 
         #region Properties
+        public override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> RootItems => RegistryItemInfo.DefaultRootItems;
+
         ///// <summary>
         ///// Gets a value that indicates whether this object needs to reconstruct objects on deep cloning.
         ///// </summary>
@@ -74,19 +74,19 @@ namespace WinCopies.IO.ObjectModel
                     {
                         case RegistryItemType.Root:
 
-                            _itemTypeName = "Registry root";
+                            _itemTypeName = Properties.Resources.RegistryRoot;
 
                             break;
 
                         case RegistryItemType.Key:
 
-                            _itemTypeName = "Registry key";
+                            _itemTypeName = Properties.Resources.RegistryKey;
 
                             break;
 
                         case RegistryItemType.Value:
 
-                            _itemTypeName = "Registry value";
+                            _itemTypeName = Properties.Resources.RegistryValue;
 
                             break;
                     }
@@ -132,31 +132,44 @@ namespace WinCopies.IO.ObjectModel
         /// <summary>
         /// Gets a value that indicates whether this <see cref="RegistryItemInfo"/> is browsable.
         /// </summary>
-        public override bool IsBrowsable
+        public override IBrowsabilityOptions Browsability
         {
             get
             {
-                if (_isBrowsable.HasValue)
-
-                    return _isBrowsable.Value;
-
-                switch (ObjectPropertiesGeneric.RegistryItemType)
+                if (_browsability == null)
                 {
-                    case RegistryItemType.Root:
-                    case RegistryItemType.Key:
+#if CS8
+                    _browsability = ObjectPropertiesGeneric.RegistryItemType switch
+                    {
+#if CS9
+                        RegistryItemType.Key or RegistryItemType.Root => BrowsabilityOptions.BrowsableByDefault,
+#else
+                        RegistryItemType.Key => BrowsabilityOptions.BrowsableByDefault,
+                        RegistryItemType.Root => BrowsabilityOptions.BrowsableByDefault,
+#endif
+                        _ => BrowsabilityOptions.NotBrowsable,
+                    };
+#else
 
-                        _isBrowsable = true;
+                    switch (ObjectPropertiesGeneric.RegistryItemType)
+                    {
+                        case RegistryItemType.Root:
+                        case RegistryItemType.Key:
 
-                        break;
+                            _isBrowsable = BrowsabilityOptions.BrowsableByDefault;
 
-                    default:
+                            break;
 
-                        _isBrowsable = false;
+                        default:
 
-                        break;
+                            _isBrowsable = BrowsabilityOptions.NotBrowsable;
+
+                            break;
+                    }
+#endif
                 }
 
-                return _isBrowsable.Value;
+                return _browsability;
             }
         }
 
@@ -164,15 +177,20 @@ namespace WinCopies.IO.ObjectModel
 
         public override IBrowsableObjectInfo Parent => _parent
 #if CS8
-                ??= GetParent();
+                ??=
 #else
-                ?? (_parent = GetParent());
+                ?? (_parent = 
 #endif
+            GetParent()
+#if !CS8
+            )
+#endif
+            ;
 
         ///// <summary>
         ///// The <see cref="RegistryKey"/> that this <see cref="RegistryItemInfo"/> represents.
         ///// </summary>
-        public sealed override RegistryKey EncapsulatedObjectGeneric
+        public sealed override RegistryKey InnerObjectGeneric
         {
             get
             {
@@ -188,7 +206,7 @@ namespace WinCopies.IO.ObjectModel
         #endregion // Properties
 
         #region Constructors
-        public RegistryItemInfo(in ClientVersion clientVersion) : base("Registry Root", clientVersion) => Name = Path;
+        public RegistryItemInfo(in ClientVersion clientVersion) : base(Properties.Resources.RegistryRoot, clientVersion) => Name = Path;
 
         public RegistryItemInfo(in RegistryKey registryKey, in ClientVersion clientVersion) : base(GetRegistryKeyName(registryKey), clientVersion)
         {
@@ -291,7 +309,7 @@ namespace WinCopies.IO.ObjectModel
 
                 case RegistryItemType.Key:
 
-                    string[] path = EncapsulatedObjectGeneric.Name.Split(IO.Path.PathSeparator);
+                    string[] path = InnerObjectGeneric.Name.Split(IO.Path.PathSeparator);
 
                     if (path.Length == 1)
 
@@ -314,7 +332,7 @@ namespace WinCopies.IO.ObjectModel
 
                 case RegistryItemType.Value:
 
-                    return new RegistryItemInfo(EncapsulatedObjectGeneric, ClientVersion);
+                    return new RegistryItemInfo(InnerObjectGeneric, ClientVersion);
             }
 
             return null;
@@ -365,12 +383,18 @@ namespace WinCopies.IO.ObjectModel
 
     public class RegistryItemInfo : RegistryItemInfo<IRegistryItemInfoProperties, RegistryItemInfoItemProvider, IBrowsableObjectInfoSelectorDictionary<RegistryItemInfoItemProvider>, RegistryItemInfoItemProvider>, IRegistryItemInfo
     {
+        private static System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> _defaultRootItems;
+
         #region Properties
+        public static System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> DefaultRootItems => _defaultRootItems ??= GetRootItems();
+
+        public override Predicate<RegistryItemInfoItemProvider> RootItemsPredicate => item => item.RegistryKey != null && item.ValueName == null;
+
+        public override Predicate<IBrowsableObjectInfo> RootItemsBrowsableObjectInfoPredicate => null;
+
         public static IBrowsableObjectInfoSelectorDictionary<RegistryItemInfoItemProvider> DefaultItemSelectorDictionary { get; } = new RegistryItemInfoSelectorDictionary();
 
         public sealed override IRegistryItemInfoProperties ObjectPropertiesGeneric { get; }
-
-        public override bool IsBrowsableByDefault => true;
 
         public override IPropertySystemCollection ObjectPropertySystem => null;
         #endregion // Properties
@@ -409,6 +433,8 @@ namespace WinCopies.IO.ObjectModel
         #endregion // Constructors
 
         #region Methods
+        public static System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetRootItems() => new IBrowsableObjectInfo[] { new RegistryItemInfo(GetDefaultClientVersion()) };
+
         public override IBrowsableObjectInfoSelectorDictionary<RegistryItemInfoItemProvider> GetSelectorDictionary() => DefaultItemSelectorDictionary;
 
         #region GetItems
@@ -490,7 +516,7 @@ namespace WinCopies.IO.ObjectModel
 
                     try
                     {
-                        keys = EncapsulatedObjectGeneric.GetSubKeyNames().Select(item => new RegistryItemInfoItemProvider(item, ClientVersion));
+                        keys = InnerObjectGeneric.GetSubKeyNames().Select(item => new RegistryItemInfoItemProvider(item, ClientVersion));
 
                         values = _registryKey.GetValueNames().Select(s => new RegistryItemInfoItemProvider(_registryKey, s, ClientVersion) /*new RegistryItemInfo(Path, s)*/);
 
@@ -566,14 +592,14 @@ namespace WinCopies.IO.ObjectModel
         //        {
         //            if (predicate == null)
         //            {
-        //                keys = EncapsulatedObjectGeneric.GetSubKeyNames().Select(item => new RegistryItemInfo($"{Path}\\{item}"));
+        //                keys = InnerObjectGeneric.GetSubKeyNames().Select(item => new RegistryItemInfo($"{Path}\\{item}"));
 
         //                values = _registryKey.GetValueNames().Select(s => new RegistryItemInfo(Path, s));
         //            }
 
         //            else
         //            {
-        //                keys = EncapsulatedObjectGeneric.GetSubKeyNames().Where(item => predicate(new RegistryItemInfoItemProvider(item, RegistryItemType.Key))).Select(item => new RegistryItemInfo($"{Path}\\{item}"));
+        //                keys = InnerObjectGeneric.GetSubKeyNames().Where(item => predicate(new RegistryItemInfoItemProvider(item, RegistryItemType.Key))).Select(item => new RegistryItemInfo($"{Path}\\{item}"));
 
         //                values = _registryKey.GetValueNames().Where(s => predicate(new RegistryItemInfoItemProvider(s, RegistryItemType.Value))).Select(s => new RegistryItemInfo(Path, s));
         //            }

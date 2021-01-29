@@ -17,16 +17,22 @@
 
 using System.Reflection;
 
-using WinCopies.IO.Reflection;
+using WinCopies.IO.Reflection.PropertySystem;
+using WinCopies.IO.Selectors;
 
 namespace WinCopies.IO.ObjectModel.Reflection
 {
-    public interface IDotNetAttributeInfo : IDotNetItemInfo, IEncapsulatorBrowsableObjectInfo<CustomAttributeData>
+    public interface IDotNetAttributeInfoBase : IDotNetItemInfo<CustomAttributeData>
     {
         // Left empty.
     }
 
-    public interface IDotNetAttributeInfo<T> : IDotNetAttributeInfo, IDotNetItemInfo<T, CustomAttributeData> where T : IDotNetItemInfoProperties
+    public interface IDotNetAttributeInfo<TObjectProperties,  TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : IDotNetItemInfo<TObjectProperties, CustomAttributeData, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IDotNetItemInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
+    {
+        // Left empty.
+    }
+
+    public interface IDotNetAttributeInfo : IDotNetAttributeInfoBase, IDotNetAttributeInfo<IDotNetItemInfoProperties,  object, IBrowsableObjectInfoSelectorDictionary<object>, object>
     {
         // Left empty.
     }

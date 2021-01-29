@@ -24,14 +24,14 @@ using WinCopies.IO.PropertySystem;
 
 namespace WinCopies.IO.Reflection.PropertySystem
 {
-    public class DotNetItemInfoProperties<T> : BrowsableObjectInfoProperties<T>, IDotNetItemInfoProperties where T : IDotNetItemInfoBase
+    public class DotNetItemInfoProperties<T> : BrowsableObjectInfoProperties<T>, IDotNetItemInfoProperties where T : IDotNetItemInfo
     {
         public DotNetItemType ItemType { get; }
 
         public DotNetItemInfoProperties(in T dotNetItemInfo, in DotNetItemType itemType) : base(dotNetItemInfo) => ItemType = itemType;
     }
 
-    public abstract class DotNetTypeOrMemberInfoProperties<T> : DotNetItemInfoProperties<T>, IDotNetTypeOrMemberInfoProperties where T : IDotNetItemInfoBase
+    public abstract class DotNetTypeOrMemberInfoProperties<T> : DotNetItemInfoProperties<T>, IDotNetTypeOrMemberInfoProperties where T : IDotNetItemInfo
     {
         public abstract Type DeclaringType { get; }
 
@@ -41,15 +41,11 @@ namespace WinCopies.IO.Reflection.PropertySystem
         }
     }
 
-    public abstract class DotNetTypeOrMethodItemInfoProperties<T> : DotNetTypeOrMemberInfoProperties<T>, IDotNetTypeOrMethodItemInfoProperties where T : IDotNetItemInfoBase
+    public abstract class DotNetTypeOrMethodItemInfoProperties<T> : DotNetTypeOrMemberInfoProperties<T>, IDotNetTypeOrMethodItemInfoProperties where T : IDotNetItemInfo
     {
         public abstract bool IsAbstract { get; }
 
         public abstract bool IsSealed { get; }
-
-        public abstract IReadOnlyList<Type> GenericTypeParameters { get; }
-
-        public abstract IReadOnlyList<Type> GenericTypeArguments { get; }
 
         protected DotNetTypeOrMethodItemInfoProperties(in T dotNetItemInfo, in DotNetItemType itemType) : base(dotNetItemInfo, itemType)
         {
@@ -67,7 +63,7 @@ namespace WinCopies.IO.Reflection.PropertySystem
             {
                 if (!_accessModifier.HasValue)
                 {
-                    TypeInfo t = BrowsableObjectInfo.EncapsulatedObject;
+                    TypeInfo t = BrowsableObjectInfo.InnerObject;
 
                     if (t.IsPublic || t.IsNestedPublic)
 
@@ -102,17 +98,13 @@ namespace WinCopies.IO.Reflection.PropertySystem
             }
         }
 
-        public bool? IsRootType { get; } 
+        public bool? IsRootType { get; }
 
-        public override bool IsAbstract => BrowsableObjectInfo.EncapsulatedObject.IsAbstract;
+        public override bool IsAbstract => BrowsableObjectInfo.InnerObject.IsAbstract;
 
-        public override bool IsSealed => BrowsableObjectInfo.EncapsulatedObject.IsSealed;
+        public override bool IsSealed => BrowsableObjectInfo.InnerObject.IsSealed;
 
-        public override IReadOnlyList<Type> GenericTypeParameters => new CountableEnumerableArray<Type>(BrowsableObjectInfo.EncapsulatedObject.GenericTypeParameters);
-
-        public override IReadOnlyList<Type> GenericTypeArguments => new CountableEnumerableArray<Type>(BrowsableObjectInfo.EncapsulatedObject.GenericTypeArguments);
-
-        public override Type DeclaringType => BrowsableObjectInfo.EncapsulatedObject.DeclaringType;
+        public override Type DeclaringType => BrowsableObjectInfo.InnerObject.DeclaringType;
 
         public DotNetTypeInfoProperties(in T dotNetTypeInfo, in DotNetItemType itemType, bool? isRootType) : base(dotNetTypeInfo, itemType) => IsRootType = isRootType;
     }

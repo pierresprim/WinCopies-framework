@@ -16,11 +16,8 @@
  * along with the WinCopies Framework. If not, see <https://www.gnu.org/licenses/>. */
 
 using System;
-using System.Drawing;
 using System.Globalization;
 using System.Management;
-using System.Windows;
-using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 
 using Microsoft.WindowsAPICodePack.PortableDevices;
@@ -31,6 +28,7 @@ using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Selectors;
 using WinCopies.Linq;
 
+using static WinCopies.IO.ObjectModel.WMIItemInfo;
 using static WinCopies.UtilHelpers;
 using static WinCopies.ThrowHelper;
 
@@ -50,55 +48,28 @@ namespace WinCopies.IO
         }
     }
 
-    public interface IWMIItemInfoOptions
-    {
-        ConnectionOptions ConnectionOptions { get; }
-
-        ObjectGetOptions ObjectGetOptions { get; }
-
-        EnumerationOptions EnumerationOptions { get; }
-    }
-
-    public class WMIItemInfoOptions : IWMIItemInfoOptions
-    {
-        public ConnectionOptions ConnectionOptions { get; }
-
-        public ObjectGetOptions ObjectGetOptions { get; }
-
-        public EnumerationOptions EnumerationOptions { get; }
-
-        public WMIItemInfoOptions() { /* Left empty. */ }
-
-        public WMIItemInfoOptions(ConnectionOptions connectionOptions, ObjectGetOptions objectGetOptions, EnumerationOptions enumerationOptions)
-        {
-            ConnectionOptions = connectionOptions;
-
-            ObjectGetOptions = objectGetOptions;
-
-            EnumerationOptions = enumerationOptions;
-        }
-    }
-
     namespace ObjectModel
     {
         public abstract class WMIItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : BrowsableObjectInfo<TObjectProperties, ManagementBaseObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IWMIItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IWMIItemInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
         {
-            #region Consts
-            public const string RootPath = @"\\.\";
-            public const string NamespacePath = ":__NAMESPACE";
-            public const string NameConst = "Name";
-            public const string RootNamespace = "root:__namespace";
-            public const string ROOT = "ROOT";
-            #endregion
-
             #region Fields
             private ManagementBaseObject _managementObject;
             private IBrowsableObjectInfo _parent;
             private string _itemTypeName;
-            private bool? _isBrowsable;
+            private IBrowsabilityOptions _browsability;
             #endregion
 
             #region Properties
+            private static System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> _defaultRootItems;
+
+            public static System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> DefaultRootItems => _defaultRootItems ??= GetRootItems();
+
+            public override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> RootItems => DefaultRootItems;
+
+            public override Predicate<TPredicateTypeParameter> RootItemsPredicate => null;
+
+            public override Predicate<IBrowsableObjectInfo> RootItemsBrowsableObjectInfoPredicate => item => item.Browsability?.Browsability == IO.Browsability.BrowsableByDefault;
+
             public override bool IsSpecialItem => false;
 
             public override string ItemTypeName
@@ -107,19 +78,31 @@ namespace WinCopies.IO
                 {
                     if (string.IsNullOrEmpty(_itemTypeName))
 
+#if CS8
+                        _itemTypeName = ObjectPropertiesGeneric.ItemType switch
+                        {
+                            WMIItemType.Namespace => Properties.Resources.WMINamespace,
+                            WMIItemType.Class => Properties.Resources.WMIClass,
+                            WMIItemType.Instance => Properties.Resources.WMIInstance,
+                            _ => throw new InvalidOperationException("Invalid item type."),
+                        };
+#else
+
                         switch (ObjectPropertiesGeneric.ItemType)
                         {
                             case WMIItemType.Namespace:
-                                _itemTypeName = "WMI Namespace";
+                                _itemTypeName = Properties.Resources.WMINamespace;
                                 break;
                             case WMIItemType.Class:
-                                _itemTypeName = "WMI Class";
+                                _itemTypeName = Properties.Resources.WMIClass;
                                 break;
                             case WMIItemType.Instance:
-                                _itemTypeName = "WMI Instance";
+                                _itemTypeName = Properties.Resources.WMIInstance;
                                 break;
+                            default:
+                                throw new InvalidOperationException($"Invalid item type.");
                         }
-
+#endif
                     return _itemTypeName;
                 }
             }
@@ -132,22 +115,26 @@ namespace WinCopies.IO
                 {
                     if (_description == null)
                     {
+                        object value = _managementObject.Qualifiers[nameof(Description)].Value;
 
-                        object value = _managementObject.Qualifiers["Description"].Value;
-
-                        _description = value == null ? "N/A" : (string)value;
-
+                        _description = value == null ? NotApplicable : (string)value;
                     }
 
                     return _description;
                 }
             }
 
-#if NETCORE
-            public override IBrowsableObjectInfo Parent => _parent ??= GetParent();
+            public override IBrowsableObjectInfo Parent => _parent
+#if CS8
+                ??=
 #else
-            public override IBrowsableObjectInfo Parent => _parent ?? (_parent = GetParent());
+            ?? (_parent = 
 #endif
+                GetParent()
+#if !CS8
+)
+#endif
+                ;
 
             /// <summary>
             /// Gets the localized path of this <see cref="WMIItemInfo"/>.
@@ -184,40 +171,48 @@ namespace WinCopies.IO
             /// <summary>
             /// Gets a value that indicates whether this <see cref="WMIItemInfo"/> is browsable.
             /// </summary>
-            public override bool IsBrowsable
+            public override IBrowsabilityOptions Browsability
             {
                 get
                 {
-                    if (_isBrowsable.HasValue)
+                    if (_browsability == null)
+                    {
+#if CS8
+                        _browsability = ObjectPropertiesGeneric.ItemType switch
+                        {
+#if CS9
+                        WMIItemType.Namespace or WMIItemType.Class => BrowsabilityOptions.BrowsableByDefault,
+#else
+                            WMIItemType.Namespace => BrowsabilityOptions.BrowsableByDefault,
+                            WMIItemType.Class => BrowsabilityOptions.BrowsableByDefault,
+#endif
+                            _ => BrowsabilityOptions.NotBrowsable
+                        };
+#else
 
-                        return _isBrowsable.Value;
-
-                    switch (ObjectPropertiesGeneric.ItemType)
+                        switch (ObjectPropertiesGeneric.ItemType)
                     {
                         case WMIItemType.Namespace:
                         case WMIItemType.Class:
-
                             _isBrowsable = true;
-
                             break;
-
                         default:
-
                             _isBrowsable = false;
-
                             break;
                     }
+#endif
+                    }
 
-                    return _isBrowsable.Value;
+                    return _browsability;
                 }
             }
 
-            public override bool IsRecursivelyBrowsable { get; } = true;
+            public override bool IsRecursivelyBrowsable => true;
 
             /// <summary>
             /// Gets the <see cref="ManagementBaseObject"/> that this <see cref="WMIItemInfo"/> represents.
             /// </summary>
-            public sealed override ManagementBaseObject EncapsulatedObjectGeneric => _managementObject;
+            public sealed override ManagementBaseObject InnerObjectGeneric => _managementObject;
 
             //public override bool NeedsObjectsOrValuesReconstruction => true;
             #endregion // Properties
@@ -260,6 +255,8 @@ namespace WinCopies.IO
             #endregion // Constructors
 
             #region Methods
+            public static System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetRootItems() => new IBrowsableObjectInfo[] { new WMIItemInfo(null, GetDefaultClientVersion()) };
+
             private static WMIItemInfoInitializer GetRootInitializer()
             {
                 string path = $"{RootPath}{ROOT}{NamespacePath}";
@@ -374,10 +371,16 @@ namespace WinCopies.IO
 
         public class WMIItemInfo : WMIItemInfo<IWMIItemInfoProperties, ManagementBaseObject, IBrowsableObjectInfoSelectorDictionary<WMIItemInfoItemProvider>, WMIItemInfoItemProvider>, IWMIItemInfo
         {
+            #region Consts
+            public const string RootPath = @"\\.\";
+            public const string NamespacePath = ":__NAMESPACE";
+            public const string NameConst = "Name";
+            public const string RootNamespace = "root:__namespace";
+            public const string ROOT = "ROOT";
+            #endregion
+
             #region Properties
             public static IBrowsableObjectInfoSelectorDictionary<WMIItemInfoItemProvider> DefaultItemSelectorDictionary { get; } = new WMIItemInfoSelectorDictionary();
-
-            public override bool IsBrowsableByDefault => true;
 
             public sealed override IWMIItemInfoProperties ObjectPropertiesGeneric { get; }
 
@@ -483,7 +486,7 @@ namespace WinCopies.IO
 
                 bool dispose = false;
 
-                var managementClass = EncapsulatedObjectGeneric as ManagementClass;
+                var managementClass = InnerObjectGeneric as ManagementClass;
 
                 if (managementClass == null)
                 {

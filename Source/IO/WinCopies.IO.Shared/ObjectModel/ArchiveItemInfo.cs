@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+using Microsoft.WindowsAPICodePack.PortableDevices;
 using Microsoft.WindowsAPICodePack.Win32Native.Shell;
 
 using SevenZip;
@@ -46,9 +47,9 @@ namespace WinCopies.IO.ObjectModel
     public abstract class ArchiveItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : ArchiveItemInfoProvider<TObjectProperties, ArchiveFileInfo?, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IArchiveItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IFileSystemObjectInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
     {
         #region Private fields
-        private ArchiveFileInfo? _encapsulatedObject;
+        private ArchiveFileInfo? _InnerObject;
         private IBrowsableObjectInfo _parent;
-        private bool? _isBrowsable;
+        private IBrowsabilityOptions _browsability;
         #endregion
 
         #region Properties
@@ -58,25 +59,22 @@ namespace WinCopies.IO.ObjectModel
         /// <summary>
         /// The <see cref="ArchiveFileInfo"/> that this <see cref="ArchiveItemInfo"/> represents.
         /// </summary>
-        public sealed override ArchiveFileInfo? EncapsulatedObjectGeneric => _encapsulatedObject;
+        public sealed override ArchiveFileInfo? InnerObjectGeneric => _InnerObject;
 
         // public override FileSystemType ItemFileSystemType => FileSystemType.Archive;
 
-        /// <summary>
-        /// Gets a value that indicates whether this <see cref="ArchiveItemInfo"/> is browsable.
-        /// </summary>
-        public override bool IsBrowsable
+        public override IBrowsabilityOptions Browsability
 #if CS8
-                => _isBrowsable ?? (_isBrowsable = ObjectPropertiesGeneric.FileType switch
+                => _browsability ??= ObjectPropertiesGeneric.FileType switch
                 {
 #if CS9
-                    FileType.Folder or FileType.Drive => true,// case FileType.Archive:
+                    FileType.Folder or FileType.Drive => BrowsabilityOptions.BrowsableByDefault,// case FileType.Archive:
 #else
-                    FileType.Folder => true,
-                    FileType.Drive => true,
+                    FileType.Folder => BrowsabilityOptions.BrowsableByDefault,
+                    FileType.Drive => BrowsabilityOptions.BrowsableByDefault,
 #endif
-                    _ => false
-                }).Value;
+                    _ => BrowsabilityOptions.NotBrowsable
+                };
 #else
                 {
                 get
@@ -91,13 +89,13 @@ namespace WinCopies.IO.ObjectModel
                         case FileType.Drive:
                             // case FileType.Archive:
 
-                            _isBrowsable = true;
+                            _isBrowsable = BrowsabilityOptions.BrowsableByDefault;
 
                             break;
 
                         default:
 
-                            _isBrowsable = false;
+                            _isBrowsable = BrowsabilityOptions.NotBrowsable;
 
                             break;
                     }
@@ -145,12 +143,12 @@ namespace WinCopies.IO.ObjectModel
         public override BitmapSource ExtraLargeBitmapSource => TryGetBitmapSource(ExtraLargeIconSize);
         #endregion // BitmapSources
 
-        public override string ItemTypeName => FileSystemObjectInfo. GetItemTypeName(System.IO.Path.GetExtension(Path), ObjectPropertiesGeneric.FileType);
+        public override string ItemTypeName => FileSystemObjectInfo.GetItemTypeName(System.IO.Path.GetExtension(Path), ObjectPropertiesGeneric.FileType);
 
         /// <summary>
         /// Not applicable for this item kind.
         /// </summary>
-        public override string Description => "N/A";
+        public override string Description => UtilHelpers.NotApplicable;
 
         /// <summary>
         /// Gets a value that indicates whether this item is a hidden or system item.
@@ -159,9 +157,9 @@ namespace WinCopies.IO.ObjectModel
         {
             get
             {
-                if (_encapsulatedObject.HasValue)
+                if (_InnerObject.HasValue)
                 {
-                    var value = (FileAttributes)_encapsulatedObject.Value.Attributes;
+                    var value = (FileAttributes)_InnerObject.Value.Attributes;
 
                     return value.HasFlag(FileAttributes.Hidden, FileAttributes.System);
                 }
@@ -179,11 +177,11 @@ namespace WinCopies.IO.ObjectModel
         #endregion // Overrides
         #endregion // Properties
 
-        protected ArchiveItemInfo(in string path, in IShellObjectInfoBase archiveShellObject, in ArchiveFileInfo? archiveFileInfo/*, DeepClone<ArchiveFileInfo?> archiveFileInfoDelegate*/) : base(path)
+        protected ArchiveItemInfo(in string path, in IShellObjectInfoBase archiveShellObject, in ArchiveFileInfo? archiveFileInfo, in ClientVersion clientVersion/*, DeepClone<ArchiveFileInfo?> archiveFileInfoDelegate*/) : base(path, clientVersion)
         {
             ArchiveShellObject = archiveShellObject;
 
-            _encapsulatedObject = archiveFileInfo;
+            _InnerObject = archiveFileInfo;
         }
 
         #region Methods
@@ -199,7 +197,7 @@ namespace WinCopies.IO.ObjectModel
 
                     archiveFileInfo = extractor.ArchiveFileData.FirstOrDefault(item => string.Compare(item.FileName, path, StringComparison.OrdinalIgnoreCase) == 0);
 
-                return new ArchiveItemInfo(path, FileType.Folder, ArchiveShellObject, archiveFileInfo);
+                return new ArchiveItemInfo(path, FileType.Folder, ArchiveShellObject, archiveFileInfo, ClientVersion);
             }
 
             return ArchiveShellObject;
@@ -211,7 +209,7 @@ namespace WinCopies.IO.ObjectModel
 
             if (disposing)
 
-                _encapsulatedObject = null;
+                _InnerObject = null;
         }
         #endregion // Methods
     }
@@ -221,14 +219,12 @@ namespace WinCopies.IO.ObjectModel
         #region Properties
         public static IBrowsableObjectInfoSelectorDictionary<ArchiveItemInfoItemProvider> DefaultItemSelectorDictionary { get; } = new ArchiveItemInfoSelectorDictionary();
 
-        public override bool IsBrowsableByDefault => true;
-
         public sealed override IFileSystemObjectInfoProperties ObjectPropertiesGeneric { get; }
 
         public override IPropertySystemCollection ObjectPropertySystem => null;
         #endregion // Properties
 
-        protected internal ArchiveItemInfo(in string path, in FileType fileType, in IShellObjectInfoBase archiveShellObject, in ArchiveFileInfo? archiveFileInfo/*, DeepClone<ArchiveFileInfo?> archiveFileInfoDelegate*/) : base(path, archiveShellObject, archiveFileInfo)
+        protected internal ArchiveItemInfo(in string path, in FileType fileType, in IShellObjectInfoBase archiveShellObject, in ArchiveFileInfo? archiveFileInfo, ClientVersion clientVersion/*, DeepClone<ArchiveFileInfo?> archiveFileInfoDelegate*/) : base(path, archiveShellObject, archiveFileInfo, clientVersion)
 #if CS9
                 => ObjectPropertiesGeneric = archiveFileInfo.HasValue ? new ArchiveItemInfoProperties<IArchiveItemInfoBase>(this, fileType) : new FileSystemObjectInfoProperties(this, fileType);
 #else
@@ -257,7 +253,7 @@ namespace WinCopies.IO.ObjectModel
 
             string extension = System.IO.Path.GetExtension(archiveFileInfo.FileName);
 
-            return new ArchiveItemInfo(System.IO.Path.Combine(archiveShellObjectInfo.Path, archiveFileInfo.FileName), archiveFileInfo.IsDirectory ? FileType.Folder : extension == ".lnk" ? FileType.Link : extension == ".library.ms" ? FileType.Library : FileType.File, archiveShellObjectInfo, archiveFileInfo);
+            return new ArchiveItemInfo(System.IO.Path.Combine(archiveShellObjectInfo.Path, archiveFileInfo.FileName), archiveFileInfo.IsDirectory ? FileType.Folder : extension == ".lnk" ? FileType.Link : extension == ".library.ms" ? FileType.Library : FileType.File, archiveShellObjectInfo, archiveFileInfo, archiveShellObjectInfo.ClientVersion);
         }
 
         public static ArchiveItemInfo From(in IShellObjectInfoBase archiveShellObjectInfo, in string archiveFilePath)
@@ -265,7 +261,7 @@ namespace WinCopies.IO.ObjectModel
             ThrowIfNull(archiveShellObjectInfo, nameof(archiveShellObjectInfo));
             ThrowIfNullEmptyOrWhiteSpace(archiveFilePath);
 
-            return new ArchiveItemInfo(System.IO.Path.Combine(archiveShellObjectInfo.Path, archiveFilePath), FileType.Folder, archiveShellObjectInfo, null);
+            return new ArchiveItemInfo(System.IO.Path.Combine(archiveShellObjectInfo.Path, archiveFilePath), FileType.Folder, archiveShellObjectInfo, null, archiveShellObjectInfo.ClientVersion);
         }
         #endregion
 

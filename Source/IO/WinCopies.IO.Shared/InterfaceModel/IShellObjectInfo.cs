@@ -17,7 +17,6 @@
 
 using Microsoft.WindowsAPICodePack.Shell;
 
-using System;
 using System.IO;
 
 using WinCopies.IO.AbstractionInterop;

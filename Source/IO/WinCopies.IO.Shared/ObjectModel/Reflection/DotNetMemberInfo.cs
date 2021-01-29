@@ -16,59 +16,68 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 
-using WinCopies.Collections
-#if WinCopies3
-    .Generic
-#endif
-    ;
-using WinCopies.IO.Reflection;
-
-#if DEBUG
-#if !WinCopies3
-using static WinCopies.Util.Util;
-#else
 using WinCopies.Diagnostics;
+using WinCopies.IO.AbstractionInterop.Reflection;
+using WinCopies.IO.Enumeration.Reflection;
+using WinCopies.IO.PropertySystem;
+using WinCopies.IO.Reflection;
+using WinCopies.IO.Reflection.PropertySystem;
+using WinCopies.IO.Selectors;
 
 using static WinCopies.Diagnostics.IfHelpers;
-#endif
-#endif
 
 namespace WinCopies.IO.ObjectModel.Reflection
 {
-    public sealed class DotNetMemberInfo : BrowsableDotNetItemInfo<IDotNetItemInfoProperties, MemberInfo>, IDotNetMemberInfo
+    public abstract class DotNetMemberInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : BrowsableDotNetItemInfo<TObjectProperties, MemberInfo, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IDotNetMemberInfoBase where TObjectProperties : IDotNetItemInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
     {
         #region Properties
-        public sealed override MemberInfo EncapsulatedObjectGeneric { get; }
+        public sealed override MemberInfo InnerObjectGeneric { get; }
 
-        public override DotNetItemType DotNetItemType { get; }
-
-        public override string ItemTypeName => ".Net member";
-
-        public sealed override IDotNetItemInfoProperties ObjectPropertiesGeneric { get; }
+        public override string ItemTypeName => Properties.Resources.DotNetMember;
         #endregion
 
-        internal DotNetMemberInfo(in MemberInfo memberInfo, in DotNetItemType dotNetItemType, in IDotNetTypeInfo dotNetTypeInfo) : base($"{dotNetTypeInfo.Path}{IO.Path.PathSeparator}{memberInfo.Name}", memberInfo.Name, dotNetTypeInfo)
-        {
+        protected DotNetMemberInfo(in MemberInfo memberInfo, in DotNetItemType dotNetItemType, in IDotNetTypeInfo dotNetTypeInfo) : base($"{dotNetTypeInfo.Path}{IO.Path.PathSeparator}{memberInfo.Name}", memberInfo.Name, dotNetTypeInfo)
 #if DEBUG
-            Debug.Assert(If(ComparisonType.And, ComparisonMode.Logical,
-#if !WinCopies3
-Util.Util.
+        {
+            Debug.Assert(If(ComparisonType.And, ComparisonMode.Logical, Comparison.NotEqual, null, dotNetTypeInfo, dotNetTypeInfo.ParentDotNetAssemblyInfo));
+#else
+=>
 #endif
-                Comparison.NotEqual, null, dotNetTypeInfo, dotNetTypeInfo.ParentDotNetAssemblyInfo));
-#endif
 
-            EncapsulatedObjectGeneric = memberInfo;
-
-            DotNetItemType = dotNetItemType;
-
-            ObjectPropertiesGeneric = new DotNetItemInfoProperties<IDotNetItemInfo>(this);
+            InnerObjectGeneric = memberInfo;
+#if DEBUG
         }
+#endif
+    }
 
-        public override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems() => GetItems(new DotNetItemType[] { DotNetItemType.Parameter, DotNetItemType.Attribute }, null);
+    public class DotNetMemberInfo : DotNetMemberInfo<IDotNetItemInfoProperties, DotNetMemberInfoItemProvider, IBrowsableObjectInfoSelectorDictionary<DotNetMemberInfoItemProvider>, DotNetMemberInfoItemProvider>, IDotNetMemberInfo
+    {
+        #region Properties
+        public static IBrowsableObjectInfoSelectorDictionary<ShellObjectInfoItemProvider> DefaultItemSelectorDictionary { get; } = new ShellObjectInfoSelectorDictionary();
 
-        public System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(System.Collections.Generic.IEnumerable<DotNetItemType> enumerable, Predicate<DotNetMemberInfoEnumeratorStruct> func) => new Enumerable<IBrowsableObjectInfo>(() => DotNetMemberInfoEnumerator.From(this, enumerable, func));
+        public sealed override IDotNetItemInfoProperties ObjectPropertiesGeneric { get; }
+
+        public override bool IsBrowsableByDefault => true;
+
+        public override IPropertySystemCollection ObjectPropertySystem => null;
+        #endregion
+
+        protected DotNetMemberInfo(in MemberInfo memberInfo, in DotNetItemType dotNetItemType, in IDotNetTypeInfo dotNetTypeInfo) : base(memberInfo, dotNetItemType, dotNetTypeInfo) => ObjectPropertiesGeneric = new DotNetItemInfoProperties<IDotNetItemInfo>(this, dotNetItemType);
+
+        #region Methods
+        public static System.Collections.Generic.IEnumerable<DotNetItemType> GetDefaultItemTypes() => new DotNetItemType[] { DotNetItemType.Parameter, DotNetItemType.Attribute };
+
+        protected virtual System.Collections.Generic.IEnumerable<DotNetMemberInfoItemProvider> GetItemProviders(System.Collections.Generic.IEnumerable<DotNetItemType> enumerable, Predicate<DotNetMemberInfoItemProvider> func) => DotNetMemberInfoEnumeration.From(this, enumerable, func);
+
+        public System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(System.Collections.Generic.IEnumerable<DotNetItemType> enumerable, Predicate<DotNetMemberInfoItemProvider> func) => GetItems(GetItemProviders(enumerable, func));
+
+        protected override IEnumerable<DotNetMemberInfoItemProvider> GetItemProviders(Predicate<DotNetMemberInfoItemProvider> predicate) => GetItemProviders(GetDefaultItemTypes(), predicate);
+
+        protected override System.Collections.Generic.IEnumerable<DotNetMemberInfoItemProvider> GetItemProviders() => GetItemProviders(GetDefaultItemTypes(), null);
+        #endregion
     }
 }

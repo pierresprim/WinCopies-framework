@@ -21,6 +21,7 @@ using Microsoft.WindowsAPICodePack.PortableDevices;
 using System;
 using System.Collections;
 using System.Drawing;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
@@ -61,7 +62,7 @@ namespace WinCopies.IO.ObjectModel
 
         IBrowsableObjectInfo Collections.Generic.IRecursiveEnumerable<IBrowsableObjectInfo>.Value => this;
 
-        public abstract object EncapsulatedObject { get; }
+        public abstract object InnerObject { get; }
 
 #if WinCopies3
         public abstract IPropertySystemCollection ObjectPropertySystem { get; }
@@ -69,14 +70,9 @@ namespace WinCopies.IO.ObjectModel
 
         public abstract object ObjectProperties { get; }
 
-        /// <summary>
-        /// When overridden in a derived class, gets a value that indicates whether this <see cref="BrowsableObjectInfo"/> is browsable.
-        /// </summary>
-        public abstract bool IsBrowsable { get; }
+        public abstract IBrowsabilityOptions Browsability { get; }
 
         public abstract bool IsRecursivelyBrowsable { get; }
-
-        public abstract bool IsBrowsableByDefault { get; }
 
         /// <summary>
         /// Gets the <see cref="IBrowsableObjectInfo"/> parent of this <see cref="BrowsableObjectInfo"/>. Returns <see langword="null"/> if this object is the root object of a hierarchy.
@@ -112,6 +108,10 @@ namespace WinCopies.IO.ObjectModel
         public abstract bool IsSpecialItem { get; }
 
         public ClientVersion ClientVersion { get; }
+
+        public abstract System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> RootItems { get; }
+
+        public abstract Predicate<IBrowsableObjectInfo> RootItemsBrowsableObjectInfoPredicate { get; }
         #endregion
 
         #region Constructors
@@ -124,6 +124,17 @@ namespace WinCopies.IO.ObjectModel
         #endregion
 
         #region Methods
+        public static ClientVersion GetDefaultClientVersion()
+        {
+            AssemblyName assemblyName = Assembly.GetExecutingAssembly().GetName();
+
+            Version assemblyVersion = assemblyName.Version;
+
+            // todo: use the new constructor
+
+            return new ClientVersion(assemblyName.Name, (uint)assemblyVersion.Major, (uint)assemblyVersion.Minor, (uint)assemblyVersion.Revision);
+        }
+
         public static Icon TryGetIcon(in int iconIndex, in string dll, in System.Drawing.Size size) => new IconExtractor(IO.Path.GetRealPathFromEnvironmentVariables(IO.Path.System32Path + dll)).GetIcon(iconIndex).Split()?.TryGetIcon(size, 32, true, true);
 
         public static BitmapSource TryGetBitmapSource(in int iconIndex, in string dllName, in int size)
@@ -241,20 +252,22 @@ namespace WinCopies.IO.ObjectModel
         #endregion
     }
 
-    public abstract class BrowsableObjectInfo<TObjectProperties, TEncapsulatedObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : BrowsableObjectInfo<TObjectProperties>, IBrowsableObjectInfo<TObjectProperties, TEncapsulatedObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
+    public abstract class BrowsableObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : BrowsableObjectInfo<TObjectProperties>, IBrowsableObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
     {
         #region Properties
-        public abstract TEncapsulatedObject EncapsulatedObjectGeneric { get; }
+        public abstract TInnerObject InnerObjectGeneric { get; }
 
-        TEncapsulatedObject IEncapsulatorBrowsableObjectInfo<TEncapsulatedObject>.EncapsulatedObject => EncapsulatedObjectGeneric;
+        TInnerObject IEncapsulatorBrowsableObjectInfo<TInnerObject>.InnerObject => InnerObjectGeneric;
 
-        public sealed override object EncapsulatedObject => EncapsulatedObjectGeneric;
+        public sealed override object InnerObject => InnerObjectGeneric;
+
+        public abstract Predicate<TPredicateTypeParameter> RootItemsPredicate { get; }
         #endregion
 
         /// <summary>
-        /// When called from a derived class, initializes a new instance of the <see cref="BrowsableObjectInfo{TObjectProperties, TEncapsulatedObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/> class with a custom <see cref="ClientVersion"/>.
+        /// When called from a derived class, initializes a new instance of the <see cref="BrowsableObjectInfo{TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/> class with a custom <see cref="ClientVersion"/>.
         /// </summary>
-        /// <param name="path">The path of the new <see cref="BrowsableObjectInfo{TObjectProperties, TEncapsulatedObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/>.</param>
+        /// <param name="path">The path of the new <see cref="BrowsableObjectInfo{TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/>.</param>
         /// <param name="clientVersion">A custom <see cref="ClientVersion"/>. This parameter can be null for non-file system and portable devices-related types.</param>
         protected BrowsableObjectInfo(in string path, in ClientVersion clientVersion) : base(path, clientVersion) { /* Left empty. */ }
 

@@ -117,37 +117,13 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="DotNetAttribute" xml:space="preserve">
-    <value>.Net Attribute</value>
+  <data name="ItemProviderNotSupported" xml:space="preserve">
+    <value>The given item provider or its current configuration is not supported.</value>
   </data>
-  <data name="DotNetMember" xml:space="preserve">
-    <value>.Net Member</value>
+  <data name="ParentMustBeAnIDotNetAssemblyInfoOrAnIDotNetItemInfoBase" xml:space="preserve">
+    <value>'parent' must be an IDotNetAssemblyInfo or an IDotNetItemInfoBase.</value>
   </data>
-  <data name="DotNetNamespace" xml:space="preserve">
-    <value>.Net Namespace</value>
-  </data>
-  <data name="DotNetType" xml:space="preserve">
-    <value>.Net Type</value>
-  </data>
-  <data name="PortableDevice" xml:space="preserve">
-    <value>Portable Device</value>
-  </data>
-  <data name="RegistryKey" xml:space="preserve">
-    <value>Registry Key</value>
-  </data>
-  <data name="RegistryRoot" xml:space="preserve">
-    <value>Registry Root</value>
-  </data>
-  <data name="RegistryValue" xml:space="preserve">
-    <value>Registry Value</value>
-  </data>
-  <data name="WMIClass" xml:space="preserve">
-    <value>WMI Class</value>
-  </data>
-  <data name="WMIInstance" xml:space="preserve">
-    <value>WMI Instance</value>
-  </data>
-  <data name="WMINamespace" xml:space="preserve">
-    <value>WMI Namespace</value>
+  <data name="PropertyCannotBeNullOnObject" xml:space="preserve">
+    <value>{0} cannot be null on {1}.</value>
   </data>
 </root>

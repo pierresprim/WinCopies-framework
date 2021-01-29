@@ -64,7 +64,7 @@ namespace WinCopies.IO
             /// <summary>
             /// Gets a <see cref="ShellObject"/> that represents this <see cref="ShellObjectInfo"/>.
             /// </summary>
-            public sealed override ShellObject EncapsulatedObjectGeneric => _shellObject;
+            public sealed override ShellObject InnerObjectGeneric => _shellObject;
 
             public Stream ArchiveFileStream { get; private set; }
 
@@ -73,10 +73,7 @@ namespace WinCopies.IO
             #region Overrides
             // public override FileSystemType ItemFileSystemType => FileSystemType.CurrentDeviceFileSystem;
 
-            /// <summary>
-            /// Gets a value that indicates whether this <see cref="ShellObjectInfo"/> is browsable.
-            /// </summary>
-            public override bool IsBrowsable => _shellObject is System.Collections.Generic.IEnumerable<ShellObject>;
+            public override IBrowsabilityOptions Browsability => _shellObject is System.Collections.Generic.IEnumerable<ShellObject> ? BrowsabilityOptions.BrowsableByDefault : BrowsabilityOptions.NotBrowsable;
 
 #if NETFRAMEWORK
             public override IBrowsableObjectInfo Parent => _parent ?? (_parent = GetParent());
@@ -251,10 +248,6 @@ namespace WinCopies.IO
                         ? new ShellObjectInfo(Computer.Path, FileType.KnownFolder, ShellObject.FromParsingName(Computer.ParsingName), ClientVersion)
                         : null;
             }
-
-            protected abstract System.Collections.Generic.IEnumerable<TDictionaryItems> GetItemProviders(Predicate<ArchiveFileInfoEnumeratorStruct> func);
-
-            public System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<ArchiveFileInfoEnumeratorStruct> func) => func == null ? GetItems(GetItemProviders(item => true)) : GetItems(GetItemProviders(func));
             #endregion
         }
 
@@ -354,13 +347,15 @@ namespace WinCopies.IO
             public override IBrowsableObjectInfoSelectorDictionary<ShellObjectInfoItemProvider> GetSelectorDictionary() => DefaultItemSelectorDictionary;
 
             #region GetItems
+            public System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<ArchiveFileInfoEnumeratorStruct> func) => func == null ? GetItems(GetItemProviders(item => true)) : GetItems(GetItemProviders(func));
+
             protected override System.Collections.Generic.IEnumerable<ShellObjectInfoItemProvider> GetItemProviders(Predicate<ShellObjectInfoEnumeratorStruct> predicate) => IsBrowsable
                 ? ObjectPropertiesGeneric.FileType == FileType.Archive
                     ? GetItemProviders(item => predicate(new ShellObjectInfoEnumeratorStruct(item)))
                     : ShellObjectInfoEnumeration.From(this, ClientVersion, predicate)
                 : GetEmptyEnumerable();
 
-            protected override System.Collections.Generic.IEnumerable<ShellObjectInfoItemProvider> GetItemProviders(Predicate<ArchiveFileInfoEnumeratorStruct> func)
+            protected virtual System.Collections.Generic.IEnumerable<ShellObjectInfoItemProvider> GetItemProviders(Predicate<ArchiveFileInfoEnumeratorStruct> func)
 #if NETFRAMEWORK
             {
                 switch (ObjectPropertiesGeneric.FileType)

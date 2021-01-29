@@ -30,7 +30,7 @@ namespace WinCopies.IO.Selectors
 
                 return ArchiveItemInfo.From(item.ShellObjectInfo, item.ArchiveFileInfo.Value);
 
-            return UtilHelpers.IsNullEmptyOrWhiteSpace(item.ArchiveFilePath) ? throw new ArgumentException("The given item provider or its current configuration is not supported.") : ArchiveItemInfo.From(item.ShellObjectInfo, item.ArchiveFilePath);
+            return UtilHelpers.IsNullEmptyOrWhiteSpace(item.ArchiveFilePath) ? throw new ArgumentException(Resources.ExceptionMessages.ItemProviderNotSupported) : ArchiveItemInfo.From(item.ShellObjectInfo, item.ArchiveFilePath);
         }
 
         protected override Converter<ArchiveItemInfoItemProvider, IBrowsableObjectInfo> DefaultSelectorOverride => Convert;

@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Security;
 
+using WinCopies.Collections.Generic;
 using WinCopies.IO.AbstractionInterop.Reflection;
 using WinCopies.IO.Enumeration;
 using WinCopies.IO.Enumeration.Reflection;
@@ -30,16 +31,30 @@ using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Reflection;
 using WinCopies.IO.Selectors;
 
+using static WinCopies.IO.DotNetAssemblyInfoHandledExtensions;
+using static WinCopies.UtilHelpers;
+
+namespace WinCopies.IO
+{
+    public static class DotNetAssemblyInfoHandledExtensions
+    {
+        public const string Exe = ".exe";
+        public const string Dll = ".dll";
+    }
+}
+
 namespace WinCopies.IO.ObjectModel.Reflection
 {
-    public class DotNetAssemblyInfo : ShellObjectInfo<IFileSystemObjectInfoProperties2, DotNetNamespaceInfoEnumeratorStruct, IBrowsableObjectInfoSelectorDictionary<DotNetAssemblyInfoItemProvider>, DotNetAssemblyInfoItemProvider>, IDotNetAssemblyInfo // <IFileSystemObjectInfoProperties>
+    public class DotNetAssemblyInfo : ShellObjectInfo<IFileSystemObjectInfoProperties2, DotNetAssemblyInfoItemProvider, IBrowsableObjectInfoSelectorDictionary<DotNetAssemblyInfoItemProvider>, DotNetAssemblyInfoItemProvider>, IDotNetAssemblyInfo // <IFileSystemObjectInfoProperties>
     {
         #region Properties
-        public static IBrowsableObjectInfoSelectorDictionary<ShellObjectInfoItemProvider> DefaultItemSelectorDictionary { get; } = new ShellObjectInfoSelectorDictionary
+        public override Predicate<DotNetAssemblyInfoItemProvider> RootItemsPredicate => item => !IsNullEmptyOrWhiteSpace(item.NamespaceName);
+
+        public override Predicate<IBrowsableObjectInfo> RootItemsBrowsableObjectInfoPredicate => null;
 
         public static Action RegisterSelectors { get; private set; } = () =>
         {
-            ShellObjectInfo.DefaultItemSelectorDictionary.Push(item => item.ShellObject is ShellFile shellFile && shellFile.Path.EndsWith(".exe", ".dll"), _item => new DotNetAssemblyInfo(ShellObjectInfo.GetInitInfo(_item.ShellObject).Path, _item.ShellObject, _item.ClientVersion.Value));
+            ShellObjectInfo.DefaultItemSelectorDictionary.Push(item => item.ShellObject is ShellFile shellFile && shellFile.Path.EndsWith(Exe, Dll), _item => new DotNetAssemblyInfo(ShellObjectInfo.GetInitInfo(_item.ShellObject).Path, _item.ShellObject, _item.ClientVersion.Value));
 
             RegisterSelectors = () => { /* Left empty. */ };
         };
@@ -52,7 +67,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
 
         public Assembly Assembly { get; private set; }
 
-        public override IFileSystemObjectInfoProperties2 ObjectPropertiesGeneric => throw new NotImplementedException();
+        public override IFileSystemObjectInfoProperties2 ObjectPropertiesGeneric => ;
         #endregion
 
         protected DotNetAssemblyInfo(in string path, in ShellObject shellObject, in ClientVersion clientVersion) : base(path, shellObject, clientVersion) { /* Left empty. */ }
@@ -82,15 +97,13 @@ namespace WinCopies.IO.ObjectModel.Reflection
 
         public void CloseAssembly() => Assembly = null;
 
-        protected override IEnumerable<DotNetAssemblyInfoItemProvider> GetItemProviders() => GetItemsOverride(new DotNetItemType[] { DotNetItemType.Namespace, DotNetItemType.Struct, DotNetItemType.Enum, DotNetItemType.Class, DotNetItemType.Interface, DotNetItemType.Delegate }, null);
+        public static System.Collections.Generic.IEnumerable<DotNetItemType> GetDefaultItemTypes() => new DotNetItemType[] { DotNetItemType.Namespace, DotNetItemType.Struct, DotNetItemType.Enum, DotNetItemType.Class, DotNetItemType.Interface, DotNetItemType.Delegate };
 
-        protected virtual IEnumerable<DotNetAssemblyInfoItemProvider> GetItemsOverride(IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetNamespaceInfoEnumeratorStruct> func) => new WinCopies.Collections.Generic.Enumerable<DotNetAssemblyInfoItemProvider>(() => new DotNetNamespaceInfoEnumerator(this, Assembly.DefinedTypes, typesToEnumerate, func));
+        protected virtual System.Collections.Generic.IEnumerable<DotNetAssemblyInfoItemProvider> GetItemProviders(System.Collections.Generic.IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetAssemblyInfoItemProvider> func) => DotNetNamespaceInfoEnumeration.From(this, typesToEnumerate, func);
 
-        public IEnumerable<IBrowsableObjectInfo> GetItems(IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetNamespaceInfoEnumeratorStruct> func) => GetItems(GetItemsOverride(typesToEnumerate, func));
+        protected override System.Collections.Generic.IEnumerable<DotNetAssemblyInfoItemProvider> GetItemProviders(Predicate<DotNetAssemblyInfoItemProvider> predicate) => GetItemProviders(GetDefaultItemTypes(), predicate);
 
-        public override IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<ShellObjectInfoEnumeratorStruct> func) => Temp.GetEmptyEnumerable<IBrowsableObjectInfo>();
-
-        public override IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<ArchiveFileInfoEnumeratorStruct> func) => Temp.GetEmptyEnumerable<IBrowsableObjectInfo>();
+        protected override System.Collections.Generic.IEnumerable<DotNetAssemblyInfoItemProvider> GetItemProviders() => GetItemProviders(GetDefaultItemTypes(), null);
         #endregion
     }
 }

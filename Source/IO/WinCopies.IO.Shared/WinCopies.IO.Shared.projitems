@@ -10,13 +10,16 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AbstractionInterop\ArchiveItemInfoProviderItemProvider.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)AbstractionInterop\DotNetNamespaceInfoItemProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AbstractionInterop\Reflection\DotNetMemberInfoItemProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AbstractionInterop\Reflection\DotNetNamespaceInfoItemProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AbstractionInterop\ArchiveItemInfoItemProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AbstractionInterop\Reflection\DotNetTypeInfoEnumeratorProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AbstractionInterop\RegistryItemInfoItemProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AbstractionInterop\PortableDeviceObjectInfoItemProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AbstractionInterop\WMIItemInfoItemProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AbstractionInterop\ShellObjectInfoItemProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectInfoSelector.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Enumeration\Reflection\DotNetEnumeration.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enumeration\RegistryItemInfoEnumeratorStruct.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\IArchiveItemInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\IArchiveItemInfoProvider.cs" />
@@ -57,9 +60,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\Reflection\DotNetNamespaceInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\Reflection\DotNetParameterInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\Reflection\DotNetTypeInfo.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Enumeration\Reflection\DotNetMemberInfoEnumerator.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Enumeration\Reflection\DotNetNamespaceInfoEnumerator.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Enumeration\Reflection\DotNetTypeInfoEnumerator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Enumeration\Reflection\DotNetMemberInfoEnumeration.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Enumeration\Reflection\DotNetNamespaceInfoEnumeration.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Enumeration\Reflection\DotNetTypeInfoEnumeration.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PathInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\BrowsableObjectInfoBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FileSystemObjectComparer.cs" />
@@ -67,7 +70,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)FileTypes.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FolderLoader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\IBrowsableObjectInfo.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\IFileSystemObject.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\IBrowsableObjectInfoBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IFileSystemObjectComparer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exceptions\DirectoryNotFoundException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exceptions\DriveNotFoundException.cs" />
@@ -109,7 +112,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)WMIItemTypes.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="$(MSBuildThisFileDirectory)Enumeration\Reflection\" />
     <Folder Include="$(MSBuildThisFileDirectory)PropertySystem\Core\" />
     <Folder Include="$(MSBuildThisFileDirectory)PropertySystem\Shell\" />
     <Folder Include="$(MSBuildThisFileDirectory)PropertySystem\TypeCommonProperties\ObjectModel\Reflection\" />

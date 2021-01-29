@@ -18,18 +18,16 @@
 using System;
 using System.Collections.Generic;
 
-using WinCopies.IO.Enumeration.Reflection;
 using WinCopies.IO.Reflection;
-using WinCopies.IO.Reflection.PropertySystem;
 
 namespace WinCopies.IO.ObjectModel.Reflection
 {
-    public interface IDotNetNamespaceInfoBase : IDotNetItemInfoBase
+    public interface IDotNetNamespaceInfoBase : IDotNetItemInfo<string>
     {
         IEnumerable<IBrowsableObjectInfo> GetItems(IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetNamespaceInfoEnumeratorStruct> func);
     }
 
-    public interface IDotNetNamespaceInfo<TObjectProperties, TEncapsulatedObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : IDotNetNamespaceInfoBase, IDotNetItemInfo<T, object> where T : IDotNetNamespaceInfoProperties
+    public interface IDotNetNamespaceInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : IDotNetNamespaceInfoBase, IDotNetItemInfo<T, object> where T : IDotNetNamespaceInfoProperties
     {
         // Left empty.
     }

@@ -22,48 +22,58 @@ using System.Reflection;
 using System.Windows.Media.Imaging;
 
 using WinCopies.IO.Reflection;
+using WinCopies.IO.Selectors;
+using WinCopies.IO.Reflection.PropertySystem;
+using WinCopies.IO.PropertySystem;
 
 #if DEBUG
-#if !WinCopies3
-using static WinCopies.Util.Util;
-#else
 using WinCopies.Diagnostics;
 
 using static WinCopies.Diagnostics.IfHelpers;
 #endif
-#endif
 
 namespace WinCopies.IO.ObjectModel.Reflection
 {
-    public sealed class DotNetAttributeInfo : DotNetItemInfo<IDotNetItemInfoProperties, CustomAttributeData>, IDotNetAttributeInfo<IDotNetItemInfoProperties>
+    public abstract class DotNetAttributeInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : DotNetItemInfo<TObjectProperties, CustomAttributeData, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IDotNetAttributeInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IDotNetItemInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
     {
         #region Properties
-        public sealed override CustomAttributeData EncapsulatedObjectGeneric { get; }
+        public sealed override CustomAttributeData InnerObjectGeneric { get; }
 
         public override bool IsBrowsable => false;
 
-        public override string ItemTypeName => ".Net attribute";
+        public override bool IsBrowsableByDefault => false;
 
-        public override DotNetItemType DotNetItemType => DotNetItemType.Attribute;
-
-        public override IDotNetItemInfoProperties ObjectPropertiesGeneric { get; }
+        public override string ItemTypeName => Properties.Resources.DotNetAttribute;
         #endregion
 
-        internal DotNetAttributeInfo(in CustomAttributeData customAttributeData, in IDotNetItemInfo parent) : base($"{parent.Path}{IO.Path.PathSeparator}{customAttributeData.AttributeType.Name}", customAttributeData.AttributeType.Name, parent)
-        {
+        protected DotNetAttributeInfo(in CustomAttributeData customAttributeData, in IDotNetItemInfo parent) : base($"{parent.Path}{IO.Path.PathSeparator}{customAttributeData.AttributeType.Name}", customAttributeData.AttributeType.Name, parent)
 #if DEBUG
+        {
             Debug.Assert(If(ComparisonType.And, ComparisonMode.Logical, Comparison.NotEqual, null, parent, parent.ParentDotNetAssemblyInfo, customAttributeData));
+#else
+=>
 #endif
 
-            EncapsulatedObjectGeneric = customAttributeData;
-
-            ObjectPropertiesGeneric = new DotNetItemInfoProperties<IDotNetItemInfo>(this);
+            InnerObjectGeneric = customAttributeData;
+#if DEBUG
         }
+#endif
 
-        #region Methods
         protected sealed override BitmapSource TryGetBitmapSource(in int size) => TryGetBitmapSource(FileIcon, Microsoft.WindowsAPICodePack.NativeAPI.Consts.DllNames.Shell32, size);
+    }
 
-        public override IEnumerable<IBrowsableObjectInfo> GetItems() => throw new NotSupportedException("This item does not support browsing.");
-        #endregion
+    public class DotNetAttributeInfo : DotNetAttributeInfo<IDotNetItemInfoProperties, object, IBrowsableObjectInfoSelectorDictionary<object>, object>
+    {
+        public override IDotNetItemInfoProperties ObjectPropertiesGeneric { get; }
+
+        public override IPropertySystemCollection ObjectPropertySystem => null;
+
+        protected DotNetAttributeInfo(in CustomAttributeData customAttributeData, in IDotNetItemInfo parent) : base(customAttributeData, parent) => ObjectPropertiesGeneric = new DotNetItemInfoProperties<IDotNetItemInfo>(this, DotNetItemType.Attribute);
+
+        protected override IEnumerable<object> GetItemProviders() => null;
+
+        protected override IEnumerable<object> GetItemProviders(Predicate<object> predicate) => null;
+
+        public override IBrowsableObjectInfoSelectorDictionary<object> GetSelectorDictionary() => null;
     }
 }

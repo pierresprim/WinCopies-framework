@@ -167,7 +167,7 @@ namespace WinCopies.IO.PropertySystem
 
         public static ShellObjectPropertySystemCollection GetShellObjectPropertySystemCollection(in ShellObject shellObject) => new ShellObjectPropertySystemCollection(shellObject ?? throw GetArgumentNullException(nameof(shellObject)));
 
-        internal static ShellObjectPropertySystemCollection _GetShellObjectPropertySystemCollection<T>(in IEncapsulatorBrowsableObjectInfo<T> browsableObjectInfo) where T : ShellObject => new ShellObjectPropertySystemCollection(browsableObjectInfo.EncapsulatedObject);
+        internal static ShellObjectPropertySystemCollection _GetShellObjectPropertySystemCollection<T>(in IEncapsulatorBrowsableObjectInfo<T> browsableObjectInfo) where T : ShellObject => new ShellObjectPropertySystemCollection(browsableObjectInfo.InnerObject);
 
         public static ShellObjectPropertySystemCollection GetShellObjectPropertySystemCollection<T>(in IEncapsulatorBrowsableObjectInfo<T> browsableObjectInfo) where T : ShellObject => _GetShellObjectPropertySystemCollection(browsableObjectInfo ?? throw GetArgumentNullException(nameof(ShellObjectInfo)));
 

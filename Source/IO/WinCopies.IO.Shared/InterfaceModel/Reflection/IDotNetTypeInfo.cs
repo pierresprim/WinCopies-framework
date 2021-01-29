@@ -15,22 +15,27 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-using System;
-using System.Collections.Generic;
 using System.Reflection;
 
-using WinCopies.IO.Reflection;
+using WinCopies.IO.AbstractionInterop.Reflection;
+using WinCopies.IO.Reflection.PropertySystem;
+using WinCopies.IO.Selectors;
 
 namespace WinCopies.IO
 {
     namespace ObjectModel.Reflection
     {
-        public interface IDotNetTypeInfo :  IDotNetItemInfo, IEncapsulatorBrowsableObjectInfo<TypeInfo>
+        public interface IDotNetTypeInfoBase : IDotNetItemInfo<TypeInfo>
         {
-            IEnumerable<IBrowsableObjectInfo> GetItems(IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetTypeInfoEnumeratorStruct> func);
+            // Left empty.
         }
 
-        public interface IDotNetTypeInfo<T> : IDotNetTypeInfo, IDotNetItemInfo<T, TypeInfo> where T : IDotNetTypeInfoProperties
+        public interface IDotNetTypeInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : IDotNetTypeInfoBase, IDotNetItemInfo<TObjectProperties, TypeInfo, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IDotNetTypeInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
+        {
+            // Left empty.
+        }
+
+        public interface IDotNetTypeInfo : IDotNetTypeInfo<IDotNetTypeInfoProperties, DotNetTypeInfoItemProvider, IBrowsableObjectInfoSelectorDictionary<DotNetTypeInfoItemProvider>, DotNetTypeInfoItemProvider>
         {
             // Left empty.
         }

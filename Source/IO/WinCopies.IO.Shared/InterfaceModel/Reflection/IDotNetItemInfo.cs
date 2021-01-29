@@ -18,18 +18,20 @@
 using WinCopies.IO.Reflection.PropertySystem;
 using WinCopies.IO.Selectors;
 
-namespace WinCopies.IO
+namespace WinCopies.IO.ObjectModel.Reflection
 {
-    namespace ObjectModel.Reflection
+    public interface IDotNetItemInfo : IBrowsableObjectInfo
     {
-        public interface IDotNetItemInfoBase : IBrowsableObjectInfo
-        {
-            IDotNetAssemblyInfo ParentDotNetAssemblyInfo { get; }
-        }
+        IDotNetAssemblyInfo ParentDotNetAssemblyInfo { get; }
+    }
 
-        public interface IDotNetItemInfo<TObjectProperties, TEncapsulatedObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : IDotNetItemInfoBase, IBrowsableObjectInfo<TObjectProperties, TEncapsulatedObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IDotNetItemInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
-        {
-            // Left empty.
-        }
+    public interface IDotNetItemInfo<T> : IDotNetItemInfo, IEncapsulatorBrowsableObjectInfo<T>
+    {
+        // Left empty.
+    }
+
+    public interface IDotNetItemInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : IDotNetItemInfo<TInnerObject>, IBrowsableObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IDotNetItemInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
+    {
+        // Left empty.
     }
 }

@@ -21,7 +21,6 @@ using Microsoft.WindowsAPICodePack.Win32Native;
 
 using System;
 using System.Drawing;
-using System.Linq;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
@@ -40,7 +39,7 @@ namespace WinCopies.IO.ObjectModel
         private const string PortableDeviceIconDllName = "imageres.dll";
 
         #region Properties
-        public sealed override IPortableDevice EncapsulatedObjectGeneric { get; }
+        public sealed override IPortableDevice InnerObjectGeneric { get; }
 
         public override bool IsSpecialItem => false;
 
@@ -52,20 +51,20 @@ namespace WinCopies.IO.ObjectModel
 
         public override BitmapSource ExtraLargeBitmapSource => TryGetBitmapSource(ExtraLargeIconSize);
 
-        public override bool IsBrowsable => true;
+        public override IBrowsabilityOptions Browsability => BrowsabilityOptions.BrowsableByDefault;
 
-        public override string ItemTypeName => "Portable device";
+        public override string ItemTypeName => Properties.Resources.PortableDevice;
 
-        public override string Description => "N/A";
+        public override string Description => UtilHelpers.NotApplicable;
 
         public override IBrowsableObjectInfo Parent => ShellObjectInfo.From(ShellObject.FromParsingName(KnownFolders.Computer.ParsingName), ClientVersion);
 
         public override string LocalizedName => Name;
 
-        public override string Name => EncapsulatedObjectGeneric.DeviceFriendlyName;
+        public override string Name => InnerObjectGeneric.DeviceFriendlyName;
         #endregion // Properties
 
-        public PortableDeviceInfo(in IPortableDevice portableDevice, in ClientVersion clientVersion) : base((portableDevice ?? throw GetArgumentNullException(nameof(portableDevice))).DeviceFriendlyName, clientVersion) => EncapsulatedObjectGeneric = portableDevice;
+        public PortableDeviceInfo(in IPortableDevice portableDevice, in ClientVersion clientVersion) : base((portableDevice ?? throw GetArgumentNullException(nameof(portableDevice))).DeviceFriendlyName, clientVersion) => InnerObjectGeneric = portableDevice;
 
         private BitmapSource TryGetBitmapSource(in int size)
         {
@@ -91,8 +90,6 @@ namespace WinCopies.IO.ObjectModel
         #region Properties
         public static IBrowsableObjectInfoSelectorDictionary<PortableDeviceObjectInfoItemProvider> DefaultItemSelectorDictionary { get; } = new PortableDeviceInfoSelectorDictionary();
 
-        public override bool IsBrowsableByDefault => true;
-
         public sealed override IPortableDeviceInfoProperties ObjectPropertiesGeneric { get; }
 
         public override IPropertySystemCollection ObjectPropertySystem => null;
@@ -111,11 +108,11 @@ namespace WinCopies.IO.ObjectModel
         #region GetItems
         protected override System.Collections.Generic.IEnumerable<PortableDeviceObjectInfoItemProvider> GetItemProviders(Predicate<IPortableDeviceObject> predicate)
         {
-            if (!EncapsulatedObjectGeneric.IsOpen)
+            if (!InnerObjectGeneric.IsOpen)
 
-                EncapsulatedObjectGeneric.Open(ClientVersion, ObjectPropertiesGeneric.OpeningOptions);
+                InnerObjectGeneric.Open(ClientVersion, ObjectPropertiesGeneric.OpeningOptions);
 
-            return (predicate == null ? EncapsulatedObjectGeneric : EncapsulatedObjectGeneric.WherePredicate(predicate)).SelectConverter(item=>new PortableDeviceObjectInfoItemProvider(item, this, ClientVersion));
+            return (predicate == null ? InnerObjectGeneric : InnerObjectGeneric.WherePredicate(predicate)).SelectConverter(item => new PortableDeviceObjectInfoItemProvider(item, this, ClientVersion));
         }
 
         protected override System.Collections.Generic.IEnumerable<PortableDeviceObjectInfoItemProvider> GetItemProviders() => GetItemProviders(null);

@@ -16,10 +16,8 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 
-using WinCopies.IO.ObjectModel.Reflection;
 using WinCopies.IO.Reflection;
 
 #if !WinCopies3
@@ -32,19 +30,16 @@ using WinCopies.Collections.Generic;
 using static WinCopies.ThrowHelper;
 #endif
 
-namespace WinCopies.IO
+namespace WinCopies.IO.ObjectModel.Reflection
 {
-
-    namespace ObjectModel.Reflection
-    {
         public sealed class DotNetNamespaceInfo : BrowsableDotNetItemInfo<IDotNetNamespaceInfoProperties, object>, IDotNetNamespaceInfo<IDotNetNamespaceInfoProperties>
         {
             #region Properties
             public bool IsRootNamespace { get; }
 
-            public override string ItemTypeName { get; } = ".Net namespace";
+            public override string ItemTypeName { get; } = Properties.Resources. DotNetNamespace;
 
-            public sealed override object EncapsulatedObjectGeneric => null;
+            public sealed override object InnerObjectGeneric => null;
 
             public override DotNetItemType DotNetItemType => DotNetItemType.Namespace;
 
@@ -74,7 +69,6 @@ namespace WinCopies.IO
 
             public override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems() => GetItems(new DotNetItemType[] { DotNetItemType.Namespace, DotNetItemType.Struct, DotNetItemType.Enum, DotNetItemType.Class, DotNetItemType.Interface, DotNetItemType.Delegate }, GetCommonPredicate<DotNetNamespaceInfoEnumeratorStruct>());
 
-            public System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(System.Collections.Generic.IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetNamespaceInfoEnumeratorStruct> func) => new Enumerable<IBrowsableObjectInfo>(() => new DotNetNamespaceInfoEnumerator(this, ParentDotNetAssemblyInfo.EncapsulatedObject.DefinedTypes, typesToEnumerate, func));
+            public System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(System.Collections.Generic.IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetNamespaceInfoEnumeratorStruct> func) => new Enumerable<IBrowsableObjectInfo>(() => new DotNetNamespaceInfoEnumerator(this, ParentDotNetAssemblyInfo.InnerObject.DefinedTypes, typesToEnumerate, func));
         }
-    }
 }
