@@ -47,7 +47,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)EnumerablePath.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\TypeCommonProperties\ObjectModel\PortableDeviceProperties.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\TypeCommonProperties\ObjectModel\WMIItemInfoProperties.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ReflectionHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Selectors\PortableDeviceSelectorDictionaries.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Selectors\Reflection\DotNetTypeInfoSelectorDictionary.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Selectors\Reflection\DotNetNamespaceInfoSelectorDictionary.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Selectors\Reflection\DotNetMemberInfoSelectorDictionary.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Selectors\WMIItemInfoSelectorDictionary.cs" />

@@ -22,14 +22,14 @@ namespace WinCopies.IO.Resources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class ExceptionMessages {
+    internal class PropertyDescriptions {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal ExceptionMessages() {
+        internal PropertyDescriptions() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace WinCopies.IO.Resources {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("WinCopies.IO.Resources.ExceptionMessages", typeof(ExceptionMessages).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("WinCopies.IO.Resources.PropertyDescriptions", typeof(PropertyDescriptions).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,38 +61,38 @@ namespace WinCopies.IO.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The given item&apos;s inner object is not a(n) {0}..
+        ///   Looks up a localized string similar to The type of the current item (folder, file, ...).
         /// </summary>
-        internal static string GivenItemInnerObjectIsNotFromSupportedType {
+        internal static string FileType {
             get {
-                return ResourceManager.GetString("GivenItemInnerObjectIsNotFromSupportedType", resourceCulture);
+                return ResourceManager.GetString("FileType", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The given item provider or its current configuration is not supported..
+        ///   Looks up a localized string similar to File type.
         /// </summary>
-        internal static string ItemProviderNotSupported {
+        internal static string FileTypeName {
             get {
-                return ResourceManager.GetString("ItemProviderNotSupported", resourceCulture);
+                return ResourceManager.GetString("FileTypeName", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &apos;parent&apos; must be an IDotNetAssemblyInfo or an IDotNetItemInfoBase..
+        ///   Looks up a localized string similar to The size on disk of the current item..
         /// </summary>
-        internal static string ParentMustBeAnIDotNetAssemblyInfoOrAnIDotNetItemInfoBase {
+        internal static string Size {
             get {
-                return ResourceManager.GetString("ParentMustBeAnIDotNetAssemblyInfoOrAnIDotNetItemInfoBase", resourceCulture);
+                return ResourceManager.GetString("Size", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} cannot be null on {1}..
+        ///   Looks up a localized string similar to Size.
         /// </summary>
-        internal static string PropertyCannotBeNullOnObject {
+        internal static string SizeName {
             get {
-                return ResourceManager.GetString("PropertyCannotBeNullOnObject", resourceCulture);
+                return ResourceManager.GetString("SizeName", resourceCulture);
             }
         }
     }

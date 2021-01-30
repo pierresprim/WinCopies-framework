@@ -26,6 +26,8 @@ namespace WinCopies.IO.Reflection.PropertySystem
 
     public interface IDotNetTypeOrMemberInfoProperties : IDotNetItemInfoProperties
     {
+        AccessModifier AccessModifier { get; }
+
         Type DeclaringType { get; }
     }
 
@@ -36,10 +38,13 @@ namespace WinCopies.IO.Reflection.PropertySystem
         bool IsSealed { get; }
     }
 
+    public interface IDotNetMethodItemInfoProperties: IDotNetTypeOrMethodItemInfoProperties
+    {
+        bool IsPropertyMethod { get; }
+    }
+
     public interface IDotNetTypeInfoProperties : IDotNetTypeOrMethodItemInfoProperties
     {
-        AccessModifier AccessModifier { get; }
-
         bool? IsRootType { get; }
     }
 }

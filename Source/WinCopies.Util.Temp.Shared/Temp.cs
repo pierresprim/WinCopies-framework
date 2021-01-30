@@ -344,6 +344,46 @@ namespace WinCopies
 
     public delegate T Converter<T>(object obj);
 
+    [AttributeUsage(AttributeTargets.Property)]
+    public class PropertyDescriptionAttribute : Attribute
+    {
+        public string FriendlyName { get; }
+
+        public string Description { get; }
+
+        public PropertyDescriptionAttribute(string friendlyName, string description)
+        {
+            ThrowIfNullEmptyOrWhiteSpace(friendlyName);
+            ThrowIfNullEmptyOrWhiteSpace(description);
+
+            FriendlyName = friendlyName;
+
+            Description = description;
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Class)]
+    public class PropertyDescriptionFindingAttribute : Attribute
+    {
+        public Type PropertyDescriptionType { get; }
+
+        public string NameFormat { get; }
+
+        public string DescriptionFormat { get; }
+
+        public PropertyDescriptionFindingAttribute(Type propertyDescriptionType, string nameFormat, string descriptionFormat)
+        {
+            ThrowIfNullEmptyOrWhiteSpace(nameFormat);
+            ThrowIfNullEmptyOrWhiteSpace(descriptionFormat);
+
+            PropertyDescriptionType = propertyDescriptionType;
+
+            NameFormat = nameFormat;
+
+            DescriptionFormat = descriptionFormat;
+        }
+    }
+
     public static class Extensions
     {
         public static bool HasFlag(this Enum @enum, System.Collections.Generic.IEnumerable<Enum> values)

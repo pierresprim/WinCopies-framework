@@ -16,7 +16,7 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using System;
-
+using System.Reflection;
 using WinCopies.IO.AbstractionInterop.Reflection;
 using WinCopies.IO.Enumeration.Reflection;
 using WinCopies.IO.ObjectModel;
@@ -28,30 +28,12 @@ namespace WinCopies.IO.Selectors.Reflection
 {
     public class DotNetMemberInfoSelectorDictionary : BrowsableObjectInfoSelectorDictionary<DotNetMemberInfoItemProvider>
     {
-        public static IBrowsableObjectInfo Convert(DotNetMemberInfoItemProvider item)
-        {
-            if ((item ?? throw GetArgumentNullException(nameof(item))).ParameterInfoItemProvider != null)
-
-                return new DotNetParameterInfo(item.ParameterInfoItemProvider.ParameterInfo, IO.Reflection.DotNetItemType.Parameter, item.ParameterInfoItemProvider.IsReturnParameter, item.Parent);
-
-            if (item.ReturnType != null)
-
-                return new DotNetTypeInfo(item.ReturnType, DotNetEnumeration.GetTypeItemType(item.ReturnType), false, item.Parent);
-
-            if (item.MethodInfo != null)
-
-                return new DotNetMemberInfo(item.MethodInfo, IO.Reflection.DotNetItemType.Method, true, item.Parent);
-
-            if (item.GenericTypeInfo != null)
-
-                return new DotNetGenericItemInfo(item.GenericTypeInfo.Type, item.GenericTypeInfo.GenericTypeStructValue, item.Parent);
-
-            if (item.CustomAttributeData != null)
-
-                return new DotNetAttributeInfo(item.CustomAttributeData, item.Parent);
-
-            throw BrowsableObjectInfoSelectorDictionary.GetInvalidItemProviderException();
-        }
+        public static IBrowsableObjectInfo Convert(DotNetMemberInfoItemProvider item) => (item ?? throw GetArgumentNullException(nameof(item))).ParameterInfoItemProvider != null ? new DotNetParameterInfo(item.ParameterInfoItemProvider.ParameterInfo, IO.Reflection.DotNetItemType.Parameter, item.ParameterInfoItemProvider.IsReturnParameter, item.Parent)
+            : item.ReturnType != null ? new DotNetTypeInfo(item.ReturnType.GetTypeInfo(), DotNetEnumeration.GetTypeItemType(item.ReturnType), false, item.Parent)
+            : item.MethodInfo != null ? new DotNetMemberInfo(item.MethodInfo, IO.Reflection.DotNetItemType.Method, true, item.Parent)
+            : item.GenericTypeInfo != null ? new DotNetGenericItemInfo(item.GenericTypeInfo.Type, item.GenericTypeInfo.GenericTypeStructValue, item.Parent)
+            : item.CustomAttributeData == null ? throw BrowsableObjectInfoSelectorDictionary.GetInvalidItemProviderException()
+            : (IBrowsableObjectInfo)new DotNetAttributeInfo(item.CustomAttributeData, item.Parent);
 
         protected override Converter<DotNetMemberInfoItemProvider, IBrowsableObjectInfo> DefaultSelectorOverride => Convert;
 

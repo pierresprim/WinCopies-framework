@@ -18,7 +18,6 @@
 using System;
 using System.Reflection;
 
-using WinCopies.Collections.DotNetFix.Generic;
 using WinCopies.Collections.Generic;
 using WinCopies.IO.AbstractionInterop.Reflection;
 using WinCopies.IO.ObjectModel.Reflection;
@@ -31,7 +30,7 @@ namespace WinCopies.IO.Enumeration.Reflection
 {
     public static class DotNetTypeInfoEnumeration
     {
-        public static System.Collections.Generic.IEnumerable<DotNetTypeInfoItemProvider> From(IDotNetTypeInfo dotNetTypeInfo, System.Collections.Generic.IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetTypeInfoItemProvider> func)
+        public static System.Collections.Generic.IEnumerable<DotNetTypeInfoItemProvider> From(IDotNetTypeInfo dotNetTypeInfo, in System.Collections.Generic.IEnumerable<DotNetItemType> typesToEnumerate, in Predicate<DotNetTypeInfoItemProvider> func)
         {
             ThrowIfNull(dotNetTypeInfo, nameof(dotNetTypeInfo));
             ThrowIfNull(typesToEnumerate, nameof(typesToEnumerate));

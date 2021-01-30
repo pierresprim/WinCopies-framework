@@ -81,6 +81,11 @@
 			<AutoGen>True</AutoGen>
 			<DependentUpon>Resources.resx</DependentUpon>
 		</Compile>
+		<Compile Update="Resources\PropertyDescriptions.Designer.cs">
+		  <DesignTime>True</DesignTime>
+		  <AutoGen>True</AutoGen>
+		  <DependentUpon>PropertyDescriptions.resx</DependentUpon>
+		</Compile>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -91,6 +96,10 @@
 		<EmbeddedResource Update="Properties\Resources.resx">
 			<Generator>PublicResXFileCodeGenerator</Generator>
 			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\PropertyDescriptions.resx">
+		  <Generator>ResXFileCodeGenerator</Generator>
+		  <LastGenOutput>PropertyDescriptions.Designer.cs</LastGenOutput>
 		</EmbeddedResource>
 	</ItemGroup>
 

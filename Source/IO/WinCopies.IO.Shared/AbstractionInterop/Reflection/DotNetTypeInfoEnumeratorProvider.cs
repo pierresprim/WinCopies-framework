@@ -18,7 +18,7 @@
 using System;
 using System.Reflection;
 
-using WinCopies.IO.ObjectModel;
+using WinCopies.IO.ObjectModel.Reflection;
 
 namespace WinCopies.IO.AbstractionInterop.Reflection
 {
@@ -33,13 +33,18 @@ namespace WinCopies.IO.AbstractionInterop.Reflection
     {
         public DotNetTypeInfoProviderGenericTypeStructValue GenericTypeStructValue { get; }
 
-        public Type Type { get; }
+        public TypeInfo TypeInfo { get; }
 
-        public DotNetTypeInfoProviderGenericTypeStruct(in DotNetTypeInfoProviderGenericTypeStructValue genericTypeStructValue, in Type type)
+        public DotNetTypeInfoProviderGenericTypeStruct(in DotNetTypeInfoProviderGenericTypeStructValue genericTypeStructValue, in TypeInfo typeInfo)
         {
             GenericTypeStructValue = genericTypeStructValue;
 
-            Type = type;
+            TypeInfo = typeInfo;
+        }
+
+        public DotNetTypeInfoProviderGenericTypeStruct(in DotNetTypeInfoProviderGenericTypeStructValue genericTypeStructValue, in Type type) : this(genericTypeStructValue, type.GetTypeInfo())
+        {
+            // Left empty.
         }
     }
 
@@ -54,19 +59,19 @@ namespace WinCopies.IO.AbstractionInterop.Reflection
 
         public DotNetTypeInfoProviderGenericTypeStruct GenericTypeInfo { get; }
 
-        public IBrowsableObjectInfo Parent { get; }
+        public IDotNetItemInfo Parent { get; }
         #endregion
 
         #region Constructors
-        private DotNetTypeInfoItemProvider(in IBrowsableObjectInfo parent) => Parent = parent;
+        private DotNetTypeInfoItemProvider(in IDotNetItemInfo parent) => Parent = parent;
 
-        public DotNetTypeInfoItemProvider(in TypeInfoItemProvider typeInfoItemProvider, in IBrowsableObjectInfo parent) : this(parent) => TypeInfoItemProvider = typeInfoItemProvider;
+        public DotNetTypeInfoItemProvider(in TypeInfoItemProvider typeInfoItemProvider, in IDotNetItemInfo parent) : this(parent) => TypeInfoItemProvider = typeInfoItemProvider;
 
-        public DotNetTypeInfoItemProvider(in MemberInfoItemProvider memberInfoItemProvider, in IBrowsableObjectInfo parent) : this(parent) => MemberInfoItemProvider = memberInfoItemProvider;
+        public DotNetTypeInfoItemProvider(in MemberInfoItemProvider memberInfoItemProvider, in IDotNetItemInfo parent) : this(parent) => MemberInfoItemProvider = memberInfoItemProvider;
 
-        public DotNetTypeInfoItemProvider(in CustomAttributeData customAttributeData, in IBrowsableObjectInfo parent) : this(parent) => CustomAttributeData = customAttributeData;
+        public DotNetTypeInfoItemProvider(in CustomAttributeData customAttributeData, in IDotNetItemInfo parent) : this(parent) => CustomAttributeData = customAttributeData;
 
-        public DotNetTypeInfoItemProvider(in DotNetTypeInfoProviderGenericTypeStruct genericTypeInfo, in IBrowsableObjectInfo parent) : this(parent) => GenericTypeInfo = genericTypeInfo;
+        public DotNetTypeInfoItemProvider(in DotNetTypeInfoProviderGenericTypeStruct genericTypeInfo, in IDotNetItemInfo parent) : this(parent) => GenericTypeInfo = genericTypeInfo;
         #endregion
     }
 }

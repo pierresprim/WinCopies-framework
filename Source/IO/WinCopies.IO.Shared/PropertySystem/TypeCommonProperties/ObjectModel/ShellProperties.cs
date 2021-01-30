@@ -22,13 +22,17 @@ using WinCopies.IO.ObjectModel;
 
 namespace WinCopies.IO.PropertySystem
 {
+    [PropertyDescriptionFinding(typeof(Resources.PropertyDescriptions), "{0}Name", "{0}")]
     public abstract class FileSystemObjectInfoProperties<T> : BrowsableObjectInfoProperties<T>, IFileSystemObjectInfoProperties where T : IFileSystemObjectInfo
     {
-        ///// <summary>
-        ///// The file type of this <see cref="FileSystemObject"/>.
-        ///// </summary>
+        /// <summary>
+        /// The type of the current item (folder, file, ...)
+        /// </summary>
         public FileType FileType { get; }
 
+        /// <summary>
+        /// The size on disk of the current item.
+        /// </summary>
         public abstract Size? Size { get; }
 
         protected FileSystemObjectInfoProperties(in T fileSystemObjectInfo, in FileType fileType) : base(fileSystemObjectInfo) => FileType = fileType;
@@ -58,6 +62,7 @@ namespace WinCopies.IO.PropertySystem
         protected FileSystemObjectInfoProperties(in TBrowsableObjectInfo fileSystemObjectInfo, in FileType fileType, in TInnerProperties innerProperties) : base(fileSystemObjectInfo, fileType) => InnerProperties = innerProperties;
     }
 
+    [PropertyDescriptionFinding(typeof(Resources.PropertyDescriptions), "{0}Name", "{0}")]
     public abstract class FileOrFolderShellObjectInfoProperties<TBrowsableObjectInfo, TInnerProperties> : FileSystemObjectInfoProperties<TBrowsableObjectInfo, TInnerProperties>, IFileSystemObjectInfoProperties2 where TBrowsableObjectInfo : IShellObjectInfoBase2 where TInnerProperties : FileSystemInfo
     {
         public DateTime LastWriteTime => InnerProperties.LastWriteTime;
@@ -86,6 +91,7 @@ namespace WinCopies.IO.PropertySystem
         }
     }
 
+    [PropertyDescriptionFinding(typeof(Resources.PropertyDescriptions), "{0}Name", "{0}")]
     public class FolderShellObjectInfoProperties<T> : FileOrFolderShellObjectInfoProperties<T, DirectoryInfo> where T : IShellObjectInfoBase2
     {
         public string ParentName => InnerProperties.Parent.FullName;
@@ -100,11 +106,12 @@ namespace WinCopies.IO.PropertySystem
         }
     }
 
+    [PropertyDescriptionFinding(typeof(Resources.PropertyDescriptions), "{0}Name", "{0}")]
     public class FileShellObjectInfoProperties<T> : FileOrFolderShellObjectInfoProperties<T, System.IO.FileInfo> where T : IShellObjectInfoBase2
     {
         public bool IsReadOnly => InnerProperties.IsReadOnly;
 
-        public string? DirectoryName => InnerProperties.DirectoryName;
+        public string DirectoryName => InnerProperties.DirectoryName;
 
         public sealed override Size? Size => new Size(BrowsableObjectInfo.InnerObject.Properties.System.Size.Value.Value);
 
@@ -114,6 +121,7 @@ namespace WinCopies.IO.PropertySystem
         }
     }
 
+    [PropertyDescriptionFinding(typeof(Resources.PropertyDescriptions), "{0}Name", "{0}")]
     public class DriveShellObjectInfoProperties<T> : FileSystemObjectInfoProperties<T, DriveInfo> where T : IShellObjectInfoBase2
     {
         public Size AvailableFreeSpace => new IO.Size((ulong)InnerProperties.AvailableFreeSpace);

@@ -68,10 +68,22 @@ namespace WinCopies.IO.ObjectModel.Reflection
 
         protected internal DotNetAttributeInfo(in CustomAttributeData customAttributeData, in IDotNetItemInfo parent) : base(customAttributeData, parent) => ObjectPropertiesGeneric = new DotNetItemInfoProperties<IDotNetItemInfo>(this, DotNetItemType.Attribute);
 
+        /// <summary>
+        /// Returns <see langword="null"/> as this item does not contain any item.
+        /// </summary>
+        /// <returns>A <see langword="null"/> value.</returns>
         protected override IEnumerable<object> GetItemProviders() => null;
 
+        /// <summary>
+        /// Returns <see langword="null"/> as this item does not contain any item.
+        /// </summary>
+        /// <returns>A <see langword="null"/> value.</returns>
         protected override IEnumerable<object> GetItemProviders(Predicate<object> predicate) => null;
 
+        /// <summary>
+        /// Returns <see langword="null"/> as this item does not contain any item.
+        /// </summary>
+        /// <returns>A <see langword="null"/> value.</returns>
         public override IBrowsableObjectInfoSelectorDictionary<object> GetSelectorDictionary() => null;
     }
 }

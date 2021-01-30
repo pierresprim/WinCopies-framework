@@ -15,9 +15,18 @@
 * You should have received a copy of the GNU General Public License
 * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+using System;
 using WinCopies.IO.ObjectModel;
 
 using static WinCopies.ThrowHelper;
+
+namespace WinCopies.IO
+{
+    public static class IOHelper
+    {
+        public static ArgumentException GetInvalidInnerObjectException(in string expectedType, in string argumentName) => throw new ArgumentException(string.Format(Resources.ExceptionMessages.GivenItemInnerObjectIsNotFromSupportedType, expectedType), argumentName);
+    }
+}
 
 namespace WinCopies.IO.PropertySystem
 {

@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
+using WinCopies.IO.AbstractionInterop.Reflection;
 using WinCopies.IO.Reflection;
 
 namespace WinCopies.IO.ObjectModel.Reflection
@@ -27,7 +28,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
     {
         Assembly Assembly { get; }
 
-        IEnumerable<IBrowsableObjectInfo> GetItems(IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetNamespaceInfoEnumeratorStruct> func);
+        IEnumerable<IBrowsableObjectInfo> GetItems(IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetNamespaceInfoItemProvider> func);
     }
 
     //public interface IDotNetAssemblyInfo<T> : IDotNetAssemblyInfo, IBrowsableObjectInfo<T, Assembly>, IShellObjectInfoBase<T> where T : IFileSystemObjectInfoProperties

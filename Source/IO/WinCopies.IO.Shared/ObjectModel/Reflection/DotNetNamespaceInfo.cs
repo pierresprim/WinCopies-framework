@@ -26,15 +26,7 @@ using WinCopies.IO.Enumeration.Reflection;
 using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Selectors.Reflection;
 
-#if !WinCopies3
-using WinCopies.Collections;
-
-using static WinCopies.Util.Util;
-#else
-using WinCopies.Collections.Generic;
-
 using static WinCopies.ThrowHelper;
-#endif
 
 namespace WinCopies.IO.ObjectModel.Reflection
 {
@@ -76,11 +68,11 @@ namespace WinCopies.IO.ObjectModel.Reflection
         }
 
         #region Methods
+        public static DotNetItemType[] GetDefaultItemTypes() => new DotNetItemType[] { DotNetItemType.Namespace, DotNetItemType.Struct, DotNetItemType.Enum, DotNetItemType.Class, DotNetItemType.Interface, DotNetItemType.Delegate };
+
         public override IBrowsableObjectInfoSelectorDictionary<DotNetNamespaceInfoItemProvider> GetSelectorDictionary() => DefaultItemSelectorDictionary;
 
         protected override System.Collections.Generic.IEnumerable<DotNetNamespaceInfoItemProvider> GetItemProviders(System.Collections.Generic.IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetNamespaceInfoItemProvider> func) => DotNetNamespaceInfoEnumeration.From(this, typesToEnumerate, func);
-
-        public static DotNetItemType[] GetDefaultItemTypes() => new DotNetItemType[] { DotNetItemType.Namespace, DotNetItemType.Struct, DotNetItemType.Enum, DotNetItemType.Class, DotNetItemType.Interface, DotNetItemType.Delegate };
 
         protected override System.Collections.Generic.IEnumerable<DotNetNamespaceInfoItemProvider> GetItemProviders(Predicate<DotNetNamespaceInfoItemProvider> predicate) => GetItemProviders(GetDefaultItemTypes(), predicate);
 

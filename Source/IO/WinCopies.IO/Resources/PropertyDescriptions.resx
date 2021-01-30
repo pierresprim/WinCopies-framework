@@ -117,16 +117,16 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="GivenItemInnerObjectIsNotFromSupportedType" xml:space="preserve">
-    <value>The given item's inner object is not a(n) {0}.</value>
+  <data name="FileType" xml:space="preserve">
+    <value>The type of the current item (folder, file, ...)</value>
   </data>
-  <data name="ItemProviderNotSupported" xml:space="preserve">
-    <value>The given item provider or its current configuration is not supported.</value>
+  <data name="FileTypeName" xml:space="preserve">
+    <value>File type</value>
   </data>
-  <data name="ParentMustBeAnIDotNetAssemblyInfoOrAnIDotNetItemInfoBase" xml:space="preserve">
-    <value>'parent' must be an IDotNetAssemblyInfo or an IDotNetItemInfoBase.</value>
+  <data name="Size" xml:space="preserve">
+    <value>The size on disk of the current item.</value>
   </data>
-  <data name="PropertyCannotBeNullOnObject" xml:space="preserve">
-    <value>{0} cannot be null on {1}.</value>
+  <data name="SizeName" xml:space="preserve">
+    <value>Size</value>
   </data>
 </root>

@@ -21,11 +21,14 @@ using System.Reflection;
 
 using WinCopies.Collections.Generic;
 using WinCopies.IO.AbstractionInterop.Reflection;
+using WinCopies.IO.Enumeration.Reflection;
+using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Reflection;
 using WinCopies.IO.Reflection.PropertySystem;
 using WinCopies.IO.Selectors;
-
+using WinCopies.IO.Selectors.Reflection;
 using static WinCopies.IO.Path;
+using static WinCopies.ThrowHelper;
 
 namespace WinCopies.IO.ObjectModel.Reflection
 {
@@ -35,60 +38,22 @@ namespace WinCopies.IO.ObjectModel.Reflection
         public sealed override TypeInfo InnerObjectGeneric { get; }
 
         public override string ItemTypeName => Properties.Resources.DotNetType;
-
-        public sealed override IDotNetTypeInfoProperties ObjectPropertiesGeneric { get; }
         #endregion
 
-        protected DotNetTypeInfo(in TypeInfo typeInfo, in IBrowsableObjectInfo parent) : base(isRootType.HasValue && isRootType.Value ? typeInfo.Name : $"{parent.Path}{PathSeparator}{typeInfo.Name}", typeInfo.Name, parent)
-        {
+        protected DotNetTypeInfo(in TypeInfo type, in IBrowsableObjectInfo parent) : base(parent is IDotNetAssemblyInfo ? type.Name : $"{parent.Path}{PathSeparator}{type.Name}", type.Name, parent)
 #if DEBUG
-            if (isRootType.HasValue && isRootType.Value)
-
-                Debug.Assert(parent is IDotNetAssemblyInfo);
-
-            else
+        {
+            if (!(parent is IDotNetAssemblyInfo))
 
                 Debug.Assert(parent is IDotNetNamespaceInfoBase dotNetNamespaceInfo && dotNetNamespaceInfo.ParentDotNetAssemblyInfo != null);
-
-            switch (itemType)
-            {
-                case DotNetItemType.Struct:
-
-                    Debug.Assert(typeInfo.IsValueType && !typeInfo.IsEnum);
-
-                    break;
-
-                case DotNetItemType.Enum:
-
-                    Debug.Assert(typeInfo.IsEnum);
-
-                    break;
-
-                case DotNetItemType.Class:
-                case DotNetItemType.Attribute:
-
-                    Debug.Assert(typeInfo.IsClass);
-
-                    break;
-
-                case DotNetItemType.Interface:
-
-                    Debug.Assert(typeInfo.IsInterface);
-
-                    break;
-
-                case DotNetItemType.Delegate:
-
-                    Debug.Assert(typeof(Delegate).IsAssignableFrom(typeInfo));
-
-                    break;
-            }
+#else
+        =>
 #endif
 
-            InnerObjectGeneric = typeInfo;
-
-            ObjectPropertiesGeneric = new DotNetTypeInfoProperties<IDotNetTypeInfo>(this, itemType, isRootType);
+            InnerObjectGeneric = type ?? throw GetArgumentNullException(nameof(type));
+#if DEBUG
         }
+#endif
 
         protected DotNetTypeInfo(in Type type, in IBrowsableObjectInfo parent) : this(type.GetTypeInfo(), parent)
         {
@@ -96,18 +61,67 @@ namespace WinCopies.IO.ObjectModel.Reflection
         }
     }
 
-    public sealed class DotNetTypeInfo : DotNetTypeInfo<IDotNetTypeInfoProperties, DotNetTypeInfoItemProvider, IBrowsableObjectInfoSelectorDictionary<DotNetTypeInfoItemProvider>, DotNetTypeInfoItemProvider>, IDotNetTypeInfo
+    public class DotNetTypeInfo : DotNetTypeInfo<IDotNetTypeInfoProperties, DotNetTypeInfoItemProvider, IBrowsableObjectInfoSelectorDictionary<DotNetTypeInfoItemProvider>, DotNetTypeInfoItemProvider>, IDotNetTypeInfo
     {
         private static DotNetItemType[] _defaultTypesToEnumerate;
 
-        public static DotNetItemType[] DefaultTypesToEnumerate => _defaultTypesToEnumerate ??= new DotNetItemType[] { DotNetItemType.GenericParameter, DotNetItemType.GenericArgument, DotNetItemType.Field, DotNetItemType.Property, DotNetItemType.Event, DotNetItemType.Constructor, DotNetItemType.Method, DotNetItemType.Struct, DotNetItemType.Enum, DotNetItemType.Class, DotNetItemType.Interface, DotNetItemType.Delegate, DotNetItemType.Attribute, DotNetItemType.ImplementedInterface };
+        public static DotNetItemType[] DefaultTypesToEnumerate => _defaultTypesToEnumerate ??= new DotNetItemType[] { DotNetItemType.GenericParameter, DotNetItemType.GenericArgument, DotNetItemType.Field, DotNetItemType.Property, DotNetItemType.Event, DotNetItemType.Constructor, DotNetItemType.Method, DotNetItemType.Struct, DotNetItemType.Enum, DotNetItemType.Class, DotNetItemType.Interface, DotNetItemType.Delegate, DotNetItemType.Attribute, DotNetItemType.BaseTypeOrInterface };
+
+        public static IBrowsableObjectInfoSelectorDictionary<DotNetTypeInfoItemProvider> DefaultItemSelectorDictionary { get; } = new DotNetTypeInfoSelectorDictionary();
+
+        public sealed override IDotNetTypeInfoProperties ObjectPropertiesGeneric { get; }
+
+        public override IPropertySystemCollection ObjectPropertySystem => null;
 
         protected internal DotNetTypeInfo(in TypeInfo type, in DotNetItemType itemType, in bool isRootType, in IBrowsableObjectInfo parent) : base(type, parent)
+#if DEBUG
         {
+            switch (itemType)
+            {
+                case DotNetItemType.Struct:
 
+                    Debug.Assert(type.IsValueType && !type.IsEnum);
+
+                    break;
+
+                case DotNetItemType.Enum:
+
+                    Debug.Assert(type.IsEnum);
+
+                    break;
+
+                case DotNetItemType.Class:
+                case DotNetItemType.Attribute:
+
+                    Debug.Assert(type.IsClass);
+
+                    break;
+
+                case DotNetItemType.Interface:
+
+                    Debug.Assert(type.IsInterface);
+
+                    break;
+
+                case DotNetItemType.Delegate:
+
+                    Debug.Assert(typeof(Delegate).IsAssignableFrom(type));
+
+                    break;
+            }
+#else
+        =>
+#endif
+
+            ObjectPropertiesGeneric = new DotNetTypeInfoProperties<IDotNetTypeInfo>(this, itemType, isRootType);
+
+#if DEBUG
         }
+#endif
 
-        protected virtual System.Collections.Generic.IEnumerable<DotNetTypeInfoItemProvider> GetItemProviders(System.Collections.Generic.IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetTypeInfoItemProvider> func) => new Enumerable<DotNetTypeInfoItemProvider>(() => DotNetTypeInfoEnumerator.From(this, typesToEnumerate, func));
+        public override IBrowsableObjectInfoSelectorDictionary<DotNetTypeInfoItemProvider> GetSelectorDictionary() => DefaultItemSelectorDictionary;
+
+        protected virtual System.Collections.Generic.IEnumerable<DotNetTypeInfoItemProvider> GetItemProviders(System.Collections.Generic.IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetTypeInfoItemProvider> func) => DotNetTypeInfoEnumeration.From(this, typesToEnumerate, func);
 
         protected override System.Collections.Generic.IEnumerable<DotNetTypeInfoItemProvider> GetItemProviders(Predicate<DotNetTypeInfoItemProvider> predicate) => GetItemProviders(DefaultTypesToEnumerate, predicate);
 

@@ -34,7 +34,7 @@ using static WinCopies.ThrowHelper;
 
 namespace WinCopies.IO.ObjectModel.Reflection
 {
-    public abstract class DotNetMemberInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : BrowsableDotNetItemInfo<TObjectProperties, MemberInfo, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IDotNetMemberInfoBase where TObjectProperties : IDotNetItemInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
+    public abstract class DotNetMemberInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : BrowsableDotNetItemInfo<TObjectProperties, MemberInfo, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IDotNetMemberInfoBase where TObjectProperties : IDotNetTypeOrMemberInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
     {
         #region Properties
         public sealed override MemberInfo InnerObjectGeneric { get; }
@@ -56,17 +56,48 @@ namespace WinCopies.IO.ObjectModel.Reflection
 #endif
     }
 
-    public class DotNetMemberInfo : DotNetMemberInfo<IDotNetItemInfoProperties, DotNetMemberInfoItemProvider, IBrowsableObjectInfoSelectorDictionary<DotNetMemberInfoItemProvider>, DotNetMemberInfoItemProvider>, IDotNetMemberInfo
+    public class DotNetMemberInfo : DotNetMemberInfo<IDotNetTypeOrMemberInfoProperties, DotNetMemberInfoItemProvider, IBrowsableObjectInfoSelectorDictionary<DotNetMemberInfoItemProvider>, DotNetMemberInfoItemProvider>, IDotNetMemberInfo
     {
         #region Properties
         public static IBrowsableObjectInfoSelectorDictionary<DotNetMemberInfoItemProvider> DefaultItemSelectorDictionary { get; } = new DotNetMemberInfoSelectorDictionary();
 
-        public sealed override IDotNetItemInfoProperties ObjectPropertiesGeneric { get; }
+        public sealed override IDotNetTypeOrMemberInfoProperties ObjectPropertiesGeneric { get; }
 
         public override IPropertySystemCollection ObjectPropertySystem => null;
         #endregion
 
-        protected internal DotNetMemberInfo(in MemberInfo memberInfo, in DotNetItemType dotNetItemType, in bool isPropertyMethod, in IDotNetItemInfo parent) : base(memberInfo,  parent) => ObjectPropertiesGeneric = new DotNetItemInfoProperties<IDotNetItemInfo>(this, dotNetItemType);
+        protected internal DotNetMemberInfo(in MemberInfo memberInfo, in IDotNetItemInfo parent) : base(memberInfo, parent)
+#if CS9
+        => ObjectPropertiesGeneric =
+#else
+        {
+            if (
+#endif
+
+                memberInfo is MethodBase
+
+#if CS9
+                ?
+#else
+                )
+
+                ObjectPropertiesGeneric =
+#endif
+
+DotNetPropertyOrMethodItemInfoProperties<IDotNetMemberInfo>.From(this)
+
+#if CS9
+                :
+#else
+                ;
+
+            else
+
+                ObjectPropertiesGeneric =
+#endif
+
+                new DotNetFieldItemInfoProperties<IDotNetMemberInfo>(this);
+        }
 
         #region Methods
         public static System.Collections.Generic.IEnumerable<DotNetItemType> GetDefaultItemTypes() => new DotNetItemType[] { DotNetItemType.Parameter, DotNetItemType.Attribute };

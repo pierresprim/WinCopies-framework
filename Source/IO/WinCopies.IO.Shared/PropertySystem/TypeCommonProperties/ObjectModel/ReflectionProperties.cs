@@ -21,6 +21,9 @@ using System.Reflection;
 using WinCopies.IO.ObjectModel.Reflection;
 using WinCopies.IO.PropertySystem;
 
+using static WinCopies.IO.IOHelper;
+using static WinCopies.IO.Reflection.ReflectionHelper;
+
 namespace WinCopies.IO.Reflection.PropertySystem
 {
     public class DotNetItemInfoProperties<T> : BrowsableObjectInfoProperties<T>, IDotNetItemInfoProperties where T : IDotNetItemInfo
@@ -34,10 +37,23 @@ namespace WinCopies.IO.Reflection.PropertySystem
     {
         public abstract Type DeclaringType { get; }
 
+        public abstract AccessModifier AccessModifier { get; }
+
         protected DotNetTypeOrMemberInfoProperties(in T dotNetItemInfo, in DotNetItemType itemType) : base(dotNetItemInfo, itemType)
         {
             // Left empty.
         }
+    }
+
+    public class DotNetFieldItemInfoProperties<T> : DotNetTypeOrMemberInfoProperties<T>, IDotNetTypeOrMemberInfoProperties where T : IDotNetMemberInfo
+    {
+        private FieldInfo _field;
+
+        public override Type DeclaringType => _field.DeclaringType;
+
+        public override AccessModifier AccessModifier => GetAccessModifier(_field);
+
+        public DotNetFieldItemInfoProperties(in T dotNetItemInfo) : base(dotNetItemInfo, DotNetItemType.Field) => _field = dotNetItemInfo.InnerObject as FieldInfo ?? throw GetInvalidInnerObjectException(nameof(FieldInfo), nameof(dotNetItemInfo));
     }
 
     public abstract class DotNetTypeOrMethodItemInfoProperties<T> : DotNetTypeOrMemberInfoProperties<T>, IDotNetTypeOrMethodItemInfoProperties where T : IDotNetItemInfo
@@ -52,50 +68,36 @@ namespace WinCopies.IO.Reflection.PropertySystem
         }
     }
 
+    public class DotNetPropertyOrMethodItemInfoProperties<T> : DotNetTypeOrMethodItemInfoProperties<T>, IDotNetMethodItemInfoProperties where T : IDotNetMemberInfo
+    {
+        private MethodBase _method;
+        private AccessModifier? _accessModifier;
+
+        public override Type DeclaringType => _method.DeclaringType;
+
+        public override AccessModifier AccessModifier => _accessModifier ??= GetAccessModifier(_method);
+
+        public override bool IsAbstract => _method.IsAbstract;
+
+        public override bool IsSealed => _method.IsFinal;
+
+        public bool IsPropertyMethod { get; }
+
+        private DotNetPropertyOrMethodItemInfoProperties(in T dotNetItemInfo, in DotNetItemType itemType, in bool isPropertyMethod) : base(dotNetItemInfo, itemType) => IsPropertyMethod = isPropertyMethod;
+
+        public static DotNetPropertyOrMethodItemInfoProperties<T> From(in T dotNetItemInfo) => dotNetItemInfo.Parent?.InnerObject is PropertyInfo
+            ? dotNetItemInfo.InnerObject is MethodInfo ? new DotNetPropertyOrMethodItemInfoProperties<T>(dotNetItemInfo, DotNetItemType.Method, true) : throw GetInvalidInnerObjectException(nameof(MethodInfo), nameof(dotNetItemInfo))
+            : new DotNetPropertyOrMethodItemInfoProperties<T>(dotNetItemInfo,
+                dotNetItemInfo.InnerObject is MethodInfo ? DotNetItemType.Method
+                : dotNetItemInfo.InnerObject is PropertyInfo ? DotNetItemType.Property
+                : throw new ArgumentException("Invalid inner object.", nameof(dotNetItemInfo)), false);
+    }
+
     public class DotNetTypeInfoProperties<T> : DotNetTypeOrMethodItemInfoProperties<T>, IDotNetTypeInfoProperties where T : IDotNetTypeInfo
     {
         private AccessModifier? _accessModifier;
 
-        public AccessModifier AccessModifier
-        {
-            get
-            {
-                if (!_accessModifier.HasValue)
-                {
-                    TypeInfo t = BrowsableObjectInfo.InnerObject;
-
-                    if (t.IsPublic || t.IsNestedPublic)
-
-                        _accessModifier = AccessModifier.Public;
-
-                    else if (t.IsNestedFamily)
-
-                        _accessModifier = AccessModifier.Protected;
-
-                    else if (t.IsNestedFamORAssem)
-
-                        _accessModifier = AccessModifier.ProtectedInternal;
-
-                    else if (t.IsNestedAssembly)
-
-                        _accessModifier = AccessModifier.Internal;
-
-                    else if (t.IsNestedFamANDAssem)
-
-                        _accessModifier = AccessModifier.PrivateProtected;
-
-                    else if (t.IsNestedPrivate)
-
-                        _accessModifier = AccessModifier.Private;
-
-                    else
-
-                        _accessModifier = (AccessModifier)0;
-                }
-
-                return _accessModifier.Value;
-            }
-        }
+        public override AccessModifier AccessModifier => _accessModifier ??= GetAccessModifier(BrowsableObjectInfo.InnerObject);
 
         public bool? IsRootType { get; }
 
