@@ -72,49 +72,49 @@ namespace WinCopies.IO.ObjectModel.Reflection
         private BitmapSource _extraLargeBitmapSource;
 
         public sealed override BitmapSource SmallBitmapSource => _smallBitmapSource
-#if CS7
-            ?? (_smallBitmapSource =
-#else
+#if CS8
             ??=
+#else
+            ?? (_smallBitmapSource =
 #endif
             TryGetBitmapSource(SmallIconSize)
-#if CS7
+#if !CS8
             )
 #endif
             ;
 
         public sealed override BitmapSource MediumBitmapSource => _mediumBitmapSource
-#if CS7
-            ?? (_mediumBitmapSource =
-#else
+#if CS8
             ??=
+#else
+            ?? (_mediumBitmapSource =
 #endif
             TryGetBitmapSource(MediumIconSize)
-#if CS7
+#if !CS8
             )
 #endif
             ;
 
         public sealed override BitmapSource LargeBitmapSource => _largeBitmapSource
-#if CS7
-            ?? (_largeBitmapSource =
-#else
+#if CS8
             ??=
+#else
+            ?? (_largeBitmapSource =
 #endif
             TryGetBitmapSource(LargeIconSize)
-#if CS7
+#if !CS8
             )
 #endif
             ;
 
         public sealed override BitmapSource ExtraLargeBitmapSource => _extraLargeBitmapSource
-#if CS7
-            ?? (_extraLargeBitmapSource =
-#else
+#if CS8
             ??=
+#else
+            ?? (_extraLargeBitmapSource =
 #endif
             TryGetBitmapSource(ExtraLargeIconSize)
-#if CS7
+#if !CS8
             )
 #endif
             ;

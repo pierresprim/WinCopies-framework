@@ -37,9 +37,10 @@ namespace WinCopies.IO.ObjectModel
     {
         private const int PortableDeviceIcon = 42;
         private const string PortableDeviceIconDllName = "imageres.dll";
+        private IPortableDevice _portableDevice;
 
         #region Properties
-        public sealed override IPortableDevice InnerObjectGeneric { get; }
+        public sealed override IPortableDevice InnerObjectGeneric => IsDisposed ? throw GetExceptionForDispose(false) : _portableDevice;
 
         public override bool IsSpecialItem => false;
 
@@ -64,7 +65,7 @@ namespace WinCopies.IO.ObjectModel
         public override string Name => InnerObjectGeneric.DeviceFriendlyName;
         #endregion // Properties
 
-        public PortableDeviceInfo(in IPortableDevice portableDevice, in ClientVersion clientVersion) : base((portableDevice ?? throw GetArgumentNullException(nameof(portableDevice))).DeviceFriendlyName, clientVersion) => InnerObjectGeneric = portableDevice;
+        public PortableDeviceInfo(in IPortableDevice portableDevice, in ClientVersion clientVersion) : base((portableDevice ?? throw GetArgumentNullException(nameof(portableDevice))).DeviceFriendlyName, clientVersion) => _portableDevice = portableDevice;
 
         private BitmapSource TryGetBitmapSource(in int size)
         {
@@ -83,19 +84,30 @@ namespace WinCopies.IO.ObjectModel
 
             return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
         }
+
+        protected override void DisposeManaged()
+        {
+            base.DisposeManaged();
+
+            _portableDevice.Dispose();
+
+            _portableDevice = null;
+        }
     }
 
     public class PortableDeviceInfo : PortableDeviceInfo<IPortableDeviceInfoProperties, IPortableDeviceObject, IBrowsableObjectInfoSelectorDictionary<PortableDeviceObjectInfoItemProvider>, PortableDeviceObjectInfoItemProvider>, IPortableDeviceInfo
     {
+        private IPortableDeviceInfoProperties _objectProperties;
+
         #region Properties
         public static IBrowsableObjectInfoSelectorDictionary<PortableDeviceObjectInfoItemProvider> DefaultItemSelectorDictionary { get; } = new PortableDeviceInfoSelectorDictionary();
 
-        public sealed override IPortableDeviceInfoProperties ObjectPropertiesGeneric { get; }
+        public sealed override IPortableDeviceInfoProperties ObjectPropertiesGeneric => IsDisposed?throw GetExceptionForDispose(false): _objectProperties;
 
         public override IPropertySystemCollection ObjectPropertySystem => null;
         #endregion // Properties
 
-        public PortableDeviceInfo(in IPortableDevice portableDevice, in PortableDeviceOpeningOptions openingOptions, in ClientVersion clientVersion) : base(portableDevice, clientVersion) => ObjectPropertiesGeneric = new PortableDeviceInfoProperties<IPortableDeviceInfo>(this, openingOptions);
+        public PortableDeviceInfo(in IPortableDevice portableDevice, in PortableDeviceOpeningOptions openingOptions, in ClientVersion clientVersion) : base(portableDevice, clientVersion) => _objectProperties = new PortableDeviceInfoProperties<IPortableDeviceInfo>(this, openingOptions);
 
         public PortableDeviceInfo(in IPortableDevice portableDevice, in ClientVersion clientVersion) : this(portableDevice, new PortableDeviceOpeningOptions(GenericRights.Read, FileShareOptions.Read, true), clientVersion)
         {
@@ -104,6 +116,13 @@ namespace WinCopies.IO.ObjectModel
 
         #region Methods
         public override IBrowsableObjectInfoSelectorDictionary<PortableDeviceObjectInfoItemProvider> GetSelectorDictionary() => DefaultItemSelectorDictionary;
+
+        protected override void DisposeManaged()
+        {
+            base.DisposeManaged();
+
+            _objectProperties = null;
+        }
 
         #region GetItems
         protected override System.Collections.Generic.IEnumerable<PortableDeviceObjectInfoItemProvider> GetItemProviders(Predicate<IPortableDeviceObject> predicate)

@@ -188,34 +188,24 @@ namespace WinCopies.IO.ObjectModel
 
                 return;
 
+            DisposeUnmanaged();
+
             DisposeManaged();
 
-            Dispose(true);
-
             GC.SuppressFinalize(this);
-
-#if !WinCopies3
-            IsDisposed = true;
-#endif
         }
 
         /// <summary>
-        /// In WinCopies 3, sets <see cref="IsDisposed"/> to <see langword="true"/>. This method does nothing in WinCopies 2. This method is called from the <see cref="Dispose()"/> method.
+        /// Sets <see cref="IsDisposed"/> to <see langword="true"/>. This method is called from the <see cref="Dispose()"/> method.
         /// </summary>
-        protected virtual void DisposeManaged()
-#if WinCopies3
-            => IsDisposed = true;
-#else
-        {
-            // Left empty.
-        }
-#endif
+        protected virtual void DisposeManaged() => IsDisposed = true;
 
         /// <summary>
         /// Not used in this class.
         /// </summary>
-        /// <param name="disposing"></param>
-        protected virtual void Dispose(in bool disposing)
+        /// <seealso cref="Dispose"/>
+        /// <seealso cref="DisposeManaged"/>
+        protected virtual void DisposeUnmanaged()
         {
             //if (ItemsLoader != null)
 
@@ -237,7 +227,7 @@ namespace WinCopies.IO.ObjectModel
         #endregion
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        ~BrowsableObjectInfo() => Dispose(false);
+        ~BrowsableObjectInfo() => DisposeUnmanaged();
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
     }
 

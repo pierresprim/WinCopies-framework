@@ -19,17 +19,24 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
+using WinCopies.IO.AbstractionInterop.Reflection;
 using WinCopies.IO.Reflection.PropertySystem;
+using WinCopies.IO.Selectors;
 
 namespace WinCopies.IO.ObjectModel.Reflection
 {
-    public interface IDotNetParameterInfo : IDotNetItemInfo<ParameterInfo>
-    {
-        IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<CustomAttributeData> func);
-    }
-
-    public interface IDotNetParameterInfo<T> : IDotNetParameterInfo, IDotNetItemInfo<T, ParameterInfo> where T : IDotNetItemInfoProperties
+    public interface IDotNetParameterInfoBase : IDotNetItemInfo<ParameterInfo>
     {
         // Left empty.
+    }
+
+    public interface IDotNetParameterInfo<TObjectProperties, TSelectorDictionary> : IDotNetParameterInfoBase, IDotNetItemInfo<TObjectProperties, ParameterInfo, CustomAttributeData, TSelectorDictionary, DotNetParameterInfoItemProvider> where TObjectProperties : IDotNetParameterInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<DotNetParameterInfoItemProvider>
+    {
+        // Left empty.
+    }
+
+    public interface IDotNetParameterInfo : IDotNetParameterInfo<IDotNetParameterInfoProperties, IBrowsableObjectInfoSelectorDictionary<DotNetParameterInfoItemProvider>>
+    {
+        IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<CustomAttributeData> func);
     }
 }

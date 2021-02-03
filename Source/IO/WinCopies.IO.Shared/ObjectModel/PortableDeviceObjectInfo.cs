@@ -35,13 +35,14 @@ namespace WinCopies.IO.ObjectModel
     public abstract class PortableDeviceObjectInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : FileSystemObjectInfo<TObjectProperties, IPortableDeviceObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IPortableDeviceObjectInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IFileSystemObjectInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
     {
         #region Private fields
+        private IPortableDeviceObject _portableDeviceObject;
         private IBrowsabilityOptions _browsability;
         private bool _isNameLoaded;
         private string _name;
         #endregion
 
         #region Properties
-        public sealed override IPortableDeviceObject InnerObjectGeneric { get; }
+        public sealed override IPortableDeviceObject InnerObjectGeneric => IsDisposed ? throw GetExceptionForDispose(false) : _portableDeviceObject;
 
         private bool? _isSpecialItem;
 
@@ -103,8 +104,17 @@ namespace WinCopies.IO.ObjectModel
 
         protected PortableDeviceObjectInfo(in IPortableDeviceObject portableDeviceObject, in IPortableDeviceObjectInfoBase parent, in ClientVersion clientVersion) : this(GetPath(portableDeviceObject, parent), portableDeviceObject, clientVersion) => Parent = parent;
 
-        private PortableDeviceObjectInfo(in string path, in IPortableDeviceObject portableDeviceObject, in ClientVersion clientVersion) : base(path, clientVersion) => InnerObjectGeneric = portableDeviceObject;
+        private PortableDeviceObjectInfo(in string path, in IPortableDeviceObject portableDeviceObject, in ClientVersion clientVersion) : base(path, clientVersion) => _portableDeviceObject = portableDeviceObject;
         #endregion
+
+        protected override void DisposeManaged()
+        {
+            base.DisposeManaged();
+
+            InnerObjectGeneric.Dispose();
+
+            _portableDeviceObject = null;
+        }
 
         private static string GetPath(in IPortableDeviceObject portableDeviceObject, in IPortableDeviceInfoBase parentPortableDevice)
         {
@@ -125,24 +135,33 @@ namespace WinCopies.IO.ObjectModel
 
     public class PortableDeviceObjectInfo : PortableDeviceObjectInfo<IFileSystemObjectInfoProperties, IPortableDeviceObject, IBrowsableObjectInfoSelectorDictionary<PortableDeviceObjectInfoItemProvider>, PortableDeviceObjectInfoItemProvider>, IPortableDeviceObjectInfo
     {
+        private IFileSystemObjectInfoProperties _objectProperties;
+
         #region Properties
         public static IBrowsableObjectInfoSelectorDictionary<PortableDeviceObjectInfoItemProvider> DefaultItemSelectorDictionary { get; } = new PortableDeviceObjectInfoSelectorDictionary();
 
-        public sealed override IFileSystemObjectInfoProperties ObjectPropertiesGeneric { get; }
+        public sealed override IFileSystemObjectInfoProperties ObjectPropertiesGeneric => IsDisposed ? throw GetExceptionForDispose(false) : _objectProperties;
 
         public override IPropertySystemCollection ObjectPropertySystem => null; // TODO
         #endregion
 
         #region Constructors
-        internal PortableDeviceObjectInfo(in IPortableDeviceObject portableDeviceObject, in IPortableDeviceInfoBase parentPortableDevice, in ClientVersion clientVersion) : base(portableDeviceObject, parentPortableDevice, clientVersion) => ObjectPropertiesGeneric = GetProperties();
+        internal PortableDeviceObjectInfo(in IPortableDeviceObject portableDeviceObject, in IPortableDeviceInfoBase parentPortableDevice, in ClientVersion clientVersion) : base(portableDeviceObject, parentPortableDevice, clientVersion) => _objectProperties = GetProperties();
 
-        internal PortableDeviceObjectInfo(in IPortableDeviceObject portableDeviceObject, in IPortableDeviceObjectInfoBase parent, in ClientVersion clientVersion) : base(portableDeviceObject, parent, clientVersion) => ObjectPropertiesGeneric = GetProperties();
+        internal PortableDeviceObjectInfo(in IPortableDeviceObject portableDeviceObject, in IPortableDeviceObjectInfoBase parent, in ClientVersion clientVersion) : base(portableDeviceObject, parent, clientVersion) => _objectProperties = GetProperties();
         #endregion
 
         #region Methods
         public override IBrowsableObjectInfoSelectorDictionary<PortableDeviceObjectInfoItemProvider> GetSelectorDictionary() => DefaultItemSelectorDictionary;
 
         private IFileSystemObjectInfoProperties GetProperties() => new PortableDeviceObjectInfoProperties<IPortableDeviceObjectInfoBase>(this);
+
+        protected override void DisposeManaged()
+        {
+            base.DisposeManaged();
+
+            _objectProperties = null;
+        }
 
         #region GetItems
         protected override System.Collections.Generic.IEnumerable<PortableDeviceObjectInfoItemProvider> GetItemProviders(Predicate<IPortableDeviceObject> predicate) => InnerObject is IEnumerablePortableDeviceObject enumerablePortableDeviceObject

@@ -22,6 +22,8 @@ using SevenZip;
 
 using WinCopies.IO.ObjectModel;
 
+using static WinCopies.ThrowHelper;
+
 namespace WinCopies.IO.AbstractionInterop
 {
     public enum NonShellObjectRootItemType : byte
@@ -68,6 +70,6 @@ namespace WinCopies.IO.AbstractionInterop
             ClientVersion = clientVersion;
         }
 
-        public static ShellObjectInfoItemProvider ToShellObjectInfoItemProvider(ArchiveItemInfoItemProvider archiveItemInfoItemProvider) => archiveItemInfoItemProvider.ArchiveFileInfo.HasValue ? new ShellObjectInfoItemProvider(archiveItemInfoItemProvider.ShellObjectInfo, archiveItemInfoItemProvider.ArchiveFileInfo) : new ShellObjectInfoItemProvider(archiveItemInfoItemProvider.ShellObjectInfo, archiveItemInfoItemProvider.ArchiveFilePath);
+        public static ShellObjectInfoItemProvider ToShellObjectInfoItemProvider(ArchiveItemInfoItemProvider archiveItemInfoItemProvider) => (archiveItemInfoItemProvider??throw GetArgumentNullException(nameof(archiveItemInfoItemProvider))).ArchiveFileInfo.HasValue ? new ShellObjectInfoItemProvider(archiveItemInfoItemProvider.ShellObjectInfo, archiveItemInfoItemProvider.ArchiveFileInfo) : new ShellObjectInfoItemProvider(archiveItemInfoItemProvider.ShellObjectInfo, archiveItemInfoItemProvider.ArchiveFilePath);
     }
 }

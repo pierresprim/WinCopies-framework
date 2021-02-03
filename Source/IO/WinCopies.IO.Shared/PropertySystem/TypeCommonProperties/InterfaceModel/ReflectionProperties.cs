@@ -47,4 +47,9 @@ namespace WinCopies.IO.Reflection.PropertySystem
     {
         bool? IsRootType { get; }
     }
+
+    public interface IDotNetParameterInfoProperties:IDotNetItemInfoProperties
+    {
+        bool IsReturn { get; } 
+    }
 }

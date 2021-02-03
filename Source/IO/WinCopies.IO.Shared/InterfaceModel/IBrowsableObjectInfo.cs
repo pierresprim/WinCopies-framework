@@ -103,6 +103,12 @@ namespace WinCopies.IO
         public static IBrowsabilityOptions BrowsableByDefault { get; } = new _Browsability(Browsability.BrowsableByDefault);
 
         public static IBrowsabilityOptions Browsable { get; } = new _Browsability(Browsability.Browsable);
+
+        public static bool IsBrowsable(this Browsability browsability) => browsability switch
+        {
+            Browsability.BrowsableByDefault or Browsability.Browsable => true,
+            _ => false,
+        };
     }
 
     namespace ObjectModel

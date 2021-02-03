@@ -18,46 +18,43 @@
 using System;
 using System.Linq;
 using System.Reflection;
+
 using WinCopies.IO.AbstractionInterop.Reflection;
-using WinCopies.IO.Reflection;
+using WinCopies.IO.PropertySystem;
+using WinCopies.IO.Reflection.PropertySystem;
+using WinCopies.IO.Selectors;
 using WinCopies.Linq;
+
+using static WinCopies.ThrowHelper;
 
 namespace WinCopies.IO.ObjectModel.Reflection
 {
-    public sealed class DotNetGenericItemInfo : BrowsableObjectInfo<idotnetiteminfoproperties, Type>,IDotNetItemInfo
-    {
-        internal DotNetGenericArgumentInfo(in Type type, in DotNetTypeInfoProviderGenericTypeStructValue genericItemType, in IDotNetItemInfo parent) : base($"{parent.Path}{WinCopies.IO.Path.PathSeparator}{type.Name}")
-        {
-
-        }
-    }
-
-    public sealed class DotNetParameterInfo : BrowsableDotNetItemInfo<IDotNetItemInfoProperties, ParameterInfo>, IDotNetParameterInfo<IDotNetItemInfoProperties>
+    public abstract class DotNetParameterInfo<TObjectProperties, TSelectorDictionary> : BrowsableDotNetItemInfo<TObjectProperties, ParameterInfo, CustomAttributeData, TSelectorDictionary, DotNetParameterInfoItemProvider>, IDotNetParameterInfo<TObjectProperties, TSelectorDictionary> where TObjectProperties : IDotNetParameterInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<DotNetParameterInfoItemProvider>
     {
         #region Properties
-        public override string ItemTypeName => ".Net parameter";
-
-        public override DotNetItemType DotNetItemType { get; }
+        public override string ItemTypeName => Properties.Resources.DotNetParameter;
 
         /// <summary>
         /// Gets the inner <see cref="ParameterInfo"/>.
         /// </summary>
         public sealed override ParameterInfo InnerObjectGeneric { get; }
-
-        public sealed override IDotNetItemInfoProperties ObjectPropertiesGeneric { get; }
         #endregion
 
-        internal DotNetParameterInfo(in ParameterInfo parameterInfo, in DotNetItemType dotNetItemType, in bool isReturnParameter, in IDotNetItemInfo parent) : base($"{parent.Path}{WinCopies.IO.Path.PathSeparator}{parameterInfo.Name}", parameterInfo.Name, parent)
-        {
-            InnerObjectGeneric = parameterInfo;
+        internal DotNetParameterInfo(in ParameterInfo parameterInfo, in IDotNetItemInfo parent) : base($"{(parent ?? throw GetArgumentNullException(nameof(parent))).Path}{WinCopies.IO.Path.PathSeparator}{(parameterInfo ?? throw GetArgumentNullException(nameof(parameterInfo))).Name}", parameterInfo.Name, parent) => InnerObjectGeneric = parameterInfo;
+    }
 
-            DotNetItemType = dotNetItemType;
+    public class DotNetParameterInfo : DotNetParameterInfo<IDotNetParameterInfoProperties, IBrowsableObjectInfoSelectorDictionary<DotNetParameterInfoItemProvider>>, IDotNetParameterInfo
+    {
+        public sealed override IDotNetParameterInfoProperties ObjectPropertiesGeneric { get; }
 
-            ObjectPropertiesGeneric = new DotNetItemInfoProperties<IDotNetItemInfo>(this);
-        }
+        public override IPropertySystemCollection ObjectPropertySystem => null;
 
-        public override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems() => GetItems(null);
+        internal DotNetParameterInfo(in ParameterInfo parameterInfo, in bool isReturn, in IDotNetItemInfo parent) : base(parameterInfo, parent) => ObjectPropertiesGeneric = new DotNetParameterInfoProperties<IDotNetParameterInfo>(this, isReturn);
 
-        public System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<CustomAttributeData> func) => (func == null ? InnerObjectGeneric.GetCustomAttributesData() : InnerObjectGeneric.GetCustomAttributesData().WherePredicate(func)).Select(a => new DotNetAttributeInfo(a, this));
+        protected override System.Collections.Generic.IEnumerable<DotNetParameterInfoItemProvider> GetItemProviders(Predicate<CustomAttributeData> func) => (func == null ? InnerObjectGeneric.GetCustomAttributesData() : InnerObjectGeneric.GetCustomAttributesData().WherePredicate(func)).Select(a => new DotNetParameterInfoItemProvider(a, this));
+
+        protected override System.Collections.Generic.IEnumerable<DotNetParameterInfoItemProvider> GetItemProviders() => GetItemProviders(null);
+
+        public override IBrowsableObjectInfoSelectorDictionary<DotNetParameterInfoItemProvider> GetSelectorDictionary() => null;
     }
 }
