@@ -10,7 +10,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AbstractionInterop\ArchiveItemInfoProviderItemProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AbstractionInterop\BrowsableObjectInfoItemProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AbstractionInterop\Reflection\DotNetMemberInfoItemProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AbstractionInterop\Reflection\DotNetParameterInfoItemProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AbstractionInterop\Reflection\DotNetNamespaceInfoItemProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AbstractionInterop\ArchiveItemInfoItemProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AbstractionInterop\Reflection\DotNetTypeInfoEnumeratorProvider.cs" />
@@ -94,7 +96,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\Shell\ShellObjectPropertySystemCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\TypeCommonProperties\BrowsableObjectInfoProperties.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\TypeCommonProperties\InterfaceModel\ReflectionProperties.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\TypeCommonProperties\InterfaceModel\ShellProperties.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\TypeCommonProperties\InterfaceModel\FileSystemProperties.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\TypeCommonProperties\ObjectModel\ArchiveItemInfoProperties.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\TypeCommonProperties\ObjectModel\ReflectionProperties.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\TypeCommonProperties\ObjectModel\RegistryItemInfoProperties.cs" />

@@ -18,12 +18,11 @@
 using System;
 using System.Reflection;
 
-using WinCopies.IO.ObjectModel;
 using WinCopies.IO.ObjectModel.Reflection;
 
 namespace WinCopies.IO.AbstractionInterop.Reflection
 {
-    public class DotNetMemberInfoItemProvider
+    public class DotNetMemberInfoItemProvider:BrowsableObjectInfoItemProvider<IDotNetMemberInfoBase>
     {
         #region Properties
         public ParameterInfoItemProvider ParameterInfoItemProvider { get; }
@@ -35,22 +34,18 @@ namespace WinCopies.IO.AbstractionInterop.Reflection
         public DotNetTypeInfoProviderGenericTypeStruct GenericTypeInfo { get; }
 
         public MethodInfo MethodInfo { get; }
-
-        public IDotNetItemInfo Parent { get; }
         #endregion
 
         #region Constructors
-        private DotNetMemberInfoItemProvider(in IDotNetItemInfo parent) => Parent = parent;
+        public DotNetMemberInfoItemProvider(in ParameterInfoItemProvider parameterInfoItemProvider, in IDotNetMemberInfoBase parent) : base(parent) => ParameterInfoItemProvider = parameterInfoItemProvider;
 
-        public DotNetMemberInfoItemProvider(in ParameterInfoItemProvider parameterInfoItemProvider, in IDotNetItemInfo parent) : this(parent) => ParameterInfoItemProvider = parameterInfoItemProvider;
+        public DotNetMemberInfoItemProvider(in CustomAttributeData customAttributeData, in IDotNetMemberInfoBase parent) : base(parent) => CustomAttributeData = customAttributeData;
 
-        public DotNetMemberInfoItemProvider(in CustomAttributeData customAttributeData, in IDotNetItemInfo parent) : this(parent) => CustomAttributeData = customAttributeData;
+        public DotNetMemberInfoItemProvider(in Type returnType, in IDotNetMemberInfoBase parent) : base(parent) => ReturnType = returnType;
 
-        public DotNetMemberInfoItemProvider(in Type returnType, in IDotNetItemInfo parent) : this(parent) => ReturnType = returnType;
+        public DotNetMemberInfoItemProvider(in DotNetTypeInfoProviderGenericTypeStruct genericTypeInfo, in IDotNetMemberInfoBase parent) : base(parent) => GenericTypeInfo = genericTypeInfo;
 
-        public DotNetMemberInfoItemProvider(in DotNetTypeInfoProviderGenericTypeStruct genericTypeInfo, in IDotNetItemInfo parent) : this(parent) => GenericTypeInfo = genericTypeInfo;
-
-        public DotNetMemberInfoItemProvider(in MethodInfo methodInfo, in IDotNetItemInfo parent) : this(parent) => MethodInfo = methodInfo;
+        public DotNetMemberInfoItemProvider(in MethodInfo methodInfo, in IDotNetMemberInfoBase parent) : base(parent) => MethodInfo = methodInfo;
         #endregion
     }
 }

@@ -19,13 +19,10 @@ using Microsoft.WindowsAPICodePack.PortableDevices;
 using Microsoft.WindowsAPICodePack.Shell;
 
 using System;
-using System.Collections.Generic;
 using System.Reflection;
 using System.Security;
 
-using WinCopies.Collections.Generic;
 using WinCopies.IO.AbstractionInterop.Reflection;
-using WinCopies.IO.Enumeration;
 using WinCopies.IO.Enumeration.Reflection;
 using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Reflection;

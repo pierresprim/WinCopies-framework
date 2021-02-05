@@ -26,6 +26,7 @@ using System.Windows.Media.Imaging;
 
 using WinCopies.IO.AbstractionInterop;
 using WinCopies.IO.Enumeration;
+using WinCopies.IO.ObjectModel;
 using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Selectors;
 
@@ -50,6 +51,17 @@ namespace WinCopies.IO
         }
     }
 
+    public sealed class ShellLinkBrowsabilityOptions : IBrowsabilityOptions
+    {
+        private readonly IShellObjectInfoBase _shellObjectInfo;
+
+        public Browsability Browsability => Browsability.RedirectsToBrowsableItem;
+
+        public ShellLinkBrowsabilityOptions(in IShellObjectInfoBase shellObjectInfo) => _shellObjectInfo = shellObjectInfo ?? throw GetArgumentNullException(nameof(shellObjectInfo));
+
+        public IBrowsableObjectInfo RedirectToBrowsableItem() => _shellObjectInfo;
+    }
+
     namespace ObjectModel
     {
         /// <summary>
@@ -59,6 +71,7 @@ namespace WinCopies.IO
         {
             private ShellObject _shellObject;
             private IBrowsableObjectInfo _parent;
+            private IBrowsabilityOptions _browsability;
 
             #region Properties
             /// <summary>
@@ -73,7 +86,37 @@ namespace WinCopies.IO
             #region Overrides
             // public override FileSystemType ItemFileSystemType => FileSystemType.CurrentDeviceFileSystem;
 
-            public override IBrowsabilityOptions Browsability => _shellObject is System.Collections.Generic.IEnumerable<ShellObject> ? BrowsabilityOptions.BrowsableByDefault : BrowsabilityOptions.NotBrowsable;
+            public override IBrowsabilityOptions Browsability
+            {
+                get
+                {
+                    ThrowIfDisposed(this);
+
+                    if (_browsability == null)
+
+                        if (InnerObjectGeneric is ShellLink shellLink)
+                        {
+                            ShellObjectInfo targetShellObjectInfo = ShellObjectInfo.From(shellLink.TargetShellObject, ClientVersion);
+
+                            if (targetShellObjectInfo.InnerObjectGeneric is ShellLink)
+                            {
+                                targetShellObjectInfo.Dispose();
+
+                                _browsability = BrowsabilityOptions.NotBrowsable;
+                            }
+
+                            else
+
+                                _browsability = new ShellLinkBrowsabilityOptions(targetShellObjectInfo);
+                        }
+
+                        else
+
+                            _browsability = _shellObject is System.Collections.Generic.IEnumerable<ShellObject> ? BrowsabilityOptions.BrowsableByDefault : BrowsabilityOptions.NotBrowsable;
+
+                    return _browsability;
+                }
+            }
 
 #if NETFRAMEWORK
             public override IBrowsableObjectInfo Parent => _parent ?? (_parent = GetParent());
@@ -197,19 +240,19 @@ namespace WinCopies.IO
             #endregion
 
             #region Overrides
-            protected override void Dispose(in bool disposing)
+            protected override void DisposeManaged()
             {
-                base.Dispose(disposing);
+                base.DisposeManaged();
 
                 _shellObject.Dispose();
+
+                _shellObject = null;
 
                 if (IsArchiveOpen)
 
                     CloseArchive();
 
-                if (disposing)
-
-                    _shellObject = null;
+                _browsability = null;
             }
 
             /// <summary>
@@ -253,10 +296,12 @@ namespace WinCopies.IO
 
         public class ShellObjectInfo : ShellObjectInfo<IFileSystemObjectInfoProperties, ShellObjectInfoEnumeratorStruct, IBrowsableObjectInfoSelectorDictionary<ShellObjectInfoItemProvider>, ShellObjectInfoItemProvider>, IShellObjectInfo
         {
+            private IFileSystemObjectInfoProperties _objectProperties;
+
             #region Properties
             public static IBrowsableObjectInfoSelectorDictionary<ShellObjectInfoItemProvider> DefaultItemSelectorDictionary { get; } = new ShellObjectInfoSelectorDictionary();
 
-            public sealed override IFileSystemObjectInfoProperties ObjectPropertiesGeneric { get; }
+            public sealed override IFileSystemObjectInfoProperties ObjectPropertiesGeneric => IsDisposed ? throw GetExceptionForDispose(false) : _objectProperties;
             #endregion // Properties
 
             #region Constructors
@@ -267,7 +312,7 @@ namespace WinCopies.IO
                     case FileType.Folder:
                     case FileType.KnownFolder:
 
-                        ObjectPropertiesGeneric = new FolderShellObjectInfoProperties<IShellObjectInfoBase2>(this, fileType);
+                        _objectProperties = new FolderShellObjectInfoProperties<IShellObjectInfoBase2>(this, fileType);
 
                         break;
 
@@ -276,19 +321,19 @@ namespace WinCopies.IO
                     case FileType.Library:
                     case FileType.Link:
 
-                        ObjectPropertiesGeneric = new FileShellObjectInfoProperties<IShellObjectInfoBase2>(this, fileType);
+                        _objectProperties = new FileShellObjectInfoProperties<IShellObjectInfoBase2>(this, fileType);
 
                         break;
 
                     case FileType.Drive:
 
-                        ObjectPropertiesGeneric = new DriveShellObjectInfoProperties<IShellObjectInfoBase2>(this, fileType);
+                        _objectProperties = new DriveShellObjectInfoProperties<IShellObjectInfoBase2>(this, fileType);
 
                         break;
 
                     default:
 
-                        ObjectPropertiesGeneric = new FileSystemObjectInfoProperties(this, fileType);
+                        _objectProperties = new FileSystemObjectInfoProperties(this, fileType);
 
                         break;
                 }
@@ -344,10 +389,17 @@ namespace WinCopies.IO
 
             public override IBrowsableObjectInfoSelectorDictionary<ShellObjectInfoItemProvider> GetSelectorDictionary() => DefaultItemSelectorDictionary;
 
+            protected override void DisposeManaged()
+            {
+                base.DisposeManaged();
+
+                _objectProperties = null;
+            }
+
             #region GetItems
             public System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<ArchiveFileInfoEnumeratorStruct> func) => func == null ? GetItems(GetItemProviders(item => true)) : GetItems(GetItemProviders(func));
 
-            protected override System.Collections.Generic.IEnumerable<ShellObjectInfoItemProvider> GetItemProviders(Predicate<ShellObjectInfoEnumeratorStruct> predicate) => IsBrowsable
+            protected override System.Collections.Generic.IEnumerable<ShellObjectInfoItemProvider> GetItemProviders(Predicate<ShellObjectInfoEnumeratorStruct> predicate) => Browsability.Browsability.IsBrowsable()
                 ? ObjectPropertiesGeneric.FileType == FileType.Archive
                     ? GetItemProviders(item => predicate(new ShellObjectInfoEnumeratorStruct(item)))
                     : ShellObjectInfoEnumeration.From(this, ClientVersion, predicate)

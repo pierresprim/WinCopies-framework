@@ -48,7 +48,7 @@ namespace WinCopies.IO.AbstractionInterop.Reflection
         }
     }
 
-    public class DotNetTypeInfoItemProvider : ITypeInfoItemProvider
+    public class DotNetTypeInfoItemProvider : BrowsableObjectInfoItemProvider<IDotNetTypeInfoBase>, ITypeInfoItemProvider
     {
         #region Properties
         public TypeInfoItemProvider TypeInfoItemProvider { get; }
@@ -58,20 +58,16 @@ namespace WinCopies.IO.AbstractionInterop.Reflection
         public CustomAttributeData CustomAttributeData { get; }
 
         public DotNetTypeInfoProviderGenericTypeStruct GenericTypeInfo { get; }
-
-        public IDotNetItemInfo Parent { get; }
         #endregion
 
         #region Constructors
-        private DotNetTypeInfoItemProvider(in IDotNetItemInfo parent) => Parent = parent;
+        public DotNetTypeInfoItemProvider(in TypeInfoItemProvider typeInfoItemProvider, in IDotNetTypeInfoBase parent) : base(parent) => TypeInfoItemProvider = typeInfoItemProvider;
 
-        public DotNetTypeInfoItemProvider(in TypeInfoItemProvider typeInfoItemProvider, in IDotNetItemInfo parent) : this(parent) => TypeInfoItemProvider = typeInfoItemProvider;
+        public DotNetTypeInfoItemProvider(in MemberInfoItemProvider memberInfoItemProvider, in IDotNetTypeInfoBase parent) : base(parent) => MemberInfoItemProvider = memberInfoItemProvider;
 
-        public DotNetTypeInfoItemProvider(in MemberInfoItemProvider memberInfoItemProvider, in IDotNetItemInfo parent) : this(parent) => MemberInfoItemProvider = memberInfoItemProvider;
+        public DotNetTypeInfoItemProvider(in CustomAttributeData customAttributeData, in IDotNetTypeInfoBase parent) : base(parent) => CustomAttributeData = customAttributeData;
 
-        public DotNetTypeInfoItemProvider(in CustomAttributeData customAttributeData, in IDotNetItemInfo parent) : this(parent) => CustomAttributeData = customAttributeData;
-
-        public DotNetTypeInfoItemProvider(in DotNetTypeInfoProviderGenericTypeStruct genericTypeInfo, in IDotNetItemInfo parent) : this(parent) => GenericTypeInfo = genericTypeInfo;
+        public DotNetTypeInfoItemProvider(in DotNetTypeInfoProviderGenericTypeStruct genericTypeInfo, in IDotNetTypeInfoBase parent) : base(parent) => GenericTypeInfo = genericTypeInfo;
         #endregion
     }
 }

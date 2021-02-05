@@ -47,7 +47,7 @@ namespace WinCopies.IO.ObjectModel
     public abstract class ArchiveItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : ArchiveItemInfoProvider<TObjectProperties, ArchiveFileInfo?, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IArchiveItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IFileSystemObjectInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
     {
         #region Private fields
-        private ArchiveFileInfo? _InnerObject;
+        private ArchiveFileInfo? _innerObject;
         private IBrowsableObjectInfo _parent;
         private IBrowsabilityOptions _browsability;
         #endregion
@@ -59,7 +59,7 @@ namespace WinCopies.IO.ObjectModel
         /// <summary>
         /// The <see cref="ArchiveFileInfo"/> that this <see cref="ArchiveItemInfo"/> represents.
         /// </summary>
-        public sealed override ArchiveFileInfo? InnerObjectGeneric => _InnerObject;
+        public sealed override ArchiveFileInfo? InnerObjectGeneric => IsDisposed ? throw GetExceptionForDispose(false) : _innerObject;
 
         // public override FileSystemType ItemFileSystemType => FileSystemType.Archive;
 
@@ -157,9 +157,11 @@ namespace WinCopies.IO.ObjectModel
         {
             get
             {
-                if (_InnerObject.HasValue)
+                ThrowIfDisposed(this);
+
+                if (_innerObject.HasValue)
                 {
-                    var value = (FileAttributes)_InnerObject.Value.Attributes;
+                    var value = (FileAttributes)_innerObject.Value.Attributes;
 
                     return value.HasFlag(FileAttributes.Hidden, FileAttributes.System);
                 }
@@ -181,7 +183,7 @@ namespace WinCopies.IO.ObjectModel
         {
             ArchiveShellObject = archiveShellObject;
 
-            _InnerObject = archiveFileInfo;
+            _innerObject = archiveFileInfo;
         }
 
         #region Methods
@@ -203,30 +205,30 @@ namespace WinCopies.IO.ObjectModel
             return ArchiveShellObject;
         }
 
-        protected override void Dispose(in bool disposing)
+        protected override void DisposeManaged()
         {
-            base.Dispose(disposing);
+            base.DisposeManaged();
 
-            if (disposing)
-
-                _InnerObject = null;
+            _innerObject = null;
         }
         #endregion // Methods
     }
 
     public class ArchiveItemInfo : ArchiveItemInfo<IFileSystemObjectInfoProperties, ArchiveFileInfoEnumeratorStruct, IBrowsableObjectInfoSelectorDictionary<ArchiveItemInfoItemProvider>, ArchiveItemInfoItemProvider>, IArchiveItemInfo
     {
+        private IFileSystemObjectInfoProperties _objectProperties;
+
         #region Properties
         public static IBrowsableObjectInfoSelectorDictionary<ArchiveItemInfoItemProvider> DefaultItemSelectorDictionary { get; } = new ArchiveItemInfoSelectorDictionary();
 
-        public sealed override IFileSystemObjectInfoProperties ObjectPropertiesGeneric { get; }
+        public sealed override IFileSystemObjectInfoProperties ObjectPropertiesGeneric => IsDisposed ? throw GetExceptionForDispose(false) : _objectProperties;
 
         public override IPropertySystemCollection ObjectPropertySystem => null;
         #endregion // Properties
 
         protected internal ArchiveItemInfo(in string path, in FileType fileType, in IShellObjectInfoBase archiveShellObject, in ArchiveFileInfo? archiveFileInfo, ClientVersion clientVersion/*, DeepClone<ArchiveFileInfo?> archiveFileInfoDelegate*/) : base(path, archiveShellObject, archiveFileInfo, clientVersion)
 #if CS9
-                => ObjectPropertiesGeneric = archiveFileInfo.HasValue ? new ArchiveItemInfoProperties<IArchiveItemInfoBase>(this, fileType) : new FileSystemObjectInfoProperties(this, fileType);
+                => _objectProperties = archiveFileInfo.HasValue ? new ArchiveItemInfoProperties<IArchiveItemInfoBase>(this, fileType) : new FileSystemObjectInfoProperties(this, fileType);
 #else
         {
             if (archiveFileInfo.HasValue)
@@ -266,6 +268,13 @@ namespace WinCopies.IO.ObjectModel
         #endregion
 
         public override IBrowsableObjectInfoSelectorDictionary<ArchiveItemInfoItemProvider> GetSelectorDictionary() => DefaultItemSelectorDictionary;
+
+        protected override void DisposeManaged()
+        {
+            base.DisposeManaged();
+
+            _objectProperties = null;
+        }
 
         #region GetItems
         protected override System.Collections.Generic.IEnumerable<ArchiveItemInfoItemProvider> GetItemProviders(Predicate<ArchiveFileInfoEnumeratorStruct> predicate) => GetArchiveItemInfoItems(this, predicate);

@@ -327,21 +327,18 @@ namespace WinCopies.IO
                 }
             }
 
-            protected override void Dispose(in bool disposing)
+            protected override void DisposeManaged()
             {
-                base.Dispose(disposing);
+                base.DisposeManaged();
 
                 _managementObject.Dispose();
 
-                if (disposing)
-                    //{
                     _managementObject = null;
 
                 //_managementObjectDelegate = null;
-                //}
             }
 
-            private BitmapSource TryGetBitmapSource(in ushort size)
+            private static BitmapSource TryGetBitmapSource(in ushort size)
             {
                 int iconIndex = 0;
 
@@ -366,10 +363,12 @@ namespace WinCopies.IO
             public const string ROOT = "ROOT";
             #endregion
 
+            private IWMIItemInfoProperties _objectProperties;
+
             #region Properties
             public static IBrowsableObjectInfoSelectorDictionary<WMIItemInfoItemProvider> DefaultItemSelectorDictionary { get; } = new WMIItemInfoSelectorDictionary();
 
-            public sealed override IWMIItemInfoProperties ObjectPropertiesGeneric { get; }
+            public sealed override IWMIItemInfoProperties ObjectPropertiesGeneric =>IsDisposed?throw GetExceptionForDispose(false): _objectProperties;
 
             public override IPropertySystemCollection ObjectPropertySystem => null;
             #endregion
@@ -378,7 +377,7 @@ namespace WinCopies.IO
             /// <summary>
             /// Initializes a new instance of the <see cref="WMIItemInfo"/> class as the WMI root item.
             /// </summary>
-            public WMIItemInfo(in IWMIItemInfoOptions options, in ClientVersion clientVersion) : base(clientVersion) => ObjectPropertiesGeneric = new WMIItemInfoProperties(this, WMIItemType.Namespace, true, options);
+            public WMIItemInfo(in IWMIItemInfoOptions options, in ClientVersion clientVersion) : base(clientVersion) => _objectProperties = new WMIItemInfoProperties(this, WMIItemType.Namespace, true, options);
 
             ///// <summary>
             ///// Initializes a new instance of the <see cref="WMIItemInfo"/> class. If you want to initialize this class in order to represent the root WMI item, you can also use the <see cref="WMIItemInfo()"/> constructor.
@@ -387,7 +386,7 @@ namespace WinCopies.IO
             ///// <param name="wmiItemType">The type of this <see cref="WMIItemInfo"/>.</param>
             ///// <param name="managementObjectDelegate">The delegate that will be used by the <see cref="BrowsableObjectInfo.DeepClone()"/> method to get a new <see cref="ManagementBaseObject"/>.</param>
             ///// <param name="managementObject">The <see cref="ManagementBaseObject"/> that this <see cref="WMIItemInfo"/> represents.</param>
-            protected internal WMIItemInfo(in string path, in WMIItemType wmiItemType, in ManagementBaseObject managementObject, in IWMIItemInfoOptions options, in ClientVersion clientVersion) : base(new WMIItemInfoInitializer(path, managementObject), wmiItemType == WMIItemType.Instance ? null : GetName(managementObject, wmiItemType), clientVersion) => ObjectPropertiesGeneric = new WMIItemInfoProperties(this, wmiItemType, false, options);
+            protected internal WMIItemInfo(in string path, in WMIItemType wmiItemType, in ManagementBaseObject managementObject, in IWMIItemInfoOptions options, in ClientVersion clientVersion) : base(new WMIItemInfoInitializer(path, managementObject), wmiItemType == WMIItemType.Instance ? null : GetName(managementObject, wmiItemType), clientVersion) => _objectProperties = new WMIItemInfoProperties(this, wmiItemType, false, options);
 
             public WMIItemInfo(in WMIItemType itemType, in ManagementBaseObject managementObject, in IWMIItemInfoOptions options, in ClientVersion clientVersion) : this(GetPath(managementObject, itemType), itemType, managementObject, options, clientVersion)
             {
@@ -459,6 +458,13 @@ namespace WinCopies.IO
             // #pragma warning restore IDE0067 // Dispose objects before losing scope
 
             public override IBrowsableObjectInfoSelectorDictionary<WMIItemInfoItemProvider> GetSelectorDictionary() => DefaultItemSelectorDictionary;
+
+            protected override void DisposeManaged()
+            {
+                base.DisposeManaged();
+
+                _objectProperties = null;
+            }
 
             #region GetItems
             protected override System.Collections.Generic.IEnumerable<WMIItemInfoItemProvider> GetItemProviders(Predicate<ManagementBaseObject> predicate) => GetItemProviders(predicate, ObjectPropertiesGeneric.Options);

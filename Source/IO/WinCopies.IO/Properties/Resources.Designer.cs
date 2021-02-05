@@ -88,6 +88,15 @@ namespace WinCopies.IO.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to .Net Parameter.
+        /// </summary>
+        public static string DotNetParameter {
+            get {
+                return ResourceManager.GetString("DotNetParameter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to .Net Type.
         /// </summary>
         public static string DotNetType {

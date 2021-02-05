@@ -19,6 +19,7 @@ using System;
 using System.Reflection;
 
 using WinCopies.IO.ObjectModel;
+using WinCopies.IO.ObjectModel.Reflection;
 using WinCopies.IO.Reflection;
 
 namespace WinCopies.IO.AbstractionInterop.Reflection
@@ -28,18 +29,18 @@ namespace WinCopies.IO.AbstractionInterop.Reflection
         TypeInfoItemProvider TypeInfoItemProvider { get; }
     }
 
-    public class TypeInfoItemProvider
+    public class DotNetItemInfoItemProvider
+    {
+        public DotNetItemType ItemType { get; }
+
+        protected DotNetItemInfoItemProvider(in DotNetItemType itemType) => ItemType = itemType;
+    }
+
+    public class TypeInfoItemProvider : DotNetItemInfoItemProvider
     {
         public TypeInfo TypeInfo { get; }
 
-        public DotNetItemType ItemType { get; }
-
-        public TypeInfoItemProvider(in TypeInfo typeInfo, in DotNetItemType itemType)
-        {
-            TypeInfo = typeInfo;
-
-            ItemType = itemType;
-        }
+        public TypeInfoItemProvider(in TypeInfo typeInfo, in DotNetItemType itemType) : base(itemType) => TypeInfo = typeInfo;
 
         public TypeInfoItemProvider(in Type type, in DotNetItemType itemType) : this(type.GetTypeInfo(), itemType)
         {
@@ -47,18 +48,11 @@ namespace WinCopies.IO.AbstractionInterop.Reflection
         }
     }
 
-    public class MemberInfoItemProvider
+    public class MemberInfoItemProvider: DotNetItemInfoItemProvider
     {
         public MemberInfo MemberInfo { get; }
 
-        public DotNetItemType ItemType { get; }
-
-        public MemberInfoItemProvider(in MemberInfo memberInfo, in DotNetItemType itemType)
-        {
-            MemberInfo = memberInfo;
-
-            ItemType = itemType;
-        }
+        public MemberInfoItemProvider(in MemberInfo memberInfo, in DotNetItemType itemType) :base(itemType)=> MemberInfo = memberInfo;
     }
 
     public class ParameterInfoItemProvider
@@ -75,18 +69,14 @@ namespace WinCopies.IO.AbstractionInterop.Reflection
         }
     }
 
-    public class DotNetNamespaceInfoItemProvider : ITypeInfoItemProvider
+    public class DotNetNamespaceInfoItemProvider : BrowsableObjectInfoItemProvider<IDotNetNamespaceInfoBase>, ITypeInfoItemProvider
     {
         public string NamespaceName { get; }
 
         public TypeInfoItemProvider TypeInfoItemProvider { get; }
 
-        public IBrowsableObjectInfo Parent { get; }
+        public DotNetNamespaceInfoItemProvider(in string _namespace, in IDotNetNamespaceInfoBase parent) : base(parent) => NamespaceName = _namespace;
 
-        private DotNetNamespaceInfoItemProvider(in IBrowsableObjectInfo parent) => Parent = parent;
-
-        public DotNetNamespaceInfoItemProvider(in string _namespace, in IBrowsableObjectInfo parent) : this(parent) => NamespaceName = _namespace;
-
-        public DotNetNamespaceInfoItemProvider(in TypeInfoItemProvider typeInfoItemProvider, in IBrowsableObjectInfo parent) : this(parent) => TypeInfoItemProvider = typeInfoItemProvider;
+        public DotNetNamespaceInfoItemProvider(in TypeInfoItemProvider typeInfoItemProvider, in IDotNetNamespaceInfoBase parent) : base(parent) => TypeInfoItemProvider = typeInfoItemProvider;
     }
 }

@@ -126,6 +126,9 @@
   <data name="DotNetNamespace" xml:space="preserve">
     <value>.Net Namespace</value>
   </data>
+  <data name="DotNetParameter" xml:space="preserve">
+    <value>.Net Parameter</value>
+  </data>
   <data name="DotNetType" xml:space="preserve">
     <value>.Net Type</value>
   </data>

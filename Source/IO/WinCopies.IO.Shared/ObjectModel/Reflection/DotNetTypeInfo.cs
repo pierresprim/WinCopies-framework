@@ -27,6 +27,7 @@ using WinCopies.IO.Reflection;
 using WinCopies.IO.Reflection.PropertySystem;
 using WinCopies.IO.Selectors;
 using WinCopies.IO.Selectors.Reflection;
+
 using static WinCopies.IO.Path;
 using static WinCopies.ThrowHelper;
 

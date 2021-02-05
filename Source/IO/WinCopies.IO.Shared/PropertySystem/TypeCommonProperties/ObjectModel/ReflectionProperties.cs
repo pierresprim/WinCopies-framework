@@ -45,9 +45,9 @@ namespace WinCopies.IO.Reflection.PropertySystem
         }
     }
 
-    public class DotNetFieldItemInfoProperties<T> : DotNetTypeOrMemberInfoProperties<T>, IDotNetTypeOrMemberInfoProperties where T : IDotNetMemberInfo
+    public class DotNetFieldItemInfoProperties<T> : DotNetTypeOrMemberInfoProperties<T>, IDotNetTypeOrMemberInfoProperties where T : IDotNetMemberInfoBase
     {
-        private FieldInfo _field;
+        private readonly FieldInfo _field;
 
         public override Type DeclaringType => _field.DeclaringType;
 
@@ -68,9 +68,9 @@ namespace WinCopies.IO.Reflection.PropertySystem
         }
     }
 
-    public class DotNetPropertyOrMethodItemInfoProperties<T> : DotNetTypeOrMethodItemInfoProperties<T>, IDotNetMethodItemInfoProperties where T : IDotNetMemberInfo
+    public class DotNetPropertyOrMethodItemInfoProperties<T> : DotNetTypeOrMethodItemInfoProperties<T>, IDotNetMethodItemInfoProperties where T : IDotNetMemberInfoBase
     {
-        private MethodBase _method;
+        private readonly MethodBase _method;
         private AccessModifier? _accessModifier;
 
         public override Type DeclaringType => _method.DeclaringType;
@@ -93,7 +93,7 @@ namespace WinCopies.IO.Reflection.PropertySystem
                 : throw new ArgumentException("Invalid inner object.", nameof(dotNetItemInfo)), false);
     }
 
-    public class DotNetTypeInfoProperties<T> : DotNetTypeOrMethodItemInfoProperties<T>, IDotNetTypeInfoProperties where T : IDotNetTypeInfo
+    public class DotNetTypeInfoProperties<T> : DotNetTypeOrMethodItemInfoProperties<T>, IDotNetTypeInfoProperties where T : IDotNetTypeInfoBase
     {
         private AccessModifier? _accessModifier;
 
@@ -108,5 +108,12 @@ namespace WinCopies.IO.Reflection.PropertySystem
         public override Type DeclaringType => BrowsableObjectInfo.InnerObject.DeclaringType;
 
         public DotNetTypeInfoProperties(in T dotNetTypeInfo, in DotNetItemType itemType, bool? isRootType) : base(dotNetTypeInfo, itemType) => IsRootType = isRootType;
+    }
+
+    public class DotNetParameterInfoProperties<T> : DotNetItemInfoProperties<T>, IDotNetParameterInfoProperties where T : IDotNetParameterInfoBase
+    {
+        public bool IsReturn { get; }
+
+        public DotNetParameterInfoProperties(in T dotNetParameterInfo, in bool isReturn) : base(dotNetParameterInfo, DotNetItemType.Parameter) => IsReturn = isReturn;
     }
 }
