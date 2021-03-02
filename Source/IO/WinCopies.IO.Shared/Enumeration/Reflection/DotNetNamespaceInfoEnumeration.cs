@@ -27,6 +27,7 @@ using WinCopies.IO.ObjectModel;
 using WinCopies.IO.ObjectModel.Reflection;
 using WinCopies.IO.Reflection;
 using WinCopies.Linq;
+using WinCopies.Util;
 
 using static WinCopies.IO.Path;
 using static WinCopies.UtilHelpers;
@@ -223,7 +224,7 @@ namespace WinCopies.IO.Enumeration.Reflection
                     types.Enqueue(enumerable.Where(t => result(t) && typePredicate(t)).Select(t => new TypeInfoItemProvider(t, itemType)));
             }
 
-            void addNamespaceEnumerable(in System.Collections.Generic.IEnumerable<Type> types, IBrowsableObjectInfo parent)
+            void addNamespaceEnumerable(in System.Collections.Generic.IEnumerable<Type> _types, IBrowsableObjectInfo parent)
             {
                 EnumerableHelper<string>.IEnumerableQueue _queue = EnumerableHelper<string>.GetEnumerableQueue();
                 string _namespace = parent is IDotNetNamespaceInfoBase ? parent.Path.Replace(PathSeparator, '.') : null;
@@ -239,7 +240,7 @@ namespace WinCopies.IO.Enumeration.Reflection
                 //    return select(___namespace);
                 //};
 
-                namespaces.Enqueue(types.Select(t => t.Namespace).Where(__namespace =>
+                namespaces.Enqueue(_types.Select(t => t.Namespace).Where(__namespace =>
                {
                    if ((parent is IDotNetNamespaceInfoBase && __namespace.StartsWith(_namespace + '.')) || parent is IDotNetAssemblyInfo)
                    {
@@ -286,7 +287,7 @@ namespace WinCopies.IO.Enumeration.Reflection
                     addEnumerable(typeToEnumerate);
             }
 
-            return namespaces.Merge().Select(_namespace => new DotNetNamespaceInfoItemProvider(_namespace, dotNetItemInfo)).AppendValues(types.Merge().Select(type => new DotNetNamespaceInfoItemProvider(type, dotNetItemInfo)));
+            return namespaces.Merge<string>().Select(_namespace => new DotNetNamespaceInfoItemProvider(_namespace, dotNetItemInfo)).AppendValues(types.Merge<TypeInfoItemProvider>().Select(type => new DotNetNamespaceInfoItemProvider(type, dotNetItemInfo)));
         }
     }
 }

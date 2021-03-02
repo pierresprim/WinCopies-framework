@@ -11,21 +11,22 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using WinCopies.GUI.IO;
+using WinCopies.GUI.IO.Process;
 
 namespace WinCopies.GUI.Samples
 {
     /// <summary>
-    /// Interaction logic for CopyProcessTest.xaml
+    /// Interaction logic for CopyTest.xaml
     /// </summary>
-    public partial class CopyProcessTest : Window
+    public partial class CopyTest : Window
     {
-        private static readonly DependencyPropertyKey ItemsPropertyKey = DependencyProperty.RegisterReadOnly(nameof(Items), typeof(ObservableCollection<CopyProcess>), typeof(CopyProcessTest), new PropertyMetadata(new ObservableCollection<CopyProcess>()));
+        private static readonly DependencyPropertyKey ItemsPropertyKey = DependencyProperty.RegisterReadOnly(nameof(Items), typeof(ObservableCollection<Copy>), typeof(CopyTest), new PropertyMetadata(new ObservableCollection<Copy>()));
 
         public static readonly DependencyProperty ItemsProperty = ItemsPropertyKey.DependencyProperty;
 
-        public ObservableCollection<CopyProcess> Items => (ObservableCollection<CopyProcess>)GetValue(ItemsProperty);
+        public ObservableCollection<Copy> Items => (ObservableCollection<Copy>)GetValue(ItemsProperty);
 
-        public CopyProcessTest()
+        public CopyTest()
         {
             InitializeComponent();
 
@@ -34,25 +35,28 @@ namespace WinCopies.GUI.Samples
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            var addNew = new AddNewCopyProcess();
+            var addNew = new AddNewCopy();
 
             if (addNew.ShowDialog() == true)
             {
-                var copyProcess = new CopyProcess(new PathCollection(addNew.SourcePath), addNew.DestPath
+                var Copy = IO.Process.Copy.From(new CopyProcessPathCollection(addNew.SourcePath), addNew.DestPath
 #if DEBUG
 , null
 #endif
-                    ) { WorkerReportsProgress = true, WorkerSupportsCancellation = true };
+                    ) ;
 
-                Items.Add(copyProcess);
+                Copy.WorkerReportsProgress = true;
+                Copy.WorkerSupportsCancellation = true;
 
-                copyProcess.RunWorkerAsync();
+                Items.Add(Copy);
+
+                Copy.RunWorkerAsync();
             }
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            ObservableCollection<CopyProcess> items = Items;
+            ObservableCollection<Copy> items = Items;
 
             while (items.Count > 0)
             {

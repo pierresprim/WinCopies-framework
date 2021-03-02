@@ -16,19 +16,25 @@
 * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using System;
+using System.Collections;
 using System.Collections.ObjectModel;
 
 using WinCopies.IO.ObjectModel;
 
 namespace WinCopies.GUI.IO.ObjectModel
 {
-    public interface IBrowsableObjectInfoViewModelCommon
-    {
-        bool IsSelected { get; set; }
-    }
-
     public interface IBrowsableObjectInfoViewModel : IBrowsableObjectInfo, IBrowsableObjectInfoViewModelCommon
     {
+        bool RootParentIsRootNode { get; }
+
+        IBrowsableObjectInfo Model { get; }
+
+        bool IsSelected { get; set; }
+
+        int SelectedIndex { get; set; }
+
+        object SelectedItem { get; set; }
+
         ObservableCollection<IBrowsableObjectInfoViewModel> Items { get; }
 
         Comparison<IBrowsableObjectInfo> SortComparison { get; set; }

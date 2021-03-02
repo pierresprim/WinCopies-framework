@@ -16,17 +16,22 @@
  * along with the WinCopies Framework. If not, see <https://www.gnu.org/licenses/>. */
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Management;
 using System.Windows.Media.Imaging;
 
 using Microsoft.WindowsAPICodePack.PortableDevices;
 using Microsoft.WindowsAPICodePack.Shell;
 
+using WinCopies.Collections;
 using WinCopies.IO.AbstractionInterop;
 using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Selectors;
 using WinCopies.Linq;
+using WinCopies.PropertySystem;
+using WinCopies.Util;
 
 using static WinCopies.IO.ObjectModel.WMIItemInfo;
 using static WinCopies.UtilHelpers;
@@ -63,13 +68,23 @@ namespace WinCopies.IO
             private static System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> _defaultRootItems;
 
             #region Properties
-            public static System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> DefaultRootItems => _defaultRootItems ??= GetRootItems();
+            public static System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> DefaultRootItems => _defaultRootItems
+#if CS8
+                ??=
+#else
+                ?? (_defaultRootItems =
+#endif
+                GetRootItems()
+#if !CS8
+                )
+#endif
+                ;
 
             public override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> RootItems => DefaultRootItems;
 
-            public override Predicate<TPredicateTypeParameter> RootItemsPredicate => null;
+            //public override Predicate<TPredicateTypeParameter> RootItemsPredicate => null;
 
-            public override Predicate<IBrowsableObjectInfo> RootItemsBrowsableObjectInfoPredicate => item => item.Browsability?.Browsability == IO.Browsability.BrowsableByDefault;
+            //public override Predicate<IBrowsableObjectInfo> RootItemsBrowsableObjectInfoPredicate => item => item.Browsability?.Browsability == IO.Browsability.BrowsableByDefault;
 
             public override bool IsSpecialItem => false;
 
@@ -126,11 +141,11 @@ namespace WinCopies.IO
 #if CS8
                 ??=
 #else
-                _parent ?? (_parent = 
+                ?? (_parent =
 #endif
                 GetParent()
 #if !CS8
-)
+                )
 #endif
                 ;
 
@@ -179,7 +194,7 @@ namespace WinCopies.IO
                         _browsability = ObjectPropertiesGeneric.ItemType switch
                         {
 #if CS9
-                        WMIItemType.Namespace or WMIItemType.Class => BrowsabilityOptions.BrowsableByDefault,
+                            WMIItemType.Namespace or WMIItemType.Class => BrowsabilityOptions.BrowsableByDefault,
 #else
                             WMIItemType.Namespace => BrowsabilityOptions.BrowsableByDefault,
                             WMIItemType.Class => BrowsabilityOptions.BrowsableByDefault,
@@ -187,16 +202,16 @@ namespace WinCopies.IO
                             _ => BrowsabilityOptions.NotBrowsable
                         };
 #else
-                    switch (ObjectPropertiesGeneric.ItemType)
-                    {
-                        case WMIItemType.Namespace:
-                        case WMIItemType.Class:
-                            _isBrowsable = true;
-                            break;
-                        default:
-                            _isBrowsable = false;
-                            break;
-                    }
+                        switch (ObjectPropertiesGeneric.ItemType)
+                        {
+                            case WMIItemType.Namespace:
+                            case WMIItemType.Class:
+                                _browsability = BrowsabilityOptions.BrowsableByDefault;
+                                break;
+                            default:
+                                _browsability = BrowsabilityOptions.NotBrowsable;
+                                break;
+                        }
 #endif
                     }
 
@@ -213,13 +228,12 @@ namespace WinCopies.IO
             #endregion // Properties
 
             #region Constructors
+            protected WMIItemInfo() : this(GetDefaultClientVersion()) { /* Left empty. */ }
+
             /// <summary>
             /// Initializes a new instance of the <see cref="WMIItemInfo"/> class as the WMI root item.
             /// </summary>
-            protected WMIItemInfo(in ClientVersion clientVersion) : this(GetRootInitializer(), null, clientVersion)
-            {
-                // Left empty.
-            }
+            protected WMIItemInfo(in ClientVersion clientVersion) : this(GetRootInitializer(), null, clientVersion) { /* Left empty. */ }
 
             ///// <summary>
             ///// Initializes a new instance of the <see cref="WMIItemInfo"/> class. If you want to initialize this class in order to represent the root WMI item, you can also use the <see cref="WMIItemInfo()"/> constructor.
@@ -333,23 +347,20 @@ namespace WinCopies.IO
 
                 _managementObject.Dispose();
 
-                    _managementObject = null;
+                _managementObject = null;
 
                 //_managementObjectDelegate = null;
             }
 
-            private static BitmapSource TryGetBitmapSource(in ushort size)
-            {
-                int iconIndex = 0;
-
-                return TryGetBitmapSource(iconIndex, Microsoft.WindowsAPICodePack.NativeAPI.Consts.DllNames.Shell32, size);
-            }
+            private BitmapSource TryGetBitmapSource(in ushort size) => TryGetBitmapSource(IsBrowsable() ? FolderIcon : FileIcon, Microsoft.WindowsAPICodePack.NativeAPI.Consts.DllNames.Shell32, size);
 
             // public override bool CheckFilter(string path) => throw new NotImplementedException();
 
-            public override Collections.IEqualityComparer<IBrowsableObjectInfoBase> GetDefaultEqualityComparer() => new WMIItemInfoEqualityComparer<IBrowsableObjectInfoBase>();
+            public override WinCopies.Collections.Generic.IEqualityComparer<IBrowsableObjectInfoBase> GetDefaultEqualityComparer() => new WMIItemInfoEqualityComparer<IBrowsableObjectInfoBase>();
 
-            public override System.Collections.Generic.IComparer<IBrowsableObjectInfoBase> GetDefaultComparer() => new WMIItemInfoComparer<IBrowsableObjectInfoBase>();
+            public override WinCopies.Collections.Generic.IComparer<IBrowsableObjectInfoBase> GetDefaultComparer() => new WMIItemInfoComparer<IBrowsableObjectInfoBase>();
+
+            public override IEnumerable<IBrowsableObjectInfo> GetSubRootItems() => GetItems().Where(item => item.Browsability?.Browsability == IO.Browsability.BrowsableByDefault);
             #endregion // Methods
         }
 
@@ -368,16 +379,21 @@ namespace WinCopies.IO
             #region Properties
             public static IBrowsableObjectInfoSelectorDictionary<WMIItemInfoItemProvider> DefaultItemSelectorDictionary { get; } = new WMIItemInfoSelectorDictionary();
 
-            public sealed override IWMIItemInfoProperties ObjectPropertiesGeneric =>IsDisposed?throw GetExceptionForDispose(false): _objectProperties;
+            public sealed override IWMIItemInfoProperties ObjectPropertiesGeneric => IsDisposed ? throw GetExceptionForDispose(false) : _objectProperties;
 
-            public override IPropertySystemCollection ObjectPropertySystem => null;
+            public override IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystem => null;
             #endregion
 
             #region Constructors
             /// <summary>
             /// Initializes a new instance of the <see cref="WMIItemInfo"/> class as the WMI root item.
             /// </summary>
-            public WMIItemInfo(in IWMIItemInfoOptions options, in ClientVersion clientVersion) : base(clientVersion) => _objectProperties = new WMIItemInfoProperties(this, WMIItemType.Namespace, true, options);
+            public WMIItemInfo() : base() => _objectProperties = GetProperties(this, new WMIItemInfoOptions());
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="WMIItemInfo"/> class as the WMI root item.
+            /// </summary>
+            public WMIItemInfo(in IWMIItemInfoOptions options, in ClientVersion clientVersion) : base(clientVersion) => _objectProperties = GetProperties(this, options);
 
             ///// <summary>
             ///// Initializes a new instance of the <see cref="WMIItemInfo"/> class. If you want to initialize this class in order to represent the root WMI item, you can also use the <see cref="WMIItemInfo()"/> constructor.
@@ -402,6 +418,8 @@ namespace WinCopies.IO
             #region Methods
             //public static WMIItemInfoComparer<IWMIItemInfo> GetDefaultWMIItemInfoComparer() => new WMIItemInfoComparer<IWMIItemInfo>();
 
+            public static IWMIItemInfoProperties GetProperties(in IWMIItemInfoBase item, in IWMIItemInfoOptions options) => new WMIItemInfoProperties(item, WMIItemType.Namespace, true, options);
+
             /// <summary>
             /// Gets the name of the given <see cref="ManagementBaseObject"/>.
             /// </summary>
@@ -412,9 +430,7 @@ namespace WinCopies.IO
             {
                 (managementObject as ManagementClass)?.Get();
 
-                const string name = NameConst;
-
-                return wmiItemType == WMIItemType.Namespace ? (string)managementObject[name] : managementObject.ClassPath.ClassName;
+                return wmiItemType == WMIItemType.Namespace ? (string)managementObject[NameConst] : managementObject.ClassPath.ClassName;
             }
 
             /// <summary>
@@ -425,13 +441,13 @@ namespace WinCopies.IO
             /// <returns>The path of the given <see cref="ManagementBaseObject"/>.</returns>
             public static string GetPath(ManagementBaseObject managementObject, WMIItemType wmiItemType)
             {
-                string path = $"{WinCopies.IO.Path.PathSeparator}{managementObject.ClassPath.Server}{WinCopies.IO.Path.PathSeparator}{managementObject.ClassPath.NamespacePath}";
+                string path = $"{WinCopies.IO.Path.PathSeparator.Repeat(2)}{managementObject.ClassPath.Server}{WinCopies.IO.Path.PathSeparator}{managementObject.ClassPath.NamespacePath}";
 
                 string name = GetName(managementObject, wmiItemType);
 
-                string _getPath() => $"{path}:{managementObject.ClassPath.ClassName}";
+                string _getPath(in string format) => $"{path}{format}:{managementObject.ClassPath.ClassName}";
 
-                path = name == null ? _getPath() : $"{WinCopies.IO.Path.PathSeparator}{name}" + _getPath();
+                path = name == null ? _getPath("") : _getPath($"{WinCopies.IO.Path.PathSeparator}{name}");
 
                 return path;
             }
@@ -492,9 +508,15 @@ namespace WinCopies.IO
 
                 try
                 {
-                    static System.Collections.Generic.IEnumerable<ManagementBaseObject> _as(in ManagementObjectCollection collection) => collection.As<ManagementBaseObject>();
+#if CS8
+                    static
+#endif
+                    System.Collections.Generic.IEnumerable<ManagementBaseObject> _as(in ManagementObjectCollection collection) => collection.As<ManagementBaseObject>();
 
-                    static System.Collections.Generic.IEnumerable<ManagementBaseObject> enumerateInstances(in ManagementClass managementClass, in IWMIItemInfoOptions options) => _as(options?.EnumerationOptions == null ? managementClass.GetInstances() : managementClass.GetInstances(options?.EnumerationOptions));
+#if CS8
+                    static
+#endif
+                    System.Collections.Generic.IEnumerable<ManagementBaseObject> enumerateInstances(in ManagementClass _managementClass, in IWMIItemInfoOptions _options) => _as(_options?.EnumerationOptions == null ? _managementClass.GetInstances() : _managementClass.GetInstances(_options?.EnumerationOptions));
 
                     System.Collections.Generic.IEnumerable<WMIItemInfoItemProvider> getEnumerable(in System.Collections.Generic.IEnumerable<ManagementBaseObject> enumerable, WMIItemType itemType) => enumerable.SelectConverter(item => new WMIItemInfoItemProvider(null, item, itemType, ObjectPropertiesGeneric.Options, ClientVersion));
 

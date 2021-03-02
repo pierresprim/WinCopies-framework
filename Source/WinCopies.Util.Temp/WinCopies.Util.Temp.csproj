@@ -7,18 +7,28 @@
 		<AssemblyOriginatorKeyFile>WinCopies.Util.Temp.snk</AssemblyOriginatorKeyFile>
 		<DefineConstants>WinCopies3;$(DefineConstants)</DefineConstants>
 		<UseWPF>true</UseWPF>
+		<PackageIcon>WinCopies.png</PackageIcon>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netcoreapp3.0|AnyCPU'">
+	  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="WinCopies.Util" Version="3.1.0.1-preview" />
-		<PackageReference Include="WinCopies.Collections" Version="3.1.0.1-preview" />
-		<PackageReference Include="WinCopies.Util.Desktop" Version="3.1.0.1-preview" />
+		<PackageReference Include="WinCopies.Util" Version="3.4-preview" />
+		<PackageReference Include="WinCopies.Collections" Version="3.4-preview" />
+		<PackageReference Include="WinCopies.Util.Desktop" Version="3.4-preview" />
+    <PackageReference Include="WinCopies.WindowsAPICodePack.Consts" Version="3.0.1-preview" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<None Include="..\..\LICENSE.md">
 			<Pack>True</Pack>
 			<PackagePath></PackagePath>
+		</None>
+		<None Include="..\WinCopies.png">
+		  <Pack>True</Pack>
+		  <PackagePath></PackagePath>
 		</None>
 	</ItemGroup>
 

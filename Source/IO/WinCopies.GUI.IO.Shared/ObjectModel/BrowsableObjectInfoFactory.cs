@@ -31,9 +31,13 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         Comparison<IBrowsableObjectInfo> SortComparison { get; set; }
 
+        IBrowsableObjectInfo GetBrowsableObjectInfo(string path);
+
         IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo);
 
-        IBrowsableObjectInfo GetBrowsableObjectInfo(string path);
+        IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(string path);
+
+        IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo, IBrowsableObjectInfoViewModel parent);
     }
 
     public class BrowsableObjectInfoFactory : IBrowsableObjectInfoFactory
@@ -49,9 +53,9 @@ namespace WinCopies.GUI.IO.ObjectModel
         /// Initializes a new instance of the <see cref="BrowsableObjectInfoFactory"/> class.
         /// </summary>
         /// <param name="clientVersion">The <see cref="Microsoft.WindowsAPICodePack.PortableDevices.ClientVersion"/> value for PortableDevice items creation. See <see cref="ClientVersion"/>.</param>
-        public BrowsableObjectInfoFactory(ClientVersion clientVersion) => ClientVersion = clientVersion;
+        public BrowsableObjectInfoFactory(in ClientVersion clientVersion) => ClientVersion = clientVersion;
 
-        public virtual IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo) => new BrowsableObjectInfoViewModel(browsableObjectInfo) { SortComparison = SortComparison };
+        public BrowsableObjectInfoFactory() : this(BrowsableObjectInfo.GetDefaultClientVersion()) { /* Left empty. */ }
 
         /// <summary>
         /// Creates an <see cref="IBrowsableObjectInfo"/> for a given path. See Remarks section.
@@ -64,13 +68,21 @@ namespace WinCopies.GUI.IO.ObjectModel
         {
             if (Path.IsFileSystemPath(path))
 
-                return ShellObjectInfo.From(ShellObject.FromParsingName(path), ClientVersion);
+                return ShellObjectInfo.From(ShellObjectFactory.Create(path), ClientVersion);
 
             else if (Path.IsRegistryPath(path))
 
-                return new RegistryItemInfo(path);
+                return new RegistryItemInfo(path, BrowsableObjectInfo.GetDefaultClientVersion());
 
             throw new ArgumentException("The factory cannot create an object for the given path.");
         }
+
+        protected virtual IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo, bool rootParentIsRootNode) => new BrowsableObjectInfoViewModel(browsableObjectInfo, rootParentIsRootNode) { SortComparison = SortComparison };
+
+        public virtual IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(string path) => GetBrowsableObjectInfoViewModel(GetBrowsableObjectInfo(path), false);
+
+        public virtual IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo) => GetBrowsableObjectInfoViewModel(browsableObjectInfo, true);
+
+        public virtual IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo, IBrowsableObjectInfoViewModel parent) => GetBrowsableObjectInfoViewModel(browsableObjectInfo, parent.RootParentIsRootNode);
     }
 }

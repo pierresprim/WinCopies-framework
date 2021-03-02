@@ -165,6 +165,10 @@ namespace WinCopies.GUI.IO.Process
             return result;
         }
 
+        [DllImport(Microsoft.WindowsAPICodePack.NativeAPI.Consts.DllNames.Kernel32, SetLastError = true, CharSet = CharSet.Unicode)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool CreateDirectoryW([In, MarshalAs(UnmanagedType.LPWStr)] string lpPathName, [In] IntPtr lpSecurityAttributes);
+
         protected override ProcessError OnProcessDoWork(DoWorkEventArgs e)
         {
             ProcessError error = CheckIfDrivesAreReady(
@@ -244,9 +248,9 @@ namespace WinCopies.GUI.IO.Process
 #if DEBUG
                                     SimulationParameters?.CreateDirectoryWAction?.Invoke(destPath) ??
 #endif
-                                    Directory.CreateDirectoryW(destPath, IntPtr.Zero);
+                                    CreateDirectoryW(destPath, IntPtr.Zero);
 
-                    void reportProgressCommon() => TryReportProgress((_Paths.Count / InitialItemCount) * 100);
+                    void reportProgressCommon() => TryReportProgress((int)((_Paths.Count / InitialItemCount) * 100));
 
                     Action reportProgress = () =>
                     {
@@ -470,7 +474,7 @@ namespace WinCopies.GUI.IO.Process
                                         if (SimulationParameters == null)
 #endif
 
-                                        _result = WinCopies.IO.File.IsDuplicate(sourceFileStream, destFileStream, _bufferLength, () => CheckIfPauseOrCancellationPending());
+                                            _result = WinCopies.IO.File.IsDuplicate(sourceFileStream, destFileStream, _bufferLength, () => CheckIfPauseOrCancellationPending());
 
 #if DEBUG
 

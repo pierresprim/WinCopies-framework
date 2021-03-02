@@ -40,6 +40,7 @@ using static WinCopies.
     ;
 
 using Size = System.Drawing.Size;
+using System.Linq;
 
 namespace WinCopies.GUI.Drawing
 {
@@ -52,7 +53,7 @@ namespace WinCopies.GUI.Drawing
         #endregion
 
         #region Constructors
-        internal SingleIcon(in string name) => mName = name;
+        public SingleIcon(in string name) => mName = name;
         #endregion
 
         #region Properties
@@ -129,6 +130,39 @@ namespace WinCopies.GUI.Drawing
                 return;
 
             CopyFrom(multiIcon[0]);
+        }
+
+        public static IconImage GetIconImage(in Stream stream)
+        {
+            ThrowIfNull(stream, nameof(stream));
+
+            var iconFormat = new IconFormat();
+
+            if (!iconFormat.IsRecognizedFormat(stream))
+
+                throw new InvalidFileException();
+
+            MultiIcon multiIcon = iconFormat.Load(stream);
+
+            if (multiIcon.Count < 1)
+
+                return null;
+
+            return multiIcon[0].FirstOrDefault();
+        }
+
+        public static IconImage GetIconImage(in string fileName)
+        {
+            var fs = new FileStream(fileName, FileMode.Open, FileAccess.Read);
+
+            try
+            {
+                return GetIconImage(fs);
+            }
+            finally
+            {
+                fs?.Close();
+            }
         }
 
         public void Save(in string fileName)
@@ -330,7 +364,7 @@ namespace WinCopies.GUI.Drawing
             }
         }
 
-        internal IconImage Add(in IconImage iconImage)
+        public IconImage Add(in IconImage iconImage)
         {
             mIconImages.Add(iconImage);
 
@@ -387,7 +421,7 @@ namespace WinCopies.GUI.Drawing
         #endregion
 
         #region Helper Classes
-        [Serializable, StructLayout(LayoutKind.Sequential)]
+        [Serializable]
         public
 #if !WinCopies3
 struct
@@ -446,7 +480,7 @@ struct
 #if !WinCopies3
                     Current
 #else
-_current 
+                    _current
 #endif
                         = mList[mIndex];
                     mIndex++;
@@ -463,13 +497,13 @@ _current
 #if !WinCopies3
             private
 #else
-            protected override 
+            protected override
 #endif
                 void ResetCurrent() =>
 #if !WinCopies3
                 Current
 #else
-                _current 
+                _current
 #endif
                 = null;
 

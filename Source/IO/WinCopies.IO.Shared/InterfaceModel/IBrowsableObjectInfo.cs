@@ -25,6 +25,7 @@ using WinCopies.Collections.Generic;
 using WinCopies.IO.ObjectModel;
 using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Selectors;
+using WinCopies.PropertySystem;
 
 namespace WinCopies.IO
 {
@@ -104,11 +105,31 @@ namespace WinCopies.IO
 
         public static IBrowsabilityOptions Browsable { get; } = new _Browsability(Browsability.Browsable);
 
-        public static bool IsBrowsable(this Browsability browsability) => browsability switch
+        public static bool IsBrowsable(this Browsability browsability)
+#if CS8
+            => browsability switch
+            {
+#if CS9
+                Browsability.BrowsableByDefault or Browsability.Browsable => true,
+#else
+                Browsability.BrowsableByDefault => true,
+                Browsability.Browsable => true,
+#endif
+                _ => false,
+            };
+#else
         {
-            Browsability.BrowsableByDefault or Browsability.Browsable => true,
-            _ => false,
-        };
+            switch (browsability)
+            {
+                case Browsability.BrowsableByDefault:
+                case Browsability.Browsable:
+
+                    return true;
+            }
+
+            return false;
+        }
+#endif
     }
 
     namespace ObjectModel
@@ -144,7 +165,7 @@ WinCopies.
             /// <summary>
             /// Gets the specific properties of <see cref="InnerObject"/>. These properties are specific to this object.
             /// </summary>
-            IPropertySystemCollection ObjectPropertySystem { get; }
+            IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystem { get; }
 #endif
 
             /// <summary>
@@ -201,6 +222,8 @@ WinCopies.
             //IReadOnlyCollection<IBrowsableObjectInfo> Items { get; }
 
             System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems();
+
+            System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetSubRootItems();
 
             // IBrowsableObjectInfo GetBrowsableObjectInfo(IBrowsableObjectInfo browsableObjectInfo);
 

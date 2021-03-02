@@ -19,6 +19,7 @@
 using Microsoft.WindowsAPICodePack.Win32Native.Shell;
 using System;
 using WinCopies.IO;
+using WinCopies.IO.Enumeration;
 
 namespace WinCopies.GUI.IO.Process
 {

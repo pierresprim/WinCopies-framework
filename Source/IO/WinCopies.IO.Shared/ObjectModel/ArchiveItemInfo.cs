@@ -24,12 +24,13 @@ using System;
 using System.Linq;
 using System.Windows.Media.Imaging;
 
-using WinCopies.Collections;
 using WinCopies.Collections.Generic;
+using WinCopies.Extensions;
 using WinCopies.IO.AbstractionInterop;
 using WinCopies.IO.Enumeration;
 using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Selectors;
+using WinCopies.PropertySystem;
 
 using static WinCopies.
 #if !WinCopies3
@@ -76,37 +77,37 @@ namespace WinCopies.IO.ObjectModel
                     _ => BrowsabilityOptions.NotBrowsable
                 };
 #else
+        {
+            get
+            {
+                if (_browsability != null)
+
+                    return _browsability;
+
+                switch (ObjectPropertiesGeneric.FileType)
                 {
-                get
-                {
-                    if (_isBrowsable.HasValue)
+                    case FileType.Folder:
+                    case FileType.Drive:
+                        // case FileType.Archive:
 
-                        return _isBrowsable.Value;
+                        _browsability = BrowsabilityOptions.BrowsableByDefault;
 
-                    switch (ObjectPropertiesGeneric.FileType)
-                    {
-                        case FileType.Folder:
-                        case FileType.Drive:
-                            // case FileType.Archive:
+                        break;
 
-                            _isBrowsable = BrowsabilityOptions.BrowsableByDefault;
+                    default:
 
-                            break;
+                        _browsability = BrowsabilityOptions.NotBrowsable;
 
-                        default:
-
-                            _isBrowsable = BrowsabilityOptions.NotBrowsable;
-
-                            break;
-                    }
-
-                    return _isBrowsable.Value;
+                        break;
                 }
+
+                return _browsability;
             }
+        }
 #endif
 
 #if NETFRAMEWORK
-        public override IBrowsableObjectInfo Parent => _parent ?? (_parent=GetParent());
+        public override IBrowsableObjectInfo Parent => _parent ?? (_parent = GetParent());
 #else
         public override IBrowsableObjectInfo Parent => _parent ??= GetParent();
 #endif
@@ -223,7 +224,7 @@ namespace WinCopies.IO.ObjectModel
 
         public sealed override IFileSystemObjectInfoProperties ObjectPropertiesGeneric => IsDisposed ? throw GetExceptionForDispose(false) : _objectProperties;
 
-        public override IPropertySystemCollection ObjectPropertySystem => null;
+        public override IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystem => null;
         #endregion // Properties
 
         protected internal ArchiveItemInfo(in string path, in FileType fileType, in IShellObjectInfoBase archiveShellObject, in ArchiveFileInfo? archiveFileInfo, ClientVersion clientVersion/*, DeepClone<ArchiveFileInfo?> archiveFileInfoDelegate*/) : base(path, archiveShellObject, archiveFileInfo, clientVersion)
@@ -233,11 +234,11 @@ namespace WinCopies.IO.ObjectModel
         {
             if (archiveFileInfo.HasValue)
 
-                ObjectPropertiesGeneric = new ArchiveItemInfoProperties<IArchiveItemInfoBase>(this, fileType);
+                _objectProperties = new ArchiveItemInfoProperties<IArchiveItemInfoBase>(this, fileType);
 
             else
 
-                ObjectPropertiesGeneric = new FileSystemObjectInfoProperties(this, fileType);
+                _objectProperties = new FileSystemObjectInfoProperties(this, fileType);
         }
 #endif
 

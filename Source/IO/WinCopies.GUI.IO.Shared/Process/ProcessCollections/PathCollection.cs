@@ -22,6 +22,7 @@ using System.IO;
 
 using WinCopies.IO;
 using WinCopies.Collections.DotNetFix.Generic;
+using WinCopies.IO.Enumeration;
 
 #if WinCopies3
 using WinCopies;

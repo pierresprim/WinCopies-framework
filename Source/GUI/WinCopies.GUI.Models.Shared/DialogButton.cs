@@ -16,9 +16,6 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 namespace WinCopies.GUI.Windows
-#if !WinCopies3
-    .Dialogs
-#endif
 {
     public enum DialogButton : uint
     {
@@ -59,7 +56,7 @@ namespace WinCopies.GUI.Windows
 
         CancelRetryContinue = CancelTryContinue,
 
-        ContinueIgnoreCancel=0x000007,
+        ContinueIgnoreCancel = 0x000007,
 
         OKApplyCancel = 0x000008,
 
@@ -90,37 +87,12 @@ namespace WinCopies.GUI.Windows
 
         No = 7,
 
-        YesToAll=8,
+        YesToAll = 8,
 
-        NoToAll=9,
+        NoToAll = 9,
 
         Apply = 10,
 
         Continue = 11
-    }
-
-    public enum MessageBoxResult
-    {
-        None = 0,
-
-        OK = 1,
-
-        Cancel = 2,
-
-        Abort = 3,
-
-        Retry = 4,
-
-        Ignore = 5,
-
-        Yes = 6,
-
-        No = 7,
-
-        YesToAll=8,
-
-        NoToAll=9,
-
-        Continue=10
     }
 }

@@ -20,6 +20,7 @@ using Microsoft.WindowsAPICodePack.PortableDevices;
 using Microsoft.WindowsAPICodePack.Shell;
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows.Media.Imaging;
@@ -29,6 +30,7 @@ using WinCopies.IO.Enumeration;
 using WinCopies.IO.ObjectModel;
 using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Selectors;
+using WinCopies.PropertySystem;
 
 using static Microsoft.WindowsAPICodePack.Shell.KnownFolders;
 
@@ -191,7 +193,7 @@ namespace WinCopies.IO
             public override IShellObjectInfoBase ArchiveShellObject => ObjectPropertiesGeneric.FileType == FileType.Archive ? this : null;
 
 #if WinCopies3
-            public override IPropertySystemCollection ObjectPropertySystem => ShellObjectPropertySystemCollection._GetShellObjectPropertySystemCollection(this);
+            public override IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystem => ShellObjectPropertySystemCollection._GetShellObjectPropertySystemCollection(this);
 #endif
             #endregion
             #endregion
@@ -288,7 +290,7 @@ namespace WinCopies.IO
                 return equalsFileType()
                     ? ShellObjectInfo.From(_shellObject.Parent, ClientVersion)
                     : ObjectPropertiesGeneric.FileType == FileType.Drive
-                        ? new ShellObjectInfo(Computer.Path, FileType.KnownFolder, ShellObject.FromParsingName(Computer.ParsingName), ClientVersion)
+                        ? new ShellObjectInfo(Computer.Path, FileType.KnownFolder, ShellObjectFactory.Create(Computer.ParsingName), ClientVersion)
                         : null;
             }
             #endregion
@@ -339,7 +341,7 @@ namespace WinCopies.IO
                 }
             }
 
-            public ShellObjectInfo(in IKnownFolder knownFolder, in ClientVersion clientVersion) : this(knownFolder.Path, FileType.KnownFolder, ShellObject.FromParsingName(knownFolder.ParsingName), clientVersion)
+            public ShellObjectInfo(in IKnownFolder knownFolder, in ClientVersion clientVersion) : this(string.IsNullOrEmpty(knownFolder.Path) ? knownFolder.ParsingName : knownFolder.Path, FileType.KnownFolder, ShellObjectFactory.Create(knownFolder.ParsingName), clientVersion)
             {
                 // Left empty.
             }
@@ -348,34 +350,43 @@ namespace WinCopies.IO
             #region Methods
             public static ShellObjectInitInfo GetInitInfo(in ShellObject shellObject)
             {
-                if ((shellObject ?? throw GetArgumentNullException(nameof(shellObject))) is ShellFolder shellFolder)
+#if DEBUG
+                if (shellObject.ParsingName == Computer.ParsingName)
+
+                    Debug.WriteLine(shellObject.ParsingName);
+#endif
+
+                switch (shellObject ?? throw GetArgumentNullException(nameof(shellObject)))
                 {
-                    if (shellObject is ShellFileSystemFolder shellFileSystemFolder)
-                    {
-                        (string path, FileType fileType) = shellFileSystemFolder is FileSystemKnownFolder ? (shellObject.ParsingName, FileType.KnownFolder) : (shellFileSystemFolder.Path, FileType.Folder);
+                    case ShellFolder shellFolder:
 
-                        return new ShellObjectInitInfo(path, System.IO.Directory.GetParent(path) is null ? FileType.Drive : fileType);
-                    }
+                        switch (shellObject)
+                        {
+                            case ShellFileSystemFolder shellFileSystemFolder:
 
-                    switch (shellObject)
-                    {
-                        case NonFileSystemKnownFolder nonFileSystemKnownFolder:
+                                (string path, FileType fileType) = shellFileSystemFolder is FileSystemKnownFolder ? (shellObject.ParsingName, FileType.KnownFolder) : (shellFileSystemFolder.Path, FileType.Folder);
 
-                            return new ShellObjectInitInfo(nonFileSystemKnownFolder.Path, FileType.KnownFolder);
+                                return new ShellObjectInitInfo(path, System.IO.Directory.GetParent(path) is null ? FileType.Drive : fileType);
 
-                        case ShellNonFileSystemFolder _:
+                            case NonFileSystemKnownFolder nonFileSystemKnownFolder:
 
-                            return new ShellObjectInitInfo(shellObject.ParsingName, FileType.Folder);
-                    }
+                                return new ShellObjectInitInfo(nonFileSystemKnownFolder.Path, FileType.KnownFolder);
+
+                            case ShellNonFileSystemFolder _:
+
+                                return new ShellObjectInitInfo(shellObject.ParsingName, FileType.Folder);
+                        }
+
+                        break;
+
+                    case ShellLink shellLink:
+
+                        return new ShellObjectInitInfo(shellLink.Path, FileType.Link);
+
+                    case ShellFile shellFile:
+
+                        return new ShellObjectInitInfo(shellFile.Path, IsSupportedArchiveFormat(System.IO.Path.GetExtension(shellFile.Path)) ? FileType.Archive : shellFile.IsLink ? FileType.Link : System.IO.Path.GetExtension(shellFile.Path) == ".library-ms" ? FileType.Library : FileType.File);
                 }
-
-                if (shellObject is ShellLink shellLink)
-
-                    return new ShellObjectInitInfo(shellLink.Path, FileType.Link);
-
-                if (shellObject is ShellFile shellFile)
-
-                    return new ShellObjectInitInfo(shellFile.Path, IsSupportedArchiveFormat(System.IO.Path.GetExtension(shellFile.Path)) ? FileType.Archive : shellFile.IsLink ? FileType.Link : System.IO.Path.GetExtension(shellFile.Path) == ".library-ms" ? FileType.Library : FileType.File);
 
                 throw new ArgumentException($"The given {nameof(ShellObject)} is not supported.");
             }
@@ -386,6 +397,8 @@ namespace WinCopies.IO
 
                 return new ShellObjectInfo(initInfo.Path, initInfo.FileType, shellObject, clientVersion);
             }
+
+            public static ShellObjectInfo From(in string path, in ClientVersion clientVersion) => From(ShellObjectFactory.Create(path), clientVersion);
 
             public override IBrowsableObjectInfoSelectorDictionary<ShellObjectInfoItemProvider> GetSelectorDictionary() => DefaultItemSelectorDictionary;
 
@@ -411,7 +424,7 @@ namespace WinCopies.IO
                 switch (ObjectPropertiesGeneric.FileType)
                 {
                     case FileType.Archive:
-                        return GetArchiveItemInfoItems(func);
+                        return ArchiveItemInfo.GetArchiveItemInfoItems(this, func).Select(ShellObjectInfoItemProvider.ToShellObjectInfoItemProvider);
                     default:
                         return null;
                 }

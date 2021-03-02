@@ -25,6 +25,7 @@ using WinCopies.IO.Reflection;
 using WinCopies.IO.Selectors;
 using WinCopies.IO.Reflection.PropertySystem;
 using WinCopies.IO.PropertySystem;
+using WinCopies.PropertySystem;
 
 #if DEBUG
 using WinCopies.Diagnostics;
@@ -47,7 +48,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
         protected DotNetAttributeInfo(in CustomAttributeData customAttributeData, in IDotNetItemInfo parent) : base($"{parent.Path}{IO.Path.PathSeparator}{customAttributeData.AttributeType.Name}", customAttributeData.AttributeType.Name, parent)
 #if DEBUG
         {
-            Debug.Assert(If(ComparisonType.And, ComparisonMode.Logical, Comparison.NotEqual, null, parent, parent.ParentDotNetAssemblyInfo, customAttributeData));
+            Debug.Assert(If(ComparisonType.And, ComparisonMode.Logical, WinCopies.Diagnostics. Comparison.NotEqual, null, parent, parent.ParentDotNetAssemblyInfo, customAttributeData));
 #else
 =>
 #endif
@@ -64,7 +65,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
     {
         public override IDotNetItemInfoProperties ObjectPropertiesGeneric { get; }
 
-        public override IPropertySystemCollection ObjectPropertySystem => null;
+        public override IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystem => null;
 
         protected internal DotNetAttributeInfo(in CustomAttributeData customAttributeData, in IDotNetItemInfo parent) : base(customAttributeData, parent) => ObjectPropertiesGeneric = new DotNetItemInfoProperties<IDotNetItemInfo>(this, DotNetItemType.Attribute);
 

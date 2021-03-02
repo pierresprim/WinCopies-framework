@@ -9,7 +9,6 @@
     <Import_RootNamespace>WinCopies.GUI.Windows</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)ButtonAlignmentToHorizontalAlignmentConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Dialogs\ArchiveCompression.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Dialogs\ArchiveCompressionToolTipConverter.cs" />

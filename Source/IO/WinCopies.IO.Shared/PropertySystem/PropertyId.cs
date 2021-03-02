@@ -23,12 +23,11 @@ using System.Diagnostics.CodeAnalysis;
 
 using WinCopies.Collections.DotNetFix.Generic;
 using WinCopies.Collections.Generic;
-using static WinCopies.Temp;
+using WinCopies.PropertySystem;
 
 namespace WinCopies.IO.PropertySystem
 {
-
-    public struct PropertyId : IEquatable<PropertyId>
+    public struct PropertyId : IPropertyId<ShellPropertyGroup>
     {
         public string Name { get; }
 
@@ -44,27 +43,28 @@ namespace WinCopies.IO.PropertySystem
         public bool Equals(
 #if CS8
             [AllowNull]
-        #endif
+#endif
         PropertyId other) => other.PropertyGroup == PropertyGroup && other.Name == Name;
 
         public override bool Equals(object obj) => obj is PropertyId _obj && Equals(_obj);
 
         public override int GetHashCode() => PropertyGroup.GetHashCode() ^ Name.GetHashCode(
-            #if CS8
+#if CS8
              StringComparison.CurrentCulture
-            #endif
+#endif
             );
 
         public override string ToString() => $"{PropertyGroup}.{Name}";
 
+        public bool Equals(
+#if CS8
+            [AllowNull]
+        #endif
+        IPropertyId<ShellPropertyGroup> other) => other is PropertyId _other && Equals(_other);
+
         public static bool operator ==(PropertyId x, PropertyId y) => x.Equals(y);
 
         public static bool operator !=(PropertyId x, PropertyId y) => !(x == y);
-    }
-
-    public interface IPropertySystemCollection : IReadOnlyCollection<IProperty>, System.Collections.Generic.IReadOnlyList<IProperty>, IReadOnlyDictionary<PropertyId, IProperty>, ICountableEnumerable<IProperty>, IEnumerableInfo<KeyValuePair<PropertyId, IProperty>>, IEnumerableInfo<IProperty>
-    {
-        // Left empty.
     }
 }
 

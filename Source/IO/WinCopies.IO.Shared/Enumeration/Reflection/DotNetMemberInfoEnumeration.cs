@@ -106,16 +106,12 @@ namespace WinCopies.IO.Enumeration.Reflection
 
             EnumerableHelper<System.Collections.Generic.IEnumerable<DotNetMemberInfoItemProvider>>.IEnumerableQueue queue = EnumerableHelper<System.Collections.Generic.IEnumerable<DotNetMemberInfoItemProvider>>.GetEnumerableQueue();
 
-            void add<T>(in System.Collections.Generic.IEnumerable<T> enumerable, in Converter<T, DotNetMemberInfoItemProvider> selector)
+            void add<T>(in System.Collections.Generic.IEnumerable<T> _enumerable, in Converter<T, DotNetMemberInfoItemProvider> selector)
             {
-                if (enumerable != null)
+                if (_enumerable != null)
 
-                    queue.Enqueue(enumerable.SelectConverter(selector));
+                    queue.Enqueue(_enumerable.SelectConverter(selector));
             }
-
-            MemberInfo memberInfo = dotNetMemberInfo.InnerObject;
-
-            System.Collections.Generic.IEnumerator<DotNetItemType> typesToEnumerateEnumerator = typesToEnumerate.GetEnumerator();
 
             void addGenericItems(DotNetTypeInfoProviderGenericTypeStructValue itemType, in System.Collections.Generic.IEnumerable<Type> types) => add(types, item => new DotNetMemberInfoItemProvider(new DotNetTypeInfoProviderGenericTypeStruct(itemType, item), dotNetMemberInfo));
 
@@ -130,11 +126,11 @@ namespace WinCopies.IO.Enumeration.Reflection
                     queue.Enqueue(new DotNetMemberInfoItemProvider[] { select(methodInfo.ReturnParameter, true) });
             }
 
-            void addPropertyMethod(in EnumerableHelper<MethodInfo>.IEnumerableQueue queue, in MethodInfo methodInfo)
+            void addPropertyMethod(in EnumerableHelper<MethodInfo>.IEnumerableQueue _queue, in MethodInfo methodInfo)
             {
                 if (methodInfo != null)
 
-                    queue.Enqueue(methodInfo);
+                    _queue.Enqueue(methodInfo);
             }
 
             void addGenericParameters()
@@ -240,7 +236,7 @@ namespace WinCopies.IO.Enumeration.Reflection
 
             typesToEnumerateEnumerator.Dispose();
 
-            System.Collections.Generic.IEnumerable<DotNetMemberInfoItemProvider> enumerable = queue.Merge();
+            System.Collections.Generic.IEnumerable<DotNetMemberInfoItemProvider> enumerable = queue.Merge<DotNetMemberInfoItemProvider>();
 
             return func == null ? enumerable : enumerable.WherePredicate(func);
         }

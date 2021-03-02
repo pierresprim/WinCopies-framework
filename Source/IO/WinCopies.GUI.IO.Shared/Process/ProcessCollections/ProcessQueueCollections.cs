@@ -15,16 +15,14 @@
 * You should have received a copy of the GNU General Public License
 * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-using System.Collections;
-using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.ComponentModel;
 
 using WinCopies.Collections.DotNetFix
-    #if WinCopies3
+#if WinCopies3
     .Generic
 #endif
     ;
+using WinCopies.Collections.Generic;
 using WinCopies.IO;
 
 namespace WinCopies.GUI.IO.Process
@@ -41,7 +39,7 @@ namespace WinCopies.GUI.IO.Process
 
         public void DecrementSize(ulong sizeInBytes) => Size -= sizeInBytes;
 
-        protected override void OnCollectionChanged(SimpleLinkedCollectionChangedEventArgs<T> e) 
+        protected override void OnCollectionChanged(SimpleLinkedCollectionChangedEventArgs<T> e)
         {
             base.OnCollectionChanged(e);
 
@@ -62,15 +60,25 @@ namespace WinCopies.GUI.IO.Process
                     break;
             }
         }
+
+        IUIntCountableEnumerator<T> IUIntCountableEnumerable<T>.GetEnumerator() => new UIntCountableEnumeratorInfo<T>(new EnumeratorInfo<T>(this), () => Count);
     }
 
-    public sealed class ProcessQueueCollection : ProcessQueueCollection<IPathInfo>, IProcessCollection { }
+    public sealed class ProcessQueueCollection : ProcessQueueCollection<IPathInfo>, IProcessCollection
+    {
+        IUIntCountableEnumerator<IPathInfo> IUIntCountableEnumerable<IPathInfo>.GetEnumerator() => new UIntCountableEnumeratorInfo<IPathInfo>(new EnumeratorInfo<IPathInfo>(this), () => Count);
+    }
 
     public sealed class ReadOnlyProcessQueueCollection : ReadOnlyObservableQueueCollection<IPathInfo>, IReadOnlyProcessCollection
     {
         public Size Size => ((ProcessQueueCollection)InnerQueueCollection).Size;
 
-        public ReadOnlyProcessQueueCollection(ProcessQueueCollection queueCollection) : base(queueCollection) { }
+        public ReadOnlyProcessQueueCollection(ProcessQueueCollection queueCollection) : base(queueCollection)
+        {
+            // Left empty.
+        }
+
+        IUIntCountableEnumerator<IPathInfo> IUIntCountableEnumerable<IPathInfo>.GetEnumerator() => new UIntCountableEnumeratorInfo<IPathInfo>(new EnumeratorInfo<IPathInfo>(this), () => Count);
     }
 
     //public sealed class ReadOnlyProcessQueueCollection : IReadOnlyProcessCollection
@@ -102,10 +110,18 @@ namespace WinCopies.GUI.IO.Process
     //    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     //}
 
-    public sealed class ProcessErrorPathQueueCollection : ProcessQueueCollection<IErrorPathInfo>, IProcessErrorPathCollection { }
+    public sealed class ProcessErrorPathQueueCollection : ProcessQueueCollection<IErrorPathInfo>, IProcessErrorPathCollection
+    {
+        IUIntCountableEnumerator<IErrorPathInfo> IUIntCountableEnumerable<IErrorPathInfo>.GetEnumerator() => new UIntCountableEnumeratorInfo<IErrorPathInfo>(new EnumeratorInfo<IErrorPathInfo>(this), () => Count);
+    }
 
     public sealed class ReadOnlyProcessErrorPathQueueCollection : ReadOnlyObservableQueueCollection<IErrorPathInfo>, IReadOnlyProcessErrorPathCollection
     {
-        public ReadOnlyProcessErrorPathQueueCollection(ProcessErrorPathQueueCollection queue) : base(queue) { }
+        public ReadOnlyProcessErrorPathQueueCollection(ProcessErrorPathQueueCollection queue) : base(queue)
+        {
+            // Left empty.
+        }
+
+        IUIntCountableEnumerator<IErrorPathInfo> IUIntCountableEnumerable<IErrorPathInfo>.GetEnumerator() => new UIntCountableEnumeratorInfo<IErrorPathInfo>(new EnumeratorInfo<IErrorPathInfo>(this), () => Count);
     }
 }

@@ -116,7 +116,7 @@ namespace WinCopies.IO.Enumeration.Reflection
                 }
             }
 
-            System.Collections.Generic.IEnumerable<DotNetTypeInfoItemProvider> enumerable = queue.Merge();
+            System.Collections.Generic.IEnumerable<DotNetTypeInfoItemProvider> enumerable = queue.Merge<DotNetTypeInfoItemProvider>();
 
             return func == null ? enumerable : enumerable.WherePredicate(func);
         }

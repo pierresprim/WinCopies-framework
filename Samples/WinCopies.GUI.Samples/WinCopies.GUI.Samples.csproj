@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>net5.0-windows</TargetFramework>
     <OutputType>WinExe</OutputType>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="WinCopies.Util.Desktop" Version="3.1.0.1-preview" />
+    <PackageReference Include="WinCopies.Util.Desktop" Version="3.4-preview" />
   </ItemGroup>
 
   <ItemGroup>
@@ -27,6 +27,13 @@
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Source\GUI\WinCopies.GUI.Templates\WinCopies.GUI.Templates.csproj" />
+    <ProjectReference Include="..\..\Source\GUI\WinCopies.GUI\WinCopies.GUI.csproj" />
+    <ProjectReference Include="..\..\Source\IO\WinCopies.GUI.IO\WinCopies.GUI.IO.csproj" />
+    <ProjectReference Include="..\..\Source\IO\WinCopies.IO\WinCopies.IO.csproj" />
   </ItemGroup>
 
 </Project>

@@ -31,6 +31,8 @@ using WinCopies.IO.AbstractionInterop;
 using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Selectors;
 using WinCopies.Linq;
+using WinCopies.PropertySystem;
+using WinCopies.Util;
 
 using static Microsoft.WindowsAPICodePack.NativeAPI.Consts.DllNames;
 
@@ -156,13 +158,13 @@ namespace WinCopies.IO.ObjectModel
                         case RegistryItemType.Root:
                         case RegistryItemType.Key:
 
-                            _isBrowsable = BrowsabilityOptions.BrowsableByDefault;
+                            _browsability = BrowsabilityOptions.BrowsableByDefault;
 
                             break;
 
                         default:
 
-                            _isBrowsable = BrowsabilityOptions.NotBrowsable;
+                            _browsability = BrowsabilityOptions.NotBrowsable;
 
                             break;
                     }
@@ -179,7 +181,7 @@ namespace WinCopies.IO.ObjectModel
 #if CS8
                 ??=
 #else
-                ?? (_parent = 
+                ?? (_parent =
 #endif
             GetParent()
 #if !CS8
@@ -206,28 +208,19 @@ namespace WinCopies.IO.ObjectModel
         #endregion // Properties
 
         #region Constructors
+        public RegistryItemInfo() : this(GetDefaultClientVersion()) { /* Left empty. */ }
+
         public RegistryItemInfo(in ClientVersion clientVersion) : base(Properties.Resources.RegistryRoot, clientVersion) => Name = Path;
 
         public RegistryItemInfo(in RegistryKey registryKey, in ClientVersion clientVersion) : base(GetRegistryKeyName(registryKey), clientVersion)
         {
-            Name = registryKey.Name.Split(WinCopies.IO.Path.PathSeparator)
-
-#if NETFRAMEWORK
-                    [name.Length-1];
-#else
-                    [^1];
-#endif
+            Name = registryKey.Name.Split(WinCopies.IO.Path.PathSeparator).GetLast();
 
             _registryKey = registryKey;
         }
 
-        public RegistryItemInfo(in string path, in ClientVersion clientVersion) : base(IsNullEmptyOrWhiteSpace(path) ? throw GetNullEmptyOrWhiteSpaceStringException(nameof(path)) : path, clientVersion) => Name = path.Split(WinCopies.IO.Path.PathSeparator)
+        public RegistryItemInfo(in string path, in ClientVersion clientVersion) : base(IsNullEmptyOrWhiteSpace(path) ? throw GetNullEmptyOrWhiteSpaceStringException(nameof(path)) : path, clientVersion) => Name = path.Split(WinCopies.IO.Path.PathSeparator).GetLast();
 
-#if NETFRAMEWORK
-                    [name.Length-1];
-#else
-                    [^1];
-#endif
         public RegistryItemInfo(in RegistryKey registryKey, in string valueName, in ClientVersion clientVersion) : base($"{GetRegistryKeyName(registryKey)}{WinCopies.IO.Path.PathSeparator}{(IsNullEmptyOrWhiteSpace(valueName) ? throw GetNullEmptyOrWhiteSpaceStringException(nameof(valueName)) : valueName)}", clientVersion)
         {
             Name = valueName;
@@ -376,9 +369,9 @@ namespace WinCopies.IO.ObjectModel
             return TryGetBitmapSource(iconIndex, Shell32, size);
         }
 
-        public override Collections.IEqualityComparer<IBrowsableObjectInfoBase> GetDefaultEqualityComparer() => new RegistryItemInfoEqualityComparer<IBrowsableObjectInfoBase>();
+        public override WinCopies.Collections.Generic.IEqualityComparer<IBrowsableObjectInfoBase> GetDefaultEqualityComparer() => new RegistryItemInfoEqualityComparer<IBrowsableObjectInfoBase>();
 
-        public override IComparer<IBrowsableObjectInfoBase> GetDefaultComparer() => new RegistryItemInfoComparer<IBrowsableObjectInfoBase>();
+        public override WinCopies.Collections.Generic.IComparer<IBrowsableObjectInfoBase> GetDefaultComparer() => new RegistryItemInfoComparer<IBrowsableObjectInfoBase>();
         #endregion // Methods
     }
 
@@ -388,20 +381,32 @@ namespace WinCopies.IO.ObjectModel
         private IRegistryItemInfoProperties _objectProperties;
 
         #region Properties
-        public static System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> DefaultRootItems => _defaultRootItems ??= GetRootItems();
+        public static System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> DefaultRootItems => _defaultRootItems
+#if CS8
+            ??=
+#else
+            ?? (_defaultRootItems =
+#endif
+            GetRootItems()
+#if !CS8
+            )
+#endif
+            ;
 
-        public override Predicate<RegistryItemInfoItemProvider> RootItemsPredicate => item => item.RegistryKey != null && item.ValueName == null;
+        //public override Predicate<RegistryItemInfoItemProvider> RootItemsPredicate => item => item.RegistryKey != null && item.ValueName == null;
 
-        public override Predicate<IBrowsableObjectInfo> RootItemsBrowsableObjectInfoPredicate => null;
+        //public override Predicate<IBrowsableObjectInfo> RootItemsBrowsableObjectInfoPredicate => null;
 
         public static IBrowsableObjectInfoSelectorDictionary<RegistryItemInfoItemProvider> DefaultItemSelectorDictionary { get; } = new RegistryItemInfoSelectorDictionary();
 
         public sealed override IRegistryItemInfoProperties ObjectPropertiesGeneric => IsDisposed ? throw GetExceptionForDispose(false) : _objectProperties;
 
-        public override IPropertySystemCollection ObjectPropertySystem => null;
+        public override IPropertySystemCollection<PropertyId,ShellPropertyGroup> ObjectPropertySystem => null;
         #endregion // Properties
 
         #region Constructors
+        public RegistryItemInfo() : base() { /* Left empty. */ }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="RegistryItemInfo"/> class as the Registry root.
         /// </summary>
@@ -679,6 +684,8 @@ namespace WinCopies.IO.ObjectModel
 
         //    // }
         //}
+
+        public override IEnumerable<IBrowsableObjectInfo> GetSubRootItems() => GetItems(GetItemProviders(item => item.RegistryKey != null && item.ValueName == null));
         #endregion // GetItems
         #endregion // Methods
     }

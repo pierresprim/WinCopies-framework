@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Security.AccessControl;
+using WinCopies.IO.Resources;
 
 #if WinCopies3
 using WinCopies.Collections;
@@ -532,7 +533,7 @@ namespace WinCopies.IO
                 ? name.Length > 0
                     ? registryKey.OpenSubKey(name, registryKeyPermissionCheck, registryRights)
                     : registryKey
-                : throw new RegistryException(string.Format(Properties.Resources.RegistryKeyNotExists, originalName), originalName);
+                : throw new RegistryException(string.Format(ExceptionMessages.RegistryKeyNotExists, originalName), originalName);
         }
 
         //        //public static Icon[] GetIconVariationsFromFileType(string fileType) => GetIconVariationsFromFileTypeRegistryKey(GetFileTypeRegistryKey(fileType));

@@ -15,11 +15,18 @@
 * You should have received a copy of the GNU General Public License
 * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Windows.Controls;
 
 namespace WinCopies.GUI.IO.ObjectModel
 {
+    public interface IBrowsableObjectInfoViewModelCommon : INotifyPropertyChanged
+    {
+        bool IsSelected { get; set; }
+    }
+
     public interface IExplorerControlBrowsableObjectInfoViewModel : IBrowsableObjectInfoViewModelCommon
     {
         IEnumerable<IBrowsableObjectInfoViewModel> TreeViewItems { get; set; }
@@ -31,6 +38,8 @@ namespace WinCopies.GUI.IO.ObjectModel
         IBrowsableObjectInfoFactory Factory { get; set; }
 
         SelectionMode SelectionMode { get; set; }
+
+        IList SelectedItems { get; set; }
 
         bool IsCheckBoxVisible { get; set; }
     }

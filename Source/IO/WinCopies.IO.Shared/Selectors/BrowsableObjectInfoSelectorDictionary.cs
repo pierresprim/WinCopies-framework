@@ -44,7 +44,7 @@ namespace WinCopies.IO.Selectors
 
     public abstract class BrowsableObjectInfoSelectorDictionary<T> : IBrowsableObjectInfoSelectorDictionary<T>
     {
-        private EnumerableStack<KeyValuePair<Predicate<T>, Converter<T, IBrowsableObjectInfo>>> _stack;
+        private EnumerableStack<KeyValuePair<Predicate<T>, Converter<T, IBrowsableObjectInfo>>> _stack = new EnumerableStack<KeyValuePair<Predicate<T>, Converter<T, IBrowsableObjectInfo>>>();
 
         protected abstract Converter<T, IBrowsableObjectInfo> DefaultSelectorOverride { get; }
 
@@ -74,7 +74,17 @@ namespace WinCopies.IO.Selectors
         {
             ThrowIfDisposed(this);
 
-            return _Select(item ?? throw GetArgumentNullException(nameof(item)));
+            return _Select(item
+#if CS8
+                ??
+#else
+                == null ?
+#endif
+                throw GetArgumentNullException(nameof(item))
+#if !CS8
+                : item
+#endif
+                );
         }
 
         public System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> Select(System.Collections.Generic.IEnumerable<T> items) => IsDisposed ? throw GetExceptionForDispose(false) : items.SelectConverter(_stack.Count == 0 ? DefaultSelectorOverride : _Select);

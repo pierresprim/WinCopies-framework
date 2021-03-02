@@ -17,7 +17,7 @@
 
 #if WinCopies3
 
-using static WinCopies.Temp;
+using WinCopies.PropertySystem;
 
 namespace WinCopies.IO.PropertySystem
 {
@@ -172,7 +172,7 @@ namespace WinCopies.IO.PropertySystem
         Task
     }
 
-    public interface IShellProperty : Temp.IProperty<ShellPropertyGroup>
+    public interface IShellProperty : IProperty<ShellPropertyGroup>
     {
         // Left empty.
     }

@@ -28,10 +28,10 @@ namespace WinCopies.IO.Selectors.Reflection
 {
     public class DotNetMemberInfoSelectorDictionary : BrowsableObjectInfoSelectorDictionary<DotNetMemberInfoItemProvider>
     {
-        public static IBrowsableObjectInfo Convert(DotNetMemberInfoItemProvider item) => (item ?? throw GetArgumentNullException(nameof(item))).ParameterInfoItemProvider != null ? new DotNetParameterInfo(item.ParameterInfoItemProvider.ParameterInfo, IO.Reflection.DotNetItemType.Parameter, item.ParameterInfoItemProvider.IsReturnParameter, item.Parent)
+        public static IBrowsableObjectInfo Convert(DotNetMemberInfoItemProvider item) => (item ?? throw GetArgumentNullException(nameof(item))).ParameterInfoItemProvider != null ? new DotNetParameterInfo(item.ParameterInfoItemProvider.ParameterInfo,  item.ParameterInfoItemProvider.IsReturnParameter, item.Parent)
             : item.ReturnType != null ? new DotNetTypeInfo(item.ReturnType.GetTypeInfo(), DotNetEnumeration.GetTypeItemType(item.ReturnType), false, item.Parent)
-            : item.MethodInfo != null ? new DotNetMemberInfo(item.MethodInfo, IO.Reflection.DotNetItemType.Method, true, item.Parent)
-            : item.GenericTypeInfo != null ? new DotNetGenericItemInfo(item.GenericTypeInfo.Type, item.GenericTypeInfo.GenericTypeStructValue, item.Parent)
+            : item.MethodInfo != null ? new DotNetMemberInfo(item.MethodInfo,  item.Parent)
+            : item.GenericTypeInfo != null ? new DotNetTypeInfo(item.GenericTypeInfo.TypeInfo, item.GenericTypeInfo.GenericTypeStructValue == DotNetTypeInfoProviderGenericTypeStructValue.GenericTypeParameter? IO.Reflection.DotNetItemType.GenericParameter:  IO.Reflection.DotNetItemType.GenericArgument, false, item.Parent)
             : item.CustomAttributeData == null ? throw BrowsableObjectInfoSelectorDictionary.GetInvalidItemProviderException()
             : (IBrowsableObjectInfo)new DotNetAttributeInfo(item.CustomAttributeData, item.Parent);
 

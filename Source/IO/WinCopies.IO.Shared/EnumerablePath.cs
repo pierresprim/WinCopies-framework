@@ -22,6 +22,7 @@ using System.Diagnostics;
 using System.IO;
 
 using WinCopies.Collections.Generic;
+using WinCopies.IO.Enumeration;
 
 #if !WinCopies3
 using WinCopies.Util;

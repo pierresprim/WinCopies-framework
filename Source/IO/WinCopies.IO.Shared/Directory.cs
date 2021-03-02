@@ -22,6 +22,7 @@ using System.Linq;
 using WinCopies.Collections;
 #endif
 using WinCopies.Collections.Generic;
+using WinCopies.IO.Enumeration;
 
 namespace WinCopies.IO
 {

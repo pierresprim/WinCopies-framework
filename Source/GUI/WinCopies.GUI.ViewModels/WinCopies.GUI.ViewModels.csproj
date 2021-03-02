@@ -17,6 +17,7 @@
     <AssemblyVersion>3.0.0</AssemblyVersion>
     <FileVersion>3.0.0</FileVersion>
     <AssemblyOriginatorKeyFile>WinCopies.GUI.ViewModels.snk</AssemblyOriginatorKeyFile>
+    <PackageIcon>WinCopies.png</PackageIcon>
   </PropertyGroup>
 
   <Import Project="..\WinCopies.GUI.ViewModels.Shared\WinCopies.GUI.ViewModels.Shared.projitems" Label="Shared" />
@@ -27,6 +28,10 @@
 
   <ItemGroup>
     <None Include="..\..\..\LICENSE.md">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+    <None Include="..\..\WinCopies.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>

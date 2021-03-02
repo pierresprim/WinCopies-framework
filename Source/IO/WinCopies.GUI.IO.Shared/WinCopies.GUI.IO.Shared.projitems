@@ -16,6 +16,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AssemblyInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\ExplorerControlPropertyGrid.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\Process\CopyProcessControl.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\BrowsableObjectInfoViewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\DuplicateFindingOptions.cs" />
@@ -31,7 +32,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\PathInfoPathToPathProcess.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\ArchiveProcess.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessSimulationParameters\CopyProcessSimulationParameters.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Directory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\ExplorerControl.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\ExplorerControlListView.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\ExplorerControlListViewItem.cs" />

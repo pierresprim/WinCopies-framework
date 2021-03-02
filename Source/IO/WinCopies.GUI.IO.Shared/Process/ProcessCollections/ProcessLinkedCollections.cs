@@ -21,6 +21,7 @@ using System.Collections.Specialized;
 using WinCopies.Collections.DotNetFix;
 #if WinCopies3
 using WinCopies.Collections.DotNetFix.Generic;
+using WinCopies.Collections.Generic;
 #endif
 using WinCopies.IO;
 
@@ -201,6 +202,8 @@ namespace WinCopies.GUI.IO.Process
         public Size Size => ((ProcessLinkedCollection)InnerLinkedCollection).Size;
 
         public ReadOnlyProcessLinkedCollection(ProcessLinkedCollection linkedCollection) : base(linkedCollection) { }
+
+        IUIntCountableEnumerator<IPathInfo> IUIntCountableEnumerable<IPathInfo>.GetEnumerator() => new UIntCountableEnumeratorInfo<IPathInfo>(new EnumeratorInfo<IPathInfo>(this), () => Count);
     }
 
     public sealed class ProcessErrorPathLinkedCollection : ProcessLinkedCollection<IErrorPathInfo>, IProcessErrorPathCollection
@@ -215,5 +218,7 @@ namespace WinCopies.GUI.IO.Process
         /// </summary>
         /// <param name="linkedCollection">The inner <see cref="ObservableLinkedCollection{IErrorPathInfo}"/> of the new collection.</param>
         public ReadOnlyProcessErrorPathLinkedCollection(ProcessErrorPathLinkedCollection linkedCollection) : base(linkedCollection) { }
+
+        IUIntCountableEnumerator<IErrorPathInfo> IUIntCountableEnumerable<IErrorPathInfo>.GetEnumerator() => new UIntCountableEnumeratorInfo<IErrorPathInfo>(new EnumeratorInfo<IErrorPathInfo>(this), () => Count);
     }
 }

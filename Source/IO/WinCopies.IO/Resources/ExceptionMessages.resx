@@ -129,4 +129,7 @@
   <data name="PropertyCannotBeNullOnObject" xml:space="preserve">
     <value>{0} cannot be null on {1}.</value>
   </data>
+  <data name="RegistryKeyNotExists" xml:space="preserve">
+    <value>The specified registry key does not exist.</value>
+  </data>
 </root>

@@ -19,11 +19,11 @@ using SevenZip;
 
 using System;
 using System.Security;
-
+using WinCopies.Collections;
 using WinCopies.Collections.Generic;
 using WinCopies.IO.AbstractionInterop;
 using WinCopies.IO.ObjectModel;
-
+using WinCopies.Util;
 using static WinCopies.ThrowHelper;
 
 namespace WinCopies.IO.Enumeration
@@ -163,7 +163,7 @@ new WinCopies.Collections.Generic.Queue
 
             #endregion
 
-            if (!_archiveItemInfoProvider.IsBrowsable)
+            if (!_archiveItemInfoProvider.IsBrowsable())
 
                 return false;
 

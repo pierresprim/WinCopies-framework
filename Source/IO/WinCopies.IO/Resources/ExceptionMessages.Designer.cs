@@ -95,5 +95,14 @@ namespace WinCopies.IO.Resources {
                 return ResourceManager.GetString("PropertyCannotBeNullOnObject", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The specified registry key does not exist..
+        /// </summary>
+        internal static string RegistryKeyNotExists {
+            get {
+                return ResourceManager.GetString("RegistryKeyNotExists", resourceCulture);
+            }
+        }
     }
 }

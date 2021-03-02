@@ -25,6 +25,7 @@ using WinCopies.IO.AbstractionInterop.Reflection;
 using WinCopies.IO.Enumeration.Reflection;
 using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Selectors.Reflection;
+using WinCopies.PropertySystem;
 
 using static WinCopies.ThrowHelper;
 
@@ -55,7 +56,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
 
         public override IDotNetItemInfoProperties ObjectPropertiesGeneric { get; }
 
-        public override IPropertySystemCollection ObjectPropertySystem => null;
+        public override IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystem => null;
         #endregion
 
         protected internal DotNetNamespaceInfo(in string name, in IBrowsableObjectInfo parent) : base(name, parent)

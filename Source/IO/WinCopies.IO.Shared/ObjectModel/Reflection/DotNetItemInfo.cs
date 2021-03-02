@@ -25,6 +25,7 @@ using WinCopies.IO.Selectors;
 using static WinCopies.UtilHelpers;
 using static WinCopies.ThrowHelper;
 using static WinCopies.IO.Resources.ExceptionMessages;
+using System.Collections.Generic;
 
 namespace WinCopies.IO.ObjectModel.Reflection
 {
@@ -33,9 +34,9 @@ namespace WinCopies.IO.ObjectModel.Reflection
         #region Properties
         public override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> RootItems => FileSystemObjectInfo.DefaultRootItems;
 
-        public override Predicate<TPredicateTypeParameter> RootItemsPredicate => item => false;
+        //public override Predicate<TPredicateTypeParameter> RootItemsPredicate => item => false;
 
-        public override Predicate<IBrowsableObjectInfo> RootItemsBrowsableObjectInfoPredicate => null;
+        //public override Predicate<IBrowsableObjectInfo> RootItemsBrowsableObjectInfoPredicate => null;
 
         /// <summary>
         /// Gets the name of this <see cref="IDotNetItemInfo"/>.
@@ -135,6 +136,8 @@ namespace WinCopies.IO.ObjectModel.Reflection
 
             ParentDotNetAssemblyInfo = parent is IDotNetItemInfo dotNetItemInfo ? dotNetItemInfo.ParentDotNetAssemblyInfo ?? throw new ArgumentException(string.Format(PropertyCannotBeNullOnObject, nameof(IDotNetItemInfo.ParentDotNetAssemblyInfo), nameof(dotNetItemInfo))) : parent is IDotNetAssemblyInfo dotNetAssemblyInfo ? dotNetAssemblyInfo : throw new ArgumentException(ParentMustBeAnIDotNetAssemblyInfoOrAnIDotNetItemInfoBase, nameof(parent));
         }
+
+        public override IEnumerable<IBrowsableObjectInfo> GetSubRootItems() => null;
     }
 
     public abstract class BrowsableDotNetItemInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : DotNetItemInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IDotNetItemInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>

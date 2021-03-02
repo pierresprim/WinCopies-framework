@@ -1,19 +1,19 @@
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="clr-namespace:WinCopies.GUI.IO"
     xmlns:localControls="clr-namespace:WinCopies.GUI.IO.Controls"
     xmlns:localObjectModel="clr-namespace:WinCopies.GUI.IO.ObjectModel"
     xmlns:localProcess="clr-namespace:WinCopies.GUI.IO.Process"
     xmlns:localProcessControls="clr-namespace:WinCopies.GUI.IO.Controls.Process"
-    xmlns:controls="clr-namespace:WinCopies.GUI.Controls;assembly=WinCopies.GUI.Controls"
-    xmlns:converters="clr-namespace:WinCopies.Util.Data;assembly=WinCopies.Util.Desktop"
+    xmlns:controls="clr-namespace:WinCopies.GUI.Controls;assembly=WinCopies.GUI"
     xmlns:icons="clr-namespace:WinCopies.GUI.Icons.Properties;assembly=WinCopies.GUI.Icons"
     xmlns:data="clr-namespace:WinCopies.Util.Data;assembly=WinCopies.Util.Desktop"
-    xmlns:sys="clr-namespace:System;assembly=mscorlib"
-    >
+    xmlns:markup="clr-namespace:WinCopies.Markup;assembly=WinCopies.Util.Desktop"
+    xmlns:propertySystem="clr-namespace:WinCopies.PropertySystem;assembly=WinCopies.Util.Desktop"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib">
     <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="pack://application:,,,/wincopies.gui.controls;component/Themes/Generic.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/wincopies.gui;component/Themes/Generic.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/wincopies.gui.templates;component/Themes/Generic.xaml" />
         <ResourceDictionary>
             <!--Colors-->
 
@@ -30,16 +30,19 @@
 
             <!--Strings-->
 
-            <sys:String x:Key="WinCopies.Static.GUI.IO.Name">Name:</sys:String>
+            <!--<sys:String x:Key="WinCopies.Static.GUI.IO.Name">Name:</sys:String>
             <sys:String x:Key="WinCopies.Static.GUI.IO.Status">Status:</sys:String>
             <sys:String x:Key="WinCopies.Static.GUI.IO.TotalItemCount">Total item count:</sys:String>
             <sys:String x:Key="WinCopies.Static.GUI.IO.Remaining">Remaining:</sys:String>
             <sys:String x:Key="WinCopies.Static.GUI.IO.CopyingFrom">Copying from</sys:String>
-            <sys:String x:Key="WinCopies.Static.GUI.IO.To">To</sys:String>
+            <sys:String x:Key="WinCopies.Static.GUI.IO.To">To</sys:String>-->
 
             <!--Data converters-->
 
             <data:MultiStringConverter x:Key="MultiStringConverter" />
+            <data:IntComparisonConverter x:Key="IntComparisonConverter" />
+            <propertySystem:PropertyArrayToListConverter x:Key="PropertyArrayToListConverter" />
+            <propertySystem:ObjectToPropertyCollectionConverter x:Key="ObjectToPropertyCollectionConverter" />
         </ResourceDictionary>
     </ResourceDictionary.MergedDictionaries>
 
@@ -101,12 +104,13 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="100" />
                 <ColumnDefinition />
+                <ColumnDefinition Width="100" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto" />
                 <RowDefinition />
             </Grid.RowDefinitions>
-            <Grid Grid.ColumnSpan="2">
+            <Grid Grid.ColumnSpan="3">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition />
                     <ColumnDefinition Width="auto" />
@@ -123,11 +127,7 @@
                         </Style>
                     </TextBox.Style>
                 </TextBox>
-                <Button Grid.Column="1" Command="{TemplateBinding GoButtonCommand}" CommandParameter="{TemplateBinding GoButtonCommandParameter}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}">
-                    <Button.Content>
-                        <Image Source="{Binding Source={x:Static icons:Resources.accept}, Converter={StaticResource IconToImageSourceConverter}}" />
-                    </Button.Content>
-                </Button>
+                <Button Grid.Column="1" Command="{TemplateBinding GoButtonCommand}" CommandParameter="{TemplateBinding GoButtonCommandParameter}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Source={x:Static icons:Resources.accept}}" />
             </Grid>
             <localControls:ExplorerControlTreeView Grid.Row="1" Style="{TemplateBinding TreeViewStyle}">
                 <!--<TreeView.ItemTemplate>
@@ -143,7 +143,7 @@
                     </DataTemplate>
                 </TreeView.ItemTemplate>-->
             </localControls:ExplorerControlTreeView>
-            <localControls:ExplorerControlListView Grid.Column="1" Grid.Row="1" Style="{TemplateBinding ListViewStyle}">
+            <localControls:ExplorerControlListView Grid.Column="1" Grid.Row="1" SelectedIndex="{Binding SelectedIndex, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" SelectedItem="{Binding SelectedItem, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" Style="{TemplateBinding ListViewStyle}">
                 <!--<Style TargetType="{x:Type ListView}" BasedOn="{StaticResource {x:Type ListView}}">-->
                 <!--<Setter Property="ItemTemplate" Value="{StaticResource ExplorerControlSizeThreeListViewItemTemplate}" />-->
                 <!--<Setter Property="ItemsPanel">
@@ -166,15 +166,28 @@
                 <!--</Style>-->
             </localControls:ExplorerControlListView>
             <GridSplitter Grid.Column="1" Grid.Row="1" Width="5" HorizontalAlignment="Left" />
+            <localControls:ExplorerControlPropertyGrid Grid.Column="2" Grid.Row="1" Item="{TemplateBinding PropertyGridItem}" Description="{TemplateBinding PropertyGridDescription}" />
+            <GridSplitter Grid.Column="2" Grid.Row="1" Width="5" HorizontalAlignment="Left" />
         </Grid>
     </ControlTemplate>
 
     <Style TargetType="{x:Type localControls:ExplorerControl}">
         <Setter Property="Template" Value="{StaticResource ExplorerControlTemplate}" />
-        <!--<Setter.Value>-->
-        <!--</DataTemplate>-->
-        <!--</Setter.Value>-->
-        <!--</Setter>-->
+    </Style>
+
+    <ControlTemplate x:Key="ExplorerControlPropertyGridTemplate" TargetType="{x:Type localControls:ExplorerControlPropertyGrid}">
+        <controls:PropertyGrid Header1="{Binding Item.Name, RelativeSource={RelativeSource TemplatedParent}}" Header2="{TemplateBinding Description}">
+            <controls:PropertyGrid.Properties>
+                <MultiBinding Converter="{StaticResource PropertyArrayToListConverter}">
+                    <Binding Path="Item.ObjectProperties" RelativeSource="{RelativeSource TemplatedParent}" Converter="{StaticResource ObjectToPropertyCollectionConverter}" />
+                    <Binding Path="Item.ObjectPropertySystem" RelativeSource="{RelativeSource TemplatedParent}" />
+                </MultiBinding>
+            </controls:PropertyGrid.Properties>
+        </controls:PropertyGrid>
+    </ControlTemplate>
+
+    <Style TargetType="{x:Type localControls:ExplorerControlPropertyGrid}">
+        <Setter Property="Template" Value="{StaticResource ExplorerControlPropertyGridTemplate}" />
     </Style>
 
     <DataTemplate x:Key="TreeViewItemHeaderDataTemplate" DataType="{x:Type localObjectModel:IBrowsableObjectInfoViewModel}" x:Shared="false">
@@ -286,7 +299,37 @@
     </Style>
 
     <DataTemplate DataType="{x:Type localObjectModel:IExplorerControlBrowsableObjectInfoViewModel}" x:Shared="false">
-        <localControls:ExplorerControl Path="{Binding Path.Path}" Text="{Binding Text, Mode=TwoWay}" TreeViewStyle="{StaticResource ExplorerControlTreeViewStyle}" ListViewStyle="{StaticResource ExplorerControlListViewStyle}" GoButtonCommand="{x:Static localObjectModel:ExplorerControlBrowsableObjectInfoViewModel.GoCommand}" GoButtonCommandParameter="{Binding}" IsCheckBoxVisible="{Binding IsCheckBoxVisible}" />
+        <localControls:ExplorerControl x:Name="ExplorerControl" Path="{Binding Path.Path}" Text="{Binding Text, Mode=TwoWay}"
+                                       TreeViewStyle="{StaticResource ExplorerControlTreeViewStyle}" ListViewStyle="{StaticResource ExplorerControlListViewStyle}"
+                                       GoButtonCommand="{x:Static localObjectModel:ExplorerControlBrowsableObjectInfoViewModel.GoCommand}" GoButtonCommandParameter="{Binding}"
+                                       IsCheckBoxVisible="{Binding IsCheckBoxVisible}"
+                                       SelectedIndex="{Binding Path.SelectedIndex, Mode=TwoWay}" SelectedItem="{Binding Path.SelectedItem, Mode=TwoWay}"
+                                       PropertyGridItem="{Binding Path}" PropertyGridDescription="{Binding Path.Items.Count, StringFormat={}{0} items}">
+            <data:PushBindingManager.PushBindings>
+                <data:PushBinding TargetProperty="SelectedItems" Path="SelectedItems" />
+            </data:PushBindingManager.PushBindings>
+        </localControls:ExplorerControl>
+        <DataTemplate.Triggers>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding SelectedItems.Count}" Value="1" />
+                    <Condition Binding="{Binding Path.SelectedItem, Converter={StaticResource IsNullConverter}}" Value="{markup:FalseValue}" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="PropertyGridItem" TargetName="ExplorerControl" Value="{Binding Path.SelectedItem}" />
+                <Setter Property="PropertyGridDescription" TargetName="ExplorerControl" Value="{Binding Path.Items.Count, StringFormat={}{0} items; 1 item selected}" />
+            </MultiDataTrigger>
+            <DataTrigger Binding="{Binding SelectedItems.Count, Converter={StaticResource IntComparisonConverter}, ConverterParameter={data:IntComparsionConverterParameter Parameter=1, ExpectedComparisonResult=Greater}}" Value="{markup:TrueValue}">
+                <Setter Property="PropertyGridItem" TargetName="ExplorerControl" Value="{x:Null}" />
+                <Setter Property="PropertyGridDescription" TargetName="ExplorerControl">
+                    <Setter.Value>
+                        <MultiBinding StringFormat="{}{0} items; {1} items selected">
+                            <Binding Path="Path.Items.Count" />
+                            <Binding Path="SelectedItems.Count" />
+                        </MultiBinding>
+                    </Setter.Value>
+                </Setter>
+            </DataTrigger>
+        </DataTemplate.Triggers>
     </DataTemplate>
 
     <Style TargetType="{x:Type localControls:ExplorerControlTreeViewItemHeader}">
@@ -299,7 +342,7 @@
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
                         <Image Source="{TemplateBinding Icon}" />
-                        <controls:Label Grid.Column="1" Content="{TemplateBinding ItemName}" Foreground="{TemplateBinding Foreground}" />
+                        <controls:Label Grid.Column="1" Content="{TemplateBinding ItemName}" Foreground="{TemplateBinding Foreground}" RecognizesAccessKey="False" />
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
@@ -426,7 +469,7 @@
         </Style.Triggers>
     </Style>
 
-    <ControlTemplate x:Key="ExplorerControlSizeThreeListViewItemContentTemplate" x:Shared="false" >
+    <ControlTemplate x:Key="ExplorerControlSizeThreeListViewItemContentTemplate" TargetType="{x:Type localControls:ExplorerControlListViewItemContent}" x:Shared="false">
         <Grid Width="100">
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto" />

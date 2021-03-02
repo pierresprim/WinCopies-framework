@@ -15,26 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-using Microsoft.WindowsAPICodePack.Win32Native.Shell;
+using Microsoft.WindowsAPICodePack;
 using Microsoft.WindowsAPICodePack.Shell;
 using Microsoft.WindowsAPICodePack.Win32Native.Shell.DesktopWindowManager;
 
 using System;
-using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
-using Microsoft.WindowsAPICodePack.COMNative.Shell;
+
 using WindowUtilities = Microsoft.WindowsAPICodePack.Shell.DesktopWindowManager;
-using Microsoft.WindowsAPICodePack.Win32Native;
-using Microsoft.WindowsAPICodePack;
 
 namespace WinCopies.GUI.Windows
 {
-
     public class Window : System.Windows.Window
     {
-
         /// <summary>
         /// Identifies the <see cref="ShowHelpButton"/> dependency property.
         /// </summary>
@@ -61,20 +56,18 @@ namespace WinCopies.GUI.Windows
         public static readonly RoutedEvent HelpButtonClickEvent = EventManager.RegisterRoutedEvent(nameof(HelpButtonClick), RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(Window));
 
         public event RoutedEventHandler HelpButtonClick
-
         {
-
             add => AddHandler(HelpButtonClickEvent, value);
 
             remove => RemoveHandler(HelpButtonClickEvent, value);
-
         }
 
-        static Window() => DefaultStyleKeyProperty. OverrideMetadata(typeof(Window), new FrameworkPropertyMetadata(typeof(Window)));
+         static Window() => DefaultStyleKeyProperty.OverrideMetadata(typeof(Window), new FrameworkPropertyMetadata(typeof(Window)));
 
         protected override void OnSourceInitialized(EventArgs e)
         {
             base.OnSourceInitialized(e);
+
             if (ShowHelpButton)
             {
                 IntPtr hwnd = new WindowInteropHelper(this).Handle;
@@ -100,21 +93,15 @@ namespace WinCopies.GUI.Windows
         protected void RaiseHelpButtonClickEvent() => RaiseEvent(new RoutedEventArgs(HelpButtonClickEvent));
 
         protected virtual void OnHelpButtonClick()
-
         {
-
             // if (IsInHelpMode)
-
             // {
+            SetValue(IsInHelpModePropertyKey, !(bool)IsInHelpMode);
 
-                SetValue(IsInHelpModePropertyKey, !(bool)IsInHelpMode);
-
-                // Cursor = (bool)IsInHelpMode ? Cursors.Help : Cursors.Arrow;
-
+            // Cursor = (bool)IsInHelpMode ? Cursors.Help : Cursors.Arrow;
             // }
 
             RaiseHelpButtonClickEvent();
-
         }
 
         protected virtual IntPtr OnSourceHook(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
@@ -125,6 +112,7 @@ namespace WinCopies.GUI.Windows
                 OnHelpButtonClick();
                 handled = true;
             }
+
             return IntPtr.Zero;
         }
     }

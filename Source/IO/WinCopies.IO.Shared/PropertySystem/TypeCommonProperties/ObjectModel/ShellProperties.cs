@@ -19,6 +19,7 @@ using System;
 using System.IO;
 
 using WinCopies.IO.ObjectModel;
+using WinCopies.PropertySystem;
 
 namespace WinCopies.IO.PropertySystem
 {

@@ -33,6 +33,6 @@ namespace WinCopies.IO.Selectors.Reflection
 
         protected override Converter<DotNetNamespaceInfoItemProvider, IBrowsableObjectInfo> DefaultSelectorOverride => Convert;
 
-        public DotNetAssemblyInfoSelectorDictionary() { /* Left empty. */ }
+        public DotNetNamespaceInfoSelectorDictionary() { /* Left empty. */ }
     }
 }

@@ -19,7 +19,9 @@ using System;
 using System.Globalization;
 
 using WinCopies.Collections;
+using WinCopies.Collections.Generic;
 using WinCopies.IO.ObjectModel;
+using WinCopies.IO.PropertySystem;
 using WinCopies.Util;
 
 using static WinCopies.
@@ -57,15 +59,13 @@ namespace WinCopies.IO
 
         public FileSystemObjectComparer(StringComparer stringComparer) => StringComparer = stringComparer;
 
-        public int? Validate(in T x, in T y)
+        public int Validate(in T x, in T y)
         {
-            if (x.ItemFileSystemType != y.ItemFileSystemType) return CompareLocalizedNames(x, y);
-
             if (x == null) return y == null ? 0 : -1;
 
             if (y == null) return 1;
 
-            return null;
+            return CompareLocalizedNames(x, y);
         }
 
         public int CompareLocalizedNames(in T x, in T y) => StringComparer.Compare(x.LocalizedName.RemoveAccents(), y.LocalizedName.RemoveAccents());
@@ -113,36 +113,36 @@ namespace WinCopies.IO
 
                 return result.Value;
 
-            if (x is IFileSystemObjectInfo _x && y is IFileSystemObjectInfo _y)
+            if (x is IBrowsableObjectInfo<IFileSystemObjectInfoProperties> _x && y is IBrowsableObjectInfo<IFileSystemObjectInfoProperties> _y)
             {
-                if (_x.FileType == _y.FileType) return CompareLocalizedNames(x, y);
+                if (_x.ObjectProperties.FileType == _y.ObjectProperties.FileType) return CompareLocalizedNames(x, y);
 
-                if (_x.FileType.IsValidEnumValue())
+                if (_x.ObjectProperties.FileType.IsValidEnumValue())
                 {
 #if CS8
                     static
 #endif
                         FileType[] getFileItemTypes() => new FileType[] { FileType.File, FileType.Archive, FileType.Library, FileType.Link };
 
-                    if (_y.FileType.IsValidEnumValue())
+                    if (_y.ObjectProperties.FileType.IsValidEnumValue())
                     {
                         FileType[] fileTypes = getFileItemTypes();
 
-                        if (_x.FileType.IsValidEnumValue(true, fileTypes))
+                        if (_x.ObjectProperties.FileType.IsValidEnumValue(true, fileTypes))
 
-                            return _y.FileType.IsValidEnumValue(true, fileTypes) ? CompareLocalizedNames(x, y) : 1;
+                            return _y.ObjectProperties.FileType.IsValidEnumValue(true, fileTypes) ? CompareLocalizedNames(x, y) : 1;
 
                         fileTypes = new FileType[] { FileType.Folder, FileType.KnownFolder, FileType.Drive, FileType.Other };
 
-                        if (_x.FileType.IsValidEnumValue(true, fileTypes))
+                        if (_x.ObjectProperties.FileType.IsValidEnumValue(true, fileTypes))
 
-                            return _y.FileType.IsValidEnumValue(true, fileTypes) ? CompareLocalizedNames(x, y) : -1;
+                            return _y.ObjectProperties.FileType.IsValidEnumValue(true, fileTypes) ? CompareLocalizedNames(x, y) : -1;
                     }
 
                     return 1;
                 }
 
-                if (_y.FileType.IsValidEnumValue()) return -1;
+                if (_y.ObjectProperties.FileType.IsValidEnumValue()) return -1;
             }
 
             return CompareLocalizedNames(x, y);
@@ -161,21 +161,21 @@ namespace WinCopies.IO
 
             if (x is IRegistryItemInfo _x && y is IRegistryItemInfo _y)
             {
-                if (_x.RegistryItemType == _y.RegistryItemType) return CompareLocalizedNames(x, y);
+                if (_x.ObjectProperties.RegistryItemType == _y.ObjectProperties.RegistryItemType) return CompareLocalizedNames(x, y);
 
-                if (_x.RegistryItemType.IsValidEnumValue())
+                if (_x.ObjectProperties.RegistryItemType.IsValidEnumValue())
                 {
-                    if (_y.RegistryItemType.IsValidEnumValue())
+                    if (_y.ObjectProperties.RegistryItemType.IsValidEnumValue())
 
-                        switch (_x.RegistryItemType)
+                        switch (_x.ObjectProperties.RegistryItemType)
                         {
                             case RegistryItemType.Key:
 
-                                return _y.RegistryItemType == RegistryItemType.Value ? -1 : 1;
+                                return _y.ObjectProperties.RegistryItemType == RegistryItemType.Value ? -1 : 1;
 
                             case RegistryItemType.Value:
 
-                                return _y.RegistryItemType == RegistryItemType.Key ? 1 : -1;
+                                return _y.ObjectProperties.RegistryItemType == RegistryItemType.Key ? 1 : -1;
 
                             case RegistryItemType.Root:
 
@@ -185,7 +185,7 @@ namespace WinCopies.IO
                     return 1;
                 }
 
-                if (_y.RegistryItemType.IsValidEnumValue()) return -1;
+                if (_y.ObjectProperties.RegistryItemType.IsValidEnumValue()) return -1;
             }
 
             return CompareLocalizedNames(x, y);
@@ -204,21 +204,21 @@ namespace WinCopies.IO
 
             if (x is IWMIItemInfo _x && y is IWMIItemInfo _y)
             {
-                if (_x.WMIItemType == _y.WMIItemType) return CompareLocalizedNames(x, y);
+                if (_x.ObjectProperties.ItemType == _y.ObjectProperties.ItemType) return CompareLocalizedNames(x, y);
 
-                if (_x.WMIItemType.IsValidEnumValue())
+                if (_x.ObjectProperties.ItemType.IsValidEnumValue())
                 {
-                    if (_y.WMIItemType.IsValidEnumValue())
+                    if (_y.ObjectProperties.ItemType.IsValidEnumValue())
 
-                        switch (_x.WMIItemType)
+                        switch (_x.ObjectProperties.ItemType)
                         {
                             case WMIItemType.Class:
 
-                                return _y.WMIItemType == WMIItemType.Instance ? -1 : 1;
+                                return _y.ObjectProperties.ItemType == WMIItemType.Instance ? -1 : 1;
 
                             case WMIItemType.Instance:
 
-                                return _y.WMIItemType == WMIItemType.Class ? 1 : -1;
+                                return _y.ObjectProperties.ItemType == WMIItemType.Class ? 1 : -1;
 
                             case WMIItemType.Namespace:
 
@@ -228,7 +228,7 @@ namespace WinCopies.IO
                     return 1;
                 }
 
-                if (_y.WMIItemType.IsValidEnumValue()) return -1;
+                if (_y.ObjectProperties.ItemType.IsValidEnumValue()) return -1;
             }
 
             return CompareLocalizedNames(x, y);

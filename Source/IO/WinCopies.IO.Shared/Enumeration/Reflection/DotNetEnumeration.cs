@@ -26,7 +26,7 @@ namespace WinCopies.IO.Enumeration.Reflection
     {
         // internal static System.Collections.Generic.IEnumerable<T> GetDotNetItemInfoEnumerator<T>(in System.Collections.Generic.IEnumerable<TypeInfo> enumerable, in Predicate<TypeInfo> func, Converter<TypeInfo, T> selector) where T : ITypeInfoItemProvider => enumerable?.WherePredicate(func).SelectConverter(selector);
 
-        public static bool TryGetTypeItemType(in Type t, out DotNetItemType itemType )   
+        public static bool TryGetTypeItemType(in Type t, out DotNetItemType itemType)
         {
             if (t.IsClass)
             {
@@ -67,9 +67,7 @@ namespace WinCopies.IO.Enumeration.Reflection
             return false;
         }
 
-        public static DotNetItemType GetTypeItemType(in Type t) => TryGetItemType(t, out DotNetItemType itemType) ? itemType : throw GetInvalidTypeArgumentException(nameof(t));
-
-        public static ArgumentException GetInvalidTypeArgumentException(in string argumentName) => new ArgumentException("The given type is not supported.", argumentName );
+        public static DotNetItemType GetTypeItemType(in Type t) => TryGetTypeItemType(t, out DotNetItemType itemType) ? itemType : throw ThrowHelper.GetInvalidTypeArgumentException(nameof(t));
 
         public static bool TryGetTypeInfoPredicate(in DotNetItemType typeToEnumerate, out Predicate<TypeInfo> result)
         {

@@ -25,6 +25,7 @@ using System.Windows.Input;
 
 using WinCopies.Commands;
 using WinCopies.GUI.Controls.Models;
+using WinCopies.Linq;
 
 using static WinCopies.GUI.Controls.ButtonTextBoxModel;
 

@@ -24,6 +24,7 @@ using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Reflection.PropertySystem;
 using WinCopies.IO.Selectors;
 using WinCopies.Linq;
+using WinCopies.PropertySystem;
 
 using static WinCopies.ThrowHelper;
 
@@ -47,7 +48,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
     {
         public sealed override IDotNetParameterInfoProperties ObjectPropertiesGeneric { get; }
 
-        public override IPropertySystemCollection ObjectPropertySystem => null;
+        public override IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystem => null;
 
         internal DotNetParameterInfo(in ParameterInfo parameterInfo, in bool isReturn, in IDotNetItemInfo parent) : base(parameterInfo, parent) => ObjectPropertiesGeneric = new DotNetParameterInfoProperties<IDotNetParameterInfo>(this, isReturn);
 

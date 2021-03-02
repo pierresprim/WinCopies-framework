@@ -1,4 +1,4 @@
-﻿/* Copyright © Pierre Sprimont, 2020
+﻿/* Copyright © Pierre Sprimont, 2019
  *
  * This file is part of the WinCopies Framework.
  *
@@ -15,19 +15,33 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+namespace WinCopies.GUI.Windows
 #if !WinCopies3
-
-using System;
-using System.Runtime.InteropServices;
-
-namespace WinCopies.GUI.IO
+    .Dialogs
+#endif
 {
-    internal static class Directory
+    public enum MessageBoxResult
     {
-        [DllImport(Microsoft.WindowsAPICodePack.NativeAPI.Consts.DllNames.Kernel32, SetLastError = true, CharSet = CharSet.Unicode)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        internal static extern bool CreateDirectoryW([In, MarshalAs(UnmanagedType.LPWStr)] string lpPathName, [In] IntPtr lpSecurityAttributes);
+        None = 0,
+
+        OK = 1,
+
+        Cancel = 2,
+
+        Abort = 3,
+
+        Retry = 4,
+
+        Ignore = 5,
+
+        Yes = 6,
+
+        No = 7,
+
+        YesToAll=8,
+
+        NoToAll=9,
+
+        Continue=10
     }
 }
-
-#endif

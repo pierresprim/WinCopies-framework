@@ -21,9 +21,6 @@ using System.Windows.Data;
 using WinCopies.Util.Data;
 
 namespace WinCopies.GUI.Windows
-#if !WinCopies3
-Dialogs
-#endif
 {
     [ValueConversion(typeof(HorizontalAlignment), typeof(System.Windows.HorizontalAlignment))]
     public class ButtonAlignmentToHorizontalAlignmentConverter : ConverterBase
@@ -33,7 +30,6 @@ Dialogs
             if (value is HorizontalAlignment _value)
 
 #if NETFRAMEWORK
-
                 switch (_value)
                 {
                     case HorizontalAlignment.Left:
@@ -48,9 +44,7 @@ Dialogs
                 
                         throw new ArgumentException("Invalid value for HorizontalAlignment.");
                 }
-
 #else
-
                 return _value switch
                 {
                     HorizontalAlignment.Left => System.Windows.HorizontalAlignment.Left,
@@ -59,7 +53,6 @@ Dialogs
 
                     _ => throw new ArgumentException("Invalid value for HorizontalAlignment.")
                 };
-
 #endif
 
             else
@@ -72,7 +65,6 @@ Dialogs
             if (value is System.Windows.HorizontalAlignment _value)
 
 #if NETFRAMEWORK
-
                 switch (_value)
                 {
                     case System.Windows.HorizontalAlignment.Left:
@@ -87,9 +79,7 @@ Dialogs
                 
                         throw new ArgumentException("Invalid value for HorizontalAlignment.");
                 }
-
 #else
-
                 return _value switch
                 {
                     System.Windows.HorizontalAlignment.Left => HorizontalAlignment.Left,
@@ -98,7 +88,6 @@ Dialogs
 
                     _ => throw new ArgumentException("Invalid value for HorizontalAlignment.")
                 };
-
 #endif
 
             else

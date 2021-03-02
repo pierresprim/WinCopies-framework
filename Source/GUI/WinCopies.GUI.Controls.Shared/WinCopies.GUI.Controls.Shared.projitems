@@ -17,11 +17,16 @@
     <Compile Include="$(MSBuildThisFileDirectory)Controls\Link.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\LinkRun.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\PlaceholderTextBox.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\PropertySystem\ArrayPropertyViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\PropertySystem\CheckBoxProperty.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\PropertySystem\PropertyConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\PropertySystem\PropertyViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\PropertySystem\TextBoxProperty.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\TextBox.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\MenuButton.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)LinkUnderliningMode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\InlineTextEditor.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Controls\PropertyGrid.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\PropertySystem\PropertyGrid.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\UpDownButton.cs" />
   </ItemGroup>
 </Project>

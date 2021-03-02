@@ -22,7 +22,7 @@ namespace WinCopies.IO.Resources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class PropertyDescriptions {
+    public class PropertyDescriptions {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace WinCopies.IO.Resources {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("WinCopies.IO.Resources.PropertyDescriptions", typeof(PropertyDescriptions).Assembly);
@@ -51,7 +51,7 @@ namespace WinCopies.IO.Resources {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,7 +63,7 @@ namespace WinCopies.IO.Resources {
         /// <summary>
         ///   Looks up a localized string similar to The type of the current item (folder, file, ...).
         /// </summary>
-        internal static string FileType {
+        public static string FileType {
             get {
                 return ResourceManager.GetString("FileType", resourceCulture);
             }
@@ -72,7 +72,7 @@ namespace WinCopies.IO.Resources {
         /// <summary>
         ///   Looks up a localized string similar to File type.
         /// </summary>
-        internal static string FileTypeName {
+        public static string FileTypeName {
             get {
                 return ResourceManager.GetString("FileTypeName", resourceCulture);
             }
@@ -81,7 +81,7 @@ namespace WinCopies.IO.Resources {
         /// <summary>
         ///   Looks up a localized string similar to The size on disk of the current item..
         /// </summary>
-        internal static string Size {
+        public static string Size {
             get {
                 return ResourceManager.GetString("Size", resourceCulture);
             }
@@ -90,7 +90,7 @@ namespace WinCopies.IO.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Size.
         /// </summary>
-        internal static string SizeName {
+        public static string SizeName {
             get {
                 return ResourceManager.GetString("SizeName", resourceCulture);
             }

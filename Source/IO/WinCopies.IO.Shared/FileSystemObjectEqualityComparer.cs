@@ -20,6 +20,8 @@ using System.Globalization;
 
 using WinCopies.Collections;
 using WinCopies.IO.ObjectModel;
+using WinCopies.Collections.Generic;
+using WinCopies.IO.PropertySystem;
 
 #if CS8
 using System.Diagnostics.CodeAnalysis;
@@ -49,15 +51,7 @@ namespace WinCopies.IO
         {
             bool leftIsNull = x == null, rightIsNull = y == null;
 
-            if (leftIsNull && rightIsNull)
-
-                return true;
-
-            if (leftIsNull != rightIsNull)
-
-                return false;
-
-            return ReferenceEquals(x, y) || x.ItemFileSystemType == y.ItemFileSystemType;
+            return (leftIsNull && rightIsNull) || (leftIsNull == rightIsNull && ReferenceEquals(x, y));
         }
 
         public bool EqualityCompareLocalizedNames(in T x, in T y) => x.Path.ToLower(CultureInfo.CurrentCulture) == y.Path.ToLower(CultureInfo.CurrentCulture);
@@ -93,13 +87,13 @@ namespace WinCopies.IO
 #if CS8
             [AllowNull]
 #endif
-        T y) => !(x is IFileSystemObjectInfo _x && y is IFileSystemObjectInfo _y && _x.FileType == _y.FileType) && Validate(x, y) && EqualityCompareLocalizedNames(x, y);
+        T y) => x is IBrowsableObjectInfo<IFileSystemObjectInfoProperties> _x && y is IBrowsableObjectInfo<IFileSystemObjectInfoProperties> _y && _x.ObjectProperties.FileType == _y.ObjectProperties.FileType && Validate(x, y) && EqualityCompareLocalizedNames(x, y);
 
         public override int GetHashCode(
 #if CS8
             [DisallowNull]
 #endif
-        T obj) => obj is IFileSystemObjectInfo _obj ? _obj.FileType.GetHashCode() ^ _obj.Path.ToLower(CultureInfo.CurrentCulture).GetHashCode(
+        T obj) => obj is IBrowsableObjectInfo<IFileSystemObjectInfoProperties> _obj ? _obj.ObjectProperties.FileType.GetHashCode() ^ _obj.Path.ToLower(CultureInfo.CurrentCulture).GetHashCode(
 #if !NETFRAMEWORK
         StringComparison.CurrentCulture
 #endif
@@ -116,13 +110,13 @@ namespace WinCopies.IO
 #if CS8
             [AllowNull]
 #endif
-        T y) => !(x is IRegistryItemInfo _x && y is IRegistryItemInfo _y && _x.RegistryItemType == _y.RegistryItemType) && Validate(x, y) && EqualityCompareLocalizedNames(x, y);
+        T y) => !(x is IBrowsableObjectInfo<IRegistryItemInfoProperties> _x && y is IBrowsableObjectInfo<IRegistryItemInfoProperties> _y && _x.ObjectProperties.RegistryItemType == _y.ObjectProperties.RegistryItemType) && Validate(x, y) && EqualityCompareLocalizedNames(x, y);
 
         public override int GetHashCode(
 #if CS8
             [DisallowNull]
 #endif
-        T obj) => obj is IFileSystemObjectInfo _obj ? _obj.FileType.GetHashCode() ^ _obj.Path.ToLower(CultureInfo.CurrentCulture).GetHashCode(
+        T obj) => obj is IBrowsableObjectInfo<IRegistryItemInfoProperties> _obj ? _obj.ObjectProperties.RegistryItemType.GetHashCode() ^ _obj.Path.ToLower(CultureInfo.CurrentCulture).GetHashCode(
 #if !NETFRAMEWORK
         StringComparison.CurrentCulture
 #endif
@@ -139,13 +133,13 @@ namespace WinCopies.IO
 #if CS8
             [AllowNull]
 #endif
-        T y) => !(x is IWMIItemInfo _x && y is IWMIItemInfo _y && _x.WMIItemType == _y.WMIItemType) && Validate(x, y) && EqualityCompareLocalizedNames(x, y);
+        T y) => !(x is IBrowsableObjectInfo<IWMIItemInfoProperties> _x && y is IBrowsableObjectInfo<IWMIItemInfoProperties> _y && _x.ObjectProperties.ItemType == _y.ObjectProperties.ItemType) && Validate(x, y) && EqualityCompareLocalizedNames(x, y);
 
         public override int GetHashCode(
 #if CS8
             [DisallowNull]
 #endif
-        T obj) => obj is IFileSystemObjectInfo _obj ? _obj.FileType.GetHashCode() ^ _obj.Path.ToLower(CultureInfo.CurrentCulture).GetHashCode(
+        T obj) => obj is IBrowsableObjectInfo<IWMIItemInfoProperties> _obj ? _obj.ObjectProperties.ItemType.GetHashCode() ^ _obj.Path.ToLower(CultureInfo.CurrentCulture).GetHashCode(
 #if !NETFRAMEWORK
         StringComparison.CurrentCulture
 #endif

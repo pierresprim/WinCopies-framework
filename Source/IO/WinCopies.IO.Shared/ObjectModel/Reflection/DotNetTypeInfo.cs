@@ -19,7 +19,6 @@ using System;
 using System.Diagnostics;
 using System.Reflection;
 
-using WinCopies.Collections.Generic;
 using WinCopies.IO.AbstractionInterop.Reflection;
 using WinCopies.IO.Enumeration.Reflection;
 using WinCopies.IO.PropertySystem;
@@ -27,6 +26,7 @@ using WinCopies.IO.Reflection;
 using WinCopies.IO.Reflection.PropertySystem;
 using WinCopies.IO.Selectors;
 using WinCopies.IO.Selectors.Reflection;
+using WinCopies.PropertySystem;
 
 using static WinCopies.IO.Path;
 using static WinCopies.ThrowHelper;
@@ -66,13 +66,23 @@ namespace WinCopies.IO.ObjectModel.Reflection
     {
         private static DotNetItemType[] _defaultTypesToEnumerate;
 
-        public static DotNetItemType[] DefaultTypesToEnumerate => _defaultTypesToEnumerate ??= new DotNetItemType[] { DotNetItemType.GenericParameter, DotNetItemType.GenericArgument, DotNetItemType.Field, DotNetItemType.Property, DotNetItemType.Event, DotNetItemType.Constructor, DotNetItemType.Method, DotNetItemType.Struct, DotNetItemType.Enum, DotNetItemType.Class, DotNetItemType.Interface, DotNetItemType.Delegate, DotNetItemType.Attribute, DotNetItemType.BaseTypeOrInterface };
+        public static DotNetItemType[] DefaultTypesToEnumerate => _defaultTypesToEnumerate
+#if CS8
+            ??=
+#else
+            ?? (_defaultTypesToEnumerate =
+#endif
+            new DotNetItemType[] { DotNetItemType.GenericParameter, DotNetItemType.GenericArgument, DotNetItemType.Field, DotNetItemType.Property, DotNetItemType.Event, DotNetItemType.Constructor, DotNetItemType.Method, DotNetItemType.Struct, DotNetItemType.Enum, DotNetItemType.Class, DotNetItemType.Interface, DotNetItemType.Delegate, DotNetItemType.Attribute, DotNetItemType.BaseTypeOrInterface }
+#if !CS8
+            )
+#endif
+            ;
 
         public static IBrowsableObjectInfoSelectorDictionary<DotNetTypeInfoItemProvider> DefaultItemSelectorDictionary { get; } = new DotNetTypeInfoSelectorDictionary();
 
         public sealed override IDotNetTypeInfoProperties ObjectPropertiesGeneric { get; }
 
-        public override IPropertySystemCollection ObjectPropertySystem => null;
+        public override IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystem => null;
 
         protected internal DotNetTypeInfo(in TypeInfo type, in DotNetItemType itemType, in bool isRootType, in IBrowsableObjectInfo parent) : base(type, parent)
 #if DEBUG

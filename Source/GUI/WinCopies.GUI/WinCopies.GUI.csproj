@@ -17,6 +17,7 @@
     <VersionSuffix>preview</VersionSuffix>
     <AssemblyVersion>3.0.0</AssemblyVersion>
     <FileVersion>3.0.0</FileVersion>
+    <PackageIcon>WinCopies.png</PackageIcon>
   </PropertyGroup>
 
   <Import Project="..\WinCopies.GUI.Shared\WinCopies.GUI.Shared.projitems" Label="Shared" />
@@ -24,11 +25,11 @@
   <Import Project="..\WinCopies.GUI.Controls.Shared\WinCopies.GUI.Controls.Shared.projitems" Label="Shared" />
 
   <ItemGroup>
-    <PackageReference Include="WinCopies.Util" Version="3.1.0.1-preview" />
-    <PackageReference Include="WinCopies.Util.Extensions" Version="3.1.0.1-preview" />
-    <PackageReference Include="WinCopies.Util.Desktop" Version="3.1.0.1-preview" />
+    <PackageReference Include="WinCopies.Util" Version="3.4-preview" />
+    <PackageReference Include="WinCopies.Util.Extensions" Version="3.4-preview" />
+    <PackageReference Include="WinCopies.Util.Desktop" Version="3.4-preview" />
     
-    <PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="3.0.0-preview" />
+    <PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="3.0.1-preview" />
   </ItemGroup>
 
   <ItemGroup>
@@ -36,6 +37,20 @@
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
+    <None Include="..\..\WinCopies.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(Configuration)'=='Debug'">
+    <ProjectReference Include="..\..\WinCopies.Util.Temp\WinCopies.Util.Temp.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\WinCopies.GUI.Icons\WinCopies.GUI.Icons.csproj" />
+    <ProjectReference Include="..\WinCopies.GUI.Models\WinCopies.GUI.Models.csproj" />
+    <ProjectReference Include="..\WinCopies.GUI.ViewModels\WinCopies.GUI.ViewModels.csproj" />
   </ItemGroup>
 
   <ItemGroup>

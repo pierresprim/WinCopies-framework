@@ -17,8 +17,14 @@
 
 #if DEBUG
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Linq;
+using System.Windows.Data;
 
 using WinCopies.Util.Data;
 using WinCopies.Collections.DotNetFix
@@ -26,7 +32,6 @@ using WinCopies.Collections.DotNetFix
     .Generic
 #endif
     ;
-using WinCopies.Linq;
 using static WinCopies.
 #if WinCopies3
     ThrowHelper
@@ -36,20 +41,13 @@ using static WinCopies.
 using static WinCopies.Util.ThrowHelper
 #endif
     ;
-using System.Diagnostics;
-using WinCopies.Collections.Generic;
-using System.Drawing;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Interop;
-using System.Windows;
-using System.Runtime.InteropServices;
-using System.Windows.Controls;
-using System.Linq;
 
 using WinCopies.Collections;
-using System.Windows.Markup;
-using System.Text;
+using WinCopies.Collections.Abstraction.Generic;
+using WinCopies.Collections.Generic;
+using WinCopies.Linq;
+
+using static WinCopies.Util.Data.ConverterHelper;
 
 #if !WinCopies3
 using System.Collections;
@@ -58,100 +56,170 @@ using WinCopies.Util;
 
 namespace WinCopies
 {
-    [AttributeUsage(AttributeTargets.Property)]
-    public class PropertyDescriptionAttribute : Attribute
-    {
-        public string FriendlyName { get; }
-
-        public string Description { get; }
-
-        public PropertyDescriptionAttribute(string friendlyName, string description)
-        {
-            ThrowIfNullEmptyOrWhiteSpace(friendlyName);
-            ThrowIfNullEmptyOrWhiteSpace(description);
-
-            FriendlyName = friendlyName;
-
-            Description = description;
-        }
-    }
-
-    [AttributeUsage(AttributeTargets.Class)]
-    public class PropertyDescriptionFindingAttribute : Attribute
-    {
-        public Type PropertyDescriptionType { get; }
-
-        public string NameFormat { get; }
-
-        public string DescriptionFormat { get; }
-
-        public PropertyDescriptionFindingAttribute(Type propertyDescriptionType, string nameFormat, string descriptionFormat)
-        {
-            ThrowIfNullEmptyOrWhiteSpace(nameFormat);
-            ThrowIfNullEmptyOrWhiteSpace(descriptionFormat);
-
-            PropertyDescriptionType = propertyDescriptionType;
-
-            NameFormat = nameFormat;
-
-            DescriptionFormat = descriptionFormat;
-        }
-    }
-
-    public static class Extensions
-    {
-        public static
-#if !WinCopies3
-System.Collections.Generic.IEnumerator
-#else
-            IEnumeratorInfo2
+    /*#region Already in WinCopies.Collections
+    public abstract class ArrayEnumeratorBase<TEnumerable, TItems> :
+#if WinCopies3
+        EnumeratorInfo<TItems>,
 #endif
-            <TDestination> Select<TSource, TDestination>(this System.Collections.Generic.IEnumerator<TSource> enumerator, Converter<TSource, TDestination> func) => new SelectEnumerator<TSource, TDestination>(enumerator, value => func(value));
-    }
-
-    public static class Temp
+        ICountableDisposableEnumeratorInfo<TItems> where TEnumerable : System.Collections.Generic.IEnumerable<TItems>
     {
-        public static System.Collections.Generic.IEnumerable<T> GetEmptyEnumerable<T>() => new WinCopies.Collections.Generic.Enumerable<T>(() => new EmptyEnumerator<T>());
+        private int _currentIndex;
+        private readonly bool _reverse;
+        private Func<bool> _condition;
+        private Func<int> _moveNext;
+        private Func<int, TItems> _getAt;
+        private Func<int> _getLength;
 
-        // Already implemented in WinCopies.Util.
+        public int Count => IsDisposed ? throw GetExceptionForDispose(false) : _getLength();
 
-        public static TValue GetValue<TKey, TValue>(KeyValuePair<TKey, TValue> keyValuePair) => keyValuePair.Value;
+        protected int CurrentIndex => IsDisposed ? throw GetExceptionForDispose(false) : _currentIndex;
 
-        public interface IReadOnlyProperty
+        public ArrayEnumeratorBase(in TEnumerable enumerable, in Func<int, TItems> getAt, in Func<int> getLength, in bool reverse = false) : base(enumerable)
         {
-            // bool IsEnabled { get; }
+            _getAt = getAt ?? throw GetArgumentNullException(nameof(getAt));
+            _getLength = getLength ?? throw GetArgumentNullException(nameof(getLength));
 
-            string Name { get; }
+#if WinCopies3
+            ResetCurrent();
+#else
+            _Reset();
+#endif
 
-            string DisplayName { get; }
+            if ((_reverse = reverse))
+            {
+                _condition = () => _currentIndex >= 0;
+                _moveNext = () => _currentIndex--;
+            }
 
-            string Description { get; }
-
-            string EditInvitation { get; }
-
-            object PropertyGroup { get; }
-
-            object Value { get; }
-
-            Type Type { get; }
-
-            // string GetDisplayGroupName();
+            else
+            {
+                _condition = () => _currentIndex < _getLength();
+                _moveNext = () => _currentIndex++;
+            }
         }
 
-        public interface IProperty : IReadOnlyProperty
+#if WinCopies3
+        protected override TItems CurrentOverride => _getAt(_currentIndex);
+
+        public override bool? IsResetSupported => true;
+
+        protected override bool MoveNextOverride()
         {
-            bool IsReadOnly { get; }
+            _currentIndex = _moveNext();
+
+            return _condition();
+        }
+#else
+        public bool? IsResetSupported => true;
+
+        public bool MoveNext()
+        {
+            if (IsDisposed)
+
+                throw GetExceptionForDispose(false);
+
+            if (IsCompleted)
+
+                return false;
+
+            _currentIndex = _moveNext();
+
+            if (_condition())
+            {
+                IsStarted = true;
+
+                return true;
+            }
+
+            _Reset();
+
+            IsCompleted = true;
+
+            return false;
+        }
+#endif
+
+#if WinCopies3
+        protected override void ResetCurrent() =>
+#else
+        private void _Reset()
+        {
+#endif
+            _currentIndex = _reverse ? _getLength() : -1;
+
+#if !WinCopies3
+            IsStarted = false;
+        }
+#endif
+
+        protected
+#if WinCopies3
+        override void DisposeManaged()
+        {
+#else
+        virtual void Dispose(bool disposing)
+        {
+            if (IsDisposed)
+
+                return;
+
+            if (disposing)
+            {
+#endif
+            _condition = null;
+            _moveNext = null;
+            _getAt = null;
+            _getLength = null;
+
+            Reset();
+
+#if !WinCopies3
+                IsDisposed = true;
+            }
+#endif
         }
 
-        public interface IReadOnlyProperty<T> : IReadOnlyProperty
-        {
-            new T PropertyGroup { get; }
-        }
+#if !WinCopies3
+        public bool IsStarted { get; private set; }
 
-        public interface IProperty<T> : IReadOnlyProperty<T>, IProperty
+        public bool IsCompleted { get; private set; }
+
+        public T Current => IsStarted && !IsDisposed ? _getAt(_currentIndex) : throw GetEnumeratorNotStartedOrDisposedException();
+
+        object System.Collections.IEnumerator.Current => Current;
+
+        public bool IsDisposed { get; private set; }
+
+        public void Dispose() => Dispose(true);
+
+        public void Reset()
         {
-            new T PropertyGroup { get; }
+            if (IsDisposed)
+
+                throw GetExceptionForDispose(false);
+
+            _Reset();
+
+            IsCompleted = false;
+        }
+#endif
+    }
+
+    public class ArrayEnumerator<T> : ArrayEnumeratorBase<T[], T>
+    {
+        public ArrayEnumerator(T[] array, in bool reverse = false) : base(array ?? throw GetArgumentNullException(nameof(array)), i => array[i], () => array.Length, reverse)
+        {
+            // Left empty.
         }
     }
+
+    public class ListEnumerator<T> : ArrayEnumeratorBase<System.Collections.Generic.IReadOnlyList<T>, T>
+    {
+        public ListEnumerator(System.Collections.Generic.IReadOnlyList<T> list, in bool reverse = false) : base(list ?? throw GetArgumentNullException(nameof(list)), i => list[i], () => list.Count, reverse)
+        {
+            // Left empty.
+        }
+    }
+    #endregion*/
 }
 #endif

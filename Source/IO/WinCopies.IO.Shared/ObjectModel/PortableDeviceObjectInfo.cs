@@ -25,6 +25,7 @@ using WinCopies.IO.AbstractionInterop;
 using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Selectors;
 using WinCopies.Linq;
+using WinCopies.PropertySystem;
 
 using static Microsoft.WindowsAPICodePack.PortableDevices.PropertySystem.Properties.Legacy.Object.Common;
 
@@ -72,7 +73,17 @@ namespace WinCopies.IO.ObjectModel
         public override BitmapSource ExtraLargeBitmapSource => TryGetBitmapSource(ExtraLargeIconSize);
         #endregion
 
-        public override IBrowsabilityOptions Browsability => _browsability ??= InnerObject is IEnumerablePortableDeviceObject ? BrowsabilityOptions.BrowsableByDefault : BrowsabilityOptions.NotBrowsable;
+        public override IBrowsabilityOptions Browsability => _browsability
+#if CS8
+            ??=
+#else
+            ?? (_browsability =
+#endif
+            InnerObject is IEnumerablePortableDeviceObject ? BrowsabilityOptions.BrowsableByDefault : BrowsabilityOptions.NotBrowsable
+#if !CS8
+            )
+#endif
+            ;
 
         public override string ItemTypeName => FileSystemObjectInfo.GetItemTypeName(System.IO.Path.GetExtension(Path), ObjectPropertiesGeneric.FileType);
 
@@ -142,7 +153,7 @@ namespace WinCopies.IO.ObjectModel
 
         public sealed override IFileSystemObjectInfoProperties ObjectPropertiesGeneric => IsDisposed ? throw GetExceptionForDispose(false) : _objectProperties;
 
-        public override IPropertySystemCollection ObjectPropertySystem => null; // TODO
+        public override IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystem => null; // TODO
         #endregion
 
         #region Constructors

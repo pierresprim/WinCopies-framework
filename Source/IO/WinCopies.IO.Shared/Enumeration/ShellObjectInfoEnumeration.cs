@@ -24,11 +24,11 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 
-using WinCopies.Collections;
 using WinCopies.IO.AbstractionInterop;
 using WinCopies.IO.ObjectModel;
 
 using static Microsoft.WindowsAPICodePack.Shell.KnownFolders;
+using WinCopies.Linq;
 
 #if WinCopies3
 using WinCopies.Collections.Generic;
@@ -69,7 +69,7 @@ namespace WinCopies.IO.Enumeration
 
                 return (portableDevices == null
                         ? GetShellObjects(shellObjects, null, clientVersion, func)
-                        : GetShellObjects(shellObjects, portableDevices, clientVersion, func).AppendValues(GetPortableDevices(portableDevices, shellObjects, clientVersion, func))).AppendValues(new ShellObjectInfoItemProvider(ShellObject.FromParsingName(RecycleBin.ParsingName), shellObjectInfo.ClientVersion), new ShellObjectInfoItemProvider(NonShellObjectRootItemType.Registry, shellObjectInfo.ClientVersion), new ShellObjectInfoItemProvider(NonShellObjectRootItemType.WMI, shellObjectInfo.ClientVersion));
+                        : GetShellObjects(shellObjects, portableDevices, clientVersion, func).AppendValues(GetPortableDevices(portableDevices, shellObjects, clientVersion, func))).AppendValues(new ShellObjectInfoItemProvider(ShellObjectFactory.Create(RecycleBin.ParsingName), shellObjectInfo.ClientVersion), new ShellObjectInfoItemProvider(NonShellObjectRootItemType.Registry, shellObjectInfo.ClientVersion), new ShellObjectInfoItemProvider(NonShellObjectRootItemType.WMI, shellObjectInfo.ClientVersion));
             }
 
             else return GetShellObjects(shellObjects, null, clientVersion, func);

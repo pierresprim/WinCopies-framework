@@ -10,14 +10,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)ButtonAlignmentToHorizontalAlignmentConverter.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DialogButton.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MessageBoxResult.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DialogWindowCommandParameters.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HorizontalAlignment.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="$(MSBuildThisFileDirectory)Themes\Generic.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
   </ItemGroup>
 </Project>

@@ -28,7 +28,7 @@ using WinCopies.IO.Reflection;
 using WinCopies.IO.Reflection.PropertySystem;
 using WinCopies.IO.Selectors;
 using WinCopies.IO.Selectors.Reflection;
-
+using WinCopies.PropertySystem;
 using static WinCopies.Diagnostics.IfHelpers;
 using static WinCopies.ThrowHelper;
 
@@ -45,7 +45,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
         protected DotNetMemberInfo(in MemberInfo memberInfo, in IDotNetItemInfo parent) : base($"{(parent ?? throw GetArgumentNullException(nameof(parent))).Path}{IO.Path.PathSeparator}{(memberInfo ?? throw GetArgumentNullException(nameof(memberInfo))).Name}", memberInfo.Name, parent)
 #if DEBUG
         {
-            Debug.Assert(If(ComparisonType.And, ComparisonMode.Logical, Comparison.NotEqual, null, parent, parent.ParentDotNetAssemblyInfo));
+            Debug.Assert(If(ComparisonType.And, ComparisonMode.Logical, WinCopies.Diagnostics.Comparison.NotEqual, null, parent, parent.ParentDotNetAssemblyInfo));
 #else
 =>
 #endif
@@ -63,7 +63,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
 
         public sealed override IDotNetTypeOrMemberInfoProperties ObjectPropertiesGeneric { get; }
 
-        public override IPropertySystemCollection ObjectPropertySystem => null;
+        public override IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystem => null;
         #endregion
 
         protected internal DotNetMemberInfo(in MemberInfo memberInfo, in IDotNetItemInfo parent) : base(memberInfo, parent)
@@ -97,7 +97,9 @@ DotNetPropertyOrMethodItemInfoProperties<IDotNetMemberInfo>.From(this)
 #endif
 
                 new DotNetFieldItemInfoProperties<IDotNetMemberInfo>(this);
-        }
+#if !CS9
+    }
+#endif
 
         #region Methods
         public static System.Collections.Generic.IEnumerable<DotNetItemType> GetDefaultItemTypes() => new DotNetItemType[] { DotNetItemType.Parameter, DotNetItemType.Attribute };

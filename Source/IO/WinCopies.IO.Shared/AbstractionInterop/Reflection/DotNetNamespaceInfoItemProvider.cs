@@ -69,14 +69,14 @@ namespace WinCopies.IO.AbstractionInterop.Reflection
         }
     }
 
-    public class DotNetNamespaceInfoItemProvider : BrowsableObjectInfoItemProvider<IDotNetNamespaceInfoBase>, ITypeInfoItemProvider
+    public class DotNetNamespaceInfoItemProvider : BrowsableObjectInfoItemProvider<IBrowsableObjectInfo>, ITypeInfoItemProvider
     {
         public string NamespaceName { get; }
 
         public TypeInfoItemProvider TypeInfoItemProvider { get; }
 
-        public DotNetNamespaceInfoItemProvider(in string _namespace, in IDotNetNamespaceInfoBase parent) : base(parent) => NamespaceName = _namespace;
+        public DotNetNamespaceInfoItemProvider(in string _namespace, in IBrowsableObjectInfo parent) : base(parent) => NamespaceName = _namespace;
 
-        public DotNetNamespaceInfoItemProvider(in TypeInfoItemProvider typeInfoItemProvider, in IDotNetNamespaceInfoBase parent) : base(parent) => TypeInfoItemProvider = typeInfoItemProvider;
+        public DotNetNamespaceInfoItemProvider(in TypeInfoItemProvider typeInfoItemProvider, in IBrowsableObjectInfo parent) : base(parent) => TypeInfoItemProvider = typeInfoItemProvider;
     }
 }

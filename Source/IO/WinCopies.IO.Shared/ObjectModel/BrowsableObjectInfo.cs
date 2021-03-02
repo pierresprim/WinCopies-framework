@@ -28,12 +28,22 @@ using System.Windows.Media.Imaging;
 
 using WinCopies.Collections.Generic;
 using WinCopies.GUI.Drawing;
+using WinCopies.IO.ObjectModel;
 using WinCopies.IO.ObjectModel.Reflection;
 using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Selectors;
+using WinCopies.PropertySystem;
 
-using static WinCopies.Temp;
 using static WinCopies.ThrowHelper;
+using static WinCopies.Collections.Util;
+
+namespace WinCopies.IO
+{
+    public static class BrowsableObjectInfoHelper
+    {
+        public static bool IsBrowsable(this IBrowsableObjectInfo browsableObjectInfo) => BrowsableObjectInfo._IsBrowsable(browsableObjectInfo ?? throw GetArgumentNullException(nameof(browsableObjectInfo)));
+    }
+}
 
 namespace WinCopies.IO.ObjectModel
 {
@@ -66,7 +76,7 @@ namespace WinCopies.IO.ObjectModel
         public abstract object InnerObject { get; }
 
 #if WinCopies3
-        public abstract IPropertySystemCollection ObjectPropertySystem { get; }
+        public abstract IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystem { get; }
 #endif
 
         public abstract object ObjectProperties { get; }
@@ -112,7 +122,7 @@ namespace WinCopies.IO.ObjectModel
 
         public abstract System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> RootItems { get; }
 
-        public abstract Predicate<IBrowsableObjectInfo> RootItemsBrowsableObjectInfoPredicate { get; }
+        // public abstract Predicate<IBrowsableObjectInfo> RootItemsBrowsableObjectInfoPredicate { get; }
         #endregion
 
         #region Constructors
@@ -125,11 +135,9 @@ namespace WinCopies.IO.ObjectModel
         #endregion
 
         #region Methods
-        private static bool _IsBrowsable(in IBrowsableObjectInfo browsableObjectInfo) => browsableObjectInfo.Browsability == null
+        internal static bool _IsBrowsable(in IBrowsableObjectInfo browsableObjectInfo) => browsableObjectInfo.Browsability == null
                 ? false
                 : browsableObjectInfo.Browsability.Browsability == IO.Browsability.BrowsableByDefault || browsableObjectInfo.Browsability.Browsability == IO.Browsability.Browsable;
-
-        public static bool IsBrowsable(in IBrowsableObjectInfo browsableObjectInfo) => _IsBrowsable(browsableObjectInfo ?? throw GetArgumentNullException(nameof(browsableObjectInfo)));
 
         public bool IsBrowsable() => _IsBrowsable(this);
 
@@ -159,7 +167,7 @@ namespace WinCopies.IO.ObjectModel
             )
 #endif
 
-            return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+                return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
         }
 
         System.Collections.Generic.IEnumerator<Collections.Generic.IRecursiveEnumerable<IBrowsableObjectInfo>> IRecursiveEnumerableProviderEnumerable<IBrowsableObjectInfo>.GetRecursiveEnumerator() => GetItems().GetEnumerator();
@@ -175,6 +183,8 @@ namespace WinCopies.IO.ObjectModel
         /// </summary>
         /// <returns>An <see cref="System.Collections.Generic.IEnumerable{IBrowsableObjectInfo}"/> that enumerates through the items of this <see cref="BrowsableObjectInfo"/>.</returns>
         public abstract System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems();
+
+        public abstract System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetSubRootItems();
 
         #region IDisposable
         /// <summary>
@@ -260,7 +270,7 @@ namespace WinCopies.IO.ObjectModel
 
         public sealed override object InnerObject => InnerObjectGeneric;
 
-        public abstract Predicate<TPredicateTypeParameter> RootItemsPredicate { get; }
+        // public abstract Predicate<TPredicateTypeParameter> RootItemsPredicate { get; }
         #endregion
 
         /// <summary>

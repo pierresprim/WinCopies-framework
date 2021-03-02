@@ -20,6 +20,8 @@ using System.Reflection;
 
 using WinCopies.IO.ObjectModel.Reflection;
 
+using static WinCopies.ThrowHelper;
+
 namespace WinCopies.IO.AbstractionInterop.Reflection
 {
     public enum DotNetTypeInfoProviderGenericTypeStructValue : byte
@@ -37,6 +39,8 @@ namespace WinCopies.IO.AbstractionInterop.Reflection
 
         public DotNetTypeInfoProviderGenericTypeStruct(in DotNetTypeInfoProviderGenericTypeStructValue genericTypeStructValue, in TypeInfo typeInfo)
         {
+            ThrowIfNotValidEnumValue(nameof(genericTypeStructValue), genericTypeStructValue);
+
             GenericTypeStructValue = genericTypeStructValue;
 
             TypeInfo = typeInfo;

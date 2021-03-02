@@ -19,11 +19,11 @@ using System;
 using System.Collections.Generic;
 
 using static WinCopies.
-    #if !WinCopies3
+#if !WinCopies3
     Util.Util
 #else
     UtilHelpers
-    #endif
+#endif
     ;
 
 namespace WinCopies.IO.ObjectModel
@@ -33,7 +33,7 @@ namespace WinCopies.IO.ObjectModel
     /// </summary>
     public abstract class BrowsableObjectInfoBase : IBrowsableObjectInfoBase
     {
-#region Properties
+        #region Properties
         /// <summary>
         /// Gets the path of this <see cref="BrowsableObjectInfoBase"/>.
         /// </summary>
@@ -48,7 +48,7 @@ namespace WinCopies.IO.ObjectModel
         /// When overridden in a derived class, gets the name of this <see cref="BrowsableObjectInfoBase"/>.
         /// </summary>
         public abstract string Name { get; }
-#endregion
+        #endregion
 
         /// <summary>
         /// When called from a derived class, initializes a new instance of the <see cref="BrowsableObjectInfoBase"/> class.
@@ -56,8 +56,8 @@ namespace WinCopies.IO.ObjectModel
         /// <param name="path">The path of this <see cref="BrowsableObjectInfoBase"/>.</param>
         protected BrowsableObjectInfoBase(string path) => Path = path;
 
-#region Methods
-        public virtual Collections.IEqualityComparer<IBrowsableObjectInfoBase> GetDefaultEqualityComparer() => new FileSystemObjectEqualityComparer<IBrowsableObjectInfoBase>();
+        #region Methods
+        public virtual WinCopies.Collections.Generic.IEqualityComparer<IBrowsableObjectInfoBase> GetDefaultEqualityComparer() => new FileSystemObjectEqualityComparer<IBrowsableObjectInfoBase>();
 
         ///// <summary>
         ///// Determines whether the specified <see cref="IFileSystemObject"/> is equal to the current object by calling the <see cref="Equals(object)"/> method.
@@ -85,7 +85,7 @@ namespace WinCopies.IO.ObjectModel
         /// <returns>The <see cref="LocalizedName"/> of this <see cref="BrowsableObjectInfoBase"/>.</returns>
         public override string ToString() => IsNullEmptyOrWhiteSpace(LocalizedName) ? Path : LocalizedName;
 
-        public virtual IComparer<IBrowsableObjectInfoBase> GetDefaultComparer() => new FileSystemObjectComparer<IBrowsableObjectInfoBase>();
+        public virtual WinCopies.Collections.Generic.IComparer<IBrowsableObjectInfoBase> GetDefaultComparer() => new FileSystemObjectComparer<IBrowsableObjectInfoBase>();
 
         /// <summary>
         /// Compares the current object to a given <see cref="BrowsableObjectInfoBase"/>.
@@ -93,9 +93,9 @@ namespace WinCopies.IO.ObjectModel
         /// <param name="fileSystemObject">The <see cref="BrowsableObjectInfoBase"/> to compare with.</param>
         /// <returns>The comparison result. See <see cref="IComparable{T}.CompareTo(T)"/> for more details.</returns>
         public virtual int CompareTo(IBrowsableObjectInfoBase fileSystemObject) => GetDefaultComparer().Compare(this, fileSystemObject);
-#endregion
+        #endregion
 
-#region Operators
+        #region Operators
         /// <summary>
         /// Checks if two <see cref="BrowsableObjectInfoBase"/>s are equal.
         /// </summary>
@@ -143,6 +143,6 @@ namespace WinCopies.IO.ObjectModel
         /// <param name="right">Right operand.</param>
         /// <returns>A <see cref="bool"/> value that indicates whether the given <see cref="BrowsableObjectInfoBase"/> is greater or equal to the <see cref="BrowsableObjectInfoBase"/> to compare with.</returns>
         public static bool operator >=(BrowsableObjectInfoBase left, BrowsableObjectInfoBase right) => left is null ? right is null : left.CompareTo(right) >= 0;
-#endregion
+        #endregion
     }
 }

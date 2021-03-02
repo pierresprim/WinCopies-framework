@@ -361,7 +361,7 @@ namespace WinCopies.GUI.Controls
                 return;
 
 #if NETCORE || NET5
-            Temp.StartProcessNetCore(Uri);
+            StartProcessNetCore(Uri);
 #else
             _ = Process.Start(Uri);
 #endif

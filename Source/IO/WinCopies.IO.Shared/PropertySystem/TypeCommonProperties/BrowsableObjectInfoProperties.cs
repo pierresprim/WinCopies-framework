@@ -34,6 +34,16 @@ namespace WinCopies.IO.PropertySystem
     {
         protected T BrowsableObjectInfo { get; }
 
-        protected BrowsableObjectInfoProperties(T browsableObjectInfo) => BrowsableObjectInfo = browsableObjectInfo ?? throw GetArgumentNullException(nameof(browsableObjectInfo));
+        protected BrowsableObjectInfoProperties(T browsableObjectInfo) => BrowsableObjectInfo = browsableObjectInfo
+#if CS8
+            ??
+#else
+            == null ?
+#endif
+            throw GetArgumentNullException(nameof(browsableObjectInfo))
+#if !CS8
+            : browsableObjectInfo
+#endif
+            ;
     }
 }

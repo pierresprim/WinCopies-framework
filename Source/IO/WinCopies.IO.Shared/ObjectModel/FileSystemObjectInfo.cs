@@ -32,6 +32,7 @@ using WinCopies.Collections;
 using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Selectors;
 using WinCopies.Collections.Generic;
+using System.Linq;
 
 namespace WinCopies.IO
 {
@@ -53,9 +54,9 @@ namespace WinCopies.IO
 
             public override bool IsRecursivelyBrowsable => true;
 
-            public override Predicate<TPredicateTypeParameter> RootItemsPredicate => null;
+            // public override Predicate<TPredicateTypeParameter> RootItemsPredicate => null;
 
-            public override Predicate<IBrowsableObjectInfo> RootItemsBrowsableObjectInfoPredicate => item => item.Browsability?.Browsability == IO.Browsability.BrowsableByDefault;
+            //public override Predicate<IBrowsableObjectInfo> RootItemsBrowsableObjectInfoPredicate => item => item.Browsability?.Browsability == IO.Browsability.BrowsableByDefault;
             #endregion
 
             // /// <param name="fileType">The <see cref="FileType"/> of this <see cref="BrowsableObjectInfo"/>.</param>
@@ -107,9 +108,11 @@ namespace WinCopies.IO
             /// <returns>The <see cref="FileSystemObject.LocalizedName"/> of this <see cref="FileSystemObjectInfo{T}"/>.</returns>
             public override string ToString() => IsNullEmptyOrWhiteSpace(LocalizedName) ? Path : LocalizedName;*/
 
-            public override IEqualityComparer<IBrowsableObjectInfoBase> GetDefaultEqualityComparer() => new FileSystemObjectInfoEqualityComparer<IBrowsableObjectInfoBase>();
+            public override WinCopies.Collections.Generic.IEqualityComparer<IBrowsableObjectInfoBase> GetDefaultEqualityComparer() => new FileSystemObjectInfoEqualityComparer<IBrowsableObjectInfoBase>();
 
-            public override System.Collections.Generic.IComparer<IBrowsableObjectInfoBase> GetDefaultComparer() => new FileSystemObjectInfoComparer<IBrowsableObjectInfoBase>();
+            public override WinCopies.Collections.Generic.IComparer<IBrowsableObjectInfoBase> GetDefaultComparer() => new FileSystemObjectInfoComparer<IBrowsableObjectInfoBase>();
+
+            public override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetSubRootItems() => GetItems().Where(item => item.Browsability?.Browsability == IO.Browsability.BrowsableByDefault);
             #endregion
             #endregion
 
@@ -168,11 +171,25 @@ namespace WinCopies.IO
         {
             private static System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> _defaultRootItems;
 
-            public static System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> DefaultRootItems => _defaultRootItems ??= GetRootItems();
+            public static System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> DefaultRootItems => _defaultRootItems
+#if CS8
+                ??=
+#else
+                ?? (_defaultRootItems =
+#endif
+                GetRootItems()
+#if !CS8
+                )
+#endif
+                ;
 
             public static System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetRootItems()
             {
+#if WinCopies4
                 EnumerableHelper<IBrowsableObjectInfo>.IEnumerableQueue queue = EnumerableHelper<IBrowsableObjectInfo>.GetEnumerableQueue();
+#else
+                var queue = new Queue<IBrowsableObjectInfo>();
+#endif
 
                 ClientVersion clientVersion = BrowsableObjectInfo.GetDefaultClientVersion();
 

@@ -21,7 +21,7 @@ namespace WinCopies.GUI.Controls.Samples
         {
             InitializeComponent();
 
-            _ = CommandBindings.Add(new CommandBinding(Util.Commands.Commands.CommonCommand, (object sender, ExecutedRoutedEventArgs e) => MessageBox.Show((string)e.Parameter), (object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = true));
+            _ = CommandBindings.Add(new CommandBinding(Commands.Commands.CommonCommand, (object sender, ExecutedRoutedEventArgs e) => MessageBox.Show((string)e.Parameter), (object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = true));
         }
     }
 }

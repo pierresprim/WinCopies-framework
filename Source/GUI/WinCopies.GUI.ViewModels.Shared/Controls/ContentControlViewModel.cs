@@ -32,7 +32,7 @@ namespace WinCopies.GUI.Controls.ViewModels
 {
     public class ControlViewModel<T> : ViewModel<T>, IControlModel where T : IControlModel
     {
-        public bool IsEnabled => ModelGeneric.IsEnabled;
+        public bool IsEnabled { get => ModelGeneric.IsEnabled; set => ModelGeneric.IsEnabled = value; }
 
         public ControlViewModel(T model) : base(model) { /* Left empty. */ }
     }

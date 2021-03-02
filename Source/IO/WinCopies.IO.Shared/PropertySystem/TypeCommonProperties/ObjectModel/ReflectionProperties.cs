@@ -75,7 +75,17 @@ namespace WinCopies.IO.Reflection.PropertySystem
 
         public override Type DeclaringType => _method.DeclaringType;
 
-        public override AccessModifier AccessModifier => _accessModifier ??= GetAccessModifier(_method);
+        public override AccessModifier AccessModifier => _accessModifier
+#if CS8
+            ??=
+#else
+            ?? (_accessModifier =
+#endif
+            GetAccessModifier(_method)
+#if !CS8
+            ).Value
+#endif
+            ;
 
         public override bool IsAbstract => _method.IsAbstract;
 
@@ -97,7 +107,17 @@ namespace WinCopies.IO.Reflection.PropertySystem
     {
         private AccessModifier? _accessModifier;
 
-        public override AccessModifier AccessModifier => _accessModifier ??= GetAccessModifier(BrowsableObjectInfo.InnerObject);
+        public override AccessModifier AccessModifier => _accessModifier
+#if CS8
+            ??=
+#else
+            ?? (_accessModifier =
+#endif
+            GetAccessModifier(BrowsableObjectInfo.InnerObject)
+#if !CS8
+            ).Value
+#endif
+            ;
 
         public bool? IsRootType { get; }
 

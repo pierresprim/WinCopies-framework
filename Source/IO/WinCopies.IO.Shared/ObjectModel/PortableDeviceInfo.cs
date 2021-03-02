@@ -28,6 +28,7 @@ using WinCopies.IO.AbstractionInterop;
 using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Selectors;
 using WinCopies.Linq;
+using WinCopies.PropertySystem;
 
 using static WinCopies.ThrowHelper;
 
@@ -58,7 +59,7 @@ namespace WinCopies.IO.ObjectModel
 
         public override string Description => UtilHelpers.NotApplicable;
 
-        public override IBrowsableObjectInfo Parent => ShellObjectInfo.From(ShellObject.FromParsingName(KnownFolders.Computer.ParsingName), ClientVersion);
+        public override IBrowsableObjectInfo Parent => ShellObjectInfo.From(ShellObjectFactory.Create(KnownFolders.Computer.ParsingName), ClientVersion);
 
         public override string LocalizedName => Name;
 
@@ -104,7 +105,7 @@ namespace WinCopies.IO.ObjectModel
 
         public sealed override IPortableDeviceInfoProperties ObjectPropertiesGeneric => IsDisposed?throw GetExceptionForDispose(false): _objectProperties;
 
-        public override IPropertySystemCollection ObjectPropertySystem => null;
+        public override IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystem => null;
         #endregion // Properties
 
         public PortableDeviceInfo(in IPortableDevice portableDevice, in PortableDeviceOpeningOptions openingOptions, in ClientVersion clientVersion) : base(portableDevice, clientVersion) => _objectProperties = new PortableDeviceInfoProperties<IPortableDeviceInfo>(this, openingOptions);

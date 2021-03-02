@@ -4,6 +4,41 @@
         <name>WinCopies.GUI.Models</name>
     </assembly>
     <members>
+        <member name="F:WinCopies.GUI.Windows.DialogButton.OK">
+            <summary>
+            This field corresponds to the Win32 MB_OK flag.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.DialogButton.OKCancel">
+            <summary>
+            This field corresponds to the Win32 MB_OKCANCEL flag.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.DialogButton.AbortRetryIgnore">
+            <summary>
+            This field corresponds to the Win32 MB_ABORTRETRYIGNORE flag.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.DialogButton.YesNoCancel">
+            <summary>
+            This field corresponds to the Win32 MB_YESNOCANCEL flag.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.DialogButton.YesNo">
+            <summary>
+            This field corresponds to the Win32 MB_YESNO flag.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.DialogButton.RetryCancel">
+            <summary>
+            This field corresponds to the Win32 MB_RETRYCANCEL flag.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.DialogButton.CancelTryContinue">
+            <summary>
+            This field corresponds to the Win32 MB_CANCELTRYCONTINUE flag.
+            </summary>
+        </member>
         <member name="T:WinCopies.GUI.Windows.Dialogs.Models.IDialogModel">
             <summary>
             Represents a model that corresponds to a default view for dialog windows.

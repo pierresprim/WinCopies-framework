@@ -9,6 +9,7 @@
     <Import_RootNamespace>WinCopies.GUI.Models</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)DialogButton.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models.cs" />
   </ItemGroup>
 </Project>

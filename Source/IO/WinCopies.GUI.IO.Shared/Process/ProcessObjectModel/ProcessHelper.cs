@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Security;
+using WinCopies.Util;
 
 #if !WinCopies3
 using WinCopies.Util;
@@ -89,7 +90,7 @@ namespace WinCopies.GUI.IO.Process
                         else break;
                     }
 
-                    catch (Exception ex) when (ex.Is(false, typeof(System.IO.IOException), typeof(SecurityException))) { }
+                    catch (Exception ex) when (ex.Is(false, typeof(IOException), typeof(SecurityException))) { }
 
                 return process.Error;
             }
@@ -108,12 +109,12 @@ namespace WinCopies.GUI.IO.Process
                 return ProcessError.None;
             }
 
-            catch (Exception ex) when (ex.Is(false, typeof(System.Security.SecurityException), typeof(UnauthorizedAccessException)))
+            catch (Exception ex) when (ex.Is(false, typeof(SecurityException), typeof(UnauthorizedAccessException)))
             {
                 return ProcessError.ReadProtection;
             }
 
-            catch (System.IO.PathTooLongException)
+            catch (PathTooLongException)
             {
                 return ProcessError.PathTooLong;
             }

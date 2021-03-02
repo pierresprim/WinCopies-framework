@@ -200,9 +200,9 @@ namespace WinCopies.GUI.Controls.Models
         bool IsEnabled { get; set; }
     }
 
-    public class ControlModel:IControlModel
+    public class ControlModel : IControlModel
     {
-        public bool IsEnabled { get; } = true;
+        public bool IsEnabled { get; set; } = true;
     }
 #endif
 
