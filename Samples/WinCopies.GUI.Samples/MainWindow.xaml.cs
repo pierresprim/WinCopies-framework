@@ -29,10 +29,12 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+
 using WinCopies.GUI.Controls.Models;
 using WinCopies.GUI.Windows.Dialogs;
 using WinCopies.Util;
-using WinCopies.Util.Commands;
+using WinCopies.Commands;
+using WinCopies.GUI.Windows;
 
 namespace WinCopies.GUI.Samples
 {
@@ -66,9 +68,9 @@ namespace WinCopies.GUI.Samples
             () => new DialogWindow() { Content = "4 - This is a sample DialogWindow.", ShowHelpButtonAsCommandButton = true },
             () => new DialogWindow() { Content = "5 - This is a sample DialogWindow.", DialogButton = DialogButton.YesNoCancel, DefaultButton = DefaultButton.Cancel, ShowHelpButtonAsCommandButton = true },
             () => new DialogWindow() { Content = "6 - This is a sample DialogWindow.", DialogButton = null, CustomButtonTemplateSelector = new AttributeDataTemplateSelector(), CustomButtonsSource = new ButtonModel[] { new ButtonModel("Button1") { CommandParameter = "1", Command = command }, new ButtonModel("Button2") { CommandParameter = "2", Command = command } } },
-            () => 
-            { 
-                var _dialogWindow = new WinCopies.GUI.Windows.Dialogs.DialogWindow() { Content = "7 - This is a sample DialogWindow.", DialogButton = null, CustomButtonTemplateSelector = new AttributeDataTemplateSelector(), CustomButtonsSource = new ButtonModel[] { new ButtonModel("Button1") { CommandParameter = "1", Command = routedCommand }, new ButtonModel("Button2") { CommandParameter = "2", Command = routedCommand } } };
+            () =>
+            {
+                var _dialogWindow = new DialogWindow() { Content = "7 - This is a sample DialogWindow.", DialogButton = null, CustomButtonTemplateSelector = new AttributeDataTemplateSelector(), CustomButtonsSource = new ButtonModel[] { new ButtonModel("Button1") { CommandParameter = "1", Command = routedCommand }, new ButtonModel("Button2") { CommandParameter = "2", Command = routedCommand } } };
 
                 _dialogWindow.CommandBindings.Add(new CommandBinding(routedCommand, (object _sender, ExecutedRoutedEventArgs _e) => MessageBox.Show($"You clicked the Button{ (string) _e.Parameter}!")));
 
@@ -79,14 +81,14 @@ namespace WinCopies.GUI.Samples
 
             int i = 0;
 
-            WinCopies.GUI.Windows.Dialogs.DialogWindow dialogWindow = dialogWindows[0]();
+            DialogWindow dialogWindow = dialogWindows[0]();
 
             dialogWindow.Closed += (object _sender, EventArgs _e) => OnDialogWindowClosed(dialogWindows, i);
 
             dialogWindow.Show();
         }
 
-        private void OnDialogWindowClosed(Func<WinCopies.GUI.Windows.Dialogs.DialogWindow>[] dialogWindows, int i)
+        private void OnDialogWindowClosed(Func<DialogWindow>[] dialogWindows, int i)
         {
 
             i++;
@@ -99,7 +101,7 @@ namespace WinCopies.GUI.Samples
 
             {
 
-                WinCopies.GUI.Windows.Dialogs.DialogWindow dialogWindow = dialogWindows[i]();
+                DialogWindow dialogWindow = dialogWindows[i]();
 
                 dialogWindow.Closed += (object sender, EventArgs e) => OnDialogWindowClosed(dialogWindows, i);
 
@@ -111,7 +113,7 @@ namespace WinCopies.GUI.Samples
 
             {
 
-                WinCopies.GUI.Windows.Dialogs.DialogWindow dialogWindow = dialogWindows[i]();
+                DialogWindow dialogWindow = dialogWindows[i]();
 
                 dialogWindow.Closed += (object sender, EventArgs e) => OnDialogWindowClosed(dialogWindows, i);
 
@@ -129,6 +131,6 @@ namespace WinCopies.GUI.Samples
 
         private void MenuItem_Click_1(object sender, RoutedEventArgs e) => new ExplorerControlTest().Show();
 
-        private void MenuItem_Click_2(object sender, RoutedEventArgs e) => new CopyProcessTest().Show();
+        private void MenuItem_Click_2(object sender, RoutedEventArgs e) => new CopyTest().Show();
     }
 }

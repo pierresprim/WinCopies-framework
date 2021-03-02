@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<PackageId>WinCopies.Util.Temp</PackageId>
+		<TargetFrameworks>netcoreapp3.0;netcoreapp3.1;net5.0-windows;net472;net48</TargetFrameworks>
+		<SignAssembly>true</SignAssembly>
+		<AssemblyOriginatorKeyFile>WinCopies.Util.Temp.snk</AssemblyOriginatorKeyFile>
+		<DefineConstants>WinCopies3;$(DefineConstants)</DefineConstants>
+		<UseWPF>true</UseWPF>
+		<PackageIcon>WinCopies.png</PackageIcon>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netcoreapp3.0|AnyCPU'">
+	  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="WinCopies.Util" Version="3.4-preview" />
+		<PackageReference Include="WinCopies.Collections" Version="3.4-preview" />
+		<PackageReference Include="WinCopies.Util.Desktop" Version="3.4-preview" />
+    <PackageReference Include="WinCopies.WindowsAPICodePack.Consts" Version="3.0.1-preview" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\..\LICENSE.md">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+		<None Include="..\WinCopies.png">
+		  <Pack>True</Pack>
+		  <PackagePath></PackagePath>
+		</None>
+	</ItemGroup>
+
+	<Import Project="..\WinCopies.Util.Temp.Shared\WinCopies.Util.Temp.Shared.projitems" Label="Shared" />
+
+</Project>

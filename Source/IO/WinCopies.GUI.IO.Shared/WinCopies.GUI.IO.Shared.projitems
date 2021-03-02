@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>690260b7-f85d-481e-9527-0a6034e39053</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>WinCopies.GUI.IO</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Page Include="$(MSBuildThisFileDirectory)Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)AssemblyInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\ExplorerControlPropertyGrid.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\Process\CopyProcessControl.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\BrowsableObjectInfoViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\DuplicateFindingOptions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessCollections\IProcessCollections.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessCollections\ProcessLinkedCollections.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessCollections\ProcessQueueCollections.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessError.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessCollections\PathInfoPathCollection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\Compression.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\Copy.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\IProcess.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\ProcessHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\PathInfoPathToPathProcess.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\ArchiveProcess.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessSimulationParameters\CopyProcessSimulationParameters.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\ExplorerControl.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\ExplorerControlListView.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\ExplorerControlListViewItem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\ExplorerControlListViewItemContent.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\ExplorerControlTreeView.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\ExplorerControlTreeViewItem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\ExplorerControlTreeViewItemHeader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\BrowsableObjectInfoFactory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\ExplorerControlBrowsableObjectInfoViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\IBrowsableObjectInfoViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\IExplorerControlBrowsableObjectInfoViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessCollections\PathCollection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PathInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\Deletion.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\DuplicateFinding.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\Extraction.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\MoveToDifferentDrive.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\MoveToSameDrive.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\PathToPathProcess.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\Process.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\Process\ProcessControl.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\Recycling.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Temp.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Process\ProcessSimulationParameters\" />
+  </ItemGroup>
+</Project>

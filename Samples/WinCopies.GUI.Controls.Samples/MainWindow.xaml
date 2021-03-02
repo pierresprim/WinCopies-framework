@@ -1,0 +1,65 @@
+﻿<Window x:Class="WinCopies.GUI.Controls.Samples.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WinCopies.GUI.Controls.Samples"
+        xmlns:commands="clr-namespace:WinCopies.Commands;assembly=WinCopies.Util.Desktop"
+        xmlns:controls="clr-namespace:WinCopies.GUI.Controls;assembly=WinCopies.GUI"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <TabControl>
+        <TabItem Header="_Label">
+            <StackPanel Grid.Row="1">
+                <controls:Label Content="_Label" Padding="10" RecognizesAccessKey="True" />
+                <controls:Label Content="_Label" Padding="10" RecognizesAccessKey="False" />
+                <controls:Label Content="_Label" Padding="10" RecognizesAccessKey="True" IsEnabled="False" />
+                <controls:Label Content="_Label" Padding="10" RecognizesAccessKey="False" IsEnabled="False" />
+            </StackPanel>
+        </TabItem>
+        <TabItem Header="L_ink">
+            <StackPanel>
+                <GroupBox Header="Link">
+                    <StackPanel>
+                        <controls:Link UnderliningMode="None" Command="{x:Static commands:Commands.CommonCommand}" CommandParameter="Link - None">No underlining</controls:Link>
+                        <controls:Link UnderliningMode="UnderlineWhenMouseOverOrFocused" Command="{x:Static commands:Commands.CommonCommand}" CommandParameter="Link - UnderlineWhenMouseOverOrFocused">Underlining when mouse over or focused</controls:Link>
+                        <controls:Link UnderliningMode="UnderlineWhenNotMouseOverNorFocused" Command="{x:Static commands:Commands.CommonCommand}" CommandParameter="Link - UnderlineWhenNotMouseOverNorFocused">Underlining when not mouse over nor focused</controls:Link>
+                        <controls:Link UnderliningMode="AlwaysUnderline" Command="{x:Static commands:Commands.CommonCommand}" CommandParameter="Link - AlwaysUnderline">Always underlining</controls:Link>
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox Header="LinkRun">
+                    <StackPanel>
+                        <TextBlock><controls:LinkRun UnderliningMode="None" Command="{x:Static commands:Commands.CommonCommand}" CommandParameter="Link - None">No underlining</controls:LinkRun></TextBlock>
+                        <TextBlock><controls:LinkRun UnderliningMode="UnderlineWhenMouseOverOrFocused" Command="{x:Static commands:Commands.CommonCommand}" CommandParameter="Link - UnderlineWhenMouseOverOrFocused">Underlining when mouse over or focused</controls:LinkRun></TextBlock>
+                        <TextBlock><controls:LinkRun UnderliningMode="UnderlineWhenNotMouseOverNorFocused" Command="{x:Static commands:Commands.CommonCommand}" CommandParameter="Link - UnderlineWhenNotMouseOverNorFocused">Underlining when not mouse over nor focused</controls:LinkRun></TextBlock>
+                        <TextBlock><controls:LinkRun UnderliningMode="AlwaysUnderline" Command="{x:Static commands:Commands.CommonCommand}" CommandParameter="Link - AlwaysUnderline">Always underlining</controls:LinkRun></TextBlock>
+                    </StackPanel>
+                </GroupBox>
+            </StackPanel>
+        </TabItem>
+        <TabItem Header="_TextBox">
+            <StackPanel>
+                <TextBox>Normal TextBox</TextBox>
+                <controls:PlaceholderTextBox>No placeholder TextBox</controls:PlaceholderTextBox>
+                <controls:PlaceholderTextBox PlaceholderMode="OnTextChanged">
+                    <controls:PlaceholderTextBox.PlaceholderStyle>
+                        <Style TargetType="{x:Type TextBox}">
+                            <Setter Property="Foreground" Value="DimGray" />
+                            <Setter Property="FontStyle" Value="Italic" />
+                            <Setter Property="Text" Value="OnTextChanged-Placeholder TextBox" />
+                        </Style>
+                    </controls:PlaceholderTextBox.PlaceholderStyle>
+                </controls:PlaceholderTextBox>
+                <controls:PlaceholderTextBox PlaceholderMode="OnFocus">
+                    <controls:PlaceholderTextBox.PlaceholderStyle>
+                        <Style TargetType="{x:Type TextBox}">
+                            <Setter Property="Foreground" Value="DimGray" />
+                            <Setter Property="FontStyle" Value="Italic" />
+                            <Setter Property="Text" Value="OnFocus-Placeholder TextBox" />
+                        </Style>
+                    </controls:PlaceholderTextBox.PlaceholderStyle>
+                </controls:PlaceholderTextBox>
+            </StackPanel>
+        </TabItem>
+    </TabControl>
+</Window>

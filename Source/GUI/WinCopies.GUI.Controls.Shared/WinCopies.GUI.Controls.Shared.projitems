@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>8e59282e-c7fb-44dc-8617-a1b2a932c5a9</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>WinCopies.GUI.Controls.Shared</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)AssemblyInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\CommandableTextBox.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\DockControl.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\HeaderedControl.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\Label.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\Link.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\LinkRun.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\PlaceholderTextBox.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\PropertySystem\ArrayPropertyViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\PropertySystem\CheckBoxProperty.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\PropertySystem\PropertyConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\PropertySystem\PropertyViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\PropertySystem\TextBoxProperty.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\TextBox.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\MenuButton.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)LinkUnderliningMode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\InlineTextEditor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\PropertySystem\PropertyGrid.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\UpDownButton.cs" />
+  </ItemGroup>
+</Project>

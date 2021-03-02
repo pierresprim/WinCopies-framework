@@ -9,6 +9,11 @@ CHANGELOG
 Updates
 -------
 
+03/02/2021 3.0.0-preview
+========================
+
+Complete rewrite.
+
 07/20/2020 2.5.9-preview
 ========================
 
@@ -80,7 +85,7 @@ WinCopies.IO (2.3.0-preview5)
 	- WinCopies.IO.Path.PathSeparator const.
 
 05/07/2020 2.2.0-preview4
-===================
+=========================
 
 - .Net Core and .Net Standard are now supported.
 

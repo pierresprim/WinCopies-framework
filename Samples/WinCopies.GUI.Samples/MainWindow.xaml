@@ -20,8 +20,8 @@ along with the WinCopies Framework.  If not, see<https://www.gnu.org/licenses/>.
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:windows="clr-namespace:WinCopies.GUI.Windows;assembly=WinCopies.GUI.Windows"
-        xmlns:controls="clr-namespace:WinCopies.GUI.Controls;assembly=WinCopies.GUI.Controls"
+        xmlns:windows="clr-namespace:WinCopies.GUI.Windows;assembly=WinCopies.GUI"
+        xmlns:controls="clr-namespace:WinCopies.GUI.Controls;assembly=WinCopies.GUI"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800" HelpButtonClick="Window_HelpButtonClick">
     <windows:Window.CommandBindings>
@@ -40,14 +40,8 @@ along with the WinCopies Framework.  If not, see<https://www.gnu.org/licenses/>.
             <MenuItem Header="View">
                 <MenuItem Header="LabelTest" Click="MenuItem_Click" />
                 <MenuItem Header="ExplorerControlTest" Click="MenuItem_Click_1" />
-                <MenuItem Header="CopyProcessTest" Click="MenuItem_Click_2" />
+                <MenuItem Header="CopyTest" Click="MenuItem_Click_2" />
             </MenuItem>
         </Menu>
-        <StackPanel Grid.Row="1">
-            <controls:Label Content="_Label" Padding="50" RecognizesAccessKey="True" />
-            <controls:Label Content="_Label" Padding="50" RecognizesAccessKey="False" />
-            <controls:Label Content="_Label" Padding="50" RecognizesAccessKey="True" IsEnabled="False" />
-            <controls:Label Content="_Label" Padding="50" RecognizesAccessKey="False" IsEnabled="False" />
-        </StackPanel>
     </Grid>
 </windows:Window>

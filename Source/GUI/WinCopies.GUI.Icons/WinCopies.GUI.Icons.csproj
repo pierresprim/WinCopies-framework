@@ -1,0 +1,61 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <PackageId>WinCopies.GUI.Icons</PackageId>
+    <AssemblyName>WinCopies.GUI.Icons</AssemblyName>
+    <RootNamespace>WinCopies.GUI.Icons</RootNamespace>
+    <TargetFrameworks>netcoreapp3.0;netcoreapp3.1;net5.0-windows;net472;net48</TargetFrameworks>
+    <UseWPF>true</UseWPF>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>WinCopies.GUI.Icons.snk</AssemblyOriginatorKeyFile>
+    <DefineConstants>WinCopies2;WinCopies3;$(DefineConstants)</DefineConstants>
+    <VersionPrefix>3.0.0</VersionPrefix>
+    <VersionSuffix>preview</VersionSuffix>
+    <AssemblyVersion>3.0.0</AssemblyVersion>
+    <FileVersion>3.0.0</FileVersion>
+    <PackageIcon>WinCopies.png</PackageIcon>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'!='netcoreapp3.1'">
+    <!--<PackageReference Include="Microsoft.Win32.Registry" Version="4.7.0" />-->
+    <PackageReference Include="System.Drawing.Common" Version="4.7.0" />
+    <!--<PackageReference Include="System.Management" Version="4.7.0" />-->
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'!='netcoreapp3.0'">
+    <!--<PackageReference Include="Microsoft.Win32.Registry" Version="4.6.0" />-->
+    <PackageReference Include="System.Drawing.Common" Version="4.6.0" />
+    <!--<PackageReference Include="System.Management" Version="4.6.0" />-->
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WinCopies.Util.Desktop" Version="3.4-preview" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\LICENSE.md">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+    <None Include="..\..\WinCopies.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>

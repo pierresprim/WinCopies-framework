@@ -1,0 +1,542 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>WinCopies.GUI.IO</name>
+    </assembly>
+    <members>
+        <member name="F:WinCopies.GUI.IO.Controls.Process.CopyProcessControl.DestPathProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.Process.CopyProcessControl.DestPath"/> dependency property.
+            </summary>
+        </member>
+        <member name="T:WinCopies.GUI.IO.Controls.Process.ProcessControl">
+            <summary>
+            Represents an I/O process control.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.Process.ProcessControl.SourcePathProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.Process.ProcessControl.SourcePath"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.Controls.Process.ProcessControl.SourcePath">
+            <summary>
+            Gets or sets the source path.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.Process.ProcessControl.ArePathsLoadedProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.Process.ProcessControl.ArePathsLoaded"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.Controls.Process.ProcessControl.ArePathsLoaded">
+            <summary>
+            Gets or sets a value that indicates whether the paths of the associated process are loaded.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.Process.ProcessControl.StatusProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.Process.ProcessControl.Status"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.Process.ProcessControl.InitialItemSizeProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.Process.ProcessControl.InitialItemSize"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.Controls.Process.ProcessControl.InitialItemSize">
+            <summary>
+            Gets or sets the initial item size.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.Process.ProcessControl.InitialItemCountProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.Process.ProcessControl.InitialItemCount"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.Controls.Process.ProcessControl.InitialItemCount">
+            <summary>
+            Gets or sets the initial item count.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.Process.ProcessControl.RemainingItemSizeProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.Process.ProcessControl.RemainingItemSize"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.Controls.Process.ProcessControl.RemainingItemSize">
+            <summary>
+            Gets or sets the Remaining item size.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.Process.ProcessControl.RemainingItemCountProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.Process.ProcessControl.RemainingItemCount"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.Controls.Process.ProcessControl.RemainingItemCount">
+            <summary>
+            Gets or sets the Remaining item count.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.Process.ProcessControl.CurrentPathProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.Process.ProcessControl.CurrentPath"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.Process.ProcessControl.ProgressPercentageProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.Process.ProcessControl.ProgressPercentage"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.Process.ProcessControl.CurrentPathProgressPercentageProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.Process.ProcessControl.CurrentPathProgressPercentage"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.ExplorerControl.PathProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.ExplorerControl.Path"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.ExplorerControl.TextProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.ExplorerControl.Text"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.ExplorerControl.TreeViewStyleProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.ExplorerControl.TreeViewStyle"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.ExplorerControl.ListViewStyleProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.ExplorerControl.ListViewStyle"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.ExplorerControl.IsCheckBoxVisibleProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.ExplorerControl.IsCheckBoxVisible"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.ExplorerControl.GoButtonCommandProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.ExplorerControl.GoButtonCommand"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.ExplorerControl.GoButtonCommandParameterProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.ExplorerControl.GoButtonCommandParameter"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.ExplorerControl.PathChangedEvent">
+            <summary>
+            Identifies the <see cref="E:WinCopies.GUI.IO.Controls.ExplorerControl.PathChanged"/> routed event.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.ExplorerControlListViewItem.CommandProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.ExplorerControlListViewItem.Command"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.ExplorerControlListViewItem.CommandParameterProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.ExplorerControlListViewItem.CommandParameter"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.ExplorerControlListViewItem.CommandTargetProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.ExplorerControlListViewItem.CommandTarget"/> dependency property.
+            </summary>
+        </member>
+        <member name="M:WinCopies.GUI.IO.Controls.ExplorerControlListViewItem.OnMouseDoubleClick(System.Windows.Input.MouseButtonEventArgs)">
+            <summary>
+            Raises the <see cref="E:System.Windows.Controls.Control.MouseDoubleClick"/> routed event, tries to execute the command and, if succeeded, handles the event.
+            </summary>
+            <param name="e">The event data.</param>
+        </member>
+        <member name="M:WinCopies.GUI.IO.Controls.ExplorerControlListViewItem.OnKeyDown(System.Windows.Input.KeyEventArgs)">
+            <summary>
+            Invoked when an unhandled System.Windows.Input.Keyboard.KeyDown attached event reaches an element in its route that is derived from this class. If the <see cref="P:System.Windows.Input.KeyEventArgs.Key"/> property of <paramref name="e"/> is defined to <see cref="F:System.Windows.Input.Key.Enter"/>, tries to execute the command and, if succeeded, handles the event. Implement this method to add class handling for this event.
+            </summary>
+            <param name="e">The <see cref="T:System.Windows.Input.KeyEventArgs"/> that contains the event data.</param>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.ExplorerControlListViewItemContent.IsCheckBoxVisibleProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.ExplorerControlListViewItemContent.IsCheckBoxVisible"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.ExplorerControlListViewItemContent.SmallIconProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.ExplorerControlListViewItemContent.SmallIcon"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.ExplorerControlListViewItemContent.LargeIconProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.ExplorerControlListViewItemContent.LargeIcon"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.ExplorerControlListViewItemContent.ItemNameProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.ExplorerControlListViewItemContent.ItemName"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.ExplorerControlListViewItemContent.HasTransparencyProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.ExplorerControlListViewItemContent.HasTransparency"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.ExplorerControlTreeViewItem.CommandProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.ExplorerControlTreeViewItem.Command"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.ExplorerControlTreeViewItem.CommandParameterProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.ExplorerControlTreeViewItem.CommandParameter"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.ExplorerControlTreeViewItem.CommandTargetProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.ExplorerControlTreeViewItem.CommandTarget"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.ExplorerControlTreeViewItemHeader.IconProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.ExplorerControlTreeViewItemHeader.Icon"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.ExplorerControlTreeViewItemHeader.ItemNameProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.ExplorerControlTreeViewItemHeader.ItemName"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.ObjectModel.BrowsableObjectInfoViewModel.IsRecursivelyBrowsable">
+            <summary>
+            Gets a value indicating whether this <see cref="T:WinCopies.IO.ObjectModel.IBrowsableObjectInfo"/> is recursively browsable.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.ObjectModel.BrowsableObjectInfoViewModel.Path">
+            <summary>
+            Gets the path of this <see cref="T:WinCopies.IO.ObjectModel.IBrowsableObjectInfoBase"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.ObjectModel.BrowsableObjectInfoViewModel.LocalizedName">
+            <summary>
+            Gets the localized name of this <see cref="T:WinCopies.IO.ObjectModel.IBrowsableObjectInfoBase"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.ObjectModel.BrowsableObjectInfoViewModel.Name">
+            <summary>
+            Gets the name of this <see cref="T:WinCopies.IO.ObjectModel.IBrowsableObjectInfoBase"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.ObjectModel.BrowsableObjectInfoViewModel.ModelGeneric">
+            <summary>
+            The model for this view model instance.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.ObjectModel.BrowsableObjectInfoFactory.ClientVersion">
+            <summary>
+            Gets the <see cref="T:Microsoft.WindowsAPICodePack.PortableDevices.ClientVersion"/> value associated to this factory. This value is used for <see cref="T:WinCopies.IO.ObjectModel.PortableDeviceInfo"/> and <see cref="!:PortableDeviceItemInfo"/> creation when browsing the Computer folder with a <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/> item.
+            </summary>
+        </member>
+        <member name="M:WinCopies.GUI.IO.ObjectModel.BrowsableObjectInfoFactory.#ctor(Microsoft.WindowsAPICodePack.PortableDevices.ClientVersion@)">
+            <summary>
+            Initializes a new instance of the <see cref="T:WinCopies.GUI.IO.ObjectModel.BrowsableObjectInfoFactory"/> class.
+            </summary>
+            <param name="clientVersion">The <see cref="T:Microsoft.WindowsAPICodePack.PortableDevices.ClientVersion"/> value for PortableDevice items creation. See <see cref="P:WinCopies.GUI.IO.ObjectModel.BrowsableObjectInfoFactory.ClientVersion"/>.</param>
+        </member>
+        <member name="M:WinCopies.GUI.IO.ObjectModel.BrowsableObjectInfoFactory.GetBrowsableObjectInfo(System.String)">
+            <summary>
+            Creates an <see cref="T:WinCopies.IO.ObjectModel.IBrowsableObjectInfo"/> for a given path. See Remarks section.
+            </summary>
+            <param name="path">The path of the <see cref="T:WinCopies.IO.ObjectModel.IBrowsableObjectInfo"/> to create.</param>
+            <returns>An <see cref="T:WinCopies.IO.ObjectModel.IBrowsableObjectInfo"/> for <paramref name="path"/>.</returns>
+            <remarks>This method cannot create <see cref="T:WinCopies.IO.ObjectModel.IBrowsableObjectInfo"/> for WMI paths.</remarks>
+            <exception cref="T:System.ArgumentException"><paramref name="path"/> is not a Shell or a Registry path.</exception>
+        </member>
+        <member name="M:WinCopies.GUI.IO.Process.ReadOnlyProcessErrorPathLinkedCollection.#ctor(WinCopies.GUI.IO.Process.ProcessErrorPathLinkedCollection)">
+            <summary>
+            Initializes a new instance of the <see cref="T:WinCopies.GUI.IO.Process.ReadOnlyProcessErrorPathLinkedCollection"/> class.
+            </summary>
+            <param name="linkedCollection">The inner <see cref="T:WinCopies.Collections.DotNetFix.Generic.ObservableLinkedCollection`1"/> of the new collection.</param>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Process.ProcessError.None">
+            <summary>
+            No error occurred.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Process.ProcessError.UnknownError">
+            <summary>
+            An unknown error occurred.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Process.ProcessError.AbortedByUser">
+            <summary>
+            The process was aborted by user.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Process.ProcessError.PathNotFound">
+            <summary>
+            One part or all of the source or destination path was not found.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Process.ProcessError.DriveNotReady">
+            <summary>
+            The source or destination drive is not ready.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Process.ProcessError.ReadProtection">
+            <summary>
+            The source or destination path is read-protected.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Process.ProcessError.DestinationReadProtection">
+            <summary>
+            The destination path is read-protected.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Process.ProcessError.WriteProtection">
+            <summary>
+            The destination path is write-protected.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Process.ProcessError.PathTooLong">
+            <summary>
+            The destination path is too long.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Process.ProcessError.NotEnoughSpace">
+            <summary>
+            The destination disk has not enough space.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Process.ProcessError.FileSystemEntryAlreadyExists">
+            <summary>
+            A file or folder already exists with the same name.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Process.ProcessError.FolderAlreadyExists">
+            <summary>
+            A folder already exists with the same name.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Process.ProcessError.FileRenamingFailed">
+            <summary>
+            The file could not be renamed.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Process.ProcessError.SourceAndDestPathAreEqual">
+            <summary>
+            The source and destination relative paths are equal.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Process.ProcessError.DestPathIsASubPath">
+            <summary>
+            The destination path is a sub-path of the source path.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Process.ProcessError.DiskError">
+            <summary>
+            An unknown disk error occurred.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.Process.Copy.AutoRenameFiles">
+            <summary>
+            Gets a value that indicates whether files are automatically renamed when they conflict with existing paths.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.Process.PathToPathProcess`6.DestPath">
+            <summary>
+            Gets the destination root path.
+            </summary>
+        </member>
+        <member name="T:WinCopies.GUI.IO.Process.ProcessBase`5">
+            <summary>
+            The base class for WinCopies IO processes.
+            </summary>
+            <typeparam name="TCollection">The type of the loaded paths collection.</typeparam>
+            <typeparam name="TReadOnlyCollection">The type of the loaded paths read-only collection.</typeparam>
+            <typeparam name="TErrorPathCollection">The type of the error paths collection.</typeparam>
+            <typeparam name="TReadOnlyErrorPathCollection">The type of the error paths read-only collection.</typeparam>
+            <typeparam name="TSimulationParameters">The type of the simulation parameters.</typeparam>
+        </member>
+        <member name="P:WinCopies.GUI.IO.Process.ProcessBase`5.Paths">
+            <summary>
+            Gets the paths that have been loaded.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.Process.ProcessBase`5.BackgroundWorker">
+            <summary>
+            Gets the inner background worker.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.Process.ProcessBase`5.InitialItemSize">
+            <summary>
+            Gets or sets (protected) the initial total item size.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.Process.ProcessBase`5.InitialItemCount">
+            <summary>
+            Gets or sets (protected) the initial total item count.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.Process.ProcessBase`5.IsCompleted">
+            <summary>
+            Gets a value that indicates whether the process has completed.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.Process.ProcessBase`5.SourcePath">
+            <summary>
+            Gets the source root path.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.Process.ProcessBase`5.ArePathsLoaded">
+            <summary>
+            Gets a value that indicates whether all the paths and subpaths are loaded.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.Process.ProcessBase`5.Error">
+            <summary>
+            Gets the global process error, if any.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.Process.ProcessBase`5.CurrentPath">
+            <summary>
+            Gets the current processed <see cref="T:WinCopies.GUI.IO.IPathInfo"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.Process.ProcessBase`5.ProgressPercentage">
+            <summary>
+            Gets the progress percentage of the current process.
+            </summary>
+        </member>
+        <member name="M:WinCopies.GUI.IO.Process.ProcessBase`5.ThrowIfCompleted">
+            <summary>
+            Throws an <see cref="T:System.InvalidOperationException"/> if the <see cref="P:WinCopies.GUI.IO.Process.ProcessBase`5.IsCompleted"/> property is <see langword="true"/>.
+            </summary>
+        </member>
+        <member name="M:WinCopies.GUI.IO.Process.ProcessBase`5.CheckIfPauseOrCancellationPending">
+            <summary>
+            Checks if a cancellation or a pause is pending. See Remarks section.
+            </summary>
+            <returns>A value indicating whether a cancellation or a pause is pending.</returns>
+            <remarks><para>This method checks if a cancellation is pending, then, if not, checks if a pause is pending. These checks are performed by calling the <see cref="M:WinCopies.GUI.IO.Process.ProcessBase`5.OnCancellationPending"/> and <see cref="M:WinCopies.GUI.IO.Process.ProcessBase`5.OnPausePending"/> methods.</para>
+            <para>Each of these methods is called only if the corresponding -Pending property is <see langword="true"/>. If one of these methods is called, the <see cref="P:WinCopies.GUI.IO.Process.ProcessBase`5.Error"/> property is assigned to the value returned by the one of these method that was called.</para>
+            <para>If one of these method is called, the other one is not.</para></remarks>
+        </member>
+        <member name="M:WinCopies.GUI.IO.Process.ProcessBase`5.OnPausePending">
+            <summary>
+            Returns <see cref="F:WinCopies.GUI.IO.Process.ProcessError.AbortedByUser"/>.
+            </summary>
+            <returns>The <see cref="F:WinCopies.GUI.IO.Process.ProcessError.AbortedByUser"/> error code.</returns>
+        </member>
+        <member name="M:WinCopies.GUI.IO.Process.ProcessBase`5.OnCancellationPending">
+            <summary>
+            Clears <see cref="P:WinCopies.GUI.IO.Process.ProcessBase`5._Paths"/>, sets <see cref="P:WinCopies.GUI.IO.Process.ProcessBase`5.IsCompleted"/> to <see langword="true"/> and returns <see cref="F:WinCopies.GUI.IO.Process.ProcessError.AbortedByUser"/>.
+            </summary>
+            <returns>The <see cref="F:WinCopies.GUI.IO.Process.ProcessError.AbortedByUser"/> error code.</returns>
+        </member>
+        <member name="M:WinCopies.GUI.IO.Process.ProcessBase`5.OnDoWork(System.ComponentModel.DoWorkEventArgs)">
+            <summary>
+            Starts the paths load and process operations. This method reset the <see cref="P:WinCopies.GUI.IO.Process.ProcessBase`5.Error"/> property to <see cref="F:WinCopies.GUI.IO.Process.ProcessError.None"/>.
+            </summary>
+            <param name="e">The event args of the event that was raised originally.</param>
+            <exception cref="T:System.InvalidOperationException"><see cref="P:WinCopies.GUI.IO.Process.ProcessBase`5.IsCompleted"/> is <see langword="true"/>.</exception>
+        </member>
+        <member name="M:WinCopies.GUI.IO.Process.ProcessBase`5.LoadPaths(System.ComponentModel.DoWorkEventArgs)">
+            <summary>
+            Calls <see cref="M:WinCopies.GUI.IO.Process.ProcessBase`5.OnLoadPaths(System.ComponentModel.DoWorkEventArgs)"/> and initializes the current process to process the loaded paths if <see cref="M:WinCopies.GUI.IO.Process.ProcessBase`5.OnLoadPaths(System.ComponentModel.DoWorkEventArgs)"/> returned a success error code. The <see cref="P:WinCopies.GUI.IO.Process.ProcessBase`5.Error"/> property is assigned to the error code returned by <see cref="M:WinCopies.GUI.IO.Process.ProcessBase`5.OnLoadPaths(System.ComponentModel.DoWorkEventArgs)"/> anyway.
+            </summary>
+            <param name="e">The event args of the event that was raised originally.</param>
+        </member>
+        <member name="M:WinCopies.GUI.IO.Process.ProcessBase`5.RemoveErrorPath(WinCopies.GUI.IO.Process.ProcessError)">
+            <summary>
+            Adds the value of <see cref="P:WinCopies.GUI.IO.Process.ProcessBase`5.CurrentPath"/> to <see cref="P:WinCopies.GUI.IO.Process.ProcessBase`5.ErrorPaths"/> and removes it from <see cref="P:WinCopies.GUI.IO.Process.ProcessBase`5._Paths"/>.
+            </summary>
+            <param name="error">The error associated to the value of <see cref="P:WinCopies.GUI.IO.Process.ProcessBase`5.CurrentPath"/>.</param>
+        </member>
+        <member name="M:WinCopies.GUI.IO.Process.ProcessBase`5.OnLoadPaths(System.ComponentModel.DoWorkEventArgs)">
+            <summary>
+            When overridden in a derived class, loads the paths to process.
+            </summary>
+            <param name="e">The event args of the event that was raised originally.</param>
+            <returns>An error code for the current operation.</returns>
+        </member>
+        <member name="P:WinCopies.GUI.IO.Process.ProcessBase`5.WorkerSupportsCancellation">
+            <summary>
+            Gets or sets a value that indicates whether the process supports cancellation.
+            </summary>
+            <exception cref="T:System.InvalidOperationException">When setting: The process is busy.</exception>
+        </member>
+        <member name="P:WinCopies.GUI.IO.Process.ProcessBase`5.WorkerSupportsPausing">
+            <summary>
+            Gets or sets a value that indicates whether the process supports pausing.
+            </summary>
+            <exception cref="T:System.InvalidOperationException">When setting: The process is busy.</exception>
+        </member>
+        <member name="P:WinCopies.GUI.IO.Process.ProcessBase`5.WorkerReportsProgress">
+            <summary>
+            Gets or sets a value that indicates whether the process reports progress.
+            </summary>
+            <exception cref="T:System.InvalidOperationException">When setting: The process is busy.</exception>
+        </member>
+        <member name="P:WinCopies.GUI.IO.Process.ProcessBase`5.IsBusy">
+            <summary>
+            Gets a value that indicates whether the process is busy.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.Process.ProcessBase`5.CancellationPending">
+            <summary>
+            Gets a value that indicates whether a cancellation is pending.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.Process.ProcessBase`5.PausePending">
+            <summary>
+            Gets a value that indicates whether a pause is pending.
+            </summary>
+        </member>
+        <member name="M:WinCopies.GUI.IO.Process.ProcessBase`5.RunWorkerAsync">
+            <summary>
+            Starts the process at background.
+            </summary>
+            <exception cref="T:System.InvalidOperationException"><see cref="P:WinCopies.GUI.IO.Process.ProcessBase`5.IsBusy"/> is <see langword="true"/>.</exception>
+        </member>
+        <member name="M:WinCopies.GUI.IO.Process.ProcessBase`5.RunWorkerAsync(System.Object)">
+            <summary>
+            Starts the process at background.
+            </summary>
+            <param name="argument">A parameter for use by the process.</param>
+            <exception cref="T:System.InvalidOperationException"><see cref="P:WinCopies.GUI.IO.Process.ProcessBase`5.IsBusy"/> is <see langword="true"/>.</exception>
+        </member>
+        <member name="M:WinCopies.GUI.IO.Process.ProcessBase`5.ReportProgress(System.Int32)">
+            <summary>
+            Raises the <see cref="E:WinCopies.GUI.IO.Process.ProcessBase`5.ProgressChanged"/> event of the <see cref="P:WinCopies.GUI.IO.Process.ProcessBase`5.BackgroundWorker"/> property.
+            </summary>
+            <param name="progressPercentage">The percentage, from 0 to 100, of the background operation that is complete.</param>
+            <exception cref="T:System.InvalidOperationException">The <see cref="P:WinCopies.GUI.IO.Process.ProcessBase`5.WorkerReportsProgress"/> property is set to <see langword="false"/>.</exception>
+        </member>
+        <member name="M:WinCopies.GUI.IO.Process.ProcessBase`5.ReportProgress(System.Int32,System.Object)">
+            <summary>
+            Raises the <see cref="E:WinCopies.GUI.IO.Process.ProcessBase`5.ProgressChanged"/> event of the <see cref="P:WinCopies.GUI.IO.Process.ProcessBase`5.BackgroundWorker"/> property.
+            </summary>
+            <param name="progressPercentage">The percentage, from 0 to 100, of the background operation that is complete.</param>
+            <param name="userState">The state object passed to <see cref="M:WinCopies.GUI.IO.Process.ProcessBase`5.RunWorkerAsync(System.Object)"/>.</param>
+            <exception cref="T:System.InvalidOperationException">The <see cref="P:WinCopies.GUI.IO.Process.ProcessBase`5.WorkerReportsProgress"/> property is set to <see langword="false"/>.</exception>
+        </member>
+        <member name="P:WinCopies.GUI.IO.Process.Process`6.PathCollection">
+            <summary>
+            Gets the <see cref="T:WinCopies.GUI.IO.Process.PathCollection`1"/> from which to load the paths.
+            </summary>
+        </member>
+        <member name="M:WinCopies.GUI.IO.Process.Process`6.GetSourcePathFromPathCollection(WinCopies.GUI.IO.Process.PathCollection{`0}@)">
+            <summary>
+            Returns the source path of a given <see cref="T:WinCopies.GUI.IO.Process.PathCollection`1"/>.
+            </summary>
+            <param name="paths">The path collection from which to get the source path.</param>
+            <returns>The source path of <paramref name="paths"/>.</returns>
+            <exception cref="T:System.ArgumentNullException"><paramref name="paths"/> is <see langword="null"/>.</exception>
+        </member>
+    </members>
+</doc>

@@ -1,0 +1,378 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>WinCopies.GUI</name>
+    </assembly>
+    <members>
+        <member name="T:WinCopies.GUI.Windows.DialogWindow">
+            <summary>
+            Represents a common dialog window for WPF.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.DialogWindow.DialogButtonProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Windows.DialogWindow.DialogButton"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.DialogWindow.DialogButton">
+            <summary>
+            Gets or sets the <see cref="T:WinCopies.GUI.Windows.DialogButton"/>. <see cref="P:WinCopies.GUI.Windows.DialogWindow.Command"/> will not be executed if this property is set to <see cref="F:WinCopies.GUI.Windows.DialogButton.OK"/>, or if the user clicks on one of the following buttons: Cancel, Ignore, Abort. This is a dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.DialogWindow.ButtonAlignmentProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Windows.DialogWindow.ButtonAlignment"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.DialogWindow.ButtonAlignment">
+            <summary>
+            Gets or sets the <see cref="T:WinCopies.GUI.Windows.HorizontalAlignment"/> for the button alignment. This is a dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.DialogWindow.DefaultButtonProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Windows.DialogWindow.DefaultButton"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.DialogWindow.CustomButtonsSourceProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Windows.DialogWindow.CustomButtonsSource"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.DialogWindow.CustomButtonTemplateProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Windows.DialogWindow.CustomButtonTemplate"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.DialogWindow.CustomButtonTemplateSelectorProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Windows.DialogWindow.CustomButtonTemplateSelector"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.DialogWindow.ShowHelpButtonAsCommandButtonProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Windows.DialogWindow.ShowHelpButtonAsCommandButton"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.DialogWindow.MessageBoxResult">
+            <summary>
+            Gets the <see cref="T:WinCopies.GUI.Windows.MessageBoxResult"/>.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.DialogWindow.CommandProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Windows.DialogWindow.Command"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.DialogWindow.Command">
+            <summary>
+            Gets or sets the command that will be executed when the command source is invoked.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.DialogWindow.CommandParameterProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Windows.DialogWindow.CommandParameter"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.DialogWindow.CommandParameter">
+            <summary>
+            Gets or sets a value that represents a user defined data value that can be passed to the command when it is executed.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.DialogWindow.CommandTargetProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Windows.DialogWindow.CommandTarget"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.DialogWindow.CommandTarget">
+            <summary>
+            Gets or sets a value that represents the object that the command is being executed on.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.Window.ShowHelpButtonProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Windows.Window.ShowHelpButton"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.Window.IsInHelpModeProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Windows.Window.IsInHelpMode"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.Window.HelpButtonClickEvent">
+            <summary>
+            Identifies the <see cref="E:WinCopies.GUI.Windows.Window.HelpButtonClick"/> routed event.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.CommandableTextBox.CommandProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.CommandableTextBox.Command"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.CommandableTextBox.CommandParameterProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.CommandableTextBox.CommandParameter"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.CommandableTextBox.CommandTargetProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.CommandableTextBox.CommandTarget"/> dependency property.
+            </summary>
+        </member>
+        <member name="T:WinCopies.GUI.Controls.HeaderedControl">
+            <summary>
+            Represents a WPF control that can display a header.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.HeaderedControl.HeaderProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.HeaderedControl.Header"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Controls.HeaderedControl.Header">
+            <summary>
+            Gets or sets the header of the control. This is a dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.Label.RecognizesAccessKeyProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.Label.RecognizesAccessKey"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.Link.UnderliningModeProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.Link.UnderliningMode"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.Link.NormalForegroundProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.Link.NormalForeground"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.Link.HighlightedForegroundProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.Link.HighlightedForeground"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.Link.ActiveForegroundProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.Link.ActiveForeground"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.Link.SeenForegroundProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.Link.SeenForeground"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.Link.SeenProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.Link.Seen"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.Link.UriProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.Link.Uri"/> dependency property.
+            </summary>
+        </member>
+        <member name="T:WinCopies.GUI.Controls.LinkRun">
+            <summary>
+            Provides some properties to define a link <see cref="T:System.Windows.Documents.Run"/>. See the remarks section.
+            </summary>
+            <remarks>
+            Usage of <see cref="P:System.Windows.Documents.TextElement.Foreground"/> and <see cref="P:System.Windows.Documents.Inline.TextDecorations"/> is deprecated, particularly to set a new value, for the foreground and text decorations for this type. Consider using the <see cref="P:WinCopies.GUI.Controls.LinkRun.NormalForeground"/> property instead for the <see cref="P:System.Windows.Documents.TextElement.Foreground"/> property.
+            </remarks>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.LinkRun.UnderliningModeProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.LinkRun.UnderliningMode"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Controls.LinkRun.UnderliningMode">
+            <summary>
+            Gets or sets a <see cref="T:WinCopies.GUI.Controls.LinkUnderliningMode"/> value that describes how to underline this <see cref="T:WinCopies.GUI.Controls.LinkRun"/>. This is a dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.LinkRun.NormalForegroundProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.LinkRun.NormalForeground"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Controls.LinkRun.NormalForeground">
+            <summary>
+            Gets or sets the <see cref="T:System.Windows.Media.Brush"/> foreground to use when this <see cref="T:WinCopies.GUI.Controls.LinkRun"/> is in a normal state (not highlighted, active or seen). This is a dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.LinkRun.HighlightedForegroundProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.LinkRun.HighlightedForeground"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Controls.LinkRun.HighlightedForeground">
+            <summary>
+            Gets or sets the <see cref="T:System.Windows.Media.Brush"/> foreground to use when this <see cref="T:WinCopies.GUI.Controls.LinkRun"/> is highlighted. See the remarks section. This is dependency property.
+            </summary>
+            <remarks>
+            The following table show the possibility for a <see cref="T:WinCopies.GUI.Controls.LinkRun"/> to be highlighted:
+            |---------------------------------------------------------------------------------------|
+            | Is mouse over                 |   *   | true  | true  | false | false | true  | false |
+            | Is mouse left button pressed  | false | true  | false | true  | false | true  | true  |
+            | Is focused                    | true  | true  | false | true  | false | false | false |
+            | 
+            | Is highlighted                | true  | false | true  | true  | false |   /   | false |
+            |---------------------------------------------------------------------------------------|
+            </remarks>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.LinkRun.ActiveForegroundProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.LinkRun.ActiveForeground"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.LinkRun.SeenForegroundProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.LinkRun.SeenForeground"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.LinkRun.SeenProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.LinkRun.Seen"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.LinkRun.UriProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.LinkRun.Uri"/> dependency property.
+            </summary>
+        </member>
+        <member name="T:WinCopies.GUI.Controls.TextBox">
+            <summary>
+            Represents a <see cref="T:System.Windows.Controls.TextBox"/> that can display items on the left and right of the text.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.TextBox.LeftItemsProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.TextBox.LeftItems"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.TextBox.RightItemsProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.TextBox.RightItems"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.TextBox.LeftItemsStyleProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.TextBox.LeftItemsStyle"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.TextBox.RightItemsStyleProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.TextBox.RightItemsStyle"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.TextBox.LeftItemsTemplateSelectorProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.TextBox.LeftItemsTemplateSelector"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.TextBox.RightItemsTemplateSelectorProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.TextBox.RightItemsTemplateSelector"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.ButtonTextBox.ButtonsProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.ButtonTextBox.Buttons"/> dependency property.
+            </summary>
+        </member>
+        <member name="M:WinCopies.GUI.Controls.ButtonTextBox.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:WinCopies.GUI.Controls.ButtonTextBox"/>.
+            </summary>
+        </member>
+        <member name="M:WinCopies.GUI.Controls.ButtonTextBox.AddButtons">
+            <summary>
+            Adds the default buttons to the <see cref="P:WinCopies.GUI.Controls.ButtonTextBox.Buttons"/> property.
+            </summary>
+        </member>
+        <member name="M:WinCopies.GUI.Controls.ButtonTextBox.OnCanCancel(System.Windows.Input.CanExecuteRoutedEventArgs)">
+            <summary>
+            Determines whether the <see cref="P:WinCopies.Commands.DialogCommands.Cancel"/> command can be executed. This method handles the command.
+            </summary>
+            <param name="e">The event args of the command.</param>
+        </member>
+        <member name="M:WinCopies.GUI.Controls.ButtonTextBox.OnCancel(System.Windows.Input.ExecutedRoutedEventArgs)">
+            <summary>
+            Clears <see cref="P:System.Windows.Controls.TextBox.Text"/>. This method is called on <see cref="P:WinCopies.Commands.DialogCommands.Cancel"/>. This method handles the command.
+            </summary>
+            <param name="e">The event args of the command.</param>
+        </member>
+        <member name="T:WinCopies.GUI.Controls.LinkUnderliningMode">
+            <summary>
+            Values that describe how to underline the links.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.LinkUnderliningMode.None">
+            <summary>
+            No underline.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.LinkUnderliningMode.UnderlineWhenMouseOverOrFocused">
+            <summary>
+            Underline only when the mouse is over the link, or when the link is focused.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.LinkUnderliningMode.UnderlineWhenNotMouseOverNorFocused">
+            <summary>
+            Underline only when the mouse is NOT over the link and when the link is NOT focused.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.LinkUnderliningMode.AlwaysUnderline">
+            <summary>
+            Always underline.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.PropertyGrid.Header1Property">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.PropertyGrid.Header1"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.PropertyGrid.Header2Property">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.PropertyGrid.Header2"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.PropertyGrid.IconProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.PropertyGrid.Icon"/> dependency property.
+            </summary>
+        </member>
+        <member name="T:XamlGeneratedNamespace.GeneratedInternalTypeHelper">
+            <summary>
+            GeneratedInternalTypeHelper
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateInstance(System.Type,System.Globalization.CultureInfo)">
+            <summary>
+            CreateInstance
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.GetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            GetPropertyValue
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.SetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            SetPropertyValue
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateDelegate(System.Type,System.Object,System.String)">
+            <summary>
+            CreateDelegate
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.AddEventHandler(System.Reflection.EventInfo,System.Object,System.Delegate)">
+            <summary>
+            AddEventHandler
+            </summary>
+        </member>
+    </members>
+</doc>
