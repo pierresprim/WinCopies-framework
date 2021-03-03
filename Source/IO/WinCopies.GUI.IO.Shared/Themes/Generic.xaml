@@ -551,7 +551,7 @@
     </Style>-->
 
 
-    <ControlTemplate x:Key="CopyProcessControlTemplate" TargetType="{x:Type localProcessControls:ProcessControl}">
+    <!--<ControlTemplate x:Key="CopyProcessControlTemplate" TargetType="{x:Type localProcessControls:ProcessControl}">
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto" />
@@ -622,5 +622,5 @@
                 </MultiBinding>
             </localProcessControls:ProcessControl.Header>
         </localProcessControls:CopyProcessControl>
-    </DataTemplate>
+    </DataTemplate>-->
 </ResourceDictionary>

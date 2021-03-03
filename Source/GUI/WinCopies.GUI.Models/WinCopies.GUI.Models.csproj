@@ -7,7 +7,7 @@
     <Description>Models for the WinCopies framework.</Description>
     <TargetFrameworks>netcoreapp3.0;netcoreapp3.1;net5.0-windows;net472;net48</TargetFrameworks>
     <UseWPF>true</UseWPF>
-    <Copyright>Copyright © 2020 Pierre Sprimont</Copyright>
+    <Copyright>Copyright © 2021 Pierre Sprimont</Copyright>
     <PackageTags>WinCopies, GUI, WPF, Models</PackageTags>
     <DocumentationFile>WinCopies.GUI.Models.xml</DocumentationFile>
     <SignAssembly>true</SignAssembly>

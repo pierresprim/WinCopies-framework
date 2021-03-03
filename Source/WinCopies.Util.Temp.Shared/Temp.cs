@@ -56,8 +56,8 @@ using WinCopies.Util;
 
 namespace WinCopies
 {
-    /*#region Already in WinCopies.Collections
-    public abstract class ArrayEnumeratorBase<TEnumerable, TItems> :
+    #region Already in WinCopies.Collections
+    /*public abstract class ArrayEnumeratorBase<TEnumerable, TItems> :
 #if WinCopies3
         EnumeratorInfo<TItems>,
 #endif
@@ -219,7 +219,7 @@ namespace WinCopies
         {
             // Left empty.
         }
-    }
-    #endregion*/
+    }*/
+#endregion
 }
 #endif

@@ -12,8 +12,8 @@
             <RowDefinition />
         </Grid.RowDefinitions>
         <ToolBar>
-            <Button Click="Button_Click">+</Button>
-            <Button Click="Button_Click_1">Clear</Button>
+            <!--<Button Click="Button_Click">+</Button>
+            <Button Click="Button_Click_1">Clear</Button>-->
         </ToolBar>
         <ItemsControl Grid.Row="1" ItemsSource="{Binding Items}" />
     </Grid>
