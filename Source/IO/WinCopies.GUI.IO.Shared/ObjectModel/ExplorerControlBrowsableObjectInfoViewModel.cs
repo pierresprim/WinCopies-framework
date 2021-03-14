@@ -18,16 +18,15 @@
 using Microsoft.WindowsAPICodePack.Shell;
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Windows.Controls;
 
 using WinCopies.IO;
 using WinCopies.Util.Data;
 using WinCopies.IO.PropertySystem;
-using WinCopies.IO.ObjectModel;
-using System.Linq;
-using System.Collections;
 
 #if !WinCopies3
 using WinCopies.Util.Commands;
@@ -80,7 +79,7 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         public static IExplorerControlBrowsableObjectInfoViewModel From(in IBrowsableObjectInfoViewModel path) => From(path, new BrowsableObjectInfoFactory());
 
-        private ExplorerControlBrowsableObjectInfoViewModel(in IBrowsableObjectInfoViewModel path, in IEnumerable<IBrowsableObjectInfoViewModel> treeViewItems, in IBrowsableObjectInfoFactory factory)
+        protected ExplorerControlBrowsableObjectInfoViewModel(in IBrowsableObjectInfoViewModel path, in IEnumerable<IBrowsableObjectInfoViewModel> treeViewItems, in IBrowsableObjectInfoFactory factory)
         {
             _path = path;
 

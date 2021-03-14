@@ -9,6 +9,16 @@ CHANGELOG
 Updates
 -------
 
+??/??/???? 3.1.0-preview
+========================
+
+Complete rewrite of Processes, file system enumeration and (I)PathInfo (related-)types.
+
+WinCopies.GUI.IO
+----------------
+
+WinCopies.GUI.IO.ObjectModel.ExplorerControlBrowsableObjectInfoViewModel's constructor is now protected.
+
 03/02/2021 3.0.0-preview
 ========================
 

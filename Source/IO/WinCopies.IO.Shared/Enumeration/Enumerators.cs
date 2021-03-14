@@ -139,11 +139,11 @@ namespace WinCopies.IO.Enumeration
 
         enum PathType
     {
-        All = 1,
+        Directories = 1,
 
-        Directories = 2,
+        Files = 2,
 
-        Files = 3
+        All = Directories | Files
     }
 
 #if DEBUG

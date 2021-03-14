@@ -41,6 +41,7 @@ namespace SampleApp
                         m_iconExtractor = null;
                         icon = new Icon(iconPickerDialog.FileName);
                     }
+
                     else
                     {
                         m_iconExtractor = new IconExtractor(fileName);
@@ -49,14 +50,14 @@ namespace SampleApp
 
                     splitIcons = IconUtil.Split(icon);
                 }
+
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message, Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    _ = MessageBox.Show(ex.Message, Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
-                txtFileName.Text = String.Format(
-                    "{0}, #{1}, {2} variations", fileName, m_iconIndex, splitIcons.Length);
+                txtFileName.Text = $"{fileName}, #{m_iconIndex}, {splitIcons.Length} variations";
 
                 // Update icons.
 
@@ -66,13 +67,13 @@ namespace SampleApp
                 lvwIcons.BeginUpdate();
                 ClearAllIcons();
 
-                foreach (var i in splitIcons)
+                foreach (Icon i in splitIcons)
                 {
                     var item = new IconListViewItem();
                     Size size = i.Size;
                     item.BitCount = IconUtil.GetBitCount(i);
                     item.Bitmap = IconUtil.ToBitmap(i);
-                    item.ToolTipText = String.Format("{0}x{1}, {2} bits", size.Width, size.Height, item.BitCount);
+                    item.ToolTipText = $"{size.Width}x{size.Height}, {item.BitCount} bits";
                     i.Dispose();
 
                     _ = lvwIcons.Items.Add(item);
@@ -105,8 +106,7 @@ namespace SampleApp
                 {
                     var item = (IconListViewItem)lvwIcons.Items[i];
 
-                    string fileName = String.Format(
-                        "{0}x{1}, {2} bits.png", item.Bitmap.Width, item.Bitmap.Height, item.BitCount);
+                    string fileName = $"{item.Bitmap.Width}x{item.Bitmap.Height}, {item.BitCount} bits.png";
 
                     fileName = Path.Combine(folderBrowserDialog.SelectedPath, fileName);
 

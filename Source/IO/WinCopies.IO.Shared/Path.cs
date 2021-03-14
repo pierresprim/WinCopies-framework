@@ -166,6 +166,8 @@ namespace WinCopies.IO
             InArchiveFormats = new ReadOnlyDictionary<InArchiveFormat, string[]>(dic);
         }
 
+        // internal static object GetFileName(string path) => throw new NotImplementedException();
+
         //        public static ITreeNode< FileSystemObjectInfo > GetBrowsableObjectInfoFromPath(string path, bool parent/*, bool deepArchiveCheck*/)
 
         //        {

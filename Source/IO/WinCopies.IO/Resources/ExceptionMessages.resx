@@ -117,19 +117,61 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AbortedByUser" xml:space="preserve">
+    <value>The operation was aborted by user.</value>
+  </data>
+  <data name="Destination" xml:space="preserve">
+    <value>destination</value>
+  </data>
+  <data name="DiskError" xml:space="preserve">
+    <value>A disk error occurred.</value>
+  </data>
+  <data name="DriveNotReady" xml:space="preserve">
+    <value>The source and/or the destination drive is not ready.</value>
+  </data>
+  <data name="EncryptionFailed" xml:space="preserve">
+    <value>The encryption failed.</value>
+  </data>
+  <data name="FileRenamingFailed" xml:space="preserve">
+    <value>The file could not be renamed.</value>
+  </data>
+  <data name="FileSystemEntryAlreadyExists" xml:space="preserve">
+    <value>There is already an item with this path.</value>
+  </data>
   <data name="GivenItemInnerObjectIsNotFromSupportedType" xml:space="preserve">
     <value>The given item's inner object is not a(n) {0}.</value>
   </data>
   <data name="ItemProviderNotSupported" xml:space="preserve">
     <value>The given item provider or its current configuration is not supported.</value>
   </data>
+  <data name="NoError" xml:space="preserve">
+    <value>Process completed successfully.</value>
+  </data>
+  <data name="NotEnoughSpace" xml:space="preserve">
+    <value>There is not enough space on the destination drive or the total size cannot be determined.</value>
+  </data>
   <data name="ParentMustBeAnIDotNetAssemblyInfoOrAnIDotNetItemInfoBase" xml:space="preserve">
     <value>'parent' must be an IDotNetAssemblyInfo or an IDotNetItemInfoBase.</value>
+  </data>
+  <data name="PathNotFound" xml:space="preserve">
+    <value>The path could not be found.</value>
+  </data>
+  <data name="PathTooLong" xml:space="preserve">
+    <value>The destination path is too long.</value>
   </data>
   <data name="PropertyCannotBeNullOnObject" xml:space="preserve">
     <value>{0} cannot be null on {1}.</value>
   </data>
+  <data name="ReadProtection" xml:space="preserve">
+    <value>The {0} is protected from reading.</value>
+  </data>
   <data name="RegistryKeyNotExists" xml:space="preserve">
     <value>The specified registry key does not exist.</value>
+  </data>
+  <data name="Source" xml:space="preserve">
+    <value>source</value>
+  </data>
+  <data name="UnknownError" xml:space="preserve">
+    <value>An unknown error occurred.</value>
   </data>
 </root>

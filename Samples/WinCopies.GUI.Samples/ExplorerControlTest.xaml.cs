@@ -54,7 +54,7 @@ namespace WinCopies.GUI.Samples
             DataContext = this;
         }
 
-        public static ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> GetShellItems() => new ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel>() { { GetExplorerControlBrowsableObjectInfoViewModel(GetBrowsableObjectInfoViewModel(ShellObjectInfo.From(ShellObjectFactory.Create("C:\\"), ClientVersion)), true, SelectionMode.Extended, true) } };
+        public static ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> GetShellItems() => new() { { GetExplorerControlBrowsableObjectInfoViewModel(GetBrowsableObjectInfoViewModel(ShellObjectInfo.From(ShellObjectFactory.Create("C:\\"), ClientVersion)), true, SelectionMode.Extended, true) } };
 
         private static IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo) => new BrowsableObjectInfoViewModel(browsableObjectInfo) { Factory = new BrowsableObjectInfoFactory(ClientVersion) { SortComparison = BrowsableObjectInfoViewModel.DefaultComparison }, SortComparison = BrowsableObjectInfoViewModel.DefaultComparison };
 
@@ -69,9 +69,9 @@ namespace WinCopies.GUI.Samples
             return result;
         }
 
-        public static ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> GetRegistryItems() => new ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel>() { { GetExplorerControlBrowsableObjectInfoViewModel(new BrowsableObjectInfoViewModel(new RegistryItemInfo()), true, SelectionMode.Extended, true) } };
+        public static ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> GetRegistryItems() => new() { { GetExplorerControlBrowsableObjectInfoViewModel(new BrowsableObjectInfoViewModel(new RegistryItemInfo()), true, SelectionMode.Extended, true) } };
 
-        public static ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> GetWMIItems() => new ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel>() { { GetExplorerControlBrowsableObjectInfoViewModel(new BrowsableObjectInfoViewModel(new WMIItemInfo()), true, SelectionMode.Extended, true) } };
+        public static ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> GetWMIItems() => new() { { GetExplorerControlBrowsableObjectInfoViewModel(new BrowsableObjectInfoViewModel(new WMIItemInfo()), true, SelectionMode.Extended, true) } };
 
         private void RadioButton_Checked(object sender, RoutedEventArgs e)
         {

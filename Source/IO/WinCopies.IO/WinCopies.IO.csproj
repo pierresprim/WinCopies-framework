@@ -24,6 +24,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\GUI\WinCopies.GUI.Drawing\WinCopies.GUI.Drawing.csproj" />
+		<ProjectReference Include="..\..\GUI\WinCopies.GUI.Models\WinCopies.GUI.Models.csproj" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)'=='Debug'">

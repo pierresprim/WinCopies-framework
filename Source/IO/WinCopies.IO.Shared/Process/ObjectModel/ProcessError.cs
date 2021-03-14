@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-namespace WinCopies.GUI.IO.Process
+namespace WinCopies.IO.Process
 {
     public enum ProcessError : byte
     {
@@ -29,55 +29,52 @@ namespace WinCopies.GUI.IO.Process
         /// </summary>
         UnknownError = 1,
 
+        WrongStatus = 2,
+
         /// <summary>
         /// The process was aborted by user.
         /// </summary>
-        AbortedByUser = 2,
+        AbortedByUser = 3,
 
         /// <summary>
         /// One part or all of the source or destination path was not found.
         /// </summary>
-        PathNotFound = 3,
+        PathNotFound = 4,
 
         /// <summary>
         /// The source or destination drive is not ready.
         /// </summary>
-        DriveNotReady = 4,
+        DriveNotReady = 5,
 
         /// <summary>
         /// The source or destination path is read-protected.
         /// </summary>
-        ReadProtection = 5,
+        ReadProtection = 6,
 
         /// <summary>
         /// The destination path is read-protected.
         /// </summary>
-        DestinationReadProtection = 6,
+        DestinationReadProtection = 7,
 
         /// <summary>
         /// The destination path is write-protected.
         /// </summary>
-        WriteProtection = 7,
+        WriteProtection = 8,
 
         /// <summary>
         /// The destination path is too long.
         /// </summary>
-        PathTooLong = 8,
+        PathTooLong = 9,
 
         /// <summary>
         /// The destination disk has not enough space.
         /// </summary>
-        NotEnoughSpace = 9,
+        NotEnoughSpace = 10,
 
         /// <summary>
         /// A file or folder already exists with the same name.
         /// </summary>
-        FileSystemEntryAlreadyExists = 10,
-
-        /// <summary>
-        /// A folder already exists with the same name.
-        /// </summary>
-        FolderAlreadyExists = 11,
+        FileSystemEntryAlreadyExists = 11,
 
         /// <summary>
         /// The file could not be renamed.

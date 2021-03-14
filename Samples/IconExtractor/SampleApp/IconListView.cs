@@ -29,13 +29,14 @@ namespace SampleApp
             e.Graphics.Clip = new Region(e.Bounds);
 
             if (e.Item.Selected)
+
                 e.Graphics.FillRectangle(SystemBrushes.MenuHighlight, e.Bounds);
 
             int w = Math.Min(128, item.Bitmap.Width);
             int h = Math.Min(128, item.Bitmap.Height);
 
-            int x = e.Bounds.X + (e.Bounds.Width - w) / 2;
-            int y = e.Bounds.Y + (e.Bounds.Height - h) / 2;
+            int x = e.Bounds.X + ((e.Bounds.Width - w) / 2);
+            int y = e.Bounds.Y + ((e.Bounds.Height - h) / 2);
             var dstRect = new Rectangle(x, y, w, h);
             var srcRect = new Rectangle(Point.Empty, item.Bitmap.Size);
 

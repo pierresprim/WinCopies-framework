@@ -1,4 +1,4 @@
-﻿/* Copyright © Pierre Sprimont, 2020
+﻿/* Copyright © Pierre Sprimont, 2021
  *
  * This file is part of the WinCopies Framework.
  *
@@ -18,17 +18,185 @@
 using System;
 using System.IO;
 using System.Linq;
-#if !WinCopies3
-using WinCopies.Collections;
-#endif
+using System.Security;
+
 using WinCopies.Collections.Generic;
 using WinCopies.IO.Enumeration;
+using WinCopies.Util;
+
+using static WinCopies.Collections.Util;
 
 namespace WinCopies.IO
 {
     public static class Directory
     {
-        public static System.Collections.Generic.IEnumerable<T> Enumerate<T>(System.Collections.Generic.IEnumerable<T> paths, Func<IPathInfo, T> getNewPathInfoDelegate
+        #region Safe Enumeration
+        public static Type[] GetIOSafeEnumerationExceptionTypes() => new Type[] { typeof(DirectoryNotFoundException), typeof(IOException), typeof(PathTooLongException), typeof(SecurityException), typeof(UnauthorizedAccessException) };
+
+        public static System.Collections.Generic.IEnumerable<string> EnumerateFileSystemEntriesIOSafe(string path)
+        {
+            try
+            {
+                return System.IO.Directory.EnumerateFileSystemEntries(path);
+            }
+
+            catch (Exception ex) when (ex.Is(false, GetIOSafeEnumerationExceptionTypes()))
+            {
+                return GetEmptyEnumerable<string>();
+            }
+        }
+
+        public static System.Collections.Generic.IEnumerable<string> EnumerateFileSystemEntriesIOSafe(in string path, in string searchPattern)
+        {
+            try
+            {
+                return System.IO.Directory.EnumerateFileSystemEntries(path, searchPattern);
+            }
+
+            catch (Exception ex) when (ex.Is(false, GetIOSafeEnumerationExceptionTypes()))
+            {
+                return GetEmptyEnumerable<string>();
+            }
+        }
+
+        public static System.Collections.Generic.IEnumerable<string> EnumerateFileSystemEntriesIOSafe(in string path, in string searchPattern, in EnumerationOptions enumerationOptions)
+        {
+            try
+            {
+                return System.IO.Directory.EnumerateFileSystemEntries(path, searchPattern, enumerationOptions);
+            }
+
+            catch (Exception ex) when (ex.Is(false, GetIOSafeEnumerationExceptionTypes()))
+            {
+                return GetEmptyEnumerable<string>();
+            }
+        }
+
+        public static System.Collections.Generic.IEnumerable<string> EnumerateFileSystemEntriesIOSafe(string path, in string searchPattern, in SearchOption searchOption)
+        {
+            try
+            {
+                return System.IO.Directory.EnumerateFileSystemEntries(path, searchPattern, searchOption);
+            }
+
+            catch (Exception ex) when (ex.Is(false, GetIOSafeEnumerationExceptionTypes()))
+            {
+                return GetEmptyEnumerable<string>();
+            }
+        }
+
+
+
+        public static System.Collections.Generic.IEnumerable<string> EnumerateDirectoriesIOSafe(string path)
+        {
+            try
+            {
+                return System.IO.Directory.EnumerateDirectories(path);
+            }
+
+            catch (Exception ex) when (ex.Is(false, GetIOSafeEnumerationExceptionTypes()))
+            {
+                return GetEmptyEnumerable<string>();
+            }
+        }
+
+        public static System.Collections.Generic.IEnumerable<string> EnumerateDirectoriesIOSafe(string path, string searchPattern)
+        {
+            try
+            {
+                return System.IO.Directory.EnumerateDirectories(path, searchPattern);
+            }
+
+            catch (Exception ex) when (ex.Is(false, GetIOSafeEnumerationExceptionTypes()))
+            {
+                return GetEmptyEnumerable<string>();
+            }
+        }
+
+        public static System.Collections.Generic.IEnumerable<string> EnumerateDirectoriesIOSafe(string path, string searchPattern, EnumerationOptions enumerationOptions)
+        {
+            try
+            {
+                return System.IO.Directory.EnumerateDirectories(path, searchPattern, enumerationOptions);
+            }
+
+            catch (Exception ex) when (ex.Is(false, GetIOSafeEnumerationExceptionTypes()))
+            {
+                return GetEmptyEnumerable<string>();
+            }
+        }
+
+        public static System.Collections.Generic.IEnumerable<string> EnumerateDirectoriesIOSafe(string path, string searchPattern, SearchOption searchOption)
+        {
+            try
+            {
+                return System.IO.Directory.EnumerateDirectories(path, searchPattern, searchOption);
+            }
+
+            catch (Exception ex) when (ex.Is(false, GetIOSafeEnumerationExceptionTypes()))
+            {
+                return GetEmptyEnumerable<string>();
+            }
+        }
+
+
+
+        public static System.Collections.Generic.IEnumerable<string> EnumerateFilesIOSafe(string path)
+        {
+            try
+            {
+                return System.IO.Directory.EnumerateFiles(path);
+            }
+
+            catch (Exception ex) when (ex.Is(false, GetIOSafeEnumerationExceptionTypes()))
+            {
+                return GetEmptyEnumerable<string>();
+            }
+        }
+
+        public static System.Collections.Generic.IEnumerable<string> EnumerateFilesIOSafe(string path, string searchPattern)
+        {
+            try
+            {
+                return System.IO.Directory.EnumerateFiles(path, searchPattern);
+            }
+
+            catch (Exception ex) when (ex.Is(false, GetIOSafeEnumerationExceptionTypes()))
+            {
+                return GetEmptyEnumerable<string>();
+            }
+        }
+
+        public static System.Collections.Generic.IEnumerable<string> EnumerateFilesIOSafe(string path, string searchPattern, EnumerationOptions enumerationOptions)
+        {
+            try
+            {
+                return System.IO.Directory.EnumerateFiles(path, searchPattern, enumerationOptions);
+            }
+
+            catch (Exception ex) when (ex.Is(false, GetIOSafeEnumerationExceptionTypes()))
+            {
+                return GetEmptyEnumerable<string>();
+            }
+        }
+
+        public static System.Collections.Generic.IEnumerable<string> EnumerateFilesIOSafe(string path, string searchPattern, SearchOption searchOption)
+        {
+            try
+            {
+                return System.IO.Directory.EnumerateFiles(path, searchPattern, searchOption);
+            }
+
+            catch (Exception ex) when (ex.Is(false, GetIOSafeEnumerationExceptionTypes()))
+            {
+                return GetEmptyEnumerable<string>();
+            }
+        }
+        #endregion Safe Enumeration
+
+
+
+        public static System.Collections.Generic.IEnumerable<T> Enumerate<T>(in System.Collections.Generic.IEnumerable<T> paths, in Func<IPathInfo, T> getNewPathInfoDelegate, in bool safeEnumeration
 #if DEBUG
             , FileSystemEntryEnumeratorProcessSimulation simulationParameters
 #endif
@@ -36,7 +204,7 @@ namespace WinCopies.IO
 #if NETCORE
             , null
 #endif
-                , FileSystemEntryEnumerationOrder.None, getNewPathInfoDelegate
+                , FileSystemEntryEnumerationOrder.None, getNewPathInfoDelegate, safeEnumeration
 #if DEBUG
                 , simulationParameters
 #endif
@@ -49,7 +217,7 @@ namespace WinCopies.IO
 #if NETCORE
             , EnumerationOptions enumerationOptions
 #endif
-            , FileSystemEntryEnumerationOrder enumerationOrder, Func<IPathInfo, T> getNewPathInfoDelegate
+            , FileSystemEntryEnumerationOrder enumerationOrder, Func<IPathInfo, T> getNewPathInfoDelegate, bool safeEnumeration
 #if DEBUG
             , FileSystemEntryEnumeratorProcessSimulation simulationParameters
 #endif
@@ -57,11 +225,11 @@ namespace WinCopies.IO
 #if NETCORE
                 , enumerationOptions
 #endif
-                , enumerationOrder
+                , enumerationOrder, getNewPathInfoDelegate, safeEnumeration
 #if DEBUG
                 , simulationParameters
 #endif
-                , getNewPathInfoDelegate))));
+                ))));
 
         #region Old
 

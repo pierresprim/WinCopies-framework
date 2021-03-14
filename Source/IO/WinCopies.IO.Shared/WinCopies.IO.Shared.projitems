@@ -23,6 +23,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectInfoSelector.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enumeration\Reflection\DotNetEnumeration.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enumeration\RegistryItemInfoEnumeratorStruct.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\IArchiveItemInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\IArchiveItemInfoProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\IFileSystemObjectInfo.cs" />
@@ -36,6 +37,18 @@
     <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\Reflection\IDotNetTypeInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enumeration\ArchiveItemInfoEnumerator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enumeration\WMIItemInfoEnumerator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ObjectModel\Copy.old.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ObjectModel\Copy.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\Errors.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ObjectModel\IProcess.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ObjectModel\Process.Partial\LinkedLists.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ObjectModel\Process.Partial\Parameters.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ObjectModel\Process.Partial\Process.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ObjectModel\ProcessData.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ObjectModel\ProcessError.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessTypes.Partial\ProcessCollection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessTypes.Partial\ProcessDelegates.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessTypes.Partial\ProcessErrorTypes.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\PropertyId.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enumeration\ArchiveFileInfoEnumeratorStruct.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FileInfoLoader.cs" />

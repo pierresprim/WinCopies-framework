@@ -61,6 +61,15 @@ namespace WinCopies.IO.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Copy.
+        /// </summary>
+        public static string Copy {
+            get {
+                return ResourceManager.GetString("Copy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to .Net Attribute.
         /// </summary>
         public static string DotNetAttribute {

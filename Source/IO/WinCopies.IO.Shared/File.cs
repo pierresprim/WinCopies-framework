@@ -148,5 +148,11 @@ namespace WinCopies.IO
 
             return true;
         }
+
+        public static FileStream GetFileStream(in string path, in int bufferLength) => new
+#if !CS9
+            FileStream
+#endif
+            (path, FileMode.Open, FileAccess.Read, FileShare.Read, bufferLength, FileOptions.None);
     }
 }
