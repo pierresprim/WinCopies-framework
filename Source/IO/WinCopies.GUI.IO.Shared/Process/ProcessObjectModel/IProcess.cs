@@ -16,70 +16,20 @@
 * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using System.ComponentModel;
+using WinCopies.IO;
 
 namespace WinCopies.GUI.IO.Process
 {
-    public interface IProcess // : IPausableBackgroundWorker
+    public interface IProcess : WinCopies.IO.Process.ObjectModel.IProcess,  IBackgroundWorker, INotifyPropertyChanged
     {
         #region Properties
-        IReadOnlyProcessCollection Paths { get; }
-
-        IReadOnlyProcessErrorPathCollection ErrorPaths { get; }
-
-        WinCopies.IO.Size InitialItemSize { get; }
-
-#if !WinCopies3
-int 
-#else
-        uint
-#endif
-            InitialItemCount { get; }
-
         bool IsCompleted { get; }
 
-        string SourcePath { get; }
+        bool IsPaused { get; }
 
-        bool ArePathsLoaded { get; }
-
-        bool WorkerSupportsCancellation { get; set; }
-
-        bool WorkerSupportsPausing { get; set; }
-
-        bool WorkerReportsProgress { get; set; }
-
-        bool IsBusy { get; }
-
-        bool CancellationPending { get; }
-
-        bool PausePending { get; }
-
-        ProcessError Error { get; }
-
-        IPathInfo CurrentPath { get; }
-
-        int ProgressPercentage { get; }
-
-#if DEBUG
-        ProcessSimulationParameters SimulationParameters { get; }
-#endif
-#endregion
-
-#region Events
-        event ProgressChangedEventHandler ProgressChanged;
-
-        event RunWorkerCompletedEventHandler RunWorkerCompleted;
-#endregion
-
-#region Methods
-        string[] PathsToStringArray();
+        IPathCommon CurrentPath { get; }
+        #endregion
 
         void RunWorkerAsync();
-
-        void RunWorkerAsync(object argument);
-
-        void PauseAsync();
-
-        void CancelAsync();
-#endregion
     }
 }

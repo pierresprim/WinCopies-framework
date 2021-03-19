@@ -106,10 +106,11 @@ namespace WinCopies.IO.ObjectModel
         }
 #endif
 
-#if NETFRAMEWORK
-        public override IBrowsableObjectInfo Parent => _parent ?? (_parent = GetParent());
+        public override IBrowsableObjectInfo Parent => _parent
+#if CS8
+            ??= GetParent();
 #else
-        public override IBrowsableObjectInfo Parent => _parent ??= GetParent();
+            ?? (_parent = GetParent());
 #endif
 
         /// <summary>

@@ -23,9 +23,9 @@ using static WinCopies.Collections.ThrowHelper;
 
 namespace WinCopies.IO.Process.ObjectModel
 {
-    public static partial class ProcessObjectModelTypes<TItems, TFactory, TError, TProcessDelegates, TProcessDelegateParam>
+    public static partial class ProcessObjectModelTypes<TItems, TFactory, TError, TProcessDelegates, TProcessEventDelegates, TProcessDelegateParam>
     {
-        public abstract partial class Process : IProcess<TItems, TError>, DotNetFix.IDisposable
+        public abstract partial class Process
         {
             private interface _IQueue<T> : System.IDisposable
             {
@@ -79,7 +79,17 @@ namespace WinCopies.IO.Process.ObjectModel
                     return node;
                 }
 
-                bool _IQueue<IProcessErrorItem<TItems, TError>>.HasItems => (_currentNode ??= Peek()) != null;
+                bool _IQueue<IProcessErrorItem<TItems, TError>>.HasItems => (_currentNode
+#if CS8
+                    ??=
+#else
+                    ?? (_currentNode =
+#endif
+                    Peek()
+#if !CS8
+                    )
+#endif
+                    ) != null;
 
                 IProcessErrorItem<TItems, TError> _IQueue<IProcessErrorItem<TItems, TError>>.Peek() => _currentNode.Value;
 
@@ -143,6 +153,11 @@ namespace WinCopies.IO.Process.ObjectModel
 
                     return false;
                 }
+            }
+
+            public interface IEnumerableInfoLinkedList : IEnumerableInfoLinkedList<IProcessErrorItem<TItems, TError>>, ProcessTypes<TItems>.IProcessCollection
+            {
+                new void Clear();
             }
         }
     }

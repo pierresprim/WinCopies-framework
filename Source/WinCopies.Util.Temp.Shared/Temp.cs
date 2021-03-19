@@ -1,4 +1,4 @@
-﻿/* Copyright © Pierre Sprimont, 2020
+﻿/* Copyright © Pierre Sprimont, 2021
  *
  * This file is part of the WinCopies Framework.
  *
@@ -241,45 +241,70 @@ namespace WinCopies
         System.Collections.Generic.IEnumerator<T> Collections.Generic.IEnumerable<T>.GetReversedEnumerator() => GetReversedEnumerator();
     }
 
-    public sealed class EnumeratorValue<T> : IUIntCountableEnumerator<T>, ICountableEnumerator<T>, IUIntCountableEnumerableInfo<T>, ICountableEnumerableInfo<T>
+    public sealed class RepeatEnumerator<T> : Enumerator<T>, IUIntCountableEnumerator<T>, ICountableEnumerator<T>, IUIntCountableEnumerableInfo<T>, ICountableEnumerableInfo<T>
     {
         private NullableGeneric<T> _value;
-        private bool _completed;
+        private readonly uint _count;
+        private uint _i;
+
+        public override bool? IsResetSupported => GetValueIfNotDisposed(true);
 
         private TValue GetValueIfNotDisposed<TValue>(in TValue value) => _value == null ? throw GetExceptionForDispose(false) : value;
 
-        public T Value => GetValueIfNotDisposed(_value.Value);
+        protected override T CurrentOverride => GetValueIfNotDisposed(_value.Value);
 
-        uint IUIntCountable.Count => GetValueIfNotDisposed(1u);
+        uint IUIntCountable.Count => GetValueIfNotDisposed(_count);
 
-        private int Count => GetValueIfNotDisposed(1);
+        private int Count => GetValueIfNotDisposed(_count > int.MaxValue ? throw new InvalidOperationException($"The number of items is greater than {nameof(Int32)}.{nameof(int.MaxValue)}.") : (int)_count);
 
         int ICountable.Count => Count;
 
         int IReadOnlyCollection<T>.Count => Count;
 
-        T System.Collections.Generic.IEnumerator<T>.Current => Value;
-
-        object System.Collections.IEnumerator.Current => Value;
-
         int ICountableEnumerable<T>.Count => Count;
 
-        public bool SupportsReversedEnumeration => GetValueIfNotDisposed(true);
+        bool Collections.Generic.IEnumerable<T>.SupportsReversedEnumeration => GetValueIfNotDisposed(true);
 
-        public EnumeratorValue(in NullableGeneric<T> value) => _value = value;
+        public RepeatEnumerator(in NullableGeneric<T> value, in uint count)
+        {
+            _value = value;
 
-        public EnumeratorValue(in T value) : this(new NullableGeneric<T>(value))
+            _count = count;
+        }
+
+        public RepeatEnumerator(in T value, in uint count) : this(new NullableGeneric<T>(value), count)
         {
             // Left empty.
         }
 
-        bool System.Collections.IEnumerator.MoveNext() => _value == null ? throw GetExceptionForDispose(false) : _completed ? false : (_completed = true);
+        protected override bool MoveNextOverride()
+        {
+            if (_value == null)
 
-        void System.Collections.IEnumerator.Reset() => _completed = _value == null ? throw GetExceptionForDispose(false) : false;
+                throw GetExceptionForDispose(false);
+
+            if (_i == _count)
+
+                return false;
+
+            else
+            {
+                _i++;
+
+                return true;
+            }
+        }
+
+        protected override void ResetOverride()
+        {
+            base.ResetOverride();
+
+            _i = _value == null ? throw GetExceptionForDispose(false) : 0u;
+        }
 
         void System.IDisposable.Dispose() => _value = null;
 
-        private EnumeratorValue<T> GetEnumerator() => GetValueIfNotDisposed(this);
+        private RepeatEnumerator<T> GetEnumerator() => GetValueIfNotDisposed(this);
 
         private ICountableEnumerator<T> GetCountableEnumerator() => GetEnumerator();
 
@@ -298,6 +323,192 @@ namespace WinCopies
         System.Collections.IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         IUIntCountableEnumerator<T> IUIntCountableEnumerable<T>.GetEnumerator() => GetEnumerator();
+    }
+
+    public abstract class ValueManager<T> : DotNetFix.IDisposable
+    {
+        private ILinkedList<T> _values;
+
+        protected ILinkedList<T> Values => this.GetIfNotDisposed(_values);
+
+        public bool IsDisposed { get; private set; }
+
+        public void Add(in T action) => _values.Add(action);
+
+        public void Remove(in T action)
+        {
+            ILinkedListNode<T> node = _values.First;
+
+            if (node == null)
+
+                return;
+
+            do
+            {
+                if (Equals(node.Value, action))
+                {
+                    _values.Remove(node);
+
+                    break;
+                }
+            } while ((node = node.Next) != null);
+        }
+
+        protected virtual void Dispose(in bool disposing)
+        {
+            if (IsDisposed)
+
+                return;
+
+            if (disposing)
+            {
+                _values.Clear();
+
+                _values = null;
+            }
+
+            IsDisposed = true;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+
+            GC.SuppressFinalize(this);
+        }
+    }
+
+    public class EventDelegate<T> : ValueManager<Action<T>>
+    {
+        public void RaiseEvent(in T param)
+        {
+            foreach (Action<T> action in Values)
+
+                action(param);
+        }
+    }
+
+    public interface IQueryDelegateDelegate<TIn, TOut>
+    {
+        Func<TIn, TOut> FirstAction { get; }
+
+        Func<TIn, TOut, TOut> OtherAction { get; }
+    }
+
+    public class QueryDelegateDelegate<TIn, TOut> : IQueryDelegateDelegate<TIn, TOut>
+    {
+        public Func<TIn, TOut> FirstAction { get; }
+
+        public Func<TIn, TOut, TOut> OtherAction { get; }
+
+        public QueryDelegateDelegate(in Func<TIn, TOut> firstAction, in Func<TIn, TOut, TOut> otherAction)
+        {
+            FirstAction = firstAction;
+
+            OtherAction = otherAction;
+        }
+    }
+
+    public abstract class EventAndQueryDelegate<TIn, TOut> : ValueManager<IQueryDelegateDelegate<TIn, TOut>>
+    {
+        protected abstract bool Check(in TOut outParam);
+
+        protected abstract bool Merge(in TOut x, in TOut y, out TOut result);
+
+        public TOut RaiseEvent(TIn param)
+        {
+            NullableGeneric<TOut> result = null;
+            bool mergeResult;
+
+            Values.ForEach<IQueryDelegateDelegate<TIn, TOut>>(func =>
+            {
+                result = new NullableGeneric<TOut>(func.FirstAction(param));
+
+                return Check(result.Value);
+            }, func =>
+            {
+                mergeResult = Merge(result.Value, func.OtherAction(param, result.Value), out TOut mergeResultParam);
+
+                result = new NullableGeneric<TOut>(mergeResultParam);
+
+                return mergeResult;
+            });
+
+            return result == null ? default : result.Value;
+        }
+    }
+
+    public abstract class EventAndQueryDelegate2<TIn, TOut> : EventAndQueryDelegate<TIn, TOut>
+    {
+        protected abstract TOut Merge(in TOut x, in TOut y);
+
+        protected sealed override bool Merge(in TOut x, in TOut y, out TOut result)
+        {
+            result = Merge(x, y);
+
+            return Check(result);
+        }
+    }
+
+    public class AND_EventAndQueryDelegate<TIn> : EventAndQueryDelegate2<TIn, bool>
+    {
+        protected override bool Check(in bool outParam) => true;
+
+        protected override bool Merge(in bool x, in bool y) => x && y;
+    }
+
+    public class ANDALSO_EventAndQueryDelegate<TIn> : EventAndQueryDelegate2<TIn, bool>
+    {
+        protected override bool Check(in bool outParam) => outParam;
+
+        protected override bool Merge(in bool x, in bool y) => x && y;
+    }
+
+    public class OR_EventAndQueryDelegate<TIn> : EventAndQueryDelegate2<TIn, bool>
+    {
+        protected override bool Check(in bool outParam) => true;
+
+        protected override bool Merge(in bool x, in bool y) => x || y;
+    }
+
+    public class ORELSE_EventAndQueryDelegate<TIn> : EventAndQueryDelegate2<TIn, bool>
+    {
+        protected override bool Check(in bool outParam) => !outParam;
+
+        protected override bool Merge(in bool x, in bool y) => x || y;
+    }
+
+    public class XOR_EventAndQueryDelegate<TIn> : EventAndQueryDelegate2<TIn, bool>
+    {
+        protected override bool Check(in bool outParam) => true;
+
+        protected override bool Merge(in bool x, in bool y) => x ^ y;
+    }
+
+    public class XORELSE_EventAndQueryDelegate<TIn> : EventAndQueryDelegate<TIn, bool>
+    {
+        protected override bool Check(in bool outParam) => true;
+
+        protected override bool Merge(in bool x, in bool y, out bool result)
+        {
+            if (x && y)
+            {
+                result = false;
+
+                return false;
+            }
+
+            result = x ^ y;
+
+            return true;
+        }
+    }
+
+    public interface IPropertyObservable : DotNetFix.IDisposable
+    {
+        void AddPropertyChangedDelegate(Action<string> action);
+
+        void RemovePropertyChangedDelegate(Action<string> action);
     }
 
     public static class Temp
@@ -319,6 +530,28 @@ namespace WinCopies
         public static T GetIfNotDisposed<T>(this WinCopies.DotNetFix.IDisposable obj, in T value) => obj.IsDisposed ? throw GetExceptionForDispose(false) : value;
 
         public static T GetIfNotDisposedOrDisposing<T>(this WinCopies.IDisposable obj, in T value) => obj.IsDisposed ? throw GetExceptionForDispose(false) : obj.IsDisposing ? throw GetExceptionForDispose(true) : value;
+
+        public static void ForEach<T>(this System.Collections.Generic.IEnumerable<T> enumerable, in Func<T, bool> firstAction, Func<T, bool> otherAction)
+        {
+            System.Collections.Generic.IEnumerator<T> enumerator = enumerable.GetEnumerator();
+
+            try
+            {
+                if (enumerator.MoveNext())
+
+                    if (firstAction(enumerator.Current))
+
+                        while (enumerator.MoveNext() && otherAction(enumerator.Current))
+                        {
+                            // Left empty.
+                        }
+            }
+
+            finally
+            {
+                enumerator.Dispose();
+            }
+        }
 
         [DllImport(Microsoft.WindowsAPICodePack.NativeAPI.Consts.DllNames.Kernel32, SetLastError = true, CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.Bool)]

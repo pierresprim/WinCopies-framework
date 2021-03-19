@@ -16,6 +16,7 @@
 * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using System;
+using System.Collections.Generic;
 
 using WinCopies.Collections.DotNetFix;
 using WinCopies.Collections.DotNetFix.Generic;
@@ -24,9 +25,9 @@ using static WinCopies.Temp;
 
 namespace WinCopies.IO.Process.ObjectModel
 {
-    public static partial class ProcessObjectModelTypes<TItems, TFactory, TError, TProcessDelegates, TProcessDelegateParam>
+    public static partial class ProcessObjectModelTypes<TItems, TFactory, TError, TProcessDelegates, TProcessEventDelegates, TProcessDelegateParam>
     {
-        public abstract partial class Process : IProcess<TItems, TError>, WinCopies.DotNetFix.IDisposable
+        public abstract partial class Process
         {
             public class Parameter<T1, T2> : DelegateValueProvider<T1, T2> where T2 : ISimpleLinkedListBase
             {
@@ -47,9 +48,9 @@ namespace WinCopies.IO.Process.ObjectModel
                 }
             }
 
-            public class QueueParameter : Parameter<ProcessTypes<TItems>.ProcessCollection, ProcessTypes<TItems>.ProcessCollection>
+            public class QueueParameter : Parameter<ProcessTypes<TItems>.ProcessCollection, ProcessTypes<TItems>.IProcessCollection>
             {
-                public QueueParameter(in ProcessTypes<TItems>.ProcessCollection value, in Func<ProcessTypes<TItems>.ProcessCollection, ProcessTypes<TItems>.ProcessCollection> func) : base(value, func)
+                public QueueParameter(in ProcessTypes<TItems>.ProcessCollection value, in Func<ProcessTypes<TItems>.ProcessCollection, ProcessTypes<TItems>.IProcessCollection> func) : base(value, func)
                 {
                     // Left empty.
                 }
@@ -57,14 +58,14 @@ namespace WinCopies.IO.Process.ObjectModel
                 protected override void ValidateValue(in ProcessTypes<TItems>.ProcessCollection value) => ThrowIfNullOrReadOnly(value, nameof(value));
             }
 
-            public class LinkedListParameter : Parameter<IEnumerableInfoLinkedList<IProcessErrorItem<TItems, TError>>, IQueue<IProcessErrorItem<TItems, TError>>>
+            public class LinkedListParameter : Parameter<IEnumerableInfoLinkedList, ProcessTypes<IProcessErrorItem<TItems, TError>>.IProcessCollection>
             {
-                public LinkedListParameter(in IEnumerableInfoLinkedList<IProcessErrorItem<TItems, TError>> value, in Func<IEnumerableInfoLinkedList<IProcessErrorItem<TItems, TError>>, IQueue<IProcessErrorItem<TItems, TError>>> func) : base(value, func)
+                public LinkedListParameter(in IEnumerableInfoLinkedList value, in Func<IEnumerableInfoLinkedList<IProcessErrorItem<TItems, TError>>, ProcessTypes<IProcessErrorItem<TItems, TError>>.IProcessCollection> func) : base(value, func)
                 {
                     // Left empty.
                 }
 
-                protected override void ValidateValue(in IEnumerableInfoLinkedList<IProcessErrorItem<TItems, TError>> value) => ThrowIfNullOrReadOnly(value, nameof(value));
+                protected override void ValidateValue(in IEnumerableInfoLinkedList value) => ThrowIfNullOrReadOnly((ICollection<IProcessErrorItem<TItems, TError>>)value, nameof(value));
             }
         }
     }

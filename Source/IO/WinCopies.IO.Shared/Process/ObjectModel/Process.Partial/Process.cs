@@ -16,18 +16,18 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using System;
-using System.Collections.Generic;
+
 using WinCopies.Collections.DotNetFix.Generic;
 
 using static WinCopies.ThrowHelper;
 
 namespace WinCopies.IO.Process.ObjectModel
 {
-    public static partial class ProcessObjectModelTypes<TItems, TFactory, TError, TProcessDelegates, TProcessDelegateParam> where TItems : IPathInfo where TFactory : ProcessTypes<TItems>.ProcessErrorTypes<TError>.IProcessErrorFactories where TProcessDelegates : ProcessTypes<TItems>.ProcessDelegates<TProcessDelegateParam>
+    public static partial class ProcessObjectModelTypes<TItems, TFactory, TError, TProcessDelegates, TProcessEventDelegates, TProcessDelegateParam> where TItems : IPathInfo where TFactory : ProcessTypes<TItems>.ProcessErrorTypes<TError>.IProcessErrorFactories where TProcessDelegates : ProcessDelegateTypes<TItems, TProcessDelegateParam>.ProcessDelegatesAbstract<TProcessEventDelegates> where TProcessEventDelegates : ProcessDelegateTypes<TItems, TProcessDelegateParam>.IProcessEventDelegates where TProcessDelegateParam : IProcessProgressDelegateParameter
     {
-        public abstract partial class Process : IProcess<TItems, TError>, DotNetFix.IDisposable
+        public abstract partial class Process : ProcessInterfaceModelTypes<TItems, TError>.IProcess<TProcessDelegateParam, TProcessEventDelegates>
         {
-            public class ProcessErrorItem : ProcessTypes<TItems>.ProcessErrorTypes<TError>.ProcessErrorItem
+            public class ProcessErrorItem : ProcessTypes<TItems, TError>.ProcessErrorItem
             {
                 public ProcessErrorItem(in TItems path, in IProcessError<TError> error) : base(path, error)
                 {
@@ -36,47 +36,108 @@ namespace WinCopies.IO.Process.ObjectModel
             }
 
             #region Fields
+            private bool _arePathsLoaded;
+            private uint _initialItemCount;
+            private IProcessError<TError> _error;
             private IQueueBase<TItems> _initialPaths;
-            private IQueue<TItems> _paths;
-            private ProcessTypes<TItems>.ProcessCollection _pathsReadOnlyQueue;
+            private Size _actualRemainingSize;
+            private ProcessTypes<TItems>.IProcessCollection _paths;
+            private ProcessTypes<TItems>.IProcessCollection _pathsReadOnlyQueue;
             private TProcessDelegates _processDelegates;
-            private IEnumerableInfoLinkedList<IProcessErrorItem<TItems, TError>> _errorPaths;
-            private IQueue<IProcessErrorItem<TItems, TError>> _errorPathsReadOnlyQueue;
+            private NullableGeneric<TProcessEventDelegates> _processEventDelegates;
+            private IEnumerableInfoLinkedList _errorPaths;
+            private ProcessTypes<IProcessErrorItem<TItems, TError>>.IProcessCollection _errorPathsReadOnlyQueue;
             private NullableGeneric<TFactory> _factory;
+            private Size _initialTotalSize;
+            private EventDelegate<string> _propertyEventDelegate = new
+#if !CS9
+                EventDelegate<string>
+#endif
+                ();
             #endregion Fields
 
             #region Properties
-            public abstract TError NoError { get; }
-
-            public abstract TError UnknownError { get; }
-
-            public abstract TError WrongStatus { get; }
-
             public TFactory Factory => this.GetIfNotDisposed(_factory).Value;
+
+            IProcessErrorFactory<TError> ProcessInterfaceModelTypes<TItems, TError>.IProcess<TProcessDelegateParam, TProcessEventDelegates>.Factory => Factory;
 
             protected TProcessDelegates ProcessDelegates => this.GetIfNotDisposed(_processDelegates);
 
-            public bool ArePathsLoaded { get; private set; }
+            public TProcessEventDelegates ProcessEventDelegates => this.GetIfNotDisposed(_processEventDelegates).Value;
+
+            public bool ArePathsLoaded
+            {
+                get => _arePathsLoaded;
+
+                private set
+                {
+                    _arePathsLoaded = value;
+
+                    _propertyEventDelegate.RaiseEvent(nameof(ArePathsLoaded));
+                }
+            }
 
             public abstract TItems SourcePath { get; }
 
-            public ProcessTypes<TItems>.ProcessCollection Paths => this.GetIfNotDisposed(_pathsReadOnlyQueue);
-
-            IQueue<TItems> IProcess<TItems, TError>.Paths => Paths;
+            public ProcessTypes<TItems>.IProcessCollection Paths => this.GetIfNotDisposed(_pathsReadOnlyQueue);
 
             public IQueueBase<TItems> InitialPaths => this.GetIfNotDisposed(_initialPaths);
 
             public abstract string Name { get; }
 
-            public IProcessError<TError> Error { get; private set; }
+            public IProcessError<TError> Error
+            {
+                get => _error;
 
-            public IQueue<IProcessErrorItem<TItems, TError>> ErrorPaths => this.GetIfNotDisposed(_errorPathsReadOnlyQueue);
+                private set
+                {
+                    _error = value;
 
-            public Size InitialTotalSize { get; private set; }
+                    _propertyEventDelegate.RaiseEvent(nameof(Error));
+                }
+            }
 
-            public IPathInfo CurrentItem { get; private set; }
+            public IProcessErrorFactoryData<TError> ProcessErrorFactoryData => this.GetIfNotDisposed(_factory).Value;
 
-            public abstract IList<IProcessData> ProcessData { get; }
+            public ProcessTypes<IProcessErrorItem<TItems, TError>>.IProcessCollection ErrorPaths => this.GetIfNotDisposed(_errorPathsReadOnlyQueue);
+
+            public Size InitialTotalSize
+            {
+                get => _initialTotalSize;
+
+                private set
+                {
+                    _initialTotalSize = value;
+                    ActualRemainingSize = value;
+
+                    _propertyEventDelegate.RaiseEvent(nameof(InitialTotalSize));
+                    _propertyEventDelegate.RaiseEvent(nameof(ActualRemainingSize));
+                }
+            }
+
+            public uint InitialItemCount
+            {
+                get => _initialItemCount;
+
+                private set
+                {
+                    _initialItemCount = value;
+
+                    _propertyEventDelegate.RaiseEvent(nameof(InitialItemCount));
+                }
+            }
+
+            public Size ActualRemainingSize
+            {
+                get => _actualRemainingSize;
+
+                private set
+                {
+                    _actualRemainingSize = value;
+
+                    _propertyEventDelegate.RaiseEvent(nameof(ActualRemainingSize));
+                }
+            }
             #endregion Properties
 
             public Process(in IQueueBase<TItems> initialPaths, QueueParameter paths, in LinkedListParameter errorsQueue, in TProcessDelegates processDelegates)
@@ -97,9 +158,14 @@ namespace WinCopies.IO.Process.ObjectModel
                 _errorPaths = errorsQueue.ProvideValues(out _errorPathsReadOnlyQueue);
 
                 _processDelegates = processDelegates;
+                _processEventDelegates = new NullableGeneric<TProcessEventDelegates>(processDelegates.GetProcessEventDelegates());
             }
 
             #region Methods
+            void IPropertyObservable.AddPropertyChangedDelegate(Action<string> action) => this.GetIfNotDisposed(_propertyEventDelegate).Add(action);
+
+            void IPropertyObservable.RemovePropertyChangedDelegate(Action<string> action) => this.GetIfNotDisposed(_propertyEventDelegate).Remove(action);
+
             protected abstract bool Check(out IProcessError<TError> error);
 
             protected abstract bool LoadPathsOverride(out IProcessError<TError> error, out bool clearOnError);
@@ -115,7 +181,7 @@ namespace WinCopies.IO.Process.ObjectModel
 
                 catch (Exception ex)
                 {
-                    Error = _factory.Value.GetError(UnknownError, ex);
+                    Error = _factory.Value.GetError(_factory.Value.UnknownError, ex);
                 }
 
                 finally
@@ -127,7 +193,7 @@ namespace WinCopies.IO.Process.ObjectModel
 
                     catch (Exception ex)
                     {
-                        Error = _factory.Value.GetError(WrongStatus, ex);
+                        Error = _factory.Value.GetError(_factory.Value.WrongStatusError, ex);
                     }
                 }
 
@@ -138,11 +204,13 @@ namespace WinCopies.IO.Process.ObjectModel
             {
                 bool result = LoadPathsOverride(out IProcessError<TError> error, out bool clearOnError);
 
-                if (result && Equals(Error, NoError))
+                if (result && Equals(Error, _factory.Value.NoError))
                 {
                     ArePathsLoaded = true;
 
                     InitialTotalSize = Paths.TotalSize;
+
+                    InitialItemCount = Paths.Count;
                 }
 
                 else if (clearOnError)
@@ -162,7 +230,7 @@ namespace WinCopies.IO.Process.ObjectModel
                 return DoWorkSafe(_LoadPaths);
             }
 
-            protected abstract bool DoWork(out IProcessError<TError> error, out bool isErrorGlobal);
+            protected abstract bool DoWork(TItems path, out IProcessError<TError> error, out bool isErrorGlobal);
 
             protected abstract bool DoWork(IProcessErrorItem<TItems, TError> path, out IProcessError<TError> error, out bool isErrorGlobal);
 
@@ -178,13 +246,11 @@ namespace WinCopies.IO.Process.ObjectModel
 
                 do
                 {
-                    CurrentItem = paths.Peek();
-
-                    _processDelegates.ProgressDelegate(getPathDelegate(paths.Peek()));
+                    _processDelegates.ProgressDelegate.RaiseEvent(getPathDelegate(paths.Peek()));
 
                     result = func(paths.Peek(), out error, out isErrorGlobal);
 
-                    if (Equals(error.Error, NoError))
+                    if (Equals(error.Error, _factory.Value.NoError))
 
                         _ = paths.Dequeue();
 
@@ -198,6 +264,8 @@ namespace WinCopies.IO.Process.ObjectModel
                     else
 
                         _ = _errorPaths.AddLast(_func(paths.Dequeue(), error));
+
+                    ActualRemainingSize = _paths.TotalSize;
                 } while (result && paths.HasItems);
 
                 return true;
@@ -218,9 +286,9 @@ namespace WinCopies.IO.Process.ObjectModel
 
                 Error = globalError;
 
-                if ((result &= _processDelegates.CheckPerformedDelegate(result)))
+                if ((result &= _processDelegates.CheckPerformedDelegate.RaiseEvent(result)))
 
-                    result = Equals(globalError.Error, NoError);
+                    result = Equals(globalError.Error, _factory.Value.NoError);
 
                 if (!result) // We do not perform an 'else if' because we want to check the latest result, but we do not have to check the equality of globalError.Error and NoError if the previous result was false; we exit the method if at least one result is false.
 
@@ -228,14 +296,16 @@ namespace WinCopies.IO.Process.ObjectModel
 
                 if (_paths.HasItems)
 
-                    return DoWork<TItems>(new Queue(_paths), path => path, (TItems path, out IProcessError<TError> error, out bool isErrorGlobal) => DoWork(out error, out isErrorGlobal), (_path, _error) => new ProcessErrorItem(_path, _error));
+                    return DoWork(new Queue(_paths), path => path, (TItems path, out IProcessError<TError> error, out bool isErrorGlobal) => DoWork(path, out error, out isErrorGlobal), (_path, _error) => new ProcessErrorItem(_path, _error));
 
                 else if (_errorPaths.Count != 0)
 
-                    return DoWork<IProcessErrorItem<TItems, TError>>(new LinkedList(_errorPaths), path => path.Path, (IProcessErrorItem<TItems, TError> path, out IProcessError<TError> error, out bool isErrorGlobal) => DoWork(path, out error, out isErrorGlobal), (_path, _error) => new ProcessErrorItem(_path.Path, _error));
+                    return DoWork(new LinkedList(_errorPaths), path => path.Path, (IProcessErrorItem<TItems, TError> path, out IProcessError<TError> error, out bool isErrorGlobal) => DoWork(path, out error, out isErrorGlobal), (_path, _error) => new ProcessErrorItem(_path.Path, _error));
 
                 return true;
             }
+
+            protected virtual void DecrementActualRemainingSize(Size size) => ActualRemainingSize -= size;
 
             public bool Start()
             {
@@ -259,6 +329,8 @@ namespace WinCopies.IO.Process.ObjectModel
                 ResetStatus();
 
                 InitialTotalSize = new Size();
+
+                InitialItemCount = 0;
             }
             #endregion Methods
 
@@ -283,7 +355,11 @@ namespace WinCopies.IO.Process.ObjectModel
                 _errorPathsReadOnlyQueue = null;
 
                 _processDelegates = null;
+                _processEventDelegates = null;
                 _factory = null;
+
+                _propertyEventDelegate.Dispose();
+                _propertyEventDelegate = null;
             }
 
             public virtual void Dispose()
@@ -293,9 +369,28 @@ namespace WinCopies.IO.Process.ObjectModel
                 GC.SuppressFinalize(this);
             }
             #endregion IDisposable Support
+
+#if !CS8
+            #region IProcess Support
+            IProcessErrorFactory IProcess.Factory => Factory;
+
+            IProcessEventDelegates IProcess.ProcessEventDelegates => ProcessEventDelegates;
+
+            IPathCommon IProcess.SourcePath => SourcePath;
+
+            ProcessTypes<IPathInfo>.IProcessCollection IProcess.Paths => new AbstractionProcessCollection<TItems, IPathInfo>(Paths);
+
+            IProcessError IProcess.Error => Error;
+
+            IProcessErrorFactoryData IProcess.ProcessErrorFactoryData => ProcessErrorFactoryData;
+
+            ProcessTypes<IProcessErrorItem>.IProcessCollection IProcess.ErrorPaths => new AbstractionProcessCollection<IProcessErrorItem<TItems, TError>, IProcessErrorItem>(ErrorPaths);
+            #endregion
+#endif
+
         }
 
-        public abstract class DestinationProcess : Process, IDestinationProcess<TItems, TError>
+        public abstract class DestinationProcess : Process, ProcessInterfaceModelTypes<TItems, TError>.IDestinationProcess
         {
             public abstract TItems DestinationPath { get; }
 
@@ -303,6 +398,12 @@ namespace WinCopies.IO.Process.ObjectModel
             {
                 // Left empty.
             }
+
+#if !CS8
+            #region IDestinationProcess Support
+            IPathCommon ObjectModel.IDestinationProcess.DestinationPath => DestinationPath;
+            #endregion
+#endif
         }
 
         public abstract class DefaultDestinationProcess : DestinationProcess

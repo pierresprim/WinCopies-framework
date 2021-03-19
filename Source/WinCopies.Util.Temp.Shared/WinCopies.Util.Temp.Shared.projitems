@@ -9,6 +9,8 @@
     <Import_RootNamespace>WinCopies.Util.Temp.Shared</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)AbstractionTypes.Partial\Queue.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AbstractionTypes.Partial\Stack.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Temp.cs" />
   </ItemGroup>
 </Project>

@@ -19,7 +19,6 @@ using Microsoft.WindowsAPICodePack.Win32Native;
 using Microsoft.WindowsAPICodePack.Win32Native.Shell;
 
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -35,22 +34,14 @@ using static WinCopies.Temp;
 
 namespace WinCopies.IO.Process.ObjectModel
 {
-    public class CopyProcess<T> : ProcessObjectModelTypes<IPathInfo, T, ProcessError, ProcessTypes<IPathInfo>.ProcessDelegates<int>, int>.DefaultDestinationProcess where T : ProcessTypes<IPathInfo>.ProcessErrorTypes<ProcessError>.IProcessErrorFactories
+    public class CopyProcess<T> : ProcessObjectModelTypes<IPathInfo, T, ProcessError, ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.ProcessDelegatesAbstract<ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.ProcessEventDelegates>, ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.ProcessEventDelegates, IProcessProgressDelegateParameter>.DefaultDestinationProcess where T : ProcessTypes<IPathInfo>.ProcessErrorTypes<ProcessError>.IProcessErrorFactories
     {
         #region Fields
         private int _bufferLength;
         #endregion
 
         #region Properties
-        public override ProcessError NoError => ProcessError.None;
-
-        public override ProcessError UnknownError => ProcessError.UnknownError;
-
-        public override ProcessError WrongStatus => ProcessError.WrongStatus;
-
         public override string Name => Properties.Resources.Copy;
-
-        public override IList<IProcessData> ProcessData => null;
 
         protected ProcessTypes<IPathInfo>.ProcessErrorTypes<ProcessError>.ProcessOptions Options { get; }
 
@@ -72,10 +63,7 @@ namespace WinCopies.IO.Process.ObjectModel
         }
         #endregion Properties
 
-        public CopyProcess(in IQueueBase<IPathInfo> initialPaths, in IPathInfo sourcePath, in IPathInfo destinationPath, in QueueParameter paths, in LinkedListParameter errorsQueue, in ProcessTypes<IPathInfo>.ProcessDelegates<int> progressDelegate, in ProcessTypes<IPathInfo>.ProcessErrorTypes<ProcessError>.ProcessOptions processOptions) : base(initialPaths, sourcePath, destinationPath.IsDirectory ? destinationPath : throw new ArgumentException($"{nameof(destinationPath)} must be a directory."), paths, errorsQueue, progressDelegate)
-        {
-            Options = processOptions;
-        }
+        public CopyProcess(in IQueueBase<IPathInfo> initialPaths, in IPathInfo sourcePath, in IPathInfo destinationPath, in QueueParameter paths, in LinkedListParameter errorsQueue, in ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.ProcessDelegatesAbstract<ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.ProcessEventDelegates> progressDelegate, in ProcessTypes<IPathInfo>.ProcessErrorTypes<ProcessError>.ProcessOptions processOptions) : base(initialPaths, sourcePath, destinationPath.IsDirectory ? destinationPath : throw new ArgumentException($"{nameof(destinationPath)} must be a directory."), paths, errorsQueue, progressDelegate) => Options = processOptions;
 
         #region Methods
         #region Checks
@@ -93,7 +81,7 @@ namespace WinCopies.IO.Process.ObjectModel
 
                 if ((driveInfo.IsReady && drive == (drive = System.IO.Path.GetPathRoot(DestinationPath.Path))) || (System.IO.Directory.Exists(drive) && new DriveInfo(drive).IsReady))
 
-                    return driveInfo.TotalFreeSpace >= Paths.TotalSize.ValueInBytes ? new ProcessError<ProcessError>(NoError, ExceptionMessages.NoError) : new ProcessError<ProcessError>(ProcessError.NotEnoughSpace, NotEnoughSpace);
+                    return driveInfo.TotalFreeSpace >= Paths.TotalSize.ValueInBytes ? new ProcessError<ProcessError>(ProcessErrorFactoryData.NoError, NoError) : new ProcessError<ProcessError>(ProcessError.NotEnoughSpace, NotEnoughSpace);
             }
 
             return Factory.GetError(ProcessError.DriveNotReady, DriveNotReady);
@@ -106,11 +94,15 @@ namespace WinCopies.IO.Process.ObjectModel
 
             while (InitialPaths.HasItems)
 
-                foreach (IRecursivelyEnumerablePath<IPathInfo> _path in new RecursivelyEnumerablePath<IPathInfo>(InitialPaths.Peek(), null, null, null, FileSystemEntryEnumerationOrder.DirectoriesThenFiles, __path => __path, true, null))
+                foreach (IRecursivelyEnumerablePath<IPathInfo> _path in new RecursivelyEnumerablePath<IPathInfo>(InitialPaths.Peek(), null, null
+#if CS8
+                    , null
+#endif
+                    , FileSystemEntryEnumerationOrder.DirectoriesThenFiles, __path => __path, true, null))
                 {
                     AddPath(_path.Value);
 
-                    if (Options.PathLoadedDelegate(_path.Value) && !ProcessDelegates.CancellationPendingDelegate())
+                    if (Options.PathLoadedDelegate(_path.Value) && !ProcessDelegates.CancellationPendingDelegate.RaiseEvent(null))
 
                         continue;
 
@@ -132,10 +124,10 @@ namespace WinCopies.IO.Process.ObjectModel
         {
             error = CheckDrivesAndSpace();
 
-            return error.Error == NoError;
+            return error.Error == ProcessErrorFactoryData.NoError;
         }
 
-        protected override bool DoWork(out IProcessError<ProcessError> error, out bool isErrorGlobal)
+        protected override bool DoWork(IPathInfo path, out IProcessError<ProcessError> error, out bool isErrorGlobal)
         {
             // string sourcePath;
             string destPath;
@@ -148,44 +140,42 @@ namespace WinCopies.IO.Process.ObjectModel
                 alreadyRenamed = true;
             }
 
-            string getDestPath(in IPathInfo path) => $"{DestinationPath.Path}{Path.PathSeparator}{path.GetPath(true)}";
+            string getDestPath(in IPathInfo _path) => $"{DestinationPath.Path}{Path.PathSeparator}{_path.GetPath(true)}";
 
             void copyFileOrCreateDirectory(out IProcessError<ProcessError> _error, out bool _isErrorGlobal)
             {
                 bool cancel = false;
                 bool result;
 
-                if (CurrentItem.Size.HasValue)
+                if (path.Size.HasValue)
                 {
                     CopyFileFlags copyFileFlags = CopyFileFlags.FailIfExists | CopyFileFlags.NoBuffering;
 
-                    if (CurrentItem.Path.EndsWith(".lnk", true, CultureInfo.InvariantCulture))
+                    if (path.Path.EndsWith(".lnk", true, CultureInfo.InvariantCulture))
 
                         copyFileFlags |= CopyFileFlags.CopySymLink;
 
-                    CopyProgressResult getCopyProgressResult() => ProcessDelegates.CancellationPendingDelegate() ? CopyProgressResult.Cancel : CopyProgressResult.Continue;
+                    CopyProgressResult getCopyProgressResult() => ProcessDelegates.CancellationPendingDelegate.RaiseEvent(null) ? CopyProgressResult.Cancel : CopyProgressResult.Continue;
 
                     Func<long/*, CopyProgressCallbackReason*/, CopyProgressResult> _copyProgressRoutine = __totalBytesTransferred =>
                     {
-                        if (Paths.TotalSize.ValueInBytes.IsNaN || CurrentItem.Size.Value.ValueInBytes.IsNaN)
+                        if (Paths.TotalSize.ValueInBytes.IsNaN || path.Size.Value.ValueInBytes.IsNaN)
 
                             _copyProgressRoutine = ___totalBytesTransferred => getCopyProgressResult();
 
                         else
 
                             _copyProgressRoutine = ___totalBytesTransferred/*, CopyProgressCallbackReason __copyProgressCallbackReason*/ =>
-                            {
                                 // _Paths.DecrementSize((ulong)___totalBytesTransferred);
 
-                                return ProcessDelegates.CommonDelegate(((int)Paths.TotalSize / (int)InitialTotalSize) * 100) ? CopyProgressResult.Continue : CopyProgressResult.Cancel;
-                            };
+                                ProcessDelegates.CommonDelegate.RaiseEvent(new ProcessProgressDelegateParameter(((int)Paths.TotalSize / (int)InitialTotalSize) * 100)) ? CopyProgressResult.Continue : CopyProgressResult.Cancel;
 
                         return getCopyProgressResult();
                     };
 
                     CopyProgressResult copyProgressRoutine(long totalFileSize, long totalBytesTransferred, long streamSize, long streamBytesTransferred, uint streamNumber, CopyProgressCallbackReason copyProgressCallbackReason, IntPtr sourceFile, IntPtr destinationFile, IntPtr data) => _copyProgressRoutine(totalBytesTransferred/*, copyProgressCallbackReason*/);
 
-                    result = Shell.CopyFileEx(CurrentItem.Path, destPath, copyProgressRoutine, IntPtr.Zero, ref cancel, copyFileFlags);
+                    result = Shell.CopyFileEx(path.Path, destPath, copyProgressRoutine, IntPtr.Zero, ref cancel, copyFileFlags);
                 }
 
                 else
@@ -216,7 +206,7 @@ namespace WinCopies.IO.Process.ObjectModel
 
                     //    reportProgress();
 
-                    _error = Factory.GetError(NoError, ExceptionMessages.NoError);
+                    _error = Factory.GetError(ProcessErrorFactoryData.NoError, NoError);
 
                     _isErrorGlobal = false;
 
@@ -228,7 +218,7 @@ namespace WinCopies.IO.Process.ObjectModel
                     // todo: the current version of this process is not optimized: when a file name conflict occurs when we want to create a folder, we know that all the subpaths won't be able to be copied neither. So, we should have a tree structure, so we can dequeue all the path in conflict with all of its subpaths at one time.
                     case ErrorCode.AlreadyExists:
 
-                        if (CurrentItem.Size.HasValue) // We do not try to rename folders, because folder name conflicts are handled the same way as file name conflicts.
+                        if (path.Size.HasValue) // We do not try to rename folders, because folder name conflicts are handled the same way as file name conflicts.
                         {
                             if (alreadyRenamed)
                             {
@@ -285,7 +275,7 @@ namespace WinCopies.IO.Process.ObjectModel
 
                     default:
 
-                        _error = Factory.GetError(UnknownError, ExceptionMessages.UnknownError);
+                        _error = Factory.GetError(ProcessErrorFactoryData.UnknownError, UnknownError);
 
                         break;
                 }
@@ -299,9 +289,9 @@ namespace WinCopies.IO.Process.ObjectModel
 
             // sourcePath = $"{SourcePath}{WinCopies.IO.Path.PathSeparator}{CurrentPath.Path}";
 
-            destPath = getDestPath(CurrentItem);
+            destPath = getDestPath(path);
 
-            if (!CurrentItem.IsDirectory && Path.Exists(destPath))
+            if (!path.IsDirectory && Path.Exists(destPath))
 
                 if (AutoRenameFiles)
 
@@ -317,7 +307,7 @@ namespace WinCopies.IO.Process.ObjectModel
 #if !CS8
                             (
 #endif
-                                FileStream sourceFileStream = GetFileStream(CurrentItem.Path, _bufferLength)
+                                FileStream sourceFileStream = GetFileStream(path.Path, _bufferLength)
 #if !CS8
                             )
                             {
@@ -325,64 +315,64 @@ namespace WinCopies.IO.Process.ObjectModel
                             ;
 #endif
 
-                            try
-                            {
-                                using
+                                try
+                                {
+                                    using
 #if !CS8
                                 (
 #endif
                                     FileStream destFileStream = GetFileStream(destPath, _bufferLength)
 #if !CS8
                                 )
-                                {
+                                    {
 #else
                                 ;
 #endif
 
-                                bool? _result;
+                                        bool? _result;
 
-                                _result = IsDuplicate(sourceFileStream, destFileStream, _bufferLength, ProcessDelegates.CancellationPendingDelegate);
+                                        _result = IsDuplicate(sourceFileStream, destFileStream, _bufferLength, () => ProcessDelegates.CancellationPendingDelegate.RaiseEvent(null));
 
-                                if (_result.HasValue)
+                                        if (_result.HasValue)
 
-                                    if (_result.Value)
+                                            if (_result.Value)
 
-                                        renameOnDuplicate();
+                                                renameOnDuplicate();
 
-                                    else
-                                    {
-                                        error = new ProcessError<ProcessError>(NoError, ExceptionMessages.NoError); // _ = _Paths.Dequeue();
+                                            else
+                                            {
+                                                error = new ProcessError<ProcessError>(ProcessErrorFactoryData.NoError, NoError); // _ = _Paths.Dequeue();
 
-                                        isErrorGlobal = false;
+                                                isErrorGlobal = false;
 
-                                        return true;
-                                    }
+                                                return true;
+                                            }
 
-                                else
-                                {
-                                    error = new ProcessError<ProcessError>(ProcessError.FileSystemEntryAlreadyExists, FileSystemEntryAlreadyExists);
+                                        else
+                                        {
+                                            error = new ProcessError<ProcessError>(ProcessError.FileSystemEntryAlreadyExists, FileSystemEntryAlreadyExists);
 
-                                    isErrorGlobal = false;
+                                            isErrorGlobal = false;
 
-                                    return true;
-                                }
+                                            return true;
+                                        }
 #if !CS8
-                            }
+                                    }
 #endif
-                            }
+                                }
 
-                            catch (System.IO.FileNotFoundException)
-                            {
-                                // Left empty because this is a check for duplicate.
-                            }
+                                catch (System.IO.FileNotFoundException)
+                                {
+                                    // Left empty because this is a check for duplicate.
+                                }
 
-                            catch (Exception ex) when (ex.Is(false, typeof(UnauthorizedAccessException), typeof(SecurityException)))
-                            {
-                                error = Factory.GetError(ProcessError.DestinationReadProtection, string.Format(ReadProtection, Destination));
-                            }
+                                catch (Exception ex) when (ex.Is(false, typeof(UnauthorizedAccessException), typeof(SecurityException)))
+                                {
+                                    error = Factory.GetError(ProcessError.DestinationReadProtection, string.Format(ReadProtection, Destination));
+                                }
 
 #if NETFRAMEWORK
-                                                        }
+                            }
 #endif
                         }
 
@@ -418,7 +408,7 @@ namespace WinCopies.IO.Process.ObjectModel
             return true;
         }
 
-        protected override bool DoWork(IProcessErrorItem<IPathInfo, ProcessError> path, out IProcessError<ProcessError> error, out bool isErrorGlobal) => DoWork(out error, out isErrorGlobal);
+        protected override bool DoWork(IProcessErrorItem<IPathInfo, ProcessError> path, out IProcessError<ProcessError> error, out bool isErrorGlobal) => DoWork(path, out error, out isErrorGlobal);
 
         protected override void ResetStatus() { /* Left empty. */ }
         #endregion Methods

@@ -15,13 +15,24 @@
 * You should have received a copy of the GNU General Public License
 * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+using System;
+
+using WinCopies.Collections.AbstractionInterop.Generic;
+using WinCopies.Collections.DotNetFix;
 using WinCopies.Collections.DotNetFix.Generic;
+
+using static WinCopies.Collections.ThrowHelper;
 
 namespace WinCopies.IO.Process
 {
     public static partial class ProcessTypes<T> where T : IPath
     {
-        public class ProcessCollection : IQueue<T>
+        public interface IProcessCollection : IQueue<T>
+        {
+            Size TotalSize { get; }
+        }
+
+        public class ProcessCollection : IProcessCollection
         {
             protected IQueue<T> InnerQueue { get; }
 
@@ -33,11 +44,11 @@ namespace WinCopies.IO.Process
 
             public uint Count => InnerQueue.Count;
 
-            public bool IsReadOnly => InnerQueue.IsReadOnly;
+            public bool IsReadOnly => false;
 
             public bool HasItems => InnerQueue.HasItems;
 
-            public ProcessCollection(in IQueue<T> queue) => InnerQueue = queue;
+            public ProcessCollection(in IQueue<T> queue) => InnerQueue = queue.IsReadOnly ? throw new ArgumentException($"{nameof(queue)} must be non-read-only.", nameof(queue)) : queue;
 
             protected virtual void OnClear() => TotalSize = new Size();
 
@@ -93,6 +104,51 @@ namespace WinCopies.IO.Process
             }
 
             public bool TryPeek(out T result) => InnerQueue.TryPeek(out result);
+        }
+
+        public class ReadOnlyProcessCollection : IProcessCollection
+        {
+            protected IProcessCollection ProcessCollection { get; }
+
+            public Size TotalSize => ProcessCollection.TotalSize;
+
+            public bool IsReadOnly => true;
+
+            public object SyncRoot => ProcessCollection.SyncRoot;
+
+            public bool IsSynchronized => ProcessCollection.IsSynchronized;
+
+            public uint Count => ProcessCollection.Count;
+
+            public bool HasItems => ProcessCollection.HasItems;
+
+            public ReadOnlyProcessCollection(in IProcessCollection processCollection) => ProcessCollection = processCollection.IsReadOnly ? throw new ArgumentException($"{nameof(processCollection)} must be read-only.", nameof(processCollection)) : processCollection;
+
+            public T Peek() => ProcessCollection.Peek();
+
+            public bool TryPeek(out T result) => ProcessCollection.TryPeek(out result);
+
+            void IQueue<T>.Clear() => throw GetReadOnlyListOrCollectionException();
+
+            void ISimpleLinkedListBase2.Clear() => throw GetReadOnlyListOrCollectionException();
+
+            void IQueueBase<T>.Enqueue(T item) => throw GetReadOnlyListOrCollectionException();
+
+            T IQueueBase<T>.Dequeue() => throw GetReadOnlyListOrCollectionException();
+
+            bool IQueueBase<T>.TryDequeue(out T result) => throw GetReadOnlyListOrCollectionException();
+
+            void IQueueBase<T>.Clear() => throw GetReadOnlyListOrCollectionException();
+        }
+    }
+
+    public class AbstractionProcessCollection<TSource, TDestination> : AbstractionTypes<TSource, TDestination>.Queue<ProcessTypes<TSource>.IProcessCollection>, ProcessTypes<TDestination>.IProcessCollection where TSource : IPathInfo, TDestination where TDestination : IPath
+    {
+        Size ProcessTypes<TDestination>.IProcessCollection.TotalSize => InnerQueue.TotalSize;
+
+        public AbstractionProcessCollection(in ProcessTypes<TSource>.IProcessCollection queue) : base(queue)
+        {
+            // Left empty.
         }
     }
 }

@@ -18,6 +18,8 @@
 using System;
 using System.Linq;
 
+using static WinCopies.ThrowHelper;
+
 namespace WinCopies.IO.Process
 {
     public static class ProcessErrorHelper
@@ -47,11 +49,70 @@ namespace WinCopies.IO.Process
         public ProcessError(in TError error, in Exception exception) : this(error) => Exception = exception;
 
         public ProcessError(in TError error, in string message) : this(error) => _message = message;
+
+#if !CS8
+        #region IProcessError Support
+        object IProcessError.Error => Error;
+        #endregion
+#endif
     }
-    public interface IProcessErrorFactory<T>
+
+    public interface IProcessErrorFactoryData
+    {
+        object NoError { get; }
+
+        object UnknownError { get; }
+
+        object CancelledByUserError { get; }
+
+        object WrongStatusError { get; }
+    }
+
+    public interface IProcessErrorFactoryData<T> : IProcessErrorFactoryData
+    {
+        T NoError { get; }
+
+        T UnknownError { get; }
+
+        T CancelledByUserError { get; }
+
+        T WrongStatusError { get; }
+
+#if CS8
+        object IProcessErrorFactoryData.NoError => NoError;
+
+        object IProcessErrorFactoryData.UnknownError => UnknownError;
+
+        object IProcessErrorFactoryData.CancelledByUserError => CancelledByUserError;
+
+        object IProcessErrorFactoryData.WrongStatusError => WrongStatusError;
+#endif
+    }
+
+    public interface IProcessErrorFactory
+    {
+        IProcessError GetError(object error, Exception exception);
+
+        IProcessError GetError(object error, string message);
+    }
+
+    public interface IProcessErrorFactoryBase<T> : IProcessErrorFactory
     {
         IProcessError<T> GetError(T error, Exception exception);
 
         IProcessError<T> GetError(T error, string message);
+
+#if CS8
+        private static T GetError(in object error, in string argumentName) => error is T _error ? _error : throw GetInvalidTypeArgumentException(argumentName);
+
+        IProcessError IProcessErrorFactory.GetError(object error, Exception exception) => GetError(GetError(error, nameof(error)), exception);
+
+        IProcessError IProcessErrorFactory.GetError(object error, string message) => GetError(GetError(error, nameof(error)), message);
+#endif
+    }
+
+    public interface IProcessErrorFactory<T> : IProcessErrorFactoryData<T>, IProcessErrorFactoryBase<T>
+    {
+        // Left empty.
     }
 }

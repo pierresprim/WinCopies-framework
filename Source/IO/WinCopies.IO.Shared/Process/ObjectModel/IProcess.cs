@@ -15,57 +15,47 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-using System.Collections.Generic;
-using WinCopies.Collections.DotNetFix.Generic;
+using WinCopies.Collections.DotNetFix;
 
-namespace WinCopies.IO.Process
+namespace WinCopies.IO.Process.ObjectModel
 {
-    public interface IProcessError<TError>
+    public interface IProcess : IPropertyObservable
     {
-        TError Error { get; }
+        IProcessErrorFactory Factory { get; }
 
-        string ErrorMessage { get; }
+        IProcessEventDelegates ProcessEventDelegates { get; }
+
+        bool ArePathsLoaded { get; }
+
+        IPathCommon SourcePath { get; }
+
+        ProcessTypes<IPathInfo>.IProcessCollection Paths { get; }
+
+        // todo: IQueue InitialPaths { get; }
+
+        string Name { get; }
+
+        IProcessError Error { get; }
+
+        IProcessErrorFactoryData ProcessErrorFactoryData { get; }
+
+        ProcessTypes<IProcessErrorItem>.IProcessCollection ErrorPaths { get; }
+
+        Size InitialTotalSize { get; }
+
+        uint InitialItemCount { get; }
+
+        Size ActualRemainingSize { get; }
+
+        bool LoadPaths();
+
+        bool Start();
+
+        void Reset();
     }
 
-    public interface IProcessErrorItem<TInnerItem, TError> : IPathInfo
+    public interface IDestinationProcess : IProcess
     {
-        TInnerItem Path { get; }
-
-        IProcessError<TError> Error { get; }
-    }
-
-    namespace ObjectModel
-    {
-        public interface IProcess<TItems, TError>
-        {
-            TItems SourcePath { get; }
-
-            IQueue<TItems> Paths { get; }
-
-            string Name { get; }
-
-            TError NoError { get; }
-
-            TError UnknownError { get; }
-
-            TError WrongStatus { get; }
-
-            IProcessError<TError> Error { get; }
-
-            IQueue<IProcessErrorItem<TItems, TError>> ErrorPaths { get; }
-
-            IList<IProcessData> ProcessData { get; }
-
-            bool LoadPaths();
-
-            bool Start();
-
-            void Reset();
-        }
-
-        public interface IDestinationProcess<TItems, TError> : IProcess<TItems, TError>
-        {
-            TItems DestinationPath { get; }
-        }
+        IPathCommon DestinationPath { get; }
     }
 }
