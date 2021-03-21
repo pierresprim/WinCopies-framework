@@ -24,6 +24,7 @@ using System.Drawing;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
+
 using WinCopies.IO.AbstractionInterop;
 using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Selectors;
@@ -41,6 +42,8 @@ namespace WinCopies.IO.ObjectModel
         private IPortableDevice _portableDevice;
 
         #region Properties
+        public override IProcessFactory ProcessFactory => DefaultProcessFactory.Instance;
+
         public sealed override IPortableDevice InnerObjectGeneric => IsDisposed ? throw GetExceptionForDispose(false) : _portableDevice;
 
         public override bool IsSpecialItem => false;
@@ -83,7 +86,7 @@ namespace WinCopies.IO.ObjectModel
                 ;
 #endif
 
-            return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+                return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
         }
 
         protected override void DisposeManaged()
@@ -103,7 +106,7 @@ namespace WinCopies.IO.ObjectModel
         #region Properties
         public static IBrowsableObjectInfoSelectorDictionary<PortableDeviceObjectInfoItemProvider> DefaultItemSelectorDictionary { get; } = new PortableDeviceInfoSelectorDictionary();
 
-        public sealed override IPortableDeviceInfoProperties ObjectPropertiesGeneric => IsDisposed?throw GetExceptionForDispose(false): _objectProperties;
+        public sealed override IPortableDeviceInfoProperties ObjectPropertiesGeneric => IsDisposed ? throw GetExceptionForDispose(false) : _objectProperties;
 
         public override IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystem => null;
         #endregion // Properties

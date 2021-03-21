@@ -381,6 +381,8 @@ namespace WinCopies.IO.ObjectModel
         private IRegistryItemInfoProperties _objectProperties;
 
         #region Properties
+        public override IProcessFactory ProcessFactory => DefaultProcessFactory.Instance;
+
         public static System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> DefaultRootItems => _defaultRootItems
 #if CS8
             ??=
@@ -401,7 +403,7 @@ namespace WinCopies.IO.ObjectModel
 
         public sealed override IRegistryItemInfoProperties ObjectPropertiesGeneric => IsDisposed ? throw GetExceptionForDispose(false) : _objectProperties;
 
-        public override IPropertySystemCollection<PropertyId,ShellPropertyGroup> ObjectPropertySystem => null;
+        public override IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystem => null;
         #endregion // Properties
 
         #region Constructors

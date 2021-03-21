@@ -34,7 +34,7 @@ using static WinCopies.Temp;
 
 namespace WinCopies.IO.Process.ObjectModel
 {
-    public class CopyProcess<T> : ProcessObjectModelTypes<IPathInfo, T, ProcessError, ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.ProcessDelegatesAbstract<ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.ProcessEventDelegates>, ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.ProcessEventDelegates, IProcessProgressDelegateParameter>.DefaultDestinationProcess where T : ProcessTypes<IPathInfo>.ProcessErrorTypes<ProcessError>.IProcessErrorFactories
+    public class CopyProcess<T> : ProcessObjectModelTypes<IPathInfo, T, ProcessError, ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessDelegates<ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessEventDelegates>, ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessEventDelegates, IProcessProgressDelegateParameter>.DefaultDestinationProcess where T : ProcessTypes<IPathInfo>.ProcessErrorTypes<ProcessError>.IProcessErrorFactories
     {
         #region Fields
         private int _bufferLength;
@@ -63,7 +63,7 @@ namespace WinCopies.IO.Process.ObjectModel
         }
         #endregion Properties
 
-        public CopyProcess(in IQueueBase<IPathInfo> initialPaths, in IPathInfo sourcePath, in IPathInfo destinationPath, in QueueParameter paths, in LinkedListParameter errorsQueue, in ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.ProcessDelegatesAbstract<ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.ProcessEventDelegates> progressDelegate, in ProcessTypes<IPathInfo>.ProcessErrorTypes<ProcessError>.ProcessOptions processOptions) : base(initialPaths, sourcePath, destinationPath.IsDirectory ? destinationPath : throw new ArgumentException($"{nameof(destinationPath)} must be a directory."), paths, errorsQueue, progressDelegate) => Options = processOptions;
+        public CopyProcess(in IQueueBase<IPathInfo> initialPaths, in IPathInfo sourcePath, in IPathInfo destinationPath, in QueueParameter paths, in LinkedListParameter errorsQueue, in ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessDelegates<ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessEventDelegates> progressDelegate, in ProcessTypes<IPathInfo>.ProcessErrorTypes<ProcessError>.ProcessOptions processOptions, T factory) : base(initialPaths, sourcePath, destinationPath.IsDirectory ? destinationPath : throw new ArgumentException($"{nameof(destinationPath)} must be a directory."), paths, errorsQueue, progressDelegate, factory) => Options = processOptions;
 
         #region Methods
         #region Checks
@@ -106,7 +106,7 @@ namespace WinCopies.IO.Process.ObjectModel
 
                         continue;
 
-                    error = Factory.GetError(ProcessError.AbortedByUser, AbortedByUser);
+                    error = Factory.GetError(ProcessError.CancelledByUser, AbortedByUser);
 
                     clearOnError = Options.ClearOnError;
 
@@ -315,9 +315,9 @@ namespace WinCopies.IO.Process.ObjectModel
                             ;
 #endif
 
-                                try
-                                {
-                                    using
+                            try
+                            {
+                                using
 #if !CS8
                                 (
 #endif
@@ -329,47 +329,47 @@ namespace WinCopies.IO.Process.ObjectModel
                                 ;
 #endif
 
-                                        bool? _result;
+                                bool? _result;
 
-                                        _result = IsDuplicate(sourceFileStream, destFileStream, _bufferLength, () => ProcessDelegates.CancellationPendingDelegate.RaiseEvent(null));
+                                _result = IsDuplicate(sourceFileStream, destFileStream, _bufferLength, () => ProcessDelegates.CancellationPendingDelegate.RaiseEvent(null));
 
-                                        if (_result.HasValue)
+                                if (_result.HasValue)
 
-                                            if (_result.Value)
+                                    if (_result.Value)
 
-                                                renameOnDuplicate();
+                                        renameOnDuplicate();
 
-                                            else
-                                            {
-                                                error = new ProcessError<ProcessError>(ProcessErrorFactoryData.NoError, NoError); // _ = _Paths.Dequeue();
+                                    else
+                                    {
+                                        error = new ProcessError<ProcessError>(ProcessErrorFactoryData.NoError, NoError); // _ = _Paths.Dequeue();
 
-                                                isErrorGlobal = false;
+                                        isErrorGlobal = false;
 
-                                                return true;
-                                            }
+                                        return true;
+                                    }
 
-                                        else
-                                        {
-                                            error = new ProcessError<ProcessError>(ProcessError.FileSystemEntryAlreadyExists, FileSystemEntryAlreadyExists);
+                                else
+                                {
+                                    error = new ProcessError<ProcessError>(ProcessError.FileSystemEntryAlreadyExists, FileSystemEntryAlreadyExists);
 
-                                            isErrorGlobal = false;
+                                    isErrorGlobal = false;
 
-                                            return true;
-                                        }
+                                    return true;
+                                }
 #if !CS8
                                     }
 #endif
-                                }
+                            }
 
-                                catch (System.IO.FileNotFoundException)
-                                {
-                                    // Left empty because this is a check for duplicate.
-                                }
+                            catch (System.IO.FileNotFoundException)
+                            {
+                                // Left empty because this is a check for duplicate.
+                            }
 
-                                catch (Exception ex) when (ex.Is(false, typeof(UnauthorizedAccessException), typeof(SecurityException)))
-                                {
-                                    error = Factory.GetError(ProcessError.DestinationReadProtection, string.Format(ReadProtection, Destination));
-                                }
+                            catch (Exception ex) when (ex.Is(false, typeof(UnauthorizedAccessException), typeof(SecurityException)))
+                            {
+                                error = Factory.GetError(ProcessError.DestinationReadProtection, string.Format(ReadProtection, Destination));
+                            }
 
 #if NETFRAMEWORK
                             }

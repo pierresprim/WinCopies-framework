@@ -48,14 +48,14 @@ namespace WinCopies.IO.Process.ObjectModel
                 }
             }
 
-            public class QueueParameter : Parameter<ProcessTypes<TItems>.ProcessCollection, ProcessTypes<TItems>.IProcessCollection>
+            public class QueueParameter : Parameter<ProcessTypes<TItems>.IProcessCollection, ProcessTypes<TItems>.IProcessCollection>
             {
-                public QueueParameter(in ProcessTypes<TItems>.ProcessCollection value, in Func<ProcessTypes<TItems>.ProcessCollection, ProcessTypes<TItems>.IProcessCollection> func) : base(value, func)
+                public QueueParameter(in ProcessTypes<TItems>.IProcessCollection value, in Func<ProcessTypes<TItems>.IProcessCollection, ProcessTypes<TItems>.IProcessCollection> func) : base(value, func)
                 {
                     // Left empty.
                 }
 
-                protected override void ValidateValue(in ProcessTypes<TItems>.ProcessCollection value) => ThrowIfNullOrReadOnly(value, nameof(value));
+                protected override void ValidateValue(in ProcessTypes<TItems>.IProcessCollection value) => ThrowIfNullOrReadOnly(value, nameof(value));
             }
 
             public class LinkedListParameter : Parameter<IEnumerableInfoLinkedList, ProcessTypes<IProcessErrorItem<TItems, TError>>.IProcessCollection>

@@ -221,6 +221,8 @@ namespace WinCopies.IO.ObjectModel
         private IFileSystemObjectInfoProperties _objectProperties;
 
         #region Properties
+        public override IProcessFactory ProcessFactory => DefaultProcessFactory.Instance;
+
         public static IBrowsableObjectInfoSelectorDictionary<ArchiveItemInfoItemProvider> DefaultItemSelectorDictionary { get; } = new ArchiveItemInfoSelectorDictionary();
 
         public sealed override IFileSystemObjectInfoProperties ObjectPropertiesGeneric => IsDisposed ? throw GetExceptionForDispose(false) : _objectProperties;

@@ -64,6 +64,8 @@ namespace WinCopies.IO.ObjectModel
         #endregion
 
         #region Properties
+        public abstract IProcessFactory ProcessFactory { get; }
+
         public static Action RegisterDefaultSelectors { get; private set; } = () =>
         {
             DotNetAssemblyInfo.RegisterSelectors();
@@ -135,9 +137,7 @@ namespace WinCopies.IO.ObjectModel
         #endregion
 
         #region Methods
-        internal static bool _IsBrowsable(in IBrowsableObjectInfo browsableObjectInfo) => browsableObjectInfo.Browsability == null
-                ? false
-                : browsableObjectInfo.Browsability.Browsability == IO.Browsability.BrowsableByDefault || browsableObjectInfo.Browsability.Browsability == IO.Browsability.Browsable;
+        internal static bool _IsBrowsable(in IBrowsableObjectInfo browsableObjectInfo) => browsableObjectInfo.Browsability != null && (browsableObjectInfo.Browsability.Browsability == IO.Browsability.BrowsableByDefault || browsableObjectInfo.Browsability.Browsability == IO.Browsability.Browsable);
 
         public bool IsBrowsable() => _IsBrowsable(this);
 
@@ -167,7 +167,7 @@ namespace WinCopies.IO.ObjectModel
             )
 #endif
 
-                return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+            return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
         }
 
         System.Collections.Generic.IEnumerator<Collections.Generic.IRecursiveEnumerable<IBrowsableObjectInfo>> IRecursiveEnumerableProviderEnumerable<IBrowsableObjectInfo>.GetRecursiveEnumerator() => GetItems().GetEnumerator();

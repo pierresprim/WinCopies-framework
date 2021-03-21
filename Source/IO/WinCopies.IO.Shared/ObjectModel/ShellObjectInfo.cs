@@ -20,22 +20,29 @@ using Microsoft.WindowsAPICodePack.PortableDevices;
 using Microsoft.WindowsAPICodePack.Shell;
 
 using System;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows.Media.Imaging;
 
+using WinCopies.Collections.Generic;
+using WinCopies.Collections.DotNetFix.Generic;
 using WinCopies.IO.AbstractionInterop;
 using WinCopies.IO.Enumeration;
 using WinCopies.IO.ObjectModel;
+using WinCopies.IO.Process;
+using WinCopies.IO.Process.ObjectModel;
 using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Selectors;
+using WinCopies.Linq;
 using WinCopies.PropertySystem;
 
 using static Microsoft.WindowsAPICodePack.Shell.KnownFolders;
 
 using static WinCopies.IO.Path;
 using static WinCopies.ThrowHelper;
+using static WinCopies.Temp;
 
 namespace WinCopies.IO
 {
@@ -298,9 +305,229 @@ namespace WinCopies.IO
 
         public class ShellObjectInfo : ShellObjectInfo<IFileSystemObjectInfoProperties, ShellObjectInfoEnumeratorStruct, IBrowsableObjectInfoSelectorDictionary<ShellObjectInfoItemProvider>, ShellObjectInfoItemProvider>, IShellObjectInfo
         {
+            public const string ShellCopyProcessGuid = "084ff8d5-c66e-40bc-8ea4-7fa2dd30bd21";
+
+            private class _ProcessFactory : IProcessFactory
+            {
+                private class ProcessParameters : IProcessParameters
+                {
+                    public Guid Guid { get; }
+
+                    public System.Collections.Generic.IEnumerable<string> Parameters { get; }
+
+                    public ProcessParameters(in string processGuid, in string sourcePath, in string destinationPath)
+                    {
+                        Guid = new Guid(processGuid);
+
+                        Parameters = new string[] { sourcePath, destinationPath };
+                    }
+                }
+
+                private readonly IShellObjectInfoBase2 _path;
+
+                public _ProcessFactory(in IShellObjectInfoBase2 path) => _path = path;
+
+                public bool CanCopy(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths)
+                {
+                    foreach (IBrowsableObjectInfo path in paths ?? throw GetArgumentNullException(nameof(paths)))
+
+                        if (!(path is IShellObjectInfoBase2 shellObjectInfo && shellObjectInfo.InnerObject.IsFileSystemObject && shellObjectInfo.Path.StartsWith(_path.Path)))
+
+                            return false;
+
+                    return true;
+                }
+
+                private static bool _Copy(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths, in uint count)
+                {
+                    ThrowIfNull(paths, nameof(paths));
+
+                    var sc = new StringCollection();
+
+                    sc.AddRange(new ArrayBuilder<string>(paths.As<IShellObjectInfoBase2>().Select(path => path.Path)).ToArray());
+
+                    for (int i = 0; i < count; i++)
+
+                        try
+                        {
+                            System.Windows.Clipboard.SetFileDropList(sc);
+
+                            return true;
+                        }
+
+                        catch
+                        {
+                            // Left empty.
+                        }
+
+                    return false;
+                }
+
+                public void Copy(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths, uint count)
+                {
+                    if (!(CanCopy(paths) && _Copy(paths, count)))
+
+                        throw new InvalidOperationException("The copy operation has not succeeded.");
+                }
+
+                public bool TryCopy(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths, uint count) => CanCopy(paths) && _Copy(paths, count);
+
+                public static bool CanPaste(uint count, out string sourcePath)
+                {
+                    StringCollection sc = null;
+
+                    uint i = 0;
+
+                    if (For(() => i < count, () => sc = System.Windows.Clipboard.GetFileDropList(), () => i++))
+                    {
+                        if (sc.Count == 0)
+                        {
+                            sourcePath = null;
+
+                            return false;
+                        }
+
+                        if (sc.Count == 1)
+                        {
+                            sourcePath = sc[0];
+
+                            return true;
+                        }
+
+                        System.Collections.Generic.IEnumerable<string> paths = new Enumerable<string>(() => new StringEnumerator(sc, Collections.DotNetFix.EnumerationDirection.FIFO));
+
+                        string parent = null;
+                        bool result = false;
+
+                        paths.ForEach(path =>
+                        {
+                            parent = System.IO.Path.GetDirectoryName(path);
+
+                            return true;
+                        }, path => (result = (parent == System.IO.Path.GetDirectoryName(path))));
+
+                        if (result)
+                        {
+                            sourcePath = parent;
+
+                            return true;
+                        }
+                    }
+
+                    sourcePath = null;
+
+                    return false;
+                }
+
+                bool IProcessFactory.CanPaste(uint count, out string sourcePath) => CanPaste(count, out sourcePath);
+
+                public IProcessParameters GetCopyProcessParameters(uint count) => TryGetCopyProcessParameters(count) ?? throw new InvalidOperationException("An unknown error occurred during copy process parameters generation.");
+
+                public IProcessParameters TryGetCopyProcessParameters(uint count) => CanPaste(count, out string sourcePath) ? new ProcessParameters(ShellCopyProcessGuid, sourcePath, _path.Path) : null;
+
+                public IProcess TryGetProcess(IProcessParameters processParameters, uint count)
+                {
+                    string guid = (processParameters ?? throw GetArgumentNullException(nameof(processParameters))).Guid.ToString();
+
+                    switch (guid)
+                    {
+                        case ShellCopyProcessGuid:
+
+                            StringCollection sc = null;
+
+                            uint i = 0;
+
+                            if (For(() => i < count, () => sc = System.Windows.Clipboard.GetFileDropList(), () => i++))
+                            {
+                                System.Collections.Generic.IEnumerator<string> enumerator = processParameters.Parameters.GetEnumerator();
+
+                                PathTypes<IPathInfo>.RootPath getParameter()
+                                {
+                                    enumerator.MoveNext();
+
+                                    return new PathTypes<IPathInfo>.RootPath(enumerator.Current, true);
+                                }
+
+                                #region ShellCopyProcessGuid
+                                return new CopyProcess<ProcessErrorFactory<IPathInfo>>(
+                                    new ReadOnlyQueue<IPathInfo>(
+                                        new Enumerable<string>(
+                                            () => new StringEnumerator(
+                                                sc, Collections.DotNetFix.EnumerationDirection.FIFO)
+                                            ).Select(
+                                                path => (IPathInfo)new PathTypes<IPathInfo>.RootPath(path)).ToQueue()),
+                                    getParameter(),
+                                    getParameter(),
+                                    new ProcessObjectModelTypes<
+                                        IPathInfo,
+                                        ProcessErrorFactory<IPathInfo>,
+                                        ProcessError,
+                                        ProcessDelegateTypes<
+                                            IPathInfo,
+                                            IProcessProgressDelegateParameter>
+                                            .IProcessDelegates<
+                                                ProcessDelegateTypes<
+                                                    IPathInfo,
+                                                    IProcessProgressDelegateParameter>
+                                                    .IProcessEventDelegates>,
+                                        ProcessDelegateTypes<
+                                            IPathInfo,
+                                            IProcessProgressDelegateParameter>
+                                            .IProcessEventDelegates,
+                                        IProcessProgressDelegateParameter>
+                                        .Process.QueueParameter(
+                                            _path.ProcessPathCollectionFactory.GetProcessCollection<IPathInfo>(),
+                                            collection => _path.ProcessPathCollectionFactory.GetReadOnlyProcessCollection(collection)),
+                                    new ProcessObjectModelTypes<
+                                        IPathInfo,
+                                        ProcessErrorFactory<IPathInfo>,
+                                        ProcessError,
+                                        ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>
+                                        .IProcessDelegates<
+                                            ProcessDelegateTypes<
+                                                IPathInfo,
+                                                IProcessProgressDelegateParameter>
+                                                .IProcessEventDelegates>,
+                                        ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>
+                                        .IProcessEventDelegates,
+                                        IProcessProgressDelegateParameter>.Process.LinkedListParameter(
+                                            _path.ProcessPathCollectionFactory.GetEnumerableInfoLinkedList<
+                                                IPathInfo,
+                                                ProcessErrorFactory<IPathInfo>,
+                                                ProcessError,
+                                                ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>
+                                                .IProcessDelegates<
+                                                    ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>
+                                                    .IProcessEventDelegates>,
+                                                ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>
+                                                .IProcessEventDelegates,
+                                                IProcessProgressDelegateParameter>(),
+                                            collection => _path.ProcessPathCollectionFactory.GetReadOnlyEnumerableInfoLinkedList(collection)),
+                                    new ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>
+                                    .ProcessDelegates(
+                                        new EventDelegate<IPathInfo>(),
+                                        new ANDALSO_EventAndQueryDelegate<bool>(),
+                                        new ANDALSO_EventAndQueryDelegate<object>(),
+                                        new ANDALSO_EventAndQueryDelegate<IProcessProgressDelegateParameter>()),
+                                    new ProcessTypes<IPathInfo>.ProcessErrorTypes<ProcessError>.ProcessOptions(path => true, true),
+                                    new ProcessErrorFactory<IPathInfo>());
+                                #endregion ShellCopyProcessGuid
+                            }
+
+                            break;
+                    }
+
+                    return null;
+                }
+
+                public IProcess GetProcess(IProcessParameters processParameters, uint count) => TryGetProcess(processParameters, count) ?? throw new InvalidOperationException("No process could be generated.");
+            }
+
             private IFileSystemObjectInfoProperties _objectProperties;
 
             #region Properties
+            public override IProcessFactory ProcessFactory { get; }
+
             public static IBrowsableObjectInfoSelectorDictionary<ShellObjectInfoItemProvider> DefaultItemSelectorDictionary { get; } = new ShellObjectInfoSelectorDictionary();
 
             public sealed override IFileSystemObjectInfoProperties ObjectPropertiesGeneric => IsDisposed ? throw GetExceptionForDispose(false) : _objectProperties;
@@ -309,6 +536,15 @@ namespace WinCopies.IO
             #region Constructors
             public ShellObjectInfo(in string path, in FileType fileType, in ShellObject shellObject, in ClientVersion clientVersion) : base(path, shellObject, clientVersion)
             {
+#if CS9
+                _objectProperties = fileType switch
+                {
+                    FileType.Folder or FileType.KnownFolder => new FolderShellObjectInfoProperties<IShellObjectInfoBase2>(this, fileType),
+                    FileType.File or FileType.Archive or FileType.Library or FileType.Link => new FileShellObjectInfoProperties<IShellObjectInfoBase2>(this, fileType),
+                    FileType.Drive => new DriveShellObjectInfoProperties<IShellObjectInfoBase2>(this, fileType),
+                    _ => new FileSystemObjectInfoProperties(this, fileType),
+                };
+#else
                 switch (fileType)
                 {
                     case FileType.Folder:
@@ -339,6 +575,9 @@ namespace WinCopies.IO
 
                         break;
                 }
+#endif
+
+                ProcessFactory = new _ProcessFactory(this);
             }
 
             public ShellObjectInfo(in IKnownFolder knownFolder, in ClientVersion clientVersion) : this(string.IsNullOrEmpty(knownFolder.Path) ? knownFolder.ParsingName : knownFolder.Path, FileType.KnownFolder, ShellObjectFactory.Create(knownFolder.ParsingName), clientVersion)

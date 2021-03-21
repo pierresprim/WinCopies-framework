@@ -15,10 +15,13 @@
 * You should have received a copy of the GNU General Public License
 * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using WinCopies.Collections;
 using WinCopies.Collections.DotNetFix;
 using WinCopies.Collections.DotNetFix.Generic;
-
+using WinCopies.Collections.Generic;
 using static WinCopies.Collections.ThrowHelper;
 
 namespace WinCopies.IO.Process.ObjectModel

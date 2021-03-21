@@ -34,7 +34,7 @@ namespace WinCopies.IO.Process
         /// <summary>
         /// The process was aborted by user.
         /// </summary>
-        AbortedByUser = 3,
+        CancelledByUser = 3,
 
         /// <summary>
         /// One part or all of the source or destination path was not found.

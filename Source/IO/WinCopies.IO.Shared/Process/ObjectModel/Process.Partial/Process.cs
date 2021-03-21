@@ -23,7 +23,7 @@ using static WinCopies.ThrowHelper;
 
 namespace WinCopies.IO.Process.ObjectModel
 {
-    public static partial class ProcessObjectModelTypes<TItems, TFactory, TError, TProcessDelegates, TProcessEventDelegates, TProcessDelegateParam> where TItems : IPathInfo where TFactory : ProcessTypes<TItems>.ProcessErrorTypes<TError>.IProcessErrorFactories where TProcessDelegates : ProcessDelegateTypes<TItems, TProcessDelegateParam>.ProcessDelegatesAbstract<TProcessEventDelegates> where TProcessEventDelegates : ProcessDelegateTypes<TItems, TProcessDelegateParam>.IProcessEventDelegates where TProcessDelegateParam : IProcessProgressDelegateParameter
+    public static partial class ProcessObjectModelTypes<TItems, TFactory, TError, TProcessDelegates, TProcessEventDelegates, TProcessDelegateParam> where TItems : IPathInfo where TFactory : ProcessTypes<TItems>.ProcessErrorTypes<TError>.IProcessErrorFactories where TProcessDelegates : ProcessDelegateTypes<TItems, TProcessDelegateParam>.IProcessDelegates<TProcessEventDelegates> where TProcessEventDelegates : ProcessDelegateTypes<TItems, TProcessDelegateParam>.IProcessEventDelegates where TProcessDelegateParam : IProcessProgressDelegateParameter
     {
         public abstract partial class Process : ProcessInterfaceModelTypes<TItems, TError>.IProcess<TProcessDelegateParam, TProcessEventDelegates>
         {
@@ -43,7 +43,7 @@ namespace WinCopies.IO.Process.ObjectModel
             private Size _actualRemainingSize;
             private ProcessTypes<TItems>.IProcessCollection _paths;
             private ProcessTypes<TItems>.IProcessCollection _pathsReadOnlyQueue;
-            private TProcessDelegates _processDelegates;
+            private NullableGeneric<TProcessDelegates> _processDelegates;
             private NullableGeneric<TProcessEventDelegates> _processEventDelegates;
             private IEnumerableInfoLinkedList _errorPaths;
             private ProcessTypes<IProcessErrorItem<TItems, TError>>.IProcessCollection _errorPathsReadOnlyQueue;
@@ -61,7 +61,7 @@ namespace WinCopies.IO.Process.ObjectModel
 
             IProcessErrorFactory<TError> ProcessInterfaceModelTypes<TItems, TError>.IProcess<TProcessDelegateParam, TProcessEventDelegates>.Factory => Factory;
 
-            protected TProcessDelegates ProcessDelegates => this.GetIfNotDisposed(_processDelegates);
+            protected TProcessDelegates ProcessDelegates => this.GetIfNotDisposed(_processDelegates).Value;
 
             public TProcessEventDelegates ProcessEventDelegates => this.GetIfNotDisposed(_processEventDelegates).Value;
 
@@ -140,7 +140,7 @@ namespace WinCopies.IO.Process.ObjectModel
             }
             #endregion Properties
 
-            public Process(in IQueueBase<TItems> initialPaths, QueueParameter paths, in LinkedListParameter errorsQueue, in TProcessDelegates processDelegates)
+            public Process(in IQueueBase<TItems> initialPaths, QueueParameter paths, in LinkedListParameter errorsQueue, in TProcessDelegates processDelegates, in TFactory factory)
             {
                 ThrowIfNull(initialPaths, nameof(initialPaths));
 
@@ -151,14 +151,24 @@ namespace WinCopies.IO.Process.ObjectModel
                 ThrowIfNull(paths, nameof(paths));
                 ThrowIfNull(errorsQueue, nameof(errorsQueue));
 
+                if (processDelegates == null)
+
+                    throw GetArgumentNullException(nameof(processDelegates));
+
                 _initialPaths = initialPaths;
 
                 _paths = paths.ProvideValues(out _pathsReadOnlyQueue);
 
                 _errorPaths = errorsQueue.ProvideValues(out _errorPathsReadOnlyQueue);
 
-                _processDelegates = processDelegates;
+                _processDelegates = new NullableGeneric<TProcessDelegates>(processDelegates);
                 _processEventDelegates = new NullableGeneric<TProcessEventDelegates>(processDelegates.GetProcessEventDelegates());
+
+                if (_processEventDelegates.Value == null)
+
+                    throw new ArgumentException($"The given {nameof(processDelegates)} did not provide a non-null value for process event delegates.");
+
+                _factory = new NullableGeneric<TFactory>(factory == null ? throw GetArgumentNullException(nameof(factory)) : factory);
             }
 
             #region Methods
@@ -246,7 +256,7 @@ namespace WinCopies.IO.Process.ObjectModel
 
                 do
                 {
-                    _processDelegates.ProgressDelegate.RaiseEvent(getPathDelegate(paths.Peek()));
+                    _processDelegates.Value.ProgressDelegate.RaiseEvent(getPathDelegate(paths.Peek()));
 
                     result = func(paths.Peek(), out error, out isErrorGlobal);
 
@@ -286,7 +296,7 @@ namespace WinCopies.IO.Process.ObjectModel
 
                 Error = globalError;
 
-                if ((result &= _processDelegates.CheckPerformedDelegate.RaiseEvent(result)))
+                if ((result &= _processDelegates.Value.CheckPerformedDelegate.RaiseEvent(result)))
 
                     result = Equals(globalError.Error, _factory.Value.NoError);
 
@@ -394,7 +404,7 @@ namespace WinCopies.IO.Process.ObjectModel
         {
             public abstract TItems DestinationPath { get; }
 
-            public DestinationProcess(in IQueueBase<TItems> initialPaths, in QueueParameter paths, in LinkedListParameter errorsQueue, in TProcessDelegates processDelegates) : base(initialPaths, paths, errorsQueue, processDelegates)
+            public DestinationProcess(in IQueueBase<TItems> initialPaths, in QueueParameter paths, in LinkedListParameter errorsQueue, in TProcessDelegates processDelegates, TFactory factory) : base(initialPaths, paths, errorsQueue, processDelegates, factory)
             {
                 // Left empty.
             }
@@ -412,7 +422,7 @@ namespace WinCopies.IO.Process.ObjectModel
 
             public override TItems DestinationPath { get; }
 
-            public DefaultDestinationProcess(in IQueueBase<TItems> initialPaths, in TItems sourcePath, in TItems destinationPath, in QueueParameter paths, in LinkedListParameter errorsQueue, in TProcessDelegates processDelegates) : base(initialPaths, paths, errorsQueue, processDelegates)
+            public DefaultDestinationProcess(in IQueueBase<TItems> initialPaths, in TItems sourcePath, in TItems destinationPath, in QueueParameter paths, in LinkedListParameter errorsQueue, in TProcessDelegates processDelegates, TFactory factory) : base(initialPaths, paths, errorsQueue, processDelegates, factory)
             {
                 SourcePath = sourcePath;
 

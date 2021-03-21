@@ -6,10 +6,7 @@ The WinCopies® software framework
 README
 ======
 
-Usage notes
------------
-
-This framework is currently still in development. Only the code on the master branch (starting to the 2.0 release of the WinCopies framework) and the packages that are built from that code, and only if not otherwise noted, are currently released.
+This framework contains core, graphical and I/O packages. For the core packages, see the WinCopies.Util repository.
 
 License
 -------

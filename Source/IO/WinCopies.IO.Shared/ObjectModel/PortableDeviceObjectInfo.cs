@@ -43,6 +43,8 @@ namespace WinCopies.IO.ObjectModel
         #endregion
 
         #region Properties
+        public override IProcessFactory ProcessFactory => DefaultProcessFactory.Instance;
+
         public sealed override IPortableDeviceObject InnerObjectGeneric => IsDisposed ? throw GetExceptionForDispose(false) : _portableDeviceObject;
 
         private bool? _isSpecialItem;

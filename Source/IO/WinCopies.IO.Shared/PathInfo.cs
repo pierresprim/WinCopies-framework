@@ -46,8 +46,14 @@ namespace WinCopies.IO
         {
             new NullableGeneric<T> Parent { get; }
 
+#if CS8
+            IO.IPathCommon IO.IPathCommon.Parent => Parent == null ?
 #if CS9
-            IO.IPathCommon IO.IPathCommon.Parent => Parent == null ? null : Parent.Value;
+                null
+#else
+                default
+#endif
+                : Parent.Value;
 #endif
         }
 
@@ -72,15 +78,45 @@ namespace WinCopies.IO
 
                 RelativePath = relativePath;
             }
+
+#if !CS8
+            IO.IPathCommon IO.IPathCommon.Parent => Parent == null ? default : Parent.Value;
+#endif
         }
 
-        public class PathInfoBase
+        public abstract class PathInfoBase
         {
+            private NullableGeneric<Size?> _size;
+
             public string RelativePath { get; }
 
             public bool IsDirectory { get; }
 
-            public Size? Size { get; init; }
+            public abstract string Path { get; }
+
+            public Size? Size
+            {
+                get
+                {
+                    if (IsDirectory)
+
+                        return null;
+
+                    if (_size == null)
+
+                        try
+                        {
+                            _size = new NullableGeneric<Size?>(new Size((ulong)new System.IO.FileInfo(Path).Length));
+                        }
+
+                        catch
+                        {
+                            _size = new NullableGeneric<Size?>(null);
+                        }
+
+                    return _size.Value;
+                }
+            }
 
             public PathInfoBase(in string relativePath, in bool isDirectory)
             {
@@ -96,7 +132,7 @@ namespace WinCopies.IO
         {
             public NullableGeneric<T> Parent { get; }
 
-            public string Path => this.GetPath(false);
+            public override string Path => this.GetPath(false);
 
             public PathInfo(in string relativePath, in NullableGeneric<T> parent, in bool isDirectory) : base(relativePath, isDirectory)
             {
@@ -110,8 +146,8 @@ namespace WinCopies.IO
                 // Left empty.
             }
 
-#if !CS9
-            IO.IPathCommon IO.IPathCommon.Parent => Parent;
+#if !CS8
+            IO.IPathCommon IO.IPathCommon.Parent => Parent.Value;
 #endif
         }
 
@@ -119,12 +155,34 @@ namespace WinCopies.IO
         {
             public NullableGeneric<T> Parent => null;
 
-            public string Path => RelativePath;
+            public override string Path => RelativePath;
+
+            private static bool GetIsDirectory(in string path)
+            {
+                try
+                {
+                    return System.IO.Directory.Exists(path);
+                }
+
+                catch
+                {
+                    return false;
+                }
+            }
 
             public RootPath(in string path, in bool isDirectory) : base(path, isDirectory)
             {
                 // Left empty.
             }
+
+            public RootPath(in string path) : this(path, GetIsDirectory(path))
+            {
+                // Left empty.
+            }
+
+#if !CS8
+            IO.IPathCommon IO.IPathCommon.Parent => Parent == null ? default : Parent.Value;
+#endif
         }
     }
 }

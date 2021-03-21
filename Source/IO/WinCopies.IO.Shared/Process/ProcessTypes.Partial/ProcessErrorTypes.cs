@@ -34,11 +34,7 @@ namespace WinCopies.IO.Process
 
             public interface IProcessErrorFactories : IProcessErrorFactory<TError>, IProcessErrorItemFactory
             {
-#if CS8
-                IProcessErrorItem<T, TError> GetErrorItem(T item, TError error, Exception exception) => GetErrorItem(item, GetError(error, exception));
-
-                IProcessErrorItem<T, TError> GetErrorItem(T item, TError error, string message) => GetErrorItem(item, GetError(error, message));
-#endif
+                // Left empty.
             }
 
             public class ProcessOptions
@@ -59,7 +55,7 @@ namespace WinCopies.IO.Process
 
     public static class ProcessTypes<TPath, TError> where TPath : IPathInfo
     {
-        public class ProcessErrorFactory : IProcessErrorFactoryBase<TError>
+        public class ProcessErrorFactoryBase : IProcessErrorFactoryBase<TError>
         {
             public IProcessError<TError> GetError(TError error, Exception exception) => new ProcessError<TError>(error, exception);
 
@@ -107,5 +103,26 @@ namespace WinCopies.IO.Process
             #endregion
 #endif
         }
+    }
+
+    public class ProcessErrorFactory<T> : ProcessTypes<T, ProcessError>.ProcessErrorFactoryBase, ProcessTypes<T>.ProcessErrorTypes<ProcessError>.IProcessErrorFactories where T : IPathInfo
+    {
+        public ProcessError NoError => ProcessError.None;
+
+        public ProcessError UnknownError => ProcessError.UnknownError;
+
+        public ProcessError CancelledByUserError => ProcessError.CancelledByUser;
+
+        public ProcessError WrongStatusError => ProcessError.WrongStatus;
+
+#if !CS8
+        object IProcessErrorFactoryData.NoError => NoError;
+
+        object IProcessErrorFactoryData.UnknownError => UnknownError;
+
+        object IProcessErrorFactoryData.CancelledByUserError => CancelledByUserError;
+
+        object IProcessErrorFactoryData.WrongStatusError => WrongStatusError;
+#endif
     }
 }

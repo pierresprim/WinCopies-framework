@@ -361,7 +361,7 @@ namespace WinCopies.IO
             public override WinCopies.Collections.Generic.IComparer<IBrowsableObjectInfoBase> GetDefaultComparer() => new WMIItemInfoComparer<IBrowsableObjectInfoBase>();
 
             public override IEnumerable<IBrowsableObjectInfo> GetSubRootItems() => GetItems().Where(item => item.Browsability?.Browsability == IO.Browsability.BrowsableByDefault);
-            #endregion // Methods
+            #endregion Methods
         }
 
         public class WMIItemInfo : WMIItemInfo<IWMIItemInfoProperties, ManagementBaseObject, IBrowsableObjectInfoSelectorDictionary<WMIItemInfoItemProvider>, WMIItemInfoItemProvider>, IWMIItemInfo
@@ -377,6 +377,8 @@ namespace WinCopies.IO
             private IWMIItemInfoProperties _objectProperties;
 
             #region Properties
+            public override IProcessFactory ProcessFactory => DefaultProcessFactory.Instance;
+
             public static IBrowsableObjectInfoSelectorDictionary<WMIItemInfoItemProvider> DefaultItemSelectorDictionary { get; } = new WMIItemInfoSelectorDictionary();
 
             public sealed override IWMIItemInfoProperties ObjectPropertiesGeneric => IsDisposed ? throw GetExceptionForDispose(false) : _objectProperties;

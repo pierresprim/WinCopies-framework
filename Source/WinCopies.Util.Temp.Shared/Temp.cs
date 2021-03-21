@@ -49,6 +49,7 @@ using WinCopies.Linq;
 
 using static WinCopies.Util.Data.ConverterHelper;
 using WinCopies.Collections.DotNetFix;
+using System.Collections.Specialized;
 
 #if !WinCopies3
 using System.Collections;
@@ -511,6 +512,59 @@ namespace WinCopies
         void RemovePropertyChangedDelegate(Action<string> action);
     }
 
+    public class StringEnumerator : Enumerator<string>
+    {
+        private int _currentIndex = -1;
+        private Func<bool> _func;
+
+        protected StringCollection StringCollection { get; }
+
+        public EnumerationDirection EnumerationDirection { get; }
+
+        public override bool? IsResetSupported => true;
+
+        public StringEnumerator(in StringCollection stringCollection, in EnumerationDirection enumerationDirection)
+        {
+            StringCollection = stringCollection ?? throw GetArgumentNullException(nameof(stringCollection));
+
+            EnumerationDirection = enumerationDirection;
+
+            switch (enumerationDirection)
+            {
+                case EnumerationDirection.FIFO:
+
+                    _func = () => ++_currentIndex < StringCollection.Count;
+
+                    break;
+
+                case EnumerationDirection.LIFO:
+
+                    _currentIndex = StringCollection.Count;
+
+                    _func = () => --_currentIndex > -1;
+
+                    break;
+
+                default:
+
+                    throw GetInvalidEnumArgumentException(nameof(enumerationDirection), enumerationDirection);
+            }
+        }
+
+        protected override string CurrentOverride => StringCollection[_currentIndex];
+
+        protected override bool MoveNextOverride() => _func();
+
+        protected override void ResetCurrent() => _currentIndex = -1;
+
+        protected override void DisposeManaged()
+        {
+            _func = null;
+
+            base.DisposeManaged();
+        }
+    }
+
     public static class Temp
     {
         public static void ThrowIfNullOrReadOnly(in ISimpleLinkedListBase linkedList, in string argumentName)
@@ -551,6 +605,77 @@ namespace WinCopies
             {
                 enumerator.Dispose();
             }
+        }
+
+        public static bool For(in Func<bool> loopCondition, in Func<bool> action, in Action postIterationAction)
+        {
+            while (loopCondition())
+            {
+                if (action())
+
+                    return true;
+
+                postIterationAction();
+            }
+
+            return false;
+        }
+
+        public static bool For(in Func<bool> loopCondition, Action action, in Action postIterationAction) => For(loopCondition, () =>
+         {
+             try
+             {
+                 action();
+
+                 return true;
+             }
+
+             catch { return false; }
+
+         }, postIterationAction);
+
+        public static IQueue<T> ToQueue<T>(this System.Collections.Generic.IEnumerable<T> enumerable)
+        {
+            var queue = new Collections.Generic.Queue<T>();
+
+            foreach (T item in enumerable)
+
+                queue.Enqueue(item);
+
+            return queue;
+        }
+
+        public static IStack<T> ToStack<T>(this System.Collections.Generic.IEnumerable<T> enumerable)
+        {
+            var stack = new Collections.Generic.Stack<T>();
+
+            foreach (T item in enumerable)
+
+                stack.Push(item);
+
+            return stack;
+        }
+
+        public static IEnumerableQueue<T> ToEnumerableQueue<T>(this System.Collections.Generic.IEnumerable<T> enumerable)
+        {
+            var queue = new EnumerableQueue<T>();
+
+            foreach (T item in enumerable)
+
+                queue.Enqueue(item);
+
+            return queue;
+        }
+
+        public static IEnumerableStack<T> ToEnumerableStack<T>(this System.Collections.Generic.IEnumerable<T> enumerable)
+        {
+            var stack = new EnumerableStack<T>();
+
+            foreach (T item in enumerable)
+
+                stack.Push(item);
+
+            return stack;
         }
 
         [DllImport(Microsoft.WindowsAPICodePack.NativeAPI.Consts.DllNames.Kernel32, SetLastError = true, CharSet = CharSet.Unicode)]

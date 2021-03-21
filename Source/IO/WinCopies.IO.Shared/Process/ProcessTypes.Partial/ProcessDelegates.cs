@@ -61,6 +61,11 @@ namespace WinCopies.IO.Process
             ANDALSO_EventAndQueryDelegate<TParam> CommonDelegate { get; }
         }
 
+        public interface IProcessDelegates<TProcessEventDelegates> : IProcessDelegates
+        {
+            TProcessEventDelegates GetProcessEventDelegates();
+        }
+
         public class ProcessDelegatesBase : IProcessDelegates
         {
             public EventDelegate<T> ProgressDelegate { get; }
@@ -80,7 +85,7 @@ namespace WinCopies.IO.Process
             }
         }
 
-        public abstract class ProcessDelegatesAbstract<TProcessEventDelegates> : ProcessDelegatesBase where TProcessEventDelegates : IProcessEventDelegates
+        public abstract class ProcessDelegatesAbstract<TProcessEventDelegates> : ProcessDelegatesBase, IProcessDelegates<TProcessEventDelegates> where TProcessEventDelegates : IProcessEventDelegates
         {
             public ProcessDelegatesAbstract(in EventDelegate<T> progressDelegate, in ANDALSO_EventAndQueryDelegate<bool> checkPerformedDelegate, in ANDALSO_EventAndQueryDelegate<object> cancellationPendingDelegate, in ANDALSO_EventAndQueryDelegate<TParam> commonDelegate) : base(progressDelegate, checkPerformedDelegate, cancellationPendingDelegate, commonDelegate)
             {
