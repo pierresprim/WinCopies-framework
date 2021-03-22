@@ -43,7 +43,7 @@ namespace WinCopies.IO.ObjectModel
         #endregion
 
         #region Properties
-        public override IProcessFactory ProcessFactory => DefaultProcessFactory.Instance;
+        public override IProcessFactory ProcessFactory => IO.ProcessFactory.DefaultProcessFactory;
 
         public sealed override IPortableDeviceObject InnerObjectGeneric => IsDisposed ? throw GetExceptionForDispose(false) : _portableDeviceObject;
 
@@ -110,14 +110,14 @@ namespace WinCopies.IO.ObjectModel
                 return _name;
             }
         }
-        #endregion
+        #endregion Properties
 
         #region Constructors
+        private PortableDeviceObjectInfo(in string path, in IPortableDeviceObject portableDeviceObject, in ClientVersion clientVersion) : base(path, null, clientVersion) => _portableDeviceObject = portableDeviceObject;
+
         protected PortableDeviceObjectInfo(in IPortableDeviceObject portableDeviceObject, in IPortableDeviceInfoBase parentPortableDevice, in ClientVersion clientVersion) : this(GetPath(portableDeviceObject, parentPortableDevice), portableDeviceObject, clientVersion) => Parent = parentPortableDevice;
 
         protected PortableDeviceObjectInfo(in IPortableDeviceObject portableDeviceObject, in IPortableDeviceObjectInfoBase parent, in ClientVersion clientVersion) : this(GetPath(portableDeviceObject, parent), portableDeviceObject, clientVersion) => Parent = parent;
-
-        private PortableDeviceObjectInfo(in string path, in IPortableDeviceObject portableDeviceObject, in ClientVersion clientVersion) : base(path, clientVersion) => _portableDeviceObject = portableDeviceObject;
         #endregion
 
         protected override void DisposeManaged()

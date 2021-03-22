@@ -16,6 +16,7 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows.Media.Imaging;
 
@@ -25,14 +26,25 @@ using WinCopies.IO.Selectors;
 using static WinCopies.UtilHelpers;
 using static WinCopies.ThrowHelper;
 using static WinCopies.IO.Resources.ExceptionMessages;
-using System.Collections.Generic;
 
 namespace WinCopies.IO.ObjectModel.Reflection
 {
     public abstract class DotNetItemInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : BrowsableObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IDotNetItemInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IDotNetItemInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
     {
+        private static System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> _defaultRootItems;
+
         #region Properties
-        public override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> RootItems => FileSystemObjectInfo.DefaultRootItems;
+        public override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> RootItems => _defaultRootItems
+#if CS8
+            ??=
+#else
+            ?? (_defaultRootItems =
+#endif
+            FileSystemObjectInfo.GetRootItems(null)
+#if !CS8
+            )
+#endif
+            ;
 
         //public override Predicate<TPredicateTypeParameter> RootItemsPredicate => item => false;
 
@@ -122,7 +134,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
         #endregion
         #endregion
 
-        protected DotNetItemInfo(in string path, in string name, in IBrowsableObjectInfo parent) : base(path, parent.ClientVersion)
+        protected DotNetItemInfo(in string path, in string name, in IBrowsableObjectInfo parent) : base(path, null, parent.ClientVersion)
         {
             Debug.Assert(!(IsNullEmptyOrWhiteSpace(Path) || IsNullEmptyOrWhiteSpace(name)));
 

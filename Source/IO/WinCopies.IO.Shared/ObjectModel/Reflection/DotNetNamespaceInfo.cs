@@ -34,6 +34,8 @@ namespace WinCopies.IO.ObjectModel.Reflection
     public abstract class DotNetNamespaceInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : BrowsableDotNetItemInfo<TObjectProperties, object, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IDotNetNamespaceInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IDotNetItemInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
     {
         #region Properties
+        public override IProcessFactory ProcessFactory => IO.ProcessFactory.DefaultProcessFactory;
+
         public override string ItemTypeName { get; } = Properties.Resources.DotNetNamespace;
 
         public sealed override object InnerObjectGeneric => null;
@@ -57,7 +59,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
         public override IDotNetItemInfoProperties ObjectPropertiesGeneric { get; }
 
         public override IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystem => null;
-        #endregion
+        #endregion Properties
 
         protected internal DotNetNamespaceInfo(in string name, in IBrowsableObjectInfo parent) : base(name, parent)
         {
@@ -78,6 +80,6 @@ namespace WinCopies.IO.ObjectModel.Reflection
         protected override System.Collections.Generic.IEnumerable<DotNetNamespaceInfoItemProvider> GetItemProviders(Predicate<DotNetNamespaceInfoItemProvider> predicate) => GetItemProviders(GetDefaultItemTypes(), predicate);
 
         protected override System.Collections.Generic.IEnumerable<DotNetNamespaceInfoItemProvider> GetItemProviders() => GetItemProviders(GetDefaultItemTypes(), null);
-        #endregion
+        #endregion Methods
     }
 }

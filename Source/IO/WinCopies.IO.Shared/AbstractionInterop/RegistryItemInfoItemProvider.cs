@@ -28,24 +28,35 @@ namespace WinCopies.IO.AbstractionInterop
 
         public string ValueName { get; }
 
+        public IProcessPathCollectionFactory ShellProcessPathCollectionFactory { get; }
+
         public ClientVersion ClientVersion { get; }
 
-        public RegistryItemInfoItemProvider(in RegistryKey registryKey, in ClientVersion clientVersion)
+        public RegistryItemInfoItemProvider(in RegistryKey registryKey, in IProcessPathCollectionFactory shellProcessPathCollectionFactory, in ClientVersion clientVersion)
         {
             RegistryKey = registryKey;
 
+            ShellProcessPathCollectionFactory = shellProcessPathCollectionFactory;
+
             ClientVersion = clientVersion;
         }
 
-        public RegistryItemInfoItemProvider(in RegistryKey registryKey, in string valueName, in ClientVersion clientVersion) : this(registryKey, clientVersion) => ValueName = valueName;
+        public RegistryItemInfoItemProvider(in RegistryKey registryKey, in string valueName, in IProcessPathCollectionFactory shellProcessPathCollectionFactory, in ClientVersion clientVersion) : this(registryKey, shellProcessPathCollectionFactory, clientVersion) => ValueName = valueName;
 
-        public RegistryItemInfoItemProvider(in string path, in ClientVersion clientVersion)
+        public RegistryItemInfoItemProvider(in string path, in IProcessPathCollectionFactory shellProcessPathCollectionFactory, in ClientVersion clientVersion)
         {
             Path = path;
 
+            ShellProcessPathCollectionFactory = shellProcessPathCollectionFactory;
+
             ClientVersion = clientVersion;
         }
 
-        public RegistryItemInfoItemProvider(in string registryKeyPath, in string valueName, in ClientVersion clientVersion) : this(registryKeyPath, clientVersion) => ValueName = valueName;
+        public RegistryItemInfoItemProvider(in string registryKeyPath, in string valueName, in IProcessPathCollectionFactory shellProcessPathCollectionFactory, in ClientVersion clientVersion) : this(registryKeyPath, shellProcessPathCollectionFactory , clientVersion)
+        {
+            ValueName = valueName;
+
+            ShellProcessPathCollectionFactory = shellProcessPathCollectionFactory;
+        }
     }
 }

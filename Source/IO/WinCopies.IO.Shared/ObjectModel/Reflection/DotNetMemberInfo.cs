@@ -39,6 +39,8 @@ namespace WinCopies.IO.ObjectModel.Reflection
         #region Properties
         public sealed override MemberInfo InnerObjectGeneric { get; }
 
+        public override IProcessFactory ProcessFactory => IO.ProcessFactory.DefaultProcessFactory;
+
         public override string ItemTypeName => Properties.Resources.DotNetMember;
         #endregion
 
@@ -64,6 +66,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
         public sealed override IDotNetTypeOrMemberInfoProperties ObjectPropertiesGeneric { get; }
 
         public override IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystem => null;
+
         #endregion
 
         protected internal DotNetMemberInfo(in MemberInfo memberInfo, in IDotNetItemInfo parent) : base(memberInfo, parent)

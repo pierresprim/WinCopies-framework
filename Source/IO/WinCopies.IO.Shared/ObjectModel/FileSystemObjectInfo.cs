@@ -49,8 +49,20 @@ namespace WinCopies.IO
     {
         public abstract class FileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : BrowsableObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IFileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IFileSystemObjectInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
         {
+            private System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> _defaultRootItems;
+
             #region Properties
-            public override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> RootItems => FileSystemObjectInfo.DefaultRootItems;
+            public override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> RootItems => _defaultRootItems
+#if CS8
+                ??=
+#else
+                ?? (_defaultRootItems =
+#endif
+               FileSystemObjectInfo.GetRootItems(ProcessPathCollectionFactory)
+#if !CS8
+                )
+#endif
+                ;
 
             public override bool IsRecursivelyBrowsable => true;
 
@@ -60,7 +72,7 @@ namespace WinCopies.IO
             #endregion
 
             // /// <param name="fileType">The <see cref="FileType"/> of this <see cref="BrowsableObjectInfo"/>.</param>
-            protected FileSystemObjectInfo(in string path, in ClientVersion clientVersion) : base(path, clientVersion) { /* Left empty. */ }
+            protected FileSystemObjectInfo(in string path, in IProcessPathCollectionFactory processPathCollectionFactory, in ClientVersion clientVersion) : base(path, processPathCollectionFactory, clientVersion) { /* Left empty. */ }
 
             #region Methods
             #region Helpers
@@ -169,21 +181,7 @@ namespace WinCopies.IO
 
         public static class FileSystemObjectInfo
         {
-            private static System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> _defaultRootItems;
-
-            public static System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> DefaultRootItems => _defaultRootItems
-#if CS8
-                ??=
-#else
-                ?? (_defaultRootItems =
-#endif
-                GetRootItems()
-#if !CS8
-                )
-#endif
-                ;
-
-            public static System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetRootItems()
+            public static System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetRootItems(IProcessPathCollectionFactory processPathCollectionFactory)
             {
 #if WinCopies4
                 EnumerableHelper<IBrowsableObjectInfo>.IEnumerableQueue queue = EnumerableHelper<IBrowsableObjectInfo>.GetEnumerableQueue();
@@ -193,7 +191,7 @@ namespace WinCopies.IO
 
                 ClientVersion clientVersion = BrowsableObjectInfo.GetDefaultClientVersion();
 
-                void enqueue(in IKnownFolder knownFolder) => queue.Enqueue(new ShellObjectInfo(knownFolder, clientVersion));
+                void enqueue(in IKnownFolder knownFolder) => queue.Enqueue(new ShellObjectInfo(knownFolder, processPathCollectionFactory, clientVersion));
 
                 enqueue(KnownFolders.UserPinned);
                 enqueue(KnownFolders.Desktop);
@@ -222,14 +220,14 @@ namespace WinCopies.IO
             {
 #if NETFRAMEWORK
 
-            using (Icon icon = TryGetIcon(extension, fileType, new System.Drawing.Size(size, size)))
+                using (Icon icon = TryGetIcon(extension, fileType, new System.Drawing.Size(size, size)))
 
 #else
 
                 using Icon icon = TryGetIcon(extension, fileType, new System.Drawing.Size(size, size));
 
 #endif
-                return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+                    return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
             }
         }
     }

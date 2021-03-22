@@ -105,7 +105,7 @@ namespace WinCopies.IO
 
                         if (InnerObjectGeneric is ShellLink shellLink)
                         {
-                            ShellObjectInfo targetShellObjectInfo = ShellObjectInfo.From(shellLink.TargetShellObject, ClientVersion);
+                            ShellObjectInfo targetShellObjectInfo = ShellObjectInfo.From(shellLink.TargetShellObject, ProcessPathCollectionFactory, ClientVersion);
 
                             if (targetShellObjectInfo.InnerObjectGeneric is ShellLink)
                             {
@@ -212,7 +212,7 @@ namespace WinCopies.IO
             ///// <param name="fileType">The file type of this <see cref="ShellObjectInfo"/>.</param>
             ///// <param name="specialFolder">The special folder type of this <see cref="ShellObjectInfo"/>. <see cref="WinCopies.IO.SpecialFolder.None"/> if this <see cref="ShellObjectInfo"/> is a casual file system item.</param>
             ///// <param name="shellObject">The <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> that this <see cref="ShellObjectInfo"/> represents.</param>
-            protected ShellObjectInfo(in string path, in ShellObject shellObject, in ClientVersion clientVersion) : base(path, clientVersion) => _shellObject = shellObject;
+            protected ShellObjectInfo(in string path, in ShellObject shellObject, in IProcessPathCollectionFactory processPathCollectionFactory, in ClientVersion clientVersion) : base(path, processPathCollectionFactory, clientVersion) => _shellObject = shellObject;
 
             #region Methods
             #region Archive
@@ -295,9 +295,9 @@ namespace WinCopies.IO
                 }
 
                 return equalsFileType()
-                    ? ShellObjectInfo.From(_shellObject.Parent, ClientVersion)
+                    ? ShellObjectInfo.From(_shellObject.Parent, ProcessPathCollectionFactory, ClientVersion)
                     : ObjectPropertiesGeneric.FileType == FileType.Drive
-                        ? new ShellObjectInfo(Computer.Path, FileType.KnownFolder, ShellObjectFactory.Create(Computer.ParsingName), ClientVersion)
+                        ? new ShellObjectInfo(Computer.Path, FileType.KnownFolder, ShellObjectFactory.Create(Computer.ParsingName), ProcessPathCollectionFactory, ClientVersion)
                         : null;
             }
             #endregion
@@ -534,7 +534,7 @@ namespace WinCopies.IO
             #endregion // Properties
 
             #region Constructors
-            public ShellObjectInfo(in string path, in FileType fileType, in ShellObject shellObject, in ClientVersion clientVersion) : base(path, shellObject, clientVersion)
+            public ShellObjectInfo(in string path, in FileType fileType, in ShellObject shellObject, in IProcessPathCollectionFactory processPathCollectionFactory, in ClientVersion clientVersion) : base(path, shellObject, processPathCollectionFactory, clientVersion)
             {
 #if CS9
                 _objectProperties = fileType switch
@@ -580,7 +580,7 @@ namespace WinCopies.IO
                 ProcessFactory = new _ProcessFactory(this);
             }
 
-            public ShellObjectInfo(in IKnownFolder knownFolder, in ClientVersion clientVersion) : this(string.IsNullOrEmpty(knownFolder.Path) ? knownFolder.ParsingName : knownFolder.Path, FileType.KnownFolder, ShellObjectFactory.Create(knownFolder.ParsingName), clientVersion)
+            public ShellObjectInfo(in IKnownFolder knownFolder, in IProcessPathCollectionFactory processPathCollectionFactory, in ClientVersion clientVersion) : this(string.IsNullOrEmpty(knownFolder.Path) ? knownFolder.ParsingName : knownFolder.Path, FileType.KnownFolder, ShellObjectFactory.Create(knownFolder.ParsingName), processPathCollectionFactory, clientVersion)
             {
                 // Left empty.
             }
@@ -630,14 +630,14 @@ namespace WinCopies.IO
                 throw new ArgumentException($"The given {nameof(ShellObject)} is not supported.");
             }
 
-            public static ShellObjectInfo From(in ShellObject shellObject, in ClientVersion clientVersion)
+            public static ShellObjectInfo From(in ShellObject shellObject, in IProcessPathCollectionFactory processPathCollectionFactory, in ClientVersion clientVersion)
             {
                 ShellObjectInitInfo initInfo = GetInitInfo(shellObject);
 
-                return new ShellObjectInfo(initInfo.Path, initInfo.FileType, shellObject, clientVersion);
+                return new ShellObjectInfo(initInfo.Path, initInfo.FileType, shellObject, processPathCollectionFactory, clientVersion);
             }
 
-            public static ShellObjectInfo From(in string path, in ClientVersion clientVersion) => From(ShellObjectFactory.Create(path), clientVersion);
+            public static ShellObjectInfo From(in string path, in IProcessPathCollectionFactory processPathCollectionFactory, in ClientVersion clientVersion) => From(ShellObjectFactory.Create(path), processPathCollectionFactory, clientVersion);
 
             public override IBrowsableObjectInfoSelectorDictionary<ShellObjectInfoItemProvider> GetSelectorDictionary() => DefaultItemSelectorDictionary;
 

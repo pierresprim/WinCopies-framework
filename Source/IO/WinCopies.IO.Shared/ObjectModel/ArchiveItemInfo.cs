@@ -57,6 +57,8 @@ namespace WinCopies.IO.ObjectModel
         //IShellObjectInfo IArchiveItemInfoProvider.ArchiveShellObject => ArchiveShellObjectOverride;
 
         #region Overrides
+        public override IProcessFactory ProcessFactory => IO.ProcessFactory.DefaultProcessFactory;
+
         /// <summary>
         /// The <see cref="ArchiveFileInfo"/> that this <see cref="ArchiveItemInfo"/> represents.
         /// </summary>
@@ -181,7 +183,7 @@ namespace WinCopies.IO.ObjectModel
         #endregion // Overrides
         #endregion // Properties
 
-        protected ArchiveItemInfo(in string path, in IShellObjectInfoBase archiveShellObject, in ArchiveFileInfo? archiveFileInfo, in ClientVersion clientVersion/*, DeepClone<ArchiveFileInfo?> archiveFileInfoDelegate*/) : base(path, clientVersion)
+        protected ArchiveItemInfo(in string path, in IShellObjectInfoBase archiveShellObject, in ArchiveFileInfo? archiveFileInfo, in ClientVersion clientVersion/*, DeepClone<ArchiveFileInfo?> archiveFileInfoDelegate*/) : base(path, null, clientVersion)
         {
             ArchiveShellObject = archiveShellObject;
 
@@ -221,14 +223,12 @@ namespace WinCopies.IO.ObjectModel
         private IFileSystemObjectInfoProperties _objectProperties;
 
         #region Properties
-        public override IProcessFactory ProcessFactory => DefaultProcessFactory.Instance;
-
         public static IBrowsableObjectInfoSelectorDictionary<ArchiveItemInfoItemProvider> DefaultItemSelectorDictionary { get; } = new ArchiveItemInfoSelectorDictionary();
 
         public sealed override IFileSystemObjectInfoProperties ObjectPropertiesGeneric => IsDisposed ? throw GetExceptionForDispose(false) : _objectProperties;
 
         public override IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystem => null;
-        #endregion // Properties
+        #endregion Properties
 
         protected internal ArchiveItemInfo(in string path, in FileType fileType, in IShellObjectInfoBase archiveShellObject, in ArchiveFileInfo? archiveFileInfo, ClientVersion clientVersion/*, DeepClone<ArchiveFileInfo?> archiveFileInfoDelegate*/) : base(path, archiveShellObject, archiveFileInfo, clientVersion)
 #if CS9

@@ -25,7 +25,6 @@ using System.Windows.Media.Imaging;
 using Microsoft.WindowsAPICodePack.PortableDevices;
 using Microsoft.WindowsAPICodePack.Shell;
 
-using WinCopies.Collections;
 using WinCopies.IO.AbstractionInterop;
 using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Selectors;
@@ -58,6 +57,7 @@ namespace WinCopies.IO
         public abstract class WMIItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : BrowsableObjectInfo<TObjectProperties, ManagementBaseObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IWMIItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IWMIItemInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
         {
             #region Fields
+            private System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> _defaultRootItems;
             private ManagementBaseObject _managementObject;
             private IBrowsableObjectInfo _parent;
             private string _itemTypeName;
@@ -65,22 +65,22 @@ namespace WinCopies.IO
             private string _description;
             #endregion
 
-            private static System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> _defaultRootItems;
-
             #region Properties
-            public static System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> DefaultRootItems => _defaultRootItems
+            public override IProcessFactory ProcessFactory => IO.ProcessFactory.DefaultProcessFactory;
+
+            public IProcessPathCollectionFactory ShellProcessPathCollectionFactory { get; }
+
+            public override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> RootItems => _defaultRootItems
 #if CS8
                 ??=
 #else
                 ?? (_defaultRootItems =
 #endif
-                GetRootItems()
+                GetRootItems(ShellProcessPathCollectionFactory)
 #if !CS8
                 )
 #endif
                 ;
-
-            public override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> RootItems => DefaultRootItems;
 
             //public override Predicate<TPredicateTypeParameter> RootItemsPredicate => null;
 
@@ -228,12 +228,12 @@ namespace WinCopies.IO
             #endregion // Properties
 
             #region Constructors
-            protected WMIItemInfo() : this(GetDefaultClientVersion()) { /* Left empty. */ }
+            protected WMIItemInfo(in IProcessPathCollectionFactory shellProcessPathCollectionFactory) : this(shellProcessPathCollectionFactory, GetDefaultClientVersion()) { /* Left empty. */ }
 
             /// <summary>
             /// Initializes a new instance of the <see cref="WMIItemInfo"/> class as the WMI root item.
             /// </summary>
-            protected WMIItemInfo(in ClientVersion clientVersion) : this(GetRootInitializer(), null, clientVersion) { /* Left empty. */ }
+            protected WMIItemInfo(in IProcessPathCollectionFactory shellProcessPathCollectionFactory, in ClientVersion clientVersion) : this(GetRootInitializer(), null, shellProcessPathCollectionFactory, clientVersion) { /* Left empty. */ }
 
             ///// <summary>
             ///// Initializes a new instance of the <see cref="WMIItemInfo"/> class. If you want to initialize this class in order to represent the root WMI item, you can also use the <see cref="WMIItemInfo()"/> constructor.
@@ -247,7 +247,7 @@ namespace WinCopies.IO
             //    // Left empty.
             //}
 
-            protected WMIItemInfo(in WMIItemInfoInitializer initializer, in string name, in ClientVersion clientVersion) : base((initializer ?? throw GetArgumentNullException(nameof(initializer))).Path, clientVersion)
+            protected WMIItemInfo(in WMIItemInfoInitializer initializer, in string name, in IProcessPathCollectionFactory shellProcessPathCollectionFactory, in ClientVersion clientVersion) : base((initializer ?? throw GetArgumentNullException(nameof(initializer))).Path, null, clientVersion)
             {
                 //ThrowIfNull(managementObjectDelegate, nameof(managementObjectDelegate));
 
@@ -260,11 +260,13 @@ namespace WinCopies.IO
                 if (!IsNullEmptyOrWhiteSpace(name))
 
                     Name = name;
+
+                ShellProcessPathCollectionFactory = shellProcessPathCollectionFactory;
             }
             #endregion // Constructors
 
             #region Methods
-            public static System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetRootItems() => new IBrowsableObjectInfo[] { new WMIItemInfo(null, GetDefaultClientVersion()) };
+            public static System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetRootItems(in IProcessPathCollectionFactory shellProcessPathCollectionFactory) => new IBrowsableObjectInfo[] { new WMIItemInfo(null, shellProcessPathCollectionFactory, GetDefaultClientVersion()) };
 
             private static WMIItemInfoInitializer GetRootInitializer()
             {
@@ -273,13 +275,13 @@ namespace WinCopies.IO
                 return new WMIItemInfoInitializer(path, new ManagementClass(path));
             }
 
-            public WMIItemInfo GetWMIItemInfo(in string serverName, in string serverRelativePath) => WMIItemInfo.GetWMIItemInfo(serverName, serverRelativePath, ObjectPropertiesGeneric.Options, ClientVersion);
+            public WMIItemInfo GetWMIItemInfo(in string serverName, in string serverRelativePath, in IProcessPathCollectionFactory shellProcessPathCollectionFactory) => WMIItemInfo.GetWMIItemInfo(serverName, serverRelativePath, ObjectPropertiesGeneric.Options, shellProcessPathCollectionFactory, ClientVersion);
 
-            public WMIItemInfo GetWMIItemInfo(in WMIItemType itemType, in ManagementBaseObject managementObject) => new WMIItemInfo(itemType, managementObject, ObjectPropertiesGeneric.Options, ClientVersion);
+            public WMIItemInfo GetWMIItemInfo(in WMIItemType itemType, in ManagementBaseObject managementObject, in IProcessPathCollectionFactory shellProcessPathCollectionFactory) => new WMIItemInfo(itemType, managementObject, ObjectPropertiesGeneric.Options, shellProcessPathCollectionFactory, ClientVersion);
 
-            public WMIItemInfo GetWMIItemInfo(in string path, in WMIItemType itemType) => new WMIItemInfo(path, itemType, ObjectPropertiesGeneric.Options, ClientVersion);
+            public WMIItemInfo GetWMIItemInfo(in string path, in WMIItemType itemType, in IProcessPathCollectionFactory shellProcessPathCollectionFactory) => new WMIItemInfo(path, itemType, ObjectPropertiesGeneric.Options, shellProcessPathCollectionFactory, ClientVersion);
 
-            public WMIItemInfo GetRootWMIItemInfo() => new WMIItemInfo(ObjectPropertiesGeneric.Options, ClientVersion);
+            public WMIItemInfo GetRootWMIItemInfo(in IProcessPathCollectionFactory shellProcessPathCollectionFactory) => new WMIItemInfo(ObjectPropertiesGeneric.Options, shellProcessPathCollectionFactory, ClientVersion);
 
             /*public override bool Equals(object obj) => ReferenceEquals(this, obj) || (obj is IWMIItemInfo _obj && WMIItemType == _obj.WMIItemType && Path.ToLower() == _obj.Path.ToLower());
 
@@ -300,7 +302,7 @@ namespace WinCopies.IO
 
             private IBrowsableObjectInfo GetParent()
             {
-                if (ObjectPropertiesGeneric.IsRootNode) return new ShellObjectInfo(KnownFolders.Computer, ClientVersion);
+                if (ObjectPropertiesGeneric.IsRootNode) return new ShellObjectInfo(KnownFolders.Computer, ShellProcessPathCollectionFactory, ClientVersion);
 
                 string path;
 
@@ -311,14 +313,14 @@ namespace WinCopies.IO
                         path = Path.Substring(0, Path.LastIndexOf(WinCopies.IO.Path.PathSeparator)) + NamespacePath;
 
                         return path.EndsWith(RootNamespace, true, CultureInfo.InvariantCulture)
-                            ? GetRootWMIItemInfo()
-                            : GetWMIItemInfo(path, WMIItemType.Namespace);
+                            ? GetRootWMIItemInfo(ShellProcessPathCollectionFactory)
+                            : GetWMIItemInfo(path, WMIItemType.Namespace, ShellProcessPathCollectionFactory);
 
                     case WMIItemType.Class:
 
                         return Path.EndsWith("root:" + Name, true, CultureInfo.InvariantCulture)
-                            ? GetRootWMIItemInfo()
-                            : GetWMIItemInfo(Path.Substring(0, Path.IndexOf(':')) + NamespacePath, WMIItemType.Namespace);
+                            ? GetRootWMIItemInfo(ShellProcessPathCollectionFactory)
+                            : GetWMIItemInfo(Path.Substring(0, Path.IndexOf(':')) + NamespacePath, WMIItemType.Namespace, ShellProcessPathCollectionFactory);
 
                     case WMIItemType.Instance:
 
@@ -333,7 +335,7 @@ namespace WinCopies.IO
                         $"{path.Substring(0, splitIndex)}:{path.Substring(splitIndex + 1)}";
 #endif
 
-                        return GetWMIItemInfo(path, WMIItemType.Class);
+                        return GetWMIItemInfo(path, WMIItemType.Class, ShellProcessPathCollectionFactory);
 
                     default:
 
@@ -377,8 +379,6 @@ namespace WinCopies.IO
             private IWMIItemInfoProperties _objectProperties;
 
             #region Properties
-            public override IProcessFactory ProcessFactory => DefaultProcessFactory.Instance;
-
             public static IBrowsableObjectInfoSelectorDictionary<WMIItemInfoItemProvider> DefaultItemSelectorDictionary { get; } = new WMIItemInfoSelectorDictionary();
 
             public sealed override IWMIItemInfoProperties ObjectPropertiesGeneric => IsDisposed ? throw GetExceptionForDispose(false) : _objectProperties;
@@ -390,12 +390,12 @@ namespace WinCopies.IO
             /// <summary>
             /// Initializes a new instance of the <see cref="WMIItemInfo"/> class as the WMI root item.
             /// </summary>
-            public WMIItemInfo() : base() => _objectProperties = GetProperties(this, new WMIItemInfoOptions());
+            public WMIItemInfo(in IProcessPathCollectionFactory shellProcessPathCollectionFactory) : base(shellProcessPathCollectionFactory) => _objectProperties = GetProperties(this, new WMIItemInfoOptions());
 
             /// <summary>
             /// Initializes a new instance of the <see cref="WMIItemInfo"/> class as the WMI root item.
             /// </summary>
-            public WMIItemInfo(in IWMIItemInfoOptions options, in ClientVersion clientVersion) : base(clientVersion) => _objectProperties = GetProperties(this, options);
+            public WMIItemInfo(in IWMIItemInfoOptions options, in IProcessPathCollectionFactory shellProcessPathCollectionFactory, in ClientVersion clientVersion) : base(shellProcessPathCollectionFactory, clientVersion) => _objectProperties = GetProperties(this, options);
 
             ///// <summary>
             ///// Initializes a new instance of the <see cref="WMIItemInfo"/> class. If you want to initialize this class in order to represent the root WMI item, you can also use the <see cref="WMIItemInfo()"/> constructor.
@@ -404,14 +404,14 @@ namespace WinCopies.IO
             ///// <param name="wmiItemType">The type of this <see cref="WMIItemInfo"/>.</param>
             ///// <param name="managementObjectDelegate">The delegate that will be used by the <see cref="BrowsableObjectInfo.DeepClone()"/> method to get a new <see cref="ManagementBaseObject"/>.</param>
             ///// <param name="managementObject">The <see cref="ManagementBaseObject"/> that this <see cref="WMIItemInfo"/> represents.</param>
-            protected internal WMIItemInfo(in string path, in WMIItemType wmiItemType, in ManagementBaseObject managementObject, in IWMIItemInfoOptions options, in ClientVersion clientVersion) : base(new WMIItemInfoInitializer(path, managementObject), wmiItemType == WMIItemType.Instance ? null : GetName(managementObject, wmiItemType), clientVersion) => _objectProperties = new WMIItemInfoProperties(this, wmiItemType, false, options);
+            protected internal WMIItemInfo(in string path, in WMIItemType wmiItemType, in ManagementBaseObject managementObject, in IWMIItemInfoOptions options, IProcessPathCollectionFactory shellProcessPathCollectionFactory, in ClientVersion clientVersion) : base(new WMIItemInfoInitializer(path, managementObject), wmiItemType == WMIItemType.Instance ? null : GetName(managementObject, wmiItemType), shellProcessPathCollectionFactory, clientVersion) => _objectProperties = new WMIItemInfoProperties(this, wmiItemType, false, options);
 
-            public WMIItemInfo(in WMIItemType itemType, in ManagementBaseObject managementObject, in IWMIItemInfoOptions options, in ClientVersion clientVersion) : this(GetPath(managementObject, itemType), itemType, managementObject, options, clientVersion)
+            public WMIItemInfo(in WMIItemType itemType, in ManagementBaseObject managementObject, in IWMIItemInfoOptions options, in IProcessPathCollectionFactory shellProcessPathCollectionFactory, in ClientVersion clientVersion) : this(GetPath(managementObject, itemType), itemType, managementObject, options, shellProcessPathCollectionFactory, clientVersion)
             {
                 // Left empty.
             }
 
-            public WMIItemInfo(in string path, in WMIItemType itemType, in IWMIItemInfoOptions options, in ClientVersion clientVersion) : this(path, itemType, GetManagementClassFromPath(path, options), options, clientVersion)
+            public WMIItemInfo(in string path, in WMIItemType itemType, in IWMIItemInfoOptions options, in IProcessPathCollectionFactory shellProcessPathCollectionFactory, in ClientVersion clientVersion) : this(path, itemType, GetManagementClassFromPath(path, options), options, shellProcessPathCollectionFactory, clientVersion)
             {
                 // Left empty.
             }
@@ -462,11 +462,11 @@ namespace WinCopies.IO
             ///// <returns>A new <see cref="WMIItemInfo"/> that corresponds to the given server name and relative path.</returns>
             ///// <seealso cref="WMIItemInfo()"/>
             ///// <seealso cref="WMIItemInfo(string, WMIItemType, ManagementBaseObject, DeepClone{ManagementBaseObject})"/>
-            public static WMIItemInfo GetWMIItemInfo(in string serverName, in string serverRelativePath, in IWMIItemInfoOptions options, in ClientVersion clientVersion)
+            public static WMIItemInfo GetWMIItemInfo(in string serverName, in string serverRelativePath, in IWMIItemInfoOptions options, in IProcessPathCollectionFactory shellProcessPathCollectionFactory, in ClientVersion clientVersion)
             {
                 string path = $"{WinCopies.IO.Path.PathSeparator}{WinCopies.IO.Path.PathSeparator}{serverName}{WinCopies.IO.Path.PathSeparator}{(IsNullEmptyOrWhiteSpace(serverRelativePath) ? ROOT : serverRelativePath)}{NamespacePath}";
 
-                return new WMIItemInfo(path, WMIItemType.Namespace, new ManagementClass(path), options, clientVersion  /*, managementObject => DefaultManagementClassDeepCloneDelegate((ManagementClass)managementObject, null)*/);
+                return new WMIItemInfo(path, WMIItemType.Namespace, new ManagementClass(path), options, shellProcessPathCollectionFactory, clientVersion  /*, managementObject => DefaultManagementClassDeepCloneDelegate((ManagementClass)managementObject, null)*/);
             }
 
             public static ManagementClass GetManagementClassFromPath(in string path, in IWMIItemInfoOptions options) =>
@@ -520,7 +520,7 @@ namespace WinCopies.IO
 #endif
                     System.Collections.Generic.IEnumerable<ManagementBaseObject> enumerateInstances(in ManagementClass _managementClass, in IWMIItemInfoOptions _options) => _as(_options?.EnumerationOptions == null ? _managementClass.GetInstances() : _managementClass.GetInstances(_options?.EnumerationOptions));
 
-                    System.Collections.Generic.IEnumerable<WMIItemInfoItemProvider> getEnumerable(in System.Collections.Generic.IEnumerable<ManagementBaseObject> enumerable, WMIItemType itemType) => enumerable.SelectConverter(item => new WMIItemInfoItemProvider(null, item, itemType, ObjectPropertiesGeneric.Options, ClientVersion));
+                    System.Collections.Generic.IEnumerable<WMIItemInfoItemProvider> getEnumerable(in System.Collections.Generic.IEnumerable<ManagementBaseObject> enumerable, WMIItemType itemType) => enumerable.SelectConverter(item => new WMIItemInfoItemProvider(null, item, itemType, ObjectPropertiesGeneric.Options, ShellProcessPathCollectionFactory, ClientVersion));
 
                     if (ObjectPropertiesGeneric.ItemType == WMIItemType.Namespace)
                     {
@@ -565,8 +565,8 @@ namespace WinCopies.IO
             public System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(in Predicate<ManagementBaseObject> predicate, in IWMIItemInfoOptions options) => GetItems(GetItemProviders(predicate, options));
 
             public System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(in IWMIItemInfoOptions options) => GetItems(item => true, options);
-            #endregion // GetItems
-            #endregion // Methods
+            #endregion GetItems
+            #endregion Methods
         }
     }
 }

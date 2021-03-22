@@ -36,6 +36,8 @@ namespace WinCopies.IO.ObjectModel.Reflection
     public abstract class DotNetTypeInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : BrowsableDotNetItemInfo<TObjectProperties, TypeInfo, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IDotNetTypeInfoBase where TObjectProperties : IDotNetTypeInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
     {
         #region Properties
+        public override IProcessFactory ProcessFactory => IO.ProcessFactory.DefaultProcessFactory;
+
         public sealed override TypeInfo InnerObjectGeneric { get; }
 
         public override string ItemTypeName => Properties.Resources.DotNetType;
@@ -66,6 +68,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
     {
         private static DotNetItemType[] _defaultTypesToEnumerate;
 
+        #region Properties
         public static DotNetItemType[] DefaultTypesToEnumerate => _defaultTypesToEnumerate
 #if CS8
             ??=
@@ -83,6 +86,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
         public sealed override IDotNetTypeInfoProperties ObjectPropertiesGeneric { get; }
 
         public override IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystem => null;
+        #endregion Properties
 
         protected internal DotNetTypeInfo(in TypeInfo type, in DotNetItemType itemType, in bool isRootType, in IBrowsableObjectInfo parent) : base(type, parent)
 #if DEBUG

@@ -35,7 +35,7 @@ namespace WinCopies.IO
 
             while ((_path = _path.Parent) != null)
             {
-                _ = merger.AddFirst(new EnumeratorValue<char>('\\'));
+                _ = merger.AddFirst(new RepeatEnumerator<char>('\\', 1));
 
                 _ = merger.AddFirst(new UIntCountableEnumerable<char>(new StringCharArray(_path.RelativePath)));
             }

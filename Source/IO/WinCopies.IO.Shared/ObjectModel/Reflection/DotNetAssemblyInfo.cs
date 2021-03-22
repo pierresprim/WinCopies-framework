@@ -59,6 +59,8 @@ namespace WinCopies.IO.ObjectModel.Reflection
             RegisterSelectors = () => { /* Left empty. */ };
         };
 
+        public override IProcessFactory ProcessFactory => IO.ProcessFactory.DefaultProcessFactory;
+
         public override IBrowsabilityOptions Browsability => BrowsabilityOptions.Browsable;
 
         public sealed override bool IsRecursivelyBrowsable => false;
@@ -66,9 +68,9 @@ namespace WinCopies.IO.ObjectModel.Reflection
         public Assembly Assembly { get; private set; }
 
         public override IFileSystemObjectInfoProperties2 ObjectPropertiesGeneric { get; }
-        #endregion
+        #endregion Properties
 
-        protected DotNetAssemblyInfo(in string path, in ShellObject shellObject, in ClientVersion clientVersion) : base(path, shellObject, clientVersion) => ObjectPropertiesGeneric = new FileShellObjectInfoProperties<IShellObjectInfoBase2>(this, FileType.File);
+        protected DotNetAssemblyInfo(in string path, in ShellObject shellObject, in ClientVersion clientVersion) : base(path, shellObject, null, clientVersion) => ObjectPropertiesGeneric = new FileShellObjectInfoProperties<IShellObjectInfoBase2>(this, FileType.File);
 
         #region Methods
         public static DotNetAssemblyInfo From(in ShellObject shellObject, in ClientVersion clientVersion)

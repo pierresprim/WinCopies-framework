@@ -25,7 +25,7 @@ namespace WinCopies.IO.ObjectModel
     /// <summary>
     /// The base class for archive item info provider objects.
     /// </summary>
-    public abstract class ArchiveItemInfoProvider<TObjectProperties, TInnerObject, TPredicateTypeParameter,  TSelectorDictionary, TDictionaryItems> : FileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter,TSelectorDictionary, TDictionaryItems>, IArchiveItemInfoProvider<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IFileSystemObjectInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
+    public abstract class ArchiveItemInfoProvider<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : FileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IArchiveItemInfoProvider<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IFileSystemObjectInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
     {
         /// <summary>
         /// The parent <see cref="IShellObjectInfoBase"/> of this item. For <see cref="ShellObjectInfo"/> items, this property returns the current object.
@@ -39,6 +39,6 @@ namespace WinCopies.IO.ObjectModel
         /// </summary>
         /// <param name="path">The path of this <see cref="ArchiveItemInfoProvider{TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/>.</param>
         /// <param name="clientVersion">The <see cref="ClientVersion"/> that will be used for <see cref="PortableDeviceInfo"/> and <see cref="PortableDeviceObjectInfo"/> initialization.</param>
-        protected ArchiveItemInfoProvider(in string path, in ClientVersion clientVersion) : base(path, clientVersion) { /* Left empty. */ }
+        protected ArchiveItemInfoProvider(in string path, in IProcessPathCollectionFactory processPathCollectionFactory, in ClientVersion clientVersion) : base(path, processPathCollectionFactory, clientVersion) { /* Left empty. */ }
     }
 }

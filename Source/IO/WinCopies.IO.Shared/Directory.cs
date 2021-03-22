@@ -59,6 +59,7 @@ namespace WinCopies.IO
             }
         }
 
+#if CS8
         public static System.Collections.Generic.IEnumerable<string> EnumerateFileSystemEntriesIOSafe(in string path, in string searchPattern, in EnumerationOptions enumerationOptions)
         {
             try
@@ -71,6 +72,7 @@ namespace WinCopies.IO
                 return GetEmptyEnumerable<string>();
             }
         }
+#endif
 
         public static System.Collections.Generic.IEnumerable<string> EnumerateFileSystemEntriesIOSafe(string path, in string searchPattern, in SearchOption searchOption)
         {
@@ -113,6 +115,7 @@ namespace WinCopies.IO
             }
         }
 
+#if CS8
         public static System.Collections.Generic.IEnumerable<string> EnumerateDirectoriesIOSafe(string path, string searchPattern, EnumerationOptions enumerationOptions)
         {
             try
@@ -125,6 +128,7 @@ namespace WinCopies.IO
                 return GetEmptyEnumerable<string>();
             }
         }
+#endif
 
         public static System.Collections.Generic.IEnumerable<string> EnumerateDirectoriesIOSafe(string path, string searchPattern, SearchOption searchOption)
         {
@@ -167,6 +171,7 @@ namespace WinCopies.IO
             }
         }
 
+#if CS8
         public static System.Collections.Generic.IEnumerable<string> EnumerateFilesIOSafe(string path, string searchPattern, EnumerationOptions enumerationOptions)
         {
             try
@@ -179,6 +184,7 @@ namespace WinCopies.IO
                 return GetEmptyEnumerable<string>();
             }
         }
+#endif
 
         public static System.Collections.Generic.IEnumerable<string> EnumerateFilesIOSafe(string path, string searchPattern, SearchOption searchOption)
         {
@@ -201,7 +207,7 @@ namespace WinCopies.IO
             , FileSystemEntryEnumeratorProcessSimulation simulationParameters
 #endif
             ) where T : IPathInfo => Enumerate(paths, null, null
-#if NETCORE
+#if CS8
             , null
 #endif
                 , FileSystemEntryEnumerationOrder.None, getNewPathInfoDelegate, safeEnumeration
@@ -214,7 +220,7 @@ namespace WinCopies.IO
         ///// Loads the items.
         ///// </summary>
         public static System.Collections.Generic.IEnumerable<T> Enumerate<T>(System.Collections.Generic.IEnumerable<T> paths, string searchPattern, SearchOption? searchOption
-#if NETCORE
+#if CS8
             , EnumerationOptions enumerationOptions
 #endif
             , FileSystemEntryEnumerationOrder enumerationOrder, Func<IPathInfo, T> getNewPathInfoDelegate, bool safeEnumeration
@@ -222,7 +228,7 @@ namespace WinCopies.IO
             , FileSystemEntryEnumeratorProcessSimulation simulationParameters
 #endif
             ) where T : IPathInfo => new Enumerable<T>(() => new RecursiveEnumerator<T>(paths.Select(item => new RecursivelyEnumerablePath<T>(item, searchPattern, searchOption
-#if NETCORE
+#if CS8
                 , enumerationOptions
 #endif
                 , enumerationOrder, getNewPathInfoDelegate, safeEnumeration

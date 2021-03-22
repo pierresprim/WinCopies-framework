@@ -47,13 +47,28 @@ namespace WinCopies.IO.ObjectModel
     public abstract class RegistryItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>/*<TItems, TFactory>*/ : BrowsableObjectInfo<TObjectProperties, RegistryKey, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>/*<TItems, TFactory>*/, IRegistryItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IRegistryItemInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems> // where TItems : BrowsableObjectInfo, IRegistryItemInfo where TFactory : IRegistryItemInfoFactory
     {
         #region Fields
+        private System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> _defaultRootItems;
         internal RegistryKey _registryKey;
         private IBrowsableObjectInfo _parent;
         private IBrowsabilityOptions _browsability;
         #endregion
 
         #region Properties
-        public override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> RootItems => RegistryItemInfo.DefaultRootItems;
+        public override IProcessFactory ProcessFactory => IO.ProcessFactory.DefaultProcessFactory;
+
+        public IProcessPathCollectionFactory ShellProcessPathCollectionFactory { get; }
+
+        public override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> RootItems => _defaultRootItems
+#if CS8
+            ??=
+#else
+            ?? (_defaultRootItems =
+#endif
+           RegistryItemInfo.GetRootItems(ShellProcessPathCollectionFactory)
+#if !CS8
+            )
+#endif
+            ;
 
         ///// <summary>
         ///// Gets a value that indicates whether this object needs to reconstruct objects on deep cloning.
@@ -208,27 +223,41 @@ namespace WinCopies.IO.ObjectModel
         #endregion // Properties
 
         #region Constructors
-        public RegistryItemInfo() : this(GetDefaultClientVersion()) { /* Left empty. */ }
+        public RegistryItemInfo(in IProcessPathCollectionFactory shellProcessPathCollectionFactory) : this(shellProcessPathCollectionFactory, GetDefaultClientVersion()) { /* Left empty. */ }
 
-        public RegistryItemInfo(in ClientVersion clientVersion) : base(Properties.Resources.RegistryRoot, clientVersion) => Name = Path;
+        public RegistryItemInfo(in IProcessPathCollectionFactory shellProcessPathCollectionFactory, in ClientVersion clientVersion) : base(Properties.Resources.RegistryRoot, null, clientVersion)
+        {
+            Name = Path;
 
-        public RegistryItemInfo(in RegistryKey registryKey, in ClientVersion clientVersion) : base(GetRegistryKeyName(registryKey), clientVersion)
+            ShellProcessPathCollectionFactory = shellProcessPathCollectionFactory;
+        }
+
+        public RegistryItemInfo(in RegistryKey registryKey, in IProcessPathCollectionFactory shellProcessPathCollectionFactory, in ClientVersion clientVersion) : base(GetRegistryKeyName(registryKey), null, clientVersion)
         {
             Name = registryKey.Name.Split(WinCopies.IO.Path.PathSeparator).GetLast();
 
             _registryKey = registryKey;
+
+            ShellProcessPathCollectionFactory = shellProcessPathCollectionFactory;
         }
 
-        public RegistryItemInfo(in string path, in ClientVersion clientVersion) : base(IsNullEmptyOrWhiteSpace(path) ? throw GetNullEmptyOrWhiteSpaceStringException(nameof(path)) : path, clientVersion) => Name = path.Split(WinCopies.IO.Path.PathSeparator).GetLast();
+        public RegistryItemInfo(in string path, in IProcessPathCollectionFactory shellProcessPathCollectionFactory, in ClientVersion clientVersion) : base(IsNullEmptyOrWhiteSpace(path) ? throw GetNullEmptyOrWhiteSpaceStringException(nameof(path)) : path, null, clientVersion)
+        {
+            Name = path.Split(WinCopies.IO.Path.PathSeparator).GetLast();
 
-        public RegistryItemInfo(in RegistryKey registryKey, in string valueName, in ClientVersion clientVersion) : base($"{GetRegistryKeyName(registryKey)}{WinCopies.IO.Path.PathSeparator}{(IsNullEmptyOrWhiteSpace(valueName) ? throw GetNullEmptyOrWhiteSpaceStringException(nameof(valueName)) : valueName)}", clientVersion)
+            ShellProcessPathCollectionFactory = shellProcessPathCollectionFactory;
+        }
+
+        public RegistryItemInfo(in RegistryKey registryKey, in string valueName, in IProcessPathCollectionFactory shellProcessPathCollectionFactory, in ClientVersion clientVersion) : base($"{GetRegistryKeyName(registryKey)}{WinCopies.IO.Path.PathSeparator}{(IsNullEmptyOrWhiteSpace(valueName) ? throw GetNullEmptyOrWhiteSpaceStringException(nameof(valueName)) : valueName)}", null, clientVersion)
         {
             Name = valueName;
 
             _registryKey = registryKey;
+
+            ShellProcessPathCollectionFactory = shellProcessPathCollectionFactory;
         }
 
-        public RegistryItemInfo(in string registryKeyPath, in string valueName, in ClientVersion clientVersion) : this(Registry.OpenRegistryKey(registryKeyPath), valueName, clientVersion)
+        public RegistryItemInfo(in string registryKeyPath, in string valueName, in IProcessPathCollectionFactory shellProcessPathCollectionFactory, in ClientVersion clientVersion) : this(Registry.OpenRegistryKey(registryKeyPath), valueName, shellProcessPathCollectionFactory, clientVersion)
         {
             // Left empty.
         }
@@ -298,7 +327,7 @@ namespace WinCopies.IO.ObjectModel
             {
                 case RegistryItemType.Root:
 
-                    return new ShellObjectInfo(KnownFolders.Computer, ClientVersion);
+                    return new ShellObjectInfo(KnownFolders.Computer, ShellProcessPathCollectionFactory, ClientVersion);
 
                 case RegistryItemType.Key:
 
@@ -306,7 +335,7 @@ namespace WinCopies.IO.ObjectModel
 
                     if (path.Length == 1)
 
-                        return new RegistryItemInfo(ClientVersion);
+                        return new RegistryItemInfo(ShellProcessPathCollectionFactory, ClientVersion);
 
                     var stringBuilder = new StringBuilder();
 
@@ -321,11 +350,11 @@ namespace WinCopies.IO.ObjectModel
                         append(i);
                     }
 
-                    return new RegistryItemInfo(stringBuilder.ToString(), ClientVersion);
+                    return new RegistryItemInfo(stringBuilder.ToString(), ShellProcessPathCollectionFactory, ClientVersion);
 
                 case RegistryItemType.Value:
 
-                    return new RegistryItemInfo(InnerObjectGeneric, ClientVersion);
+                    return new RegistryItemInfo(InnerObjectGeneric, ShellProcessPathCollectionFactory, ClientVersion);
             }
 
             return null;
@@ -338,6 +367,8 @@ namespace WinCopies.IO.ObjectModel
         protected override void DisposeManaged()
         {
             base.DisposeManaged();
+
+            _defaultRootItems = null;
 
             if (_registryKey != null)
             {
@@ -377,24 +408,9 @@ namespace WinCopies.IO.ObjectModel
 
     public class RegistryItemInfo : RegistryItemInfo<IRegistryItemInfoProperties, RegistryItemInfoItemProvider, IBrowsableObjectInfoSelectorDictionary<RegistryItemInfoItemProvider>, RegistryItemInfoItemProvider>, IRegistryItemInfo
     {
-        private static System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> _defaultRootItems;
         private IRegistryItemInfoProperties _objectProperties;
 
         #region Properties
-        public override IProcessFactory ProcessFactory => DefaultProcessFactory.Instance;
-
-        public static System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> DefaultRootItems => _defaultRootItems
-#if CS8
-            ??=
-#else
-            ?? (_defaultRootItems =
-#endif
-            GetRootItems()
-#if !CS8
-            )
-#endif
-            ;
-
         //public override Predicate<RegistryItemInfoItemProvider> RootItemsPredicate => item => item.RegistryKey != null && item.ValueName == null;
 
         //public override Predicate<IBrowsableObjectInfo> RootItemsBrowsableObjectInfoPredicate => null;
@@ -407,42 +423,42 @@ namespace WinCopies.IO.ObjectModel
         #endregion // Properties
 
         #region Constructors
-        public RegistryItemInfo() : base() { /* Left empty. */ }
+        public RegistryItemInfo(in IProcessPathCollectionFactory shellProcessPathCollectionFactory) : base(shellProcessPathCollectionFactory) { /* Left empty. */ }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RegistryItemInfo"/> class as the Registry root.
         /// </summary>
-        public RegistryItemInfo(in ClientVersion clientVersion) : base(clientVersion) => _objectProperties = new RegistryItemInfoProperties<IRegistryItemInfoBase>(this, RegistryItemType.Root);
+        public RegistryItemInfo(in IProcessPathCollectionFactory shellProcessPathCollectionFactory, in ClientVersion clientVersion) : base(shellProcessPathCollectionFactory, clientVersion) => _objectProperties = new RegistryItemInfoProperties<IRegistryItemInfoBase>(this, RegistryItemType.Root);
 
         ///// <summary>
         ///// Initializes a new instance of the <see cref="RegistryItemInfo"/> class using a custom factory for <see cref="RegistryItemInfo"/>s.
         ///// </summary>
         ///// <param name="registryKey">The <see cref="Microsoft.Win32.RegistryKey"/> that the new <see cref="RegistryItemInfo"/> represents.</param>
-        public RegistryItemInfo(in RegistryKey registryKey, in ClientVersion clientVersion) : base(registryKey, clientVersion) => _objectProperties = new RegistryItemInfoProperties<IRegistryItemInfoBase>(this, RegistryItemType.Key);
+        public RegistryItemInfo(in RegistryKey registryKey, in IProcessPathCollectionFactory shellProcessPathCollectionFactory, in ClientVersion clientVersion) : base(registryKey, shellProcessPathCollectionFactory, clientVersion) => _objectProperties = new RegistryItemInfoProperties<IRegistryItemInfoBase>(this, RegistryItemType.Key);
 
         ///// <summary>
         ///// Initializes a new instance of the <see cref="RegistryItemInfo"/> class using a custom factory for <see cref="RegistryItemInfo"/>s.
         ///// </summary>
         ///// <param name="path">The path of the <see cref="Microsoft.Win32.RegistryKey"/> that the new <see cref="RegistryItemInfo"/> represents.</param>
-        public RegistryItemInfo(in string path, in ClientVersion clientVersion) : base(path, clientVersion) => _objectProperties = new RegistryItemInfoProperties<IRegistryItemInfoBase>(this, RegistryItemType.Key);
+        public RegistryItemInfo(in string path, in IProcessPathCollectionFactory shellProcessPathCollectionFactory, in ClientVersion clientVersion) : base(path, shellProcessPathCollectionFactory, clientVersion) => _objectProperties = new RegistryItemInfoProperties<IRegistryItemInfoBase>(this, RegistryItemType.Key);
 
         ///// <summary>
         ///// Initializes a new instance of the <see cref="RegistryItemInfo"/> class using a custom factory for <see cref="RegistryItemInfo"/>s.
         ///// </summary>
         ///// <param name="registryKey">The <see cref="Microsoft.Win32.RegistryKey"/> that the new <see cref="RegistryItemInfo"/> represents.</param>
         ///// <param name="valueName">The name of the value that the new <see cref="RegistryItemInfo"/> represents.</param>
-        public RegistryItemInfo(in RegistryKey registryKey, in string valueName, in ClientVersion clientVersion) : base(registryKey, valueName, clientVersion) => _objectProperties = new RegistryItemInfoProperties<IRegistryItemInfoBase>(this, RegistryItemType.Value);
+        public RegistryItemInfo(in RegistryKey registryKey, in string valueName, IProcessPathCollectionFactory shellProcessPathCollectionFactory, in ClientVersion clientVersion) : base(registryKey, valueName, shellProcessPathCollectionFactory, clientVersion) => _objectProperties = new RegistryItemInfoProperties<IRegistryItemInfoBase>(this, RegistryItemType.Value);
 
         ///// <summary>
         ///// Initializes a new instance of the <see cref="RegistryItemInfo"/> class using a custom factory for <see cref="RegistryItemInfo"/>s.
         ///// </summary>
         ///// <param name="registryKeyPath">The path of the <see cref="Microsoft.Win32.RegistryKey"/> that the new <see cref="RegistryItemInfo"/> represents.</param>
         ///// <param name="valueName">The name of the value that the new <see cref="RegistryItemInfo"/> represents.</param>
-        public RegistryItemInfo(in string registryKeyPath, in string valueName, in ClientVersion clientVersion) : base(registryKeyPath, valueName, clientVersion) => _objectProperties = new RegistryItemInfoProperties<IRegistryItemInfoBase>(this, RegistryItemType.Value);
+        public RegistryItemInfo(in string registryKeyPath, in string valueName, in IProcessPathCollectionFactory shellProcessPathCollectionFactory, in ClientVersion clientVersion) : base(registryKeyPath, valueName, shellProcessPathCollectionFactory, clientVersion) => _objectProperties = new RegistryItemInfoProperties<IRegistryItemInfoBase>(this, RegistryItemType.Value);
         #endregion // Constructors
 
         #region Methods
-        public static System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetRootItems() => new IBrowsableObjectInfo[] { new RegistryItemInfo(GetDefaultClientVersion()) };
+        public static System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetRootItems(in IProcessPathCollectionFactory shellProcessPathCollectionFactory) => new IBrowsableObjectInfo[] { new RegistryItemInfo(shellProcessPathCollectionFactory, GetDefaultClientVersion()) };
 
         public override IBrowsableObjectInfoSelectorDictionary<RegistryItemInfoItemProvider> GetSelectorDictionary() => DefaultItemSelectorDictionary;
 
@@ -525,9 +541,9 @@ namespace WinCopies.IO.ObjectModel
 
                     try
                     {
-                        keys = InnerObjectGeneric.GetSubKeyNames().Select(item => new RegistryItemInfoItemProvider(item, ClientVersion));
+                        keys = InnerObjectGeneric.GetSubKeyNames().Select(item => new RegistryItemInfoItemProvider(item, ShellProcessPathCollectionFactory, ClientVersion));
 
-                        values = _registryKey.GetValueNames().Select(s => new RegistryItemInfoItemProvider(_registryKey, s, ClientVersion) /*new RegistryItemInfo(Path, s)*/);
+                        values = _registryKey.GetValueNames().Select(s => new RegistryItemInfoItemProvider(_registryKey, s, ShellProcessPathCollectionFactory, ClientVersion) /*new RegistryItemInfo(Path, s)*/);
 
                         // foreach (string item in items)
 
@@ -546,7 +562,7 @@ namespace WinCopies.IO.ObjectModel
 
                 case RegistryItemType.Root:
 
-                    enumerable = typeof(Microsoft.Win32.Registry).GetFields().Select(f => new RegistryItemInfoItemProvider((RegistryKey)f.GetValue(null), ClientVersion));
+                    enumerable = typeof(Microsoft.Win32.Registry).GetFields().Select(f => new RegistryItemInfoItemProvider((RegistryKey)f.GetValue(null), ShellProcessPathCollectionFactory , ClientVersion));
 
                     break;
 
@@ -689,6 +705,13 @@ namespace WinCopies.IO.ObjectModel
 
         public override IEnumerable<IBrowsableObjectInfo> GetSubRootItems() => GetItems(GetItemProviders(item => item.RegistryKey != null && item.ValueName == null));
         #endregion // GetItems
+
+        protected override void DisposeManaged()
+        {
+            _objectProperties = null;
+
+            base.DisposeManaged();
+        }
         #endregion // Methods
     }
 }

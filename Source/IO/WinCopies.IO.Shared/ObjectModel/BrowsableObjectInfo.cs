@@ -64,14 +64,16 @@ namespace WinCopies.IO.ObjectModel
         #endregion
 
         #region Properties
-        public abstract IProcessFactory ProcessFactory { get; }
-
         public static Action RegisterDefaultSelectors { get; private set; } = () =>
         {
             DotNetAssemblyInfo.RegisterSelectors();
 
             RegisterDefaultSelectors = () => { /* Left empty. */ };
         };
+
+        public abstract IProcessFactory ProcessFactory { get; }
+
+        public IProcessPathCollectionFactory ProcessPathCollectionFactory { get; }
 
         IBrowsableObjectInfo Collections.Generic.IRecursiveEnumerable<IBrowsableObjectInfo>.Value => this;
 
@@ -133,7 +135,12 @@ namespace WinCopies.IO.ObjectModel
         /// </summary>
         /// <param name="path">The path of the new item.</param>
         /// <param name="clientVersion">The <see cref="Microsoft.WindowsAPICodePack.PortableDevices.ClientVersion"/> that will be used to initialize new <see cref="PortableDeviceInfo"/>s and <see cref="PortableDeviceObjectInfo"/>s.</param>
-        protected BrowsableObjectInfo(in string path, in ClientVersion clientVersion) : base(path) => ClientVersion = clientVersion;
+        protected BrowsableObjectInfo(in string path, in IProcessPathCollectionFactory processPathCollectionFactory, in ClientVersion clientVersion) : base(path)
+        {
+            ProcessPathCollectionFactory = processPathCollectionFactory;
+
+            ClientVersion = clientVersion;
+        }
         #endregion
 
         #region Methods
@@ -167,7 +174,7 @@ namespace WinCopies.IO.ObjectModel
             )
 #endif
 
-            return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+                return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
         }
 
         System.Collections.Generic.IEnumerator<Collections.Generic.IRecursiveEnumerable<IBrowsableObjectInfo>> IRecursiveEnumerableProviderEnumerable<IBrowsableObjectInfo>.GetRecursiveEnumerator() => GetItems().GetEnumerator();
@@ -257,7 +264,7 @@ namespace WinCopies.IO.ObjectModel
         /// </summary>
         /// <param name="path">The path of the new item.</param>
         /// <param name="clientVersion">The <see cref="ClientVersion"/> that will be used to initialize new <see cref="PortableDeviceInfo"/>s and <see cref="PortableDeviceObjectInfo"/>s.</param>
-        protected BrowsableObjectInfo(in string path, in ClientVersion clientVersion) : base(path, clientVersion) { /* Left empty. */ }
+        protected BrowsableObjectInfo(in string path, in IProcessPathCollectionFactory processPathCollectionFactory, in ClientVersion clientVersion) : base(path, processPathCollectionFactory, clientVersion) { /* Left empty. */ }
         #endregion
     }
 
@@ -278,7 +285,7 @@ namespace WinCopies.IO.ObjectModel
         /// </summary>
         /// <param name="path">The path of the new <see cref="BrowsableObjectInfo{TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/>.</param>
         /// <param name="clientVersion">A custom <see cref="ClientVersion"/>. This parameter can be null for non-file system and portable devices-related types.</param>
-        protected BrowsableObjectInfo(in string path, in ClientVersion clientVersion) : base(path, clientVersion) { /* Left empty. */ }
+        protected BrowsableObjectInfo(in string path, in IProcessPathCollectionFactory processPathCollectionFactory, in ClientVersion clientVersion) : base(path, processPathCollectionFactory, clientVersion) { /* Left empty. */ }
 
         public abstract TSelectorDictionary GetSelectorDictionary();
 

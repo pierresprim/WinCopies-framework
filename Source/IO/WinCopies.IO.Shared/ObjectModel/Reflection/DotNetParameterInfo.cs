@@ -33,6 +33,8 @@ namespace WinCopies.IO.ObjectModel.Reflection
     public abstract class DotNetParameterInfo<TObjectProperties, TSelectorDictionary> : BrowsableDotNetItemInfo<TObjectProperties, ParameterInfo, CustomAttributeData, TSelectorDictionary, DotNetParameterInfoItemProvider>, IDotNetParameterInfo<TObjectProperties, TSelectorDictionary> where TObjectProperties : IDotNetParameterInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<DotNetParameterInfoItemProvider>
     {
         #region Properties
+        public override IProcessFactory ProcessFactory => IO.ProcessFactory.DefaultProcessFactory;
+
         public override string ItemTypeName => Properties.Resources.DotNetParameter;
 
         /// <summary>
@@ -46,16 +48,20 @@ namespace WinCopies.IO.ObjectModel.Reflection
 
     public class DotNetParameterInfo : DotNetParameterInfo<IDotNetParameterInfoProperties, IBrowsableObjectInfoSelectorDictionary<DotNetParameterInfoItemProvider>>, IDotNetParameterInfo
     {
+        #region Properties
         public sealed override IDotNetParameterInfoProperties ObjectPropertiesGeneric { get; }
 
         public override IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystem => null;
+        #endregion Properties
 
         internal DotNetParameterInfo(in ParameterInfo parameterInfo, in bool isReturn, in IDotNetItemInfo parent) : base(parameterInfo, parent) => ObjectPropertiesGeneric = new DotNetParameterInfoProperties<IDotNetParameterInfo>(this, isReturn);
 
+        #region Methods
         protected override System.Collections.Generic.IEnumerable<DotNetParameterInfoItemProvider> GetItemProviders(Predicate<CustomAttributeData> func) => (func == null ? InnerObjectGeneric.GetCustomAttributesData() : InnerObjectGeneric.GetCustomAttributesData().WherePredicate(func)).Select(a => new DotNetParameterInfoItemProvider(a, this));
 
         protected override System.Collections.Generic.IEnumerable<DotNetParameterInfoItemProvider> GetItemProviders() => GetItemProviders(null);
 
         public override IBrowsableObjectInfoSelectorDictionary<DotNetParameterInfoItemProvider> GetSelectorDictionary() => null;
+        #endregion Methods
     }
 }

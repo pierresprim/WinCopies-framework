@@ -159,32 +159,33 @@ namespace WinCopies.IO
         IProcess TryGetProcess(IProcessParameters processParameters, uint count);
     }
 
-    public class DefaultProcessFactory : IProcessFactory
+    public static class ProcessFactory
     {
-        public static DefaultProcessFactory Instance { get; } = new DefaultProcessFactory();
-
-        private DefaultProcessFactory() { /* Left empty. */ }
-
-        bool IProcessFactory.CanCopy(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths) => false;
-
-        bool IProcessFactory.CanPaste(uint count, out string sourcePath)
+        private class _DefaultProcessFactory : IProcessFactory
         {
-            sourcePath = null;
+            bool IProcessFactory.CanCopy(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths) => false;
 
-            return false;
+            bool IProcessFactory.CanPaste(uint count, out string sourcePath)
+            {
+                sourcePath = null;
+
+                return false;
+            }
+
+            void IProcessFactory.Copy(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths, uint count) => throw new InvalidOperationException();
+
+            IProcessParameters IProcessFactory.GetCopyProcessParameters(uint count) => throw new InvalidOperationException();
+
+            IProcess IProcessFactory.GetProcess(IProcessParameters processParameters, uint count) => throw new InvalidOperationException();
+
+            bool IProcessFactory.TryCopy(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths, uint count) => false;
+
+            IProcessParameters IProcessFactory.TryGetCopyProcessParameters(uint count) => null;
+
+            IProcess IProcessFactory.TryGetProcess(IProcessParameters processParameters, uint count) => null;
         }
 
-        void IProcessFactory.Copy(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths, uint count) => throw new InvalidOperationException();
-
-        IProcessParameters IProcessFactory.GetCopyProcessParameters(uint count) => throw new InvalidOperationException();
-
-        IProcess IProcessFactory.GetProcess(IProcessParameters processParameters, uint count) => throw new InvalidOperationException();
-
-        bool IProcessFactory.TryCopy(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths, uint count) => false;
-
-        IProcessParameters IProcessFactory.TryGetCopyProcessParameters(uint count) => null;
-
-        IProcess IProcessFactory.TryGetProcess(IProcessParameters processParameters, uint count) => null;
+        public static IProcessFactory DefaultProcessFactory { get; } = new _DefaultProcessFactory();
     }
 
     public interface IProcessPathCollectionFactory
