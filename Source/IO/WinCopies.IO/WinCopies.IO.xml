@@ -20,6 +20,11 @@
               resource lookups using this strongly typed resource class.
             </summary>
         </member>
+        <member name="P:WinCopies.IO.Properties.Resources.Copy">
+            <summary>
+              Looks up a localized string similar to Copy.
+            </summary>
+        </member>
         <member name="P:WinCopies.IO.Properties.Resources.DotNetAttribute">
             <summary>
               Looks up a localized string similar to .Net Attribute.
@@ -96,6 +101,41 @@
               resource lookups using this strongly typed resource class.
             </summary>
         </member>
+        <member name="P:WinCopies.IO.Resources.ExceptionMessages.AbortedByUser">
+            <summary>
+              Looks up a localized string similar to The operation was aborted by user..
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Resources.ExceptionMessages.Destination">
+            <summary>
+              Looks up a localized string similar to destination.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Resources.ExceptionMessages.DiskError">
+            <summary>
+              Looks up a localized string similar to A disk error occurred..
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Resources.ExceptionMessages.DriveNotReady">
+            <summary>
+              Looks up a localized string similar to The source and/or the destination drive is not ready..
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Resources.ExceptionMessages.EncryptionFailed">
+            <summary>
+              Looks up a localized string similar to The encryption failed..
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Resources.ExceptionMessages.FileRenamingFailed">
+            <summary>
+              Looks up a localized string similar to The file could not be renamed..
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Resources.ExceptionMessages.FileSystemEntryAlreadyExists">
+            <summary>
+              Looks up a localized string similar to There is already an item with this path..
+            </summary>
+        </member>
         <member name="P:WinCopies.IO.Resources.ExceptionMessages.GivenItemInnerObjectIsNotFromSupportedType">
             <summary>
               Looks up a localized string similar to The given item&apos;s inner object is not a(n) {0}..
@@ -106,9 +146,29 @@
               Looks up a localized string similar to The given item provider or its current configuration is not supported..
             </summary>
         </member>
+        <member name="P:WinCopies.IO.Resources.ExceptionMessages.NoError">
+            <summary>
+              Looks up a localized string similar to Process completed successfully..
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Resources.ExceptionMessages.NotEnoughSpace">
+            <summary>
+              Looks up a localized string similar to There is not enough space on the destination drive or the total size cannot be determined..
+            </summary>
+        </member>
         <member name="P:WinCopies.IO.Resources.ExceptionMessages.ParentMustBeAnIDotNetAssemblyInfoOrAnIDotNetItemInfoBase">
             <summary>
               Looks up a localized string similar to &apos;parent&apos; must be an IDotNetAssemblyInfo or an IDotNetItemInfoBase..
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Resources.ExceptionMessages.PathNotFound">
+            <summary>
+              Looks up a localized string similar to The path could not be found..
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Resources.ExceptionMessages.PathTooLong">
+            <summary>
+              Looks up a localized string similar to The destination path is too long..
             </summary>
         </member>
         <member name="P:WinCopies.IO.Resources.ExceptionMessages.PropertyCannotBeNullOnObject">
@@ -116,9 +176,24 @@
               Looks up a localized string similar to {0} cannot be null on {1}..
             </summary>
         </member>
+        <member name="P:WinCopies.IO.Resources.ExceptionMessages.ReadProtection">
+            <summary>
+              Looks up a localized string similar to The {0} is protected from reading..
+            </summary>
+        </member>
         <member name="P:WinCopies.IO.Resources.ExceptionMessages.RegistryKeyNotExists">
             <summary>
               Looks up a localized string similar to The specified registry key does not exist..
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Resources.ExceptionMessages.Source">
+            <summary>
+              Looks up a localized string similar to source.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Resources.ExceptionMessages.UnknownError">
+            <summary>
+              Looks up a localized string similar to An unknown error occurred..
             </summary>
         </member>
         <member name="T:WinCopies.IO.Resources.PropertyDescriptions">
@@ -297,7 +372,7 @@
             The parent <see cref="T:WinCopies.IO.ObjectModel.IShellObjectInfoBase"/> of this item. For <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/> items, this property returns the current object.
             </summary>
         </member>
-        <member name="M:WinCopies.IO.ObjectModel.ArchiveItemInfoProvider`5.#ctor(System.String@,Microsoft.WindowsAPICodePack.PortableDevices.ClientVersion@)">
+        <member name="M:WinCopies.IO.ObjectModel.ArchiveItemInfoProvider`5.#ctor(System.String@,WinCopies.IO.IProcessPathCollectionFactory@,Microsoft.WindowsAPICodePack.PortableDevices.ClientVersion@)">
             <summary>
             Initializes a new instance of the <see cref="T:WinCopies.IO.ObjectModel.ArchiveItemInfoProvider`5"/> class.
             </summary>
@@ -334,7 +409,7 @@
             When overridden in a derived class, gets the extra large <see cref="T:System.Windows.Media.Imaging.BitmapSource"/> of this <see cref="T:WinCopies.IO.ObjectModel.BrowsableObjectInfo"/>.
             </summary>
         </member>
-        <member name="M:WinCopies.IO.ObjectModel.BrowsableObjectInfo.#ctor(System.String@,Microsoft.WindowsAPICodePack.PortableDevices.ClientVersion@)">
+        <member name="M:WinCopies.IO.ObjectModel.BrowsableObjectInfo.#ctor(System.String@,WinCopies.IO.IProcessPathCollectionFactory@,Microsoft.WindowsAPICodePack.PortableDevices.ClientVersion@)">
             <summary>
             Initializes a new instance of the <see cref="T:WinCopies.IO.ObjectModel.BrowsableObjectInfo"/> class.
             </summary>
@@ -364,14 +439,14 @@
             <seealso cref="M:WinCopies.IO.ObjectModel.BrowsableObjectInfo.Dispose"/>
             <seealso cref="M:WinCopies.IO.ObjectModel.BrowsableObjectInfo.DisposeManaged"/>
         </member>
-        <member name="M:WinCopies.IO.ObjectModel.BrowsableObjectInfo`1.#ctor(System.String@,Microsoft.WindowsAPICodePack.PortableDevices.ClientVersion@)">
+        <member name="M:WinCopies.IO.ObjectModel.BrowsableObjectInfo`1.#ctor(System.String@,WinCopies.IO.IProcessPathCollectionFactory@,Microsoft.WindowsAPICodePack.PortableDevices.ClientVersion@)">
             <summary>
             Initializes a new instance of the <see cref="T:WinCopies.IO.ObjectModel.BrowsableObjectInfo"/> class.
             </summary>
             <param name="path">The path of the new item.</param>
             <param name="clientVersion">The <see cref="T:Microsoft.WindowsAPICodePack.PortableDevices.ClientVersion"/> that will be used to initialize new <see cref="T:WinCopies.IO.ObjectModel.PortableDeviceInfo"/>s and <see cref="T:WinCopies.IO.ObjectModel.PortableDeviceObjectInfo"/>s.</param>
         </member>
-        <member name="M:WinCopies.IO.ObjectModel.BrowsableObjectInfo`5.#ctor(System.String@,Microsoft.WindowsAPICodePack.PortableDevices.ClientVersion@)">
+        <member name="M:WinCopies.IO.ObjectModel.BrowsableObjectInfo`5.#ctor(System.String@,WinCopies.IO.IProcessPathCollectionFactory@,Microsoft.WindowsAPICodePack.PortableDevices.ClientVersion@)">
             <summary>
             When called from a derived class, initializes a new instance of the <see cref="T:WinCopies.IO.ObjectModel.BrowsableObjectInfo`5"/> class with a custom <see cref="T:Microsoft.WindowsAPICodePack.PortableDevices.ClientVersion"/>.
             </summary>
@@ -648,7 +723,7 @@
             </summary>
             <returns>The parent of this <see cref="T:WinCopies.IO.ObjectModel.RegistryItemInfo"/>.</returns>
         </member>
-        <member name="M:WinCopies.IO.ObjectModel.RegistryItemInfo.#ctor(Microsoft.WindowsAPICodePack.PortableDevices.ClientVersion@)">
+        <member name="M:WinCopies.IO.ObjectModel.RegistryItemInfo.#ctor(WinCopies.IO.IProcessPathCollectionFactory@,Microsoft.WindowsAPICodePack.PortableDevices.ClientVersion@)">
             <summary>
             Initializes a new instance of the <see cref="T:WinCopies.IO.ObjectModel.RegistryItemInfo"/> class as the Registry root.
             </summary>
@@ -760,17 +835,17 @@
             Gets the <see cref="T:System.Management.ManagementBaseObject"/> that this <see cref="T:WinCopies.IO.ObjectModel.WMIItemInfo"/> represents.
             </summary>
         </member>
-        <member name="M:WinCopies.IO.ObjectModel.WMIItemInfo`4.#ctor(Microsoft.WindowsAPICodePack.PortableDevices.ClientVersion@)">
+        <member name="M:WinCopies.IO.ObjectModel.WMIItemInfo`4.#ctor(WinCopies.IO.IProcessPathCollectionFactory@,Microsoft.WindowsAPICodePack.PortableDevices.ClientVersion@)">
             <summary>
             Initializes a new instance of the <see cref="T:WinCopies.IO.ObjectModel.WMIItemInfo"/> class as the WMI root item.
             </summary>
         </member>
-        <member name="M:WinCopies.IO.ObjectModel.WMIItemInfo.#ctor">
+        <member name="M:WinCopies.IO.ObjectModel.WMIItemInfo.#ctor(WinCopies.IO.IProcessPathCollectionFactory@)">
             <summary>
             Initializes a new instance of the <see cref="T:WinCopies.IO.ObjectModel.WMIItemInfo"/> class as the WMI root item.
             </summary>
         </member>
-        <member name="M:WinCopies.IO.ObjectModel.WMIItemInfo.#ctor(WinCopies.IO.PropertySystem.IWMIItemInfoOptions@,Microsoft.WindowsAPICodePack.PortableDevices.ClientVersion@)">
+        <member name="M:WinCopies.IO.ObjectModel.WMIItemInfo.#ctor(WinCopies.IO.PropertySystem.IWMIItemInfoOptions@,WinCopies.IO.IProcessPathCollectionFactory@,Microsoft.WindowsAPICodePack.PortableDevices.ClientVersion@)">
             <summary>
             Initializes a new instance of the <see cref="T:WinCopies.IO.ObjectModel.WMIItemInfo"/> class as the WMI root item.
             </summary>
@@ -790,6 +865,86 @@
             <param name="managementObject">The <see cref="T:System.Management.ManagementBaseObject"/> for which get the path.</param>
             <param name="wmiItemType">The <see cref="T:WinCopies.IO.PropertySystem.WMIItemType"/> of <paramref name="managementObject"/>.</param>
             <returns>The path of the given <see cref="T:System.Management.ManagementBaseObject"/>.</returns>
+        </member>
+        <member name="P:WinCopies.IO.Process.ObjectModel.CopyProcess`1.AutoRenameFiles">
+            <summary>
+            Gets a value that indicates whether files are automatically renamed when they conflict with existing paths.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.Process.ProcessError.None">
+            <summary>
+            No error occurred.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.Process.ProcessError.UnknownError">
+            <summary>
+            An unknown error occurred.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.Process.ProcessError.CancelledByUser">
+            <summary>
+            The process was aborted by user.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.Process.ProcessError.PathNotFound">
+            <summary>
+            One part or all of the source or destination path was not found.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.Process.ProcessError.DriveNotReady">
+            <summary>
+            The source or destination drive is not ready.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.Process.ProcessError.ReadProtection">
+            <summary>
+            The source or destination path is read-protected.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.Process.ProcessError.DestinationReadProtection">
+            <summary>
+            The destination path is read-protected.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.Process.ProcessError.WriteProtection">
+            <summary>
+            The destination path is write-protected.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.Process.ProcessError.PathTooLong">
+            <summary>
+            The destination path is too long.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.Process.ProcessError.NotEnoughSpace">
+            <summary>
+            The destination disk has not enough space.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.Process.ProcessError.FileSystemEntryAlreadyExists">
+            <summary>
+            A file or folder already exists with the same name.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.Process.ProcessError.FileRenamingFailed">
+            <summary>
+            The file could not be renamed.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.Process.ProcessError.SourceAndDestPathAreEqual">
+            <summary>
+            The source and destination relative paths are equal.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.Process.ProcessError.DestPathIsASubPath">
+            <summary>
+            The destination path is a sub-path of the source path.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.Process.ProcessError.DiskError">
+            <summary>
+            An unknown disk error occurred.
+            </summary>
         </member>
         <member name="T:WinCopies.IO.PropertySystem.WMIItemType">
             <summary>

@@ -1,4 +1,4 @@
-﻿/* Copyright © Pierre Sprimont, 2020
+﻿/* Copyright © Pierre Sprimont, 2021
 *
 * This file is part of the WinCopies Framework.
 *
@@ -15,40 +15,18 @@
 * You should have received a copy of the GNU General Public License
 * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-using System;
-using System.ComponentModel;
-using WinCopies.IO;
+using System.Windows;
 
-namespace WinCopies.GUI.IO.Process
+using WinCopies.GUI.IO.Process;
+
+namespace WinCopies.GUI.IO.Controls.Process
 {
-    public interface IProcess : WinCopies.IO.Process.ObjectModel.IProcess, IBackgroundWorker, INotifyPropertyChanged
+    public class ProcessWindow : Window
     {
-        #region Properties
-        bool IsCompleted { get; }
+        public static readonly DependencyProperty ProcessesProperty = DependencyProperty.Register(nameof(Processes), typeof(System.Collections.Generic.IEnumerable<IProcess>), typeof(ProcessWindow));
 
-        bool IsPaused { get; }
+        public System.Collections.Generic.IEnumerable<IProcess> Processes { get => (System.Collections.Generic.IEnumerable<IProcess>)GetValue(ProcessesProperty); set => SetValue(ProcessesProperty, value); }
 
-        IPathCommon CurrentPath { get; }
-
-        int ProgressPercentage { get; }
-
-        Action RunAction
-#if CS8
-            => RunWorkerAsync;
-#else
-            { get; }
-#endif
-
-        Action PauseAction { get; }
-
-        Action CancelAction
-#if CS8
-            => CancelAsync;
-#else
-            { get; }
-#endif
-        #endregion
-
-        void RunWorkerAsync();
+        static ProcessWindow() => DefaultStyleKeyProperty.OverrideMetadata(typeof(ProcessWindow), new FrameworkPropertyMetadata(typeof(ProcessWindow)));
     }
 }

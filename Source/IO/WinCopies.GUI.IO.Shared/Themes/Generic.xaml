@@ -10,6 +10,7 @@
     xmlns:data="clr-namespace:WinCopies.Util.Data;assembly=WinCopies.Util.Desktop"
     xmlns:markup="clr-namespace:WinCopies.Markup;assembly=WinCopies.Util.Desktop"
     xmlns:propertySystem="clr-namespace:WinCopies.PropertySystem;assembly=WinCopies.Util.Desktop"
+    xmlns:commands="clr-namespace:WinCopies.Commands;assembly=WinCopies.Util.Desktop"
     xmlns:sys="clr-namespace:System;assembly=mscorlib">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/wincopies.gui;component/Themes/Generic.xaml" />
@@ -43,6 +44,12 @@
             <data:IntComparisonConverter x:Key="IntComparisonConverter" />
             <propertySystem:PropertyArrayToListConverter x:Key="PropertyArrayToListConverter" />
             <propertySystem:ObjectToPropertyCollectionConverter x:Key="ObjectToPropertyCollectionConverter" />
+
+            <!--String resources-->
+
+            <sys:String x:Key="SourcePath">Source path:</sys:String>
+            <sys:String x:Key="CurrentPath">Current path:</sys:String>
+            <sys:String x:Key="Status">Status</sys:String>
         </ResourceDictionary>
     </ResourceDictionary.MergedDictionaries>
 
@@ -550,6 +557,91 @@
         </Setter>
     </Style>-->
 
+    <!--Processes-->
+
+    <ControlTemplate x:Key="ProcessTemplate" TargetType="{x:Type localProcessControls:ProcessControl}">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.ColumnSpan="2">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock />
+                    <StackPanel Orientation="Horizontal">
+                        <Button x:Name="PART_Run_PauseButton" Content="{x:Static icons:Resources.control_pause}" Command="{x:Static commands:Commands.CommonCommand}" CommandParameter="{TemplateBinding PauseAction}" />
+                        <Button Content="{x:Static icons:Resources.cancel}" Command="{x:Static commands:Commands.CommonCommand}" CommandParameter="{TemplateBinding CancelAction}" />
+                    </StackPanel>
+                </Grid>
+                <ProgressBar x:Name="PART_ProgressBar" IsIndeterminate="True" />
+            </StackPanel>
+
+            <Label Grid.Row="1" Content="{StaticResource SourcePath}" />
+            <Label Grid.Column="1" Grid.Row="1" Content="{Binding SourcePath, Mode=OneTime, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+
+            <Label Grid.Row="2" Content="{StaticResource CurrentPath}" />
+            <Label Grid.Column="1" Grid.Row="2" Content="{TemplateBinding CurrentPath.Path}" />
+
+            <Label Grid.Row="3" Content="{StaticResource Status}" />
+            <Label Grid.Column="1" Grid.Row="3" Content="{TemplateBinding Status}" />
+        </Grid>
+        <ControlTemplate.Triggers>
+            <DataTrigger Binding="{Binding Status, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="{x:Static localProcessControls:ProcessStatus.None}">
+                <Setter Property="Content" TargetName="PART_Run_PauseButton" Value="{x:Static icons:Resources.control_play}" />
+                <Setter Property="Command" TargetName="PART_Run_PauseButton" Value="{x:Static commands:Commands.CommonCommand}" />
+                <Setter Property="CommandParameter" TargetName="PART_Run_PauseButton" Value="{TemplateBinding RunAction}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Status, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="{x:Static localProcessControls:ProcessStatus.InProgress}">
+                <Setter Property="IsIndeterminate" TargetName="PART_ProgressBar" Value="False" />
+                <Setter Property="Value" TargetName="PART_ProgressBar" Value="{TemplateBinding ProgressPercentage}" />
+            </DataTrigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+
+    <Style TargetType="{x:Type localProcessControls:ProcessControl}">
+        <Setter Property="Template" Value="{StaticResource ProcessTemplate}" />
+    </Style>
+
+    <DataTemplate DataType="{x:Type localProcess:IProcess}">
+        <localProcessControls:ProcessControl SourcePath="{Binding SourcePath}"
+                                             ArePathsLoaded="{Binding ArePathsLoaded}"
+                                             CurrentPath="{Binding CurrentPath}"
+                                             ProgressPercentage="{Binding ProgressPercentage}"
+                                             RunAction="{Binding RunAction}"
+                                             PauseAction="{Binding PauseAction}"
+                                             CancelAction="{Binding CancelAction}"/>
+    </DataTemplate>
+
+    <ControlTemplate x:Key="ProcessWindowTemplate" TargetType="{x:Type localProcessControls:ProcessWindow}">
+        <ListView ItemsSource="{TemplateBinding Processes}">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Type" DisplayMemberBinding="{Binding Name}" />
+                    <GridViewColumn Header="Source Path" DisplayMemberBinding="{Binding SourcePath}" />
+                    <GridViewColumn Header="Status" DisplayMemberBinding="{Binding Status}" />
+                    <GridViewColumn Header="Progress">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate DataType="{x:Type localProcess:IProcess}">
+                                <ProgressBar x:Name="PART_ProgressBar" IsIndeterminate="True" />
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding Status, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="{x:Static localProcessControls:ProcessStatus.InProgress}">
+                                        <Setter Property="IsIndeterminate" TargetName="PART_ProgressBar" Value="False" />
+                                        <Setter Property="Value" TargetName="PART_ProgressBar" Value="{TemplateBinding ProgressPercentage}" />
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Source Path" DisplayMemberBinding="{Binding SourcePath}" />
+                    <GridViewColumn Header="Source Path" DisplayMemberBinding="{Binding SourcePath}" />
+                </GridView>
+            </ListView.View>
+        </ListView>
+    </ControlTemplate>
 
     <!--<ControlTemplate x:Key="CopyProcessControlTemplate" TargetType="{x:Type localProcessControls:ProcessControl}">
         <Grid>

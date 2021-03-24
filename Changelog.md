@@ -12,7 +12,8 @@ Updates
 ??/??/???? 3.1.0-preview
 ========================
 
-Complete rewrite of Processes, file system enumeration and (I)PathInfo (related-)types.
+- Complete rewrite of Processes, file system enumeration and (I)PathInfo (related-)types.
+- Add ListView control.
 
 WinCopies.GUI.IO
 ----------------

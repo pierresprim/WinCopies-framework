@@ -50,6 +50,7 @@ using WinCopies.Linq;
 using static WinCopies.Util.Data.ConverterHelper;
 using WinCopies.Collections.DotNetFix;
 using System.Collections.Specialized;
+using System.Windows.Input;
 
 #if !WinCopies3
 using System.Collections;
@@ -585,7 +586,7 @@ namespace WinCopies
 
         public static T GetIfNotDisposedOrDisposing<T>(this WinCopies.IDisposable obj, in T value) => obj.IsDisposed ? throw GetExceptionForDispose(false) : obj.IsDisposing ? throw GetExceptionForDispose(true) : value;
 
-        public static void ForEach<T>(this System.Collections.Generic.IEnumerable<T> enumerable, in Func<T, bool> firstAction, Func<T, bool> otherAction)
+        public static void ForEach<T>(this System.Collections.Generic.IEnumerable<T> enumerable, in Predicate<T> firstAction, Predicate<T> otherAction)
         {
             System.Collections.Generic.IEnumerator<T> enumerator = enumerable.GetEnumerator();
 
@@ -599,6 +600,51 @@ namespace WinCopies
                         {
                             // Left empty.
                         }
+            }
+
+            finally
+            {
+                enumerator.Dispose();
+            }
+        }
+
+        public static void ForEach<T>(this System.Collections.Generic.IEnumerable<T> enumerable, in Action<T> firstAction, Predicate<T> otherAction)
+        {
+            System.Collections.Generic.IEnumerator<T> enumerator = enumerable.GetEnumerator();
+
+            try
+            {
+                if (enumerator.MoveNext())
+                {
+                    firstAction(enumerator.Current);
+
+                    while (enumerator.MoveNext() && otherAction(enumerator.Current))
+                    {
+                        // Left empty.
+                    }
+                }
+            }
+
+            finally
+            {
+                enumerator.Dispose();
+            }
+        }
+
+        public static void ForEach<T>(this System.Collections.Generic.IEnumerable<T> enumerable, in Action<T> firstAction, Action<T> otherAction)
+        {
+            System.Collections.Generic.IEnumerator<T> enumerator = enumerable.GetEnumerator();
+
+            try
+            {
+                if (enumerator.MoveNext())
+                {
+                    firstAction(enumerator.Current);
+
+                    while (enumerator.MoveNext())
+
+                        otherAction(enumerator.Current);
+                }
             }
 
             finally
@@ -677,6 +723,137 @@ namespace WinCopies
 
             return stack;
         }
+
+        public static bool PredicateRef<T>(object value, Predicate<T> predicate) where T : class
+#if CS9
+            => predicate(value is T _value ? _value : value == null ? null : throw GetInvalidTypeArgumentException(nameof(value)));
+#else
+
+        {
+            if (value is T _value)
+
+                return predicate(_value);
+
+            else if (value == null)
+
+                return predicate(null);
+
+            throw GetInvalidTypeArgumentException(nameof(value));
+        }
+#endif
+
+        public static bool PredicateVal<T>(object value, Predicate<T> predicate) where T : struct => predicate(value is T _value ? _value : throw GetInvalidTypeArgumentException(nameof(value)));
+
+        public static bool UpdateValue<T>(ref T value, in T newValue, in Action action)
+        {
+            if (!Equals(value, newValue))
+            {
+                value = newValue;
+
+                action();
+
+                return true;
+            }
+
+            return false;
+        }
+
+        public static bool ForEachANDALSO<T>(this System.Collections.Generic.IEnumerable<T> enumerable, Predicate<T> predicate)
+        {
+            foreach (T item in enumerable)
+
+                if (!predicate(item))
+
+                    return false;
+
+            return true;
+        }
+
+        public static bool ForEachAND<T>(this System.Collections.Generic.IEnumerable<T> enumerable, Predicate<T> predicate)
+        {
+            bool result = true;
+
+            foreach (T item in enumerable)
+
+                result &= predicate(item);
+
+            return result;
+        }
+
+        public static bool ForEachORELSE<T>(this System.Collections.Generic.IEnumerable<T> enumerable, Predicate<T> predicate)
+        {
+            foreach (T item in enumerable)
+
+                if (predicate(item))
+
+                    return true;
+
+            return false;
+        }
+
+        public static bool ForEachOR<T>(this System.Collections.Generic.IEnumerable<T> enumerable, Predicate<T> predicate)
+        {
+            bool result = false;
+
+            foreach (T item in enumerable)
+
+                result |= predicate(item);
+
+            return result;
+        }
+
+        public static bool ForEachXORELSE<T>(this System.Collections.Generic.IEnumerable<T> enumerable, Predicate<T> predicate)
+        {
+            bool result = false;
+
+            enumerable.ForEach(item => result = predicate(item), item =>
+       {
+           if (predicate(item))
+
+               if (result)
+
+                   return (result = false);
+
+               else
+
+                   result = true;
+
+           return true;
+       });
+
+            return result;
+        }
+
+        public static bool ForEachXOR<T>(this System.Collections.Generic.IEnumerable<T> enumerable, Predicate<T> predicate)
+        {
+            bool result = false;
+
+            Action<T> action = item =>
+     {
+         if (predicate(item))
+
+             if (result)
+             {
+                 result = false;
+
+                 action = _item => predicate(_item);
+             }
+
+             else
+
+                 result = true;
+     };
+
+            enumerable.ForEach(item => result = predicate(item), action);
+
+            return result;
+        }
+
+        public static RoutedUICommand Reset { get; } = new RoutedUICommand(/* todo: WinCopies.
+#if !WinCopies3
+            Util.
+#endif
+            Desktop.Resources.Commands.WPF.ApplicationCommands.NewTab */ "Reset", nameof(Reset), typeof(Temp));
 
         [DllImport(Microsoft.WindowsAPICodePack.NativeAPI.Consts.DllNames.Kernel32, SetLastError = true, CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.Bool)]

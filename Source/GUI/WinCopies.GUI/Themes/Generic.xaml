@@ -77,6 +77,73 @@
         </ResourceDictionary>
     </ResourceDictionary.MergedDictionaries>
 
+    <ControlTemplate x:Key="ListViewTemplate" TargetType="{x:Type local:ListView}">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+
+            <ItemsControl ItemsSource="{TemplateBinding Filters}" Grid.RowSpan="2">
+                <ItemsControl.Template>
+                    <ControlTemplate TargetType="{x:Type ItemsControl}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+
+                            <Label>Filters</Label>
+
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                                <Button Content="Apply filters" Command="{x:Static commands:DialogCommands.Apply}" />
+                                <Button Content="Reset" Command="{x:Static temp:Temp.Reset}" />
+                            </StackPanel>
+
+                            <ItemsPresenter Grid.ColumnSpan="2" Grid.Row="1" />
+                        </Grid>
+                    </ControlTemplate>
+                </ItemsControl.Template>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type local:IFilterEnumerable}">
+                        <Expander IsExpanded="{Binding IsChecked}" Header="{Binding Header}">
+                            <ListBox ItemsSource="{Binding}">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type local:IFilter}">
+                                        <CheckBox IsChecked="{Binding IsChecked}">
+                                            <StackPanel Orientation="Horizontal">
+                                                <ContentPresenter ContentSource="Icon" />
+                                                <ContentPresenter ContentSource="Content" />
+                                            </StackPanel>
+                                        </CheckBox>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </Expander>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <ItemsPresenter Grid.Column="1" />
+
+            <ContentPresenter ContentSource="Content" />
+        </Grid>
+    </ControlTemplate>
+
+    <Style BasedOn="{StaticResource {x:Type ListView}}" TargetType="{x:Type local:ListView}">
+        <Setter Property="Template" Value="{StaticResource ListViewTemplate}" />
+    </Style>
+
     <Style BasedOn="{StaticResource {x:Type Window}}" TargetType="{x:Type windows:Window}">
         <Style.Triggers>
             <Trigger Property="IsInHelpMode" Value="true" >

@@ -654,7 +654,7 @@ namespace WinCopies.IO
             protected override System.Collections.Generic.IEnumerable<ShellObjectInfoItemProvider> GetItemProviders(Predicate<ShellObjectInfoEnumeratorStruct> predicate) => Browsability.Browsability.IsBrowsable()
                 ? ObjectPropertiesGeneric.FileType == FileType.Archive
                     ? GetItemProviders(item => predicate(new ShellObjectInfoEnumeratorStruct(item)))
-                    : ShellObjectInfoEnumeration.From(this, ClientVersion, predicate)
+                    : ShellObjectInfoEnumeration.From(this,  predicate)
                 : GetEmptyEnumerable();
 
             protected virtual System.Collections.Generic.IEnumerable<ShellObjectInfoItemProvider> GetItemProviders(Predicate<ArchiveFileInfoEnumeratorStruct> func)

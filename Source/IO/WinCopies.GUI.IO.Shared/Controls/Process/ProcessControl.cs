@@ -15,10 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+using System;
 using System.Windows;
-
+using System.Windows.Input;
 using WinCopies.GUI.Controls;
-
+using WinCopies.IO;
+using WinCopies.IO.Process;
 using Size = WinCopies.IO.Size;
 
 namespace WinCopies.GUI.IO.Controls.Process
@@ -41,6 +43,40 @@ namespace WinCopies.GUI.IO.Controls.Process
     /// </summary>
     public class ProcessControl : HeaderedControl
     {
+        public static readonly DependencyProperty PathsProperty = DependencyProperty.Register(nameof(Paths), typeof(ProcessTypes<IPathInfo>.IProcessCollection), typeof(ProcessControl));
+
+        ProcessTypes<IPathInfo>.IProcessCollection Paths { get => (ProcessTypes<IPathInfo>.IProcessCollection)GetValue(PathsProperty); set => SetValue(PathsProperty, value); }
+
+        // todo: IQueue InitialPaths { get; }
+
+        public static readonly DependencyProperty ProcessNameProperty = DependencyProperty.Register(nameof(ProcessName), typeof(string), typeof(ProcessControl));
+
+        public string ProcessName { get => (string)GetValue(ProcessNameProperty); set => SetValue(ProcessNameProperty, value); }
+
+        public static readonly DependencyProperty ErrorProperty = DependencyProperty.Register(nameof(Error), typeof(IProcessError), typeof(ProcessControl));
+
+        public IProcessError Error { get => (IProcessError)GetValue(ErrorProperty); set => SetValue(ErrorProperty, value); }
+
+        public static readonly DependencyProperty ErrorPathsProperty = DependencyProperty.Register(nameof(ErrorPaths), typeof(ProcessTypes<IProcessErrorItem>.IProcessCollection), typeof(ProcessControl));
+
+        public ProcessTypes<IProcessErrorItem>.IProcessCollection ErrorPaths { get => (ProcessTypes<IProcessErrorItem>.IProcessCollection)GetValue(ErrorPathsProperty); set => SetValue(ErrorPathsProperty, value); }
+
+        public static readonly DependencyProperty InitialTotalSizeProperty = DependencyProperty.Register(nameof(InitialTotalSize), typeof(Size), typeof(ProcessControl));
+
+        public Size InitialTotalSize { get => (Size)GetValue(InitialTotalSizeProperty); set => SetValue(InitialTotalSizeProperty, value); }
+
+        public static readonly DependencyProperty ActualRemainingSizeProperty = DependencyProperty.Register(nameof(ActualRemainingSize), typeof(Size), typeof(ProcessControl));
+
+        public Size ActualRemainingSize { get => (Size)GetValue(ActualRemainingSizeProperty); set => SetValue(ActualRemainingSizeProperty, value); }
+
+        public static readonly DependencyProperty IsCompletedProperty = DependencyProperty.Register(nameof(IsCompleted), typeof(bool), typeof(ProcessControl));
+
+        public bool IsCompleted { get => (bool)GetValue(IsCompletedProperty); set => SetValue(IsCompletedProperty, value); }
+
+        public static readonly DependencyProperty IsPausedProperty = DependencyProperty.Register(nameof(IsPaused), typeof(bool), typeof(ProcessControl));
+
+        public bool IsPaused { get => (bool)GetValue(IsPausedProperty); set => SetValue(IsPausedProperty, value); }
+
         /// <summary>
         /// Identifies the <see cref="SourcePath"/> dependency property.
         /// </summary>
@@ -66,7 +102,7 @@ namespace WinCopies.GUI.IO.Controls.Process
         /// </summary>
         public static readonly DependencyProperty StatusProperty = DependencyProperty.Register(nameof(Status), typeof(ProcessStatus), typeof(ProcessControl));
 
-        public ProcessStatus Status { get => (ProcessStatus)GetValue(StatusProperty); set => SetValue(StatusProperty, value); } 
+        public ProcessStatus Status { get => (ProcessStatus)GetValue(StatusProperty); set => SetValue(StatusProperty, value); }
 
         /// <summary>
         /// Identifies the <see cref="InitialItemSize"/> dependency property.
@@ -81,12 +117,12 @@ namespace WinCopies.GUI.IO.Controls.Process
         /// <summary>
         /// Identifies the <see cref="InitialItemCount"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty InitialItemCountProperty = DependencyProperty.Register(nameof(InitialItemCount), typeof(int), typeof(ProcessControl));
+        public static readonly DependencyProperty InitialItemCountProperty = DependencyProperty.Register(nameof(InitialItemCount), typeof(uint), typeof(ProcessControl));
 
         /// <summary>
         /// Gets or sets the initial item count.
         /// </summary>
-        public int InitialItemCount { get => (int)GetValue(InitialItemCountProperty); set => SetValue(InitialItemCountProperty, value); }
+        public uint InitialItemCount { get => (uint)GetValue(InitialItemCountProperty); set => SetValue(InitialItemCountProperty, value); }
 
         /// <summary>
         /// Identifies the <see cref="RemainingItemSize"/> dependency property.
@@ -111,9 +147,9 @@ namespace WinCopies.GUI.IO.Controls.Process
         /// <summary>
         /// Identifies the <see cref="CurrentPath"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty CurrentPathProperty = DependencyProperty.Register(nameof(CurrentPath), typeof(IPathInfo), typeof(ProcessControl));
+        public static readonly DependencyProperty CurrentPathProperty = DependencyProperty.Register(nameof(CurrentPath), typeof(IPathCommon), typeof(ProcessControl));
 
-        public IPathInfo CurrentPath { get => (IPathInfo)GetValue(CurrentPathProperty); set => SetValue(CurrentPathProperty, value); }
+        public IPathCommon CurrentPath { get => (IPathCommon)GetValue(CurrentPathProperty); set => SetValue(CurrentPathProperty, value); }
 
         /// <summary>
         /// Identifies the <see cref="ProgressPercentage"/> dependency property.
@@ -129,6 +165,34 @@ namespace WinCopies.GUI.IO.Controls.Process
 
         public sbyte CurrentPathProgressPercentage { get => (sbyte)GetValue(CurrentPathProgressPercentageProperty); set => SetValue(CurrentPathProgressPercentageProperty, value); }
 
+        public static readonly DependencyProperty RunActionProperty = DependencyProperty.Register(nameof(RunAction), typeof(Action), typeof(ProcessControl));
+
+        public Action RunAction { get => (Action)GetValue(RunActionProperty); set => SetValue(RunActionProperty, value); }
+
+        public static readonly DependencyProperty PauseActionProperty = DependencyProperty.Register(nameof(PauseAction), typeof(Action), typeof(ProcessControl));
+
+        public Action PauseAction { get => (Action)GetValue(PauseActionProperty); set => SetValue(PauseActionProperty, value); }
+
+        public static readonly DependencyProperty CancelActionProperty = DependencyProperty.Register(nameof(CancelAction), typeof(Action), typeof(ProcessControl));
+
+        public Action CancelAction { get => (Action)GetValue(CancelActionProperty); set => SetValue(CancelActionProperty, value); }
+
         static ProcessControl() => DefaultStyleKeyProperty.OverrideMetadata(typeof(ProcessControl), new FrameworkPropertyMetadata(typeof(ProcessControl)));
+
+        protected virtual void OnAddCommandBindings() => CommandBindings.Add(new CommandBinding(WinCopies.Commands.Commands.CommonCommand, (object sender, ExecutedRoutedEventArgs e) => OnExecuteCommand(e), (object sender, CanExecuteRoutedEventArgs e) => OnCanExecuteCommand(e)));
+
+        protected virtual void OnCanExecuteCommand(CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = e.Parameter != null;
+
+            e.Handled = true;
+        }
+
+        protected virtual void OnExecuteCommand(ExecutedRoutedEventArgs e)
+        {
+            ((Action)e.Parameter)();
+
+            e.Handled = true;
+        }
     }
 }

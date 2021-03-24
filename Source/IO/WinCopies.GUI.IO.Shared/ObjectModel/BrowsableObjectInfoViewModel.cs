@@ -67,6 +67,10 @@ namespace WinCopies.GUI.IO.ObjectModel
         #region Properties
         //public static Predicate<IBrowsableObjectInfo> Predicate { get; } = browsableObjectInfo => browsableObjectInfo.IsBrowsable;
 
+        public IProcessFactory ProcessFactory => ModelGeneric.ProcessFactory;
+
+        public IProcessPathCollectionFactory ProcessPathCollectionFactory => ModelGeneric.ProcessPathCollectionFactory;
+
         public bool RootParentIsRootNode { get; }
 
         public new IBrowsableObjectInfo Model => ModelGeneric;

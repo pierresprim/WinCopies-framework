@@ -42,6 +42,8 @@ namespace WinCopies.GUI.IO.ObjectModel
 
     public class BrowsableObjectInfoFactory : IBrowsableObjectInfoFactory
     {
+        public IProcessPathCollectionFactory ProcessPathCollectionFactory { get; }
+
         /// <summary>
         /// Gets the <see cref="Microsoft.WindowsAPICodePack.PortableDevices.ClientVersion"/> value associated to this factory. This value is used for <see cref="PortableDeviceInfo"/> and <see cref="PortableDeviceItemInfo"/> creation when browsing the Computer folder with a <see cref="ShellObjectInfo"/> item.
         /// </summary>
@@ -53,9 +55,14 @@ namespace WinCopies.GUI.IO.ObjectModel
         /// Initializes a new instance of the <see cref="BrowsableObjectInfoFactory"/> class.
         /// </summary>
         /// <param name="clientVersion">The <see cref="Microsoft.WindowsAPICodePack.PortableDevices.ClientVersion"/> value for PortableDevice items creation. See <see cref="ClientVersion"/>.</param>
-        public BrowsableObjectInfoFactory(in ClientVersion clientVersion) => ClientVersion = clientVersion;
+        public BrowsableObjectInfoFactory(in IProcessPathCollectionFactory processPathCollectionFactory, in ClientVersion clientVersion)
+        {
+            ProcessPathCollectionFactory = processPathCollectionFactory;
 
-        public BrowsableObjectInfoFactory() : this(BrowsableObjectInfo.GetDefaultClientVersion()) { /* Left empty. */ }
+            ClientVersion = clientVersion;
+        }
+
+        public BrowsableObjectInfoFactory(in IProcessPathCollectionFactory processPathCollectionFactory) : this(processPathCollectionFactory, BrowsableObjectInfo.GetDefaultClientVersion()) { /* Left empty. */ }
 
         /// <summary>
         /// Creates an <see cref="IBrowsableObjectInfo"/> for a given path. See Remarks section.
@@ -68,11 +75,11 @@ namespace WinCopies.GUI.IO.ObjectModel
         {
             if (Path.IsFileSystemPath(path))
 
-                return ShellObjectInfo.From(ShellObjectFactory.Create(path), ClientVersion);
+                return ShellObjectInfo.From(ShellObjectFactory.Create(path), ProcessPathCollectionFactory, ClientVersion);
 
             else if (Path.IsRegistryPath(path))
 
-                return new RegistryItemInfo(path, BrowsableObjectInfo.GetDefaultClientVersion());
+                return new RegistryItemInfo(path, ProcessPathCollectionFactory, BrowsableObjectInfo.GetDefaultClientVersion());
 
             throw new ArgumentException("The factory cannot create an object for the given path.");
         }

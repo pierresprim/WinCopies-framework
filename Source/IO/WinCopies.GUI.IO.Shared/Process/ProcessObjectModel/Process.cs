@@ -73,9 +73,20 @@ namespace WinCopies.GUI.IO.Process
 
         public bool IsPaused { get => !IsBusy && _isPaused; private set => UpdateValue(ref _isPaused, value, nameof(IsPaused)); }
 
-        public int Progress { get => _progress; set => UpdateValue(ref _progress, value, nameof(Progress)); }
+        public int Progress { get => _progress; private set { UpdateValue(ref _progress, value, nameof(Progress)); OnPropertyChanged(nameof(ProgressPercentage)); } }
+
+        public int ProgressPercentage => Progress;
 
         public IPathCommon CurrentPath { get => _currentPath; private set => UpdateValue(ref _currentPath, value, nameof(CurrentPath)); }
+
+        Action IProcess.PauseAction => PauseAsync;
+
+#if !CS8
+        Action IProcess.RunAction => RunWorkerAsync;
+
+        Action IProcess.CancelAction => CancelAsync;
+#endif
+
         ApartmentState IBackgroundWorker.ApartmentState { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         #endregion Properties
 
@@ -139,18 +150,9 @@ namespace WinCopies.GUI.IO.Process
 
         protected virtual void OnPropertyChanged(in PropertyChangedEventArgs e) => PropertyChanged?.Invoke(this, e);
 
-        protected virtual void UpdateValue<T>(ref T value, in T newValue, in PropertyChangedEventArgs e)
-        {
-            if (Equals(value, newValue))
+        protected virtual void UpdateValue<T>(ref T value, in T newValue, PropertyChangedEventArgs e) => Temp.UpdateValue(ref value, newValue, () => OnPropertyChanged(e));
 
-                return;
-
-            value = newValue;
-
-            OnPropertyChanged(e);
-        }
-
-        protected virtual void UpdateValue<T>(ref T value, in T newValue, in string propertyName) => UpdateValue(ref value, newValue, new PropertyChangedEventArgs(propertyName));
+        protected virtual void UpdateValue<T>(ref T value, in T newValue, string propertyName) => Temp.UpdateValue(ref value, newValue, () => OnPropertyChanged(propertyName));
 
         public bool LoadPaths() => InnerProcess.LoadPaths();
 
