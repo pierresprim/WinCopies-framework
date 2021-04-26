@@ -19,7 +19,6 @@ using System.Drawing;
 using System.Windows.Media.Imaging;
 
 using WinCopies.IO.PropertySystem;
-using WinCopies.IO.Selectors;
 
 namespace WinCopies.IO
 {

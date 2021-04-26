@@ -219,9 +219,9 @@ namespace WinCopies.GUI.Controls
 
         protected virtual void OnAddCommandBindings()
         {
-            _ = CommandBindings.Add(new CommandBinding(WinCopies.Commands.DialogCommands.Apply, (object sender, ExecutedRoutedEventArgs e) => OnApplyFiltersCommand(e), (object sender, CanExecuteRoutedEventArgs e) => OnCanApplyFiltersCommand(e)));
+            _ = CommandBindings.Add(new CommandBinding(Commands.DialogCommands.Apply, (object sender, ExecutedRoutedEventArgs e) => OnApplyFiltersCommand(e), (object sender, CanExecuteRoutedEventArgs e) => OnCanApplyFiltersCommand(e)));
 
-            _ = CommandBindings.Add(new CommandBinding(   Temp. Reset, (object sender, ExecutedRoutedEventArgs e) => OnResetFiltersCommand(e), (object sender, CanExecuteRoutedEventArgs e) => OnCanApplyFiltersCommand(e)));
+            _ = CommandBindings.Add(new CommandBinding(Commands.ApplicationCommands.Reset, (object sender, ExecutedRoutedEventArgs e) => OnResetFiltersCommand(e), (object sender, CanExecuteRoutedEventArgs e) => OnCanApplyFiltersCommand(e)));
         }
 
         protected virtual void OnCanResetFiltersCommand(CanExecuteRoutedEventArgs e)

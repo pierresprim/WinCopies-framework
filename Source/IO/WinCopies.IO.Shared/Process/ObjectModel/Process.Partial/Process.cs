@@ -54,9 +54,9 @@ namespace WinCopies.IO.Process
                 private ProcessTypes<IProcessErrorItem<TItems, TError>>.IProcessQueue _errorPathsReadOnlyQueue;
                 private NullableGeneric<TFactory> _factory;
                 private Size _initialTotalSize;
-                private Util.Temp.EventDelegate<string> _propertyEventDelegate = new
+                private EventDelegate<string> _propertyEventDelegate = new
 #if !CS9
-                Util.Temp.EventDelegate<string>
+                EventDelegate<string>
 #endif
                 ();
                 #endregion Fields

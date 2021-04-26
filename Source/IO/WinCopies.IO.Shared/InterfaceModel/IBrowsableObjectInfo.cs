@@ -19,13 +19,12 @@ using Microsoft.WindowsAPICodePack.PortableDevices;
 
 using System;
 using System.Windows.Media.Imaging;
-using WinCopies.Collections.DotNetFix.Generic;
+
 using WinCopies.Collections.Generic;
 using WinCopies.IO.ObjectModel;
 using WinCopies.IO.Process;
 using WinCopies.IO.Process.ObjectModel;
 using WinCopies.IO.PropertySystem;
-using WinCopies.IO.Selectors;
 using WinCopies.PropertySystem;
 
 namespace WinCopies.IO

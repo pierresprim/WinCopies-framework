@@ -21,7 +21,6 @@ using System.Management;
 
 using WinCopies.IO.AbstractionInterop;
 using WinCopies.IO.PropertySystem;
-using WinCopies.IO.Selectors;
 
 namespace WinCopies.IO.ObjectModel
 {

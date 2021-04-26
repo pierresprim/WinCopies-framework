@@ -31,10 +31,17 @@ using WinCopies.Util;
 
 using static WinCopies.IO.File;
 using static WinCopies.IO.Resources.ExceptionMessages;
-using static WinCopies.Temp;
 
 namespace WinCopies.IO.Process.ObjectModel
 {
+    // TODO:
+    internal static class Win32
+    {
+        [DllImport(Microsoft.WindowsAPICodePack.NativeAPI.Consts.DllNames.Kernel32, SetLastError = true, CharSet = CharSet.Unicode)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool CreateDirectoryW([In, MarshalAs(UnmanagedType.LPWStr)] string lpPathName, [In] IntPtr lpSecurityAttributes);
+    }
+
     [ProcessGuid(ShellObjectInfo.Guids.ShellCopyProcessGuid)]
     public class CopyProcess<T> : ProcessObjectModelTypes<IPathInfo, T, ProcessError, ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessDelegates<ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessEventDelegates>, ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessEventDelegates, IProcessProgressDelegateParameter>.DefaultDestinationProcess where T : ProcessTypes<IPathInfo>.ProcessErrorTypes<ProcessError>.IProcessErrorFactories
     {
@@ -206,7 +213,7 @@ namespace WinCopies.IO.Process.ObjectModel
 
                 else
 
-                    result = CreateDirectoryW(destPath, IntPtr.Zero);
+                    result = Win32.CreateDirectoryW(destPath, IntPtr.Zero);
 
                 //void reportProgressCommon() => TryReportProgress((int)((_Paths.Count / InitialItemCount) * 100));
 

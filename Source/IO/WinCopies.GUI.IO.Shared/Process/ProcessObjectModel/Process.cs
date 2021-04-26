@@ -99,7 +99,7 @@ namespace WinCopies.GUI.IO.Process
         {
             _process = process;
             _process.AddPropertyChangedDelegate(OnPropertyChanged);
-            _process.ProcessEventDelegates.AddCommonDelegate(new Util.Temp.QueryDelegateDelegate<IProcessProgressDelegateParameter, bool>(UpdateProgress, (value, previousResult) => UpdateProgress(value)));
+            _process.ProcessEventDelegates.AddCommonDelegate(new QueryDelegateDelegate<IProcessProgressDelegateParameter, bool>(UpdateProgress, (value, previousResult) => UpdateProgress(value)));
             _process.ProcessEventDelegates.AddProgressDelegate(path => CurrentPath = path);
 
             DoWork += Process_DoWork;

@@ -18,30 +18,62 @@
 using System;
 
 using WinCopies.Collections;
+using WinCopies.Collections.DotNetFix.Generic;
 using WinCopies.Collections.Generic;
 
 using static WinCopies.ThrowHelper;
 
 namespace WinCopies.IO
 {
+    // TODO:
+#if !WinCopies4
+    internal class CustomEnumeratorEnumerable<TItems, TEnumerator> : System.Collections.Generic.IEnumerable<TItems> where TEnumerator : System.Collections.Generic.IEnumerator<TItems>
+    {
+        protected TEnumerator InnerEnumerator { get; }
+
+        public CustomEnumeratorEnumerable(TEnumerator enumerator) => InnerEnumerator = enumerator;
+
+        public TEnumerator GetEnumerator() => InnerEnumerator;
+
+        System.Collections.Generic.IEnumerator<TItems> System.Collections.Generic.IEnumerable<TItems>.GetEnumerator() => InnerEnumerator;
+
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => InnerEnumerator;
+    }
+
+    internal class UIntCountableEnumerable<TItems, TEnumerator> : CustomEnumeratorEnumerable<TItems, TEnumerator>, IUIntCountableEnumerable<TItems> where TEnumerator : IUIntCountableEnumerator<TItems>
+    {
+        uint IUIntCountable.Count => InnerEnumerator.Count;
+
+        public UIntCountableEnumerable(in TEnumerator enumerator) : base(enumerator) { /* Left empty. */ }
+
+        IUIntCountableEnumerator<TItems> IUIntCountableEnumerable<TItems, IUIntCountableEnumerator<TItems>>.GetEnumerator() => GetEnumerator();
+
+#if !CS8
+        IUIntCountableEnumerator<TItems> Collections.Enumeration.DotNetFix.IEnumerable<IUIntCountableEnumerator<TItems>>.GetEnumerator() => GetEnumerator();
+
+        IUIntCountableEnumerator<TItems> Collections.DotNetFix.Generic.IEnumerable<TItems, IUIntCountableEnumerator<TItems>>.GetEnumerator() => GetEnumerator();
+#endif
+    }
+#endif
+
     public static class Extensions
     {
         public static string GetPath(this IPathCommon path, in bool ignoreRoot)
         {
             ThrowIfNull(path, nameof(path));
 
-            var merger = new WinCopies.Collections.Generic.Temp. ArrayMerger<char>();
+            var merger = new ArrayMerger<char>();
 
             IPathCommon _path = path;
 
             while ((_path = _path.Parent) != null)
             {
-                _ = merger.AddFirst(new RepeatEnumerator<char>('\\', 1));
+                _ = merger.AddFirst(new UIntCountableEnumerable<char, IUIntCountableEnumerator<char>>(RepeatEnumerator<char>.Get('\\', 1)));
 
                 _ = merger.AddFirst(new UIntCountableEnumerable<char>(new StringCharArray(_path.RelativePath)));
             }
 
-            if (ignoreRoot&&merger.Count>0)
+            if (ignoreRoot && merger.Count > 0)
 
                 merger.RemoveFirst();
 

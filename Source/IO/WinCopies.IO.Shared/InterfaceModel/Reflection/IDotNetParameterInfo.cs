@@ -21,7 +21,6 @@ using System.Reflection;
 
 using WinCopies.IO.AbstractionInterop.Reflection;
 using WinCopies.IO.Reflection.PropertySystem;
-using WinCopies.IO.Selectors;
 
 namespace WinCopies.IO.ObjectModel.Reflection
 {

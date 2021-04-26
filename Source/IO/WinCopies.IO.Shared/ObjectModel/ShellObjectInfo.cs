@@ -357,10 +357,10 @@ namespace WinCopies.IO
                                     ProcessError>(),
                                 new ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>
                                 .ProcessDelegates(
-                                    new Util.Temp.EventDelegate<IPathInfo>(),
-                                    Util.Temp.EventAndQueryDelegate<bool>.GetANDALSO_Delegate(true),
-                                    Util.Temp.EventAndQueryDelegate<object>.GetANDALSO_Delegate(false),
-                                    Util.Temp.EventAndQueryDelegate<IProcessProgressDelegateParameter>.GetANDALSO_Delegate(true)),
+                                    new EventDelegate<IPathInfo>(),
+                                    EventAndQueryDelegate<bool>.GetANDALSO_Delegate(true),
+                                    EventAndQueryDelegate<object>.GetANDALSO_Delegate(false),
+                                    EventAndQueryDelegate<IProcessProgressDelegateParameter>.GetANDALSO_Delegate(true)),
                                 new ProcessTypes<IPathInfo>.ProcessErrorTypes<ProcessError>.ProcessOptions(path => true, true),
                                 new ProcessErrorFactory<IPathInfo>());
                     }

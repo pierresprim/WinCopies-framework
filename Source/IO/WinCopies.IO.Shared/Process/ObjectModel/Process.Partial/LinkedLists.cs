@@ -84,6 +84,12 @@ namespace WinCopies.IO.Process
         }
 
         ProcessTypes<IProcessErrorItem<TItems, TError>>.IProcessQueue ProcessTypes<IProcessErrorItem<TItems, TError>>.IProcessQueue.AsReadOnly() => new ReadOnlyProcessLinkedCollection<TItems, TError>(this);
+
+#if !CS8
+        object ISimpleLinkedList.Peek() => ((ISimpleLinkedList)InnerList).Peek();
+
+        bool ISimpleLinkedList.TryPeek(out object result) => ((ISimpleLinkedList)InnerList).TryPeek(out result);
+#endif
     }
 
     public class ReadOnlyProcessLinkedCollection<TItems, TError> : ReadOnlyLinkedCollection<IProcessErrorItem<TItems, TError>>, IReadOnlyProcessLinkedList<TItems, TError> where TItems : IPath
@@ -133,6 +139,15 @@ namespace WinCopies.IO.Process
         bool ISimpleLinkedListBase<IProcessErrorItem<TItems, TError>>.TryPeek(out IProcessErrorItem<TItems, TError> result) => InnerList.TryPeek(out result);
 
         bool IQueueBase<IProcessErrorItem<TItems, TError>>.TryPeek(out IProcessErrorItem<TItems, TError> result) => InnerList.TryPeek(out result);
+
+        IProcessErrorItem<TItems, TError> ISimpleLinkedList<IProcessErrorItem<TItems, TError>>.Peek() => ((ISimpleLinkedList<IProcessErrorItem<TItems, TError>>)InnerList).Peek();
+
+#if !CS8
+
+        bool ISimpleLinkedList.TryPeek(out object result) => InnerList.TryPeek(out result);
+
+        object ISimpleLinkedList.Peek() => ((ISimpleLinkedList)InnerList).Peek();
+#endif
     }
 
     namespace ObjectModel

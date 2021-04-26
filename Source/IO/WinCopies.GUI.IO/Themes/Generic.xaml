@@ -473,7 +473,7 @@
                     <GridView>
                         <GridViewColumn Header="Type" DisplayMemberBinding="{Binding Name}" />
                         <GridViewColumn Header="Source Path" DisplayMemberBinding="{Binding SourcePath, Converter={localProcess:PathCommonToStringConverter}}" />
-                        <GridViewColumn Header="Status" DisplayMemberBinding="{Binding Status, Converter={dataTemp:ToStringConverter}}" />
+                        <GridViewColumn Header="Status" DisplayMemberBinding="{Binding Status, Converter={data:ToStringConverter}}" />
                         <GridViewColumn Header="Progress">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate DataType="{x:Type localProcess:IProcess}">

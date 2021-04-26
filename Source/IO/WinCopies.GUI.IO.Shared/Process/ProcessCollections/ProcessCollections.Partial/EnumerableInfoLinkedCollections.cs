@@ -131,9 +131,15 @@ namespace WinCopies.GUI.IO.Process
         }
 
         public ProcessTypes<IProcessErrorItem<TItems, TError>>.IProcessQueue AsReadOnly() => new ReadOnlyObservableProcessLinkedCollection<TItems, TError>(this);
+
+#if !CS8
+        object ISimpleLinkedList.Peek() => ((ISimpleLinkedList)InnerList).Peek();
+
+        bool ISimpleLinkedList.TryPeek(out object result) => ((ISimpleLinkedList)InnerList).TryPeek(out result);
+#endif
     }
 
-    public class ReadOnlyObservableProcessLinkedCollection<TItems, TError> : Collections.DotNetFix.Generic.ReadOnlyObservableLinkedCollection<IProcessErrorItem<TItems, TError>>, ProcessTypes<IProcessErrorItem<TItems, TError>>.IProcessQueue, IReadOnlyProcessLinkedList<TItems, TError> where TItems : IPath
+    public class ReadOnlyObservableProcessLinkedCollection<TItems, TError> : ReadOnlyObservableLinkedCollection<IProcessErrorItem<TItems, TError>>, ProcessTypes<IProcessErrorItem<TItems, TError>>.IProcessQueue, IReadOnlyProcessLinkedList<TItems, TError> where TItems : IPath
     {
         public Size TotalSize => ((IProcessQueue)InnerLinkedCollection).TotalSize;
 
@@ -170,5 +176,11 @@ namespace WinCopies.GUI.IO.Process
         public bool TryPeek(out IProcessErrorItem<TItems, TError> result) => ((IQueue<IProcessErrorItem<TItems, TError>>)InnerLinkedCollection).TryPeek(out result);
 
         ProcessTypes<IProcessErrorItem<TItems, TError>>.IProcessQueue ProcessTypes<IProcessErrorItem<TItems, TError>>.IProcessQueue.AsReadOnly() => this;
+
+#if !CS8
+        object ISimpleLinkedList.Peek() => ((ISimpleLinkedList)InnerLinkedCollection).Peek();
+
+        bool ISimpleLinkedList.TryPeek(out object result) => ((ISimpleLinkedList)InnerLinkedCollection).TryPeek(out result);
+#endif
     }
 }

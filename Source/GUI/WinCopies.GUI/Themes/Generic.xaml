@@ -9,8 +9,7 @@
     xmlns:markup="clr-namespace:WinCopies.Markup;assembly=WinCopies.Util.Desktop"
     xmlns:guiDialogs="clr-namespace:WinCopies.GUI.Windows;assembly=WinCopies.GUI.Models"
     xmlns:windows="clr-namespace:WinCopies.GUI.Windows"
-    xmlns:propertySystem="clr-namespace:WinCopies.GUI.Controls.PropertySystem"
-    xmlns:temp="clr-namespace:WinCopies;assembly=WinCopies.Util.Temp">
+    xmlns:propertySystem="clr-namespace:WinCopies.GUI.Controls.PropertySystem">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/wincopies.gui.templates;component/Themes/Generic.xaml" />
         <ResourceDictionary>
@@ -107,7 +106,7 @@
 
                             <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
                                 <Button Content="Apply filters" Command="{x:Static commands:DialogCommands.Apply}" />
-                                <Button Content="Reset" Command="{x:Static temp:Temp.Reset}" />
+                                <Button Content="Reset" Command="{x:Static commands:ApplicationCommands.Reset}" />
                             </StackPanel>
 
                             <ItemsPresenter Grid.ColumnSpan="2" Grid.Row="1" />
