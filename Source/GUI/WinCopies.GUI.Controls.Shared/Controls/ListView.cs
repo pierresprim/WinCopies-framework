@@ -22,9 +22,10 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
+using WinCopies.Util;
 using WinCopies.Util.Data;
 
-using static WinCopies.Temp;
+using static WinCopies.UtilHelpers;
 
 using PropertyChangedEventArgs = System.ComponentModel.PropertyChangedEventArgs;
 
@@ -64,9 +65,9 @@ namespace WinCopies.GUI.Controls
     public abstract class Selector : ViewModelBase
     {
 #if DEBUG && WinCopies3
-        protected virtual void UpdateValue<TValue>(ref TValue value, in TValue newValue, PropertyChangedEventArgs propertyChangedEventArgs) => Temp.UpdateValue(ref value, newValue, () => OnPropertyChanged(propertyChangedEventArgs));
+        protected virtual void UpdateValue<TValue>(ref TValue value, in TValue newValue, PropertyChangedEventArgs propertyChangedEventArgs) => UtilHelpers.UpdateValue(ref value, newValue, () => OnPropertyChanged(propertyChangedEventArgs));
 
-        protected virtual void UpdateValue<TValue>(ref TValue value, in TValue newValue, string propertyName) => Temp.UpdateValue(ref value, newValue, () => OnPropertyChanged(propertyName));
+        protected virtual void UpdateValue<TValue>(ref TValue value, in TValue newValue, string propertyName) => UtilHelpers.UpdateValue(ref value, newValue, () => OnPropertyChanged(propertyName));
 #endif
 
         private bool _isChecked;
@@ -220,7 +221,7 @@ namespace WinCopies.GUI.Controls
         {
             _ = CommandBindings.Add(new CommandBinding(WinCopies.Commands.DialogCommands.Apply, (object sender, ExecutedRoutedEventArgs e) => OnApplyFiltersCommand(e), (object sender, CanExecuteRoutedEventArgs e) => OnCanApplyFiltersCommand(e)));
 
-            _ = CommandBindings.Add(new CommandBinding(Reset, (object sender, ExecutedRoutedEventArgs e) => OnResetFiltersCommand(e), (object sender, CanExecuteRoutedEventArgs e) => OnCanApplyFiltersCommand(e)));
+            _ = CommandBindings.Add(new CommandBinding(   Temp. Reset, (object sender, ExecutedRoutedEventArgs e) => OnResetFiltersCommand(e), (object sender, CanExecuteRoutedEventArgs e) => OnCanApplyFiltersCommand(e)));
         }
 
         protected virtual void OnCanResetFiltersCommand(CanExecuteRoutedEventArgs e)

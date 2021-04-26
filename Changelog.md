@@ -9,11 +9,17 @@ CHANGELOG
 Updates
 -------
 
-??/??/???? 3.1.0-preview
+04/26/2021 3.1.0-preview
 ========================
 
 - Complete rewrite of Processes, file system enumeration and (I)PathInfo (related-)types.
 - Add ListView control.
+- Remove IBrowsableObjectInfoSelectorDictionary\<T> and BrowsableObjectInfoSelectorDictionary generic and non-generic types. Use the following WinCopies namespace (WinCopies.Util.Extensions package):
+	- ISelectorDictionary
+	- IEnumerableSelectorDictionary
+	- SelectorDictionary
+	- SelectorDictionary\<TIn, TOut>
+	- EnumerableSelectorDictionary
 
 WinCopies.GUI.IO
 ----------------

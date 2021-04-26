@@ -16,19 +16,19 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using System;
-using System.Reflection;
+
 using WinCopies.IO.AbstractionInterop.Reflection;
 using WinCopies.IO.ObjectModel;
 using WinCopies.IO.ObjectModel.Reflection;
 
 namespace WinCopies.IO.Selectors.Reflection
 {
-    public class DotNetTypeInfoSelectorDictionary : BrowsableObjectInfoSelectorDictionary<DotNetTypeInfoItemProvider>
+    public class DotNetTypeInfoSelectorDictionary : EnumerableSelectorDictionary<DotNetTypeInfoItemProvider, IBrowsableObjectInfo>
     {
         public static IBrowsableObjectInfo Convert(DotNetTypeInfoItemProvider item) => item.MemberInfoItemProvider != null ? new DotNetMemberInfo(item.MemberInfoItemProvider.MemberInfo, item.Parent)
             : item.CustomAttributeData != null ? new DotNetAttributeInfo(item.CustomAttributeData, item.Parent)
             : item.GenericTypeInfo != null ? new DotNetTypeInfo(item.GenericTypeInfo.TypeInfo, item.GenericTypeInfo.GenericTypeStructValue == DotNetTypeInfoProviderGenericTypeStructValue.GenericTypeParameter ? IO.Reflection.DotNetItemType.GenericParameter : IO.Reflection.DotNetItemType.GenericArgument, false, item.Parent)
-            : (IBrowsableObjectInfo)(item.TypeInfoItemProvider == null ? throw BrowsableObjectInfoSelectorDictionary.GetInvalidItemProviderException()
+            : (IBrowsableObjectInfo)(item.TypeInfoItemProvider == null ? throw SelectorDictionary.GetInvalidItemException()
             : new DotNetTypeInfo(item.TypeInfoItemProvider.TypeInfo, item.TypeInfoItemProvider.ItemType, true, item.Parent));
 
         protected override Converter<DotNetTypeInfoItemProvider, IBrowsableObjectInfo> DefaultSelectorOverride => Convert;

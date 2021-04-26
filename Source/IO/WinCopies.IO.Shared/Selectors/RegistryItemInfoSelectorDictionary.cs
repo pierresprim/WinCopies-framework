@@ -24,15 +24,15 @@ using static WinCopies.ThrowHelper;
 
 namespace WinCopies.IO.Selectors
 {
-    public class RegistryItemInfoSelectorDictionary : BrowsableObjectInfoSelectorDictionary<RegistryItemInfoItemProvider>
+    public class RegistryItemInfoSelectorDictionary : EnumerableSelectorDictionary<RegistryItemInfoItemProvider, IBrowsableObjectInfo>
     {
         public static IBrowsableObjectInfo Convert(RegistryItemInfoItemProvider item) => (item ?? throw GetArgumentNullException(nameof(item))).RegistryKey == null
             ? item.ValueName == null
-                ? new RegistryItemInfo(item.Path, item.ShellProcessPathCollectionFactory, item.ClientVersion)
-                : new RegistryItemInfo(item.Path, item.ValueName, item.ShellProcessPathCollectionFactory, item.ClientVersion)
+                ? new RegistryItemInfo(item.Path, item.ClientVersion)
+                : new RegistryItemInfo(item.Path, item.ValueName, item.ClientVersion)
             : item.ValueName == null
-                ? new RegistryItemInfo(item.RegistryKey, item.ShellProcessPathCollectionFactory, item.ClientVersion)
-                : new RegistryItemInfo(item.RegistryKey, item.ValueName, item.ShellProcessPathCollectionFactory, item.ClientVersion);
+                ? new RegistryItemInfo(item.RegistryKey, item.ClientVersion)
+                : new RegistryItemInfo(item.RegistryKey, item.ValueName, item.ClientVersion);
 
         protected override Converter<RegistryItemInfoItemProvider, IBrowsableObjectInfo> DefaultSelectorOverride => Convert;
 

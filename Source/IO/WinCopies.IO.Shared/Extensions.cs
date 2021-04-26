@@ -16,9 +16,10 @@
 * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using System;
-using System.Text;
-using WinCopies.Collections.Abstraction.Generic.Abstract;
+
+using WinCopies.Collections;
 using WinCopies.Collections.Generic;
+
 using static WinCopies.ThrowHelper;
 
 namespace WinCopies.IO
@@ -29,7 +30,7 @@ namespace WinCopies.IO
         {
             ThrowIfNull(path, nameof(path));
 
-            var merger = new ArrayMerger<char>();
+            var merger = new WinCopies.Collections.Generic.Temp. ArrayMerger<char>();
 
             IPathCommon _path = path;
 
@@ -40,7 +41,7 @@ namespace WinCopies.IO
                 _ = merger.AddFirst(new UIntCountableEnumerable<char>(new StringCharArray(_path.RelativePath)));
             }
 
-            if (ignoreRoot)
+            if (ignoreRoot&&merger.Count>0)
 
                 merger.RemoveFirst();
 
@@ -58,6 +59,15 @@ namespace WinCopies.IO
             if ((path ?? throw GetArgumentNullException(argumentName)).Value == null)
 
                 throw new ArgumentException($"{argumentName} must have a non-null value.");
+        }
+
+        public static NullableGeneric<T> GetOrThrowIfInvalidPath<T>(this NullableGeneric<T> path, in string argumentName) where T : IPathCommon
+        {
+            if ((path ?? throw GetArgumentNullException(argumentName)).Value == null)
+
+                throw new ArgumentException($"{argumentName} must have a non-null value.");
+
+            return path;
         }
     }
 }

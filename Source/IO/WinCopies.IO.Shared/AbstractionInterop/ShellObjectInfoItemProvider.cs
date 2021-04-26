@@ -45,35 +45,33 @@ namespace WinCopies.IO.AbstractionInterop
 
         public NonShellObjectRootItemType NonShellObjectRootItemType { get; }
 
-        public IProcessPathCollectionFactory ProcessPathCollectionFactory { get; }
-
-        public ShellObjectInfoItemProvider(in ShellObject shellObject, in IProcessPathCollectionFactory processPathCollectionFactory, in ClientVersion clientVersion)
+        public ShellObjectInfoItemProvider(in ShellObject shellObject, in ClientVersion clientVersion)
         {
             ShellObject = shellObject;
 
-            ProcessPathCollectionFactory = processPathCollectionFactory;
-
             ClientVersion = clientVersion;
         }
 
-        public ShellObjectInfoItemProvider(in IShellObjectInfoBase archiveShellObject, in ArchiveFileInfo? archiveFileInfo) : base(archiveShellObject, archiveFileInfo) => ProcessPathCollectionFactory = archiveShellObject.ProcessPathCollectionFactory;
+        public ShellObjectInfoItemProvider(in IShellObjectInfoBase archiveShellObject, in ArchiveFileInfo? archiveFileInfo) : base(archiveShellObject, archiveFileInfo)
+        {
+            // Left empty.
+        }
 
-        public ShellObjectInfoItemProvider(in IShellObjectInfoBase archiveShellObject, in string archiveFilePath) : base(archiveShellObject, archiveFilePath) => ProcessPathCollectionFactory = archiveShellObject.ProcessPathCollectionFactory;
+        public ShellObjectInfoItemProvider(in IShellObjectInfoBase archiveShellObject, in string archiveFilePath) : base(archiveShellObject, archiveFilePath)
+        {
+            // Left empty.
+        }
 
-        public ShellObjectInfoItemProvider(in IPortableDevice portableDevice, in IProcessPathCollectionFactory processPathCollectionFactory, in ClientVersion clientVersion)
+        public ShellObjectInfoItemProvider(in IPortableDevice portableDevice, in ClientVersion clientVersion)
         {
             PortableDevice = portableDevice;
 
-            ProcessPathCollectionFactory = processPathCollectionFactory;
-
             ClientVersion = clientVersion;
         }
 
-        public ShellObjectInfoItemProvider(in NonShellObjectRootItemType nonShellObjectRootItemType, in IProcessPathCollectionFactory processPathCollectionFactory, in ClientVersion clientVersion)
+        public ShellObjectInfoItemProvider(in NonShellObjectRootItemType nonShellObjectRootItemType, in ClientVersion clientVersion)
         {
             NonShellObjectRootItemType = nonShellObjectRootItemType;
-
-            ProcessPathCollectionFactory = processPathCollectionFactory;
 
             ClientVersion = clientVersion;
         }

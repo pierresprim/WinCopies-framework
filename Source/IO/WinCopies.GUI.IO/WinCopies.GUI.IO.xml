@@ -4,11 +4,6 @@
         <name>WinCopies.GUI.IO</name>
     </assembly>
     <members>
-        <member name="F:WinCopies.GUI.IO.Controls.Process.CopyProcessControl.DestPathProperty">
-            <summary>
-            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.Process.CopyProcessControl.DestPath"/> dependency property.
-            </summary>
-        </member>
         <member name="T:WinCopies.GUI.IO.Controls.Process.ProcessControl">
             <summary>
             Represents an I/O process control.
@@ -256,90 +251,34 @@
             <remarks>This method cannot create <see cref="T:WinCopies.IO.ObjectModel.IBrowsableObjectInfo"/> for WMI paths.</remarks>
             <exception cref="T:System.ArgumentException"><paramref name="path"/> is not a Shell or a Registry path.</exception>
         </member>
-        <member name="M:WinCopies.GUI.IO.Process.ReadOnlyProcessErrorPathLinkedCollection.#ctor(WinCopies.GUI.IO.Process.ProcessErrorPathLinkedCollection)">
+        <member name="T:XamlGeneratedNamespace.GeneratedInternalTypeHelper">
             <summary>
-            Initializes a new instance of the <see cref="T:WinCopies.GUI.IO.Process.ReadOnlyProcessErrorPathLinkedCollection"/> class.
-            </summary>
-            <param name="linkedCollection">The inner <see cref="T:WinCopies.Collections.DotNetFix.Generic.ObservableLinkedCollection`1"/> of the new collection.</param>
-        </member>
-        <member name="F:WinCopies.GUI.IO.Process.ProcessError.None">
-            <summary>
-            No error occurred.
+            GeneratedInternalTypeHelper
             </summary>
         </member>
-        <member name="F:WinCopies.GUI.IO.Process.ProcessError.UnknownError">
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateInstance(System.Type,System.Globalization.CultureInfo)">
             <summary>
-            An unknown error occurred.
+            CreateInstance
             </summary>
         </member>
-        <member name="F:WinCopies.GUI.IO.Process.ProcessError.AbortedByUser">
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.GetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Globalization.CultureInfo)">
             <summary>
-            The process was aborted by user.
+            GetPropertyValue
             </summary>
         </member>
-        <member name="F:WinCopies.GUI.IO.Process.ProcessError.PathNotFound">
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.SetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Object,System.Globalization.CultureInfo)">
             <summary>
-            One part or all of the source or destination path was not found.
+            SetPropertyValue
             </summary>
         </member>
-        <member name="F:WinCopies.GUI.IO.Process.ProcessError.DriveNotReady">
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateDelegate(System.Type,System.Object,System.String)">
             <summary>
-            The source or destination drive is not ready.
+            CreateDelegate
             </summary>
         </member>
-        <member name="F:WinCopies.GUI.IO.Process.ProcessError.ReadProtection">
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.AddEventHandler(System.Reflection.EventInfo,System.Object,System.Delegate)">
             <summary>
-            The source or destination path is read-protected.
-            </summary>
-        </member>
-        <member name="F:WinCopies.GUI.IO.Process.ProcessError.DestinationReadProtection">
-            <summary>
-            The destination path is read-protected.
-            </summary>
-        </member>
-        <member name="F:WinCopies.GUI.IO.Process.ProcessError.WriteProtection">
-            <summary>
-            The destination path is write-protected.
-            </summary>
-        </member>
-        <member name="F:WinCopies.GUI.IO.Process.ProcessError.PathTooLong">
-            <summary>
-            The destination path is too long.
-            </summary>
-        </member>
-        <member name="F:WinCopies.GUI.IO.Process.ProcessError.NotEnoughSpace">
-            <summary>
-            The destination disk has not enough space.
-            </summary>
-        </member>
-        <member name="F:WinCopies.GUI.IO.Process.ProcessError.FileSystemEntryAlreadyExists">
-            <summary>
-            A file or folder already exists with the same name.
-            </summary>
-        </member>
-        <member name="F:WinCopies.GUI.IO.Process.ProcessError.FolderAlreadyExists">
-            <summary>
-            A folder already exists with the same name.
-            </summary>
-        </member>
-        <member name="F:WinCopies.GUI.IO.Process.ProcessError.FileRenamingFailed">
-            <summary>
-            The file could not be renamed.
-            </summary>
-        </member>
-        <member name="F:WinCopies.GUI.IO.Process.ProcessError.SourceAndDestPathAreEqual">
-            <summary>
-            The source and destination relative paths are equal.
-            </summary>
-        </member>
-        <member name="F:WinCopies.GUI.IO.Process.ProcessError.DestPathIsASubPath">
-            <summary>
-            The destination path is a sub-path of the source path.
-            </summary>
-        </member>
-        <member name="F:WinCopies.GUI.IO.Process.ProcessError.DiskError">
-            <summary>
-            An unknown disk error occurred.
+            AddEventHandler
             </summary>
         </member>
     </members>

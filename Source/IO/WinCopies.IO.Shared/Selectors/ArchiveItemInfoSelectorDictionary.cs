@@ -24,12 +24,12 @@ using static WinCopies.ThrowHelper;
 
 namespace WinCopies.IO.Selectors
 {
-    public class ArchiveItemInfoSelectorDictionary : BrowsableObjectInfoSelectorDictionary<ArchiveItemInfoItemProvider>
+    public class ArchiveItemInfoSelectorDictionary : EnumerableSelectorDictionary<ArchiveItemInfoItemProvider, IBrowsableObjectInfo>
     {
         public static IBrowsableObjectInfo Convert(ArchiveItemInfoItemProvider item) => (item ?? throw GetArgumentNullException(nameof(item))).ArchiveFileInfo.HasValue
             ? ArchiveItemInfo.From(item.ShellObjectInfo, item.ArchiveFileInfo.Value)
             : UtilHelpers.IsNullEmptyOrWhiteSpace(item.ArchiveFilePath)
-                ? throw BrowsableObjectInfoSelectorDictionary.GetInvalidItemProviderException()
+                ? throw SelectorDictionary.GetInvalidItemException()
                 : ArchiveItemInfo.From(item.ShellObjectInfo, item.ArchiveFilePath);
 
         protected override Converter<ArchiveItemInfoItemProvider, IBrowsableObjectInfo> DefaultSelectorOverride => Convert;

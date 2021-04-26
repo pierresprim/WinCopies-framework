@@ -15,6 +15,7 @@
 * You should have received a copy of the GNU General Public License
 * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+using Microsoft.WindowsAPICodePack.Win32Native;
 using System;
 
 #if !CS8
@@ -57,9 +58,13 @@ namespace WinCopies.IO.Process
     {
         public class ProcessErrorFactoryBase : IProcessErrorFactoryBase<TError>
         {
-            public IProcessError<TError> GetError(TError error, Exception exception) => new ProcessError<TError>(error, exception);
+            public IProcessError<TError> GetError(TError error, Exception exception, ErrorCode errorCode) => new ProcessError<TError>(error, exception, errorCode);
 
-            public IProcessError<TError> GetError(TError error, string message) => new ProcessError<TError>(error, message);
+            public IProcessError<TError> GetError(TError error, Exception exception, HResult hResult) => new ProcessError<TError>(error, exception, hResult);
+
+            public IProcessError<TError> GetError(TError error, string message, ErrorCode errorCode) => new ProcessError<TError>(error, message, errorCode);
+
+            public IProcessError<TError> GetError(TError error, string message, HResult hResult) => new ProcessError<TError>(error, message, hResult);
 
             public IProcessErrorItem<TPath, TError> GetErrorItem(TPath item, IProcessError<TError> error) => new ProcessErrorItem(item, error);
 
@@ -67,35 +72,47 @@ namespace WinCopies.IO.Process
             #region IProcessErrorFactoryBase Support
             private static TError GetError(in object error, in string argumentName) => error is TError _error ? _error : throw GetInvalidTypeArgumentException(argumentName);
 
-            IProcessError IProcessErrorFactory.GetError(object error, Exception exception) => GetError(GetError(error, nameof(error)), exception);
+            IProcessError IProcessErrorFactoryBase.GetError(object error, Exception exception, ErrorCode errorCode) => GetError(GetError(error, nameof(error)), exception, errorCode);
 
-            IProcessError IProcessErrorFactory.GetError(object error, string message) => GetError(GetError(error, nameof(error)), message);
+            IProcessError IProcessErrorFactoryBase.GetError(object error, Exception exception, HResult hResult) => GetError(GetError(error, nameof(error)), exception, hResult);
+
+            IProcessError IProcessErrorFactoryBase.GetError(object error, string message, ErrorCode errorCode) => GetError(GetError(error, nameof(error)), message, errorCode);
+
+            IProcessError IProcessErrorFactoryBase.GetError(object error, string message, HResult hResult) => GetError(GetError(error, nameof(error)), message, hResult);
             #endregion
 #endif
         }
 
         public class ProcessErrorItem : IProcessErrorItem<TPath, TError>
         {
-            public TPath Path { get; }
+            public TPath Item { get; }
 
             public IProcessError<TError> Error { get; }
 
-            string IPathCommon.RelativePath => Path.RelativePath;
+            string IPathCommon.RelativePath => Item.RelativePath;
 
-            IPathCommon IPathCommon.Parent => Path.Parent;
+            IPathCommon IPathCommon.Parent => Item.Parent;
 
-            string IPathCommon.Path => Path.Path;
+            string IPathCommon.Path => Item.Path;
 
-            bool IPath.IsDirectory => Path.IsDirectory;
+            bool IPath.IsDirectory => Item.IsDirectory;
 
-            Size? IPath.Size => Path.Size;
+            Size? IPath.Size => Item.Size;
 
             public ProcessErrorItem(in TPath path, in IProcessError<TError> error)
             {
-                Path = path;
+                Item = path;
 
                 Error = error;
             }
+
+            public override string ToString() => PathHelper.ToString(this);
+
+            public bool Equals(IO.IPathCommon other) => PathHelper.Equals(this, other);
+
+            public override bool Equals(object obj) => PathHelper.Equals(this, obj);
+
+            public override int GetHashCode() => PathHelper.GetHashCode(this);
 
 #if !CS8
             #region IProcessErrorItem Support

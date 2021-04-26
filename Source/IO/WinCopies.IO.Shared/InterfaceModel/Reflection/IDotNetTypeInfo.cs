@@ -30,12 +30,12 @@ namespace WinCopies.IO
             // Left empty.
         }
 
-        public interface IDotNetTypeInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : IDotNetTypeInfoBase, IDotNetItemInfo<TObjectProperties, TypeInfo, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IDotNetTypeInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
+        public interface IDotNetTypeInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : IDotNetTypeInfoBase, IDotNetItemInfo<TObjectProperties, TypeInfo, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IDotNetTypeInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
         {
             // Left empty.
         }
 
-        public interface IDotNetTypeInfo : IDotNetTypeInfo<IDotNetTypeInfoProperties, DotNetTypeInfoItemProvider, IBrowsableObjectInfoSelectorDictionary<DotNetTypeInfoItemProvider>, DotNetTypeInfoItemProvider>
+        public interface IDotNetTypeInfo : IDotNetTypeInfo<IDotNetTypeInfoProperties, DotNetTypeInfoItemProvider, IEnumerableSelectorDictionary<DotNetTypeInfoItemProvider, IBrowsableObjectInfo>, DotNetTypeInfoItemProvider>
         {
             // Left empty.
         }

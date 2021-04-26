@@ -21,6 +21,7 @@ using System.Reflection;
 
 using WinCopies.IO.AbstractionInterop.Reflection;
 using WinCopies.IO.Enumeration.Reflection;
+using WinCopies.IO.Process;
 using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Reflection;
 using WinCopies.IO.Reflection.PropertySystem;
@@ -33,10 +34,10 @@ using static WinCopies.ThrowHelper;
 
 namespace WinCopies.IO.ObjectModel.Reflection
 {
-    public abstract class DotNetTypeInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : BrowsableDotNetItemInfo<TObjectProperties, TypeInfo, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IDotNetTypeInfoBase where TObjectProperties : IDotNetTypeInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
+    public abstract class DotNetTypeInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : BrowsableDotNetItemInfo<TObjectProperties, TypeInfo, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IDotNetTypeInfoBase where TObjectProperties : IDotNetTypeInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
     {
         #region Properties
-        public override IProcessFactory ProcessFactory => IO.ProcessFactory.DefaultProcessFactory;
+        public override IProcessFactory ProcessFactory => Process.ProcessFactory.DefaultProcessFactory;
 
         public sealed override TypeInfo InnerObjectGeneric { get; }
 
@@ -64,7 +65,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
         }
     }
 
-    public class DotNetTypeInfo : DotNetTypeInfo<IDotNetTypeInfoProperties, DotNetTypeInfoItemProvider, IBrowsableObjectInfoSelectorDictionary<DotNetTypeInfoItemProvider>, DotNetTypeInfoItemProvider>, IDotNetTypeInfo
+    public class DotNetTypeInfo : DotNetTypeInfo<IDotNetTypeInfoProperties, DotNetTypeInfoItemProvider, IEnumerableSelectorDictionary<DotNetTypeInfoItemProvider, IBrowsableObjectInfo>, DotNetTypeInfoItemProvider>, IDotNetTypeInfo
     {
         private static DotNetItemType[] _defaultTypesToEnumerate;
 
@@ -81,7 +82,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
 #endif
             ;
 
-        public static IBrowsableObjectInfoSelectorDictionary<DotNetTypeInfoItemProvider> DefaultItemSelectorDictionary { get; } = new DotNetTypeInfoSelectorDictionary();
+        public static IEnumerableSelectorDictionary<DotNetTypeInfoItemProvider, IBrowsableObjectInfo> DefaultItemSelectorDictionary { get; } = new DotNetTypeInfoSelectorDictionary();
 
         public sealed override IDotNetTypeInfoProperties ObjectPropertiesGeneric { get; }
 
@@ -134,7 +135,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
         }
 #endif
 
-        public override IBrowsableObjectInfoSelectorDictionary<DotNetTypeInfoItemProvider> GetSelectorDictionary() => DefaultItemSelectorDictionary;
+        public override IEnumerableSelectorDictionary<DotNetTypeInfoItemProvider, IBrowsableObjectInfo> GetSelectorDictionary() => DefaultItemSelectorDictionary;
 
         protected virtual System.Collections.Generic.IEnumerable<DotNetTypeInfoItemProvider> GetItemProviders(System.Collections.Generic.IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetTypeInfoItemProvider> func) => DotNetTypeInfoEnumeration.From(this, typesToEnumerate, func);
 

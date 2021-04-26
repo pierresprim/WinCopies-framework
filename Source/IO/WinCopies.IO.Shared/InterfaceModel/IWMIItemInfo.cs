@@ -30,12 +30,12 @@ namespace WinCopies.IO.ObjectModel
         // Left empty.
     }
 
-    public interface IWMIItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : IWMIItemInfoBase, IBrowsableObjectInfo<TObjectProperties, ManagementBaseObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IWMIItemInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
+    public interface IWMIItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : IWMIItemInfoBase, IBrowsableObjectInfo<TObjectProperties, ManagementBaseObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IWMIItemInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
     {
         // Left empty.
     }
 
-    public interface IWMIItemInfo : IWMIItemInfo<IWMIItemInfoProperties, ManagementBaseObject, IBrowsableObjectInfoSelectorDictionary<WMIItemInfoItemProvider>, WMIItemInfoItemProvider>
+    public interface IWMIItemInfo : IWMIItemInfo<IWMIItemInfoProperties, ManagementBaseObject, IEnumerableSelectorDictionary<WMIItemInfoItemProvider, IBrowsableObjectInfo>, WMIItemInfoItemProvider>
     {
         IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<ManagementBaseObject> predicate);
     }

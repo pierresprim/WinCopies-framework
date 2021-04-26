@@ -24,7 +24,7 @@ using static WinCopies.ThrowHelper;
 
 namespace WinCopies.IO.Selectors
 {
-    public class PortableDeviceInfoSelectorDictionary : BrowsableObjectInfoSelectorDictionary<PortableDeviceObjectInfoItemProvider>
+    public class PortableDeviceInfoSelectorDictionary : EnumerableSelectorDictionary<PortableDeviceObjectInfoItemProvider, IBrowsableObjectInfo>
     {
         public static IBrowsableObjectInfo Convert(PortableDeviceObjectInfoItemProvider item) => new PortableDeviceObjectInfo((item ?? throw GetArgumentNullException(nameof(item))).PortableDeviceObject, item.ParentPortableDevice, item.ClientVersion);
 
@@ -33,7 +33,7 @@ namespace WinCopies.IO.Selectors
         public PortableDeviceInfoSelectorDictionary() { /* Left empty. */ }
     }
 
-    public class PortableDeviceObjectInfoSelectorDictionary : BrowsableObjectInfoSelectorDictionary<PortableDeviceObjectInfoItemProvider>
+    public class PortableDeviceObjectInfoSelectorDictionary : EnumerableSelectorDictionary<PortableDeviceObjectInfoItemProvider, IBrowsableObjectInfo>
     {
         public static IBrowsableObjectInfo Convert(PortableDeviceObjectInfoItemProvider item) => new PortableDeviceObjectInfo((item ?? throw GetArgumentNullException(nameof(item))).PortableDeviceObject, item.ParentPortableDeviceObject, item.ClientVersion);
 

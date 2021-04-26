@@ -61,11 +61,11 @@ namespace WinCopies.IO.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The operation was aborted by user..
+        ///   Looks up a localized string similar to The operation was cancelled by user..
         /// </summary>
-        internal static string AbortedByUser {
+        internal static string CancelledByUser {
             get {
-                return ResourceManager.GetString("AbortedByUser", resourceCulture);
+                return ResourceManager.GetString("CancelledByUser", resourceCulture);
             }
         }
         
@@ -129,15 +129,6 @@ namespace WinCopies.IO.Resources {
         internal static string GivenItemInnerObjectIsNotFromSupportedType {
             get {
                 return ResourceManager.GetString("GivenItemInnerObjectIsNotFromSupportedType", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The given item provider or its current configuration is not supported..
-        /// </summary>
-        internal static string ItemProviderNotSupported {
-            get {
-                return ResourceManager.GetString("ItemProviderNotSupported", resourceCulture);
             }
         }
         

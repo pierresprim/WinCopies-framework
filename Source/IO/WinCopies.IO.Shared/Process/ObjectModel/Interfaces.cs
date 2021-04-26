@@ -31,28 +31,28 @@ namespace WinCopies.IO.Process.ObjectModel
 
             new TItems SourcePath { get; }
 
-            new ProcessTypes<TItems>.IProcessCollection Paths { get; }
+            new ProcessTypes<TItems>.IProcessQueue Paths { get; }
 
             new IProcessError<TError> Error { get; }
 
             new IProcessErrorFactoryData<TError> ProcessErrorFactoryData { get; }
 
-            new ProcessTypes<IProcessErrorItem<TItems, TError>>.IProcessCollection ErrorPaths { get; }
+            new ProcessTypes<IProcessErrorItem<TItems, TError>>.IProcessQueue ErrorPaths { get; }
 
 #if CS8
-            IProcessErrorFactory IProcess.Factory => Factory;
+            IProcessErrorFactoryBase IProcess.Factory => Factory;
 
             IProcessEventDelegates IProcess.ProcessEventDelegates => ProcessEventDelegates;
 
             IPathCommon IProcess.SourcePath => SourcePath;
 
-            ProcessTypes<IPathInfo>.IProcessCollection IProcess.Paths => new AbstractionProcessCollection<TItems, IPathInfo>(Paths);
+            ProcessTypes<IPathInfo>.IProcessQueue IProcess.Paths => new AbstractionProcessCollection<TItems, IPathInfo>(Paths);
 
             IProcessError IProcess.Error => Error;
 
             IProcessErrorFactoryData IProcess.ProcessErrorFactoryData => ProcessErrorFactoryData;
 
-            ProcessTypes<IProcessErrorItem>.IProcessCollection IProcess.ErrorPaths => new AbstractionProcessCollection<IProcessErrorItem<TItems, TError>, IProcessErrorItem>(ErrorPaths);
+            ProcessTypes<IProcessErrorItem>.IProcessQueue IProcess.ErrorPaths => new AbstractionProcessCollection<IProcessErrorItem<TItems, TError>, IProcessErrorItem>(ErrorPaths);
 #endif
         }
 

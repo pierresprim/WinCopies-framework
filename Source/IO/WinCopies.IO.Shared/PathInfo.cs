@@ -15,11 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+using System;
+
 using static WinCopies.ThrowHelper;
+using static WinCopies.IO.PathHelper;
 
 namespace WinCopies.IO
 {
-    public interface IPathCommon
+    public interface IPathCommon : IEquatable<IPathCommon>
     {
         string RelativePath { get; }
 
@@ -38,6 +41,19 @@ namespace WinCopies.IO
     public interface IPathInfo : IPathCommon, IPath
     {
         // Left empty.
+    }
+
+    public static class PathHelper
+    {
+        public static string ToString(in IPathCommon path) => path.Path;
+
+        private static bool _Equals(in IPathCommon path, in IPathCommon other) => path.Path == other.Path;
+
+        public static bool Equals(in IPathCommon path, in IPathCommon other) => other != null && _Equals(path, other);
+
+        public static bool Equals(in IPathCommon path, in object obj) => obj is IPathCommon other && _Equals(path, other);
+
+        public static int GetHashCode(in IPathCommon path) => path.Path.GetHashCode();
     }
 
     public static class PathTypes<T> where T : IPathCommon
@@ -64,20 +80,38 @@ namespace WinCopies.IO
 
         public class PathInfoCommon : IPathCommon
         {
+            private string _path;
+
             public NullableGeneric<T> Parent { get; }
 
             public string RelativePath { get; }
 
-            public string Path => this.GetPath(false);
+            public string Path => _path
+#if CS8
+            ??=
+#else
+                ?? (_path =
+#endif
+                this.GetPath(false)
+#if !CS8
+                )
+#endif
+                ;
 
-            public PathInfoCommon(in string relativePath, in NullableGeneric<T> parent)
+            public PathInfoCommon(in string relativePath, in T parent)
             {
-                parent.ThrowIfInvalidPath(nameof(parent));
-
-                Parent = parent;
+                Parent = new NullableGeneric<T>(parent);
 
                 RelativePath = relativePath;
             }
+
+            public override string ToString() => PathHelper.ToString(this);
+
+            public bool Equals(IO.IPathCommon other) => PathHelper.Equals(this, other);
+
+            public override bool Equals(object obj) => PathHelper.Equals(this, obj);
+
+            public override int GetHashCode() => PathHelper.GetHashCode(this);
 
 #if !CS8
             IO.IPathCommon IO.IPathCommon.Parent => Parent == null ? default : Parent.Value;
@@ -134,16 +168,39 @@ namespace WinCopies.IO
 
             public override string Path => this.GetPath(false);
 
-            public PathInfo(in string relativePath, in NullableGeneric<T> parent, in bool isDirectory) : base(relativePath, isDirectory)
-            {
-                parent.ThrowIfInvalidPath(nameof(parent));
+            public PathInfo(in string relativePath, in T parent, in bool isDirectory) : base(relativePath, isDirectory) => Parent = new NullableGeneric<T>(parent);
 
-                Parent = parent;
-            }
+            public PathInfo(in string relativePath, in T parent) : this(relativePath, parent, GetIsDirectory(new PathInfoCommon(relativePath, parent).Path)) { /* Left empty. */ }
 
-            public PathInfo(in IPathCommon path, in bool isDirectory) : this((path ?? throw GetArgumentNullException(nameof(path))).RelativePath, path.Parent, isDirectory)
+            public PathInfo(in IPathCommon path, in bool isDirectory) : this((path ?? throw GetArgumentNullException(nameof(path))).RelativePath, path.Parent.GetOrThrowIfInvalidPath(nameof(path)).Value, isDirectory)
             {
                 // Left empty.
+            }
+
+            public PathInfo(in IPathCommon path) : this((path ?? throw GetArgumentNullException(nameof(path))).RelativePath, path.Parent.GetOrThrowIfInvalidPath(nameof(path)).Value, GetIsDirectory(path.Path))
+            {
+                // Left empty.
+            }
+
+            public override string ToString() => PathHelper.ToString(this);
+
+            public bool Equals(IO.IPathCommon other) => PathHelper.Equals(this, other);
+
+            public override bool Equals(object obj) => PathHelper.Equals(this, obj);
+
+            public override int GetHashCode() => PathHelper.GetHashCode(this);
+
+            internal static bool GetIsDirectory(in string path)
+            {
+                try
+                {
+                    return System.IO.Directory.Exists(path);
+                }
+
+                catch
+                {
+                    return false;
+                }
             }
 
 #if !CS8
@@ -157,28 +214,23 @@ namespace WinCopies.IO
 
             public override string Path => RelativePath;
 
-            private static bool GetIsDirectory(in string path)
-            {
-                try
-                {
-                    return System.IO.Directory.Exists(path);
-                }
-
-                catch
-                {
-                    return false;
-                }
-            }
-
             public RootPath(in string path, in bool isDirectory) : base(path, isDirectory)
             {
                 // Left empty.
             }
 
-            public RootPath(in string path) : this(path, GetIsDirectory(path))
+            public RootPath(in string path) : this(path, PathInfo.GetIsDirectory(path))
             {
                 // Left empty.
             }
+
+            public override string ToString() => PathHelper.ToString(this);
+
+            public bool Equals(IO.IPathCommon other) => PathHelper.Equals(this, other);
+
+            public override bool Equals(object obj) => PathHelper.Equals(this, obj);
+
+            public override int GetHashCode() => PathHelper.GetHashCode(this);
 
 #if !CS8
             IO.IPathCommon IO.IPathCommon.Parent => Parent == null ? default : Parent.Value;

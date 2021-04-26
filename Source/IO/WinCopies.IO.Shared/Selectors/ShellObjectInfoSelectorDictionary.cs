@@ -24,15 +24,15 @@ using static WinCopies.ThrowHelper;
 
 namespace WinCopies.IO.Selectors
 {
-    public class ShellObjectInfoSelectorDictionary : BrowsableObjectInfoSelectorDictionary<ShellObjectInfoItemProvider>
+    public class ShellObjectInfoSelectorDictionary : EnumerableSelectorDictionary<ShellObjectInfoItemProvider,IBrowsableObjectInfo>
     {
-        public static IBrowsableObjectInfo Convert(ShellObjectInfoItemProvider item) => (item ?? throw GetArgumentNullException(nameof(item))).ShellObject != null ? ShellObjectInfo.From(item.ShellObject, item.ProcessPathCollectionFactory, item.ClientVersion.Value)
+        public static IBrowsableObjectInfo Convert(ShellObjectInfoItemProvider item) => (item ?? throw GetArgumentNullException(nameof(item))).ShellObject != null ? ShellObjectInfo.From(item.ShellObject,  item.ClientVersion.Value)
             : item.ArchiveFileInfo.HasValue ? ArchiveItemInfo.From(item.ShellObjectInfo, item.ArchiveFileInfo.Value)
             : !UtilHelpers.IsNullEmptyOrWhiteSpace(item.ArchiveFilePath) ? ArchiveItemInfo.From(item.ShellObjectInfo, item.ArchiveFilePath)
-            : item.PortableDevice != null ? new PortableDeviceInfo(item.PortableDevice, item.ProcessPathCollectionFactory, item.ClientVersion.Value)
-            : item.NonShellObjectRootItemType == NonShellObjectRootItemType.Registry ? new RegistryItemInfo(item.ProcessPathCollectionFactory, item.ClientVersion.Value)
-            : (IBrowsableObjectInfo)(item.NonShellObjectRootItemType == NonShellObjectRootItemType.WMI ? new WMIItemInfo(null, item.ProcessPathCollectionFactory, item.ClientVersion.Value)
-            : throw BrowsableObjectInfoSelectorDictionary.GetInvalidItemProviderException());
+            : item.PortableDevice != null ? new PortableDeviceInfo(item.PortableDevice,  item.ClientVersion.Value)
+            : item.NonShellObjectRootItemType == NonShellObjectRootItemType.Registry ? new RegistryItemInfo( item.ClientVersion.Value)
+            : (IBrowsableObjectInfo)(item.NonShellObjectRootItemType == NonShellObjectRootItemType.WMI ? new WMIItemInfo(null, item.ClientVersion.Value)
+            : throw SelectorDictionary.GetInvalidItemException());
 
         protected override Converter<ShellObjectInfoItemProvider, IBrowsableObjectInfo> DefaultSelectorOverride => Convert;
 

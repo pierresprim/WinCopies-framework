@@ -27,12 +27,12 @@ namespace WinCopies.IO.ObjectModel.Reflection
         // Left empty.
     }
 
-    public interface IDotNetAttributeInfo<TObjectProperties,  TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : IDotNetItemInfo<TObjectProperties, CustomAttributeData, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IDotNetItemInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
+    public interface IDotNetAttributeInfo<TObjectProperties,  TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : IDotNetItemInfo<TObjectProperties, CustomAttributeData, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IDotNetItemInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
     {
         // Left empty.
     }
 
-    public interface IDotNetAttributeInfo : IDotNetAttributeInfoBase, IDotNetAttributeInfo<IDotNetItemInfoProperties,  object, IBrowsableObjectInfoSelectorDictionary<object>, object>
+    public interface IDotNetAttributeInfo : IDotNetAttributeInfoBase, IDotNetAttributeInfo<IDotNetItemInfoProperties,  object, IEnumerableSelectorDictionary<object, IBrowsableObjectInfo>, object>
     {
         // Left empty.
     }

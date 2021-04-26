@@ -31,12 +31,12 @@ namespace WinCopies.IO.ObjectModel.Reflection
         // Left empty.
     }
 
-    public interface IDotNetMemberInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : IDotNetMemberInfoBase, IDotNetItemInfo<TObjectProperties, MemberInfo, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IDotNetTypeOrMemberInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
+    public interface IDotNetMemberInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : IDotNetMemberInfoBase, IDotNetItemInfo<TObjectProperties, MemberInfo, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IDotNetTypeOrMemberInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
     {
         // Left empty.
     }
 
-    public interface IDotNetMemberInfo : IDotNetMemberInfo<IDotNetTypeOrMemberInfoProperties, DotNetMemberInfoItemProvider, IBrowsableObjectInfoSelectorDictionary<DotNetMemberInfoItemProvider>, DotNetMemberInfoItemProvider>
+    public interface IDotNetMemberInfo : IDotNetMemberInfo<IDotNetTypeOrMemberInfoProperties, DotNetMemberInfoItemProvider, IEnumerableSelectorDictionary<DotNetMemberInfoItemProvider, IBrowsableObjectInfo>, DotNetMemberInfoItemProvider>
     {
         IEnumerable<IBrowsableObjectInfo> GetItems(IEnumerable<DotNetItemType> enumerable, Predicate<DotNetMemberInfoItemProvider> func);
     }

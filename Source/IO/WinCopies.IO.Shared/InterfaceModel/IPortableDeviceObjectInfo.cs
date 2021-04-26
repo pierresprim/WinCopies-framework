@@ -32,12 +32,12 @@ namespace WinCopies.IO.ObjectModel
         // Left empty.
     }
 
-    public interface IPortableDeviceObjectInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : IPortableDeviceObjectInfoBase, IFileSystemObjectInfo<TObjectProperties, IPortableDeviceObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IFileSystemObjectInfoProperties where TSelectorDictionary:IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
+    public interface IPortableDeviceObjectInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : IPortableDeviceObjectInfoBase, IFileSystemObjectInfo<TObjectProperties, IPortableDeviceObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IFileSystemObjectInfoProperties where TSelectorDictionary:IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
     {
         // Left empty.
     }
 
-    public interface IPortableDeviceObjectInfo: IPortableDeviceObjectInfo<IFileSystemObjectInfoProperties, IPortableDeviceObject, IBrowsableObjectInfoSelectorDictionary<PortableDeviceObjectInfoItemProvider>, PortableDeviceObjectInfoItemProvider>
+    public interface IPortableDeviceObjectInfo: IPortableDeviceObjectInfo<IFileSystemObjectInfoProperties, IPortableDeviceObject, IEnumerableSelectorDictionary<PortableDeviceObjectInfoItemProvider, IBrowsableObjectInfo>, PortableDeviceObjectInfoItemProvider>
     {
         // Left empty.
     }

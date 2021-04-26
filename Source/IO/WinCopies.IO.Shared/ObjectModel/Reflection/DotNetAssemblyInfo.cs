@@ -26,6 +26,7 @@ using System.Security;
 using WinCopies.Collections;
 using WinCopies.IO.AbstractionInterop.Reflection;
 using WinCopies.IO.Enumeration.Reflection;
+using WinCopies.IO.Process;
 using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Reflection;
 using WinCopies.IO.Selectors;
@@ -45,7 +46,7 @@ namespace WinCopies.IO
 
 namespace WinCopies.IO.ObjectModel.Reflection
 {
-    public class DotNetAssemblyInfo : ShellObjectInfo<IFileSystemObjectInfoProperties2, DotNetNamespaceInfoItemProvider, IBrowsableObjectInfoSelectorDictionary<DotNetNamespaceInfoItemProvider>, DotNetNamespaceInfoItemProvider>, IDotNetAssemblyInfo // <IFileSystemObjectInfoProperties>
+    public class DotNetAssemblyInfo : ShellObjectInfo<IFileSystemObjectInfoProperties2, DotNetNamespaceInfoItemProvider, IEnumerableSelectorDictionary<DotNetNamespaceInfoItemProvider,IBrowsableObjectInfo>, DotNetNamespaceInfoItemProvider>, IDotNetAssemblyInfo // <IFileSystemObjectInfoProperties>
     {
         #region Properties
         //public override Predicate<DotNetNamespaceInfoItemProvider> RootItemsPredicate => item => !IsNullEmptyOrWhiteSpace(item.NamespaceName);
@@ -59,7 +60,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
             RegisterSelectors = () => { /* Left empty. */ };
         };
 
-        public override IProcessFactory ProcessFactory => IO.ProcessFactory.DefaultProcessFactory;
+        public override IProcessFactory ProcessFactory => Process.ProcessFactory.DefaultProcessFactory;
 
         public override IBrowsabilityOptions Browsability => BrowsabilityOptions.Browsable;
 
@@ -70,7 +71,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
         public override IFileSystemObjectInfoProperties2 ObjectPropertiesGeneric { get; }
         #endregion Properties
 
-        protected DotNetAssemblyInfo(in string path, in ShellObject shellObject, in ClientVersion clientVersion) : base(path, shellObject, null, clientVersion) => ObjectPropertiesGeneric = new FileShellObjectInfoProperties<IShellObjectInfoBase2>(this, FileType.File);
+        protected DotNetAssemblyInfo(in string path, in ShellObject shellObject, in ClientVersion clientVersion) : base(path, shellObject,  clientVersion) => ObjectPropertiesGeneric = new FileShellObjectInfoProperties<IShellObjectInfoBase2>(this, FileType.File);
 
         #region Methods
         public static DotNetAssemblyInfo From(in ShellObject shellObject, in ClientVersion clientVersion)
@@ -80,7 +81,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
             return initInfo.FileType == FileType.File ? initInfo.Path.EndsWithOR(Exe, Dll) ? new DotNetAssemblyInfo(initInfo.Path, shellObject, clientVersion) : throw new ArgumentException($"{nameof(shellObject)} must be an exe (.exe) or a dll (.dll).") : throw new ArgumentException($"{nameof(shellObject)} is not a file.");
         }
 
-        public override IBrowsableObjectInfoSelectorDictionary<DotNetNamespaceInfoItemProvider> GetSelectorDictionary() => DotNetNamespaceInfo.DefaultItemSelectorDictionary;
+        public override IEnumerableSelectorDictionary<DotNetNamespaceInfoItemProvider, IBrowsableObjectInfo> GetSelectorDictionary() => DotNetNamespaceInfo.DefaultItemSelectorDictionary;
 
         public void OpenAssembly()
         {

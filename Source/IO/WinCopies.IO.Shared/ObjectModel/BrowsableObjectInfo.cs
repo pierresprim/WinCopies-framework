@@ -30,12 +30,14 @@ using WinCopies.Collections.Generic;
 using WinCopies.GUI.Drawing;
 using WinCopies.IO.ObjectModel;
 using WinCopies.IO.ObjectModel.Reflection;
+using WinCopies.IO.Process;
 using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Selectors;
 using WinCopies.PropertySystem;
 
 using static WinCopies.ThrowHelper;
 using static WinCopies.Collections.Util;
+using WinCopies.IO.Process.ObjectModel;
 
 namespace WinCopies.IO
 {
@@ -52,6 +54,8 @@ namespace WinCopies.IO.ObjectModel
     /// </summary>
     public abstract class BrowsableObjectInfo : BrowsableObjectInfoBase, IBrowsableObjectInfo
     {
+        protected static void EmptyVoid() { /* Left empty. */ }
+
         #region Consts
         public const ushort SmallIconSize = 16;
         public const ushort MediumIconSize = 48;
@@ -64,24 +68,29 @@ namespace WinCopies.IO.ObjectModel
         #endregion
 
         #region Properties
+        public static ISelectorDictionary<ProcessFactorySelectorDictionaryParameters, IProcess> DefaultProcessSelectorDictionary { get; } = new ProcessFactorySelectorDictionary();
+
         public static Action RegisterDefaultSelectors { get; private set; } = () =>
         {
             DotNetAssemblyInfo.RegisterSelectors();
 
-            RegisterDefaultSelectors = () => { /* Left empty. */ };
+            RegisterDefaultSelectors = EmptyVoid;
         };
 
-        public abstract IProcessFactory ProcessFactory { get; }
+        public static Action RegisterDefaultProcessSelectors { get; private set; } = () =>
+          {
+              ShellObjectInfo.RegisterProcessSelectors();
 
-        public IProcessPathCollectionFactory ProcessPathCollectionFactory { get; }
+              RegisterDefaultProcessSelectors = EmptyVoid;
+          };
+
+        public abstract IProcessFactory ProcessFactory { get; }
 
         IBrowsableObjectInfo Collections.Generic.IRecursiveEnumerable<IBrowsableObjectInfo>.Value => this;
 
         public abstract object InnerObject { get; }
 
-#if WinCopies3
         public abstract IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystem { get; }
-#endif
 
         public abstract object ObjectProperties { get; }
 
@@ -135,12 +144,7 @@ namespace WinCopies.IO.ObjectModel
         /// </summary>
         /// <param name="path">The path of the new item.</param>
         /// <param name="clientVersion">The <see cref="Microsoft.WindowsAPICodePack.PortableDevices.ClientVersion"/> that will be used to initialize new <see cref="PortableDeviceInfo"/>s and <see cref="PortableDeviceObjectInfo"/>s.</param>
-        protected BrowsableObjectInfo(in string path, in IProcessPathCollectionFactory processPathCollectionFactory, in ClientVersion clientVersion) : base(path)
-        {
-            ProcessPathCollectionFactory = processPathCollectionFactory;
-
-            ClientVersion = clientVersion;
-        }
+        protected BrowsableObjectInfo(in string path, in ClientVersion clientVersion) : base(path) => ClientVersion = clientVersion;
         #endregion
 
         #region Methods
@@ -174,7 +178,7 @@ namespace WinCopies.IO.ObjectModel
             )
 #endif
 
-                return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+            return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
         }
 
         System.Collections.Generic.IEnumerator<Collections.Generic.IRecursiveEnumerable<IBrowsableObjectInfo>> IRecursiveEnumerableProviderEnumerable<IBrowsableObjectInfo>.GetRecursiveEnumerator() => GetItems().GetEnumerator();
@@ -264,11 +268,11 @@ namespace WinCopies.IO.ObjectModel
         /// </summary>
         /// <param name="path">The path of the new item.</param>
         /// <param name="clientVersion">The <see cref="ClientVersion"/> that will be used to initialize new <see cref="PortableDeviceInfo"/>s and <see cref="PortableDeviceObjectInfo"/>s.</param>
-        protected BrowsableObjectInfo(in string path, in IProcessPathCollectionFactory processPathCollectionFactory, in ClientVersion clientVersion) : base(path, processPathCollectionFactory, clientVersion) { /* Left empty. */ }
+        protected BrowsableObjectInfo(in string path, in ClientVersion clientVersion) : base(path, clientVersion) { /* Left empty. */ }
         #endregion
     }
 
-    public abstract class BrowsableObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : BrowsableObjectInfo<TObjectProperties>, IBrowsableObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
+    public abstract class BrowsableObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : BrowsableObjectInfo<TObjectProperties>, IBrowsableObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
     {
         #region Properties
         public abstract TInnerObject InnerObjectGeneric { get; }
@@ -285,7 +289,7 @@ namespace WinCopies.IO.ObjectModel
         /// </summary>
         /// <param name="path">The path of the new <see cref="BrowsableObjectInfo{TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/>.</param>
         /// <param name="clientVersion">A custom <see cref="ClientVersion"/>. This parameter can be null for non-file system and portable devices-related types.</param>
-        protected BrowsableObjectInfo(in string path, in IProcessPathCollectionFactory processPathCollectionFactory, in ClientVersion clientVersion) : base(path, processPathCollectionFactory, clientVersion) { /* Left empty. */ }
+        protected BrowsableObjectInfo(in string path, in ClientVersion clientVersion) : base(path, clientVersion) { /* Left empty. */ }
 
         public abstract TSelectorDictionary GetSelectorDictionary();
 
@@ -297,16 +301,7 @@ namespace WinCopies.IO.ObjectModel
 
         protected abstract System.Collections.Generic.IEnumerable<TDictionaryItems> GetItemProviders(Predicate<TPredicateTypeParameter> predicate);
 
-        public System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<TPredicateTypeParameter> predicate)
-        {
-            if (predicate == null)
-
-                return GetItems(GetItemProviders(item => true));
-
-            else
-
-                return GetItems(GetItemProviders(predicate));
-        }
+        public System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<TPredicateTypeParameter> predicate) => predicate == null ? GetItems(GetItemProviders(item => true)) : GetItems(GetItemProviders(predicate));
 
         protected System.Collections.Generic.IEnumerable<TDictionaryItems> GetEmptyEnumerable() => GetEmptyEnumerable<TDictionaryItems>();
     }

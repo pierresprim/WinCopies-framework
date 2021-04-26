@@ -19,7 +19,9 @@ namespace WinCopies.IO.Process.ObjectModel
 {
     public interface IProcess : IPropertyObservable
     {
-        IProcessErrorFactory Factory { get; }
+        string Guid { get; }
+
+        IProcessErrorFactoryBase Factory { get; }
 
         IProcessEventDelegates ProcessEventDelegates { get; }
 
@@ -27,7 +29,7 @@ namespace WinCopies.IO.Process.ObjectModel
 
         IPathCommon SourcePath { get; }
 
-        ProcessTypes<IPathInfo>.IProcessCollection Paths { get; }
+        ProcessTypes<IPathInfo>.IProcessQueue Paths { get; }
 
         // todo: IQueue InitialPaths { get; }
 
@@ -37,7 +39,7 @@ namespace WinCopies.IO.Process.ObjectModel
 
         IProcessErrorFactoryData ProcessErrorFactoryData { get; }
 
-        ProcessTypes<IProcessErrorItem>.IProcessCollection ErrorPaths { get; }
+        ProcessTypes<IProcessErrorItem>.IProcessQueue ErrorPaths { get; }
 
         Size InitialTotalSize { get; }
 

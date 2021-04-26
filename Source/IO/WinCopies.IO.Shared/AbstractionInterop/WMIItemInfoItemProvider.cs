@@ -16,6 +16,7 @@
 * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using Microsoft.WindowsAPICodePack.PortableDevices;
+
 using System.Management;
 
 using WinCopies.IO.PropertySystem;
@@ -34,11 +35,9 @@ namespace WinCopies.IO.AbstractionInterop
 
         public IWMIItemInfoOptions Options { get; }
 
-        public IProcessPathCollectionFactory ShellProcessPathCollectionFactory { get; }
-
         public ClientVersion ClientVersion { get; }
 
-        public WMIItemInfoItemProvider(in string path, in ManagementBaseObject managementObject, in WMIItemType itemType, in IWMIItemInfoOptions options, in IProcessPathCollectionFactory shellProcessPathCollectionFactory, in ClientVersion clientVersion)
+        public WMIItemInfoItemProvider(in string path, in ManagementBaseObject managementObject, in WMIItemType itemType, in IWMIItemInfoOptions options, in ClientVersion clientVersion)
         {
             Path = path;
 

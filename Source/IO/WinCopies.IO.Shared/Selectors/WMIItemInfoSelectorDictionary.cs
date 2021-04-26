@@ -25,11 +25,11 @@ using static WinCopies.ThrowHelper;
 
 namespace WinCopies.IO.Selectors
 {
-    public class WMIItemInfoSelectorDictionary : BrowsableObjectInfoSelectorDictionary<WMIItemInfoItemProvider>
+    public class WMIItemInfoSelectorDictionary : EnumerableSelectorDictionary<WMIItemInfoItemProvider, IBrowsableObjectInfo>
     {
         public static IBrowsableObjectInfo Convert(WMIItemInfoItemProvider item) => IsNullEmptyOrWhiteSpace((item ?? throw GetArgumentNullException(nameof(item))).Path)
-            ? new WMIItemInfo(item.ItemType, item.ManagementObject, item.Options, item.ShellProcessPathCollectionFactory, item.ClientVersion)
-            : new WMIItemInfo(item.Path, item.ItemType, item.ManagementObject, item.Options, item.ShellProcessPathCollectionFactory, item.ClientVersion);
+            ? new WMIItemInfo(item.ItemType, item.ManagementObject, item.Options, item.ClientVersion)
+            : new WMIItemInfo(item.Path, item.ItemType, item.ManagementObject, item.Options, item.ClientVersion);
 
         protected override Converter<WMIItemInfoItemProvider, IBrowsableObjectInfo> DefaultSelectorOverride => Convert;
 

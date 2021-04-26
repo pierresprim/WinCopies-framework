@@ -29,6 +29,7 @@ using System.Windows.Media.Imaging;
 using WinCopies.Collections.Generic;
 using WinCopies.IO;
 using WinCopies.IO.ObjectModel;
+using WinCopies.IO.Process;
 using WinCopies.IO.PropertySystem;
 using WinCopies.PropertySystem;
 using WinCopies.Util.Data;
@@ -68,8 +69,6 @@ namespace WinCopies.GUI.IO.ObjectModel
         //public static Predicate<IBrowsableObjectInfo> Predicate { get; } = browsableObjectInfo => browsableObjectInfo.IsBrowsable;
 
         public IProcessFactory ProcessFactory => ModelGeneric.ProcessFactory;
-
-        public IProcessPathCollectionFactory ProcessPathCollectionFactory => ModelGeneric.ProcessPathCollectionFactory;
 
         public bool RootParentIsRootNode { get; }
 

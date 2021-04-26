@@ -28,6 +28,7 @@ using WinCopies.Collections.Generic;
 using WinCopies.Extensions;
 using WinCopies.IO.AbstractionInterop;
 using WinCopies.IO.Enumeration;
+using WinCopies.IO.Process;
 using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Selectors;
 using WinCopies.PropertySystem;
@@ -45,7 +46,7 @@ namespace WinCopies.IO.ObjectModel
     /// <summary>
     /// Represents an archive item.
     /// </summary>
-    public abstract class ArchiveItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : ArchiveItemInfoProvider<TObjectProperties, ArchiveFileInfo?, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IArchiveItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IFileSystemObjectInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
+    public abstract class ArchiveItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : ArchiveItemInfoProvider<TObjectProperties, ArchiveFileInfo?, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IArchiveItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IFileSystemObjectInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
     {
         #region Private fields
         private ArchiveFileInfo? _innerObject;
@@ -57,7 +58,7 @@ namespace WinCopies.IO.ObjectModel
         //IShellObjectInfo IArchiveItemInfoProvider.ArchiveShellObject => ArchiveShellObjectOverride;
 
         #region Overrides
-        public override IProcessFactory ProcessFactory => IO.ProcessFactory.DefaultProcessFactory;
+        public override IProcessFactory ProcessFactory => Process.ProcessFactory.DefaultProcessFactory;
 
         /// <summary>
         /// The <see cref="ArchiveFileInfo"/> that this <see cref="ArchiveItemInfo"/> represents.
@@ -183,7 +184,7 @@ namespace WinCopies.IO.ObjectModel
         #endregion // Overrides
         #endregion // Properties
 
-        protected ArchiveItemInfo(in string path, in IShellObjectInfoBase archiveShellObject, in ArchiveFileInfo? archiveFileInfo, in ClientVersion clientVersion/*, DeepClone<ArchiveFileInfo?> archiveFileInfoDelegate*/) : base(path, null, clientVersion)
+        protected ArchiveItemInfo(in string path, in IShellObjectInfoBase archiveShellObject, in ArchiveFileInfo? archiveFileInfo, in ClientVersion clientVersion/*, DeepClone<ArchiveFileInfo?> archiveFileInfoDelegate*/) : base(path,  clientVersion)
         {
             ArchiveShellObject = archiveShellObject;
 
@@ -218,12 +219,12 @@ namespace WinCopies.IO.ObjectModel
         #endregion // Methods
     }
 
-    public class ArchiveItemInfo : ArchiveItemInfo<IFileSystemObjectInfoProperties, ArchiveFileInfoEnumeratorStruct, IBrowsableObjectInfoSelectorDictionary<ArchiveItemInfoItemProvider>, ArchiveItemInfoItemProvider>, IArchiveItemInfo
+    public class ArchiveItemInfo : ArchiveItemInfo<IFileSystemObjectInfoProperties, ArchiveFileInfoEnumeratorStruct, IEnumerableSelectorDictionary<ArchiveItemInfoItemProvider, IBrowsableObjectInfo>, ArchiveItemInfoItemProvider>, IArchiveItemInfo
     {
         private IFileSystemObjectInfoProperties _objectProperties;
 
         #region Properties
-        public static IBrowsableObjectInfoSelectorDictionary<ArchiveItemInfoItemProvider> DefaultItemSelectorDictionary { get; } = new ArchiveItemInfoSelectorDictionary();
+        public static IEnumerableSelectorDictionary<ArchiveItemInfoItemProvider, IBrowsableObjectInfo> DefaultItemSelectorDictionary { get; } = new ArchiveItemInfoSelectorDictionary();
 
         public sealed override IFileSystemObjectInfoProperties ObjectPropertiesGeneric => IsDisposed ? throw GetExceptionForDispose(false) : _objectProperties;
 
@@ -271,7 +272,7 @@ namespace WinCopies.IO.ObjectModel
         }
         #endregion
 
-        public override IBrowsableObjectInfoSelectorDictionary<ArchiveItemInfoItemProvider> GetSelectorDictionary() => DefaultItemSelectorDictionary;
+        public override IEnumerableSelectorDictionary<ArchiveItemInfoItemProvider, IBrowsableObjectInfo> GetSelectorDictionary() => DefaultItemSelectorDictionary;
 
         protected override void DisposeManaged()
         {

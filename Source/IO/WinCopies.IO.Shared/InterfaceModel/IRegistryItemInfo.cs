@@ -30,12 +30,12 @@ namespace WinCopies.IO.ObjectModel
         // Left empty.
     }
 
-    public interface IRegistryItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : IRegistryItemInfoBase, IBrowsableObjectInfo<TObjectProperties, RegistryKey, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IRegistryItemInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
+    public interface IRegistryItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : IRegistryItemInfoBase, IBrowsableObjectInfo<TObjectProperties, RegistryKey, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IRegistryItemInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
     {
         // Left empty.
     }
 
-    public interface IRegistryItemInfo : IRegistryItemInfo<IRegistryItemInfoProperties, RegistryItemInfoItemProvider, IBrowsableObjectInfoSelectorDictionary<RegistryItemInfoItemProvider>, RegistryItemInfoItemProvider>
+    public interface IRegistryItemInfo : IRegistryItemInfo<IRegistryItemInfoProperties, RegistryItemInfoItemProvider, IEnumerableSelectorDictionary<RegistryItemInfoItemProvider, IBrowsableObjectInfo>, RegistryItemInfoItemProvider>
     {
         System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<RegistryItemInfoItemProvider> predicate);
     }

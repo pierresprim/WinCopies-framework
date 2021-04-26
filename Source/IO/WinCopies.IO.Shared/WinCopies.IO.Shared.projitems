@@ -37,13 +37,13 @@
     <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\Reflection\IDotNetTypeInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enumeration\ArchiveItemInfoEnumerator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enumeration\WMIItemInfoEnumerator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\BrowsableObjectInfoProcessFactoryDictionary.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ObjectModel\Copy.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\Errors.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ObjectModel\IProcess.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ObjectModel\Interfaces.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\IProcessError.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ObjectModel\Process.Partial\LinkedLists.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Process\ObjectModel\Process.Partial\Parameters.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ObjectModel\Process.Partial\Process.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessError.cs" />
@@ -120,7 +120,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\RegistryItemInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\ShellObjectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enumeration\ShellObjectInfoEnumeratorStruct.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Selectors\BrowsableObjectInfoSelectorDictionary.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Selectors\ArchiveItemInfoSelectorDictionary.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Selectors\RegistryItemInfoSelectorDictionary.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Selectors\ShellObjectInfoSelectorDictionary.cs" />

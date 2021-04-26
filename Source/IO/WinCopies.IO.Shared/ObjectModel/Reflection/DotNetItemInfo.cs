@@ -29,7 +29,7 @@ using static WinCopies.IO.Resources.ExceptionMessages;
 
 namespace WinCopies.IO.ObjectModel.Reflection
 {
-    public abstract class DotNetItemInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : BrowsableObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IDotNetItemInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IDotNetItemInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
+    public abstract class DotNetItemInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : BrowsableObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IDotNetItemInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IDotNetItemInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
     {
         private static System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> _defaultRootItems;
 
@@ -40,7 +40,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
 #else
             ?? (_defaultRootItems =
 #endif
-            FileSystemObjectInfo.GetRootItems(null)
+            FileSystemObjectInfo.GetRootItems()
 #if !CS8
             )
 #endif
@@ -134,7 +134,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
         #endregion
         #endregion
 
-        protected DotNetItemInfo(in string path, in string name, in IBrowsableObjectInfo parent) : base(path, null, parent.ClientVersion)
+        protected DotNetItemInfo(in string path, in string name, in IBrowsableObjectInfo parent) : base(path, parent.ClientVersion)
         {
             Debug.Assert(!(IsNullEmptyOrWhiteSpace(Path) || IsNullEmptyOrWhiteSpace(name)));
 
@@ -152,7 +152,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
         public override IEnumerable<IBrowsableObjectInfo> GetSubRootItems() => null;
     }
 
-    public abstract class BrowsableDotNetItemInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : DotNetItemInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IDotNetItemInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
+    public abstract class BrowsableDotNetItemInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : DotNetItemInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IDotNetItemInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
     {
         public sealed override IBrowsabilityOptions Browsability => BrowsabilityOptions.BrowsableByDefault;
 

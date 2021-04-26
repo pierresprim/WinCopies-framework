@@ -20,9 +20,9 @@ using System.Linq;
 using System.Reflection;
 
 using WinCopies.IO.AbstractionInterop.Reflection;
+using WinCopies.IO.Process;
 using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Reflection.PropertySystem;
-using WinCopies.IO.Selectors;
 using WinCopies.Linq;
 using WinCopies.PropertySystem;
 
@@ -30,10 +30,10 @@ using static WinCopies.ThrowHelper;
 
 namespace WinCopies.IO.ObjectModel.Reflection
 {
-    public abstract class DotNetParameterInfo<TObjectProperties, TSelectorDictionary> : BrowsableDotNetItemInfo<TObjectProperties, ParameterInfo, CustomAttributeData, TSelectorDictionary, DotNetParameterInfoItemProvider>, IDotNetParameterInfo<TObjectProperties, TSelectorDictionary> where TObjectProperties : IDotNetParameterInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<DotNetParameterInfoItemProvider>
+    public abstract class DotNetParameterInfo<TObjectProperties, TSelectorDictionary> : BrowsableDotNetItemInfo<TObjectProperties, ParameterInfo, CustomAttributeData, TSelectorDictionary, DotNetParameterInfoItemProvider>, IDotNetParameterInfo<TObjectProperties, TSelectorDictionary> where TObjectProperties : IDotNetParameterInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<DotNetParameterInfoItemProvider, IBrowsableObjectInfo>
     {
         #region Properties
-        public override IProcessFactory ProcessFactory => IO.ProcessFactory.DefaultProcessFactory;
+        public override IProcessFactory ProcessFactory => Process.ProcessFactory.DefaultProcessFactory;
 
         public override string ItemTypeName => Properties.Resources.DotNetParameter;
 
@@ -46,7 +46,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
         internal DotNetParameterInfo(in ParameterInfo parameterInfo, in IDotNetItemInfo parent) : base($"{(parent ?? throw GetArgumentNullException(nameof(parent))).Path}{WinCopies.IO.Path.PathSeparator}{(parameterInfo ?? throw GetArgumentNullException(nameof(parameterInfo))).Name}", parameterInfo.Name, parent) => InnerObjectGeneric = parameterInfo;
     }
 
-    public class DotNetParameterInfo : DotNetParameterInfo<IDotNetParameterInfoProperties, IBrowsableObjectInfoSelectorDictionary<DotNetParameterInfoItemProvider>>, IDotNetParameterInfo
+    public class DotNetParameterInfo : DotNetParameterInfo<IDotNetParameterInfoProperties, IEnumerableSelectorDictionary<DotNetParameterInfoItemProvider, IBrowsableObjectInfo>>, IDotNetParameterInfo
     {
         #region Properties
         public sealed override IDotNetParameterInfoProperties ObjectPropertiesGeneric { get; }
@@ -61,7 +61,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
 
         protected override System.Collections.Generic.IEnumerable<DotNetParameterInfoItemProvider> GetItemProviders() => GetItemProviders(null);
 
-        public override IBrowsableObjectInfoSelectorDictionary<DotNetParameterInfoItemProvider> GetSelectorDictionary() => null;
+        public override IEnumerableSelectorDictionary<DotNetParameterInfoItemProvider, IBrowsableObjectInfo> GetSelectorDictionary() => null;
         #endregion Methods
     }
 }

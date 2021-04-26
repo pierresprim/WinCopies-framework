@@ -43,9 +43,9 @@ namespace WinCopies.GUI.IO.Controls.Process
     /// </summary>
     public class ProcessControl : HeaderedControl
     {
-        public static readonly DependencyProperty PathsProperty = DependencyProperty.Register(nameof(Paths), typeof(ProcessTypes<IPathInfo>.IProcessCollection), typeof(ProcessControl));
+        public static readonly DependencyProperty PathsProperty = DependencyProperty.Register(nameof(Paths), typeof(ProcessTypes<IPathInfo>.IProcessQueue), typeof(ProcessControl));
 
-        ProcessTypes<IPathInfo>.IProcessCollection Paths { get => (ProcessTypes<IPathInfo>.IProcessCollection)GetValue(PathsProperty); set => SetValue(PathsProperty, value); }
+        ProcessTypes<IPathInfo>.IProcessQueue Paths { get => (ProcessTypes<IPathInfo>.IProcessQueue)GetValue(PathsProperty); set => SetValue(PathsProperty, value); }
 
         // todo: IQueue InitialPaths { get; }
 
@@ -57,9 +57,9 @@ namespace WinCopies.GUI.IO.Controls.Process
 
         public IProcessError Error { get => (IProcessError)GetValue(ErrorProperty); set => SetValue(ErrorProperty, value); }
 
-        public static readonly DependencyProperty ErrorPathsProperty = DependencyProperty.Register(nameof(ErrorPaths), typeof(ProcessTypes<IProcessErrorItem>.IProcessCollection), typeof(ProcessControl));
+        public static readonly DependencyProperty ErrorPathsProperty = DependencyProperty.Register(nameof(ErrorPaths), typeof(ProcessTypes<IProcessErrorItem>.IProcessQueue), typeof(ProcessControl));
 
-        public ProcessTypes<IProcessErrorItem>.IProcessCollection ErrorPaths { get => (ProcessTypes<IProcessErrorItem>.IProcessCollection)GetValue(ErrorPathsProperty); set => SetValue(ErrorPathsProperty, value); }
+        public ProcessTypes<IProcessErrorItem>.IProcessQueue ErrorPaths { get => (ProcessTypes<IProcessErrorItem>.IProcessQueue)GetValue(ErrorPathsProperty); set => SetValue(ErrorPathsProperty, value); }
 
         public static readonly DependencyProperty InitialTotalSizeProperty = DependencyProperty.Register(nameof(InitialTotalSize), typeof(Size), typeof(ProcessControl));
 

@@ -9,18 +9,14 @@
     <Import_RootNamespace>WinCopies.GUI.IO</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Page Include="$(MSBuildThisFileDirectory)Themes\Generic.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AssemblyInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\ExplorerControlPropertyGrid.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\Process\ProcessWindow.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\BrowsableObjectInfoViewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\DuplicateFindingOptions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessCollections\ProcessCollections.Partial\EnumerableInfoLinkedCollections.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessCollections\IProcessCollections.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessCollections\ProcessCollections.Partial\ProcessCollections.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessCollections\ProcessLinkedCollections.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessCollections\ProcessQueueCollections.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessCollections\PathInfoPathCollection.cs" />
@@ -30,6 +26,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\ProcessHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\PathInfoPathToPathProcess.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\ArchiveProcess.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessPathCollectionFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessSimulationParameters\CopyProcessSimulationParameters.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\ExplorerControl.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\ExplorerControlListView.cs" />
@@ -53,9 +50,11 @@
     <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\Process.old.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\Process\ProcessControl.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\Recycling.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SourcePathConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Temp.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Process\ProcessCollections\ProcessCollections.Partial\" />
     <Folder Include="$(MSBuildThisFileDirectory)Process\ProcessSimulationParameters\" />
   </ItemGroup>
 </Project>

@@ -117,8 +117,8 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AbortedByUser" xml:space="preserve">
-    <value>The operation was aborted by user.</value>
+  <data name="CancelledByUser" xml:space="preserve">
+    <value>The operation was cancelled by user.</value>
   </data>
   <data name="Destination" xml:space="preserve">
     <value>destination</value>
@@ -140,9 +140,6 @@
   </data>
   <data name="GivenItemInnerObjectIsNotFromSupportedType" xml:space="preserve">
     <value>The given item's inner object is not a(n) {0}.</value>
-  </data>
-  <data name="ItemProviderNotSupported" xml:space="preserve">
-    <value>The given item provider or its current configuration is not supported.</value>
   </data>
   <data name="NoError" xml:space="preserve">
     <value>Process completed successfully.</value>

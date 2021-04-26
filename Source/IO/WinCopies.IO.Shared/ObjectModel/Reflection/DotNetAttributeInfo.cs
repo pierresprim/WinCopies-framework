@@ -21,10 +21,11 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Windows.Media.Imaging;
 
-using WinCopies.IO.Reflection;
-using WinCopies.IO.Selectors;
-using WinCopies.IO.Reflection.PropertySystem;
+using WinCopies.IO.Process;
 using WinCopies.IO.PropertySystem;
+using WinCopies.IO.Reflection;
+using WinCopies.IO.Reflection.PropertySystem;
+using WinCopies.IO.Selectors;
 using WinCopies.PropertySystem;
 
 #if DEBUG
@@ -35,12 +36,12 @@ using static WinCopies.Diagnostics.IfHelpers;
 
 namespace WinCopies.IO.ObjectModel.Reflection
 {
-    public abstract class DotNetAttributeInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : DotNetItemInfo<TObjectProperties, CustomAttributeData, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IDotNetAttributeInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IDotNetItemInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
+    public abstract class DotNetAttributeInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : DotNetItemInfo<TObjectProperties, CustomAttributeData, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IDotNetAttributeInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IDotNetItemInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
     {
         #region Properties
         public sealed override CustomAttributeData InnerObjectGeneric { get; }
 
-        public override IProcessFactory ProcessFactory => IO.ProcessFactory.DefaultProcessFactory;
+        public override IProcessFactory ProcessFactory => Process.ProcessFactory.DefaultProcessFactory;
 
         public override IBrowsabilityOptions Browsability => BrowsabilityOptions.NotBrowsable;
 
@@ -50,7 +51,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
         protected DotNetAttributeInfo(in CustomAttributeData customAttributeData, in IDotNetItemInfo parent) : base($"{parent.Path}{IO.Path.PathSeparator}{customAttributeData.AttributeType.Name}", customAttributeData.AttributeType.Name, parent)
 #if DEBUG
         {
-            Debug.Assert(If(ComparisonType.And, ComparisonMode.Logical, WinCopies.Diagnostics.Comparison.NotEqual, null, parent, parent.ParentDotNetAssemblyInfo, customAttributeData));
+            Debug.Assert(If(ComparisonType.And, ComparisonMode.Logical, Comparison.NotEqual, null, parent, parent.ParentDotNetAssemblyInfo, customAttributeData));
 #else
 =>
 #endif
@@ -63,7 +64,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
         protected sealed override BitmapSource TryGetBitmapSource(in int size) => TryGetBitmapSource(FileIcon, Microsoft.WindowsAPICodePack.NativeAPI.Consts.DllNames.Shell32, size);
     }
 
-    public class DotNetAttributeInfo : DotNetAttributeInfo<IDotNetItemInfoProperties, object, IBrowsableObjectInfoSelectorDictionary<object>, object>
+    public class DotNetAttributeInfo : DotNetAttributeInfo<IDotNetItemInfoProperties, object, IEnumerableSelectorDictionary<object, IBrowsableObjectInfo>, object>
     {
         #region Properties
         public override IDotNetItemInfoProperties ObjectPropertiesGeneric { get; }
@@ -89,6 +90,6 @@ namespace WinCopies.IO.ObjectModel.Reflection
         /// Returns <see langword="null"/> as this item does not contain any item.
         /// </summary>
         /// <returns>A <see langword="null"/> value.</returns>
-        public override IBrowsableObjectInfoSelectorDictionary<object> GetSelectorDictionary() => null;
+        public override IEnumerableSelectorDictionary<object, IBrowsableObjectInfo> GetSelectorDictionary() => null;
     }
 }

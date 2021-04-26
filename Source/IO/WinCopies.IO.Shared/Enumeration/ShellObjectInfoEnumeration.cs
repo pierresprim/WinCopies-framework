@@ -29,6 +29,7 @@ using WinCopies.IO.ObjectModel;
 
 using static Microsoft.WindowsAPICodePack.Shell.KnownFolders;
 using WinCopies.Linq;
+using WinCopies.IO.Process;
 
 #if WinCopies3
 using WinCopies.Collections.Generic;
@@ -53,7 +54,7 @@ namespace WinCopies.IO.Enumeration
 
             shellObjects = (System.Collections.Generic.IEnumerable<ShellObject>)shellObjectInfo.InnerObjectGeneric;
 
-            System.Collections.Generic.IEnumerable<ShellObjectInfoItemProvider> getShellObjects(in System.Collections.Generic.IEnumerable<IPortableDevice> _portableDevices) => GetShellObjects(shellObjects, _portableDevices, shellObjectInfo.ProcessPathCollectionFactory, shellObjectInfo.ClientVersion, func);
+            System.Collections.Generic.IEnumerable<ShellObjectInfoItemProvider> getShellObjects(in System.Collections.Generic.IEnumerable<IPortableDevice> _portableDevices) => GetShellObjects(shellObjects, _portableDevices,  shellObjectInfo.ClientVersion, func);
 
             if (shellObjectInfo.InnerObjectGeneric.ParsingName == Computer.ParsingName)
             {
@@ -69,12 +70,12 @@ namespace WinCopies.IO.Enumeration
                 /*else*/
                 //;
 
-                ShellObjectInfoItemProvider getNewShellObjectInfoItemProvider(in NonShellObjectRootItemType nonShellObjectRootItemType) => new ShellObjectInfoItemProvider(nonShellObjectRootItemType, shellObjectInfo.ProcessPathCollectionFactory, shellObjectInfo.ClientVersion);
+                ShellObjectInfoItemProvider getNewShellObjectInfoItemProvider(in NonShellObjectRootItemType nonShellObjectRootItemType) => new ShellObjectInfoItemProvider(nonShellObjectRootItemType,  shellObjectInfo.ClientVersion);
 
                 return (portableDevices == null
                         ? getShellObjects(null)
-                        : getShellObjects(portableDevices).AppendValues(GetPortableDevices(portableDevices, shellObjects, shellObjectInfo.ProcessPathCollectionFactory, shellObjectInfo.ClientVersion, func)))
-                        .AppendValues(new ShellObjectInfoItemProvider(ShellObjectFactory.Create(RecycleBin.ParsingName), shellObjectInfo.ProcessPathCollectionFactory, shellObjectInfo.ClientVersion),
+                        : getShellObjects(portableDevices).AppendValues(GetPortableDevices(portableDevices, shellObjects,  shellObjectInfo.ClientVersion, func)))
+                        .AppendValues(new ShellObjectInfoItemProvider(ShellObjectFactory.Create(RecycleBin.ParsingName),  shellObjectInfo.ClientVersion),
                         getNewShellObjectInfoItemProvider(NonShellObjectRootItemType.Registry),
                         getNewShellObjectInfoItemProvider(NonShellObjectRootItemType.WMI));
             }
@@ -82,7 +83,7 @@ namespace WinCopies.IO.Enumeration
             else return getShellObjects(null);
         }
 
-        private static System.Collections.Generic.IEnumerable<ShellObjectInfoItemProvider> GetShellObjects(in System.Collections.Generic.IEnumerable<ShellObject> shellObjects, System.Collections.Generic.IEnumerable<IPortableDevice> portableDevices, IProcessPathCollectionFactory processPathCollectionFactory, ClientVersion clientVersion, Predicate<ShellObjectInfoEnumeratorStruct> func) => shellObjects.Where(item =>
+        private static System.Collections.Generic.IEnumerable<ShellObjectInfoItemProvider> GetShellObjects(in System.Collections.Generic.IEnumerable<ShellObject> shellObjects, System.Collections.Generic.IEnumerable<IPortableDevice> portableDevices,  ClientVersion clientVersion, Predicate<ShellObjectInfoEnumeratorStruct> func) => shellObjects.Where(item =>
        {
            if (portableDevices != null)
 
@@ -94,7 +95,7 @@ namespace WinCopies.IO.Enumeration
 
            return func(new ShellObjectInfoEnumeratorStruct(item));
 
-       }).Select(shellObject => new ShellObjectInfoItemProvider(shellObject, processPathCollectionFactory, clientVersion));
+       }).Select(shellObject => new ShellObjectInfoItemProvider(shellObject,  clientVersion));
 
         private static bool PortableDevicePredicate(in IPortableDevice portableDevice, in ClientVersion clientVersion, in Predicate<ShellObjectInfoEnumeratorStruct> func)
         {
@@ -152,7 +153,7 @@ namespace WinCopies.IO.Enumeration
             }
         }
 
-        private static System.Collections.Generic.IEnumerable<ShellObjectInfoItemProvider> GetPortableDevices(in System.Collections.Generic.IEnumerable<IPortableDevice> portableDevices, System.Collections.Generic.IEnumerable<ShellObject> shellObjects, IProcessPathCollectionFactory processPathCollectionFactory, ClientVersion clientVersion, Predicate<ShellObjectInfoEnumeratorStruct> func) => portableDevices.Where(item =>
+        private static System.Collections.Generic.IEnumerable<ShellObjectInfoItemProvider> GetPortableDevices(in System.Collections.Generic.IEnumerable<IPortableDevice> portableDevices, System.Collections.Generic.IEnumerable<ShellObject> shellObjects,  ClientVersion clientVersion, Predicate<ShellObjectInfoEnumeratorStruct> func) => portableDevices.Where(item =>
 {
     if (shellObjects != null)
     {
@@ -167,6 +168,6 @@ namespace WinCopies.IO.Enumeration
 
     return PortableDevicePredicate(item, clientVersion, func);
 
-}).Select(portableDevice => new ShellObjectInfoItemProvider(portableDevice, processPathCollectionFactory, clientVersion));
+}).Select(portableDevice => new ShellObjectInfoItemProvider(portableDevice,  clientVersion));
     }
 }

@@ -25,18 +25,144 @@ using static WinCopies.Collections.ThrowHelper;
 
 namespace WinCopies.IO.Process
 {
-    public static partial class ProcessTypes<T> where T : IPath
+    public sealed class DefaultProcessPathCollectionFactory : IProcessPathCollectionFactory
     {
-        public interface IProcessCollection : IQueue<T>
+        ProcessTypes<T>.IProcessQueue IProcessPathCollectionFactory.GetProcessCollection<T>() => new ProcessTypes<T>.ProcessCollection();
+
+        WinCopies.IO.Process.IProcessLinkedList<TItems, TError> IProcessPathCollectionFactory.GetProcessLinkedList<TItems, TError>() => new ProcessLinkedCollection<TItems, TError>();
+    }
+
+    public interface IProcessQueue
+    {
+        Size TotalSize { get; }
+    }
+
+    public class ProcessQueueSizeHelper
+    {
+        public Size TotalSize { get; private set; } = GetNewSize();
+
+        private static Size GetNewSize() => new Size(0ul);
+
+        public void OnClearItems() => TotalSize = GetNewSize();
+
+        public void OnEnqueueItem(in IPath item)
         {
-            Size TotalSize { get; }
+            if (item.Size.HasValue)
+
+                TotalSize += item.Size.Value;
         }
 
-        public class ProcessCollection : IProcessCollection
+        public void OnDequeueItem(in IPath item)
         {
-            protected IQueue<T> InnerQueue { get; }
+            if (item.Size.HasValue)
 
+                TotalSize -= item.Size.Value;
+        }
+    }
+
+    public static partial class ProcessTypes<T> where T : IPath
+    {
+        public interface IProcessQueue : Process.IProcessQueue, IQueue<T>
+        {
+            IProcessQueue AsReadOnly();
+        }
+
+        public class ProcessQueue : QueueCollection<T>, IProcessQueue
+        {
+            private readonly ProcessQueueSizeHelper _totalSize = new ProcessQueueSizeHelper();
+
+            public Size TotalSize => _totalSize.TotalSize;
+
+            protected override void EnqueueItem(T item)
+            {
+                base.EnqueueItem(item);
+
+                _totalSize.OnEnqueueItem(item);
+            }
+
+            protected override T DequeueItem()
+            {
+                T result = base.DequeueItem();
+
+                _totalSize.OnDequeueItem(result);
+
+                return result;
+            }
+
+            protected override void ClearItems()
+            {
+                base.ClearItems();
+
+                _totalSize.OnClearItems();
+            }
+
+            public IProcessQueue AsReadOnly() => new ReadOnlyProcessQueue(this);
+        }
+
+        public class ReadOnlyProcessQueue : ReadOnlyQueue
+#if WinCopies4
+<IProcessQueue, T>
+#else
+            <T>
+#endif
+            , IProcessQueue
+        {
+            public Size TotalSize { get; }
+
+            public ReadOnlyProcessQueue(IProcessQueue processQueue) : base(processQueue)
+            {
+                // Left empty.
+            }
+
+            IProcessQueue IProcessQueue.AsReadOnly() => this;
+        }
+
+        public class ProcessCollection : QueueCollection<IProcessQueue, T>, IProcessQueue
+        {
             public Size TotalSize { get; private set; }
+
+            public ProcessCollection() : this(new ProcessQueue()) { }
+
+            public ProcessCollection(in IProcessQueue queue) : base(queue.IsReadOnly ? throw new ArgumentException($"{nameof(queue)} must be non-read-only.", nameof(queue)) : queue)
+            {
+                // Left empty.
+            }
+
+            protected override void ClearItems()
+            {
+                base.ClearItems();
+
+                TotalSize = new Size();
+            }
+
+            protected override T DequeueItem()
+            {
+                T result = base.DequeueItem();
+
+                if (result.Size.HasValue)
+
+                    TotalSize -= result.Size.Value;
+
+                return result;
+            }
+
+            protected override void EnqueueItem(T item)
+            {
+                base.EnqueueItem(item);
+
+                if (item.Size.HasValue)
+
+                    TotalSize += item.Size.Value;
+            }
+
+            public IProcessQueue AsReadOnly() => new ReadOnlyProcessCollection(this);
+        }
+
+        public class ReadOnlyProcessCollection : ReadOnlyQueueCollection<IProcessQueue, T>, IProcessQueue
+        {
+            public Size TotalSize => InnerQueue.TotalSize;
+
+            public bool IsReadOnly => true;
 
             public object SyncRoot => InnerQueue.SyncRoot;
 
@@ -44,89 +170,16 @@ namespace WinCopies.IO.Process
 
             public uint Count => InnerQueue.Count;
 
-            public bool IsReadOnly => false;
-
             public bool HasItems => InnerQueue.HasItems;
 
-            public ProcessCollection(in IQueue<T> queue) => InnerQueue = queue.IsReadOnly ? throw new ArgumentException($"{nameof(queue)} must be non-read-only.", nameof(queue)) : queue;
-
-            protected virtual void OnClear() => TotalSize = new Size();
-
-            public void Clear()
+            public ReadOnlyProcessCollection(in IProcessQueue processCollection) : base(processCollection.IsReadOnly ? throw new ArgumentException($"{nameof(processCollection)} must be read-only.", nameof(processCollection)) : processCollection)
             {
-                InnerQueue.Clear();
-
-                OnClear();
-            }
-
-            protected virtual void OnDequeue(in T item)
-            {
-                if (item.Size.HasValue)
-
-                    TotalSize -= item.Size.Value;
-            }
-
-            public T Dequeue()
-            {
-                T result = InnerQueue.Dequeue();
-
-                OnDequeue(result);
-
-                return result;
-            }
-
-            protected virtual void OnEnqueue(T item)
-            {
-                if (item.Size.HasValue)
-
-                    TotalSize += item.Size.Value;
-            }
-
-            public void Enqueue(T item)
-            {
-                InnerQueue.Enqueue(item);
-
-                OnEnqueue(item);
+                // Left empty.
             }
 
             public T Peek() => InnerQueue.Peek();
 
-            public bool TryDequeue(out T result)
-            {
-                if (InnerQueue.TryDequeue(out result))
-                {
-                    OnDequeue(result);
-
-                    return true;
-                }
-
-                return false;
-            }
-
             public bool TryPeek(out T result) => InnerQueue.TryPeek(out result);
-        }
-
-        public class ReadOnlyProcessCollection : IProcessCollection
-        {
-            protected IProcessCollection ProcessCollection { get; }
-
-            public Size TotalSize => ProcessCollection.TotalSize;
-
-            public bool IsReadOnly => true;
-
-            public object SyncRoot => ProcessCollection.SyncRoot;
-
-            public bool IsSynchronized => ProcessCollection.IsSynchronized;
-
-            public uint Count => ProcessCollection.Count;
-
-            public bool HasItems => ProcessCollection.HasItems;
-
-            public ReadOnlyProcessCollection(in IProcessCollection processCollection) => ProcessCollection = processCollection.IsReadOnly ? throw new ArgumentException($"{nameof(processCollection)} must be read-only.", nameof(processCollection)) : processCollection;
-
-            public T Peek() => ProcessCollection.Peek();
-
-            public bool TryPeek(out T result) => ProcessCollection.TryPeek(out result);
 
             void IQueue<T>.Clear() => throw GetReadOnlyListOrCollectionException();
 
@@ -139,16 +192,20 @@ namespace WinCopies.IO.Process
             bool IQueueBase<T>.TryDequeue(out T result) => throw GetReadOnlyListOrCollectionException();
 
             void IQueueBase<T>.Clear() => throw GetReadOnlyListOrCollectionException();
+
+            IProcessQueue IProcessQueue.AsReadOnly() => this;
         }
     }
 
-    public class AbstractionProcessCollection<TSource, TDestination> : AbstractionTypes<TSource, TDestination>.Queue<ProcessTypes<TSource>.IProcessCollection>, ProcessTypes<TDestination>.IProcessCollection where TSource : IPathInfo, TDestination where TDestination : IPath
+    public class AbstractionProcessCollection<TSource, TDestination> : AbstractionTypes<TSource, TDestination>.ReadOnlyQueue<ProcessTypes<TSource>.IProcessQueue>, ProcessTypes<TDestination>.IProcessQueue where TSource : IPathInfo, TDestination where TDestination : IPath
     {
-        Size ProcessTypes<TDestination>.IProcessCollection.TotalSize => InnerQueue.TotalSize;
+        Size IProcessQueue.TotalSize => InnerQueue.TotalSize;
 
-        public AbstractionProcessCollection(in ProcessTypes<TSource>.IProcessCollection queue) : base(queue)
+        public AbstractionProcessCollection(in ProcessTypes<TSource>.IProcessQueue queue) : base(queue)
         {
             // Left empty.
         }
+
+        public ProcessTypes<TDestination>.IProcessQueue AsReadOnly() => InnerQueue.IsReadOnly ? this : new AbstractionProcessCollection<TSource, TDestination>(new ProcessTypes<TSource>.ReadOnlyProcessQueue(InnerQueue));
     }
 }

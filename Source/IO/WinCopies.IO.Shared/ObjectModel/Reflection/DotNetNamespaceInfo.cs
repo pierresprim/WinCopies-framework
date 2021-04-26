@@ -18,12 +18,13 @@
 using System;
 using System.Diagnostics;
 
+using WinCopies.IO.AbstractionInterop.Reflection;
+using WinCopies.IO.Enumeration.Reflection;
+using WinCopies.IO.Process;
+using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Reflection;
 using WinCopies.IO.Reflection.PropertySystem;
 using WinCopies.IO.Selectors;
-using WinCopies.IO.AbstractionInterop.Reflection;
-using WinCopies.IO.Enumeration.Reflection;
-using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Selectors.Reflection;
 using WinCopies.PropertySystem;
 
@@ -31,10 +32,10 @@ using static WinCopies.ThrowHelper;
 
 namespace WinCopies.IO.ObjectModel.Reflection
 {
-    public abstract class DotNetNamespaceInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : BrowsableDotNetItemInfo<TObjectProperties, object, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IDotNetNamespaceInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IDotNetItemInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
+    public abstract class DotNetNamespaceInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : BrowsableDotNetItemInfo<TObjectProperties, object, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IDotNetNamespaceInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IDotNetItemInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
     {
         #region Properties
-        public override IProcessFactory ProcessFactory => IO.ProcessFactory.DefaultProcessFactory;
+        public override IProcessFactory ProcessFactory => Process.ProcessFactory.DefaultProcessFactory;
 
         public override string ItemTypeName { get; } = Properties.Resources.DotNetNamespace;
 
@@ -51,10 +52,10 @@ namespace WinCopies.IO.ObjectModel.Reflection
         public System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(System.Collections.Generic.IEnumerable<DotNetItemType> typesToEnumerate, Predicate<TDictionaryItems> func) => GetItems(GetItemProviders(typesToEnumerate, func));
     }
 
-    public class DotNetNamespaceInfo : DotNetNamespaceInfo<IDotNetItemInfoProperties, DotNetNamespaceInfoItemProvider, IBrowsableObjectInfoSelectorDictionary<DotNetNamespaceInfoItemProvider>, DotNetNamespaceInfoItemProvider>, IDotNetNamespaceInfo
+    public class DotNetNamespaceInfo : DotNetNamespaceInfo<IDotNetItemInfoProperties, DotNetNamespaceInfoItemProvider, IEnumerableSelectorDictionary<DotNetNamespaceInfoItemProvider, IBrowsableObjectInfo>, DotNetNamespaceInfoItemProvider>, IDotNetNamespaceInfo
     {
         #region Properties
-        public static IBrowsableObjectInfoSelectorDictionary<DotNetNamespaceInfoItemProvider> DefaultItemSelectorDictionary { get; } = new DotNetNamespaceInfoSelectorDictionary();
+        public static IEnumerableSelectorDictionary<DotNetNamespaceInfoItemProvider, IBrowsableObjectInfo> DefaultItemSelectorDictionary { get; } = new DotNetNamespaceInfoSelectorDictionary();
 
         public override IDotNetItemInfoProperties ObjectPropertiesGeneric { get; }
 
@@ -73,7 +74,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
         #region Methods
         public static DotNetItemType[] GetDefaultItemTypes() => new DotNetItemType[] { DotNetItemType.Namespace, DotNetItemType.Struct, DotNetItemType.Enum, DotNetItemType.Class, DotNetItemType.Interface, DotNetItemType.Delegate };
 
-        public override IBrowsableObjectInfoSelectorDictionary<DotNetNamespaceInfoItemProvider> GetSelectorDictionary() => DefaultItemSelectorDictionary;
+        public override IEnumerableSelectorDictionary<DotNetNamespaceInfoItemProvider, IBrowsableObjectInfo> GetSelectorDictionary() => DefaultItemSelectorDictionary;
 
         protected override System.Collections.Generic.IEnumerable<DotNetNamespaceInfoItemProvider> GetItemProviders(System.Collections.Generic.IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetNamespaceInfoItemProvider> func) => DotNetNamespaceInfoEnumeration.From(this, typesToEnumerate, func);
 

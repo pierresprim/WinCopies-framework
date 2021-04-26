@@ -11,7 +11,10 @@
     xmlns:markup="clr-namespace:WinCopies.Markup;assembly=WinCopies.Util.Desktop"
     xmlns:propertySystem="clr-namespace:WinCopies.PropertySystem;assembly=WinCopies.Util.Desktop"
     xmlns:commands="clr-namespace:WinCopies.Commands;assembly=WinCopies.Util.Desktop"
+    xmlns:dataTemp="clr-namespace:WinCopies.Util.Data;assembly=WinCopies.Util.Temp"
+    xmlns:util="clr-namespace:WinCopies;assembly=WinCopies.Util.Desktop"
     xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/wincopies.gui;component/Themes/Generic.xaml" />
         <ResourceDictionary Source="pack://application:,,,/wincopies.gui.templates;component/Themes/Generic.xaml" />
@@ -356,107 +359,11 @@
         </Setter>
     </Style>
 
-    <!--<DataTemplate x:Key="ExplorerControlSizeOneListViewItemTemplate">
-        <localControls:ExplorerControlListViewItem>
-            <StackPanel Orientation="Horizontal" Height="16" Width="300" >
-                <CheckBox Visibility="{Binding IsCheckBoxVisible, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource Mode=TemplatedParent}}" IsChecked="{Binding IsSelected, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
-                <Image Source="{Binding SmallIcon, RelativeSource={RelativeSource Mode=TemplatedParent}}" Height="16" Style="{StaticResource ExplorerControlImageStyle}" />
-                -->
-    <!--, Converter={local:ImageSourceConverter}}-->
-    <!--
-                <TextBlock TextWrapping="Wrap" Style="{StaticResource ExplorerControlListViewItemTextBlockStyle}" />
-            </StackPanel>
-        </localControls:ExplorerControlListViewItem>
-    </DataTemplate>
-
-    <DataTemplate x:Key="ExplorerControlSizeTwoListViewItemContentTemplate">
-        <Grid Width="75" >
-            <Grid.RowDefinitions>
-                <RowDefinition Height="auto" />
-                <RowDefinition Height="48" />
-                <RowDefinition MaxHeight="32" />
-            </Grid.RowDefinitions>
-            <CheckBox Visibility="{Binding IsCheckBoxVisible, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource Mode=TemplatedParent}}" IsChecked="{Binding IsSelected, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
-            <Image Grid.Row="1" Source="{Binding MediumIcon, RelativeSource={RelativeSource Mode=TemplatedParent}}" VerticalAlignment="Bottom" Style="{StaticResource ExplorerControlImageStyle}" />
-            <TextBlock Grid.Row="2" TextWrapping="Wrap" TextAlignment="Center" VerticalAlignment="Top" Style="{StaticResource ExplorerControlListViewItemTextBlockStyle}" />
-        </Grid>
-    </DataTemplate>-->
-
     <!-- todo: merged style to avoid the ancestor reference in binding?-->
     <Style x:Key="ExplorerControlListViewItemTextBlockStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
         <Setter Property="Text" Value="{Binding ItemName, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
         <Setter Property="ToolTip" Value="{Binding ItemName, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
         <Setter Property="TextTrimming" Value="CharacterEllipsis" />
-
-        <!--<Style.Triggers>
-            <DataTrigger Binding="{Binding UnderliningMode, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListView}}}" Value="{x:Static controls:LinkUnderliningMode.AlwaysUnderline}" >
-                <Setter Property="TextDecorations" >
-                    <Setter.Value>
-                        <TextDecorationCollection>
-                            -->
-        <!--todo: to put in style resources-->
-        <!--
-                            <TextDecoration Location="Underline" />
-                        </TextDecorationCollection>
-                    </Setter.Value>
-                </Setter>
-            </DataTrigger>
-
-            <MultiDataTrigger >
-                <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding UnderliningMode, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListView}}}" Value="{x:Static controls:LinkUnderliningMode.UnderlineWhenMouseOverOrFocused}" />
-                    <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Mode=Self}}" Value="true" />
-                </MultiDataTrigger.Conditions>
-
-                <Setter Property="TextDecorations" >
-                    <Setter.Value>
-                        <TextDecorationCollection>
-                            -->
-        <!--todo: to put in style resources-->
-        <!--
-                            <TextDecoration Location="Underline" />
-                        </TextDecorationCollection>
-                    </Setter.Value>
-                </Setter>
-            </MultiDataTrigger>
-
-            <MultiDataTrigger >
-                <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding UnderliningMode, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListView}}}" Value="{x:Static controls:LinkUnderliningMode.UnderlineWhenMouseOverOrFocused}" />
-                    <Condition Binding="{Binding IsFocused, RelativeSource={RelativeSource Mode=Self}}" Value="true" />
-                </MultiDataTrigger.Conditions>
-
-                <Setter Property="TextDecorations" >
-                    <Setter.Value>
-                        <TextDecorationCollection>
-                            -->
-        <!--todo: to put in style resources-->
-        <!--
-                            <TextDecoration Location="Underline" />
-                        </TextDecorationCollection>
-                    </Setter.Value>
-                </Setter>
-            </MultiDataTrigger>
-
-            <MultiDataTrigger >
-                <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding UnderliningMode, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListView}}}" Value="{x:Static controls:LinkUnderliningMode.UnderlineWhenNotMouseOverNorFocused}" />
-                    <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Mode=Self}}" Value="false" />
-                    <Condition Binding="{Binding IsFocused, RelativeSource={RelativeSource Mode=Self}}" Value="false" />
-                </MultiDataTrigger.Conditions>
-
-                <Setter Property="TextDecorations" >
-                    <Setter.Value>
-                        <TextDecorationCollection>
-                            -->
-        <!--todo: to put in style resources-->
-        <!--
-                            <TextDecoration Location="Underline" />
-                        </TextDecorationCollection>
-                    </Setter.Value>
-                </Setter>
-            </MultiDataTrigger>
-        </Style.Triggers>-->
     </Style>
 
     <Style x:Key="ExplorerControlImageStyle" TargetType="Image">
@@ -494,69 +401,6 @@
         <Setter Property="Template" Value="{StaticResource ExplorerControlSizeThreeListViewItemContentTemplate}" />
     </Style>
 
-    <!--<DataTemplate x:Key="ExplorerControlSizeFourListViewItemContentTemplate" x:Shared="false">
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="auto" />
-                <RowDefinition Height="256" />
-                <RowDefinition MaxHeight="32" />
-            </Grid.RowDefinitions>
-            <CheckBox Visibility="{Binding IsCheckBoxVisible, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource Mode=TemplatedParent}}" IsChecked="{Binding IsSelected, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
-            <Image Grid.Row="1" Source="{Binding ExtraLargeBitmapSource}" Style="{StaticResource ExplorerControlImageStyle}" />
-            -->
-    <!--, Converter={local:ImageSourceConverter}}-->
-    <!--
-            <TextBlock Grid.Row="2" TextWrapping="Wrap" TextAlignment="Center" Style="{StaticResource ExplorerControlListViewItemTextBlockStyle}" />
-        </Grid>
-    </DataTemplate>
-
-    <DataTemplate x:Key="ExplorerControlListListViewItemContentTemplate" x:Shared="false">
-        <StackPanel Orientation="Horizontal" >
-            <CheckBox Visibility="{Binding IsCheckBoxVisible, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type localControls:ExplorerControlListViewItem}}}" IsChecked="{Binding IsSelected}" />
-            <Image Source="{Binding SmallBitmapSource}" Height="16" Width="16" Style="{StaticResource ExplorerControlImageStyle}" />
-            -->
-    <!--, Converter={local:ImageSourceConverter}}-->
-    <!--
-            <TextBlock Style="{StaticResource ExplorerControlListViewItemTextBlockStyle}" />
-        </StackPanel>
-    </DataTemplate>
-
-    <DataTemplate x:Key="ExplorerControlTilesListViewItemContentTemplate" x:Shared="false">
-        <StackPanel Orientation="Horizontal" >
-            <CheckBox Visibility="{Binding IsCheckBoxVisible, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type localControls:ExplorerControlListViewItem}}}" IsChecked="{Binding IsSelected}" VerticalAlignment="Center" />
-            <Image Source="{Binding MediumBitmapSource}" Height="48" Width="48" >
-                <Image.Opacity>
-                    <MultiBinding Converter="{StaticResource FileSystemInfoAttributesToOpacityConverter}" >
-                        <Binding />
-                        <Binding Path="FileSystemInfoProperties.Attributes" />
-                        <Binding Path="ShowHiddenItems" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type localControls:ExplorerControl}}" />
-                        <Binding Path="ShowSystemItems" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type localControls:ExplorerControl}}" />
-                    </MultiBinding>
-                </Image.Opacity>
-            </Image>
-            -->
-    <!--, Converter={local:ImageSourceConverter}}-->
-    <!--
-            <StackPanel Margin="10,0,0,0">
-                <TextBlock Style="{StaticResource ExplorerControlListViewItemTextBlockStyle}" />
-                <controls:Label Padding="0" Content="{Binding ShellObject.Properties.System.ItemTypeText.ValueAsObject}" Foreground="Gray" />
-                <controls:Label Padding="0" Content="{Binding ShellObject.Properties.System.Size.ValueAsObject}" Foreground="Gray" />
-            </StackPanel>
-        </StackPanel>
-    </DataTemplate>-->
-    <!--<Style TargetType="{x:Type local:CustomControl1}">
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type local:CustomControl1}">
-                    <Border Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}">
-                    </Border>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>-->
-
     <!--Processes-->
 
     <ControlTemplate x:Key="ProcessTemplate" TargetType="{x:Type localProcessControls:ProcessControl}">
@@ -577,19 +421,19 @@
                         <Button Content="{x:Static icons:Resources.cancel}" Command="{x:Static commands:Commands.CommonCommand}" CommandParameter="{TemplateBinding CancelAction}" />
                     </StackPanel>
                 </Grid>
-                <ProgressBar x:Name="PART_ProgressBar" IsIndeterminate="True" />
+                <ProgressBar x:Name="PART_ProgressBar" Value="{Binding ProgressPercentage, RelativeSource={RelativeSource Mode=TemplatedParent}}" Maximum="100" />
             </StackPanel>
 
             <Label Grid.Row="1" Content="{StaticResource SourcePath}" />
             <Label Grid.Column="1" Grid.Row="1" Content="{Binding SourcePath, Mode=OneTime, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
 
             <Label Grid.Row="2" Content="{StaticResource CurrentPath}" />
-            <Label Grid.Column="1" Grid.Row="2" Content="{TemplateBinding CurrentPath.Path}" />
+            <Label Grid.Column="1" Grid.Row="2" Content="{Binding ProgressPercentage, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
 
             <Label Grid.Row="3" Content="{StaticResource Status}" />
             <Label Grid.Column="1" Grid.Row="3" Content="{TemplateBinding Status}" />
         </Grid>
-        <ControlTemplate.Triggers>
+        <!--<ControlTemplate.Triggers>
             <DataTrigger Binding="{Binding Status, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="{x:Static localProcessControls:ProcessStatus.None}">
                 <Setter Property="Content" TargetName="PART_Run_PauseButton" Value="{x:Static icons:Resources.control_play}" />
                 <Setter Property="Command" TargetName="PART_Run_PauseButton" Value="{x:Static commands:Commands.CommonCommand}" />
@@ -597,9 +441,9 @@
             </DataTrigger>
             <DataTrigger Binding="{Binding Status, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="{x:Static localProcessControls:ProcessStatus.InProgress}">
                 <Setter Property="IsIndeterminate" TargetName="PART_ProgressBar" Value="False" />
-                <Setter Property="Value" TargetName="PART_ProgressBar" Value="{TemplateBinding ProgressPercentage}" />
+                <Setter Property="Value" TargetName="PART_ProgressBar" Value="{Binding ProgressPercentage, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
             </DataTrigger>
-        </ControlTemplate.Triggers>
+        </ControlTemplate.Triggers>-->
     </ControlTemplate>
 
     <Style TargetType="{x:Type localProcessControls:ProcessControl}">
@@ -616,103 +460,46 @@
                                              CancelAction="{Binding CancelAction}"/>
     </DataTemplate>
 
-    <ControlTemplate x:Key="ProcessWindowTemplate" TargetType="{x:Type localProcessControls:ProcessWindow}">
-        <ListView ItemsSource="{TemplateBinding Processes}">
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn Header="Type" DisplayMemberBinding="{Binding Name}" />
-                    <GridViewColumn Header="Source Path" DisplayMemberBinding="{Binding SourcePath}" />
-                    <GridViewColumn Header="Status" DisplayMemberBinding="{Binding Status}" />
-                    <GridViewColumn Header="Progress">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate DataType="{x:Type localProcess:IProcess}">
-                                <ProgressBar x:Name="PART_ProgressBar" IsIndeterminate="True" />
-                                <DataTemplate.Triggers>
-                                    <DataTrigger Binding="{Binding Status, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="{x:Static localProcessControls:ProcessStatus.InProgress}">
-                                        <Setter Property="IsIndeterminate" TargetName="PART_ProgressBar" Value="False" />
-                                        <Setter Property="Value" TargetName="PART_ProgressBar" Value="{TemplateBinding ProgressPercentage}" />
-                                    </DataTrigger>
-                                </DataTemplate.Triggers>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    <GridViewColumn Header="Source Path" DisplayMemberBinding="{Binding SourcePath}" />
-                    <GridViewColumn Header="Source Path" DisplayMemberBinding="{Binding SourcePath}" />
-                </GridView>
-            </ListView.View>
-        </ListView>
-    </ControlTemplate>
 
-    <!--<ControlTemplate x:Key="CopyProcessControlTemplate" TargetType="{x:Type localProcessControls:ProcessControl}">
+
+    <ControlTemplate x:Key="ProcessWindowTemplate" TargetType="{x:Type localProcessControls:ProcessWindow}">
         <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="auto" />
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition Height="auto" />
                 <RowDefinition />
                 <RowDefinition Height="auto" />
-                <RowDefinition Height="auto" />
-                <RowDefinition Height="auto" />
-                <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
-            <controls:Label Grid.ColumnSpan="2" RecognizesAccessKey="False" Content="{TemplateBinding Header}" />
-            <ProgressBar x:Name="PART_ProgressBar" Grid.ColumnSpan="2" Grid.Row="1" IsIndeterminate="True" />
-            <Label Grid.Row="2" Content="{StaticResource Name}" />
-            <Label Grid.Column="1" Grid.Row="2">
-                <Label.Content>
-                    <MultiBinding Converter="{StaticResource MultiStringConverter}" ConverterParameter="{}{0} ({1}%)">
-                        <Binding Path="CurrentPath" RelativeSource="{RelativeSource Mode=TemplatedParent}" />
-                        <Binding Path="CurrentPathProgressPercentage" RelativeSource="{RelativeSource Mode=TemplatedParent}" />
-                    </MultiBinding>
-                </Label.Content>
-            </Label>
-            <Label Grid.Row="3" Content="{StaticResource Status}" />
-            <Label Grid.Column="1" Grid.Row="3" Content="{TemplateBinding Status}" />
-            <Label Grid.Row="4" Content="{StaticResource TotalItemCount}" />
-            <Label Grid.Column="1" Grid.Row="4">
-                <Label.Content>
-                    <MultiBinding Converter="{StaticResource MultiStringConverter}" ConverterParameter="{}{0} ({1})">
-                        <Binding Path="InitialItemCount" RelativeSource="{RelativeSource Mode=TemplatedParent}" />
-                        <Binding Path="InitialItemCount" RelativeSource="{RelativeSource Mode=TemplatedParent}" />
-                    </MultiBinding>
-                </Label.Content>
-            </Label>
-            <Label Grid.Row="5" Content="{StaticResource Remaining}" />
-            <Label Grid.Column="1" Grid.Row="5" >
-                <Label.Content>
-                    <MultiBinding Converter="{StaticResource MultiStringConverter}" ConverterParameter="{}{0} ({1})">
-                        <Binding Path="RemainingItemCount" RelativeSource="{RelativeSource Mode=TemplatedParent}" />
-                        <Binding Path="RemainingItemCount" RelativeSource="{RelativeSource Mode=TemplatedParent}" />
-                    </MultiBinding>
-                </Label.Content>
-            </Label>
-        </Grid>
+            <ListView ItemsSource="{TemplateBinding Processes}" SelectedItem="{Binding SelectedItem, RelativeSource={RelativeSource TemplatedParent}}">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Type" DisplayMemberBinding="{Binding Name}" />
+                        <GridViewColumn Header="Source Path" DisplayMemberBinding="{Binding SourcePath, Converter={localProcess:PathCommonToStringConverter}}" />
+                        <GridViewColumn Header="Status" DisplayMemberBinding="{Binding Status, Converter={dataTemp:ToStringConverter}}" />
+                        <GridViewColumn Header="Progress">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate DataType="{x:Type localProcess:IProcess}">
+                                    <ProgressBar x:Name="PART_ProgressBar" Value="{Binding ProgressPercentage, Mode=OneWay}" Maximum="100" Height="30" Width="100" />
+                                    <!--<DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding Status, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="{x:Static localProcessControls:ProcessStatus.InProgress}">
+                                        <Setter Property="IsIndeterminate" TargetName="PART_ProgressBar" Value="False" />
+                                        <Setter Property="Value" TargetName="PART_ProgressBar" Value="{Binding ProgressPercentage}" />
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>-->
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                    </GridView>
+                </ListView.View>
+            </ListView>
 
-        <ControlTemplate.Triggers>
-            <DataTrigger Binding="{Binding ArePathsLoaded, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type localProcessControls:ProcessControl}}}" Value="true">
-                <Setter TargetName="PART_ProgressBar" Property="IsIndeterminate" Value="false" />
-                <Setter TargetName="PART_ProgressBar" Property="Maximum" Value="100" />
-                <Setter TargetName="PART_ProgressBar" Property="Value" Value="{Binding ProgressPercentage, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type localProcessControls:CopyProcessControl}}}" />
-            </DataTrigger>
-        </ControlTemplate.Triggers>
+            <ContentPresenter Grid.Row="1" Content="{TemplateBinding SelectedItem}">
+                <ContentPresenter.ContentTemplateSelector>
+                    <util:InterfaceDataTemplateSelector />
+                </ContentPresenter.ContentTemplateSelector>
+            </ContentPresenter>
+        </Grid>
     </ControlTemplate>
 
-    <Style TargetType="{x:Type localProcessControls:ProcessControl}">
-        <Setter Property="Template" Value="{StaticResource CopyProcessControlTemplate}" />
+    <Style TargetType="{x:Type localProcessControls:ProcessWindow}" BasedOn="{StaticResource {x:Type Window}}" >
+        <Setter Property="Template" Value="{StaticResource ProcessWindowTemplate}" />
     </Style>
-
-    <DataTemplate DataType="{x:Type localProcess:Copy}" x:Shared="false">
-        <localProcessControls:CopyProcessControl SourcePath="{Binding SourcePath}" DestPath="{Binding DestPath}" InitialItemCount="{Binding InitialItemCount}" InitialItemSize="{Binding InitialItemSize}" RemainingItemCount="{Binding Paths.Count}" RemainingItemSize="{Binding Paths.Size}" ArePathsLoaded="{Binding ArePathsLoaded}" ProgressPercentage="{Binding ProgressPercentage}">
-            <localProcessControls:ProcessControl.Header>
-                <MultiBinding StringFormat="{}{0} {1} {2} {3}">
-                    <Binding Source="{StaticResource CopyingFrom}" />
-                    <Binding Path="SourcePath" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type localProcessControls:ProcessControl}}" />
-                    <Binding Source="{StaticResource To}" />
-                    <Binding Path="DestPath" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type localProcessControls:ProcessControl}}" />
-                </MultiBinding>
-            </localProcessControls:ProcessControl.Header>
-        </localProcessControls:CopyProcessControl>
-    </DataTemplate>-->
 </ResourceDictionary>

@@ -19,20 +19,17 @@ using Microsoft.WindowsAPICodePack.PortableDevices;
 using Microsoft.WindowsAPICodePack.Shell;
 using Microsoft.WindowsAPICodePack.Win32Native.Shell;
 
-using System;
 using System.Drawing;
-using System.Reflection;
+using System.Linq;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 
+using WinCopies.Collections.Generic;
 using WinCopies.GUI.Drawing;
-
-using WinCopies.Collections;
 using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Selectors;
-using WinCopies.Collections.Generic;
-using System.Linq;
+using WinCopies.IO.Process;
 
 namespace WinCopies.IO
 {
@@ -47,7 +44,7 @@ namespace WinCopies.IO
 
     namespace ObjectModel
     {
-        public abstract class FileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : BrowsableObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IFileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IFileSystemObjectInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
+        public abstract class FileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : BrowsableObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IFileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IFileSystemObjectInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
         {
             private System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> _defaultRootItems;
 
@@ -58,7 +55,7 @@ namespace WinCopies.IO
 #else
                 ?? (_defaultRootItems =
 #endif
-               FileSystemObjectInfo.GetRootItems(ProcessPathCollectionFactory)
+               FileSystemObjectInfo.GetRootItems()
 #if !CS8
                 )
 #endif
@@ -72,7 +69,7 @@ namespace WinCopies.IO
             #endregion
 
             // /// <param name="fileType">The <see cref="FileType"/> of this <see cref="BrowsableObjectInfo"/>.</param>
-            protected FileSystemObjectInfo(in string path, in IProcessPathCollectionFactory processPathCollectionFactory, in ClientVersion clientVersion) : base(path, processPathCollectionFactory, clientVersion) { /* Left empty. */ }
+            protected FileSystemObjectInfo(in string path, in ClientVersion clientVersion) : base(path, clientVersion) { /* Left empty. */ }
 
             #region Methods
             #region Helpers
@@ -181,7 +178,7 @@ namespace WinCopies.IO
 
         public static class FileSystemObjectInfo
         {
-            public static System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetRootItems(IProcessPathCollectionFactory processPathCollectionFactory)
+            public static System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetRootItems()
             {
 #if WinCopies4
                 EnumerableHelper<IBrowsableObjectInfo>.IEnumerableQueue queue = EnumerableHelper<IBrowsableObjectInfo>.GetEnumerableQueue();
@@ -191,7 +188,7 @@ namespace WinCopies.IO
 
                 ClientVersion clientVersion = BrowsableObjectInfo.GetDefaultClientVersion();
 
-                void enqueue(in IKnownFolder knownFolder) => queue.Enqueue(new ShellObjectInfo(knownFolder, processPathCollectionFactory, clientVersion));
+                void enqueue(in IKnownFolder knownFolder) => queue.Enqueue(new ShellObjectInfo(knownFolder, clientVersion));
 
                 enqueue(KnownFolders.UserPinned);
                 enqueue(KnownFolders.Desktop);
@@ -227,7 +224,7 @@ namespace WinCopies.IO
                 using Icon icon = TryGetIcon(extension, fileType, new System.Drawing.Size(size, size));
 
 #endif
-                    return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+                return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
             }
         }
     }

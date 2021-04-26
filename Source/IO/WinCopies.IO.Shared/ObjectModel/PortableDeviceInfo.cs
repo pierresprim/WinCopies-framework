@@ -26,6 +26,7 @@ using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 
 using WinCopies.IO.AbstractionInterop;
+using WinCopies.IO.Process;
 using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Selectors;
 using WinCopies.Linq;
@@ -35,14 +36,14 @@ using static WinCopies.ThrowHelper;
 
 namespace WinCopies.IO.ObjectModel
 {
-    public abstract class PortableDeviceInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : FileSystemObjectInfo<TObjectProperties, IPortableDevice, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IPortableDeviceInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IPortableDeviceInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
+    public abstract class PortableDeviceInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : FileSystemObjectInfo<TObjectProperties, IPortableDevice, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IPortableDeviceInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IPortableDeviceInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems,IBrowsableObjectInfo>
     {
         private const int PortableDeviceIcon = 42;
         private const string PortableDeviceIconDllName = "imageres.dll";
         private IPortableDevice _portableDevice;
 
         #region Properties
-        public override IProcessFactory ProcessFactory => IO.ProcessFactory.DefaultProcessFactory;
+        public override IProcessFactory ProcessFactory => Process.ProcessFactory.DefaultProcessFactory;
 
         public sealed override IPortableDevice InnerObjectGeneric => IsDisposed ? throw GetExceptionForDispose(false) : _portableDevice;
 
@@ -62,21 +63,14 @@ namespace WinCopies.IO.ObjectModel
 
         public override string Description => UtilHelpers.NotApplicable;
 
-        public IProcessPathCollectionFactory ShellProcessPathCollectionFactory { get; }
-
-        public override IBrowsableObjectInfo Parent => ShellObjectInfo.From(ShellObjectFactory.Create(KnownFolders.Computer.ParsingName), ShellProcessPathCollectionFactory, ClientVersion);
+        public override IBrowsableObjectInfo Parent => ShellObjectInfo.From(ShellObjectFactory.Create(KnownFolders.Computer.ParsingName),  ClientVersion);
 
         public override string LocalizedName => Name;
 
         public override string Name => InnerObjectGeneric.DeviceFriendlyName;
         #endregion Properties
 
-        public PortableDeviceInfo(in IPortableDevice portableDevice, in IProcessPathCollectionFactory shellProcessPathCollectionFactory, in ClientVersion clientVersion) : base((portableDevice ?? throw GetArgumentNullException(nameof(portableDevice))).DeviceFriendlyName, null, clientVersion)
-        {
-            _portableDevice = portableDevice;
-
-            ShellProcessPathCollectionFactory = shellProcessPathCollectionFactory;
-        }
+        public PortableDeviceInfo(in IPortableDevice portableDevice, in ClientVersion clientVersion) : base((portableDevice ?? throw GetArgumentNullException(nameof(portableDevice))).DeviceFriendlyName,  clientVersion) => _portableDevice = portableDevice;
 
         private BitmapSource TryGetBitmapSource(in int size)
         {
@@ -106,27 +100,27 @@ namespace WinCopies.IO.ObjectModel
         }
     }
 
-    public class PortableDeviceInfo : PortableDeviceInfo<IPortableDeviceInfoProperties, IPortableDeviceObject, IBrowsableObjectInfoSelectorDictionary<PortableDeviceObjectInfoItemProvider>, PortableDeviceObjectInfoItemProvider>, IPortableDeviceInfo
+    public class PortableDeviceInfo : PortableDeviceInfo<IPortableDeviceInfoProperties, IPortableDeviceObject, IEnumerableSelectorDictionary<PortableDeviceObjectInfoItemProvider,IBrowsableObjectInfo>, PortableDeviceObjectInfoItemProvider>, IPortableDeviceInfo
     {
         private IPortableDeviceInfoProperties _objectProperties;
 
         #region Properties
-        public static IBrowsableObjectInfoSelectorDictionary<PortableDeviceObjectInfoItemProvider> DefaultItemSelectorDictionary { get; } = new PortableDeviceInfoSelectorDictionary();
+        public static IEnumerableSelectorDictionary<PortableDeviceObjectInfoItemProvider,IBrowsableObjectInfo> DefaultItemSelectorDictionary { get; } = new PortableDeviceInfoSelectorDictionary();
 
         public sealed override IPortableDeviceInfoProperties ObjectPropertiesGeneric => IsDisposed ? throw GetExceptionForDispose(false) : _objectProperties;
 
         public override IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystem => null;
         #endregion // Properties
 
-        public PortableDeviceInfo(in IPortableDevice portableDevice, in PortableDeviceOpeningOptions openingOptions, in IProcessPathCollectionFactory shellProcessPathCollectionFactory, in ClientVersion clientVersion) : base(portableDevice, shellProcessPathCollectionFactory, clientVersion) => _objectProperties = new PortableDeviceInfoProperties<IPortableDeviceInfo>(this, openingOptions);
+        public PortableDeviceInfo(in IPortableDevice portableDevice, in PortableDeviceOpeningOptions openingOptions,  in ClientVersion clientVersion) : base(portableDevice, clientVersion) => _objectProperties = new PortableDeviceInfoProperties<IPortableDeviceInfo>(this, openingOptions);
 
-        public PortableDeviceInfo(in IPortableDevice portableDevice, in IProcessPathCollectionFactory shellProcessPathCollectionFactory, in ClientVersion clientVersion) : this(portableDevice, new PortableDeviceOpeningOptions(GenericRights.Read, FileShareOptions.Read, true), shellProcessPathCollectionFactory, clientVersion)
+        public PortableDeviceInfo(in IPortableDevice portableDevice, in ClientVersion clientVersion) : this(portableDevice, new PortableDeviceOpeningOptions(GenericRights.Read, FileShareOptions.Read, true),  clientVersion)
         {
             // Left empty.
         }
 
         #region Methods
-        public override IBrowsableObjectInfoSelectorDictionary<PortableDeviceObjectInfoItemProvider> GetSelectorDictionary() => DefaultItemSelectorDictionary;
+        public override IEnumerableSelectorDictionary<PortableDeviceObjectInfoItemProvider, IBrowsableObjectInfo> GetSelectorDictionary() => DefaultItemSelectorDictionary;
 
         protected override void DisposeManaged()
         {

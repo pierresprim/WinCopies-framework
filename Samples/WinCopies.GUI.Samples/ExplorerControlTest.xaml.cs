@@ -17,15 +17,21 @@
 
 using Microsoft.WindowsAPICodePack.PortableDevices;
 using Microsoft.WindowsAPICodePack.Shell;
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
-
+using System.Windows.Input;
+using WinCopies.GUI.IO.Controls.Process;
 using WinCopies.GUI.IO.ObjectModel;
+using WinCopies.GUI.IO.Process;
 using WinCopies.IO.ObjectModel;
+using WinCopies.IO.Process;
+using WinCopies.Linq;
 
 namespace WinCopies.GUI.Samples
 {
@@ -34,12 +40,7 @@ namespace WinCopies.GUI.Samples
     /// </summary>
     public partial class ExplorerControlTest : Window
     {
-        private static ClientVersion GetClientVersion()
-        {
-            Version version = Assembly.GetExecutingAssembly().GetName().Version;
-
-            return new ClientVersion("WinCopies Framework Test App", (uint)version.Major, (uint)version.Minor, (uint)version.Revision);
-        }
+        public static WinCopies.IO.Process.IProcessPathCollectionFactory DefaultProcessPathCollectionFactory { get; } = new IO.Process.ProcessPathCollectionFactory();
 
         public static ClientVersion ClientVersion { get; } = GetClientVersion();
 
@@ -47,11 +48,61 @@ namespace WinCopies.GUI.Samples
 
         public IEnumerable<IExplorerControlBrowsableObjectInfoViewModel> Items { get => (IEnumerable<IExplorerControlBrowsableObjectInfoViewModel>)GetValue(ItemsProperty); set => SetValue(ItemsProperty, value); }
 
+        public static readonly DependencyProperty SelectedItemProperty = DependencyProperty.Register(nameof(SelectedItem), typeof(IExplorerControlBrowsableObjectInfoViewModel), typeof(ExplorerControlTest));
+
+        public IExplorerControlBrowsableObjectInfoViewModel SelectedItem { get => (IExplorerControlBrowsableObjectInfoViewModel)GetValue(SelectedItemProperty); set => SetValue(SelectedItemProperty, value); }
+
+        static ExplorerControlTest()
+        {
+            BrowsableObjectInfo.RegisterDefaultSelectors();
+
+            BrowsableObjectInfo.RegisterDefaultProcessSelectors();
+        }
+
         public ExplorerControlTest()
         {
             InitializeComponent();
 
             DataContext = this;
+
+            IEnumerable<IBrowsableObjectInfo> getEnumerable() => SelectedItem.Path.Items.WhereSelect(item => item.IsSelected, item => item.Model);
+
+            _ = CommandBindings.Add(new CommandBinding(ApplicationCommands.Copy, (object sender, ExecutedRoutedEventArgs e) => SelectedItem.Path.ProcessFactory.Copy(getEnumerable(), 10u), (object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = SelectedItem.Path.ProcessFactory.CanCopy(getEnumerable())));
+
+            _ = CommandBindings.Add(new CommandBinding(ApplicationCommands.Paste, (object sender, ExecutedRoutedEventArgs e) => Paste(new ProcessFactorySelectorDictionaryParameters(SelectedItem.Path.ProcessFactory.TryGetCopyProcessParameters(10u), DefaultProcessPathCollectionFactory)), (object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = SelectedItem.Path.ProcessFactory.CanPaste(10u)));
+        }
+
+        private static ProcessWindow _processWindow;
+
+        public static ProcessWindow ProcessWindow
+        {
+            get
+            {
+                if (_processWindow == null)
+                {
+                    _processWindow = new ProcessWindow() { Processes = new ObservableCollection<IProcess>() };
+
+                    _processWindow.Show();
+                }
+
+                return _processWindow;
+            }
+        }
+
+        private static void Paste(ProcessFactorySelectorDictionaryParameters parameters)
+        {
+            IProcess result = new Process(BrowsableObjectInfo.DefaultProcessSelectorDictionary.Select(parameters));
+
+            ((ObservableCollection<IProcess>)ProcessWindow.Processes).Add(result);
+
+            result.RunWorkerAsync();
+        }
+
+        private static ClientVersion GetClientVersion()
+        {
+            Version version = Assembly.GetExecutingAssembly().GetName().Version;
+
+            return new ClientVersion("WinCopies Framework Test App", (uint)version.Major, (uint)version.Minor, (uint)version.Revision);
         }
 
         public static ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> GetShellItems() => new() { { GetExplorerControlBrowsableObjectInfoViewModel(GetBrowsableObjectInfoViewModel(ShellObjectInfo.From(ShellObjectFactory.Create("C:\\"), ClientVersion)), true, SelectionMode.Extended, true) } };

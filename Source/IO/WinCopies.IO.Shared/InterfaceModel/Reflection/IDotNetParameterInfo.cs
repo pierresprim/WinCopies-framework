@@ -30,12 +30,12 @@ namespace WinCopies.IO.ObjectModel.Reflection
         // Left empty.
     }
 
-    public interface IDotNetParameterInfo<TObjectProperties, TSelectorDictionary> : IDotNetParameterInfoBase, IDotNetItemInfo<TObjectProperties, ParameterInfo, CustomAttributeData, TSelectorDictionary, DotNetParameterInfoItemProvider> where TObjectProperties : IDotNetParameterInfoProperties where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<DotNetParameterInfoItemProvider>
+    public interface IDotNetParameterInfo<TObjectProperties, TSelectorDictionary> : IDotNetParameterInfoBase, IDotNetItemInfo<TObjectProperties, ParameterInfo, CustomAttributeData, TSelectorDictionary, DotNetParameterInfoItemProvider> where TObjectProperties : IDotNetParameterInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<DotNetParameterInfoItemProvider, IBrowsableObjectInfo>
     {
         // Left empty.
     }
 
-    public interface IDotNetParameterInfo : IDotNetParameterInfo<IDotNetParameterInfoProperties, IBrowsableObjectInfoSelectorDictionary<DotNetParameterInfoItemProvider>>
+    public interface IDotNetParameterInfo : IDotNetParameterInfo<IDotNetParameterInfoProperties, IEnumerableSelectorDictionary<DotNetParameterInfoItemProvider, IBrowsableObjectInfo>>
     {
         IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<CustomAttributeData> func);
     }

@@ -22,6 +22,7 @@ using System.Threading;
 using WinCopies.DotNetFix;
 using WinCopies.IO;
 using WinCopies.IO.Process;
+using WinCopies.Util;
 
 namespace WinCopies.GUI.IO.Process
 {
@@ -39,7 +40,7 @@ namespace WinCopies.GUI.IO.Process
         #region Properties
         protected WinCopies.IO.Process.ObjectModel.IProcess InnerProcess => this.GetIfNotDisposed(_process);
 
-        public IProcessErrorFactory Factory => InnerProcess.Factory;
+        public IProcessErrorFactoryBase Factory => InnerProcess.Factory;
 
         public IProcessEventDelegates ProcessEventDelegates => InnerProcess.ProcessEventDelegates;
 
@@ -61,9 +62,9 @@ namespace WinCopies.GUI.IO.Process
 
         public Size ActualRemainingSize => InnerProcess.ActualRemainingSize;
 
-        public ProcessTypes<WinCopies.IO.IPathInfo>.IProcessCollection Paths => InnerProcess.Paths;
+        public ProcessTypes<WinCopies.IO.IPathInfo>.IProcessQueue Paths => InnerProcess.Paths;
 
-        public ProcessTypes<IProcessErrorItem>.IProcessCollection ErrorPaths => InnerProcess.ErrorPaths;
+        public ProcessTypes<IProcessErrorItem>.IProcessQueue ErrorPaths => InnerProcess.ErrorPaths;
 
         public bool IsCompleted { get => _isCompleted; private set => UpdateValue(ref _isCompleted, value, nameof(IsCompleted)); }
 
@@ -87,7 +88,9 @@ namespace WinCopies.GUI.IO.Process
         Action IProcess.CancelAction => CancelAsync;
 #endif
 
-        ApartmentState IBackgroundWorker.ApartmentState { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        ApartmentState IBackgroundWorker.ApartmentState { get => throw new InvalidOperationException(); set => throw new InvalidOperationException(); }
+
+        public string Guid => InnerProcess.Guid;
         #endregion Properties
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -96,7 +99,7 @@ namespace WinCopies.GUI.IO.Process
         {
             _process = process;
             _process.AddPropertyChangedDelegate(OnPropertyChanged);
-            _process.ProcessEventDelegates.AddCommonDelegate(new QueryDelegateDelegate<IProcessProgressDelegateParameter, bool>(UpdateProgress, (value, previousResult) => UpdateProgress(value)));
+            _process.ProcessEventDelegates.AddCommonDelegate(new Util.Temp.QueryDelegateDelegate<IProcessProgressDelegateParameter, bool>(UpdateProgress, (value, previousResult) => UpdateProgress(value)));
             _process.ProcessEventDelegates.AddProgressDelegate(path => CurrentPath = path);
 
             DoWork += Process_DoWork;
@@ -141,6 +144,10 @@ namespace WinCopies.GUI.IO.Process
                 _ = LoadPaths();
 
                 ArePathsLoaded = InnerProcess.ArePathsLoaded;
+
+                if (InnerProcess.ArePathsLoaded)
+
+                    _ = InnerProcess.Start();
             }
         }
 
@@ -150,9 +157,9 @@ namespace WinCopies.GUI.IO.Process
 
         protected virtual void OnPropertyChanged(in PropertyChangedEventArgs e) => PropertyChanged?.Invoke(this, e);
 
-        protected virtual void UpdateValue<T>(ref T value, in T newValue, PropertyChangedEventArgs e) => Temp.UpdateValue(ref value, newValue, () => OnPropertyChanged(e));
+        protected virtual void UpdateValue<T>(ref T value, in T newValue, PropertyChangedEventArgs e) => UtilHelpers.UpdateValue(ref value, newValue, () => OnPropertyChanged(e));
 
-        protected virtual void UpdateValue<T>(ref T value, in T newValue, string propertyName) => Temp.UpdateValue(ref value, newValue, () => OnPropertyChanged(propertyName));
+        protected virtual void UpdateValue<T>(ref T value, in T newValue, string propertyName) => UtilHelpers.UpdateValue(ref value, newValue, () => OnPropertyChanged(propertyName));
 
         public bool LoadPaths() => InnerProcess.LoadPaths();
 

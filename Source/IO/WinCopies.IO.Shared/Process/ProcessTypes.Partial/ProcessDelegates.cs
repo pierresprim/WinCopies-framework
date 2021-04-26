@@ -37,28 +37,28 @@ namespace WinCopies.IO.Process
     {
         void AddProgressDelegate(Action<IPathCommon> action);
 
-        void AddCheckPerformedDelegate(IQueryDelegateDelegate<bool, bool> delegates);
+        void AddCheckPerformedDelegate(Util.Temp.IQueryDelegateDelegate<bool, bool> delegates);
 
-        void RemoveCheckPerformedDelegate(IQueryDelegateDelegate<bool, bool> delegates);
+        void RemoveCheckPerformedDelegate(Util.Temp.IQueryDelegateDelegate<bool, bool> delegates);
 
-        void AddCancellationPendingDelegate(IQueryDelegateDelegate<object, bool> action);
+        void AddCancellationPendingDelegate(Util.Temp.IQueryDelegateDelegate<object, bool> action);
 
-        void RemoveCancellationPendingDelegate(IQueryDelegateDelegate<object, bool> action);
+        void RemoveCancellationPendingDelegate(Util.Temp.IQueryDelegateDelegate<object, bool> action);
 
-        void AddCommonDelegate(IQueryDelegateDelegate<IProcessProgressDelegateParameter, bool> action);
+        void AddCommonDelegate(Util.Temp.IQueryDelegateDelegate<IProcessProgressDelegateParameter, bool> action);
     }
 
     public static class ProcessDelegateTypes<T, TParam> where T : IPathInfo where TParam : IProcessProgressDelegateParameter
     {
         public interface IProcessDelegates
         {
-            EventDelegate<T> ProgressDelegate { get; }
+            Util.Temp.EventDelegate<T> ProgressDelegate { get; }
 
-            ANDALSO_EventAndQueryDelegate<bool> CheckPerformedDelegate { get; }
+            Util.Temp.EventAndQueryDelegate<bool, bool> CheckPerformedDelegate { get; }
 
-            ANDALSO_EventAndQueryDelegate<object> CancellationPendingDelegate { get; }
+            Util.Temp.EventAndQueryDelegate<object, bool> CancellationPendingDelegate { get; }
 
-            ANDALSO_EventAndQueryDelegate<TParam> CommonDelegate { get; }
+            Util.Temp.EventAndQueryDelegate<TParam, bool> CommonDelegate { get; }
         }
 
         public interface IProcessDelegates<TProcessEventDelegates> : IProcessDelegates
@@ -68,15 +68,15 @@ namespace WinCopies.IO.Process
 
         public class ProcessDelegatesBase : IProcessDelegates
         {
-            public EventDelegate<T> ProgressDelegate { get; }
+            public Util.Temp.EventDelegate<T> ProgressDelegate { get; }
 
-            public ANDALSO_EventAndQueryDelegate<bool> CheckPerformedDelegate { get; }
+            public Util.Temp.EventAndQueryDelegate<bool, bool> CheckPerformedDelegate { get; }
 
-            public ANDALSO_EventAndQueryDelegate<object> CancellationPendingDelegate { get; }
+            public Util.Temp.EventAndQueryDelegate<object, bool> CancellationPendingDelegate { get; }
 
-            public ANDALSO_EventAndQueryDelegate<TParam> CommonDelegate { get; }
+            public Util.Temp.EventAndQueryDelegate<TParam, bool> CommonDelegate { get; }
 
-            public ProcessDelegatesBase(in EventDelegate<T> progressDelegate, in ANDALSO_EventAndQueryDelegate<bool> checkPerformedDelegate, in ANDALSO_EventAndQueryDelegate<object> cancellationPendingDelegate, in ANDALSO_EventAndQueryDelegate<TParam> commonDelegate)
+            public ProcessDelegatesBase(in Util.Temp.EventDelegate<T> progressDelegate, in Util.Temp.EventAndQueryDelegate<bool, bool> checkPerformedDelegate, in Util.Temp.EventAndQueryDelegate<object, bool> cancellationPendingDelegate, in Util.Temp.EventAndQueryDelegate<TParam, bool> commonDelegate)
             {
                 ProgressDelegate = progressDelegate ?? throw GetArgumentNullException(nameof(progressDelegate));
                 CheckPerformedDelegate = checkPerformedDelegate ?? throw GetArgumentNullException(nameof(checkPerformedDelegate));
@@ -87,7 +87,7 @@ namespace WinCopies.IO.Process
 
         public abstract class ProcessDelegatesAbstract<TProcessEventDelegates> : ProcessDelegatesBase, IProcessDelegates<TProcessEventDelegates> where TProcessEventDelegates : IProcessEventDelegates
         {
-            public ProcessDelegatesAbstract(in EventDelegate<T> progressDelegate, in ANDALSO_EventAndQueryDelegate<bool> checkPerformedDelegate, in ANDALSO_EventAndQueryDelegate<object> cancellationPendingDelegate, in ANDALSO_EventAndQueryDelegate<TParam> commonDelegate) : base(progressDelegate, checkPerformedDelegate, cancellationPendingDelegate, commonDelegate)
+            public ProcessDelegatesAbstract(in Util.Temp.EventDelegate<T> progressDelegate, in Util.Temp.EventAndQueryDelegate<bool, bool> checkPerformedDelegate, in Util.Temp.EventAndQueryDelegate<object, bool> cancellationPendingDelegate, in Util.Temp.EventAndQueryDelegate<TParam, bool> commonDelegate) : base(progressDelegate, checkPerformedDelegate, cancellationPendingDelegate, commonDelegate)
             {
                 // Left empty.
             }
@@ -97,7 +97,7 @@ namespace WinCopies.IO.Process
 
         public class ProcessDelegates : ProcessDelegatesAbstract<IProcessEventDelegates>
         {
-            public ProcessDelegates(in EventDelegate<T> progressDelegate, in ANDALSO_EventAndQueryDelegate<bool> checkPerformedDelegate, in ANDALSO_EventAndQueryDelegate<object> cancellationPendingDelegate, in ANDALSO_EventAndQueryDelegate<TParam> commonDelegate) : base(progressDelegate, checkPerformedDelegate, cancellationPendingDelegate, commonDelegate)
+            public ProcessDelegates(in Util.Temp.EventDelegate<T> progressDelegate, in Util.Temp.EventAndQueryDelegate<bool,bool> checkPerformedDelegate, in Util.Temp.EventAndQueryDelegate<object,bool> cancellationPendingDelegate, in Util.Temp.EventAndQueryDelegate<TParam,bool> commonDelegate) : base(progressDelegate, checkPerformedDelegate, cancellationPendingDelegate, commonDelegate)
             {
                 // Left empty.
             }
@@ -111,9 +111,9 @@ namespace WinCopies.IO.Process
 
             void RemoveProgressDelegate(Action<T> action);
 
-            void AddCommonDelegate(IQueryDelegateDelegate<TParam, bool> action);
+            void AddCommonDelegate(Util.Temp.IQueryDelegateDelegate<TParam, bool> action);
 
-            void RemoveCommonDelegate(IQueryDelegateDelegate<TParam, bool> action);
+            void RemoveCommonDelegate(Util.Temp.IQueryDelegateDelegate<TParam, bool> action);
 
 #if CS8
             private static Action<T> GetDelegate(Action<IPathCommon> action) => obj => action(obj);
@@ -129,17 +129,17 @@ namespace WinCopies.IO.Process
                 return _action;
             }
 
-            private static QueryDelegateDelegate<TParam, bool> GetDelegate(IQueryDelegateDelegate<IProcessProgressDelegateParameter, bool> action) => new
+            private static Util.Temp.QueryDelegateDelegate<TParam, bool> GetDelegate(Util.Temp.IQueryDelegateDelegate<IProcessProgressDelegateParameter, bool> action) => new
 #if !CS9
-QueryDelegateDelegate<TParam, bool>
+Util.Temp.QueryDelegateDelegate<TParam, bool>
 #endif
             (obj => action.FirstAction(obj), (x, y) => action.OtherAction(x, y));
 
-            void Process.IProcessEventDelegates.AddCommonDelegate(IQueryDelegateDelegate<IProcessProgressDelegateParameter, bool> action) => AddCommonDelegate(GetDelegate(action));
+            void Process.IProcessEventDelegates.AddCommonDelegate(Util.Temp.IQueryDelegateDelegate<IProcessProgressDelegateParameter, bool> action) => AddCommonDelegate(GetDelegate(action));
 
-            public IQueryDelegateDelegate<TParam, bool> AddCommonDelegate(IQueryDelegateDelegate<IProcessProgressDelegateParameter, bool> action)
+            public Util.Temp.IQueryDelegateDelegate<TParam, bool> AddCommonDelegate(Util.Temp.IQueryDelegateDelegate<IProcessProgressDelegateParameter, bool> action)
             {
-                IQueryDelegateDelegate<TParam, bool> _action = GetDelegate(action);
+                Util.Temp.IQueryDelegateDelegate<TParam, bool> _action = GetDelegate(action);
 
                 AddCommonDelegate(_action);
 
@@ -158,17 +158,17 @@ QueryDelegateDelegate<TParam, bool>
 
             public void RemoveProgressDelegate(Action<T> action) => Delegates.ProgressDelegate.Remove(action);
 
-            public void AddCheckPerformedDelegate(IQueryDelegateDelegate<bool, bool> delegates) => Delegates.CheckPerformedDelegate.Add(delegates);
+            public void AddCheckPerformedDelegate(Util.Temp.IQueryDelegateDelegate<bool, bool> delegates) => Delegates.CheckPerformedDelegate.Add(delegates);
 
-            public void RemoveCheckPerformedDelegate(IQueryDelegateDelegate<bool, bool> delegates) => Delegates.CheckPerformedDelegate.Remove(delegates);
+            public void RemoveCheckPerformedDelegate(Util.Temp.IQueryDelegateDelegate<bool, bool> delegates) => Delegates.CheckPerformedDelegate.Remove(delegates);
 
-            public void AddCancellationPendingDelegate(IQueryDelegateDelegate<object, bool> action) => Delegates.CancellationPendingDelegate.Add(action);
+            public void AddCancellationPendingDelegate(Util.Temp.IQueryDelegateDelegate<object, bool> action) => Delegates.CancellationPendingDelegate.Add(action);
 
-            public void RemoveCancellationPendingDelegate(IQueryDelegateDelegate<object, bool> action) => Delegates.CancellationPendingDelegate.Remove(action);
+            public void RemoveCancellationPendingDelegate(Util.Temp.IQueryDelegateDelegate<object, bool> action) => Delegates.CancellationPendingDelegate.Remove(action);
 
-            public void AddCommonDelegate(IQueryDelegateDelegate<TParam, bool> action) => Delegates.CommonDelegate.Add(action);
+            public void AddCommonDelegate(Util.Temp.IQueryDelegateDelegate<TParam, bool> action) => Delegates.CommonDelegate.Add(action);
 
-            public void RemoveCommonDelegate(IQueryDelegateDelegate<TParam, bool> action) => Delegates.CommonDelegate.Remove(action);
+            public void RemoveCommonDelegate(Util.Temp.IQueryDelegateDelegate<TParam, bool> action) => Delegates.CommonDelegate.Remove(action);
 
 #if !CS8
             private static Action<T> GetDelegate(Action<IPathCommon> action) => obj => action(obj);
@@ -184,17 +184,17 @@ QueryDelegateDelegate<TParam, bool>
                 return _action;
             }
 
-            private static QueryDelegateDelegate<TParam, bool> GetDelegate(IQueryDelegateDelegate<IProcessProgressDelegateParameter, bool> action) => new
+            private static Util.Temp.QueryDelegateDelegate<TParam, bool> GetDelegate(Util.Temp.IQueryDelegateDelegate<IProcessProgressDelegateParameter, bool> action) => new
 #if !CS9
-QueryDelegateDelegate<TParam, bool>
+Util.Temp.QueryDelegateDelegate<TParam, bool>
 #endif
             (obj => action.FirstAction(obj), (x, y) => action.OtherAction(x, y));
 
-            void Process.IProcessEventDelegates.AddCommonDelegate(IQueryDelegateDelegate<IProcessProgressDelegateParameter, bool> action) => AddCommonDelegate(GetDelegate(action));
+            void Process.IProcessEventDelegates.AddCommonDelegate(Util.Temp.IQueryDelegateDelegate<IProcessProgressDelegateParameter, bool> action) => AddCommonDelegate(GetDelegate(action));
 
-            public IQueryDelegateDelegate<TParam, bool> AddCommonDelegate(IQueryDelegateDelegate<IProcessProgressDelegateParameter, bool> action)
+            public Util.Temp.IQueryDelegateDelegate<TParam, bool> AddCommonDelegate(Util.Temp.IQueryDelegateDelegate<IProcessProgressDelegateParameter, bool> action)
             {
-                IQueryDelegateDelegate<TParam, bool> _action = GetDelegate(action);
+                Util.Temp.IQueryDelegateDelegate<TParam, bool> _action = GetDelegate(action);
 
                 AddCommonDelegate(_action);
 

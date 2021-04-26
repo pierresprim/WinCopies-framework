@@ -15,23 +15,37 @@
 * You should have received a copy of the GNU General Public License
 * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+using Microsoft.WindowsAPICodePack.Win32Native;
+
 using System;
 using System.Linq;
 
+using WinCopies.IO.Resources;
+
+#if CS8
 using static WinCopies.ThrowHelper;
+#endif
 
 namespace WinCopies.IO.Process
 {
     public static class ProcessErrorHelper
     {
-        public static IProcessError<ProcessError> GetError(in ProcessError error, in IProcessErrorFactory<ProcessError> factory) => factory.GetError(error, GetErrorMessageFromProcessError(error));
+        public static IProcessError<ProcessError> GetError(in ProcessError error, in ErrorCode errorCode, in IProcessErrorFactory<ProcessError> factory) => factory.GetError(error, GetErrorMessageFromProcessError(error), errorCode);
+
+        public static IProcessError<ProcessError> GetError(in ProcessError error, in HResult hResult, in IProcessErrorFactory<ProcessError> factory) => factory.GetError(error, GetErrorMessageFromProcessError(error), hResult);
 
         public static string GetErrorMessageFromProcessError(ProcessError error)
         {
-            System.Reflection.PropertyInfo property = typeof(Resources.ExceptionMessages).GetProperties().FirstOrDefault(p => p.Name == error.ToString());
+            System.Reflection.PropertyInfo property = typeof(ExceptionMessages).GetProperties().FirstOrDefault(p => p.Name == error.ToString());
 
             return property == null ? error.ToString() : (string)property.GetValue(null);
         }
+
+#if !CS8
+        public static IProcessError GetNoErrorError(this IProcessErrorFactory factory) => factory.GetError(factory.NoError, ExceptionMessages.NoError, ErrorCode.NoError);
+
+        public static IProcessError<T> GetNoErrorError<T>(this IProcessErrorFactory<T> factory) => factory.GetError(factory.NoError, ExceptionMessages.NoError, ErrorCode.NoError);
+#endif
     }
 
     public sealed class ProcessError<TError> : IProcessError<TError>
@@ -44,11 +58,23 @@ namespace WinCopies.IO.Process
 
         public Exception Exception { get; }
 
+        public ErrorCode? ErrorCode { get; }
+
+        public HResult? HResult { get; }
+
         private ProcessError(in TError error) => Error = error;
 
-        public ProcessError(in TError error, in Exception exception) : this(error) => Exception = exception;
+        private ProcessError(in TError error, in Exception exception) : this(error) => Exception = exception;
 
-        public ProcessError(in TError error, in string message) : this(error) => _message = message;
+        public ProcessError(in TError error, in Exception exception, in ErrorCode errorCode) : this(error, exception) => ErrorCode = errorCode;
+
+        public ProcessError(in TError error, in Exception exception, in HResult hResult) : this(error, exception) => HResult = hResult;
+
+        private ProcessError(in TError error, in string message) : this(error) => _message = message;
+
+        public ProcessError(in TError error, in string message, in ErrorCode errorCode) : this(error, message) => ErrorCode = errorCode;
+
+        public ProcessError(in TError error, in string message, in HResult hResult) : this(error, message) => HResult = hResult;
 
 #if !CS8
         #region IProcessError Support
@@ -89,30 +115,51 @@ namespace WinCopies.IO.Process
 #endif
     }
 
-    public interface IProcessErrorFactory
+    public interface IProcessErrorFactoryBase
     {
-        IProcessError GetError(object error, Exception exception);
+        IProcessError GetError(object error, Exception exception, ErrorCode errorCode);
 
-        IProcessError GetError(object error, string message);
+        IProcessError GetError(object error, Exception exception, HResult hResult);
+
+        IProcessError GetError(object error, string message, ErrorCode errorCode);
+
+        IProcessError GetError(object error, string message, HResult hResult);
     }
 
-    public interface IProcessErrorFactoryBase<T> : IProcessErrorFactory
+    public interface IProcessErrorFactoryBase<T> : IProcessErrorFactoryBase
     {
-        IProcessError<T> GetError(T error, Exception exception);
+        IProcessError<T> GetError(T error, Exception exception, ErrorCode errorCode);
 
-        IProcessError<T> GetError(T error, string message);
+        IProcessError<T> GetError(T error, Exception exception, HResult hResult);
+
+        IProcessError<T> GetError(T error, string message, ErrorCode errorCode);
+
+        IProcessError<T> GetError(T error, string message, HResult hResult);
 
 #if CS8
         private static T GetError(in object error, in string argumentName) => error is T _error ? _error : throw GetInvalidTypeArgumentException(argumentName);
 
-        IProcessError IProcessErrorFactory.GetError(object error, Exception exception) => GetError(GetError(error, nameof(error)), exception);
+        IProcessError IProcessErrorFactoryBase.GetError(object error, Exception exception, ErrorCode errorCode) => GetError(GetError(error, nameof(error)), exception, errorCode);
 
-        IProcessError IProcessErrorFactory.GetError(object error, string message) => GetError(GetError(error, nameof(error)), message);
+        IProcessError IProcessErrorFactoryBase.GetError(object error, Exception exception, HResult hResult) => GetError(GetError(error, nameof(error)), exception, hResult);
+
+        IProcessError IProcessErrorFactoryBase.GetError(object error, string message, ErrorCode errorCode) => GetError(GetError(error, nameof(error)), message, errorCode);
+
+        IProcessError IProcessErrorFactoryBase.GetError(object error, string message, HResult hResult) => GetError(GetError(error, nameof(error)), message, hResult);
 #endif
     }
 
-    public interface IProcessErrorFactory<T> : IProcessErrorFactoryData<T>, IProcessErrorFactoryBase<T>
+    public interface IProcessErrorFactory : IProcessErrorFactoryData, IProcessErrorFactoryBase
     {
-        // Left empty.
+#if CS8
+        IProcessError GetNoErrorError() => GetError(NoError, ExceptionMessages.NoError, ErrorCode.NoError);
+#endif
+    }
+
+    public interface IProcessErrorFactory<T> : IProcessErrorFactoryData<T>, IProcessErrorFactoryBase<T>, IProcessErrorFactory
+    {
+#if CS8
+        new IProcessError<T> GetNoErrorError() => GetError(NoError, ExceptionMessages.NoError, ErrorCode.NoError);
+#endif
     }
 }

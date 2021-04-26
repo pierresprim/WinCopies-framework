@@ -51,6 +51,8 @@ namespace WinCopies.IO
     {
         IPathInfo Path { get; }
 
+        FileSystemEntryEnumerationOrder EnumerationOrder { get; }
+
         System.Collections.Generic.IEnumerable<string> GetFileSystemEntryEnumerable(string searchPattern, SearchOption? searchOption
 #if CS8
             , EnumerationOptions enumerationOptions
@@ -356,11 +358,15 @@ namespace WinCopies.IO
     {
         public IPathInfo Path { get; }
 
+        public FileSystemEntryEnumerationOrder EnumerationOrder { get; }
+
         protected Func<IPathInfo, T> GetNewPathInfoDelegate { get; }
 
-        public EnumerablePath(in IPathInfo path, in Func<IPathInfo, T> getNewPathInfoDelegate)
+        public EnumerablePath(in IPathInfo path, in     FileSystemEntryEnumerationOrder enumerationOrder , in Func<IPathInfo, T> getNewPathInfoDelegate)
         {
             Path = path;
+
+            EnumerationOrder = enumerationOrder;
 
             GetNewPathInfoDelegate = getNewPathInfoDelegate;
         }
@@ -468,7 +474,7 @@ namespace WinCopies.IO
 #if CS8
             , null
 #endif
-            , FileSystemEntryEnumerationOrder.None, true
+            , EnumerationOrder, true
 #if DEBUG
             , null
 #endif
@@ -480,7 +486,7 @@ namespace WinCopies.IO
 #if CS8
             , null
 #endif
-            , FileSystemEntryEnumerationOrder.None, true
+            , EnumerationOrder, true
 #if DEBUG
             , null
 #endif
@@ -531,7 +537,7 @@ namespace WinCopies.IO
 #endif
                 )
             {
-                PathTypes<IPathInfo>.IPathCommon getPathData(string path) => new PathTypes<IPathInfo>.PathInfoCommon(System.IO.Path.GetFileName(path), new NullableGeneric<IPathInfo>(enumerablePath.Path));
+                PathTypes<IPathInfo>.IPathCommon getPathData(string path) => new PathTypes<IPathInfo>.PathInfoCommon(System.IO.Path.GetFileName(path), enumerablePath.Path);
 
                 Debug.Assert(enumerablePath != null);
 
@@ -653,6 +659,8 @@ namespace WinCopies.IO
                         break;
                 }
 
+                _currentEnumerator = _enumerators[0];
+
 #if DEBUG
                 SimulationParameters = simulationParameters;
 #endif
@@ -680,38 +688,23 @@ namespace WinCopies.IO
 #endif
                     );
 
-            protected override bool MoveNextOverride()
-            {
-                if (IsDisposed)
+            protected override bool MoveNextOverride() => _moveNext();
 
-                    throw GetExceptionForDispose(false);
-
-                if (IsCompleted)
-
-                    return false;
-
-                if (_moveNext())
-
-                    return true;
-
-                _Reset();
-
-                return false;
-            }
-
-            private void _Reset()
+            protected override void ResetOverride()
             {
                 _enumerators = null;
+                _func = null;
                 _moveNext = null;
                 _current = default;
-                _func = null;
+
+                OnResetOrDisposed();
             }
 
             protected override void DisposeManaged()
             {
                 base.DisposeManaged();
-
-                _Reset();
+                
+                _currentEnumerator = null;
             }
         }
     }
@@ -739,13 +732,13 @@ namespace WinCopies.IO
 #if CS8
             ??
 #else
-            == null ? 
+            == null ?
 #endif
             throw GetArgumentNullException(nameof(path))
 #if !CS8
             : path
 #endif
-            ), getNewPathInfoDelegate)
+            ), enumerationOrder, getNewPathInfoDelegate)
         {
             Value = path;
 

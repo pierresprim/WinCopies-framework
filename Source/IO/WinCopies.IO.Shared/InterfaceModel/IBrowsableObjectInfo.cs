@@ -133,70 +133,64 @@ namespace WinCopies.IO
 #endif
     }
 
-    public interface IProcessParameters
+    namespace Process
     {
-        Guid Guid { get; }
-
-        System.Collections.Generic.IEnumerable<string> Parameters { get; }
-    }
-
-    public interface IProcessFactory
-    {
-        bool CanCopy(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths);
-
-        bool TryCopy(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths, uint count);
-
-        void Copy(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths, uint count);
-
-        bool CanPaste(uint count, out string sourcePath);
-
-        IProcessParameters GetCopyProcessParameters(uint count);
-
-        IProcessParameters TryGetCopyProcessParameters(uint count);
-
-        IProcess GetProcess(IProcessParameters processParameters, uint count);
-
-        IProcess TryGetProcess(IProcessParameters processParameters, uint count);
-    }
-
-    public static class ProcessFactory
-    {
-        private class _DefaultProcessFactory : IProcessFactory
+        public interface IProcessParameters
         {
-            bool IProcessFactory.CanCopy(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths) => false;
+            Guid Guid { get; }
 
-            bool IProcessFactory.CanPaste(uint count, out string sourcePath)
-            {
-                sourcePath = null;
-
-                return false;
-            }
-
-            void IProcessFactory.Copy(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths, uint count) => throw new InvalidOperationException();
-
-            IProcessParameters IProcessFactory.GetCopyProcessParameters(uint count) => throw new InvalidOperationException();
-
-            IProcess IProcessFactory.GetProcess(IProcessParameters processParameters, uint count) => throw new InvalidOperationException();
-
-            bool IProcessFactory.TryCopy(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths, uint count) => false;
-
-            IProcessParameters IProcessFactory.TryGetCopyProcessParameters(uint count) => null;
-
-            IProcess IProcessFactory.TryGetProcess(IProcessParameters processParameters, uint count) => null;
+            System.Collections.Generic.IEnumerable<string> Parameters { get; }
         }
 
-        public static IProcessFactory DefaultProcessFactory { get; } = new _DefaultProcessFactory();
-    }
+        public interface IProcessFactory
+        {
+            bool CanCopy(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths);
 
-    public interface IProcessPathCollectionFactory
-    {
-        ProcessTypes<T>.IProcessCollection GetProcessCollection<T>() where T : IPathInfo;
+            bool TryCopy(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths, uint count);
 
-        ProcessTypes<T>.IProcessCollection GetReadOnlyProcessCollection<T>(ProcessTypes<T>.IProcessCollection collection) where T : IPathInfo;
+            void Copy(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths, uint count);
 
-        ProcessObjectModelTypes<TItems, TFactory, TError, TProcessDelegates, TProcessEventDelegates, TProcessProgressDelegateParameter>.Process.IEnumerableInfoLinkedList GetEnumerableInfoLinkedList<TItems, TFactory, TError, TProcessDelegates, TProcessEventDelegates, TProcessProgressDelegateParameter>() where TItems : IPathInfo where TFactory : ProcessTypes<TItems>.ProcessErrorTypes<TError>.IProcessErrorFactories where TProcessDelegates : ProcessDelegateTypes<TItems, TProcessProgressDelegateParameter>.IProcessDelegates<TProcessEventDelegates> where TProcessEventDelegates : ProcessDelegateTypes<TItems, TProcessProgressDelegateParameter>.IProcessEventDelegates where TProcessProgressDelegateParameter : IProcessProgressDelegateParameter;
+            bool CanPaste(uint count);
 
-        ProcessTypes<IProcessErrorItem<TItems, TError>>.IProcessCollection GetReadOnlyEnumerableInfoLinkedList<TItems, TError>(IEnumerableInfoLinkedList<IProcessErrorItem<TItems, TError>> collection) where TItems : IPathInfo;
+            IProcessParameters GetCopyProcessParameters(uint count);
+
+            IProcessParameters TryGetCopyProcessParameters(uint count);
+
+            IProcess GetProcess(ProcessFactorySelectorDictionaryParameters processParameters, uint count);
+
+            IProcess TryGetProcess(ProcessFactorySelectorDictionaryParameters processParameters, uint count);
+        }
+
+        public static class ProcessFactory
+        {
+            private class _DefaultProcessFactory : IProcessFactory
+            {
+                bool IProcessFactory.CanCopy(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths) => false;
+
+                bool IProcessFactory.CanPaste(uint count) => false;
+
+                void IProcessFactory.Copy(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths, uint count) => throw new InvalidOperationException();
+
+                IProcessParameters IProcessFactory.GetCopyProcessParameters(uint count) => throw new InvalidOperationException();
+
+                bool IProcessFactory.TryCopy(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths, uint count) => false;
+
+                IProcessParameters IProcessFactory.TryGetCopyProcessParameters(uint count) => null;
+
+                IProcess IProcessFactory.GetProcess(ProcessFactorySelectorDictionaryParameters processParameters, uint count) => throw new InvalidOperationException();
+
+                IProcess IProcessFactory.TryGetProcess(ProcessFactorySelectorDictionaryParameters processParameters, uint count) => null;
+            }
+
+            public static IProcessFactory DefaultProcessFactory { get; } = new _DefaultProcessFactory();
+        }
+
+        public interface IProcessPathCollectionFactory
+        {
+            ProcessTypes<T>.IProcessQueue GetProcessCollection<T>() where T : IPathInfo;
+
+            IProcessLinkedList<TItems, TError> GetProcessLinkedList<TItems, TError>() where TItems : IPathInfo;
+        }
     }
 
     namespace ObjectModel
@@ -214,8 +208,6 @@ WinCopies.
             IBrowsabilityOptions Browsability { get; }
 
             IProcessFactory ProcessFactory { get; }
-
-            IProcessPathCollectionFactory ProcessPathCollectionFactory { get; }
 
             /// <summary>
             /// Gets a value indicating whether this <see cref="IBrowsableObjectInfo"/> is recursively browsable.
@@ -357,7 +349,7 @@ TInnerObject
             { get; }
         }
 
-        public interface IBrowsableObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : IBrowsableObjectInfo<TObjectProperties>, IEncapsulatorBrowsableObjectInfo<TInnerObject> where TSelectorDictionary : IBrowsableObjectInfoSelectorDictionary<TDictionaryItems>
+        public interface IBrowsableObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : IBrowsableObjectInfo<TObjectProperties>, IEncapsulatorBrowsableObjectInfo<TInnerObject> where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
         {
             System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<TPredicateTypeParameter> predicate);
 

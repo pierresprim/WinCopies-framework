@@ -27,6 +27,10 @@ namespace WinCopies.GUI.IO.Controls.Process
 
         public System.Collections.Generic.IEnumerable<IProcess> Processes { get => (System.Collections.Generic.IEnumerable<IProcess>)GetValue(ProcessesProperty); set => SetValue(ProcessesProperty, value); }
 
+        public static readonly DependencyProperty SelectedItemProperty = DependencyProperty.Register(nameof(SelectedItem), typeof(IProcess), typeof(ProcessWindow));
+
+        public IProcess SelectedItem { get => (IProcess)GetValue(SelectedItemProperty); set => SetValue(SelectedItemProperty, value); }
+
         static ProcessWindow() => DefaultStyleKeyProperty.OverrideMetadata(typeof(ProcessWindow), new FrameworkPropertyMetadata(typeof(ProcessWindow)));
     }
 }

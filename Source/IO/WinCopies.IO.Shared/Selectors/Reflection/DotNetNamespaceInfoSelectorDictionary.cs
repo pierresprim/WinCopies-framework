@@ -23,12 +23,12 @@ using WinCopies.IO.ObjectModel.Reflection;
 
 namespace WinCopies.IO.Selectors.Reflection
 {
-    public class DotNetNamespaceInfoSelectorDictionary : BrowsableObjectInfoSelectorDictionary<DotNetNamespaceInfoItemProvider>
+    public class DotNetNamespaceInfoSelectorDictionary : EnumerableSelectorDictionary<DotNetNamespaceInfoItemProvider, IBrowsableObjectInfo>
     {
         public static IBrowsableObjectInfo Convert(DotNetNamespaceInfoItemProvider item) => item.TypeInfoItemProvider != null
                 ? new DotNetTypeInfo(item.TypeInfoItemProvider.TypeInfo, item.TypeInfoItemProvider.ItemType, true, item.Parent)
                 : (IBrowsableObjectInfo)(item.NamespaceName == null
-                    ? throw BrowsableObjectInfoSelectorDictionary.GetInvalidItemProviderException()
+                    ? throw SelectorDictionary.GetInvalidItemException()
                     : new DotNetNamespaceInfo(item.NamespaceName, item.Parent));
 
         protected override Converter<DotNetNamespaceInfoItemProvider, IBrowsableObjectInfo> DefaultSelectorOverride => Convert;
