@@ -130,7 +130,11 @@ namespace WinCopies.IO.Process.ObjectModel
 #if CS8
                     , null
 #endif
-                    , FileSystemEntryEnumerationOrder.DirectoriesThenFiles, __path => __path, true, null))
+                    , FileSystemEntryEnumerationOrder.DirectoriesThenFiles, __path => __path, true
+                    #if DEBUG
+                    , null
+#endif
+                    ))
                     {
                         if (onPathLoaded(_path))
 
@@ -446,6 +450,6 @@ namespace WinCopies.IO.Process.ObjectModel
         protected override bool DoWork(IProcessErrorItem<IPathInfo, ProcessError> path, out IProcessError<ProcessError> error, out bool isErrorGlobal) => DoWork(path, out error, out isErrorGlobal);
 
         protected override void ResetStatus() { /* Left empty. */ }
-        #endregion Methods
+#endregion Methods
     }
 }
