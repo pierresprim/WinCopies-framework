@@ -4,19 +4,14 @@ WinCopies-framework
 The WinCopies® software framework
 
 CHANGELOG
-=========
+---------
 
-Updates
--------
-
-3.2.0-preview
-=============
+### 3.2.0-preview
 
 - WinCopies.GUI.Windows.Window's Close Win32 system command can be disabled using dependency property.
 - ProcessWindow inherits from WinCopies.GUI.Windows.Window.
 
-04/26/2021 3.1.0-preview
-========================
+### 04/26/2021 3.1.0-preview
 
 - Complete rewrite of Processes, file system enumeration and (I)PathInfo (related-)types.
 - Add ListView control.
@@ -26,22 +21,15 @@ Updates
 	- SelectorDictionary
 	- SelectorDictionary\<TIn, TOut>
 	- EnumerableSelectorDictionary
+- WinCopies.GUI.IO.ObjectModel.ExplorerControlBrowsableObjectInfoViewModel's constructor is now protected.
 
-WinCopies.GUI.IO
-----------------
-
-WinCopies.GUI.IO.ObjectModel.ExplorerControlBrowsableObjectInfoViewModel's constructor is now protected.
-
-03/02/2021 3.0.0-preview
-========================
+### 03/02/2021 3.0.0-preview
 
 Complete rewrite.
 
-07/20/2020 2.5.9-preview
-========================
+### 07/20/2020 2.5.9-preview
 
-WinCopies.IO & WinCopies.GUI.IO 2.5.9-preview
----------------------------------------------
+#### WinCopies.IO & WinCopies.GUI.IO 2.5.9-preview
 
 Misc BrowsableObjectInfo API updates, such as:
 
@@ -50,11 +38,9 @@ Misc BrowsableObjectInfo API updates, such as:
 - PortableDeviceItemInfo is now called PortableDeviceObjectInfo in order to have the same nomenclature as the ShellObjectInfo class.
 - PortableDevice(Object)Info.LocalizedName now return the same value as the Name property.
 
-07/06/2020 2.5.8-preview1
-=========================
+### 07/06/2020 2.5.8-preview1
 
-WinCopies.IO 2.5.8-preview1
----------------------------
+#### WinCopies.IO 2.5.8-preview1
 
 - Existing item changes:
 	- LocalizedName and Description properties return N/A for ArchiveItemInfo
@@ -73,19 +59,16 @@ WinCopies.IO 2.5.8-preview1
 	- Public (static) methods regarding item type name and icon generation in FileSystemObjectInfo.
 - Bug fixes.
 
-WinCopies.GUI.Templates 2.5.8-preview
--------------------------------------
+#### WinCopies.GUI.Templates 2.5.8-preview
 
 - Additions:
 	- DataTemplate for ImageSource
 
-05/25/2020 2.3.0-preview5
-=========================
+### 05/25/2020 2.3.0-preview5
 
 - Depends on WinCopies.Util 2.3.0-preview5
 
-WinCopies.IO (2.3.0-preview5)
------------------------------
+#### WinCopies.IO (2.3.0-preview5)
 
 - Existing item updates:
 	- The Size struct's inner value is now of the WinCopies.Util.CheckedUInt64 type.
@@ -107,34 +90,28 @@ WinCopies.IO (2.3.0-preview5)
 	- IBrowsableObjectInfo.GetItems(Predicate<IBrowsableObjectInfo> func) method.
 	- WinCopies.IO.Path.PathSeparator const.
 
-05/07/2020 2.2.0-preview4
-=========================
+### 05/07/2020 2.2.0-preview4
 
 - .Net Core and .Net Standard are now supported.
 
-WinCopies.Data (2.2.0-preview4)
--------------------------------
+#### WinCopies.Data
 
 - Package now depends on Newtonsoft.Json v9.0.1
 
-WinCopies.GUI.Windows (2.2.0-preview4)
---------------------------------------
+#### WinCopies.GUI.Windows
 
 - Package now depends on WinCopies.WindowsAPICodePack.Shell v2.0.0-preview6
 
-First releases (2.2.0-preview4)
--------------------------------
+#### First releases
 
 - WinCopies.IO
 - WinCopies.GUI.Controls
 - WinCopies.GUI.IO
 - WinCopies.GUI.Icons
 
-02/09/2020 2.1
-==============
+### 02/09/2020 2.1
 
-WinCopies.Util (2.1)
---------------------
+#### WinCopies.Util
 
 Available for .Net Framework, .Net Core and .Net Standard*
 
@@ -152,11 +129,9 @@ Available for .Net Framework, .Net Core and .Net Standard*
 
 \* Some features are not available in the .Net Core and .Net Standard versions since these frameworks do not have the same structure as the .Net Framework. New packages that include these features will be released later.
 
-2.0
-===
+### 2.0
 
-WinCopies.Util (2.0)
---------------------
+#### WinCopies.Util
 
 Available for .Net Framework, .Net Core and .Net Standard*
 
@@ -291,35 +266,14 @@ Available for .Net Framework, .Net Core and .Net Standard*
 
 \*\*\* See WinCopies.Util.Extensions.SetProperty/Field
 
-WinCopies.Data (2.0)
---------------------
+#### First releases:
 
-First release
-
-WinCoipies.GUI (2.0)
---------------------
-
-First release
-
-WinCopies.GUI.Models (2.0)
---------------------------
-
-First release
-
-WinCopies.GUI.ViewModels (2.0)
-------------------------------
-
-First release
-
-WinCopies.GUI.Templates (2.0)
------------------------------
-
-First release
-
-WinCopies.GUI.Windows (2.0)
----------------------------
-
-First release
+- WinCopies.Data
+- WinCopies.GUI
+- WinCopies.GUI.Models
+- WinCopies.GUI.ViewModels
+- WinCopies.GUI.Templates
+- WinCopies.GUI.Windows
 
 Project link
 ------------
