@@ -16,5 +16,16 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 #if DEBUG
+using System;
+using System.Windows;
 
+namespace WinCopies.Temp
+{
+    public static class Temp
+    {
+        public static int GetSystemCommandWParam(IntPtr wParam) { /* Already implemented in the WAPICP. */ return 0; }
+
+        public static object DisableCloseMenuItem(Window window) { /* Already implemented in the WAPICP. */ }
+    }
+}
 #endif

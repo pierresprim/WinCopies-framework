@@ -24,18 +24,24 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
 
+using static WinCopies.Temp.Temp;
+
 using WindowUtilities = Microsoft.WindowsAPICodePack.Shell.DesktopWindowManager;
 
 namespace WinCopies.GUI.Windows
 {
     public class Window : System.Windows.Window
     {
-        /// <summary>
-        /// Identifies the <see cref="ShowHelpButton"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty ShowHelpButtonProperty = DependencyProperty.Register(nameof(ShowHelpButton), typeof(bool), typeof(Window), new PropertyMetadata(false));
+        public static readonly DependencyProperty CloseButtonProperty = DependencyProperty.Register(nameof(CloseButton), typeof(bool), typeof(Window), new PropertyMetadata(true));
 
-        public bool ShowHelpButton { get => (bool)GetValue(ShowHelpButtonProperty); set => SetValue(ShowHelpButtonProperty, value); }
+        public bool CloseButton { get => (bool)GetValue(CloseButtonProperty); set => SetValue(CloseButtonProperty, value); }
+
+        /// <summary>
+        /// Identifies the <see cref="HelpButton"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty HelpButtonProperty = DependencyProperty.Register(nameof(HelpButton), typeof(bool), typeof(Window), new PropertyMetadata(false));
+
+        public bool HelpButton { get => (bool)GetValue(HelpButtonProperty); set => SetValue(HelpButtonProperty, value); }
 
         private static readonly DependencyPropertyKey IsInHelpModePropertyKey = DependencyProperty.RegisterReadOnly(nameof(IsInHelpMode), typeof(bool), typeof(Window), new PropertyMetadata(false));
 
@@ -62,19 +68,15 @@ namespace WinCopies.GUI.Windows
             remove => RemoveHandler(HelpButtonClickEvent, value);
         }
 
-         static Window() => DefaultStyleKeyProperty.OverrideMetadata(typeof(Window), new FrameworkPropertyMetadata(typeof(Window)));
+        // static Window() => DefaultStyleKeyProperty.OverrideMetadata(typeof(Window), new FrameworkPropertyMetadata(typeof(Window)));
 
-        protected override void OnSourceInitialized(EventArgs e)
+        protected virtual void OnSourceInitialized(HwndSource hwndSource)
         {
-            base.OnSourceInitialized(e);
-
-            if (ShowHelpButton)
+            if (HelpButton)
             {
                 IntPtr hwnd = new WindowInteropHelper(this).Handle;
 
-                WindowUtilities.SetWindow(hwnd, IntPtr.Zero, 0, 0, 0, 0, (WindowStyles)(((uint)WindowUtilities.GetWindowStyles(hwnd) & 0xFFFFFFFF) ^ ((uint)WindowStyles.MinimizeBox | (uint)WindowStyles.MaximizeBox)), (WindowStylesEx)((uint)WindowUtilities.GetWindowStylesEx(hwnd) | (uint)WindowStylesEx.ContextHelp), SetWindowPositionOptions.NoMove | SetWindowPositionOptions.NoSize | SetWindowPositionOptions.NoZOrder | SetWindowPositionOptions.FrameChanged);
-
-                ((HwndSource)PresentationSource.FromVisual(this)).AddHook(OnSourceHook);
+                WindowUtilities.SetWindow(hwnd, IntPtr.Zero, 0, 0, 0, 0, (WindowStyles)(((long)WindowUtilities.GetWindowStyles(hwnd) & 0xFFFFFFFF) ^ ((uint)WindowStyles.MinimizeBox | (uint)WindowStyles.MaximizeBox)), (WindowStylesEx)((uint)WindowUtilities.GetWindowStylesEx(hwnd) | (uint)WindowStylesEx.ContextHelp), SetWindowPositionOptions.NoMove | SetWindowPositionOptions.NoSize | SetWindowPositionOptions.NoZOrder | SetWindowPositionOptions.FrameChanged);
 
                 //IntPtr hwnd = new System.Windows.Interop.WindowInteropHelper(this).Handle;
                 //uint styles = GetWindowLongPtr(hwnd, GWL_STYLE);
@@ -86,6 +88,17 @@ namespace WinCopies.GUI.Windows
                 //SetWindowPos(hwnd, IntPtr.Zero, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
                 //((HwndSource)PresentationSource.FromVisual(this)).AddHook(OnHelpButtonClickHook);
             }
+
+            hwndSource.AddHook(OnSourceHook);
+        }
+
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            base.OnSourceInitialized(e);
+
+            if (PresentationSource.FromVisual(this) is HwndSource hwndSource)
+
+                OnSourceInitialized(hwndSource);
         }
 
         // todo: really needed?
@@ -96,7 +109,7 @@ namespace WinCopies.GUI.Windows
         {
             // if (IsInHelpMode)
             // {
-            SetValue(IsInHelpModePropertyKey, !(bool)IsInHelpMode);
+            SetValue(IsInHelpModePropertyKey, !IsInHelpMode);
 
             // Cursor = (bool)IsInHelpMode ? Cursors.Help : Cursors.Arrow;
             // }
@@ -104,13 +117,64 @@ namespace WinCopies.GUI.Windows
             RaiseHelpButtonClickEvent();
         }
 
+        protected virtual bool OnSystemCommandMessage(IntPtr wParam)
+        {
+            if (GetSystemCommandWParam(wParam) == (int)SystemCommand.ContextHelp)
+
+                OnHelpButtonClick();
+
+            return true;
+        }
+
+        protected virtual bool OnShowWindowMessage()
+        {
+            if (!CloseButton)
+
+                _ = DisableCloseMenuItem(this);
+
+            return false;
+        }
+
         protected virtual IntPtr OnSourceHook(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
-            if (msg == (int)WindowMessage.SystemCommand &&
-                    ((int)wParam & 0xFFF0) == (int)SystemCommand.ContextHelp)
-            {
-                OnHelpButtonClick();
+            var _msg = (WindowMessage)msg;
+
+            IntPtr result = OnSourceHook(hwnd, _msg, wParam, lParam, out bool _handled);
+
+            if (_handled)
+
                 handled = true;
+
+            return result;
+        }
+
+        protected virtual IntPtr OnSourceHook(IntPtr hwnd, WindowMessage msg, IntPtr wParam, IntPtr lParam, out bool handled)
+        {
+            switch (msg)
+            {
+                case WindowMessage.SystemCommand:
+
+                    handled = OnSystemCommandMessage(wParam);
+
+                    break;
+
+                case WindowMessage.ShowWindow:
+
+                    handled = OnShowWindowMessage();
+
+                    break;
+
+                case WindowMessage.Close:
+
+                    handled = !CloseButton;
+
+                    break;
+
+                default:
+
+                    handled = false;
+
+                    break;
             }
 
             return IntPtr.Zero;

@@ -21,7 +21,7 @@ using WinCopies.GUI.IO.Process;
 
 namespace WinCopies.GUI.IO.Controls.Process
 {
-    public class ProcessWindow : Window
+    public class ProcessWindow : Windows.Window
     {
         public static readonly DependencyProperty ProcessesProperty = DependencyProperty.Register(nameof(Processes), typeof(System.Collections.Generic.IEnumerable<IProcess>), typeof(ProcessWindow));
 

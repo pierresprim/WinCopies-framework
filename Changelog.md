@@ -9,6 +9,12 @@ CHANGELOG
 Updates
 -------
 
+3.2.0-preview
+=============
+
+- WinCopies.GUI.Windows.Window's Close Win32 system command can be disabled using dependency property.
+- ProcessWindow inherits from WinCopies.GUI.Windows.Window.
+
 04/26/2021 3.1.0-preview
 ========================
 
