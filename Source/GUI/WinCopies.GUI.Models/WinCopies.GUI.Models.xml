@@ -51,12 +51,12 @@
         </member>
         <member name="P:WinCopies.GUI.Windows.Dialogs.Models.IDialogModel.DialogButton">
             <summary>
-            Gets or sets the <see cref="!:Dialogs.DialogButton"/> value of this <see cref="T:WinCopies.GUI.Windows.Dialogs.Models.IDialogModel"/>.
+            Gets or sets the <see cref="T:WinCopies.GUI.Windows.DialogButton"/> value of this <see cref="T:WinCopies.GUI.Windows.Dialogs.Models.IDialogModel"/>.
             </summary>
         </member>
         <member name="P:WinCopies.GUI.Windows.Dialogs.Models.IDialogModel.DefaultButton">
             <summary>
-            Gets or sets the <see cref="!:Dialogs.DefaultButton"/> value of this <see cref="T:WinCopies.GUI.Windows.Dialogs.Models.IDialogModel"/>.
+            Gets or sets the <see cref="T:WinCopies.GUI.Windows.DefaultButton"/> value of this <see cref="T:WinCopies.GUI.Windows.Dialogs.Models.IDialogModel"/>.
             </summary>
         </member>
         <member name="T:WinCopies.GUI.Windows.Dialogs.Models.DialogModel">
@@ -379,34 +379,34 @@
             Initializes a new instance of the <see cref="T:WinCopies.GUI.Controls.Models.ButtonModel"/> class with a custom content and <see cref="T:WinCopies.GUI.Controls.Models.BindingDirection"/>.
             </summary>
         </member>
-        <member name="T:WinCopies.GUI.Controls.Models.IButtonModel`1">
+        <member name="T:WinCopies.GUI.Controls.Models.IButtonModel`2">
             <summary>
             Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.Button"/>s.
             </summary>
         </member>
-        <member name="T:WinCopies.GUI.Controls.Models.ButtonModel`1">
+        <member name="T:WinCopies.GUI.Controls.Models.ButtonModel`2">
             <summary>
             Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.Button"/>s.
             </summary>
         </member>
-        <member name="P:WinCopies.GUI.Controls.Models.ButtonModel`1.Command">
+        <member name="P:WinCopies.GUI.Controls.Models.ButtonModel`2.Command">
             <summary>
-            Gets or sets the command of this <see cref="T:WinCopies.GUI.Controls.Models.ButtonModel`1"/>.
+            Gets or sets the command of this <see cref="T:WinCopies.GUI.Controls.Models.ButtonModel`2"/>.
             </summary>
         </member>
-        <member name="P:WinCopies.GUI.Controls.Models.ButtonModel`1.CommandParameter">
+        <member name="P:WinCopies.GUI.Controls.Models.ButtonModel`2.CommandParameter">
             <summary>
-            Gets or sets the command parameter of this <see cref="T:WinCopies.GUI.Controls.Models.ButtonModel`1"/>.
+            Gets or sets the command parameter of this <see cref="T:WinCopies.GUI.Controls.Models.ButtonModel`2"/>.
             </summary>
         </member>
-        <member name="P:WinCopies.GUI.Controls.Models.ButtonModel`1.CommandTarget">
+        <member name="P:WinCopies.GUI.Controls.Models.ButtonModel`2.CommandTarget">
             <summary>
-            Gets or sets the command target of this <see cref="T:WinCopies.GUI.Controls.Models.ButtonModel`1"/>.
+            Gets or sets the command target of this <see cref="T:WinCopies.GUI.Controls.Models.ButtonModel`2"/>.
             </summary>
         </member>
-        <member name="M:WinCopies.GUI.Controls.Models.ButtonModel`1.#ctor">
+        <member name="M:WinCopies.GUI.Controls.Models.ButtonModel`2.#ctor">
             <summary>
-            Initializes a new instance of the <see cref="T:WinCopies.GUI.Controls.Models.ButtonModel`1"/> class.
+            Initializes a new instance of the <see cref="T:WinCopies.GUI.Controls.Models.ButtonModel`2"/> class.
             </summary>
         </member>
         <member name="T:WinCopies.GUI.Controls.Models.IToggleButtonModel">
@@ -444,29 +444,29 @@
             Initializes a new instance of the <see cref="T:WinCopies.GUI.Controls.Models.ToggleButtonModel"/> class.
             </summary>
         </member>
-        <member name="T:WinCopies.GUI.Controls.Models.IToggleButtonModel`1">
+        <member name="T:WinCopies.GUI.Controls.Models.IToggleButtonModel`2">
             <summary>
             Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.Primitives.ToggleButton"/>s.
             </summary>
         </member>
-        <member name="T:WinCopies.GUI.Controls.Models.ToggleButtonModel`1">
+        <member name="T:WinCopies.GUI.Controls.Models.ToggleButtonModel`2">
             <summary>
             Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.Primitives.ToggleButton"/>s.
             </summary>
         </member>
-        <member name="P:WinCopies.GUI.Controls.Models.ToggleButtonModel`1.IsChecked">
+        <member name="P:WinCopies.GUI.Controls.Models.ToggleButtonModel`2.IsChecked">
             <summary>
-            Gets or sets a value that indeicates whether this <see cref="T:WinCopies.GUI.Controls.Models.ToggleButtonModel`1"/> is checked.
+            Gets or sets a value that indeicates whether this <see cref="T:WinCopies.GUI.Controls.Models.ToggleButtonModel`2"/> is checked.
             </summary>
         </member>
-        <member name="P:WinCopies.GUI.Controls.Models.ToggleButtonModel`1.IsThreeState">
+        <member name="P:WinCopies.GUI.Controls.Models.ToggleButtonModel`2.IsThreeState">
             <summary>
-            Gets or sets a value that indeicates whether this <see cref="T:WinCopies.GUI.Controls.Models.ToggleButtonModel`1"/> is three state.
+            Gets or sets a value that indeicates whether this <see cref="T:WinCopies.GUI.Controls.Models.ToggleButtonModel`2"/> is three state.
             </summary>
         </member>
-        <member name="M:WinCopies.GUI.Controls.Models.ToggleButtonModel`1.#ctor">
+        <member name="M:WinCopies.GUI.Controls.Models.ToggleButtonModel`2.#ctor">
             <summary>
-            Initializes a new instance of the <see cref="T:WinCopies.GUI.Controls.Models.ToggleButtonModel`1"/> class.
+            Initializes a new instance of the <see cref="T:WinCopies.GUI.Controls.Models.ToggleButtonModel`2"/> class.
             </summary>
         </member>
         <member name="T:WinCopies.GUI.Controls.Models.ICheckBoxModel">
@@ -484,19 +484,19 @@
             Initializes a new instance of the <see cref="T:WinCopies.GUI.Controls.Models.CheckBoxModel"/> class.
             </summary>
         </member>
-        <member name="T:WinCopies.GUI.Controls.Models.ICheckBoxModel`1">
+        <member name="T:WinCopies.GUI.Controls.Models.ICheckBoxModel`2">
             <summary>
             Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.CheckBox"/>'.
             </summary>
         </member>
-        <member name="T:WinCopies.GUI.Controls.Models.CheckBoxModel`1">
+        <member name="T:WinCopies.GUI.Controls.Models.CheckBoxModel`2">
             <summary>
             Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.CheckBox"/>'.
             </summary>
         </member>
-        <member name="M:WinCopies.GUI.Controls.Models.CheckBoxModel`1.#ctor">
+        <member name="M:WinCopies.GUI.Controls.Models.CheckBoxModel`2.#ctor">
             <summary>
-            Initializes a new instance of the <see cref="T:WinCopies.GUI.Controls.Models.CheckBoxModel`1"/> class.
+            Initializes a new instance of the <see cref="T:WinCopies.GUI.Controls.Models.CheckBoxModel`2"/> class.
             </summary>
         </member>
         <member name="T:WinCopies.GUI.Controls.Models.ITextBoxModelTextOriented">
@@ -569,12 +569,12 @@
             Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.RadioButton"/> collection.
             </summary>
         </member>
-        <member name="T:WinCopies.GUI.Controls.Models.IRadioButtonCollection`1">
+        <member name="T:WinCopies.GUI.Controls.Models.IRadioButtonCollection`2">
             <summary>
             Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.RadioButton"/> collection.
             </summary>
         </member>
-        <member name="T:WinCopies.GUI.Controls.Models.RadioButtonCollection`1">
+        <member name="T:WinCopies.GUI.Controls.Models.RadioButtonCollection`2">
             <summary>
             Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.RadioButton"/> collection.
             </summary>
@@ -594,19 +594,19 @@
             Initializes a new instance of the <see cref="T:WinCopies.GUI.Controls.Models.RadioButtonModel"/> class.
             </summary>
         </member>
-        <member name="T:WinCopies.GUI.Controls.Models.IRadioButtonModel`1">
+        <member name="T:WinCopies.GUI.Controls.Models.IRadioButtonModel`2">
             <summary>
             Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.RadioButton"/>s.
             </summary>
         </member>
-        <member name="T:WinCopies.GUI.Controls.Models.RadioButtonModel`1">
+        <member name="T:WinCopies.GUI.Controls.Models.RadioButtonModel`2">
             <summary>
             Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.RadioButton"/>s.
             </summary>
         </member>
-        <member name="M:WinCopies.GUI.Controls.Models.RadioButtonModel`1.#ctor">
+        <member name="M:WinCopies.GUI.Controls.Models.RadioButtonModel`2.#ctor">
             <summary>
-            Initializes a new instance of the <see cref="T:WinCopies.GUI.Controls.Models.RadioButtonModel`1"/> class.
+            Initializes a new instance of the <see cref="T:WinCopies.GUI.Controls.Models.RadioButtonModel`2"/> class.
             </summary>
         </member>
         <member name="T:WinCopies.GUI.Controls.Models.IGroupingRadioButtonModel">
@@ -614,7 +614,7 @@
             Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.RadioButton"/>s.
             </summary>
         </member>
-        <member name="T:WinCopies.GUI.Controls.Models.IGroupingRadioButtonModel`1">
+        <member name="T:WinCopies.GUI.Controls.Models.IGroupingRadioButtonModel`2">
             <summary>
             Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.RadioButton"/>s.
             </summary>
@@ -629,14 +629,14 @@
             Initializes a new instance of the <see cref="T:WinCopies.GUI.Controls.Models.GroupingRadioButtonModel"/> class.
             </summary>
         </member>
-        <member name="T:WinCopies.GUI.Controls.Models.GroupingRadioButtonModel`1">
+        <member name="T:WinCopies.GUI.Controls.Models.GroupingRadioButtonModel`2">
             <summary>
             Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.RadioButton"/>s.
             </summary>
         </member>
-        <member name="M:WinCopies.GUI.Controls.Models.GroupingRadioButtonModel`1.#ctor">
+        <member name="M:WinCopies.GUI.Controls.Models.GroupingRadioButtonModel`2.#ctor">
             <summary>
-            Initializes a new instance of the <see cref="T:WinCopies.GUI.Controls.Models.GroupingRadioButtonModel`1"/> class.
+            Initializes a new instance of the <see cref="T:WinCopies.GUI.Controls.Models.GroupingRadioButtonModel`2"/> class.
             </summary>
         </member>
     </members>

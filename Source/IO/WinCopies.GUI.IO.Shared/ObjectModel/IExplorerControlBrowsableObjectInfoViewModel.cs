@@ -19,6 +19,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Controls;
+using WinCopies.Collections.Generic;
+using WinCopies.IO.ObjectModel;
 
 namespace WinCopies.GUI.IO.ObjectModel
 {
@@ -29,11 +31,13 @@ namespace WinCopies.GUI.IO.ObjectModel
 
     public interface IExplorerControlBrowsableObjectInfoViewModel : IBrowsableObjectInfoViewModelCommon
     {
-        IEnumerable<IBrowsableObjectInfoViewModel> TreeViewItems { get; set; }
+        System.Collections.Generic.IEnumerable<IBrowsableObjectInfoViewModel> TreeViewItems { get; set; }
 
         string Text { get; set; }
 
         IBrowsableObjectInfoViewModel Path { get; set; }
+
+        ObservableLinkedCollectionEnumerable<IBrowsableObjectInfo> History { get; }
 
         IBrowsableObjectInfoFactory Factory { get; set; }
 

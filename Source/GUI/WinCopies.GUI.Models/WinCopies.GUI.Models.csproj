@@ -23,7 +23,7 @@
   <Import Project="..\WinCopies.GUI.Models.Shared\WinCopies.GUI.Models.Shared.projitems" Label="Shared" />
 
   <ItemGroup>
-    <PackageReference Include="WinCopies.Util" Version="3.6-preview" />
+    <PackageReference Include="WinCopies.Util" Version="3.7-preview" />
     <PackageReference Include="WinCopies.Util.Desktop" Version="3.6-preview" />
   </ItemGroup>
 
@@ -36,6 +36,10 @@
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(Configuration)'=='Debug'">
+    <ProjectReference Include="..\..\WinCopies.Util.Temp\WinCopies.Util.Temp.csproj" />
   </ItemGroup>
 
 </Project>

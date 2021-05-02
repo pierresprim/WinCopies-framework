@@ -109,9 +109,34 @@
             Identifies the <see cref="P:WinCopies.GUI.IO.Controls.ExplorerControl.ListViewStyle"/> dependency property.
             </summary>
         </member>
+        <member name="F:WinCopies.GUI.IO.Controls.ExplorerControl.PropertyGridItemProperty">
+            <summary>
+            Identifies the <see cref="F:WinCopies.GUI.IO.Controls.ExplorerControl.PropertyGridItemProperty"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.ExplorerControl.PropertyGridDescriptionProperty">
+            <summary>
+            Identifies the <see cref="F:WinCopies.GUI.IO.Controls.ExplorerControl.PropertyGridDescriptionProperty"/> dependency property.
+            </summary>
+        </member>
         <member name="F:WinCopies.GUI.IO.Controls.ExplorerControl.IsCheckBoxVisibleProperty">
             <summary>
             Identifies the <see cref="P:WinCopies.GUI.IO.Controls.ExplorerControl.IsCheckBoxVisible"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.ExplorerControl.SelectedIndexProperty">
+            <summary>
+            Identifies the <see cref="F:WinCopies.GUI.IO.Controls.ExplorerControl.SelectedIndexProperty"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.ExplorerControl.SelectedItemProperty">
+            <summary>
+            Identifies the <see cref="F:WinCopies.GUI.IO.Controls.ExplorerControl.SelectedItemProperty"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.ExplorerControl.SelectedItemsProperty">
+            <summary>
+            Identifies the <see cref="F:WinCopies.GUI.IO.Controls.ExplorerControl.SelectedItemsProperty"/> dependency property.
             </summary>
         </member>
         <member name="F:WinCopies.GUI.IO.Controls.ExplorerControl.GoButtonCommandProperty">
@@ -127,6 +152,11 @@
         <member name="F:WinCopies.GUI.IO.Controls.ExplorerControl.PathChangedEvent">
             <summary>
             Identifies the <see cref="E:WinCopies.GUI.IO.Controls.ExplorerControl.PathChanged"/> routed event.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.ExplorerControl.SelectionChangedEvent">
+            <summary>
+            Identifies the <see cref="F:WinCopies.GUI.IO.Controls.ExplorerControl.SelectionChangedEvent"/> routed event.
             </summary>
         </member>
         <member name="F:WinCopies.GUI.IO.Controls.ExplorerControlListViewItem.CommandProperty">

@@ -25,8 +25,8 @@
   <Import Project="..\WinCopies.GUI.Controls.Shared\WinCopies.GUI.Controls.Shared.projitems" Label="Shared" />
 
   <ItemGroup>
-    <PackageReference Include="WinCopies.Util" Version="3.6-preview" />
-    <PackageReference Include="WinCopies.Collections" Version="3.6-preview" />
+    <PackageReference Include="WinCopies.Util" Version="3.7-preview" />
+    <PackageReference Include="WinCopies.Collections" Version="3.7-preview" />
     <PackageReference Include="WinCopies.Util.Extensions" Version="3.6-preview" />
     <PackageReference Include="WinCopies.Util.Desktop" Version="3.6-preview" />
     

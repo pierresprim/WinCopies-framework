@@ -9,7 +9,8 @@
     xmlns:markup="clr-namespace:WinCopies.Markup;assembly=WinCopies.Util.Desktop"
     xmlns:guiDialogs="clr-namespace:WinCopies.GUI.Windows;assembly=WinCopies.GUI.Models"
     xmlns:windows="clr-namespace:WinCopies.GUI.Windows"
-    xmlns:propertySystem="clr-namespace:WinCopies.GUI.Controls.PropertySystem">
+    xmlns:propertySystem="clr-namespace:WinCopies.GUI.Controls.PropertySystem"
+    xmlns:temp="clr-namespace:WinCopies.Temp;assembly=WinCopies.Util.Temp">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/wincopies.gui.templates;component/Themes/Generic.xaml" />
         <ResourceDictionary>
@@ -19,6 +20,7 @@
             <converters:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
             <windows:ButtonAlignmentToHorizontalAlignmentConverter x:Key="ButtonAlignmentToHorizontalAlignmentConverter" />
             <propertySystem:PropertyConverter x:Key="PropertyConverter" />
+            <temp:EqualsConverter x:Key="EqualsConverter" />
             <!--End of Converters Section-->
             <ContextMenu x:Key="TextBoxContextMenu">
                 <MenuItem Command="{x:Static ApplicationCommands.Undo}" Icon="{x:Static icons:Resources.arrow_undo}" />
@@ -832,5 +834,33 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+
+    <Style x:Key="NavigationButtonItemContainerStyle" TargetType="{x:Type MenuItem}">
+        <Setter Property="IsCheckable" Value="True" />
+        <Setter Property="IsChecked">
+            <Setter.Value>
+                <MultiBinding Converter="{StaticResource EqualsConverter}">
+                    <Binding Mode="OneWay" />
+                    <Binding Path="List.Current" Mode="OneWay" />
+                </MultiBinding>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Command" Value="{x:Static NavigationCommands.GoToPage}" />
+        <Setter Property="CommandParameter" Value="{Binding}" />
+    </Style>
+
+    <ControlTemplate x:Key="NavigationButtonTemplate" TargetType="{x:Type local:NavigationButton}">
+        <StackPanel Orientation="Horizontal">
+            <Button Command="{x:Static NavigationCommands.BrowseBack}" />
+            <Button Command="{x:Static NavigationCommands.BrowseForward}" />
+            <local:MenuButton ItemsSource="{TemplateBinding ItemsSource}" ItemContainerStyle="{TemplateBinding ItemContainerStyle}" />
+        </StackPanel>
+    </ControlTemplate>
+
+    <Style TargetType="{x:Type local:NavigationButton}">
+        <Setter Property="Template" Value="{StaticResource NavigationButtonTemplate}" />
+        <Setter Property="CommandParameter" Value="{Binding ItemsSource.Current}" />
+        <Setter Property="ItemContainerStyle" Value="{StaticResource NavigationButtonItemContainerStyle}" />
     </Style>
 </ResourceDictionary>

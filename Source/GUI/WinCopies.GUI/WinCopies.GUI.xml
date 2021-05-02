@@ -89,9 +89,9 @@
             Gets or sets a value that represents the object that the command is being executed on.
             </summary>
         </member>
-        <member name="F:WinCopies.GUI.Windows.Window.ShowHelpButtonProperty">
+        <member name="F:WinCopies.GUI.Windows.Window.HelpButtonProperty">
             <summary>
-            Identifies the <see cref="P:WinCopies.GUI.Windows.Window.ShowHelpButton"/> dependency property.
+            Identifies the <see cref="P:WinCopies.GUI.Windows.Window.HelpButton"/> dependency property.
             </summary>
         </member>
         <member name="F:WinCopies.GUI.Windows.Window.IsInHelpModeProperty">

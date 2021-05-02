@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Windows;
@@ -22,6 +23,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
+using WinCopies.Temp;
 
 #if WinCopies3
 using static WinCopies.ThrowHelper;
@@ -44,12 +46,12 @@ namespace WinCopies.GUI.Windows.Dialogs.Models
         string Title { get; set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="Dialogs.DialogButton"/> value of this <see cref="IDialogModel"/>.
+        /// Gets or sets the <see cref="Windows.DialogButton"/> value of this <see cref="IDialogModel"/>.
         /// </summary>
         DialogButton DialogButton { get; set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="Dialogs.DefaultButton"/> value of this <see cref="IDialogModel"/>.
+        /// Gets or sets the <see cref="Windows.DefaultButton"/> value of this <see cref="IDialogModel"/>.
         /// </summary>
         DefaultButton DefaultButton { get; set; }
     }
@@ -796,13 +798,21 @@ namespace WinCopies.GUI.Controls.Models
     /// <summary>
     /// Represents a model that corresponds to a default view for <see cref="Button"/>s.
     /// </summary>
-    public interface IButtonModel : IContentControlModel
+    public interface IButtonModel : IContentControlModel, ICommandSource
     {
-        ICommand Command { get; set; }
+        new ICommand Command { get; set; }
 
-        object CommandParameter { get; set; }
+        new object CommandParameter { get; set; }
 
-        IInputElement CommandTarget { get; set; }
+        new IInputElement CommandTarget { get; set; }
+
+#if CS8
+        ICommand ICommandSource.Command => Command;
+
+        object ICommandSource.CommandParameter => CommandParameter;
+
+        IInputElement ICommandSource.CommandTarget => CommandTarget;
+#endif
     }
 
     /// <summary>
@@ -850,7 +860,7 @@ namespace WinCopies.GUI.Controls.Models
     /// <summary>
     /// Represents a model that corresponds to a default view for <see cref="Button"/>s.
     /// </summary>
-    public interface IButtonModel<T> : IButtonModel, IContentControlModel<T>
+    public interface IButtonModel<TContent, TCommandParameter> : IButtonModel, ICommandSource<TCommandParameter>, IContentControlModel<TContent>
     {
         // Left empty.
     }
@@ -859,33 +869,37 @@ namespace WinCopies.GUI.Controls.Models
     /// Represents a model that corresponds to a default view for <see cref="Button"/>s.
     /// </summary>
     [TypeForDataTemplate(typeof(IButtonModel))]
-    public class ButtonModel<T> : ContentControlModel<T>, IButtonModel<T>
+    public class ButtonModel<TContent, TCommandParameter> : ContentControlModel<TContent>, IButtonModel<TContent, TCommandParameter>
     {
         /// <summary>
-        /// Gets or sets the command of this <see cref="ButtonModel{T}"/>.
+        /// Gets or sets the command of this <see cref="ButtonModel{TContent,TCommandParameter}"/>.
         /// </summary>
         public ICommand Command { get; set; }
 
         /// <summary>
-        /// Gets or sets the command parameter of this <see cref="ButtonModel{T}"/>.
+        /// Gets or sets the command parameter of this <see cref="ButtonModel{TContent,TCommandParameter}"/>.
         /// </summary>
-        public object CommandParameter { get; set; }
+        public TCommandParameter CommandParameter { get; set; }
+
+        object ICommandSource.CommandParameter => CommandParameter;
+
+        object IButtonModel.CommandParameter { get => CommandParameter; set => CommandParameter = value is TCommandParameter _value ? _value : throw new ArgumentException($"The given value is not a {typeof(TCommandParameter).Name}."); }
 
         /// <summary>
-        /// Gets or sets the command target of this <see cref="ButtonModel{T}"/>.
+        /// Gets or sets the command target of this <see cref="ButtonModel{TContent,TCommandParameter}"/>.
         /// </summary>
         public IInputElement CommandTarget { get; set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ButtonModel{T}"/> class.
+        /// Initializes a new instance of the <see cref="ButtonModel{TContent,TCommandParameter}"/> class.
         /// </summary>
         public ButtonModel() { /* Left empty. */ }
 
-        public ButtonModel(T content) : base(content) { /* Left empty. */ }
+        public ButtonModel(TContent content) : base(content) { /* Left empty. */ }
 
         public ButtonModel(BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
 
-        public ButtonModel(T content, BindingDirection bindingDirection) : base(content, bindingDirection) { /* Left empty. */ }
+        public ButtonModel(TContent content, BindingDirection bindingDirection) : base(content, bindingDirection) { /* Left empty. */ }
     }
 
     /// <summary>
@@ -935,7 +949,7 @@ namespace WinCopies.GUI.Controls.Models
     /// <summary>
     /// Represents a model that corresponds to a default view for <see cref="ToggleButton"/>s.
     /// </summary>
-    public interface IToggleButtonModel<T> : IToggleButtonModel, IButtonModel<T>
+    public interface IToggleButtonModel<TContent, TCommandParameter> : IToggleButtonModel, IButtonModel<TContent, TCommandParameter>
     {
         // Left empty.
     }
@@ -944,28 +958,28 @@ namespace WinCopies.GUI.Controls.Models
     /// Represents a model that corresponds to a default view for <see cref="ToggleButton"/>s.
     /// </summary>
     [TypeForDataTemplate(typeof(IToggleButtonModel))]
-    public class ToggleButtonModel<T> : ButtonModel<T>, IToggleButtonModel<T>
+    public class ToggleButtonModel<TContent, TCommandParameter> : ButtonModel<TContent, TCommandParameter>, IToggleButtonModel<TContent, TCommandParameter>
     {
         /// <summary>
-        /// Gets or sets a value that indeicates whether this <see cref="ToggleButtonModel{T}"/> is checked.
+        /// Gets or sets a value that indeicates whether this <see cref="ToggleButtonModel{TContent, TCommandParameter}"/> is checked.
         /// </summary>
         public bool? IsChecked { get; set; }
 
         /// <summary>
-        /// Gets or sets a value that indeicates whether this <see cref="ToggleButtonModel{T}"/> is three state.
+        /// Gets or sets a value that indeicates whether this <see cref="ToggleButtonModel{TContent, TCommandParameter}"/> is three state.
         /// </summary>
         public bool IsThreeState { get; set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ToggleButtonModel{T}"/> class.
+        /// Initializes a new instance of the <see cref="ToggleButtonModel{TContent, TCommandParameter}"/> class.
         /// </summary>
         public ToggleButtonModel() { /* Left empty. */ }
 
-        public ToggleButtonModel(T content) : base(content) { /* Left empty. */ }
+        public ToggleButtonModel(TContent content) : base(content) { /* Left empty. */ }
 
         public ToggleButtonModel(BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
 
-        public ToggleButtonModel(T content, BindingDirection bindingDirection) : base(content, bindingDirection) { /* Left empty. */ }
+        public ToggleButtonModel(TContent content, BindingDirection bindingDirection) : base(content, bindingDirection) { /* Left empty. */ }
     }
 
     /// <summary>
@@ -997,7 +1011,7 @@ namespace WinCopies.GUI.Controls.Models
     /// <summary>
     /// Represents a model that corresponds to a default view for <see cref="CheckBox"/>'.
     /// </summary>
-    public interface ICheckBoxModel<T> : IToggleButtonModel<T>, ICheckBoxModel
+    public interface ICheckBoxModel<TContent, TCommandParameter> : IToggleButtonModel<TContent, TCommandParameter>, ICheckBoxModel
     {
         // Left empty.
     }
@@ -1006,18 +1020,18 @@ namespace WinCopies.GUI.Controls.Models
     /// Represents a model that corresponds to a default view for <see cref="CheckBox"/>'.
     /// </summary>
     [TypeForDataTemplate(typeof(ICheckBoxModel))]
-    public class CheckBoxModel<T> : ToggleButtonModel<T>, ICheckBoxModel<T>
+    public class CheckBoxModel<TContent, TCommandParameter> : ToggleButtonModel<TContent, TCommandParameter>, ICheckBoxModel<TContent, TCommandParameter>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="CheckBoxModel{T}"/> class.
+        /// Initializes a new instance of the <see cref="CheckBoxModel{TContent, TCommandParameter}"/> class.
         /// </summary>
         public CheckBoxModel() { /* Left empty. */ }
 
-        public CheckBoxModel(T content) : base(content) { /* Left empty. */ }
+        public CheckBoxModel(TContent content) : base(content) { /* Left empty. */ }
 
         public CheckBoxModel(BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
 
-        public CheckBoxModel(T content, BindingDirection bindingDirection) : base(content, bindingDirection) { /* Left empty. */ }
+        public CheckBoxModel(TContent content, BindingDirection bindingDirection) : base(content, bindingDirection) { /* Left empty. */ }
     }
 
     /// <summary>
@@ -1251,7 +1265,7 @@ namespace WinCopies.GUI.Controls.Models
     /// <summary>
     /// Represents a model that corresponds to a default view for <see cref="RadioButton"/> collection.
     /// </summary>
-    public interface IRadioButtonCollection<T> : IRadioButtonCollection, IEnumerable<IRadioButtonModel<T>>
+    public interface IRadioButtonCollection<TContent, TCommandParameter> : IRadioButtonCollection, IEnumerable<IRadioButtonModel<TContent, TCommandParameter>>
     {
         // Left empty.
     }
@@ -1260,7 +1274,7 @@ namespace WinCopies.GUI.Controls.Models
     /// Represents a model that corresponds to a default view for <see cref="RadioButton"/> collection.
     /// </summary>
     [TypeForDataTemplate(typeof(IRadioButtonCollection))]
-    public class RadioButtonCollection<T> : List<IRadioButtonModel<T>>, IRadioButtonCollection<T>
+    public class RadioButtonCollection<TContent, TCommandParameter> : List<IRadioButtonModel<TContent, TCommandParameter>>, IRadioButtonCollection<TContent, TCommandParameter>
     {
         public string GroupName { get; set; }
 
@@ -1296,7 +1310,7 @@ namespace WinCopies.GUI.Controls.Models
     /// <summary>
     /// Represents a model that corresponds to a default view for <see cref="RadioButton"/>s.
     /// </summary>
-    public interface IRadioButtonModel<T> : IRadioButtonModel, IToggleButtonModel<T>
+    public interface IRadioButtonModel<TContent, TCommandParameter> : IRadioButtonModel, IToggleButtonModel<TContent, TCommandParameter>
     {
         // Left empty.
     }
@@ -1305,18 +1319,18 @@ namespace WinCopies.GUI.Controls.Models
     /// Represents a model that corresponds to a default view for <see cref="RadioButton"/>s.
     /// </summary>
     [TypeForDataTemplate(typeof(IRadioButtonModel))]
-    public class RadioButtonModel<T> : ToggleButtonModel<T>, IRadioButtonModel<T>
+    public class RadioButtonModel<TContent, TCommandParameter> : ToggleButtonModel<TContent, TCommandParameter>, IRadioButtonModel<TContent, TCommandParameter>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="RadioButtonModel{T}"/> class.
+        /// Initializes a new instance of the <see cref="RadioButtonModel{TContent, TCommandParameter}"/> class.
         /// </summary>
         public RadioButtonModel() { /* Left empty. */ }
 
-        public RadioButtonModel(T content) : base(content) { /* Left empty. */ }
+        public RadioButtonModel(TContent content) : base(content) { /* Left empty. */ }
 
         public RadioButtonModel(BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
 
-        public RadioButtonModel(T content, BindingDirection bindingDirection) : base(content, bindingDirection) { /* Left empty. */ }
+        public RadioButtonModel(TContent content, BindingDirection bindingDirection) : base(content, bindingDirection) { /* Left empty. */ }
     }
 
     /// <summary>
@@ -1330,7 +1344,7 @@ namespace WinCopies.GUI.Controls.Models
     /// <summary>
     /// Represents a model that corresponds to a default view for <see cref="RadioButton"/>s.
     /// </summary>
-    public interface IGroupingRadioButtonModel<T> : IGroupingRadioButtonModel, IRadioButtonModel<T>
+    public interface IGroupingRadioButtonModel<TContent, TCommandParameter> : IGroupingRadioButtonModel, IRadioButtonModel<TContent, TCommandParameter>
     {
         // Left empty.
     }
@@ -1359,19 +1373,19 @@ namespace WinCopies.GUI.Controls.Models
     /// Represents a model that corresponds to a default view for <see cref="RadioButton"/>s.
     /// </summary>
     [TypeForDataTemplate(typeof(IGroupingRadioButtonModel))]
-    public class GroupingRadioButtonModel<T> : RadioButtonModel<T>, IGroupingRadioButtonModel<T>
+    public class GroupingRadioButtonModel<TContent, TCommandParameter> : RadioButtonModel<TContent, TCommandParameter>, IGroupingRadioButtonModel<TContent, TCommandParameter>
     {
         public string GroupName { get; set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="GroupingRadioButtonModel{T}"/> class.
+        /// Initializes a new instance of the <see cref="GroupingRadioButtonModel{TContent, TCommandParameter}"/> class.
         /// </summary>
         public GroupingRadioButtonModel() { /* Left empty. */ }
 
-        public GroupingRadioButtonModel(T content) : base(content) { /* Left empty. */ }
+        public GroupingRadioButtonModel(TContent content) : base(content) { /* Left empty. */ }
 
         public GroupingRadioButtonModel(BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
 
-        public GroupingRadioButtonModel(T content, BindingDirection bindingDirection) : base(content, bindingDirection) { /* Left empty. */ }
+        public GroupingRadioButtonModel(TContent content, BindingDirection bindingDirection) : base(content, bindingDirection) { /* Left empty. */ }
     }
 }

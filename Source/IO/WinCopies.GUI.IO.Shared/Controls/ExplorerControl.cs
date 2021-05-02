@@ -20,8 +20,8 @@ using System.Collections;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using WinCopies.Collections.Generic;
 using WinCopies.IO.ObjectModel;
-
 using WinCopies.Util.Data;
 
 namespace WinCopies.GUI.IO.Controls
@@ -42,6 +42,10 @@ namespace WinCopies.GUI.IO.Controls
 
         public string Text { get => (string)GetValue(TextProperty); set => SetValue(TextProperty, value); }
 
+        public static readonly DependencyProperty HistoryProperty = DependencyProperty.Register(nameof(History), typeof(ObservableLinkedCollectionEnumerable<IBrowsableObjectInfo>), typeof(ExplorerControl));
+
+        public ObservableLinkedCollectionEnumerable<IBrowsableObjectInfo> History { get => (ObservableLinkedCollectionEnumerable<IBrowsableObjectInfo>)GetValue(HistoryProperty); set => SetValue(HistoryProperty, value); }
+
         /// <summary>
         /// Identifies the <see cref="TreeViewStyle"/> dependency property.
         /// </summary>
@@ -56,10 +60,16 @@ namespace WinCopies.GUI.IO.Controls
 
         public Style ListViewStyle { get => (Style)GetValue(ListViewStyleProperty); set => SetValue(ListViewStyleProperty, value); }
 
+        /// <summary>
+        /// Identifies the <see cref="PropertyGridItemProperty"/> dependency property.
+        /// </summary>
         public static readonly DependencyProperty PropertyGridItemProperty = DependencyProperty.Register(nameof(PropertyGridItem), typeof(IBrowsableObjectInfo), typeof(ExplorerControl));
 
         public IBrowsableObjectInfo PropertyGridItem { get => (IBrowsableObjectInfo)GetValue(PropertyGridItemProperty); set => SetValue(PropertyGridItemProperty, value); }
 
+        /// <summary>
+        /// Identifies the <see cref="PropertyGridDescriptionProperty"/> dependency property.
+        /// </summary>
         public static readonly DependencyProperty PropertyGridDescriptionProperty = DependencyProperty.Register(nameof(PropertyGridDescription), typeof(string), typeof(ExplorerControl));
 
         public string PropertyGridDescription { get => (string)GetValue(PropertyGridDescriptionProperty); set => SetValue(PropertyGridDescriptionProperty, value); }
@@ -71,16 +81,25 @@ namespace WinCopies.GUI.IO.Controls
 
         public bool IsCheckBoxVisible { get => (bool)GetValue(IsCheckBoxVisibleProperty); set => SetValue(IsCheckBoxVisibleProperty, value); }
 
+        /// <summary>
+        /// Identifies the <see cref="SelectedIndexProperty"/> dependency property.
+        /// </summary>
         public static readonly DependencyProperty SelectedIndexProperty = DependencyProperty.Register(nameof(SelectedIndex), typeof(int), typeof(ExplorerControl), new PropertyMetadata(-1));
 
         public int SelectedIndex { get => (int)GetValue(SelectedIndexProperty); set => SetValue(SelectedIndexProperty, value); }
 
+        /// <summary>
+        /// Identifies the <see cref="SelectedItemProperty"/> dependency property.
+        /// </summary>
         public static readonly DependencyProperty SelectedItemProperty = DependencyProperty.Register(nameof(SelectedItem), typeof(object), typeof(ExplorerControl));
 
         public object SelectedItem { get => GetValue(SelectedItemProperty); set => SetValue(SelectedItemProperty, value); }
 
         private static readonly DependencyPropertyKey SelectedItemsPropertyKey = DependencyProperty.RegisterReadOnly(nameof(SelectedItems), typeof(IList), typeof(ExplorerControl), new PropertyMetadata(null));
 
+        /// <summary>
+        /// Identifies the <see cref="SelectedItemsProperty"/> dependency property.
+        /// </summary>
         public static readonly DependencyProperty SelectedItemsProperty = SelectedItemsPropertyKey.DependencyProperty;
 
         public IList SelectedItems { get => (IList)GetValue(SelectedItemsProperty); private set => SetValue(SelectedItemsPropertyKey, value); }
@@ -111,6 +130,9 @@ namespace WinCopies.GUI.IO.Controls
             remove => RemoveHandler(PathChangedEvent, value);
         }
 
+        /// <summary>
+        /// Identifies the <see cref="SelectionChangedEvent"/> routed event.
+        /// </summary>
         public static readonly RoutedEvent SelectionChangedEvent = EventManager.RegisterRoutedEvent(nameof(SelectionChanged), RoutingStrategy.Bubble, typeof(SelectionChangedEventHandler), typeof(ExplorerControl));
 
         public event SelectionChangedEventHandler SelectionChanged
@@ -125,6 +147,13 @@ namespace WinCopies.GUI.IO.Controls
         public ExplorerControl() => OnInit();
 
         protected virtual void OnInit() => AddHandler(System.Windows.Controls.Primitives.Selector.SelectionChangedEvent, new SelectionChangedEventHandler(ListView_SelectionChanged));
+
+        protected virtual void OnGoToPageCanExecute(CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+
+            e.Handled = true;
+        }
 
         protected virtual void OnListViewSelectionChanged(SelectionChangedEventArgs e)
         {

@@ -32,7 +32,7 @@ namespace WinCopies.GUI.Windows
 {
     public class Window : System.Windows.Window
     {
-        public static readonly DependencyProperty CloseButtonProperty = DependencyProperty.Register(nameof(CloseButton), typeof(bool), typeof(Window), new PropertyMetadata(true));
+        public static readonly DependencyProperty CloseButtonProperty = DependencyProperty.Register(nameof(CloseButton), typeof(bool), typeof(Window), new PropertyMetadata(true, (DependencyObject d, DependencyPropertyChangedEventArgs e)=> _=(bool)e.NewValue?   Temp.Temp.EnableCloseMenuItem((Window)d): Temp.Temp.DisableCloseMenuItem((Window)d)));
 
         public bool CloseButton { get => (bool)GetValue(CloseButtonProperty); set => SetValue(CloseButtonProperty, value); }
 
@@ -68,7 +68,7 @@ namespace WinCopies.GUI.Windows
             remove => RemoveHandler(HelpButtonClickEvent, value);
         }
 
-        // static Window() => DefaultStyleKeyProperty.OverrideMetadata(typeof(Window), new FrameworkPropertyMetadata(typeof(Window)));
+         static Window() => DefaultStyleKeyProperty.OverrideMetadata(typeof(Window), new FrameworkPropertyMetadata(typeof(Window)));
 
         protected virtual void OnSourceInitialized(HwndSource hwndSource)
         {
@@ -120,10 +120,13 @@ namespace WinCopies.GUI.Windows
         protected virtual bool OnSystemCommandMessage(IntPtr wParam)
         {
             if (GetSystemCommandWParam(wParam) == (int)SystemCommand.ContextHelp)
-
+            {
                 OnHelpButtonClick();
 
-            return true;
+                return true;
+            }
+
+            return false;
         }
 
         protected virtual bool OnShowWindowMessage()
