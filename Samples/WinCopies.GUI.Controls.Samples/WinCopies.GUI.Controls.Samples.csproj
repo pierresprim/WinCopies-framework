@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="WinCopies.Util.Desktop" Version="3.6-preview" />
+    <PackageReference Include="WinCopies.Util.Desktop" Version="3.7.2-preview" />
   </ItemGroup>
 
   <ItemGroup>

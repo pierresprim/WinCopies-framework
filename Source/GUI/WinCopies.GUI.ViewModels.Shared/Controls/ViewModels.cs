@@ -19,8 +19,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Input;
-
+using WinCopies.Commands;
 using WinCopies.GUI.Controls.Models;
+using WinCopies.Temp;
 using WinCopies.Util;
 
 namespace WinCopies.GUI.Controls.ViewModels
@@ -76,13 +77,17 @@ namespace WinCopies.GUI.Controls.ViewModels
     }
 
     [TypeForDataTemplate(typeof(IButtonModel))]
-    public class ButtonViewModel<TModel, TContent> : ContentControlViewModel<TModel, TContent>, IButtonModel<TContent> where TModel : IButtonModel<TContent>
+    public class ButtonViewModel<TModel, TContent, TCommandParameter> : ContentControlViewModel<TModel, TContent>, IButtonModel<TContent, TCommandParameter> where TModel : IButtonModel<TContent, TCommandParameter>
     {
         public ICommand Command { get => ModelGeneric.Command; set => Update(nameof(Command), value, typeof(IButtonModel)); }
 
-        public object CommandParameter { get => ModelGeneric.CommandParameter; set => Update(nameof(CommandParameter), value, typeof(IButtonModel)); }
+        public TCommandParameter CommandParameter { get => ((ICommandSource<TCommandParameter>)ModelGeneric).CommandParameter; set => Update(nameof(CommandParameter), value, typeof(IButtonModel)); }
 
         public IInputElement CommandTarget { get => ModelGeneric.CommandTarget; set => Update(nameof(CommandTarget), value, typeof(IButtonModel)); }
+
+        object IButtonModel.CommandParameter { get => ((IButtonModel)ModelGeneric).CommandParameter; set => ((IButtonModel)ModelGeneric).CommandParameter=value; }
+
+        object ICommandSource.CommandParameter => ((ICommandSource)ModelGeneric).CommandParameter;
 
         public ButtonViewModel(TModel model) : base(model) { }
     }
@@ -98,7 +103,7 @@ namespace WinCopies.GUI.Controls.ViewModels
     }
 
     [TypeForDataTemplate(typeof(IToggleButtonModel))]
-    public class ToggleButtonViewModel<TModel, TContent> : ButtonViewModel<TModel, TContent>, IToggleButtonModel<TContent> where TModel : IToggleButtonModel<TContent>
+    public class ToggleButtonViewModel<TModel, TContent, TCommandParameter> : ButtonViewModel<TModel, TContent, TCommandParameter>, IToggleButtonModel<TContent, TCommandParameter> where TModel : IToggleButtonModel<TContent, TCommandParameter>
     {
         public bool? IsChecked { get => ModelGeneric.IsChecked; set => Update(nameof(IsChecked), value, typeof(IToggleButtonModel)); }
 
@@ -114,7 +119,7 @@ namespace WinCopies.GUI.Controls.ViewModels
     }
 
     [TypeForDataTemplate(typeof(ICheckBoxModel))]
-    public class CheckBoxViewModel<TModel, TContent> : ToggleButtonViewModel<TModel, TContent>, ICheckBoxModel<TContent> where TModel : ICheckBoxModel<TContent>
+    public class CheckBoxViewModel<TModel, TContent, TCommandParameter> : ToggleButtonViewModel<TModel, TContent, TCommandParameter>, ICheckBoxModel<TContent, TCommandParameter> where TModel : ICheckBoxModel<TContent, TCommandParameter>
     {
         public CheckBoxViewModel(TModel model) : base(model) { }
     }
@@ -138,7 +143,7 @@ namespace WinCopies.GUI.Controls.ViewModels
     }
 
     [TypeForDataTemplate(typeof(IRadioButtonCollection))]
-    public class ObservableRadioButtonCollection<T> : ObservableCollection<IRadioButtonModel<T>>, IRadioButtonCollection<T>
+    public class ObservableRadioButtonCollection<TContent, TCommandParameter> : ObservableCollection<IRadioButtonModel<TContent, TCommandParameter>>, IRadioButtonCollection<TContent, TCommandParameter>
     {
         public string GroupName
         {
@@ -154,7 +159,7 @@ namespace WinCopies.GUI.Controls.ViewModels
 
         IEnumerator<IRadioButtonModel> IEnumerable<IRadioButtonModel>.GetEnumerator() => GetEnumerator();
 
-        public ObservableRadioButtonCollection(RadioButtonCollection<T> items) : base(items) { }
+        public ObservableRadioButtonCollection(RadioButtonCollection<TContent, TCommandParameter> items) : base(items) { }
     }
 
     [TypeForDataTemplate(typeof(IGroupingRadioButtonModel))]
@@ -166,7 +171,7 @@ namespace WinCopies.GUI.Controls.ViewModels
     }
 
     [TypeForDataTemplate(typeof(IGroupingRadioButtonModel))]
-    public class GroupingRadioButtonViewModel<TModel, TContent> : ToggleButtonViewModel<TModel, TContent>, IGroupingRadioButtonModel where TModel : IGroupingRadioButtonModel<TContent>
+    public class GroupingRadioButtonViewModel<TModel, TContent, TCommandParameter> : ToggleButtonViewModel<TModel, TContent, TCommandParameter>, IGroupingRadioButtonModel where TModel : IGroupingRadioButtonModel<TContent, TCommandParameter>
     {
         public string GroupName { get => ModelGeneric.GroupName; set => Update(nameof(GroupName), value, typeof(IGroupingRadioButtonModel)); }
 

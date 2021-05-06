@@ -11,10 +11,8 @@
     xmlns:markup="clr-namespace:WinCopies.Markup;assembly=WinCopies.Util.Desktop"
     xmlns:propertySystem="clr-namespace:WinCopies.PropertySystem;assembly=WinCopies.Util.Desktop"
     xmlns:commands="clr-namespace:WinCopies.Commands;assembly=WinCopies.Util.Desktop"
-    xmlns:dataTemp="clr-namespace:WinCopies.Util.Data;assembly=WinCopies.Util.Temp"
     xmlns:util="clr-namespace:WinCopies;assembly=WinCopies.Util.Desktop"
     xmlns:sys="clr-namespace:System;assembly=mscorlib">
-
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/wincopies.gui;component/Themes/Generic.xaml" />
         <ResourceDictionary Source="pack://application:,,,/wincopies.gui.templates;component/Themes/Generic.xaml" />
@@ -108,6 +106,10 @@
         </Setter>
     </Style>-->
 
+    <Style x:Key="WinCopies.GUI.IO.NavigationButtonItemContainerStyle" TargetType="{x:Type MenuItem}" BasedOn="{StaticResource NavigationButtonItemContainerStyle}">
+        <Setter Property="Header" Value="{Binding Node.Value.Path}" />
+    </Style>
+
     <ControlTemplate x:Key="ExplorerControlTemplate" TargetType="{x:Type localControls:ExplorerControl}" x:Shared="false">
         <!--<DataTemplate DataType="{x:Type local:BrowsableObjectInfo}">-->
         <Grid>
@@ -122,10 +124,23 @@
             </Grid.RowDefinitions>
             <Grid Grid.ColumnSpan="3">
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto" />
                     <ColumnDefinition />
                     <ColumnDefinition Width="auto" />
                 </Grid.ColumnDefinitions>
-                <TextBox>
+                <controls:NavigationButton ItemsSource="{Binding History, RelativeSource={RelativeSource TemplatedParent}}" ItemContainerStyle="{StaticResource WinCopies.GUI.IO.NavigationButtonItemContainerStyle}">
+                    <controls:NavigationButton.GoBackButtonStyle>
+                        <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
+                            <Setter Property="Content" Value="{x:Static icons:Resources.resultset_previous}" />
+                        </Style>
+                    </controls:NavigationButton.GoBackButtonStyle>
+                    <controls:NavigationButton.GoForwardButtonStyle>
+                        <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
+                            <Setter Property="Content" Value="{x:Static icons:Resources.resultset_next}" />
+                        </Style>
+                    </controls:NavigationButton.GoForwardButtonStyle>
+                </controls:NavigationButton>
+                <TextBox Grid.Column="1">
                     <TextBox.Style>
                         <Style TargetType="{x:Type TextBox}">
                             <Setter Property="Text" Value="{Binding Path, RelativeSource={RelativeSource TemplatedParent}}" />
@@ -137,7 +152,7 @@
                         </Style>
                     </TextBox.Style>
                 </TextBox>
-                <Button Grid.Column="1" Command="{TemplateBinding GoButtonCommand}" CommandParameter="{TemplateBinding GoButtonCommandParameter}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Source={x:Static icons:Resources.accept}}" />
+                <Button Grid.Column="2" Command="{TemplateBinding GoButtonCommand}" CommandParameter="{TemplateBinding GoButtonCommandParameter}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{x:Static icons:Resources.accept}" />
             </Grid>
             <localControls:ExplorerControlTreeView Grid.Row="1" Style="{TemplateBinding TreeViewStyle}">
                 <!--<TreeView.ItemTemplate>
@@ -311,7 +326,7 @@
     <DataTemplate DataType="{x:Type localObjectModel:IExplorerControlBrowsableObjectInfoViewModel}" x:Shared="false">
         <localControls:ExplorerControl x:Name="ExplorerControl" Path="{Binding Path.Path}" Text="{Binding Text, Mode=TwoWay}"
                                        TreeViewStyle="{StaticResource ExplorerControlTreeViewStyle}" ListViewStyle="{StaticResource ExplorerControlListViewStyle}"
-                                       GoButtonCommand="{x:Static localObjectModel:ExplorerControlBrowsableObjectInfoViewModel.GoCommand}" GoButtonCommandParameter="{Binding}"
+                                       History="{Binding History}" GoButtonCommand="{x:Static localObjectModel:ExplorerControlBrowsableObjectInfoViewModel.GoCommand}" GoButtonCommandParameter="{Binding}"
                                        IsCheckBoxVisible="{Binding IsCheckBoxVisible}"
                                        SelectedIndex="{Binding Path.SelectedIndex, Mode=TwoWay}" SelectedItem="{Binding Path.SelectedItem, Mode=TwoWay}"
                                        PropertyGridItem="{Binding Path}" PropertyGridDescription="{Binding Path.Items.Count, StringFormat={}{0} items}">

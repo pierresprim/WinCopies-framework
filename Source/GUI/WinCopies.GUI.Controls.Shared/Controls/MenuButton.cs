@@ -32,8 +32,6 @@ namespace WinCopies.GUI.Controls
         private Button _rootButton;
         private Popup _popup;
 
-
-
         protected override void OnInitialized(EventArgs e)
         {
             base.OnInitialized(e);
@@ -89,7 +87,7 @@ namespace WinCopies.GUI.Controls
 
         protected virtual void OnSubmenuOpened()
         {
-            Mouse.Capture(this, CaptureMode.SubTree);
+            _ = Mouse.Capture(this, CaptureMode.SubTree);
 
             RaiseEvent(new RoutedEventArgs(SubmenuOpenedEvent, this));
         }
@@ -108,13 +106,11 @@ namespace WinCopies.GUI.Controls
 
             if (!itemBounds.Contains(Mouse.GetPosition(this)))
             {
-                Mouse.Capture(null);
+                _ = Mouse.Capture(null);
 
                 IsSubmenuOpen = false;
             }
         }
-
-
 
         static MenuButton() => DefaultStyleKeyProperty.OverrideMetadata(typeof(MenuButton), new FrameworkPropertyMetadata(typeof(MenuButton)));
     }

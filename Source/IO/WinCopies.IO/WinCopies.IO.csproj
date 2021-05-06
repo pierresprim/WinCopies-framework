@@ -13,10 +13,10 @@
 		<SignAssembly>true</SignAssembly>
 		<AssemblyOriginatorKeyFile>WinCopies.IO.snk</AssemblyOriginatorKeyFile>
 		<DefineConstants>WinCopies2;WinCopies3;$(DefineConstants)</DefineConstants>
-		<VersionPrefix>3.1.0</VersionPrefix>
-		<VersionSuffix>preview</VersionSuffix>
-		<AssemblyVersion>3.1.0</AssemblyVersion>
-		<FileVersion>3.1.0</FileVersion>
+    <VersionPrefix>3.2.0</VersionPrefix>
+    <VersionSuffix>preview</VersionSuffix>
+    <AssemblyVersion>3.2.0</AssemblyVersion>
+    <FileVersion>3.2.0</FileVersion>
 		<PackageIcon>WinCopies.png</PackageIcon>
 	</PropertyGroup>
 
@@ -62,14 +62,14 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="WinCopies.Util" Version="3.6-preview" />
-		<PackageReference Include="WinCopies.Collections" Version="3.6-preview" />
+		<PackageReference Include="WinCopies.Util" Version="3.7.1-preview" />
+		<PackageReference Include="WinCopies.Collections" Version="3.7.2-preview" />
 		<PackageReference Include="WinCopies.Util.Extensions" Version="3.6-preview" />
     
 		<PackageReference Include="Squid-Box.SevenZipSharp" Version="1.2.231" />
     
 		<PackageReference Include="WinCopies.WindowsAPICodePack.Consts" Version="3.0.1-preview" />
-		<PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="3.0.1-preview" />
+		<PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="3.1.1-preview" />
 		<PackageReference Include="WinCopies.WindowsAPICodePack.PortableDevices" Version="3.0.1-preview" />
 	</ItemGroup>
 

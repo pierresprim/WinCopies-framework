@@ -28,11 +28,7 @@ along with the WinCopies Framework.  If not, see<https://www.gnu.org/licenses/>.
         <CommandBinding Command="Close" Executed="CommandBinding_Executed" CanExecute="CommandBinding_CanExecute" />
     </windows:Window.CommandBindings>
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="auto" />
-            <RowDefinition />
-        </Grid.RowDefinitions>
-        <Menu>
+        <Menu VerticalAlignment="Top">
             <MenuItem Header="File">
                 <MenuItem Header="Open dialog..." Click="Button_Click" />
                 <MenuItem Command="Close" />
@@ -40,7 +36,6 @@ along with the WinCopies Framework.  If not, see<https://www.gnu.org/licenses/>.
             <MenuItem Header="View">
                 <MenuItem Header="LabelTest" Click="MenuItem_Click" />
                 <MenuItem Header="ExplorerControlTest" Click="MenuItem_Click_1" />
-                <MenuItem Header="CopyTest" Click="MenuItem_Click_2" />
             </MenuItem>
         </Menu>
     </Grid>

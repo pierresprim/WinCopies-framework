@@ -34,7 +34,9 @@ namespace WinCopies.GUI.Samples
         {
             InitializeComponent();
 
-            ShowHelpButton = true;
+            HelpButton = true;
+
+            CloseButton = false;
         }
 
         private void Window_HelpButtonClick(object sender, RoutedEventArgs e) => _ = MessageBox.Show($"The window is currently in help mode: { IsInHelpMode }.");
@@ -49,8 +51,8 @@ namespace WinCopies.GUI.Samples
 
             Func<DialogWindow>[] dialogWindows =
                 {
-                () => new DialogWindow() { Content = "1 - This is a sample DialogWindow.", ShowHelpButton = true },
-            () => new DialogWindow() { Content = "2 - This is a sample DialogWindow.", ShowHelpButton = true },
+                () => new DialogWindow() { Content = "1 - This is a sample DialogWindow.", HelpButton = true },
+            () => new DialogWindow() { Content = "2 - This is a sample DialogWindow.", HelpButton = true },
             () => new DialogWindow() { Content = "3 - This is a sample DialogWindow.", ShowHelpButtonAsCommandButton = true },
             () => new DialogWindow() { Content = "4 - This is a sample DialogWindow.", ShowHelpButtonAsCommandButton = true },
             () => new DialogWindow() { Content = "5 - This is a sample DialogWindow.", DialogButton = DialogButton.YesNoCancel, DefaultButton = DefaultButton.Cancel, ShowHelpButtonAsCommandButton = true },
@@ -104,12 +106,20 @@ namespace WinCopies.GUI.Samples
 
         private void CommandBinding_CanExecute(object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = true;
 
-        private void CommandBinding_Executed(object sender, ExecutedRoutedEventArgs e) => Close();
+        private void CommandBinding_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (!CloseButton)
+            {
+                CloseButton = true;
+
+                return;
+            }
+
+            Close();
+        }
 
         private void MenuItem_Click(object sender, RoutedEventArgs e) => new Window1().Show();
 
         private void MenuItem_Click_1(object sender, RoutedEventArgs e) => new ExplorerControlTest().Show();
-
-        private void MenuItem_Click_2(object sender, RoutedEventArgs e) => new CopyTest().Show();
     }
 }

@@ -19,6 +19,7 @@
             <converters:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
             <windows:ButtonAlignmentToHorizontalAlignmentConverter x:Key="ButtonAlignmentToHorizontalAlignmentConverter" />
             <propertySystem:PropertyConverter x:Key="PropertyConverter" />
+            <converters:EqualsConverter x:Key="EqualsConverter" />
             <!--End of Converters Section-->
             <ContextMenu x:Key="TextBoxContextMenu">
                 <MenuItem Command="{x:Static ApplicationCommands.Undo}" Icon="{x:Static icons:Resources.arrow_undo}" />
@@ -832,5 +833,33 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+
+    <Style x:Key="NavigationButtonItemContainerStyle" TargetType="{x:Type MenuItem}">
+        <Setter Property="IsCheckable" Value="True" />
+        <Setter Property="IsChecked">
+            <Setter.Value>
+                <MultiBinding Converter="{StaticResource EqualsConverter}" Mode="OneWay">
+                    <Binding Path="Node.Value" />
+                    <Binding Path="ItemsSource.Current.Node.Value" RelativeSource="{RelativeSource AncestorType={x:Type local:NavigationButton}}" />
+                </MultiBinding>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Command" Value="{x:Static NavigationCommands.GoToPage}" />
+        <Setter Property="CommandParameter" Value="{Binding}" />
+    </Style>
+
+    <ControlTemplate x:Key="NavigationButtonTemplate" TargetType="{x:Type local:NavigationButton}">
+        <StackPanel Orientation="Horizontal">
+            <Button Command="{x:Static NavigationCommands.BrowseBack}" Style="{TemplateBinding GoBackButtonStyle}" />
+            <Button Command="{x:Static NavigationCommands.BrowseForward}" Style="{TemplateBinding GoForwardButtonStyle}" />
+            <local:MenuButton ItemsSource="{TemplateBinding ItemsSource}" ItemContainerStyle="{TemplateBinding ItemContainerStyle}" />
+        </StackPanel>
+    </ControlTemplate>
+
+    <Style TargetType="{x:Type local:NavigationButton}">
+        <Setter Property="Template" Value="{StaticResource NavigationButtonTemplate}" />
+        <Setter Property="CommandParameter" Value="{Binding ItemsSource.Current}" />
+        <Setter Property="ItemContainerStyle" Value="{StaticResource NavigationButtonItemContainerStyle}" />
     </Style>
 </ResourceDictionary>

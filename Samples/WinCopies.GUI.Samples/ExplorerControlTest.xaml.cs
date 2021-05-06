@@ -21,11 +21,11 @@ using Microsoft.WindowsAPICodePack.Shell;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+
 using WinCopies.GUI.IO.Controls.Process;
 using WinCopies.GUI.IO.ObjectModel;
 using WinCopies.GUI.IO.Process;
@@ -89,7 +89,7 @@ namespace WinCopies.GUI.Samples
             }
         }
 
-        private static void Paste(ProcessFactorySelectorDictionaryParameters parameters)
+        private static void Paste(in ProcessFactorySelectorDictionaryParameters parameters)
         {
             IProcess result = new Process(BrowsableObjectInfo.DefaultProcessSelectorDictionary.Select(parameters));
 

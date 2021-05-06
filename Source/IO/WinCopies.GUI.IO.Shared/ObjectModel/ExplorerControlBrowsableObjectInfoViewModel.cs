@@ -30,6 +30,10 @@ using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Process;
 using WinCopies.Collections.DotNetFix.Generic;
 using WinCopies.GUI.IO.Process;
+using WinCopies.Collections.Generic;
+using WinCopies.IO.ObjectModel;
+using System.ComponentModel;
+using WinCopies.Collections.DotNetFix;
 
 #if !WinCopies3
 using WinCopies.Util.Commands;
@@ -49,12 +53,88 @@ namespace WinCopies.GUI.IO
         {
             //protected override void OnPropertyChanged(string propertyName, object oldValue, object newValue) => OnPropertyChanged(new WinCopies.Util.Data.PropertyChangedEventArgs(propertyName, oldValue, newValue));
 
+            private class _ObservableLinkedCollectionEnumerable : ILinkedListEnumerable<IBrowsableObjectInfo>, INotifyPropertyChanged
+            {
+                public ObservableLinkedCollectionEnumerable<IBrowsableObjectInfo> List { get; }
+
+                public ObservableLinkedCollection<IBrowsableObjectInfo> History { get; }
+
+                public bool NotifyOnPropertyChanged { get; set; }
+
+                public ILinkedListNodeEnumerable<IBrowsableObjectInfo> First => List.First;
+
+                public ILinkedListNodeEnumerable<IBrowsableObjectInfo> Current => List.Current;
+
+                public ILinkedListNodeEnumerable<IBrowsableObjectInfo> Last => List.Last;
+
+                public EnumerationDirection EnumerationDirection => List.EnumerationDirection;
+
+                ILinkedListNodeEnumerable ILinkedListEnumerable.First => First;
+
+                ILinkedListNodeEnumerable ILinkedListEnumerable.Current => Current;
+
+                ILinkedListNodeEnumerable ILinkedListEnumerable.Last => Last;
+
+                public event PropertyChangedEventHandler PropertyChanged;
+
+                public _ObservableLinkedCollectionEnumerable()
+                {
+                    (History = new ObservableLinkedCollection<IBrowsableObjectInfo>()).CollectionChanged += History_CollectionChanged;
+
+                    (List = new ObservableLinkedCollectionEnumerable<IBrowsableObjectInfo>(History, EnumerationDirection.LIFO)).PropertyChanged += _ObservableLinkedCollectionEnumerable_PropertyChanged;
+                }
+
+                private void History_CollectionChanged(object sender, LinkedCollectionChangedEventArgs<IBrowsableObjectInfo> e)
+                {
+                    switch (e.Action)
+                    {
+                        case LinkedCollectionChangedAction.AddFirst:
+
+                            NotifyOnPropertyChanged = false;
+
+                            List.UpdateCurrent(e.Node);
+
+                            NotifyOnPropertyChanged = true;
+
+                            break;
+                    }
+                }
+
+                private void _ObservableLinkedCollectionEnumerable_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+                {
+                    if (NotifyOnPropertyChanged)
+
+                        PropertyChanged?.Invoke(sender, e);
+                }
+
+                public ILinkedListNode<IBrowsableObjectInfo> Add(IBrowsableObjectInfo value) => List.Add(value);
+
+                public void UpdateCurrent(ILinkedListNode<IBrowsableObjectInfo> node) => List.UpdateCurrent(node);
+
+                public System.Collections.Generic.IEnumerator<ILinkedListNode<IBrowsableObjectInfo>> GetEnumeratorToCurrent(bool keepCurrent) => List.GetEnumeratorToCurrent(keepCurrent);
+
+                public System.Collections.Generic.IEnumerator<ILinkedListNode<IBrowsableObjectInfo>> GetEnumeratorFromCurrent(bool keepCurrent) => List.GetEnumeratorFromCurrent(keepCurrent);
+
+                public bool MovePrevious() => List.MovePrevious();
+
+                public bool MoveNext() => List.MoveNext();
+
+                public void UpdateCurrent(IReadOnlyLinkedListNode node) => ((ILinkedListEnumerable)List).UpdateCurrent(node);
+
+                public System.Collections.Generic.IEnumerator<IBrowsableObjectInfo> GetEnumerator() => List.GetEnumerator();
+
+                System.Collections.IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)List).GetEnumerator();
+
+                public ILinkedListNodeEnumerable<IBrowsableObjectInfo> GetLinkedListNodeEnumerable(ILinkedListNode<IBrowsableObjectInfo> node) => List.GetLinkedListNodeEnumerable(node);
+            }
+
             private bool _isSelected;
             private bool _isCheckBoxVisible;
             private SelectionMode _selectionMode = SelectionMode.Extended;
             private string _text;
             private System.Collections.Generic.IEnumerable<IBrowsableObjectInfoViewModel> _treeViewItems;
             private IBrowsableObjectInfoViewModel _path;
+            private _ObservableLinkedCollectionEnumerable _historyObservable;
             private IBrowsableObjectInfoFactory _factory;
             private IList _selectedItems;
 
@@ -70,11 +150,61 @@ namespace WinCopies.GUI.IO
 
             public IBrowsableObjectInfoViewModel Path { get => _path; set { _path = value; OnPropertyChanged(nameof(Path)); OnPathChanged(); } }
 
+            public ObservableLinkedCollectionEnumerable<IBrowsableObjectInfo> History => _historyObservable.List;
+
             public IBrowsableObjectInfoFactory Factory { get => _factory; set { _factory = value ?? throw GetArgumentNullException(nameof(value)); OnPropertyChanged(nameof(Factory)); } }
 
             public IList SelectedItems { get => _selectedItems; set { _selectedItems = value; OnPropertyChanged(nameof(SelectedItems)); } }
 
-            protected virtual void OnPathChanged() => Text = _path.Path;
+            protected virtual void OnPathChanged()
+            {
+                Text = _path.Path;
+
+                if (_path.Path == History.Current.Node.Value.Path)
+
+                    return;
+
+                if (_historyObservable.History.Count == 1)
+                {
+                    _ = _historyObservable.Add(_path.Model);
+
+                    return;
+                }
+
+                if (_historyObservable.History.Count >= 2)
+                {
+                    _historyObservable.NotifyOnPropertyChanged = false;
+
+                    if (_path.Path == History.Current.Node.Previous?.Value.Path)
+
+                        _ = History.MovePrevious();
+
+                    else if (_path.Path == History.Current.Node.Next?.Value.Path)
+
+                        _ = History.MoveNext();
+
+                    else
+                    {
+                        if (History.Current.Node.Next != null)
+                        {
+                            ILinkedListNode<IBrowsableObjectInfo> node = History.Current.Node;
+                            ILinkedListNode<IBrowsableObjectInfo> nextNode;
+
+                            do
+                            {
+                                nextNode = node.Next;
+
+                                _historyObservable.History.Remove(node);
+
+                            } while ((node = nextNode.Next) != null);
+                        }
+
+                        _ = _historyObservable.Add(_path.Model);
+                    }
+
+                    _historyObservable.NotifyOnPropertyChanged = true;
+                }
+            }
 
             public static IExplorerControlBrowsableObjectInfoViewModel From(in IBrowsableObjectInfoViewModel path, in System.Collections.Generic.IEnumerable<IBrowsableObjectInfoViewModel> treeViewItems) => new ExplorerControlBrowsableObjectInfoViewModel(path ?? throw GetArgumentNullException(nameof(path)), treeViewItems, new BrowsableObjectInfoFactory(path.ClientVersion));
 
@@ -87,6 +217,15 @@ namespace WinCopies.GUI.IO
             protected ExplorerControlBrowsableObjectInfoViewModel(in IBrowsableObjectInfoViewModel path, in System.Collections.Generic.IEnumerable<IBrowsableObjectInfoViewModel> treeViewItems, in IBrowsableObjectInfoFactory factory)
             {
                 _path = path;
+
+                (_historyObservable = new _ObservableLinkedCollectionEnumerable()).PropertyChanged += (object sender, System.ComponentModel.PropertyChangedEventArgs e) =>
+                {
+                    if (e.PropertyName == nameof(ObservableLinkedCollectionEnumerable<IBrowsableObjectInfo>.Current))
+
+                        OnHistoryCurrentChanged(e);
+                };
+
+                _ = _historyObservable.Add(path.Model);
 
                 _treeViewItems = treeViewItems;
 
@@ -103,6 +242,8 @@ namespace WinCopies.GUI.IO
 
                 _factory = factory;
             }
+
+            protected virtual void OnHistoryCurrentChanged(System.ComponentModel.PropertyChangedEventArgs e) => Path = new BrowsableObjectInfoViewModel(_historyObservable.Current.Node.Value);
 
             public static DelegateCommand<ExplorerControlBrowsableObjectInfoViewModel> GoCommand { get; } = new DelegateCommand<ExplorerControlBrowsableObjectInfoViewModel>(browsableObjectInfo => browsableObjectInfo != null && browsableObjectInfo.OnGoCommandCanExecute(), browsableObjectInfo => browsableObjectInfo.OnGoCommandExecuted());
 
