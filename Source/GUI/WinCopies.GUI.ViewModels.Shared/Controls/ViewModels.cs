@@ -21,8 +21,6 @@ using System.Windows;
 using System.Windows.Input;
 using WinCopies.Commands;
 using WinCopies.GUI.Controls.Models;
-using WinCopies.Temp;
-using WinCopies.Util;
 
 namespace WinCopies.GUI.Controls.ViewModels
 {

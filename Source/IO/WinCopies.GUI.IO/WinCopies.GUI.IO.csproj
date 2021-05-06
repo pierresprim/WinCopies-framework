@@ -10,10 +10,10 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>WinCopies.GUI.IO.snk</AssemblyOriginatorKeyFile>
     <DefineConstants>WinCopies2;WinCopies3;ProcessesWork$(DefineConstants)</DefineConstants>
-    <VersionPrefix>3.2.0</VersionPrefix>
+    <VersionPrefix>3.2.0.1</VersionPrefix>
     <VersionSuffix>preview</VersionSuffix>
-    <AssemblyVersion>3.2.0</AssemblyVersion>
-    <FileVersion>3.2.0</FileVersion>
+    <AssemblyVersion>3.2.0.1</AssemblyVersion>
+    <FileVersion>3.2.0.1</FileVersion>
     <PackageIcon>WinCopies.png</PackageIcon>
   </PropertyGroup>
 

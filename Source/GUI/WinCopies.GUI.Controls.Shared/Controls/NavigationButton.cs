@@ -20,13 +20,10 @@ using System.Collections;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using WinCopies.Collections.DotNetFix;
-using WinCopies.Collections.DotNetFix.Generic;
+
 using WinCopies.Collections.Generic;
 using WinCopies.Commands;
 using WinCopies.Desktop;
-using WinCopies.GUI.Controls.Models;
-using WinCopies.Temp;
 
 using static WinCopies.Util.Desktop.UtilHelpers;
 

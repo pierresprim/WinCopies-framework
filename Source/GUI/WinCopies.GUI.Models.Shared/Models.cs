@@ -24,7 +24,6 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using WinCopies.Commands;
-using WinCopies.Temp;
 
 #if WinCopies3
 using static WinCopies.ThrowHelper;
