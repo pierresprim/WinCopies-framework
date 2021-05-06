@@ -67,6 +67,8 @@ namespace WinCopies.GUI.IO
 
                 public ILinkedListNodeEnumerable<IBrowsableObjectInfo> Last => List.Last;
 
+                public EnumerationDirection EnumerationDirection => List.EnumerationDirection;
+
                 ILinkedListNodeEnumerable ILinkedListEnumerable.First => First;
 
                 ILinkedListNodeEnumerable ILinkedListEnumerable.Current => Current;
@@ -79,18 +81,18 @@ namespace WinCopies.GUI.IO
                 {
                     (History = new ObservableLinkedCollection<IBrowsableObjectInfo>()).CollectionChanged += History_CollectionChanged;
 
-                    (List = new ObservableLinkedCollectionEnumerable<IBrowsableObjectInfo>(new LinkedListEnumerable<IBrowsableObjectInfo>(History))).PropertyChanged += _ObservableLinkedCollectionEnumerable_PropertyChanged;
+                    (List = new ObservableLinkedCollectionEnumerable<IBrowsableObjectInfo>(History, EnumerationDirection.LIFO)).PropertyChanged += _ObservableLinkedCollectionEnumerable_PropertyChanged;
                 }
 
                 private void History_CollectionChanged(object sender, LinkedCollectionChangedEventArgs<IBrowsableObjectInfo> e)
                 {
                     switch (e.Action)
                     {
-                        case LinkedCollectionChangedAction.AddLast:
+                        case LinkedCollectionChangedAction.AddFirst:
 
                             NotifyOnPropertyChanged = false;
 
-                            List.UpdateCurrent(History.First);
+                            List.UpdateCurrent(e.Node);
 
                             NotifyOnPropertyChanged = true;
 
@@ -104,6 +106,8 @@ namespace WinCopies.GUI.IO
 
                         PropertyChanged?.Invoke(sender, e);
                 }
+
+                public ILinkedListNode<IBrowsableObjectInfo> Add(IBrowsableObjectInfo value) => List.Add(value);
 
                 public void UpdateCurrent(ILinkedListNode<IBrowsableObjectInfo> node) => List.UpdateCurrent(node);
 
@@ -120,6 +124,8 @@ namespace WinCopies.GUI.IO
                 public System.Collections.Generic.IEnumerator<IBrowsableObjectInfo> GetEnumerator() => List.GetEnumerator();
 
                 System.Collections.IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)List).GetEnumerator();
+
+                public ILinkedListNodeEnumerable<IBrowsableObjectInfo> GetLinkedListNodeEnumerable(ILinkedListNode<IBrowsableObjectInfo> node) => List.GetLinkedListNodeEnumerable(node);
             }
 
             private bool _isSelected;
@@ -155,12 +161,12 @@ namespace WinCopies.GUI.IO
                 Text = _path.Path;
 
                 if (_path.Path == History.Current.Node.Value.Path)
-                
+
                     return;
 
                 if (_historyObservable.History.Count == 1)
                 {
-                    _=_historyObservable.History.AddLast(_path.Model);
+                    _ = _historyObservable.Add(_path.Model);
 
                     return;
                 }
@@ -193,7 +199,7 @@ namespace WinCopies.GUI.IO
                             } while ((node = nextNode.Next) != null);
                         }
 
-                        _ = _historyObservable.History.AddLast(_path.Model);
+                        _ = _historyObservable.Add(_path.Model);
                     }
 
                     _historyObservable.NotifyOnPropertyChanged = true;
@@ -219,7 +225,7 @@ namespace WinCopies.GUI.IO
                         OnHistoryCurrentChanged(e);
                 };
 
-                    _historyObservable.History.AddLast(path.Model);
+                _ = _historyObservable.Add(path.Model);
 
                 _treeViewItems = treeViewItems;
 

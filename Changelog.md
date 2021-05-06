@@ -10,8 +10,14 @@ CHANGELOG
 
 - WinCopies.GUI.Windows.Window:
 	- Close Win32 system command can be disabled using dependency property.
-	- ShowHelpButton is now HelpButton
+	- ShowHelpButton is now HelpButton.
+	- Bug fixes.
 - ProcessWindow inherits from WinCopies.GUI.Windows.Window.
+- Add NavigationButton control.
+- IButtonModel implements ICommandSource.
+- IButtonModel\<T> is now defined as: IButtonModel<TContent, TCommandParameter> : IButtonModel, ICommandSource<TCommandParameter>, IContentControlModel<TContent>.
+- Update generic models and view models for ICommandSource support.
+- Add history management to ExplorerControl and (I)ExplorerControlBrowsableObjectInfoViewModel.
 
 ### 04/26/2021 3.1.0-preview
 

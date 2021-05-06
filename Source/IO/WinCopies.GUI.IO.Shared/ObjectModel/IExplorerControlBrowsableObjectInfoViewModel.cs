@@ -16,9 +16,9 @@
 * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using System.Collections;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Controls;
+
 using WinCopies.Collections.Generic;
 using WinCopies.IO.ObjectModel;
 

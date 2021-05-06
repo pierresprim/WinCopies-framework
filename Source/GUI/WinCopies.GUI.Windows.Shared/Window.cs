@@ -24,7 +24,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
 
-using static WinCopies.Temp.Temp;
+using static Microsoft.WindowsAPICodePack.Shell.DesktopWindowManager;
 
 using WindowUtilities = Microsoft.WindowsAPICodePack.Shell.DesktopWindowManager;
 
@@ -32,7 +32,7 @@ namespace WinCopies.GUI.Windows
 {
     public class Window : System.Windows.Window
     {
-        public static readonly DependencyProperty CloseButtonProperty = DependencyProperty.Register(nameof(CloseButton), typeof(bool), typeof(Window), new PropertyMetadata(true, (DependencyObject d, DependencyPropertyChangedEventArgs e)=> _=(bool)e.NewValue?   Temp.Temp.EnableCloseMenuItem((Window)d): Temp.Temp.DisableCloseMenuItem((Window)d)));
+        public static readonly DependencyProperty CloseButtonProperty = DependencyProperty.Register(nameof(CloseButton), typeof(bool), typeof(Window), new PropertyMetadata(true, (DependencyObject d, DependencyPropertyChangedEventArgs e) => _ = (bool)e.NewValue ? EnableCloseMenuItem((Window)d) : DisableCloseMenuItem((Window)d)));
 
         public bool CloseButton { get => (bool)GetValue(CloseButtonProperty); set => SetValue(CloseButtonProperty, value); }
 
@@ -68,7 +68,18 @@ namespace WinCopies.GUI.Windows
             remove => RemoveHandler(HelpButtonClickEvent, value);
         }
 
-         static Window() => DefaultStyleKeyProperty.OverrideMetadata(typeof(Window), new FrameworkPropertyMetadata(typeof(Window)));
+        static Window() => DefaultStyleKeyProperty.OverrideMetadata(typeof(Window), new FrameworkPropertyMetadata(typeof(Window)));
+
+        // TODO:
+
+        private static void SetWindow(IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy, WindowStyles styles, WindowStyles stylesEx, SetWindowPositionOptions windowPositionOptions)
+        {
+            SetWindowStyles(hWnd, styles, GetWindowLongEnum.Style);
+
+            SetWindowStyles(hWnd, stylesEx, GetWindowLongEnum.ExStyle);
+
+            SetWindowPos(hWnd, hWndInsertAfter, x, y, cx, cy, windowPositionOptions);
+        }
 
         protected virtual void OnSourceInitialized(HwndSource hwndSource)
         {
@@ -76,7 +87,9 @@ namespace WinCopies.GUI.Windows
             {
                 IntPtr hwnd = new WindowInteropHelper(this).Handle;
 
-                WindowUtilities.SetWindow(hwnd, IntPtr.Zero, 0, 0, 0, 0, (WindowStyles)(((long)WindowUtilities.GetWindowStyles(hwnd) & 0xFFFFFFFF) ^ ((uint)WindowStyles.MinimizeBox | (uint)WindowStyles.MaximizeBox)), (WindowStylesEx)((uint)WindowUtilities.GetWindowStylesEx(hwnd) | (uint)WindowStylesEx.ContextHelp), SetWindowPositionOptions.NoMove | SetWindowPositionOptions.NoSize | SetWindowPositionOptions.NoZOrder | SetWindowPositionOptions.FrameChanged);
+                SetWindow(hwnd, IntPtr.Zero, 0, 0, 0, 0,
+                    (WindowStyles)(((long)GetWindowStyles(hwnd, GetWindowLongEnum.Style) & 0xFFFFFFFF) ^ ((uint)WindowStyles.MinimizeBox | (uint)WindowStyles.MaximizeBox)),
+                    (WindowStyles)((uint)GetWindowStyles(hwnd, GetWindowLongEnum.ExStyle) | (uint)WindowStyles.ContextHelp), SetWindowPositionOptions.NoMove | SetWindowPositionOptions.NoSize | SetWindowPositionOptions.NoZOrder | SetWindowPositionOptions.FrameChanged);
 
                 //IntPtr hwnd = new System.Windows.Interop.WindowInteropHelper(this).Handle;
                 //uint styles = GetWindowLongPtr(hwnd, GWL_STYLE);
@@ -119,7 +132,7 @@ namespace WinCopies.GUI.Windows
 
         protected virtual bool OnSystemCommandMessage(IntPtr wParam)
         {
-            if (GetSystemCommandWParam(wParam) == (int)SystemCommand.ContextHelp)
+            if (Microsoft.WindowsAPICodePack.Win32Native.Shell.DesktopWindowManager.DesktopWindowManager.GetSystemCommandWParam(wParam) == (int)SystemCommand.ContextHelp)
             {
                 OnHelpButtonClick();
 

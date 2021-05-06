@@ -23,11 +23,12 @@ using System.Windows.Input;
 using WinCopies.Collections.DotNetFix;
 using WinCopies.Collections.DotNetFix.Generic;
 using WinCopies.Collections.Generic;
+using WinCopies.Commands;
 using WinCopies.Desktop;
 using WinCopies.GUI.Controls.Models;
 using WinCopies.Temp;
 
-using static WinCopies.Temp.Temp;
+using static WinCopies.Util.Desktop.UtilHelpers;
 
 namespace WinCopies.GUI.Controls
 {
@@ -87,11 +88,21 @@ namespace WinCopies.GUI.Controls
 
     public class NavigationButton : CommandItemsControl<ILinkedListEnumerable, object>
     {
+        public static readonly DependencyProperty GoBackButtonStyleProperty = Register<Style, NavigationButton>(nameof(GoBackButtonStyle));
+
+        public Style GoBackButtonStyle { get => (Style)GetValue(GoBackButtonStyleProperty); set => SetValue(GoBackButtonStyleProperty, value); }
+
+        public static readonly DependencyProperty GoForwardButtonStyleProperty = Register<Style, NavigationButton>(nameof(GoForwardButtonStyle));
+
+        public Style GoForwardButtonStyle { get => (Style)GetValue(GoForwardButtonStyleProperty); set => SetValue(GoForwardButtonStyleProperty, value); }
+
         public NavigationButton()
         {
             _ = CommandBindings.Add(new CommandBinding(NavigationCommands.BrowseBack, (object sender, ExecutedRoutedEventArgs e) => OnBrowseBack(e), (object sender, CanExecuteRoutedEventArgs e) => OnCanBrowseBack(e)));
 
             _ = CommandBindings.Add(new CommandBinding(NavigationCommands.BrowseForward, (object sender, ExecutedRoutedEventArgs e) => OnBrowseForward(e), (object sender, CanExecuteRoutedEventArgs e) => OnCanBrowseForward(e)));
+
+            _ = CommandBindings.Add(new CommandBinding(NavigationCommands.GoToPage, (object sender, ExecutedRoutedEventArgs e) => OnGoToPage(e), (object sender, CanExecuteRoutedEventArgs e) => OnCanGoToPage(e)));
         }
 
         protected virtual void OnCanBrowseBack(CanExecuteRoutedEventArgs e)
@@ -134,7 +145,7 @@ namespace WinCopies.GUI.Controls
                 _ = Command?.TryExecute(CommandParameter, CommandTarget);
         }
 
-        protected virtual void OnGoToPageCanExecute(CanExecuteRoutedEventArgs e)
+        protected virtual void OnCanGoToPage(CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = true;
 
@@ -149,7 +160,7 @@ namespace WinCopies.GUI.Controls
 
                 return;
 
-            ItemsSource.UpdateCurrent((IReadOnlyLinkedListNode)e.Parameter);
+            ItemsSource.UpdateCurrent(((ILinkedListNodeEnumerable)e.Parameter).Node);
 
             _ = Command?.TryExecute(CommandParameter, CommandTarget);
         }

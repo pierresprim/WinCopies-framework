@@ -23,8 +23,8 @@
   <Import Project="..\WinCopies.GUI.Models.Shared\WinCopies.GUI.Models.Shared.projitems" Label="Shared" />
 
   <ItemGroup>
-    <PackageReference Include="WinCopies.Util" Version="3.7-preview" />
-    <PackageReference Include="WinCopies.Util.Desktop" Version="3.6-preview" />
+    <PackageReference Include="WinCopies.Util" Version="3.7.1-preview" />
+    <PackageReference Include="WinCopies.Util.Desktop" Version="3.7.2-preview" />
   </ItemGroup>
 
   <ItemGroup>
