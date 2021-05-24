@@ -41,7 +41,7 @@ namespace WinCopies.GUI.Controls
 
         protected virtual void OnSubmenuItemClick(bool stayOpen, RoutedEventArgs e)
         {
-            Mouse.Capture(null);
+            _ = Mouse.Capture(null);
 
             if (!stayOpen)
 

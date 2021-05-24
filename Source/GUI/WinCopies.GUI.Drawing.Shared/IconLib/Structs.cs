@@ -53,7 +53,7 @@ namespace WinCopies.GUI.Drawing
         public SEGMENT_ENTRY[] seg_entries;
 
         #region Methods
-        public void Write(in Stream stream) => Write<SEGMENT_ENTRY>(seg_entries, stream);
+        public void Write(in System.IO.Stream stream) => Write<SEGMENT_ENTRY>(seg_entries, stream);
         #endregion
     }
     #endregion
@@ -84,7 +84,7 @@ namespace WinCopies.GUI.Drawing
         public uint e_lfanew;           // File address of new exe header
 
         #region Constructors
-        public IMAGE_DOS_HEADER(Stream stream)
+        public IMAGE_DOS_HEADER(System.IO.Stream stream)
         {
             this = new IMAGE_DOS_HEADER();
             Read(ref this, stream);
@@ -189,7 +189,7 @@ namespace WinCopies.GUI.Drawing
         public IMAGE_OPTIONAL_HEADER OptionalHeader;
 
         #region Constructors
-        public IMAGE_NT_HEADERS(Stream stream)
+        public IMAGE_NT_HEADERS(System.IO.Stream stream)
         {
             this = new IMAGE_NT_HEADERS();
             Read(stream);
@@ -197,7 +197,7 @@ namespace WinCopies.GUI.Drawing
         #endregion
 
         #region Methods
-        public void Read(in Stream stream)
+        public void Read(in System.IO.Stream stream)
         {
             var br = new BinaryReader(stream);
 
@@ -248,7 +248,7 @@ namespace WinCopies.GUI.Drawing
         public ushort ne_expver;          // Expected Windows version number
 
         #region Constructors
-        public IMAGE_OS2_HEADER(Stream stream)
+        public IMAGE_OS2_HEADER(System.IO.Stream stream)
         {
             this = new IMAGE_OS2_HEADER();
             Read(ref this, stream);
@@ -269,7 +269,7 @@ namespace WinCopies.GUI.Drawing
         public byte rscEndNames;
 
         #region Constructors
-        public RESOURCE_TABLE(Stream stream)
+        public RESOURCE_TABLE(System.IO.Stream stream)
         {
             this = new RESOURCE_TABLE();
             Read(stream);
@@ -300,7 +300,7 @@ namespace WinCopies.GUI.Drawing
         #endregion
 
         #region Methods
-        public void Read(in Stream stream)
+        public void Read(in System.IO.Stream stream)
         {
             var br = new BinaryReader(stream);
 
@@ -322,7 +322,7 @@ namespace WinCopies.GUI.Drawing
             rscEndNames = 0;
         }
 
-        public unsafe void Write(in Stream stream)
+        public unsafe void Write(in System.IO.Stream stream)
         {
             var br = new BinaryWriter(stream);
 
@@ -337,7 +337,7 @@ namespace WinCopies.GUI.Drawing
             br.Write(rscEndNames);
         }
 
-        public List<GRPICONDIR> GetGroupIcons(in Stream stream)
+        public List<GRPICONDIR> GetGroupIcons(in System.IO.Stream stream)
         {
             var groupIconDir = new ArrayBuilder<GRPICONDIR>();
             for (int i = 0; i < rscTypes.Length; i++)
@@ -364,7 +364,7 @@ namespace WinCopies.GUI.Drawing
             return groupIconDir.ToList();
         }
 
-        public void SetGroupIcons(in Stream stream, in IList<GRPICONDIR> grpIconDir)
+        public void SetGroupIcons(in System.IO.Stream stream, in IList<GRPICONDIR> grpIconDir)
         {
             int i;
 
@@ -390,7 +390,7 @@ namespace WinCopies.GUI.Drawing
             //sw.Close();
         }
 
-        public Dictionary<ushort, IconImage> GetIcons(in Stream stream)
+        public Dictionary<ushort, IconImage> GetIcons(in System.IO.Stream stream)
         {
             var icons = new Dictionary<ushort, IconImage>();
             int i;
@@ -415,7 +415,7 @@ namespace WinCopies.GUI.Drawing
             return icons;
         }
 
-        public void SetIcons(in Stream stream, in Dictionary<ushort, IconImage> icons)
+        public void SetIcons(in System.IO.Stream stream, in Dictionary<ushort, IconImage> icons)
         {
             int i;
 
@@ -470,7 +470,7 @@ namespace WinCopies.GUI.Drawing
         public TNAMEINFO[] rtNameInfo;
 
         #region Constructors
-        public TYPEINFO(Stream stream)
+        public TYPEINFO(System.IO.Stream stream)
         {
             this = new TYPEINFO();
             Read(stream);
@@ -482,7 +482,7 @@ namespace WinCopies.GUI.Drawing
         #endregion
 
         #region Methods
-        public void Read(in Stream stream)
+        public void Read(in System.IO.Stream stream)
         {
             var br = new BinaryReader(stream);
 
@@ -502,7 +502,7 @@ namespace WinCopies.GUI.Drawing
                 Read<TNAMEINFO>(ref rtNameInfo[i], stream);
         }
 
-        public void Write(in Stream stream)
+        public void Write(in System.IO.Stream stream)
         {
             var bw = new BinaryWriter(stream);
 
@@ -529,7 +529,7 @@ namespace WinCopies.GUI.Drawing
         public ushort rnUsage;
 
         #region Constructors
-        public TNAMEINFO(Stream stream)
+        public TNAMEINFO(System.IO.Stream stream)
         {
             this = new TNAMEINFO();
             Read(ref this, stream);
@@ -561,7 +561,7 @@ namespace WinCopies.GUI.Drawing
             idCount = count;
         }
 
-        public ICONDIR(Stream stream)
+        public ICONDIR(System.IO.Stream stream)
         {
             this = new ICONDIR();
             Read(ref this, stream);
@@ -620,7 +620,7 @@ namespace WinCopies.GUI.Drawing
             idEntries = Array.Empty<GRPICONDIRENTRY>();
         }
 
-        public GRPICONDIR(Stream stream)
+        public GRPICONDIR(System.IO.Stream stream)
         {
             this = new GRPICONDIR();
             Read(stream);
@@ -634,7 +634,7 @@ namespace WinCopies.GUI.Drawing
         #endregion
 
         #region Methods
-        public void Read(in Stream stream)
+        public void Read(in System.IO.Stream stream)
         {
             var br = new BinaryReader(stream);
 
@@ -648,7 +648,7 @@ namespace WinCopies.GUI.Drawing
                 idEntries[i] = new GRPICONDIRENTRY(stream);
         }
 
-        public void Write(in Stream stream)
+        public void Write(in System.IO.Stream stream)
         {
             var bw = new BinaryWriter(stream);
 
@@ -679,7 +679,7 @@ namespace WinCopies.GUI.Drawing
         public uint dwImageOffset;
 
         #region Constructors
-        public ICONDIRENTRY(Stream stream)
+        public ICONDIRENTRY(System.IO.Stream stream)
         {
             this = new ICONDIRENTRY();
             Read(stream);
@@ -687,7 +687,7 @@ namespace WinCopies.GUI.Drawing
         #endregion
 
         #region Methods
-        public void Read(in Stream stream)
+        public void Read(in System.IO.Stream stream)
         {
             var br = new BinaryReader(stream);
             byte[] array = new byte[sizeof(ICONDIRENTRY)];
@@ -729,7 +729,7 @@ namespace WinCopies.GUI.Drawing
         public ushort nID;                  // the ID
 
         #region Constructors
-        public GRPICONDIRENTRY(Stream stream)
+        public GRPICONDIRENTRY(System.IO.Stream stream)
         {
             this = new GRPICONDIRENTRY();
             Read(ref this, stream);

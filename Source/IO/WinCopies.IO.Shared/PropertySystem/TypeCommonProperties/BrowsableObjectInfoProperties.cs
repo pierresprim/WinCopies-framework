@@ -30,20 +30,51 @@ namespace WinCopies.IO
 
 namespace WinCopies.IO.PropertySystem
 {
-    public abstract class BrowsableObjectInfoProperties<T> where T : IBrowsableObjectInfo
+    public abstract class BrowsableObjectInfoProperties<T> : WinCopies.DotNetFix.IDisposable where T : IBrowsableObjectInfo
     {
-        protected T BrowsableObjectInfo { get; }
+        private T _browsableObjectInfo;
 
-        protected BrowsableObjectInfoProperties(T browsableObjectInfo) => BrowsableObjectInfo = browsableObjectInfo
-#if CS8
-            ??
+        public bool IsDisposed => _browsableObjectInfo == null;
+
+        protected TValue GetValueIfNotDisposed<TValue>(in TValue value) => IsDisposed ? throw GetExceptionForDispose(false) : value;
+
+        protected T BrowsableObjectInfo => GetValueIfNotDisposed(_browsableObjectInfo);
+
+        protected BrowsableObjectInfoProperties(in T browsableObjectInfo) => _browsableObjectInfo = browsableObjectInfo
+#if CS9
+        ??
 #else
-            == null ?
+            == null ? 
 #endif
             throw GetArgumentNullException(nameof(browsableObjectInfo))
-#if !CS8
-            : browsableObjectInfo
+#if !CS9
+: browsableObjectInfo
 #endif
             ;
+
+        protected virtual void DisposeManaged()
+        {
+
+        }
+
+        protected virtual void DisposeUnmanaged()
+        {
+            _browsableObjectInfo = default;
+        }
+
+        public void Dispose()
+        {
+            if (IsDisposed)
+
+                return;
+
+            DisposeManaged();
+
+            DisposeUnmanaged();
+
+            GC.SuppressFinalize(this);
+        }
+
+        ~BrowsableObjectInfoProperties() => DisposeUnmanaged();
     }
 }

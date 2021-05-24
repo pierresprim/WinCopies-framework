@@ -61,6 +61,15 @@ namespace WinCopies.IO.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Compression.
+        /// </summary>
+        public static string Compression {
+            get {
+                return ResourceManager.GetString("Compression", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Copy.
         /// </summary>
         public static string Copy {
@@ -111,6 +120,15 @@ namespace WinCopies.IO.Properties {
         public static string DotNetType {
             get {
                 return ResourceManager.GetString("DotNetType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Extraction.
+        /// </summary>
+        public static string Extraction {
+            get {
+                return ResourceManager.GetString("Extraction", resourceCulture);
             }
         }
         

@@ -33,7 +33,7 @@ namespace WinCopies.GUI.Drawing.EncodingFormats
     internal class IconFormat : ILibraryFormat
     {
         #region Methods
-        public bool IsRecognizedFormat(in Stream stream)
+        public bool IsRecognizedFormat(in System.IO.Stream stream)
         {
             stream.Position = 0;
 
@@ -49,7 +49,7 @@ namespace WinCopies.GUI.Drawing.EncodingFormats
             return false;
         }
 
-        public unsafe MultiIcon Load(in Stream stream)
+        public unsafe MultiIcon Load(in System.IO.Stream stream)
         {
             stream.Position = 0;
             var singleIcon = new SingleIcon("Untitled");
@@ -79,7 +79,7 @@ namespace WinCopies.GUI.Drawing.EncodingFormats
             return new MultiIcon(singleIcon);
         }
 
-        public unsafe void Save(in MultiIcon multiIcon, in Stream stream)
+        public unsafe void Save(in MultiIcon multiIcon, in System.IO.Stream stream)
         {
             if (multiIcon.SelectedIndex == -1)
 

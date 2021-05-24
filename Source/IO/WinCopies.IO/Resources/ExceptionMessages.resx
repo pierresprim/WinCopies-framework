@@ -156,6 +156,9 @@
   <data name="PathTooLong" xml:space="preserve">
     <value>The destination path is too long.</value>
   </data>
+  <data name="ProcessParametersCouldNotBeParsedCorrectly" xml:space="preserve">
+    <value>The given parameters could not be parsed correctly.</value>
+  </data>
   <data name="PropertyCannotBeNullOnObject" xml:space="preserve">
     <value>{0} cannot be null on {1}.</value>
   </data>

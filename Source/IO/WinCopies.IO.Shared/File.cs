@@ -61,7 +61,7 @@ namespace WinCopies.IO
         /// <param name="rightStream">The right <see cref="Stream"/>.</param>
         /// <param name="bufferLength">The buffer length to use to read data.</param>
         /// <returns><see langword="true"/> if the two files are duplicates; otherwise <see langword="false"/>.</returns>
-        public static bool IsDuplicate(in Stream leftStream, in Stream rightStream, in int bufferLength)
+        public static bool IsDuplicate(in System.IO.Stream leftStream, in System.IO.Stream rightStream, in int bufferLength)
         {
             ThrowIfNull(leftStream, nameof(leftStream));
             ThrowIfNull(rightStream, nameof(rightStream));
@@ -101,7 +101,7 @@ namespace WinCopies.IO
         /// <param name="bufferLength">The buffer length to use to read data.</param>
         /// <param name="callback">A delegate that is raised after each data block has been checked. If the returned value is <see langword="true"/>, then the process is stopped.</param>
         /// <returns><see langword="true"/> if the two files are duplicates; <see langword="null"/> if the process has been canceled; otherwise <see langword="false"/>.</returns>
-        public static bool? IsDuplicate(in Stream leftStream, in Stream rightStream, in int bufferLength, Func<bool> callback)
+        public static bool? IsDuplicate(in System.IO.Stream leftStream, in System.IO.Stream rightStream, in int bufferLength, Func<bool> callback)
         {
             ThrowIfNull(leftStream, nameof(leftStream));
             ThrowIfNull(rightStream, nameof(rightStream));

@@ -152,7 +152,7 @@ namespace WinCopies.IO.Process
 
     namespace ObjectModel
     {
-        public static partial class ProcessObjectModelTypes<TItems, TFactory, TError, TProcessDelegates, TProcessEventDelegates, TProcessDelegateParam>
+        public static partial class ProcessObjectModelTypes<TItemsIn, TItemsOut, TFactory, TError, TProcessDelegates, TProcessEventDelegates, TProcessDelegateParam>
         {
             public abstract partial class Process
             {
@@ -165,29 +165,29 @@ namespace WinCopies.IO.Process
                     T Dequeue();
                 }
 
-                private class Queue : _IQueue<TItems>
+                private class Queue : _IQueue<TItemsOut>
                 {
-                    private IQueue<TItems> _queue;
+                    private IQueue<TItemsOut> _queue;
 
-                    public Queue(in IQueue<TItems> queue) => _queue = queue;
+                    public Queue(in IQueue<TItemsOut> queue) => _queue = queue;
 
-                    bool _IQueue<TItems>.HasItems => _queue.HasItems;
+                    bool _IQueue<TItemsOut>.HasItems => _queue.HasItems;
 
-                    TItems _IQueue<TItems>.Peek() => _queue.Peek();
+                    TItemsOut _IQueue<TItemsOut>.Peek() => _queue.Peek();
 
-                    TItems _IQueue<TItems>.Dequeue() => _queue.Dequeue();
+                    TItemsOut _IQueue<TItemsOut>.Dequeue() => _queue.Dequeue();
 
                     void System.IDisposable.Dispose() => _queue = null;
                 }
 
-                private class LinkedList : _IQueue<IProcessErrorItem<TItems, TError>>
+                private class LinkedList : _IQueue<IProcessErrorItem<TItemsOut, TError>>
                 {
-                    private ILinkedList<IProcessErrorItem<TItems, TError>> _list;
-                    private ILinkedListNode<IProcessErrorItem<TItems, TError>> _currentNode;
-                    private ILinkedListNode<IProcessErrorItem<TItems, TError>> _previousNode;
+                    private ILinkedList<IProcessErrorItem<TItemsOut, TError>> _list;
+                    private ILinkedListNode<IProcessErrorItem<TItemsOut, TError>> _currentNode;
+                    private ILinkedListNode<IProcessErrorItem<TItemsOut, TError>> _previousNode;
                     private readonly TError _error;
 
-                    public LinkedList(in ILinkedList<IProcessErrorItem<TItems, TError>> list)
+                    public LinkedList(in ILinkedList<IProcessErrorItem<TItemsOut, TError>> list)
                     {
                         _list = list;
 
@@ -196,9 +196,9 @@ namespace WinCopies.IO.Process
                         _error = _currentNode.Value.Error.Error;
                     }
 
-                    private ILinkedListNode<IProcessErrorItem<TItems, TError>> Peek()
+                    private ILinkedListNode<IProcessErrorItem<TItemsOut, TError>> Peek()
                     {
-                        ILinkedListNode<IProcessErrorItem<TItems, TError>> node = _previousNode;
+                        ILinkedListNode<IProcessErrorItem<TItemsOut, TError>> node = _previousNode;
 
                         while ((node = node.Next) != null && !Equals(node.Value.Error.Error, _error))
                         {
@@ -208,7 +208,7 @@ namespace WinCopies.IO.Process
                         return node;
                     }
 
-                    bool _IQueue<IProcessErrorItem<TItems, TError>>.HasItems => (_currentNode
+                    bool _IQueue<IProcessErrorItem<TItemsOut, TError>>.HasItems => (_currentNode
 #if CS8
                     ??=
 #else
@@ -220,11 +220,11 @@ namespace WinCopies.IO.Process
 #endif
                     ) != null;
 
-                    IProcessErrorItem<TItems, TError> _IQueue<IProcessErrorItem<TItems, TError>>.Peek() => _currentNode.Value;
+                    IProcessErrorItem<TItemsOut, TError> _IQueue<IProcessErrorItem<TItemsOut, TError>>.Peek() => _currentNode.Value;
 
-                    IProcessErrorItem<TItems, TError> _IQueue<IProcessErrorItem<TItems, TError>>.Dequeue()
+                    IProcessErrorItem<TItemsOut, TError> _IQueue<IProcessErrorItem<TItemsOut, TError>>.Dequeue()
                     {
-                        IProcessErrorItem<TItems, TError> result = _currentNode.Value;
+                        IProcessErrorItem<TItemsOut, TError> result = _currentNode.Value;
 
                         _list.Remove(_currentNode);
 

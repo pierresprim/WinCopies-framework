@@ -21,23 +21,23 @@ using WinCopies.Collections.DotNetFix.Generic;
 
 namespace WinCopies.IO.Process.ObjectModel
 {
-    public static partial class ProcessInterfaceModelTypes<TItems, TError> where TItems : IPathInfo
+    public static partial class ProcessInterfaceModelTypes<TItemsIn, TItemsOut, TError> where TItemsIn : IPathInfo where TItemsOut : IPathInfo
     {
-        public interface IProcess<TParam,TProcessEventDelegates> : IProcess where TParam : IProcessProgressDelegateParameter where TProcessEventDelegates : ProcessDelegateTypes<TItems,TParam>.IProcessEventDelegates
+        public interface IProcess<TParam,TProcessEventDelegates> : IProcess where TParam : IProcessProgressDelegateParameter where TProcessEventDelegates : ProcessDelegateTypes<TItemsOut, TParam>.IProcessEventDelegates
         {
             new IProcessErrorFactory<TError> Factory { get; }
 
             new TProcessEventDelegates ProcessEventDelegates { get; }
 
-            new TItems SourcePath { get; }
+            new TItemsIn SourcePath { get; }
 
-            new ProcessTypes<TItems>.IProcessQueue Paths { get; }
+            new ProcessTypes<TItemsOut>.IProcessQueue Paths { get; }
 
             new IProcessError<TError> Error { get; }
 
             new IProcessErrorFactoryData<TError> ProcessErrorFactoryData { get; }
 
-            new ProcessTypes<IProcessErrorItem<TItems, TError>>.IProcessQueue ErrorPaths { get; }
+            new ProcessTypes<IProcessErrorItem<TItemsOut, TError>>.IProcessQueue ErrorPaths { get; }
 
 #if CS8
             IProcessErrorFactoryBase IProcess.Factory => Factory;
@@ -46,19 +46,19 @@ namespace WinCopies.IO.Process.ObjectModel
 
             IPathCommon IProcess.SourcePath => SourcePath;
 
-            ProcessTypes<IPathInfo>.IProcessQueue IProcess.Paths => new AbstractionProcessCollection<TItems, IPathInfo>(Paths);
+            ProcessTypes<IPathInfo>.IProcessQueue IProcess.Paths => new AbstractionProcessCollection<TItemsOut, IPathInfo>(Paths);
 
             IProcessError IProcess.Error => Error;
 
             IProcessErrorFactoryData IProcess.ProcessErrorFactoryData => ProcessErrorFactoryData;
 
-            ProcessTypes<IProcessErrorItem>.IProcessQueue IProcess.ErrorPaths => new AbstractionProcessCollection<IProcessErrorItem<TItems, TError>, IProcessErrorItem>(ErrorPaths);
+            ProcessTypes<IProcessErrorItem>.IProcessQueue IProcess.ErrorPaths => new AbstractionProcessCollection<IProcessErrorItem<TItemsOut, TError>, IProcessErrorItem>(ErrorPaths);
 #endif
         }
 
         public interface IDestinationProcess : IProcess, ObjectModel.IDestinationProcess
         {
-            new TItems DestinationPath { get; }
+            new TItemsIn DestinationPath { get; }
 
 #if CS8
             IPathCommon ObjectModel.IDestinationProcess.DestinationPath => DestinationPath;

@@ -89,16 +89,6 @@
             Gets or sets the content of this <see cref="T:WinCopies.GUI.Controls.Models.IContentControlModel"/>.
             </summary>
         </member>
-        <member name="T:WinCopies.GUI.Controls.Models.ContentControlModel">
-            <summary>
-            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.ContentControl"/>s.
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Controls.Models.ContentControlModel.Content">
-            <summary>
-            Gets or sets the content of this <see cref="T:WinCopies.GUI.Controls.Models.ContentControlModel"/>.
-            </summary>
-        </member>
         <member name="T:WinCopies.GUI.Controls.Models.IContentControlModel`1">
             <summary>
             Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.ContentControl"/>s.
@@ -107,21 +97,6 @@
         <member name="P:WinCopies.GUI.Controls.Models.IContentControlModel`1.Content">
             <summary>
             Gets or sets the content of this <see cref="T:WinCopies.GUI.Controls.Models.IContentControlModel`1"/>.
-            </summary>
-        </member>
-        <member name="T:WinCopies.GUI.Controls.Models.ContentControlModel`1">
-            <summary>
-            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.ContentControl"/>s.
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Controls.Models.ContentControlModel`1.Content">
-            <summary>
-            Gets or sets the content of this <see cref="T:WinCopies.GUI.Controls.Models.ContentControlModel`1"/>.
-            </summary>
-        </member>
-        <member name="M:WinCopies.GUI.Controls.Models.ContentControlModel`1.#ctor">
-            <summary>
-            Initializes a new instance of the <see cref="T:WinCopies.GUI.Controls.Models.ContentControlModel"/> class.
             </summary>
         </member>
         <member name="T:WinCopies.GUI.Controls.Models.IHeaderedControlModel">
@@ -139,21 +114,6 @@
             Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.HeaderedContentControl"/>s.
             </summary>
         </member>
-        <member name="T:WinCopies.GUI.Controls.Models.HeaderedContentControlModel">
-            <summary>
-            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.HeaderedContentControl"/>s.
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Controls.Models.HeaderedContentControlModel.Header">
-            <summary>
-            Gets or sets the header of this <see cref="T:WinCopies.GUI.Controls.Models.HeaderedContentControlModel"/>.
-            </summary>
-        </member>
-        <member name="M:WinCopies.GUI.Controls.Models.HeaderedContentControlModel.#ctor">
-            <summary>
-            Initializes a new instance of the <see cref="T:WinCopies.GUI.Controls.Models.HeaderedContentControlModel"/> class.
-            </summary>
-        </member>
         <member name="T:WinCopies.GUI.Controls.Models.IHeaderedControlModel`1">
             <summary>
             Represents a model that corresponds to a default view for headered controls.
@@ -167,6 +127,186 @@
         <member name="T:WinCopies.GUI.Controls.Models.IHeaderedContentControlModel`2">
             <summary>
             Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.HeaderedContentControl"/>s.
+            </summary>
+        </member>
+        <member name="T:WinCopies.GUI.Controls.Models.IItemsControlModel">
+            <summary>
+            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.ItemsControl"/>s.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Controls.Models.IItemsControlModel.Items">
+            <summary>
+            Gets or sets the items of this <see cref="T:WinCopies.GUI.Controls.Models.IItemsControlModel"/>.
+            </summary>
+        </member>
+        <member name="T:WinCopies.GUI.Controls.Models.IItemsControlModel`1">
+            <summary>
+            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.ItemsControl"/>s.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Controls.Models.IItemsControlModel`1.Items">
+            <summary>
+            Gets or sets the items of this <see cref="T:WinCopies.GUI.Controls.Models.IItemsControlModel`1"/>.
+            </summary>
+        </member>
+        <member name="T:WinCopies.GUI.Controls.Models.IHeaderedItemsControlModel">
+            <summary>
+            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.HeaderedItemsControl"/>s.
+            </summary>
+        </member>
+        <member name="T:WinCopies.GUI.Controls.Models.IHeaderedItemsControlModel`2">
+            <summary>
+            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.HeaderedItemsControl"/>s.
+            </summary>
+        </member>
+        <member name="T:WinCopies.GUI.Controls.Models.IGroupBoxModel">
+            <summary>
+            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.GroupBox"/> controls.
+            </summary>
+        </member>
+        <member name="T:WinCopies.GUI.Controls.Models.IGroupBoxModel`2">
+            <summary>
+            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.GroupBox"/> controls.
+            </summary>
+        </member>
+        <member name="T:WinCopies.GUI.Controls.Models.ITabItemModel">
+            <summary>
+            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.TabItem"/> controls.
+            </summary>
+        </member>
+        <member name="T:WinCopies.GUI.Controls.Models.ITabItemModel`2">
+            <summary>
+            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.TabItem"/> controls.
+            </summary>
+        </member>
+        <member name="T:WinCopies.GUI.Controls.Models.IButtonModel">
+            <summary>
+            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.Button"/>s.
+            </summary>
+        </member>
+        <member name="T:WinCopies.GUI.Controls.Models.IButtonModel`1">
+            <summary>
+            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.Button"/>s.
+            </summary>
+        </member>
+        <member name="T:WinCopies.GUI.Controls.Models.IButtonModel`2">
+            <summary>
+            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.Button"/>s.
+            </summary>
+        </member>
+        <member name="T:WinCopies.GUI.Controls.Models.IToggleButtonModel`2">
+            <summary>
+            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.Primitives.ToggleButton"/>s.
+            </summary>
+        </member>
+        <member name="T:WinCopies.GUI.Controls.Models.ICheckBoxModel">
+            <summary>
+            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.CheckBox"/>'s.
+            </summary>
+        </member>
+        <member name="T:WinCopies.GUI.Controls.Models.ICheckBoxModel`2">
+            <summary>
+            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.CheckBox"/>'.
+            </summary>
+        </member>
+        <member name="T:WinCopies.GUI.Controls.Models.ITextBoxModelTextOriented">
+            <summary>
+            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.TextBox"/>'s.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Controls.Models.ITextBoxModelTextOriented.Text">
+            <summary>
+            Gets or sets the text of this <see cref="T:WinCopies.GUI.Controls.Models.ITextBoxModelTextOriented"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Controls.Models.ITextBoxModelTextOriented.IsReadOnly">
+            <summary>
+            Gets or sets a value that indicates whether this <see cref="T:WinCopies.GUI.Controls.Models.ITextBoxModelTextOriented"/> is read-only.
+            </summary>
+        </member>
+        <member name="T:WinCopies.GUI.Controls.Models.ITextBoxModelSelectionOriented">
+            <summary>
+            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.TextBox"/>'s.
+            </summary>
+        </member>
+        <member name="T:WinCopies.GUI.Controls.Models.ITextBoxModelTextEditingOriented">
+            <summary>
+            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.TextBox"/>'s.
+            </summary>
+        </member>
+        <member name="T:WinCopies.GUI.Controls.Models.ITextBoxModel">
+            <summary>
+            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.TextBox"/>'s.
+            </summary>
+        </member>
+        <member name="T:WinCopies.GUI.Controls.Models.IRadioButtonCollection">
+            <summary>
+            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.RadioButton"/> collection.
+            </summary>
+        </member>
+        <member name="T:WinCopies.GUI.Controls.Models.IRadioButtonCollection`2">
+            <summary>
+            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.RadioButton"/> collection.
+            </summary>
+        </member>
+        <member name="T:WinCopies.GUI.Controls.Models.IRadioButtonModel">
+            <summary>
+            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.RadioButton"/>s.
+            </summary>
+        </member>
+        <member name="T:WinCopies.GUI.Controls.Models.IRadioButtonModel`2">
+            <summary>
+            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.RadioButton"/>s.
+            </summary>
+        </member>
+        <member name="T:WinCopies.GUI.Controls.Models.IGroupingRadioButtonModel">
+            <summary>
+            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.RadioButton"/>s.
+            </summary>
+        </member>
+        <member name="T:WinCopies.GUI.Controls.Models.IGroupingRadioButtonModel`2">
+            <summary>
+            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.RadioButton"/>s.
+            </summary>
+        </member>
+        <member name="T:WinCopies.GUI.Controls.Models.ContentControlModel">
+            <summary>
+            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.ContentControl"/>s.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Controls.Models.ContentControlModel.Content">
+            <summary>
+            Gets or sets the content of this <see cref="T:WinCopies.GUI.Controls.Models.ContentControlModel"/>.
+            </summary>
+        </member>
+        <member name="T:WinCopies.GUI.Controls.Models.ContentControlModel`1">
+            <summary>
+            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.ContentControl"/>s.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Controls.Models.ContentControlModel`1.Content">
+            <summary>
+            Gets or sets the content of this <see cref="T:WinCopies.GUI.Controls.Models.ContentControlModel`1"/>.
+            </summary>
+        </member>
+        <member name="M:WinCopies.GUI.Controls.Models.ContentControlModel`1.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:WinCopies.GUI.Controls.Models.ContentControlModel"/> class.
+            </summary>
+        </member>
+        <member name="T:WinCopies.GUI.Controls.Models.HeaderedContentControlModel">
+            <summary>
+            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.HeaderedContentControl"/>s.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Controls.Models.HeaderedContentControlModel.Header">
+            <summary>
+            Gets or sets the header of this <see cref="T:WinCopies.GUI.Controls.Models.HeaderedContentControlModel"/>.
+            </summary>
+        </member>
+        <member name="M:WinCopies.GUI.Controls.Models.HeaderedContentControlModel.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:WinCopies.GUI.Controls.Models.HeaderedContentControlModel"/> class.
             </summary>
         </member>
         <member name="T:WinCopies.GUI.Controls.Models.HeaderedContentControlModel`2">
@@ -184,16 +324,6 @@
             Initializes a new instance of the <see cref="T:WinCopies.GUI.Controls.Models.HeaderedContentControlModel`2"/> class.
             </summary>
         </member>
-        <member name="T:WinCopies.GUI.Controls.Models.IItemsControlModel">
-            <summary>
-            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.ItemsControl"/>s.
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Controls.Models.IItemsControlModel.Items">
-            <summary>
-            Gets or sets the items of this <see cref="T:WinCopies.GUI.Controls.Models.IItemsControlModel"/>.
-            </summary>
-        </member>
         <member name="T:WinCopies.GUI.Controls.Models.ItemsControlModel">
             <summary>
             Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.ItemsControl"/>s.
@@ -207,16 +337,6 @@
         <member name="M:WinCopies.GUI.Controls.Models.ItemsControlModel.#ctor">
             <summary>
             Initializes a new instance of the <see cref="T:WinCopies.GUI.Controls.Models.ItemsControlModel"/> class.
-            </summary>
-        </member>
-        <member name="T:WinCopies.GUI.Controls.Models.IItemsControlModel`1">
-            <summary>
-            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.ItemsControl"/>s.
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Controls.Models.IItemsControlModel`1.Items">
-            <summary>
-            Gets or sets the items of this <see cref="T:WinCopies.GUI.Controls.Models.IItemsControlModel`1"/>.
             </summary>
         </member>
         <member name="T:WinCopies.GUI.Controls.Models.ItemsControlModel`1">
@@ -234,11 +354,6 @@
             Initializes a new instance of the <see cref="T:WinCopies.GUI.Controls.Models.ItemsControlModel`1"/> class.
             </summary>
         </member>
-        <member name="T:WinCopies.GUI.Controls.Models.IHeaderedItemsControlModel">
-            <summary>
-            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.HeaderedItemsControl"/>s.
-            </summary>
-        </member>
         <member name="T:WinCopies.GUI.Controls.Models.HeaderedItemsControlModel">
             <summary>
             Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.HeaderedItemsControl"/>s.
@@ -254,11 +369,6 @@
             Initializes a new instance of the <see cref="T:WinCopies.GUI.Controls.Models.HeaderedItemsControlModel"/> class.
             </summary>
         </member>
-        <member name="T:WinCopies.GUI.Controls.Models.IHeaderedItemsControlModel`2">
-            <summary>
-            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.HeaderedItemsControl"/>s.
-            </summary>
-        </member>
         <member name="T:WinCopies.GUI.Controls.Models.HeaderedItemsControlModel`2">
             <summary>
             Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.HeaderedItemsControl"/>s.
@@ -272,16 +382,6 @@
         <member name="M:WinCopies.GUI.Controls.Models.HeaderedItemsControlModel`2.#ctor">
             <summary>
             Initializes a new instance of the <see cref="T:WinCopies.GUI.Controls.Models.HeaderedItemsControlModel`2"/> class.
-            </summary>
-        </member>
-        <member name="T:WinCopies.GUI.Controls.Models.IGroupBoxModel">
-            <summary>
-            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.GroupBox"/> controls.
-            </summary>
-        </member>
-        <member name="T:WinCopies.GUI.Controls.Models.IGroupBoxModel`2">
-            <summary>
-            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.GroupBox"/> controls.
             </summary>
         </member>
         <member name="T:WinCopies.GUI.Controls.Models.GroupBoxModel">
@@ -304,16 +404,6 @@
             Initializes a new instance of the <see cref="T:WinCopies.GUI.Controls.Models.GroupBoxModel`2"/> class.
             </summary>
         </member>
-        <member name="T:WinCopies.GUI.Controls.Models.ITabItemModel">
-            <summary>
-            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.TabItem"/> controls.
-            </summary>
-        </member>
-        <member name="T:WinCopies.GUI.Controls.Models.ITabItemModel`2">
-            <summary>
-            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.TabItem"/> controls.
-            </summary>
-        </member>
         <member name="T:WinCopies.GUI.Controls.Models.TabItemModel">
             <summary>
             Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.TabItem"/> controls.
@@ -332,11 +422,6 @@
         <member name="M:WinCopies.GUI.Controls.Models.TabItemModel`2.#ctor">
             <summary>
             Initializes a new instance of the <see cref="T:WinCopies.GUI.Controls.Models.TabItemModel`2"/> class.
-            </summary>
-        </member>
-        <member name="T:WinCopies.GUI.Controls.Models.IButtonModel">
-            <summary>
-            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.Button"/>s.
             </summary>
         </member>
         <member name="T:WinCopies.GUI.Controls.Models.ButtonModel">
@@ -364,24 +449,44 @@
             Initializes a new instance of the <see cref="T:WinCopies.GUI.Controls.Models.ButtonModel"/> class.
             </summary>
         </member>
-        <member name="M:WinCopies.GUI.Controls.Models.ButtonModel.#ctor(System.Object)">
+        <member name="M:WinCopies.GUI.Controls.Models.ButtonModel.#ctor(System.Object@)">
             <summary>
             Initializes a new instance of the <see cref="T:WinCopies.GUI.Controls.Models.ButtonModel"/> class with a custom content.
             </summary>
         </member>
-        <member name="M:WinCopies.GUI.Controls.Models.ButtonModel.#ctor(WinCopies.GUI.Controls.Models.BindingDirection)">
+        <member name="M:WinCopies.GUI.Controls.Models.ButtonModel.#ctor(WinCopies.GUI.Controls.Models.BindingDirection@)">
             <summary>
             Initializes a new instance of the <see cref="T:WinCopies.GUI.Controls.Models.ButtonModel"/> class with a custom <see cref="T:WinCopies.GUI.Controls.Models.BindingDirection"/>.
             </summary>
         </member>
-        <member name="M:WinCopies.GUI.Controls.Models.ButtonModel.#ctor(System.Object,WinCopies.GUI.Controls.Models.BindingDirection)">
+        <member name="M:WinCopies.GUI.Controls.Models.ButtonModel.#ctor(System.Object@,WinCopies.GUI.Controls.Models.BindingDirection@)">
             <summary>
             Initializes a new instance of the <see cref="T:WinCopies.GUI.Controls.Models.ButtonModel"/> class with a custom content and <see cref="T:WinCopies.GUI.Controls.Models.BindingDirection"/>.
             </summary>
         </member>
-        <member name="T:WinCopies.GUI.Controls.Models.IButtonModel`2">
+        <member name="T:WinCopies.GUI.Controls.Models.ButtonModel`1">
             <summary>
             Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.Button"/>s.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Controls.Models.ButtonModel`1.Command">
+            <summary>
+            Gets or sets the command of this <see cref="T:WinCopies.GUI.Controls.Models.ButtonModel`2"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Controls.Models.ButtonModel`1.CommandParameter">
+            <summary>
+            Gets or sets the command parameter of this <see cref="T:WinCopies.GUI.Controls.Models.ButtonModel`2"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Controls.Models.ButtonModel`1.CommandTarget">
+            <summary>
+            Gets or sets the command target of this <see cref="T:WinCopies.GUI.Controls.Models.ButtonModel`2"/>.
+            </summary>
+        </member>
+        <member name="M:WinCopies.GUI.Controls.Models.ButtonModel`1.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:WinCopies.GUI.Controls.Models.ButtonModel`2"/> class.
             </summary>
         </member>
         <member name="T:WinCopies.GUI.Controls.Models.ButtonModel`2">
@@ -444,11 +549,6 @@
             Initializes a new instance of the <see cref="T:WinCopies.GUI.Controls.Models.ToggleButtonModel"/> class.
             </summary>
         </member>
-        <member name="T:WinCopies.GUI.Controls.Models.IToggleButtonModel`2">
-            <summary>
-            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.Primitives.ToggleButton"/>s.
-            </summary>
-        </member>
         <member name="T:WinCopies.GUI.Controls.Models.ToggleButtonModel`2">
             <summary>
             Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.Primitives.ToggleButton"/>s.
@@ -469,11 +569,6 @@
             Initializes a new instance of the <see cref="T:WinCopies.GUI.Controls.Models.ToggleButtonModel`2"/> class.
             </summary>
         </member>
-        <member name="T:WinCopies.GUI.Controls.Models.ICheckBoxModel">
-            <summary>
-            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.CheckBox"/>'s.
-            </summary>
-        </member>
         <member name="T:WinCopies.GUI.Controls.Models.CheckBoxModel">
             <summary>
             Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.CheckBox"/>'s.
@@ -484,11 +579,6 @@
             Initializes a new instance of the <see cref="T:WinCopies.GUI.Controls.Models.CheckBoxModel"/> class.
             </summary>
         </member>
-        <member name="T:WinCopies.GUI.Controls.Models.ICheckBoxModel`2">
-            <summary>
-            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.CheckBox"/>'.
-            </summary>
-        </member>
         <member name="T:WinCopies.GUI.Controls.Models.CheckBoxModel`2">
             <summary>
             Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.CheckBox"/>'.
@@ -497,21 +587,6 @@
         <member name="M:WinCopies.GUI.Controls.Models.CheckBoxModel`2.#ctor">
             <summary>
             Initializes a new instance of the <see cref="T:WinCopies.GUI.Controls.Models.CheckBoxModel`2"/> class.
-            </summary>
-        </member>
-        <member name="T:WinCopies.GUI.Controls.Models.ITextBoxModelTextOriented">
-            <summary>
-            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.TextBox"/>'s.
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Controls.Models.ITextBoxModelTextOriented.Text">
-            <summary>
-            Gets or sets the text of this <see cref="T:WinCopies.GUI.Controls.Models.ITextBoxModelTextOriented"/>.
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Controls.Models.ITextBoxModelTextOriented.IsReadOnly">
-            <summary>
-            Gets or sets a value that indicates whether this <see cref="T:WinCopies.GUI.Controls.Models.ITextBoxModelTextOriented"/> is read-only.
             </summary>
         </member>
         <member name="T:WinCopies.GUI.Controls.Models.TextBoxModelTextOriented">
@@ -529,17 +604,7 @@
             Gets or sets a value that indicates whether this <see cref="T:WinCopies.GUI.Controls.Models.TextBoxModelTextOriented"/> is read-only.
             </summary>
         </member>
-        <member name="T:WinCopies.GUI.Controls.Models.ITextBoxModelSelectionOriented">
-            <summary>
-            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.TextBox"/>'s.
-            </summary>
-        </member>
         <member name="T:WinCopies.GUI.Controls.Models.TextBoxModelSelectionOriented">
-            <summary>
-            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.TextBox"/>'s.
-            </summary>
-        </member>
-        <member name="T:WinCopies.GUI.Controls.Models.ITextBoxModelTextEditingOriented">
             <summary>
             Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.TextBox"/>'s.
             </summary>
@@ -549,19 +614,9 @@
             Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.TextBox"/>'s.
             </summary>
         </member>
-        <member name="T:WinCopies.GUI.Controls.Models.ITextBoxModel">
-            <summary>
-            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.TextBox"/>'s.
-            </summary>
-        </member>
         <member name="T:WinCopies.GUI.Controls.Models.TextBoxModel">
             <summary>
             Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.TextBox"/>'s.
-            </summary>
-        </member>
-        <member name="T:WinCopies.GUI.Controls.Models.IRadioButtonCollection">
-            <summary>
-            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.RadioButton"/> collection.
             </summary>
         </member>
         <member name="T:WinCopies.GUI.Controls.Models.RadioButtonCollection">
@@ -569,19 +624,9 @@
             Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.RadioButton"/> collection.
             </summary>
         </member>
-        <member name="T:WinCopies.GUI.Controls.Models.IRadioButtonCollection`2">
-            <summary>
-            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.RadioButton"/> collection.
-            </summary>
-        </member>
         <member name="T:WinCopies.GUI.Controls.Models.RadioButtonCollection`2">
             <summary>
             Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.RadioButton"/> collection.
-            </summary>
-        </member>
-        <member name="T:WinCopies.GUI.Controls.Models.IRadioButtonModel">
-            <summary>
-            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.RadioButton"/>s.
             </summary>
         </member>
         <member name="T:WinCopies.GUI.Controls.Models.RadioButtonModel">
@@ -594,11 +639,6 @@
             Initializes a new instance of the <see cref="T:WinCopies.GUI.Controls.Models.RadioButtonModel"/> class.
             </summary>
         </member>
-        <member name="T:WinCopies.GUI.Controls.Models.IRadioButtonModel`2">
-            <summary>
-            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.RadioButton"/>s.
-            </summary>
-        </member>
         <member name="T:WinCopies.GUI.Controls.Models.RadioButtonModel`2">
             <summary>
             Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.RadioButton"/>s.
@@ -607,16 +647,6 @@
         <member name="M:WinCopies.GUI.Controls.Models.RadioButtonModel`2.#ctor">
             <summary>
             Initializes a new instance of the <see cref="T:WinCopies.GUI.Controls.Models.RadioButtonModel`2"/> class.
-            </summary>
-        </member>
-        <member name="T:WinCopies.GUI.Controls.Models.IGroupingRadioButtonModel">
-            <summary>
-            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.RadioButton"/>s.
-            </summary>
-        </member>
-        <member name="T:WinCopies.GUI.Controls.Models.IGroupingRadioButtonModel`2">
-            <summary>
-            Represents a model that corresponds to a default view for <see cref="T:System.Windows.Controls.RadioButton"/>s.
             </summary>
         </member>
         <member name="T:WinCopies.GUI.Controls.Models.GroupingRadioButtonModel">

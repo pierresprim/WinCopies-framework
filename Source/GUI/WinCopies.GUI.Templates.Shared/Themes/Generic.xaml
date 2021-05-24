@@ -29,8 +29,8 @@
         <ResourceDictionary>
             <!--Data converters-->
             <local:ModelToBooleanConverter x:Key="DefaultModelToBooleanConverter" />
-            <local:BitmapToImageSourceConverter x:Key="BitmapToImageSourceConverter" />
-            <local:IconToImageSourceConverter x:Key="IconToImageSourceConverter" />
+            <converters:BitmapToImageSourceConverter x:Key="BitmapToImageSourceConverter" />
+            <converters:IconToImageSourceConverter x:Key="IconToImageSourceConverter" />
             <!--End of Data Converters Section-->
             <Style x:Key="ControlStyle" TargetType="{x:Type Control}" x:Shared="false">
                 <Setter Property="IsEnabled" Value="{Binding IsEnabled}" />
@@ -113,6 +113,38 @@
             </Style>
         </ResourceDictionary>
     </ResourceDictionary.MergedDictionaries>
+
+    <ControlTemplate x:Key="DecoratedContentControlContentTemplate" TargetType="{x:Type local:DecoratedContentControlContent}" x:Shared="false">
+        <DockPanel>
+            <ContentControl DockPanel.Dock="Left" Content="{TemplateBinding ContentDecoration}" />
+            <ContentControl Content="{TemplateBinding Content}" />
+        </DockPanel>
+    </ControlTemplate>
+    <Style TargetType="{x:Type local:DecoratedContentControlContent}">
+        <Setter Property="Template" Value="{StaticResource DecoratedContentControlContentTemplate}" />
+    </Style>
+    <DataTemplate DataType="{x:Type controls:IExtendedButtonModel}" x:Shared="false">
+        <Button>
+            <Button.Style>
+                <util:MergedStyles>
+                    <util:MergedStyles.Styles>
+                        <x:Array Type="Style">
+                            <StaticResource ResourceKey="ContentControlStyle" />
+                            <StaticResource ResourceKey="ButtonStyle" />
+                            <StaticResource ResourceKey="{x:Type Button}" />
+                            <Style TargetType="{x:Type Button}">
+                                <Setter Property="Content">
+                                    <Setter.Value>
+                                        <local:DecoratedContentControlContent ContentDecoration="{Binding ContentDecoration}" Content="{Binding Content}" ToolTip="{Binding ToolTip}" />
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </x:Array>
+                    </util:MergedStyles.Styles>
+                </util:MergedStyles>
+            </Button.Style>
+        </Button>
+    </DataTemplate>
     <DataTemplate DataType="{x:Type media:ImageSource}" x:Shared="false">
         <Image Source="{Binding Mode=OneWay}" />
     </DataTemplate>

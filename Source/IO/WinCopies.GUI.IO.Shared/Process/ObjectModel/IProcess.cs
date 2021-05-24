@@ -17,13 +17,29 @@
 
 using System;
 using System.ComponentModel;
+
 using WinCopies.IO;
 
 namespace WinCopies.GUI.IO.Process
 {
+    public enum ProcessStatus : sbyte
+    {
+        None,
+
+        InProgress,
+
+        Succeeded,
+
+        CancelledByUser,
+
+        Error
+    }
+
     public interface IProcess : WinCopies.IO.Process.ObjectModel.IProcess, IBackgroundWorker, INotifyPropertyChanged
     {
         #region Properties
+        ProcessStatus Status { get; }
+
         bool IsCompleted { get; }
 
         bool IsPaused { get; }

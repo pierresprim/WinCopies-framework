@@ -350,7 +350,7 @@ namespace WinCopies.GUI.Controls
     {
         public System.Collections.Generic.IEnumerable<IButtonModel> Buttons { get; set; }
 
-        public static ObservableCollection<IButtonModel> GetDefaultButtons() => new ObservableCollection<IButtonModel>() { new ButtonModel<Bitmap, object>(Icons.Properties.Resources.cancel) { Command = DialogCommands.Cancel } };
+        public static ObservableCollection<IButtonModel> GetDefaultButtons() => new ObservableCollection<IButtonModel>() { new ButtonModel<Bitmap>(Icons.Properties.Resources.cancel) { Command = DialogCommands.Cancel } };
 
         public ButtonTextBoxModel() => Buttons = GetDefaultButtons();
 

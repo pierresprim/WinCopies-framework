@@ -50,7 +50,7 @@ namespace WinCopies.GUI.Drawing.EncodingFormats
         #endregion
 
         #region Methods
-        public bool IsRecognizedFormat(in Stream stream)
+        public bool IsRecognizedFormat(in System.IO.Stream stream)
         {
             stream.Position = 0;
 
@@ -77,7 +77,7 @@ namespace WinCopies.GUI.Drawing.EncodingFormats
             return false;
         }
 
-        public MultiIcon Load(in Stream stream)
+        public MultiIcon Load(in System.IO.Stream stream)
         {
             stream.Position = 0;
 
@@ -141,7 +141,7 @@ namespace WinCopies.GUI.Drawing.EncodingFormats
             return new MultiIcon(singleIcons);
         }
 
-        public unsafe void Save(in MultiIcon multiIcon, in Stream stream)
+        public unsafe void Save(in MultiIcon multiIcon, in System.IO.Stream stream)
         {
             //Lets prepare the complete file in memory, then we dump everything to a file
             var dos_header = new IMAGE_DOS_HEADER();

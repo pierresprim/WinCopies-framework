@@ -15,10 +15,6 @@
 * You should have received a copy of the GNU General Public License
 * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-using System;
-
-using WinCopies.IO.Process.ObjectModel;
-
 namespace WinCopies.IO.Process
 {
     public readonly struct ProcessFactorySelectorDictionaryParameters
@@ -27,13 +23,15 @@ namespace WinCopies.IO.Process
 #if CS8
             readonly
 #endif
-            IProcessParameters ProcessParameters { get; }
+            IProcessParameters ProcessParameters
+        { get; }
 
         public
 #if CS8
             readonly
 #endif
-            IProcessPathCollectionFactory Factory { get; }
+            IProcessPathCollectionFactory Factory
+        { get; }
 
         public ProcessFactorySelectorDictionaryParameters(in IProcessParameters processParameters, in IProcessPathCollectionFactory factory)
         {
@@ -41,10 +39,5 @@ namespace WinCopies.IO.Process
 
             Factory = factory;
         }
-    }
-
-    public class ProcessFactorySelectorDictionary : SelectorDictionary<ProcessFactorySelectorDictionaryParameters, IProcess>
-    {
-        protected override Converter<ProcessFactorySelectorDictionaryParameters, IProcess> DefaultSelectorOverride { get; } = parameters => null;
     }
 }

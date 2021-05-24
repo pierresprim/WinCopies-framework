@@ -35,10 +35,13 @@ namespace WinCopies.GUI.IO.Process
         private IPathCommon _currentPath;
         private bool _arePathsLoaded;
         private bool _isPaused;
+        private ProcessStatus _status = ProcessStatus.None;
         #endregion Fields
 
         #region Properties
         protected WinCopies.IO.Process.ObjectModel.IProcess InnerProcess => this.GetIfNotDisposed(_process);
+
+        public ProcessStatus Status => _status;
 
         public IProcessErrorFactoryBase Factory => InnerProcess.Factory;
 
@@ -66,7 +69,17 @@ namespace WinCopies.GUI.IO.Process
 
         public ProcessTypes<IProcessErrorItem>.IProcessQueue ErrorPaths => InnerProcess.ErrorPaths;
 
-        public bool IsCompleted { get => _isCompleted; private set => UpdateValue(ref _isCompleted, value, nameof(IsCompleted)); }
+        public bool IsCompleted
+        {
+            get => _isCompleted;
+
+            private set
+            {
+                UpdateValue(ref _isCompleted, value, nameof(IsCompleted));
+
+                UpdateValue(ref _status, object.Equals(InnerProcess.Error.Error, InnerProcess.ProcessErrorFactoryData.NoError) ? ProcessStatus.Succeeded : InnerProcess.Error.Error == InnerProcess.ProcessErrorFactoryData.CancelledByUserError ? ProcessStatus.CancelledByUser : ProcessStatus.Error, nameof(Status));
+            }
+        }
 
         // public ApartmentState ApartmentState { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
 
@@ -80,13 +93,11 @@ namespace WinCopies.GUI.IO.Process
 
         public IPathCommon CurrentPath { get => _currentPath; private set => UpdateValue(ref _currentPath, value, nameof(CurrentPath)); }
 
-        Action IProcess.PauseAction => PauseAsync;
+        public Action PauseAction => PauseAsync;
 
-#if !CS8
-        Action IProcess.RunAction => RunWorkerAsync;
+        public Action RunAction => RunWorkerAsync;
 
-        Action IProcess.CancelAction => CancelAsync;
-#endif
+        public Action CancelAction => CancelAsync;
 
         ApartmentState IBackgroundWorker.ApartmentState { get => throw new InvalidOperationException(); set => throw new InvalidOperationException(); }
 
@@ -134,6 +145,8 @@ namespace WinCopies.GUI.IO.Process
         {
             IsCompleted = false;
             IsPaused = false;
+
+            UpdateValue(ref _status, ProcessStatus.InProgress, nameof(Status));
 
             if (ArePathsLoaded)
 

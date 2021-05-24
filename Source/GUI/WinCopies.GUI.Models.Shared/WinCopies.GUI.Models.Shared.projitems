@@ -10,6 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)DialogButton.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Models.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel.cs" />
   </ItemGroup>
 </Project>

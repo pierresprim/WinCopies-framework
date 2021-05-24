@@ -1,7 +1,6 @@
 ﻿using Microsoft.WindowsAPICodePack.Win32Native.GDI;
 
 using System;
-using System.IO;
 using System.Runtime.InteropServices;
 
 namespace WinCopies.GUI.Drawing
@@ -9,7 +8,7 @@ namespace WinCopies.GUI.Drawing
     internal static class Util
     {
         #region Methods
-        public unsafe static void Read<T>(ref T @struct, in Stream stream) where T : unmanaged
+        public unsafe static void Read<T>(ref T @struct, in System.IO.Stream stream) where T : unmanaged
         {
             byte[] array = new byte[Marshal.SizeOf<T>()];
             _ = stream.Read(array, 0, array.Length);
@@ -17,7 +16,7 @@ namespace WinCopies.GUI.Drawing
                 @struct = *(T*)pData;
         }
 
-        public unsafe static void Write<T>(in T @struct, in Stream stream) where T : unmanaged
+        public unsafe static void Write<T>(in T @struct, in System.IO.Stream stream) where T : unmanaged
         {
             byte[] array = new byte[Marshal.SizeOf<T>()];
             fixed (T* ptr = &@struct)
@@ -26,7 +25,7 @@ namespace WinCopies.GUI.Drawing
         }
         #endregion
 
-        public static void Write<T>( in T[] structs, in Stream stream) where T : unmanaged
+        public static void Write<T>( in T[] structs, in System.IO.Stream stream) where T : unmanaged
         {
             foreach (T @struct in structs)
                 Write(@struct, stream);
@@ -35,7 +34,7 @@ namespace WinCopies.GUI.Drawing
         #region BitmapInfoHeader
 
         #region Constructors
-        public static BitmapInfoHeader GetBitmapInfoHeader(Stream stream)
+        public static BitmapInfoHeader GetBitmapInfoHeader(System.IO.Stream stream)
         {
             var header = new BitmapInfoHeader();
 

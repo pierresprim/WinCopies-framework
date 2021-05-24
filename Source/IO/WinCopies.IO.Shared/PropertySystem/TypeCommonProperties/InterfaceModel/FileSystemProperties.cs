@@ -20,7 +20,7 @@ using System.IO;
 
 namespace WinCopies.IO.PropertySystem
 {
-    public interface IFileSystemObjectInfoProperties
+    public interface IFileSystemObjectInfoProperties : WinCopies.DotNetFix.IDisposable
     {
         ///// <summary>
         ///// Gets the <see cref="WinCopies.IO.FileType"/> of this <see cref="IFileSystemObject"/>.

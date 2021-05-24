@@ -49,7 +49,7 @@ namespace WinCopies.IO
             private System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> _defaultRootItems;
 
             #region Properties
-            public override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> RootItems => _defaultRootItems
+            public override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> RootItems => IsDisposed ? throw WinCopies.ThrowHelper.GetExceptionForDispose(false) : _defaultRootItems
 #if CS8
                 ??=
 #else
@@ -194,7 +194,6 @@ namespace WinCopies.IO
                 enqueue(KnownFolders.Desktop);
                 enqueue(KnownFolders.Libraries);
                 enqueue(KnownFolders.Profile);
-                enqueue(KnownFolders.Desktop);
                 enqueue(KnownFolders.Computer);
                 enqueue(KnownFolders.RecycleBin);
 

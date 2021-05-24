@@ -4,6 +4,41 @@
         <name>WinCopies.GUI</name>
     </assembly>
     <members>
+        <member name="T:WinCopies.GUI.Windows.InputBox">
+            <summary>
+            Interaction logic for InputBox.xaml
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.InputBox.OrientationProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Windows.InputBox.Orientation"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.InputBox.Orientation">
+            <summary>
+            Gets or sets the <see cref="T:System.Windows.Controls.Orientation"/> of the label and the text box. This is a dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.InputBox.TextProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Windows.InputBox.Text"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.InputBox.Text">
+            <summary>
+            Gets or sets the text of the text box. This is a dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.InputBox.PlaceholderProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Windows.InputBox.Placeholder"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.InputBox.Placeholder">
+            <summary>
+            Gets or sets the placeholder for the text box. This is a dependency property.
+            </summary>
+        </member>
         <member name="T:WinCopies.GUI.Windows.DialogWindow">
             <summary>
             Represents a common dialog window for WPF.

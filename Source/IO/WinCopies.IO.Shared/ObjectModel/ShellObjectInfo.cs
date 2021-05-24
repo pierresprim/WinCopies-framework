@@ -21,14 +21,10 @@ using Microsoft.WindowsAPICodePack.Shell;
 
 using System;
 using System.Collections.Specialized;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Windows.Media.Imaging;
 
-using WinCopies.Collections;
-using WinCopies.Collections.DotNetFix.Generic;
 using WinCopies.Collections.Generic;
 using WinCopies.Extensions;
 using WinCopies.IO.AbstractionInterop;
@@ -37,6 +33,7 @@ using WinCopies.IO.ObjectModel;
 using WinCopies.IO.Process;
 using WinCopies.IO.Process.ObjectModel;
 using WinCopies.IO.PropertySystem;
+using WinCopies.IO.Resources;
 using WinCopies.IO.Selectors;
 using WinCopies.Linq;
 using WinCopies.PropertySystem;
@@ -45,8 +42,13 @@ using WinCopies.Util;
 using static Microsoft.WindowsAPICodePack.Shell.KnownFolders;
 
 using static WinCopies.IO.Path;
+using static WinCopies.IO.Process.ProcessHelper;
 using static WinCopies.ThrowHelper;
 using static WinCopies.UtilHelpers;
+
+#if !CS8
+using WinCopies.Collections;
+#endif
 
 namespace WinCopies.IO
 {
@@ -64,15 +66,19 @@ namespace WinCopies.IO
         }
     }
 
-    public sealed class ShellLinkBrowsabilityOptions : IBrowsabilityOptions
+    public sealed class ShellLinkBrowsabilityOptions : IBrowsabilityOptions, WinCopies.DotNetFix.IDisposable
     {
-        private readonly IShellObjectInfoBase _shellObjectInfo;
+        private IShellObjectInfoBase _shellObjectInfo;
+
+        public bool IsDisposed => _shellObjectInfo == null;
 
         public Browsability Browsability => Browsability.RedirectsToBrowsableItem;
 
         public ShellLinkBrowsabilityOptions(in IShellObjectInfoBase shellObjectInfo) => _shellObjectInfo = shellObjectInfo ?? throw GetArgumentNullException(nameof(shellObjectInfo));
 
-        public IBrowsableObjectInfo RedirectToBrowsableItem() => _shellObjectInfo;
+        public IBrowsableObjectInfo RedirectToBrowsableItem() => IsDisposed ? throw GetExceptionForDispose(false) : _shellObjectInfo;
+
+        public void Dispose() => _shellObjectInfo = null;
     }
 
     namespace ObjectModel
@@ -92,7 +98,7 @@ namespace WinCopies.IO
             /// </summary>
             public sealed override ShellObject InnerObjectGeneric => _shellObject;
 
-            public Stream ArchiveFileStream { get; private set; }
+            public System.IO.Stream ArchiveFileStream { get; private set; }
 
             public bool IsArchiveOpen => ArchiveFileStream is object;
 
@@ -131,11 +137,17 @@ namespace WinCopies.IO
                 }
             }
 
-#if NETFRAMEWORK
-            public override IBrowsableObjectInfo Parent => _parent ?? (_parent = GetParent());
+            public override IBrowsableObjectInfo Parent => IsDisposed ? throw GetExceptionForDispose(false) : _parent
+#if CS8
+                ??=
 #else
-            public override IBrowsableObjectInfo Parent => _parent ??= GetParent();
+                ?? (_parent =
 #endif
+                GetParent()
+#if !CS8
+                )
+#endif
+                ;
 
             /// <summary>
             /// Gets the localized name of this <see cref="ShellObjectInfo"/> depending the associated <see cref="ShellObject"/> (see the <see cref="ShellObject"/> property for more details.
@@ -225,7 +237,7 @@ namespace WinCopies.IO
                 if (ObjectPropertiesGeneric.FileType == FileType.Archive)
 
                     ArchiveFileStream = ArchiveFileStream == null
-                        ? (Stream)new FileStream(Path, fileMode, fileAccess, fileShare, bufferSize.HasValue ? bufferSize.Value : 4096, fileOptions)
+                        ? (System.IO.Stream)new FileStream(Path, fileMode, fileAccess, fileShare, bufferSize.HasValue ? bufferSize.Value : 4096, fileOptions)
                         : throw new InvalidOperationException("The archive is not open.");
 
                 else
@@ -253,19 +265,25 @@ namespace WinCopies.IO
             #endregion
 
             #region Overrides
-            protected override void DisposeManaged()
+            protected override void DisposeUnmanaged()
             {
-                base.DisposeManaged();
-
-                _shellObject.Dispose();
-
-                _shellObject = null;
+                _parent = null;
 
                 if (IsArchiveOpen)
 
                     CloseArchive();
 
+                base.DisposeUnmanaged();
+            }
+            protected override void DisposeManaged()
+            {
+                _shellObject.Dispose();
+
+                _shellObject = null;
+
                 _browsability = null;
+
+                base.DisposeManaged();
             }
 
             /// <summary>
@@ -309,7 +327,7 @@ namespace WinCopies.IO
 
         public class ShellObjectInfo : ShellObjectInfo<IFileSystemObjectInfoProperties, ShellObjectInfoEnumeratorStruct, IEnumerableSelectorDictionary<ShellObjectInfoItemProvider, IBrowsableObjectInfo>, ShellObjectInfoItemProvider>, IShellObjectInfo
         {
-            public static IProcess TryGetProcess(in ProcessFactorySelectorDictionaryParameters processParameters, uint count)
+            public static IProcess TryGetProcess(ProcessFactorySelectorDictionaryParameters processParameters)
             {
                 string guid = processParameters.ProcessParameters.Guid.ToString();
 
@@ -319,49 +337,28 @@ namespace WinCopies.IO
                 {
                     switch (guid)
                     {
-                        case Guids.ShellCopyProcessGuid:
+                        case Guids.Process.Shell.Copy:
 
                             enumerator = processParameters.ProcessParameters.Parameters.GetEnumerator();
 
-                            PathTypes<IPathInfo>.RootPath getParameter()
-                            {
-                                _ = enumerator.MoveNext();
-
-                                return new PathTypes<IPathInfo>.RootPath(enumerator.Current, true);
-                            }
+                            PathTypes<IPathInfo>.RootPath getParameter() => enumerator.MoveNext()
+                                    ? new PathTypes<IPathInfo>.RootPath(enumerator.Current, true)
+                                    : throw new InvalidOperationException(ExceptionMessages.ProcessParametersCouldNotBeParsedCorrectly);
 
                             IPathInfo sourcePath, destinationPath;
 
                             sourcePath = getParameter();
                             destinationPath = getParameter();
 
-                            return new CopyProcess<ProcessErrorFactory<IPathInfo>>(
-                                new ReadOnlyEnumerableQueueCollection<IPathInfo>(
-                                    new Enumerable<string>(
-                                        () => enumerator
-                                        ).Select(
-                                            path =>
-                                            {
-                                                if (path.EndsWith(":\\") || path.EndsWith(":\\\\"))
-
-                                                    return new PathTypes<IPathInfo>.RootPath(path, true);
-
-                                                return (IPathInfo)new PathTypes<IPathInfo>.PathInfo(System.IO.Path.GetFileName(path), sourcePath);
-                                            })
-                                        .ToEnumerableQueue()),
+                            return new CopyProcess<ProcessErrorFactory<IPathInfo>>(GetInitialPaths(enumerator, sourcePath),
                                 sourcePath,
                                 destinationPath,
                                 processParameters.Factory.GetProcessCollection<IPathInfo>(),
                                 processParameters.Factory.GetProcessLinkedList<
                                     IPathInfo,
                                     ProcessError>(),
-                                new ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>
-                                .ProcessDelegates(
-                                    new EventDelegate<IPathInfo>(),
-                                    EventAndQueryDelegate<bool>.GetANDALSO_Delegate(true),
-                                    EventAndQueryDelegate<object>.GetANDALSO_Delegate(false),
-                                    EventAndQueryDelegate<IProcessProgressDelegateParameter>.GetANDALSO_Delegate(true)),
-                                new ProcessTypes<IPathInfo>.ProcessErrorTypes<ProcessError>.ProcessOptions(path => true, true),
+                                GetDefaultProcessDelegates(),
+                                new ProcessTypes<IPathInfo>.ProcessErrorTypes<ProcessError>.ProcessOptions(Bool.True, true),
                                 new ProcessErrorFactory<IPathInfo>());
                     }
                 }
@@ -374,58 +371,86 @@ namespace WinCopies.IO
                 return null;
             }
 
-            public static IProcess GetProcess(ProcessFactorySelectorDictionaryParameters processParameters, uint count) => TryGetProcess(processParameters, count) ?? throw new InvalidOperationException("No process could be generated.");
-
-            public static class Guids
-            {
-                public const string ShellCopyProcessGuid = "084ff8d5-c66e-40bc-8ea4-7fa2dd30bd21";
-            }
+            public static IProcess GetProcess(ProcessFactorySelectorDictionaryParameters processParameters) => TryGetProcess(processParameters) ?? throw new InvalidOperationException("No process could be generated.");
 
             public static Action RegisterProcessSelectors { get; private set; } = () =>
             {
-                DefaultProcessSelectorDictionary.Push(item =>
-                {
-                    string guid = item.ProcessParameters.Guid.ToString();
+                DefaultProcessSelectorDictionary.Push(item => Predicate(item, typeof(Guids.Process.Shell))
+                                    , TryGetProcess
 
-                    foreach (FieldInfo f in typeof(Guids).GetFields())
-
-                        if ((string)f.GetValue(null) == guid)
-
-                            return true;
-
-                    return false;
-                }, _item =>
-                {
-                    string guid = _item.ToString();
-
-                    return TryGetProcess(_item, 10);
-
-                    // System.Reflection.Assembly.GetExecutingAssembly().DefinedTypes.FirstOrDefault(t => t.Namespace.StartsWith(typeof(Process.ObjectModel.IProcess).Namespace) && t.GetCustomAttribute<ProcessGuidAttribute>().Guid == guid);
-                });
+                // System.Reflection.Assembly.GetExecutingAssembly().DefinedTypes.FirstOrDefault(t => t.Namespace.StartsWith(typeof(Process.ObjectModel.IProcess).Namespace) && t.GetCustomAttribute<ProcessGuidAttribute>().Guid == guid);
+                );
 
                 RegisterProcessSelectors = EmptyVoid;
             };
 
+            private class NewItemProcessCommands : IProcessCommands
+            {
+                private IShellObjectInfo _shellObjectInfo;
+
+                public bool IsDisposed => _shellObjectInfo == null;
+
+                public string Name { get; } = "New folder";
+
+                public string Caption { get; } = "Folder name:";
+
+                public NewItemProcessCommands(in IShellObjectInfo shellObjectInfo) => _shellObjectInfo = shellObjectInfo;
+
+                public bool CanCreateNewItem()
+                {
+                    switch (_shellObjectInfo.ObjectProperties.FileType)
+                    {
+                        case FileType.Folder:
+                        case FileType.KnownFolder:
+                        case FileType.Drive:
+
+                            return _shellObjectInfo.InnerObject.IsFileSystemObject;
+                    }
+
+                    return false;
+                }
+
+                public bool TryCreateNewItem(string parameter, out IProcessParameters result)
+                {
+                    result = null;
+
+                    return Microsoft.WindowsAPICodePack.Win32Native.Shell.Shell.CreateDirectoryW($"{_shellObjectInfo.Path}\\{parameter}", IntPtr.Zero);
+                }
+
+                public IProcessParameters CreateNewItem(string parameter) => TryCreateNewItem(parameter, out IProcessParameters result)
+                        ? result
+                        : throw new InvalidOperationException("Could not create item.");
+
+                public void Dispose() => _shellObjectInfo = null;
+
+                ~NewItemProcessCommands() => Dispose();
+            }
 
             private class _ProcessFactory : IProcessFactory
             {
-                private class ProcessParameters : IProcessParameters
+                private class ProcessParameters : Process.ProcessParameters
                 {
-                    public Guid Guid { get; }
-
-                    public System.Collections.Generic.IEnumerable<string> Parameters { get; }
-
-                    public ProcessParameters(in string processGuid, in string sourcePath, in string destinationPath, StringCollection sc)
+                    public ProcessParameters(in string processGuid, in string sourcePath, in string destinationPath, StringCollection sc) : base(processGuid, new Enumerable<string>(() => new Collections.StringEnumerator(sc, Collections.DotNetFix.EnumerationDirection.FIFO)).PrependValues(sourcePath, destinationPath))
                     {
-                        Guid = new Guid(processGuid);
-
-                        Parameters = new Enumerable<string>(() => new Collections.StringEnumerator(sc, Collections.DotNetFix.EnumerationDirection.FIFO)).PrependValues(sourcePath, destinationPath);
+                        // Left empty.
                     }
                 }
 
-                private readonly IShellObjectInfoBase2 _path;
+                private IShellObjectInfoBase2 _path;
+                private IProcessCommands _newItemProcessCommands;
 
-                public _ProcessFactory(in IShellObjectInfoBase2 path) => _path = path;
+                public bool IsDisposed => _path == null;
+
+                public  System.Collections.Generic.IEnumerable<IProcessInfo> CustomProcesses => DefaultCustomProcessesSelectorDictionary.Select(_path);
+
+                public IProcessCommands NewItemProcessCommands => IsDisposed ? throw GetExceptionForDispose(false) : _newItemProcessCommands;
+
+                public _ProcessFactory(in IShellObjectInfo path)
+                {
+                    _path = path;
+
+                    _newItemProcessCommands = new NewItemProcessCommands(path);
+                }
 
                 public bool CanCopy(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths)
                 {
@@ -556,42 +581,62 @@ namespace WinCopies.IO
 
                     return sourcePath == null
                         ? null
-                     : new ProcessParameters(Guids.ShellCopyProcessGuid, sourcePath, _path.Path, sc);
+                     : new ProcessParameters(Guids.Process.Shell.Copy, sourcePath, _path.Path, sc);
                 }
 
-                IProcess IProcessFactory.GetProcess(ProcessFactorySelectorDictionaryParameters processParameters, uint count) => GetProcess(processParameters, count);
+                IProcess IProcessFactory.GetProcess(ProcessFactorySelectorDictionaryParameters processParameters) => GetProcess(processParameters);
 
-                IProcess IProcessFactory.TryGetProcess(ProcessFactorySelectorDictionaryParameters processParameters, uint count) => TryGetProcess(processParameters, count);
+                IProcess IProcessFactory.TryGetProcess(ProcessFactorySelectorDictionaryParameters processParameters) => TryGetProcess(processParameters);
+
+                public void Dispose()
+                {
+                    if (IsDisposed)
+
+                        return;
+
+                    _path = null;
+
+                    _newItemProcessCommands.Dispose();
+
+                    _newItemProcessCommands = null;
+                }
+
+                ~_ProcessFactory() => Dispose();
             }
 
             private IFileSystemObjectInfoProperties _objectProperties;
+            private IProcessFactory _processFactory;
 
             #region Properties
-            public override IProcessFactory ProcessFactory { get; }
+            public override IProcessFactory ProcessFactory => GetValueIfNotDisposed(_processFactory);
 
             public static IEnumerableSelectorDictionary<ShellObjectInfoItemProvider, IBrowsableObjectInfo> DefaultItemSelectorDictionary { get; } = new ShellObjectInfoSelectorDictionary();
 
-            public sealed override IFileSystemObjectInfoProperties ObjectPropertiesGeneric => IsDisposed ? throw GetExceptionForDispose(false) : _objectProperties;
+            public static ISelectorDictionary<IShellObjectInfoBase2, System.Collections.Generic.IEnumerable<IProcessInfo>> DefaultCustomProcessesSelectorDictionary { get; } = new DefaultNullableValueSelectorDictionary<IShellObjectInfoBase2, System.Collections.Generic.IEnumerable<IProcessInfo>>();
+
+            public sealed override IFileSystemObjectInfoProperties ObjectPropertiesGeneric => GetValueIfNotDisposed(_objectProperties);
             #endregion // Properties
 
             #region Constructors
-            public ShellObjectInfo(in string path, in FileType fileType, in ShellObject shellObject, in ClientVersion clientVersion) : base(path, shellObject, clientVersion)
+            public ShellObjectInfo(in string path, FileType fileType, in ShellObject shellObject, in ClientVersion clientVersion) : base(path, shellObject, clientVersion)
             {
+                IFileSystemObjectInfoProperties getFolderProperties() => new FolderShellObjectInfoProperties<IShellObjectInfoBase2>(this, fileType);
+                IFileSystemObjectInfoProperties getFileSystemObjectInfoProperties() => new FileSystemObjectInfoProperties(this, fileType);
 #if CS9
                 _objectProperties = fileType switch
                 {
-                    FileType.Folder or FileType.KnownFolder => new FolderShellObjectInfoProperties<IShellObjectInfoBase2>(this, fileType),
+                    FileType.Folder => getFolderProperties(),
                     FileType.File or FileType.Archive or FileType.Library or FileType.Link => new FileShellObjectInfoProperties<IShellObjectInfoBase2>(this, fileType),
+                    FileType.KnownFolder => shellObject.IsFileSystemObject ? getFolderProperties() : getFileSystemObjectInfoProperties(),
                     FileType.Drive => new DriveShellObjectInfoProperties<IShellObjectInfoBase2>(this, fileType),
-                    _ => new FileSystemObjectInfoProperties(this, fileType),
+                    _ => getFileSystemObjectInfoProperties()
                 };
 #else
                 switch (fileType)
                 {
                     case FileType.Folder:
-                    case FileType.KnownFolder:
 
-                        _objectProperties = new FolderShellObjectInfoProperties<IShellObjectInfoBase2>(this, fileType);
+                        _objectProperties = getFolderProperties();
 
                         break;
 
@@ -604,6 +649,12 @@ namespace WinCopies.IO
 
                         break;
 
+                    case FileType.KnownFolder:
+
+                        _objectProperties = shellObject.IsFileSystemObject ? getFolderProperties() : getFileSystemObjectInfoProperties();
+
+                        break;
+
                     case FileType.Drive:
 
                         _objectProperties = new DriveShellObjectInfoProperties<IShellObjectInfoBase2>(this, fileType);
@@ -612,13 +663,13 @@ namespace WinCopies.IO
 
                     default:
 
-                        _objectProperties = new FileSystemObjectInfoProperties(this, fileType);
+                        _objectProperties = getFileSystemObjectInfoProperties();
 
                         break;
                 }
 #endif
 
-                ProcessFactory = new _ProcessFactory(this);
+                _processFactory = new _ProcessFactory(this);
             }
 
             public ShellObjectInfo(in IKnownFolder knownFolder, in ClientVersion clientVersion) : this(string.IsNullOrEmpty(knownFolder.Path) ? knownFolder.ParsingName : knownFolder.Path, FileType.KnownFolder, ShellObjectFactory.Create(knownFolder.ParsingName), clientVersion)
@@ -630,12 +681,6 @@ namespace WinCopies.IO
             #region Methods
             public static ShellObjectInitInfo GetInitInfo(in ShellObject shellObject)
             {
-#if DEBUG
-                if (shellObject.ParsingName == Computer.ParsingName)
-
-                    Debug.WriteLine(shellObject.ParsingName);
-#endif
-
                 switch (shellObject ?? throw GetArgumentNullException(nameof(shellObject)))
                 {
                     case ShellFolder shellFolder:
@@ -686,9 +731,15 @@ namespace WinCopies.IO
 
             public override IEnumerableSelectorDictionary<ShellObjectInfoItemProvider, IBrowsableObjectInfo> GetSelectorDictionary() => DefaultItemSelectorDictionary;
 
-            protected override void DisposeManaged()
+            protected override void DisposeUnmanaged()
             {
-                base.DisposeManaged();
+                base.DisposeUnmanaged();
+
+                ProcessFactory.Dispose();
+
+                _processFactory = null;
+
+                _objectProperties.Dispose();
 
                 _objectProperties = null;
             }
@@ -697,7 +748,7 @@ namespace WinCopies.IO
             public System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<ArchiveFileInfoEnumeratorStruct> func) => func == null ? GetItems(GetItemProviders(item => true)) : GetItems(GetItemProviders(func));
 
             protected override System.Collections.Generic.IEnumerable<ShellObjectInfoItemProvider> GetItemProviders(Predicate<ShellObjectInfoEnumeratorStruct> predicate) => Browsability.Browsability.IsBrowsable()
-                ? ObjectPropertiesGeneric.FileType == FileType.Archive
+                ? ObjectPropertiesGeneric?.FileType == FileType.Archive
                     ? GetItemProviders(item => predicate(new ShellObjectInfoEnumeratorStruct(item)))
                     : ShellObjectInfoEnumeration.From(this, predicate)
                 : GetEmptyEnumerable();

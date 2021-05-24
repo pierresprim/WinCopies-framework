@@ -22,7 +22,7 @@ namespace WinCopies.IO.Resources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class ExceptionMessages {
+    public class ExceptionMessages {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace WinCopies.IO.Resources {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("WinCopies.IO.Resources.ExceptionMessages", typeof(ExceptionMessages).Assembly);
@@ -51,7 +51,7 @@ namespace WinCopies.IO.Resources {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,7 +63,7 @@ namespace WinCopies.IO.Resources {
         /// <summary>
         ///   Looks up a localized string similar to The operation was cancelled by user..
         /// </summary>
-        internal static string CancelledByUser {
+        public static string CancelledByUser {
             get {
                 return ResourceManager.GetString("CancelledByUser", resourceCulture);
             }
@@ -72,7 +72,7 @@ namespace WinCopies.IO.Resources {
         /// <summary>
         ///   Looks up a localized string similar to destination.
         /// </summary>
-        internal static string Destination {
+        public static string Destination {
             get {
                 return ResourceManager.GetString("Destination", resourceCulture);
             }
@@ -81,7 +81,7 @@ namespace WinCopies.IO.Resources {
         /// <summary>
         ///   Looks up a localized string similar to A disk error occurred..
         /// </summary>
-        internal static string DiskError {
+        public static string DiskError {
             get {
                 return ResourceManager.GetString("DiskError", resourceCulture);
             }
@@ -90,7 +90,7 @@ namespace WinCopies.IO.Resources {
         /// <summary>
         ///   Looks up a localized string similar to The source and/or the destination drive is not ready..
         /// </summary>
-        internal static string DriveNotReady {
+        public static string DriveNotReady {
             get {
                 return ResourceManager.GetString("DriveNotReady", resourceCulture);
             }
@@ -99,7 +99,7 @@ namespace WinCopies.IO.Resources {
         /// <summary>
         ///   Looks up a localized string similar to The encryption failed..
         /// </summary>
-        internal static string EncryptionFailed {
+        public static string EncryptionFailed {
             get {
                 return ResourceManager.GetString("EncryptionFailed", resourceCulture);
             }
@@ -108,7 +108,7 @@ namespace WinCopies.IO.Resources {
         /// <summary>
         ///   Looks up a localized string similar to The file could not be renamed..
         /// </summary>
-        internal static string FileRenamingFailed {
+        public static string FileRenamingFailed {
             get {
                 return ResourceManager.GetString("FileRenamingFailed", resourceCulture);
             }
@@ -117,7 +117,7 @@ namespace WinCopies.IO.Resources {
         /// <summary>
         ///   Looks up a localized string similar to There is already an item with this path..
         /// </summary>
-        internal static string FileSystemEntryAlreadyExists {
+        public static string FileSystemEntryAlreadyExists {
             get {
                 return ResourceManager.GetString("FileSystemEntryAlreadyExists", resourceCulture);
             }
@@ -126,7 +126,7 @@ namespace WinCopies.IO.Resources {
         /// <summary>
         ///   Looks up a localized string similar to The given item&apos;s inner object is not a(n) {0}..
         /// </summary>
-        internal static string GivenItemInnerObjectIsNotFromSupportedType {
+        public static string GivenItemInnerObjectIsNotFromSupportedType {
             get {
                 return ResourceManager.GetString("GivenItemInnerObjectIsNotFromSupportedType", resourceCulture);
             }
@@ -135,7 +135,7 @@ namespace WinCopies.IO.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Process completed successfully..
         /// </summary>
-        internal static string NoError {
+        public static string NoError {
             get {
                 return ResourceManager.GetString("NoError", resourceCulture);
             }
@@ -144,7 +144,7 @@ namespace WinCopies.IO.Resources {
         /// <summary>
         ///   Looks up a localized string similar to There is not enough space on the destination drive or the total size cannot be determined..
         /// </summary>
-        internal static string NotEnoughSpace {
+        public static string NotEnoughSpace {
             get {
                 return ResourceManager.GetString("NotEnoughSpace", resourceCulture);
             }
@@ -153,7 +153,7 @@ namespace WinCopies.IO.Resources {
         /// <summary>
         ///   Looks up a localized string similar to &apos;parent&apos; must be an IDotNetAssemblyInfo or an IDotNetItemInfoBase..
         /// </summary>
-        internal static string ParentMustBeAnIDotNetAssemblyInfoOrAnIDotNetItemInfoBase {
+        public static string ParentMustBeAnIDotNetAssemblyInfoOrAnIDotNetItemInfoBase {
             get {
                 return ResourceManager.GetString("ParentMustBeAnIDotNetAssemblyInfoOrAnIDotNetItemInfoBase", resourceCulture);
             }
@@ -162,7 +162,7 @@ namespace WinCopies.IO.Resources {
         /// <summary>
         ///   Looks up a localized string similar to The path could not be found..
         /// </summary>
-        internal static string PathNotFound {
+        public static string PathNotFound {
             get {
                 return ResourceManager.GetString("PathNotFound", resourceCulture);
             }
@@ -171,16 +171,25 @@ namespace WinCopies.IO.Resources {
         /// <summary>
         ///   Looks up a localized string similar to The destination path is too long..
         /// </summary>
-        internal static string PathTooLong {
+        public static string PathTooLong {
             get {
                 return ResourceManager.GetString("PathTooLong", resourceCulture);
             }
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The given parameters could not be parsed correctly..
+        /// </summary>
+        public static string ProcessParametersCouldNotBeParsedCorrectly {
+            get {
+                return ResourceManager.GetString("ProcessParametersCouldNotBeParsedCorrectly", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} cannot be null on {1}..
         /// </summary>
-        internal static string PropertyCannotBeNullOnObject {
+        public static string PropertyCannotBeNullOnObject {
             get {
                 return ResourceManager.GetString("PropertyCannotBeNullOnObject", resourceCulture);
             }
@@ -189,7 +198,7 @@ namespace WinCopies.IO.Resources {
         /// <summary>
         ///   Looks up a localized string similar to The {0} is protected from reading..
         /// </summary>
-        internal static string ReadProtection {
+        public static string ReadProtection {
             get {
                 return ResourceManager.GetString("ReadProtection", resourceCulture);
             }
@@ -198,7 +207,7 @@ namespace WinCopies.IO.Resources {
         /// <summary>
         ///   Looks up a localized string similar to The specified registry key does not exist..
         /// </summary>
-        internal static string RegistryKeyNotExists {
+        public static string RegistryKeyNotExists {
             get {
                 return ResourceManager.GetString("RegistryKeyNotExists", resourceCulture);
             }
@@ -207,7 +216,7 @@ namespace WinCopies.IO.Resources {
         /// <summary>
         ///   Looks up a localized string similar to source.
         /// </summary>
-        internal static string Source {
+        public static string Source {
             get {
                 return ResourceManager.GetString("Source", resourceCulture);
             }
@@ -216,7 +225,7 @@ namespace WinCopies.IO.Resources {
         /// <summary>
         ///   Looks up a localized string similar to An unknown error occurred..
         /// </summary>
-        internal static string UnknownError {
+        public static string UnknownError {
             get {
                 return ResourceManager.GetString("UnknownError", resourceCulture);
             }

@@ -56,7 +56,7 @@ namespace WinCopies.GUI.IO.ObjectModel
         /// <param name="clientVersion">The <see cref="Microsoft.WindowsAPICodePack.PortableDevices.ClientVersion"/> value for PortableDevice items creation. See <see cref="ClientVersion"/>.</param>
         public BrowsableObjectInfoFactory(in ClientVersion clientVersion) => ClientVersion = clientVersion;
 
-        public BrowsableObjectInfoFactory() : this( BrowsableObjectInfo.GetDefaultClientVersion()) { /* Left empty. */ }
+        public BrowsableObjectInfoFactory() : this(WinCopies.IO.ObjectModel.BrowsableObjectInfo.GetDefaultClientVersion()) { /* Left empty. */ }
 
         /// <summary>
         /// Creates an <see cref="IBrowsableObjectInfo"/> for a given path. See Remarks section.
@@ -69,11 +69,11 @@ namespace WinCopies.GUI.IO.ObjectModel
         {
             if (Path.IsFileSystemPath(path))
 
-                return ShellObjectInfo.From(ShellObjectFactory.Create(path),  ClientVersion);
+                return ShellObjectInfo.From(ShellObjectFactory.Create(path), ClientVersion);
 
             else if (Path.IsRegistryPath(path))
 
-                return new RegistryItemInfo(path,  BrowsableObjectInfo.GetDefaultClientVersion());
+                return new RegistryItemInfo(path, WinCopies.IO.ObjectModel.BrowsableObjectInfo.GetDefaultClientVersion());
 
             throw new ArgumentException("The factory cannot create an object for the given path.");
         }

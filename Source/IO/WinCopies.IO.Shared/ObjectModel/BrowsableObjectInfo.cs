@@ -31,19 +31,32 @@ using WinCopies.GUI.Drawing;
 using WinCopies.IO.ObjectModel;
 using WinCopies.IO.ObjectModel.Reflection;
 using WinCopies.IO.Process;
+using WinCopies.IO.Process.ObjectModel;
 using WinCopies.IO.PropertySystem;
-using WinCopies.IO.Selectors;
 using WinCopies.PropertySystem;
 
 using static WinCopies.ThrowHelper;
 using static WinCopies.Collections.Util;
-using WinCopies.IO.Process.ObjectModel;
 
 namespace WinCopies.IO
 {
     public static class BrowsableObjectInfoHelper
     {
         public static bool IsBrowsable(this IBrowsableObjectInfo browsableObjectInfo) => BrowsableObjectInfo._IsBrowsable(browsableObjectInfo ?? throw GetArgumentNullException(nameof(browsableObjectInfo)));
+    }
+
+    namespace Guids
+    {
+        public static class Process
+        {
+            public static class Shell
+            {
+                public const string Copy = "084ff8d5-c66e-40bc-8ea4-7fa2dd30bd21";
+            }
+
+            public const string ArchiveCompression = "02d03025-8cec-49b7-a639-46b9dcb2569b";
+            public const string ArchiveExtraction = "96272e6c-be30-4db8-b48f-54b6fb425302";
+        }
     }
 }
 
@@ -55,6 +68,8 @@ namespace WinCopies.IO.ObjectModel
     public abstract class BrowsableObjectInfo : BrowsableObjectInfoBase, IBrowsableObjectInfo
     {
         protected static void EmptyVoid() { /* Left empty. */ }
+
+        public static bool Predicate(in ProcessFactorySelectorDictionaryParameters item, in Type t) => WinCopies.Extensions.UtilHelpers.ContainsFieldValue(t, null, item.ProcessParameters.Guid.ToString());
 
         #region Consts
         public const ushort SmallIconSize = 16;
@@ -68,7 +83,7 @@ namespace WinCopies.IO.ObjectModel
         #endregion
 
         #region Properties
-        public static ISelectorDictionary<ProcessFactorySelectorDictionaryParameters, IProcess> DefaultProcessSelectorDictionary { get; } = new ProcessFactorySelectorDictionary();
+        public static ISelectorDictionary<ProcessFactorySelectorDictionaryParameters, IProcess> DefaultProcessSelectorDictionary { get; } = new DefaultNullableValueSelectorDictionary<ProcessFactorySelectorDictionaryParameters, IProcess>();
 
         public static Action RegisterDefaultSelectors { get; private set; } = () =>
         {
@@ -78,11 +93,11 @@ namespace WinCopies.IO.ObjectModel
         };
 
         public static Action RegisterDefaultProcessSelectors { get; private set; } = () =>
-          {
-              ShellObjectInfo.RegisterProcessSelectors();
+        {
+            ShellObjectInfo.RegisterProcessSelectors();
 
-              RegisterDefaultProcessSelectors = EmptyVoid;
-          };
+            RegisterDefaultProcessSelectors = EmptyVoid;
+        };
 
         public abstract IProcessFactory ProcessFactory { get; }
 
@@ -148,6 +163,8 @@ namespace WinCopies.IO.ObjectModel
         #endregion
 
         #region Methods
+        protected T GetValueIfNotDisposed<T>(in T value) => IsDisposed ? throw GetExceptionForDispose(false) : value;
+
         internal static bool _IsBrowsable(in IBrowsableObjectInfo browsableObjectInfo) => browsableObjectInfo.Browsability != null && (browsableObjectInfo.Browsability.Browsability == IO.Browsability.BrowsableByDefault || browsableObjectInfo.Browsability.Browsability == IO.Browsability.Browsable);
 
         public bool IsBrowsable() => _IsBrowsable(this);

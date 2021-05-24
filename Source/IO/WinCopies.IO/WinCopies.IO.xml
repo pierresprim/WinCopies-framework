@@ -20,6 +20,11 @@
               resource lookups using this strongly typed resource class.
             </summary>
         </member>
+        <member name="P:WinCopies.IO.Properties.Resources.Compression">
+            <summary>
+              Looks up a localized string similar to Compression.
+            </summary>
+        </member>
         <member name="P:WinCopies.IO.Properties.Resources.Copy">
             <summary>
               Looks up a localized string similar to Copy.
@@ -48,6 +53,11 @@
         <member name="P:WinCopies.IO.Properties.Resources.DotNetType">
             <summary>
               Looks up a localized string similar to .Net Type.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Properties.Resources.Extraction">
+            <summary>
+              Looks up a localized string similar to Extraction.
             </summary>
         </member>
         <member name="P:WinCopies.IO.Properties.Resources.PortableDevice">
@@ -164,6 +174,11 @@
         <member name="P:WinCopies.IO.Resources.ExceptionMessages.PathTooLong">
             <summary>
               Looks up a localized string similar to The destination path is too long..
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Resources.ExceptionMessages.ProcessParametersCouldNotBeParsedCorrectly">
+            <summary>
+              Looks up a localized string similar to The given parameters could not be parsed correctly..
             </summary>
         </member>
         <member name="P:WinCopies.IO.Resources.ExceptionMessages.PropertyCannotBeNullOnObject">
@@ -1145,8 +1160,8 @@
             <summary>
             Determines whether two files are duplicates by checking their size and content. For the exceptions that can occur, see the doc of the stream class that you use.
             </summary>
-            <param name="leftStream">The left <see cref="T:System.IO.Stream"/>.</param>
-            <param name="rightStream">The right <see cref="T:System.IO.Stream"/>.</param>
+            <param name="leftStream">The left <see cref="T:WinCopies.Stream"/>.</param>
+            <param name="rightStream">The right <see cref="T:WinCopies.Stream"/>.</param>
             <param name="bufferLength">The buffer length to use to read data.</param>
             <returns><see langword="true"/> if the two files are duplicates; otherwise <see langword="false"/>.</returns>
         </member>
@@ -1154,8 +1169,8 @@
             <summary>
             Determines whether two files are duplicates by checking their size and content. For the exceptions that can occur, see the doc of the stream class that you use.
             </summary>
-            <param name="leftStream">The left <see cref="T:System.IO.Stream"/>.</param>
-            <param name="rightStream">The right <see cref="T:System.IO.Stream"/>.</param>
+            <param name="leftStream">The left <see cref="T:WinCopies.Stream"/>.</param>
+            <param name="rightStream">The right <see cref="T:WinCopies.Stream"/>.</param>
             <param name="bufferLength">The buffer length to use to read data.</param>
             <param name="callback">A delegate that is raised after each data block has been checked. If the returned value is <see langword="true"/>, then the process is stopped.</param>
             <returns><see langword="true"/> if the two files are duplicates; <see langword="null"/> if the process has been canceled; otherwise <see langword="false"/>.</returns>

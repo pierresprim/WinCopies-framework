@@ -27,7 +27,7 @@ namespace WinCopies.IO.ObjectModel
 {
     public interface IShellObjectInfoBase : IArchiveItemInfoProvider
     {
-        Stream ArchiveFileStream { get; }
+        System.IO.Stream ArchiveFileStream { get; }
 
         void OpenArchive(FileMode fileMode, FileAccess fileAccess, FileShare fileShare, int? bufferSize, FileOptions fileOptions);
 

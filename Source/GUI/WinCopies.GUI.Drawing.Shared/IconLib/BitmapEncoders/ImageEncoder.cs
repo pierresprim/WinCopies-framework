@@ -133,8 +133,8 @@ namespace WinCopies.GUI.Drawing.BitmapEncoders
         #endregion
 
         #region Abstract Methods
-        public abstract void Read(in Stream stream, in int resourceSize);
-        public abstract void Write(in Stream stream);
+        public abstract void Read(in System.IO.Stream stream, in int resourceSize);
+        public abstract void Write(in System.IO.Stream stream);
         #endregion
 
         #region Methods

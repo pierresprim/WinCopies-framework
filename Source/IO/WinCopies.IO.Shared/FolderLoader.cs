@@ -34,7 +34,6 @@
 //using WinCopies.Collections;
 
 using System;
-using System.IO;
 using System.Security;
 using WinCopies.Util;
 

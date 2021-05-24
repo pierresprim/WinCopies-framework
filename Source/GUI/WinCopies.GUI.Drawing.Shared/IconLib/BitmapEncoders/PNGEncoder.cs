@@ -51,7 +51,7 @@ namespace WinCopies.GUI.Drawing.BitmapEncoders
         #endregion
 
         #region Methods
-        public unsafe override void Read(in Stream stream, in int resourceSize)
+        public unsafe override void Read(in System.IO.Stream stream, in int resourceSize)
         {
             // Buffer a PNG image
             byte[] buffer = new byte[resourceSize];
@@ -68,7 +68,7 @@ namespace WinCopies.GUI.Drawing.BitmapEncoders
             CopyFrom(iconImage.Encoder);
         }
 
-        public override void Write(in Stream stream)
+        public override void Write(in System.IO.Stream stream)
         {
             var ms = new MemoryStream();
             Icon.ToBitmap().Save(ms, ImageFormat.Png);

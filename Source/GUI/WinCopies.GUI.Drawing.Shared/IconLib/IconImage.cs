@@ -43,7 +43,7 @@ namespace WinCopies.GUI.Drawing
         #region Constructors
         internal IconImage() => Encoder = new BMPEncoder();
 
-        internal IconImage(in Stream stream, in int resourceSize) => Read(stream, resourceSize);
+        internal IconImage(in System.IO.Stream stream, in int resourceSize) => Read(stream, resourceSize);
         #endregion
 
         #region Properties
@@ -412,7 +412,7 @@ namespace WinCopies.GUI.Drawing
         #endregion
 
         #region Internal Methods
-        internal unsafe void Read(in Stream stream, in int resourceSize)
+        internal unsafe void Read(in System.IO.Stream stream, in int resourceSize)
         {
             switch (GetIconImageFormat(stream))
             {
@@ -429,11 +429,11 @@ namespace WinCopies.GUI.Drawing
             }
         }
 
-        internal unsafe void Write(in Stream stream) => Encoder.Write(stream);
+        internal unsafe void Write(in System.IO.Stream stream) => Encoder.Write(stream);
         #endregion
 
         #region Private Methods
-        private static IconImageFormat GetIconImageFormat(in Stream stream)
+        private static IconImageFormat GetIconImageFormat(in System.IO.Stream stream)
         {
             long streamPos = stream.Position;
 

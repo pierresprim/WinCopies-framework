@@ -38,7 +38,7 @@ using System.Text;
 using static Microsoft.WindowsAPICodePack.NativeAPI.Consts.Shell;
 
 using static WinCopies.
-    #if !WinCopies3
+#if !WinCopies3
     Util.Util
 #else
     ThrowHelper
@@ -49,7 +49,7 @@ namespace WinCopies.GUI.Drawing
 {
     public class IconExtractor
     {
-#region Constants
+        #region Constants
 
         // Flags for LoadLibraryEx().
 
@@ -60,15 +60,15 @@ namespace WinCopies.GUI.Drawing
         private static readonly IntPtr RT_ICON = (IntPtr)3;
         private static readonly IntPtr RT_GROUP_ICON = (IntPtr)14;
 
-#endregion
+        #endregion
 
-#region Fields
+        #region Fields
 
         private byte[][] iconData = null;   // Binary data of each icon.
 
-#endregion
+        #endregion
 
-#region Public properties
+        #region Public properties
 
         /// <summary>
         /// Gets the full path of the associated file.
@@ -80,7 +80,7 @@ namespace WinCopies.GUI.Drawing
         /// </summary>
         public int Count => iconData.Length;
 
-#endregion
+        #endregion
 
         /// <summary>
         /// Initializes a new instance of the IconExtractor class from the specified file name.
@@ -128,7 +128,7 @@ namespace WinCopies.GUI.Drawing
         /// </summary>
         /// <param name="index">Zero based index of the icon to be saved.</param>
         /// <param name="outputStream">The Stream to save to.</param>
-        public void Save(in int index, in Stream outputStream)
+        public void Save(in int index, in System.IO.Stream outputStream)
         {
             if (index < 0 || Count <= index)
 

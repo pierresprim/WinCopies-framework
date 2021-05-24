@@ -20,10 +20,10 @@
     <Compile Include="$(MSBuildThisFileDirectory)AbstractionInterop\PortableDeviceObjectInfoItemProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AbstractionInterop\WMIItemInfoItemProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AbstractionInterop\ShellObjectInfoItemProvider.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectInfoSelector.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enumeration\Reflection\DotNetEnumeration.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enumeration\RegistryItemInfoEnumeratorStruct.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Icons.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\IArchiveItemInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\IArchiveItemInfoProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\IFileSystemObjectInfo.cs" />
@@ -38,8 +38,11 @@
     <Compile Include="$(MSBuildThisFileDirectory)Enumeration\ArchiveItemInfoEnumerator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enumeration\WMIItemInfoEnumerator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\BrowsableObjectInfoProcessFactoryDictionary.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ObjectModel\ArchiveProcess.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ObjectModel\Compression.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ObjectModel\Copy.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\Errors.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ObjectModel\Extraction.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ObjectModel\IProcess.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ObjectModel\Interfaces.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\IProcessError.cs" />

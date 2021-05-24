@@ -16,11 +16,11 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 #if DEBUG
-namespace WinCopies.Temp
-{
-    public static class Temp
-    {
+//namespace WinCopies.Temp
+//{
+    //public static class Temp
+    //{
 
-    }
-}
+    //}
+//}
 #endif

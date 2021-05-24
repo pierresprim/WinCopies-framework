@@ -21,11 +21,12 @@ using Microsoft.WindowsAPICodePack.Shell;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-
+using WinCopies.GUI.IO;
 using WinCopies.GUI.IO.Controls.Process;
 using WinCopies.GUI.IO.ObjectModel;
 using WinCopies.GUI.IO.Process;
@@ -44,20 +45,22 @@ namespace WinCopies.GUI.Samples
 
         public static ClientVersion ClientVersion { get; } = GetClientVersion();
 
-        public static readonly DependencyProperty ItemsProperty = DependencyProperty.Register(nameof(Items), typeof(IEnumerable<IExplorerControlBrowsableObjectInfoViewModel>), typeof(ExplorerControlTest));
+        public static readonly DependencyProperty ItemsProperty = DependencyProperty.Register(nameof(Items), typeof(ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel>), typeof(ExplorerControlTest), new PropertyMetadata(null, (DependencyObject d, DependencyPropertyChangedEventArgs e) =>
+        {
+            if (e.NewValue != null)
 
-        public IEnumerable<IExplorerControlBrowsableObjectInfoViewModel> Items { get => (IEnumerable<IExplorerControlBrowsableObjectInfoViewModel>)GetValue(ItemsProperty); set => SetValue(ItemsProperty, value); }
+                foreach (IExplorerControlBrowsableObjectInfoViewModel item in (System.Collections.Generic.IEnumerable<IExplorerControlBrowsableObjectInfoViewModel>)e.NewValue)
+
+                    AddHandlers(item);
+        }));
+
+        public ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> Items { get => (ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel>)GetValue(ItemsProperty); set => SetValue(ItemsProperty, value); }
 
         public static readonly DependencyProperty SelectedItemProperty = DependencyProperty.Register(nameof(SelectedItem), typeof(IExplorerControlBrowsableObjectInfoViewModel), typeof(ExplorerControlTest));
 
         public IExplorerControlBrowsableObjectInfoViewModel SelectedItem { get => (IExplorerControlBrowsableObjectInfoViewModel)GetValue(SelectedItemProperty); set => SetValue(SelectedItemProperty, value); }
 
-        static ExplorerControlTest()
-        {
-            BrowsableObjectInfo.RegisterDefaultSelectors();
-
-            BrowsableObjectInfo.RegisterDefaultProcessSelectors();
-        }
+        static ExplorerControlTest() => IO.ObjectModel.BrowsableObjectInfo.RegisterAllSelectors();
 
         public ExplorerControlTest()
         {
@@ -69,7 +72,7 @@ namespace WinCopies.GUI.Samples
 
             _ = CommandBindings.Add(new CommandBinding(ApplicationCommands.Copy, (object sender, ExecutedRoutedEventArgs e) => SelectedItem.Path.ProcessFactory.Copy(getEnumerable(), 10u), (object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = SelectedItem.Path.ProcessFactory.CanCopy(getEnumerable())));
 
-            _ = CommandBindings.Add(new CommandBinding(ApplicationCommands.Paste, (object sender, ExecutedRoutedEventArgs e) => Paste(new ProcessFactorySelectorDictionaryParameters(SelectedItem.Path.ProcessFactory.TryGetCopyProcessParameters(10u), DefaultProcessPathCollectionFactory)), (object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = SelectedItem.Path.ProcessFactory.CanPaste(10u)));
+            _ = CommandBindings.Add(new CommandBinding(ApplicationCommands.Paste, (object sender, ExecutedRoutedEventArgs e) => AddProcess(SelectedItem.Path.ProcessFactory.TryGetCopyProcessParameters(10u)), (object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = SelectedItem.Path.ProcessFactory.CanPaste(10u)));
         }
 
         private static ProcessWindow _processWindow;
@@ -89,9 +92,9 @@ namespace WinCopies.GUI.Samples
             }
         }
 
-        private static void Paste(in ProcessFactorySelectorDictionaryParameters parameters)
+        private static void AddProcess(in IProcessParameters parameters)
         {
-            IProcess result = new Process(BrowsableObjectInfo.DefaultProcessSelectorDictionary.Select(parameters));
+            IProcess result = new Process(WinCopies.IO.ObjectModel.BrowsableObjectInfo.DefaultProcessSelectorDictionary.Select(new ProcessFactorySelectorDictionaryParameters(parameters, DefaultProcessPathCollectionFactory)));
 
             ((ObservableCollection<IProcess>)ProcessWindow.Processes).Add(result);
 
@@ -148,6 +151,54 @@ namespace WinCopies.GUI.Samples
 
                     break;
             }
+
+            Items.CollectionChanged += Items_CollectionChanged;
+        }
+
+        private static void AddHandlers(in IExplorerControlBrowsableObjectInfoViewModel item) => item.CustomProcessParametersGeneratedEventHandler += ExplorerControlTest_CustomProcessParametersGeneratedEventHandler;
+
+        private void Items_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            switch (e.Action)
+            {
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
+
+                    foreach (var _item in e.NewItems)
+
+                        AddHandlers((IExplorerControlBrowsableObjectInfoViewModel)_item);
+
+                    break;
+
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
+
+                    IExplorerControlBrowsableObjectInfoViewModel item;
+
+                    foreach (var _item in e.OldItems)
+                    {
+                        item = (IExplorerControlBrowsableObjectInfoViewModel)_item;
+
+                        item.CustomProcessParametersGeneratedEventHandler -= ExplorerControlTest_CustomProcessParametersGeneratedEventHandler;
+
+                        item.Dispose();
+                    }
+
+                    break;
+            }
+        }
+
+        private static void ExplorerControlTest_CustomProcessParametersGeneratedEventHandler(object sender, CustomProcessParametersGeneratedEventArgs e) => AddProcess(e.ProcessParameters);
+
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            var items = Items;
+
+            items.CollectionChanged -= Items_CollectionChanged;
+
+            Items = null;
+
+            items.Clear();
+
+            base.OnClosing(e);
         }
     }
 }

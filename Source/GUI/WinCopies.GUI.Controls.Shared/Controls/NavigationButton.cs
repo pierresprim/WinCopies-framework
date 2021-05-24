@@ -33,7 +33,7 @@ namespace WinCopies.GUI.Controls
     {
         public static readonly DependencyProperty CommandProperty = Register<ICommand, CommandSourceControl<T>>(nameof(Command));
 
-        public ICommand Command { get => (ICommand)GetValue(CommandProperty); set => SetValue(CommandProperty, value); }
+        public ICommand<T> Command { get => (ICommand<T>)GetValue(CommandProperty); set => SetValue(CommandProperty, value); }
 
         public static readonly DependencyProperty CommandParameterProperty = Register<T, CommandSourceControl<T>>(nameof(CommandParameter));
 
@@ -44,6 +44,8 @@ namespace WinCopies.GUI.Controls
         public IInputElement CommandTarget { get => (IInputElement)GetValue(CommandTargetProperty); set => SetValue(CommandTargetProperty, value); }
 
 #if !CS8
+        ICommand ICommandSource.Command => Command;
+
         object ICommandSource.CommandParameter => CommandParameter;
 #endif
     }
@@ -68,7 +70,7 @@ namespace WinCopies.GUI.Controls
     {
         public static readonly DependencyProperty CommandProperty = Register<ICommand, CommandItemsControl<TEnumerable, TCommandParameter>>(nameof(Command));
 
-        public ICommand Command { get => (ICommand)GetValue(CommandProperty); set => SetValue(CommandProperty, value); }
+        public ICommand<TCommandParameter> Command { get => (ICommand<TCommandParameter>)GetValue(CommandProperty); set => SetValue(CommandProperty, value); }
 
         public static readonly DependencyProperty CommandParameterProperty = Register<TCommandParameter, CommandItemsControl<TEnumerable, TCommandParameter>>(nameof(CommandParameter));
 
@@ -79,6 +81,8 @@ namespace WinCopies.GUI.Controls
         public IInputElement CommandTarget { get => (IInputElement)GetValue(CommandTargetProperty); set => SetValue(CommandTargetProperty, value); }
 
 #if !CS8
+        ICommand ICommandSource.Command => Command;
+
         object ICommandSource.CommandParameter => CommandParameter;
 #endif
     }

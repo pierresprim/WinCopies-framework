@@ -10,18 +10,18 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>WinCopies.GUI.IO.snk</AssemblyOriginatorKeyFile>
     <DefineConstants>WinCopies2;WinCopies3;ProcessesWork$(DefineConstants)</DefineConstants>
-    <VersionPrefix>3.2.0.1</VersionPrefix>
+    <VersionPrefix>3.3</VersionPrefix>
     <VersionSuffix>preview</VersionSuffix>
-    <AssemblyVersion>3.2.0.1</AssemblyVersion>
-    <FileVersion>3.2.0.1</FileVersion>
+    <AssemblyVersion>3.3</AssemblyVersion>
+    <FileVersion>3.3</FileVersion>
     <PackageIcon>WinCopies.png</PackageIcon>
   </PropertyGroup>
 
   <Import Project="..\WinCopies.GUI.IO.Shared\WinCopies.GUI.IO.Shared.projitems" Label="Shared" />
 
   <ItemGroup>
-    <PackageReference Include="WinCopies.Util" Version="3.7.1-preview" />
-    <PackageReference Include="WinCopies.Util.Desktop" Version="3.7.2-preview" />
+    <PackageReference Include="WinCopies.Util" Version="3.8-preview" />
+    <PackageReference Include="WinCopies.Util.Desktop" Version="3.8-preview" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(Configuration)'=='Debug'">
@@ -30,7 +30,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\GUI\WinCopies.GUI.Icons\WinCopies.GUI.Icons.csproj" />
+    <ProjectReference Include="..\..\GUI\WinCopies.GUI.Models\WinCopies.GUI.Models.csproj" />
     <ProjectReference Include="..\..\GUI\WinCopies.GUI.Templates\WinCopies.GUI.Templates.csproj" />
+    <ProjectReference Include="..\..\GUI\WinCopies.GUI.ViewModels\WinCopies.GUI.ViewModels.csproj" />
     <ProjectReference Include="..\..\GUI\WinCopies.GUI\WinCopies.GUI.csproj" />
     <ProjectReference Include="..\WinCopies.IO\WinCopies.IO.csproj" />
   </ItemGroup>
@@ -44,6 +46,21 @@
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>

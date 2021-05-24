@@ -1,6 +1,7 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:gui="clr-namespace:WinCopies.GUI"
     xmlns:local="clr-namespace:WinCopies.GUI.Controls"
     xmlns:commands="clr-namespace:WinCopies.Commands;assembly=WinCopies.Util.Desktop"
     xmlns:icons="clr-namespace:WinCopies.GUI.Icons.Properties;assembly=WinCopies.GUI.Icons"
@@ -9,7 +10,8 @@
     xmlns:markup="clr-namespace:WinCopies.Markup;assembly=WinCopies.Util.Desktop"
     xmlns:guiDialogs="clr-namespace:WinCopies.GUI.Windows;assembly=WinCopies.GUI.Models"
     xmlns:windows="clr-namespace:WinCopies.GUI.Windows"
-    xmlns:propertySystem="clr-namespace:WinCopies.GUI.Controls.PropertySystem">
+    xmlns:propertySystem="clr-namespace:WinCopies.GUI.Controls.PropertySystem"
+    xmlns:controls="clr-namespace:System.Windows.Controls;assembly=PresentationFramework">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/wincopies.gui.templates;component/Themes/Generic.xaml" />
         <ResourceDictionary>
@@ -161,8 +163,8 @@
                             <RowDefinition />
                             <RowDefinition Height="auto" />
                         </Grid.RowDefinitions>
-                        <ContentPresenter Content="{TemplateBinding Content}" />
-                        <StackPanel Grid.Row="1" Orientation="Horizontal">
+                        <ContentControl Content="{TemplateBinding Content}" Style="{TemplateBinding ContentDecoratorStyle}" ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}" />
+                        <StackPanel Grid.Row="1" Orientation="Horizontal" FlowDirection="{TemplateBinding FlowDirection}" HorizontalAlignment="{Binding FlowDirection, RelativeSource={RelativeSource Mode=TemplatedParent}, Converter={gui:FlowDirectionToHorizontalAlignment}}">
                             <Control Grid.Row="1" HorizontalAlignment="{Binding ButtonAlignment, RelativeSource={RelativeSource Mode=TemplatedParent}, Converter={StaticResource ButtonAlignmentToHorizontalAlignmentConverter}}" Focusable="False" >
                                 <Control.Style>
                                     <Style TargetType="{x:Type Control}">
@@ -181,7 +183,7 @@
                                                 <Setter Property="Template">
                                                     <Setter.Value>
                                                         <ControlTemplate>
-                                                            <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type windows:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal" >
+                                                            <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type windows:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal">
                                                                 <Button Command="{x:Static commands:DialogCommands.Ok}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.OK}}" />
                                                                 <Button Command="{x:Static commands:DialogCommands.Cancel}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Cancel}}" IsCancel="True" />
                                                             </StackPanel>
@@ -373,6 +375,40 @@
                         </StackPanel>
                     </Grid>
                 </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <ControlTemplate x:Key="InputBoxTemplate.Horizontal" TargetType="{x:Type ContentControl}">
+        <Grid Background="{Binding Background, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:InputBox}}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <ContentPresenter />
+            <TextBox Grid.Column="1" Text="{Binding Text, Mode=TwoWay, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:InputBox}}}" />
+        </Grid>
+    </ControlTemplate>
+
+    <ControlTemplate x:Key="InputBoxTemplate.Vertical" TargetType="{x:Type ContentControl}">
+        <StackPanel Background="{Binding Background, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:InputBox}}}">
+            <ContentPresenter />
+            <TextBox Text="{Binding Text, Mode=TwoWay, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:InputBox}}}" />
+        </StackPanel>
+    </ControlTemplate>
+
+    <Style BasedOn="{StaticResource {x:Type windows:DialogWindow}}" TargetType="{x:Type windows:InputBox}">
+        <Setter Property="Background" Value="White" />
+        <Setter Property="ContentDecoratorStyle">
+            <Setter.Value>
+                <Style TargetType="{x:Type Control}">
+                    <Setter Property="Template" Value="{StaticResource InputBoxTemplate.Horizontal}" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Orientation, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:InputBox}}}" Value="{x:Static controls:Orientation.Vertical}">
+                            <Setter Property="Template" Value="{StaticResource InputBoxTemplate.Vertical}" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
             </Setter.Value>
         </Setter>
     </Style>
@@ -634,7 +670,7 @@
             </Setter.Value>
         </Setter>
         <Style.Triggers>
-            <DataTrigger Binding="{Binding Command, Converter={StaticResource IsNullConverter}}" Value="{markup:FalseValue}">
+            <DataTrigger Binding="{Binding Command, RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource IsNullConverter}}" Value="{markup:FalseValue}">
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type local:MenuButton}">
@@ -841,7 +877,7 @@
             <Setter.Value>
                 <MultiBinding Converter="{StaticResource EqualsConverter}" Mode="OneWay">
                     <Binding Path="Node.Value" />
-                    <Binding Path="ItemsSource.Current.Node.Value" RelativeSource="{RelativeSource AncestorType={x:Type local:NavigationButton}}" />
+                    <Binding Path="ItemsSource.Current.Node.Value" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type local:NavigationButton}}" />
                 </MultiBinding>
             </Setter.Value>
         </Setter>
@@ -859,7 +895,7 @@
 
     <Style TargetType="{x:Type local:NavigationButton}">
         <Setter Property="Template" Value="{StaticResource NavigationButtonTemplate}" />
-        <Setter Property="CommandParameter" Value="{Binding ItemsSource.Current}" />
+        <Setter Property="CommandParameter" Value="{Binding ItemsSource.Current, RelativeSource={RelativeSource Mode=Self}}" />
         <Setter Property="ItemContainerStyle" Value="{StaticResource NavigationButtonItemContainerStyle}" />
     </Style>
 </ResourceDictionary>

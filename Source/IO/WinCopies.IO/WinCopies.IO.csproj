@@ -13,10 +13,10 @@
 		<SignAssembly>true</SignAssembly>
 		<AssemblyOriginatorKeyFile>WinCopies.IO.snk</AssemblyOriginatorKeyFile>
 		<DefineConstants>WinCopies2;WinCopies3;$(DefineConstants)</DefineConstants>
-    <VersionPrefix>3.2.0.1</VersionPrefix>
+    <VersionPrefix>3.3</VersionPrefix>
     <VersionSuffix>preview</VersionSuffix>
-    <AssemblyVersion>3.2.0.1</AssemblyVersion>
-    <FileVersion>3.2.0.1</FileVersion>
+    <AssemblyVersion>3.3</AssemblyVersion>
+    <FileVersion>3.3</FileVersion>
 		<PackageIcon>WinCopies.png</PackageIcon>
 	</PropertyGroup>
 
@@ -62,15 +62,15 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="WinCopies.Util" Version="3.7.1-preview" />
-		<PackageReference Include="WinCopies.Collections" Version="3.7.2-preview" />
-		<PackageReference Include="WinCopies.Util.Extensions" Version="3.6-preview" />
+		<PackageReference Include="WinCopies.Util" Version="3.8-preview" />
+		<PackageReference Include="WinCopies.Collections" Version="3.8-preview" />
+		<PackageReference Include="WinCopies.Util.Extensions" Version="3.8-preview" />
     
 		<PackageReference Include="Squid-Box.SevenZipSharp" Version="1.2.231" />
     
-		<PackageReference Include="WinCopies.WindowsAPICodePack.Consts" Version="3.0.1-preview" />
-		<PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="3.1.1-preview" />
-		<PackageReference Include="WinCopies.WindowsAPICodePack.PortableDevices" Version="3.0.1-preview" />
+		<PackageReference Include="WinCopies.WindowsAPICodePack.Consts" Version="3.1.2-preview" />
+		<PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="3.1.2-preview" />
+		<PackageReference Include="WinCopies.WindowsAPICodePack.PortableDevices" Version="3.1.2-preview" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -93,7 +93,7 @@
 
 	<ItemGroup>
 		<EmbeddedResource Update="Resources\ExceptionMessages.resx">
-		  <Generator>ResXFileCodeGenerator</Generator>
+		  <Generator>PublicResXFileCodeGenerator</Generator>
 		  <LastGenOutput>ExceptionMessages.Designer.cs</LastGenOutput>
 		</EmbeddedResource>
 		<EmbeddedResource Update="Properties\Resources.resx">
@@ -109,6 +109,9 @@
 	<ItemGroup>
 		<None Update="7z.dll">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="7z64.dll">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 		<None Include="..\..\WinCopies.png">
 		  <Pack>True</Pack>

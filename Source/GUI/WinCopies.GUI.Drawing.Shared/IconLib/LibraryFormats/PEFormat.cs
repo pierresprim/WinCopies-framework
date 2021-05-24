@@ -38,7 +38,7 @@ namespace WinCopies.GUI.Drawing.EncodingFormats
         #endregion
 
         #region Methods
-        public bool IsRecognizedFormat(in Stream stream)
+        public bool IsRecognizedFormat(in System.IO.Stream stream)
         {
             stream.Position = 0;
 
@@ -63,7 +63,7 @@ namespace WinCopies.GUI.Drawing.EncodingFormats
             return false;
         }
 
-        public unsafe MultiIcon Load(in Stream stream)
+        public unsafe MultiIcon Load(in System.IO.Stream stream)
         {
             // LoadLibraryEx only can load files from File System, lets create a tmp file
             string tmpFile = null;
@@ -185,7 +185,7 @@ namespace WinCopies.GUI.Drawing.EncodingFormats
             }
         }
 
-        public unsafe void Save(in MultiIcon multiIcon, in Stream stream)
+        public unsafe void Save(in MultiIcon multiIcon, in System.IO.Stream stream)
         {
             // LoadLibraryEx only can load files from File System, lets create a tmp file
             string tmpFile = null;

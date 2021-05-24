@@ -113,7 +113,7 @@ namespace WinCopies.GUI.Drawing
             }
         }
 
-        public void Load(in Stream stream)
+        public void Load(in System.IO.Stream stream)
         {
             ThrowIfNull(stream, nameof(stream));
 
@@ -132,7 +132,7 @@ namespace WinCopies.GUI.Drawing
             CopyFrom(multiIcon[0]);
         }
 
-        public static IconImage GetIconImage(in Stream stream)
+        public static IconImage GetIconImage(in System.IO.Stream stream)
         {
             ThrowIfNull(stream, nameof(stream));
 
@@ -179,7 +179,7 @@ namespace WinCopies.GUI.Drawing
             }
         }
 
-        public void Save(in Stream stream) => new IconFormat().Save(new MultiIcon(this), stream);
+        public void Save(in System.IO.Stream stream) => new IconFormat().Save(new MultiIcon(this), stream);
 
         public IconImage Add(in Bitmap bitmap)
         {

@@ -12,10 +12,10 @@
     <DocumentationFile>WinCopies.GUI.ViewModels.xml</DocumentationFile>
     <SignAssembly>true</SignAssembly>
     <DefineConstants>WinCopies2;WinCopies3;$(DefineConstants)</DefineConstants>
-    <VersionPrefix>3.2.0</VersionPrefix>
+    <VersionPrefix>3.3</VersionPrefix>
     <VersionSuffix>preview</VersionSuffix>
-    <AssemblyVersion>3.2.0</AssemblyVersion>
-    <FileVersion>3.2.0</FileVersion>
+    <AssemblyVersion>3.3</AssemblyVersion>
+    <FileVersion>3.3</FileVersion>
     <AssemblyOriginatorKeyFile>WinCopies.GUI.ViewModels.snk</AssemblyOriginatorKeyFile>
     <PackageIcon>WinCopies.png</PackageIcon>
   </PropertyGroup>

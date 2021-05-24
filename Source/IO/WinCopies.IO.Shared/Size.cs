@@ -285,7 +285,7 @@ namespace WinCopies.IO
         /// Returns a string with the size value and unit.
         /// </summary>
         /// <returns>A string with the size value and unit</returns>
-        public override string ToString() => $"{GetFloatValueInUnit(Unit)} {GetDisplaySizeUnit(Unit)}";
+        public override string ToString() => ValueInBytes.IsNaN ? "NaN": $"{GetFloatValueInUnit(Unit)} {GetDisplaySizeUnit(Unit)}";
 
         public int CompareTo(
 #if NETCORE

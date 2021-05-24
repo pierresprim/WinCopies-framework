@@ -40,7 +40,7 @@ namespace WinCopies.IO.PropertySystem
         Value
     }
 
-    public interface IRegistryItemInfoProperties
+    public interface IRegistryItemInfoProperties: System.IDisposable
     {
         RegistryItemType RegistryItemType { get; }
     }

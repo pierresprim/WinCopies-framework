@@ -27,6 +27,7 @@ using System.Linq;
 using System.Windows.Media.Imaging;
 
 using WinCopies.Collections.Generic;
+using WinCopies.GUI.Controls.Models;
 using WinCopies.IO;
 using WinCopies.IO.ObjectModel;
 using WinCopies.IO.Process;
@@ -229,9 +230,9 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)ModelGeneric).GetEnumerator();
 
-        public RecursiveEnumerator<IBrowsableObjectInfo> GetEnumerator() => ((WinCopies.IO.IRecursiveEnumerable<IBrowsableObjectInfo>)ModelGeneric).GetEnumerator();
+        public RecursiveEnumerator<IBrowsableObjectInfo> GetEnumerator() => ModelGeneric.GetEnumerator();
 
-        public IEnumerator<Collections.Generic.IRecursiveEnumerable<IBrowsableObjectInfo>> GetRecursiveEnumerator() => ((WinCopies.IO.IRecursiveEnumerable<IBrowsableObjectInfo>)ModelGeneric).GetRecursiveEnumerator();
+        public IEnumerator<Collections.Generic.IRecursiveEnumerable<IBrowsableObjectInfo>> GetRecursiveEnumerator() => ModelGeneric.GetRecursiveEnumerator();
 
         public int CompareTo(
 #if !NETFRAMEWORK

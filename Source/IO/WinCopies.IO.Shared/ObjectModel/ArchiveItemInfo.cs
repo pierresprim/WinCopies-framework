@@ -109,7 +109,7 @@ namespace WinCopies.IO.ObjectModel
         }
 #endif
 
-        public override IBrowsableObjectInfo Parent => _parent
+        public override IBrowsableObjectInfo Parent => IsDisposed ? throw GetExceptionForDispose(false) : _parent
 #if CS8
             ??= GetParent();
 #else
@@ -184,7 +184,7 @@ namespace WinCopies.IO.ObjectModel
         #endregion // Overrides
         #endregion // Properties
 
-        protected ArchiveItemInfo(in string path, in IShellObjectInfoBase archiveShellObject, in ArchiveFileInfo? archiveFileInfo, in ClientVersion clientVersion/*, DeepClone<ArchiveFileInfo?> archiveFileInfoDelegate*/) : base(path,  clientVersion)
+        protected ArchiveItemInfo(in string path, in IShellObjectInfoBase archiveShellObject, in ArchiveFileInfo? archiveFileInfo, in ClientVersion clientVersion/*, DeepClone<ArchiveFileInfo?> archiveFileInfoDelegate*/) : base(path, clientVersion)
         {
             ArchiveShellObject = archiveShellObject;
 

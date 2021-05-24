@@ -141,8 +141,62 @@ namespace WinCopies.IO
             System.Collections.Generic.IEnumerable<string> Parameters { get; }
         }
 
-        public interface IProcessFactory
+        public class ProcessParameters : IProcessParameters
         {
+            public Guid Guid { get; }
+
+            public System.Collections.Generic.IEnumerable<string> Parameters { get; }
+
+            public ProcessParameters(Guid guid, System.Collections.Generic.IEnumerable<string> parameters)
+            {
+                Guid = guid;
+
+                Parameters = parameters;
+            }
+
+            public ProcessParameters(string guid, System.Collections.Generic.IEnumerable<string> parameters) : this(new Guid(guid), parameters) { /* Left empty. */ }
+        }
+
+        [Flags]
+        public enum ProcessValidityScopeFlags
+        {
+            Global = 1,
+
+            Local = 2
+        }
+
+        public interface IProcessInfo
+        {
+            string GroupName { get; }
+
+            string Name { get; }
+
+            bool CanRun(object parameter, IBrowsableObjectInfo sourcePath, System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths);
+
+            IProcessParameters GetProcessParameters(object parameter, IBrowsableObjectInfo sourcePath, System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths);
+
+            IProcessParameters TryGetProcessParameters(object parameter, IBrowsableObjectInfo sourcePath, System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths);
+        }
+
+        public interface IProcessCommands : WinCopies.DotNetFix.IDisposable
+        {
+            string Name { get; }
+
+            string Caption { get; }
+
+            bool CanCreateNewItem();
+
+            bool TryCreateNewItem(string name, out IProcessParameters result);
+
+            IProcessParameters CreateNewItem(string name);
+        }
+
+        public interface IProcessFactory : WinCopies.DotNetFix.IDisposable
+        {
+            IProcessCommands NewItemProcessCommands { get; }
+
+            System.Collections.Generic.IEnumerable<IProcessInfo> CustomProcesses { get; }
+
             bool CanCopy(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths);
 
             bool TryCopy(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths, uint count);
@@ -155,15 +209,21 @@ namespace WinCopies.IO
 
             IProcessParameters TryGetCopyProcessParameters(uint count);
 
-            IProcess GetProcess(ProcessFactorySelectorDictionaryParameters processParameters, uint count);
+            IProcess GetProcess(ProcessFactorySelectorDictionaryParameters processParameters);
 
-            IProcess TryGetProcess(ProcessFactorySelectorDictionaryParameters processParameters, uint count);
+            IProcess TryGetProcess(ProcessFactorySelectorDictionaryParameters processParameters);
         }
 
         public static class ProcessFactory
         {
             private class _DefaultProcessFactory : IProcessFactory
             {
+                bool WinCopies.DotNetFix.IDisposable.IsDisposed => false;
+
+                System.Collections.Generic.IEnumerable<IProcessInfo> IProcessFactory.CustomProcesses => null;
+
+                IProcessCommands IProcessFactory.NewItemProcessCommands => null;
+
                 bool IProcessFactory.CanCopy(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths) => false;
 
                 bool IProcessFactory.CanPaste(uint count) => false;
@@ -176,9 +236,11 @@ namespace WinCopies.IO
 
                 IProcessParameters IProcessFactory.TryGetCopyProcessParameters(uint count) => null;
 
-                IProcess IProcessFactory.GetProcess(ProcessFactorySelectorDictionaryParameters processParameters, uint count) => throw new InvalidOperationException();
+                IProcess IProcessFactory.GetProcess(ProcessFactorySelectorDictionaryParameters processParameters) => throw new InvalidOperationException();
 
-                IProcess IProcessFactory.TryGetProcess(ProcessFactorySelectorDictionaryParameters processParameters, uint count) => null;
+                IProcess IProcessFactory.TryGetProcess(ProcessFactorySelectorDictionaryParameters processParameters) => null;
+
+                void System.IDisposable.Dispose() { /* Left empty. */ }
             }
 
             public static IProcessFactory DefaultProcessFactory { get; } = new _DefaultProcessFactory();

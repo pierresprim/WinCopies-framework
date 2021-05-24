@@ -10,8 +10,13 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AssemblyInfo.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)BitmapToImageSourceConverter.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)IconToImageSourceConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DecoratedContentControlContent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ModelToBooleanConverter.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="$(MSBuildThisFileDirectory)Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
 </Project>

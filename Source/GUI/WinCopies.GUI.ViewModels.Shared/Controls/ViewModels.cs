@@ -19,8 +19,14 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Input;
+
 using WinCopies.Commands;
 using WinCopies.GUI.Controls.Models;
+using WinCopies.Util.Data;
+
+#if !CS8
+using System.Collections;
+#endif
 
 namespace WinCopies.GUI.Controls.ViewModels
 {
@@ -75,19 +81,47 @@ namespace WinCopies.GUI.Controls.ViewModels
     }
 
     [TypeForDataTemplate(typeof(IButtonModel))]
-    public class ButtonViewModel<TModel, TContent, TCommandParameter> : ContentControlViewModel<TModel, TContent>, IButtonModel<TContent, TCommandParameter> where TModel : IButtonModel<TContent, TCommandParameter>
+    public class ButtonViewModel<TModel, TContent> : ContentControlViewModel<TModel, TContent>, IButtonModel<TContent> where TModel : IButtonModel<TContent>
     {
         public ICommand Command { get => ModelGeneric.Command; set => Update(nameof(Command), value, typeof(IButtonModel)); }
 
-        public TCommandParameter CommandParameter { get => ((ICommandSource<TCommandParameter>)ModelGeneric).CommandParameter; set => Update(nameof(CommandParameter), value, typeof(IButtonModel)); }
+        public object CommandParameter { get => ModelGeneric. CommandParameter; set => Update(nameof(CommandParameter), value, typeof(IButtonModel)); }
 
         public IInputElement CommandTarget { get => ModelGeneric.CommandTarget; set => Update(nameof(CommandTarget), value, typeof(IButtonModel)); }
 
-        object IButtonModel.CommandParameter { get => ((IButtonModel)ModelGeneric).CommandParameter; set => ((IButtonModel)ModelGeneric).CommandParameter=value; }
+        public ButtonViewModel(TModel model) : base(model) { /* Left empty. */ }
+    }
+
+    [TypeForDataTemplate(typeof(IButtonModel))]
+    public class ButtonViewModel<TModel, TContent, TCommandParameter> : ContentControlViewModel<TModel, TContent>, IButtonModel<TContent, TCommandParameter> where TModel : IButtonModel<TContent, TCommandParameter>
+    {
+        public ICommand<TCommandParameter> Command { get => ModelGeneric.Command; set => Update(nameof(Command), value, typeof(IButtonModel)); }
+
+        ICommand ICommandSource.Command => Command;
+
+        public TCommandParameter CommandParameter { get => ModelGeneric. CommandParameter; set => Update(nameof(CommandParameter), value, typeof(IButtonModel)); }
+
+        object IButtonModel.CommandParameter { get => ((IButtonModel)ModelGeneric).CommandParameter; set => ((IButtonModel)ModelGeneric).CommandParameter = value; }
 
         object ICommandSource.CommandParameter => ((ICommandSource)ModelGeneric).CommandParameter;
 
-        public ButtonViewModel(TModel model) : base(model) { }
+        public IInputElement CommandTarget { get => ModelGeneric.CommandTarget; set => Update(nameof(CommandTarget), value, typeof(IButtonModel)); }
+
+        public ButtonViewModel(TModel model) : base(model) { /* Left empty. */ }
+
+#if !CS8
+        ICommand IButtonModel.Command { get => Command; set => Command = (ICommand<TCommandParameter>)value; }
+#endif
+    }
+
+    [TypeForDataTemplate(typeof(IExtendedButtonModel))]
+    public class ExtendedButtonViewModel<TModel, TContent, TCommandParameter> : ButtonViewModel<TModel, TContent, TCommandParameter>, IExtendedButtonModel<TContent, TCommandParameter> where TModel : IExtendedButtonModel<TContent, TCommandParameter>
+    {
+        public object ToolTip { get => ModelGeneric.ToolTip; set => Update(nameof(ToolTip), value, typeof(IToolTipControlModel)); }
+
+        public object ContentDecoration { get => ModelGeneric.ContentDecoration; set => Update(nameof(ContentDecoration), value, typeof(IContentDecorationControl)); }
+
+        public ExtendedButtonViewModel(TModel model) : base(model) { }
     }
 
     [TypeForDataTemplate(typeof(IToggleButtonModel))]
@@ -174,5 +208,65 @@ namespace WinCopies.GUI.Controls.ViewModels
         public string GroupName { get => ModelGeneric.GroupName; set => Update(nameof(GroupName), value, typeof(IGroupingRadioButtonModel)); }
 
         public GroupingRadioButtonViewModel(TModel model) : base(model) { }
+    }
+
+    public abstract class MenuItemViewModelBase<TModel, THeader> : ViewModel<TModel> where TModel : IHeaderedControlModel<THeader>
+    {
+        public bool IsEnabled { get => ModelGeneric.IsEnabled; set => Update(nameof(IsEnabled), value, typeof(IControlModel)); }
+
+        public THeader Header { get => ModelGeneric.Header; set { ModelGeneric.Header = value; OnPropertyChanged(nameof(Header)); } }
+
+        protected MenuItemViewModelBase(in TModel model) : base(model) { /* Left empty. */ }
+    }
+
+
+    [TypeForDataTemplate(typeof(IMenuItemModel))]
+    public class MenuItemViewModel<TModel, THeader> : MenuItemViewModelBase<TModel, THeader>, IMenuItemModel<THeader> where TModel : IMenuItemModel<THeader>
+    {
+        public ICommand Command { get => ModelGeneric.Command; set { ModelGeneric.Command = value; OnPropertyChanged(nameof(Command)); } }
+
+        public object CommandParameter { get => ModelGeneric.CommandParameter; set { ModelGeneric.CommandParameter = value; OnPropertyChanged(nameof(CommandParameter)); } }
+
+        public IInputElement CommandTarget { get => ModelGeneric.CommandTarget; set => Update(nameof(CommandTarget), value, typeof(IMenuItemModel)); }
+
+        public System.Collections.IEnumerable Items { get => ModelGeneric.Items; set { ModelGeneric.Items = value; OnPropertyChanged(nameof(Items)); } }
+
+        public MenuItemViewModel(TModel model) : base(model) { /* Left empty. */ }
+
+#if !CS8
+        object IHeaderedControlModel.Header { get => Header; set => Header = (THeader)value; }
+#endif
+    }
+
+    [TypeForDataTemplate(typeof(IMenuItemModel))]
+    public class MenuItemViewModel<TModel, THeader, TItems, TCommandParameter> : MenuItemViewModelBase<TModel, THeader>, IMenuItemModel<THeader, TItems, TCommandParameter> where TModel : IMenuItemModel<THeader, TItems, TCommandParameter>
+    {
+        public bool IsEnabled { get => ModelGeneric.IsEnabled; set => Update(nameof(IsEnabled), value, typeof(IControlModel)); }
+
+        public THeader Header { get => ModelGeneric.Header; set { ModelGeneric.Header = value; OnPropertyChanged(nameof(Header)); } }
+
+        public ICommand<TCommandParameter> Command { get => ModelGeneric.Command; set { ModelGeneric.Command = value; OnPropertyChanged(nameof(Command)); } }
+
+        public TCommandParameter CommandParameter { get => ModelGeneric.CommandParameter; set { ModelGeneric.CommandParameter = value; OnPropertyChanged(nameof(CommandParameter)); } }
+
+        public IInputElement CommandTarget { get => ModelGeneric.CommandTarget; set => Update(nameof(CommandTarget), value, typeof(IMenuItemModel)); }
+
+        public IEnumerable<TItems> Items { get => ModelGeneric.Items; set { ModelGeneric.Items = value; OnPropertyChanged(nameof(Items)); } }
+
+        public MenuItemViewModel(TModel model) : base(model) { /* Left empty. */ }
+
+#if !CS8
+        ICommand IMenuItemModel.Command { get => Command; set => Command = (ICommand<TCommandParameter>)value; }
+
+        object IMenuItemModel.CommandParameter { get => CommandParameter; set => CommandParameter = (TCommandParameter)value; }
+
+        IEnumerable IItemsControlModel.Items { get => Items; set => Items = (IEnumerable<TItems>)value; }
+
+        object IHeaderedControlModel.Header { get => Header; set => Header = (THeader)value; }
+
+        ICommand ICommandSource.Command => Command;
+
+        object ICommandSource.CommandParameter => CommandParameter;
+#endif
     }
 }

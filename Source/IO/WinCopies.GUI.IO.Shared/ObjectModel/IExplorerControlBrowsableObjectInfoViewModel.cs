@@ -15,36 +15,56 @@
 * You should have received a copy of the GNU General Public License
 * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Windows.Controls;
 
 using WinCopies.Collections.Generic;
+using WinCopies.GUI.Controls.Models;
 using WinCopies.IO.ObjectModel;
+using WinCopies.IO.Process;
+using WinCopies.Util.Data;
 
-namespace WinCopies.GUI.IO.ObjectModel
+namespace WinCopies.GUI.IO
 {
-    public interface IBrowsableObjectInfoViewModelCommon : INotifyPropertyChanged
+    public class CustomProcessParametersGeneratedEventArgs : EventArgs
     {
-        bool IsSelected { get; set; }
+        public IProcessParameters ProcessParameters { get; }
+
+        public CustomProcessParametersGeneratedEventArgs(in IProcessParameters processParameters) => ProcessParameters = processParameters;
     }
 
-    public interface IExplorerControlBrowsableObjectInfoViewModel : IBrowsableObjectInfoViewModelCommon
+    namespace ObjectModel
     {
-        System.Collections.Generic.IEnumerable<IBrowsableObjectInfoViewModel> TreeViewItems { get; set; }
+        public interface IBrowsableObjectInfoViewModelCommon : INotifyPropertyChanged
+        {
+            bool IsSelected { get; set; }
+        }
 
-        string Text { get; set; }
+        public interface IExplorerControlBrowsableObjectInfoViewModel : IBrowsableObjectInfoViewModelCommon, WinCopies.DotNetFix.IDisposable
+        {
+            System.Collections.Generic.IEnumerable<IBrowsableObjectInfoViewModel> TreeViewItems { get; set; }
 
-        IBrowsableObjectInfoViewModel Path { get; set; }
+            string Text { get; set; }
 
-        ObservableLinkedCollectionEnumerable<IBrowsableObjectInfo> History { get; }
+            IBrowsableObjectInfoViewModel Path { get; set; }
 
-        IBrowsableObjectInfoFactory Factory { get; set; }
+            ObservableLinkedCollectionEnumerable<IBrowsableObjectInfo> History { get; }
 
-        SelectionMode SelectionMode { get; set; }
+            IBrowsableObjectInfoFactory Factory { get; set; }
 
-        IList SelectedItems { get; set; }
+            SelectionMode SelectionMode { get; set; }
 
-        bool IsCheckBoxVisible { get; set; }
+            IList SelectedItems { get; set; }
+
+            bool IsCheckBoxVisible { get; set; }
+
+            IButtonModel NewItemCommand { get; }
+
+            System.Collections.Generic.IEnumerable<IButtonModel> CommonCommands { get; }
+
+            event System.EventHandler<CustomProcessParametersGeneratedEventArgs> CustomProcessParametersGeneratedEventHandler;
+        }
     }
 }

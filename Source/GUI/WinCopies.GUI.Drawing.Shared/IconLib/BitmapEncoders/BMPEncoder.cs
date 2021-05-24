@@ -36,7 +36,7 @@ namespace WinCopies.GUI.Drawing.BitmapEncoders
         #endregion
 
         #region Methods
-        public unsafe override void Read(in Stream stream, in int resourceSize)
+        public unsafe override void Read(in System.IO.Stream stream, in int resourceSize)
         {
             // BitmapInfoHeader
             Util.Read(ref mHeader, stream);
@@ -60,7 +60,7 @@ namespace WinCopies.GUI.Drawing.BitmapEncoders
             _ = stream.Read(mAND, 0, mAND.Length);
         }
 
-        public unsafe override void Write(in Stream stream)
+        public unsafe override void Write(in System.IO.Stream stream)
         {
             // BinaryReader br = new BinaryReader(stream);
 

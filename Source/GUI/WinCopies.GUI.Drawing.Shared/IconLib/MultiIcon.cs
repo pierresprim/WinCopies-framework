@@ -179,7 +179,7 @@ namespace WinCopies.GUI.Drawing
             }
         }
 
-        public void Load(in Stream stream)
+        public void Load(in System.IO.Stream stream)
         {
             ILibraryFormat baseFormat;
 
@@ -229,7 +229,7 @@ namespace WinCopies.GUI.Drawing
             }
         }
 
-        public void Save(in Stream stream, in MultiIconFormat format)
+        public void Save(in System.IO.Stream stream, in MultiIconFormat format)
         {
             switch (format)
             {

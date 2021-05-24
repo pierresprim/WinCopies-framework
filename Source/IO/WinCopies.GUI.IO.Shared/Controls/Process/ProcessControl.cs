@@ -18,26 +18,16 @@
 using System;
 using System.Windows;
 using System.Windows.Input;
+
 using WinCopies.GUI.Controls;
+using WinCopies.GUI.IO.Process;
 using WinCopies.IO;
 using WinCopies.IO.Process;
+
 using Size = WinCopies.IO.Size;
 
 namespace WinCopies.GUI.IO.Controls.Process
 {
-    public enum ProcessStatus : sbyte
-    {
-        None,
-
-        InProgress,
-
-        Succeeded,
-
-        CancelledByUser,
-
-        Error
-    }
-
     /// <summary>
     /// Represents an I/O process control.
     /// </summary>

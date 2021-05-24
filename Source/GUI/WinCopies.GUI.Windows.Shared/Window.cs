@@ -26,8 +26,6 @@ using System.Windows.Interop;
 
 using static Microsoft.WindowsAPICodePack.Shell.DesktopWindowManager;
 
-using WindowUtilities = Microsoft.WindowsAPICodePack.Shell.DesktopWindowManager;
-
 namespace WinCopies.GUI.Windows
 {
     public class Window : System.Windows.Window
@@ -69,17 +67,6 @@ namespace WinCopies.GUI.Windows
         }
 
         static Window() => DefaultStyleKeyProperty.OverrideMetadata(typeof(Window), new FrameworkPropertyMetadata(typeof(Window)));
-
-        // TODO:
-
-        private static void SetWindow(IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy, WindowStyles styles, WindowStyles stylesEx, SetWindowPositionOptions windowPositionOptions)
-        {
-            SetWindowStyles(hWnd, styles, GetWindowLongEnum.Style);
-
-            SetWindowStyles(hWnd, stylesEx, GetWindowLongEnum.ExStyle);
-
-            SetWindowPos(hWnd, hWndInsertAfter, x, y, cx, cy, windowPositionOptions);
-        }
 
         protected virtual void OnSourceInitialized(HwndSource hwndSource)
         {

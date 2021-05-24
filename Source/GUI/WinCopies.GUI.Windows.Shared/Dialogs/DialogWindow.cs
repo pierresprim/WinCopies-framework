@@ -92,6 +92,10 @@ namespace WinCopies.GUI.Windows
 
         public IEnumerable CustomButtonsSource { get => (IEnumerable)GetValue(CustomButtonsSourceProperty); set => SetValue(CustomButtonsSourceProperty, value); }
 
+        public static readonly DependencyProperty ContentDecoratorStyleProperty = DependencyProperty.Register(nameof(ContentDecoratorStyle), typeof(Style), typeof(DialogWindow), new PropertyMetadata(new Style()));
+
+        public Style ContentDecoratorStyle { get => (Style)GetValue(ContentDecoratorStyleProperty); set => SetValue(ContentDecoratorStyleProperty, value); }
+
         //public ItemCollection CustomButtons
         //{
         //    get
@@ -464,7 +468,7 @@ namespace WinCopies.GUI.Windows
             Dialogs.
 #endif
           DialogButton.AbortRetryIgnore:
-                    
+
                     if (If(IfCT.And, IfCM.Binary, IfComp.Equal, newValue, DefaultButton.Abort, DefaultButton.Retry, DefaultButton.Ignore)) throwArgumentException();
 
                     break;

@@ -19,7 +19,7 @@ using System;
 
 namespace WinCopies.IO.Reflection.PropertySystem
 {
-    public interface IDotNetItemInfoProperties
+    public interface IDotNetItemInfoProperties: System.IDisposable
     {
         DotNetItemType ItemType { get; }
     }

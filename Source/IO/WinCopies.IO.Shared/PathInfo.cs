@@ -18,7 +18,6 @@
 using System;
 
 using static WinCopies.ThrowHelper;
-using static WinCopies.IO.PathHelper;
 
 namespace WinCopies.IO
 {

@@ -21,14 +21,57 @@ using WinCopies.Util.Data;
 
 namespace WinCopies.GUI.Controls.ViewModels
 {
-    public interface ContentModel:INotifyPropertyChanged
+    public interface IContentModel : INotifyPropertyChanged
     {
         object Content { get; set; }
 
         object Dialog { get; set; }
     }
 
-    public class ContentViewModel<TContent, TDialog> : ViewModelBase
+    public interface IContentModel<TContent,TDialog>: IContentModel
+    {
+        new TContent Content { get; set; }
+
+        new TDialog Dialog { get; set; }
+
+#if CS8
+        object IContentModel.Content { get => Content; set => Content=(TContent)value; }
+
+        object IContentModel.Dialog { get => Dialog; set => Dialog = (TDialog)value; }
+#endif
+    }
+
+    public class ContentViewModel : ViewModelBase, IContentModel
+    {
+        private object _content;
+        private object _dialog;
+
+        public object Content
+        {
+            get => _content;
+
+            set
+            {
+                _content = value;
+
+                OnPropertyChanged(nameof(Content));
+            }
+        }
+
+        public object Dialog
+        {
+            get => _dialog;
+
+            set
+            {
+                _dialog = value;
+
+                OnPropertyChanged(nameof(Dialog));
+            }
+        }
+    }
+
+    public class ContentViewModel<TContent, TDialog> : ViewModelBase, IContentModel<TContent,TDialog>
     {
         private TContent _content;
         private TDialog _dialog;
@@ -56,5 +99,11 @@ namespace WinCopies.GUI.Controls.ViewModels
                 OnPropertyChanged(nameof(Dialog));
             }
         }
+
+#if !CS8
+        object IContentModel.Content { get => Content; set => Content = (TContent)value; }
+
+        object IContentModel.Dialog { get => Dialog; set => Dialog = (TDialog)value; }
+#endif
     }
 }

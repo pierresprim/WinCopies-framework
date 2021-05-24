@@ -17,14 +17,12 @@
 //  PURPOSE. IT CAN BE DISTRIBUTED FREE OF CHARGE AS LONG AS THIS HEADER 
 //  REMAINS UNCHANGED.
 
-using System.IO;
-
 namespace WinCopies.GUI.Drawing.EncodingFormats
 {
     public interface ILibraryFormat
     {
-        bool IsRecognizedFormat(in Stream stream);
-        void Save(in MultiIcon singleIcon, in Stream stream);
-        MultiIcon Load(in Stream stream);
+        bool IsRecognizedFormat(in System.IO.Stream stream);
+        void Save(in MultiIcon singleIcon, in System.IO.Stream stream);
+        MultiIcon Load(in System.IO.Stream stream);
     }
 }

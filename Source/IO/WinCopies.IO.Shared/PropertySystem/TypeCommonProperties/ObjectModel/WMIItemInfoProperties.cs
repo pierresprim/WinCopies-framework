@@ -71,7 +71,7 @@ namespace WinCopies.IO.PropertySystem
         }
     }
 
-    public interface IWMIItemInfoProperties
+    public interface IWMIItemInfoProperties: System.IDisposable
     {
         WMIItemType ItemType { get; }
 

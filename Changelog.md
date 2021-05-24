@@ -6,6 +6,13 @@ The WinCopies® software framework
 CHANGELOG
 ---------
 
+### 3.3.0-preview
+
+- Add new types.
+- Add ContentDecoratorStyle dependency property to DialogWindow.
+- Update IO API to have better Process integration.
+- Remove image source converters. These types have been move to the WinCopies.Util.Desktop package.
+
 ### 3.2.0-preview
 
 - WinCopies.GUI.Windows.Window:

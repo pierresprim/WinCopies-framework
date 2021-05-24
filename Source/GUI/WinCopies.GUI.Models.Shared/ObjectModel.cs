@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Windows;
@@ -196,30 +195,9 @@ namespace WinCopies.GUI.Controls.Models
         }
     }
 
-#if WinCopies3
-    public interface IControlModel
-    {
-        bool IsEnabled { get; set; }
-    }
-
     public class ControlModel : IControlModel
     {
         public bool IsEnabled { get; set; } = true;
-    }
-#endif
-
-    /// <summary>
-    /// Represents a model that corresponds to a default view for <see cref="ContentControl"/>s.
-    /// </summary>
-    public interface IContentControlModel
-#if WinCopies3
-        : IControlModel
-#endif
-    {
-        /// <summary>
-        /// Gets or sets the content of this <see cref="IContentControlModel"/>.
-        /// </summary>
-        object Content { get; set; }
     }
 
     /// <summary>
@@ -229,8 +207,6 @@ namespace WinCopies.GUI.Controls.Models
     public class ContentControlModel : ControlModel, IDataTemplateSelectorsModel
     {
         private object _content;
-
-        public bool IsEnabled { get; set; } = true;
 
         /// <summary>
         /// Gets or sets the content of this <see cref="ContentControlModel"/>.
@@ -245,11 +221,11 @@ namespace WinCopies.GUI.Controls.Models
 
         public ContentControlModel() { /* Left empty. */ }
 
-        public ContentControlModel(object content) => Content = content;
+        public ContentControlModel(in object content) => Content = content;
 
-        public ContentControlModel(BindingDirection bindingDirection) => BindingDirection = bindingDirection;
+        public ContentControlModel(in BindingDirection bindingDirection) => BindingDirection = bindingDirection;
 
-        public ContentControlModel(object content, BindingDirection bindingDirection)
+        public ContentControlModel(in object content, in BindingDirection bindingDirection)
         {
             Content = content;
 
@@ -268,23 +244,10 @@ namespace WinCopies.GUI.Controls.Models
     /// <summary>
     /// Represents a model that corresponds to a default view for <see cref="ContentControl"/>s.
     /// </summary>
-    public interface IContentControlModel<T> : IContentControlModel
-    {
-        /// <summary>
-        /// Gets or sets the content of this <see cref="IContentControlModel{T}"/>.
-        /// </summary>
-        new T Content { get; set; }
-    }
-
-    /// <summary>
-    /// Represents a model that corresponds to a default view for <see cref="ContentControl"/>s.
-    /// </summary>
     [TypeForDataTemplate(typeof(IContentControlModel))]
     public class ContentControlModel<T> : ControlModel, IContentControlModel<T>, IDataTemplateSelectorsModel
     {
         private T _content;
-
-        public bool IsEnabled { get; set; } = true;
 
         /// <summary>
         /// Gets or sets the content of this <see cref="ContentControlModel{T}"/>.
@@ -304,11 +267,11 @@ namespace WinCopies.GUI.Controls.Models
         /// </summary>
         public ContentControlModel() { /* Left empty. */ }
 
-        public ContentControlModel(T content) => Content = content;
+        public ContentControlModel(in T content) => Content = content;
 
-        public ContentControlModel(BindingDirection bindingDirection) => BindingDirection = bindingDirection;
+        public ContentControlModel(in BindingDirection bindingDirection) => BindingDirection = bindingDirection;
 
-        public ContentControlModel(T content, BindingDirection bindingDirection)
+        public ContentControlModel(in T content, in BindingDirection bindingDirection)
         {
             Content = content;
 
@@ -321,25 +284,6 @@ namespace WinCopies.GUI.Controls.Models
 
             this.TryUpdate(_content, BindingDirection);
         }
-    }
-
-    /// <summary>
-    /// Represents a model that corresponds to a default view for headered controls.
-    /// </summary>
-    public interface IHeaderedControlModel
-    {
-        /// <summary>
-        /// Gets or sets the header of this <see cref="IHeaderedControlModel"/>.
-        /// </summary>
-        object Header { get; set; }
-    }
-
-    /// <summary>
-    /// Represents a model that corresponds to a default view for <see cref="HeaderedContentControl"/>s.
-    /// </summary>
-    public interface IHeaderedContentControlModel : IContentControlModel, IHeaderedControlModel
-    {
-        // Left empty.
     }
 
     /// <summary>
@@ -360,11 +304,11 @@ namespace WinCopies.GUI.Controls.Models
         /// </summary>
         public HeaderedContentControlModel() { /* Left empty. */ }
 
-        public HeaderedContentControlModel(object header, object content) : base(content) => Header = header;
+        public HeaderedContentControlModel(in object header, in object content) : base(content) => Header = header;
 
-        public HeaderedContentControlModel(BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
+        public HeaderedContentControlModel(in BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
 
-        public HeaderedContentControlModel(object header, object content, BindingDirection bindingDirection) : base(content, bindingDirection) => Header = header;
+        public HeaderedContentControlModel(in object header, in object content, in BindingDirection bindingDirection) : base(content, bindingDirection) => Header = header;
 
         protected virtual void OnHeaderChanged(object oldValue)
         {
@@ -375,24 +319,6 @@ namespace WinCopies.GUI.Controls.Models
         }
     }
 
-    /// <summary>
-    /// Represents a model that corresponds to a default view for headered controls.
-    /// </summary>
-    public interface IHeaderedControlModel<T> : IHeaderedControlModel
-    {
-        /// <summary>
-        /// Gets or sets the header of this <see cref="IHeaderedControlModel{T}"/>.
-        /// </summary>
-        new T Header { get; set; }
-    }
-
-    /// <summary>
-    /// Represents a model that corresponds to a default view for <see cref="HeaderedContentControl"/>s.
-    /// </summary>
-    public interface IHeaderedContentControlModel<THeader, TContent> : IContentControlModel<TContent>, IHeaderedControlModel<THeader>, IHeaderedContentControlModel
-    {
-        // Left empty.
-    }
 
     /// <summary>
     /// Represents a model that corresponds to a default view for <see cref="HeaderedContentControl"/>s.
@@ -414,11 +340,11 @@ namespace WinCopies.GUI.Controls.Models
         /// </summary>
         public HeaderedContentControlModel() { /* Left empty. */ }
 
-        public HeaderedContentControlModel(THeader header, TContent content) : base(content) => Header = header;
+        public HeaderedContentControlModel(in THeader header, in TContent content) : base(content) => Header = header;
 
-        public HeaderedContentControlModel(BindingDirection bindingDirection) : base(bindingDirection) { }
+        public HeaderedContentControlModel(in BindingDirection bindingDirection) : base(bindingDirection) { }
 
-        public HeaderedContentControlModel(THeader header, TContent content, BindingDirection bindingDirection) : base(content, bindingDirection) => Header = header;
+        public HeaderedContentControlModel(in THeader header, in TContent content, in BindingDirection bindingDirection) : base(content, bindingDirection) => Header = header;
 
         protected virtual void OnHeaderChanged(THeader oldValue)
         {
@@ -431,26 +357,10 @@ namespace WinCopies.GUI.Controls.Models
     /// <summary>
     /// Represents a model that corresponds to a default view for <see cref="ItemsControl"/>s.
     /// </summary>
-    public interface IItemsControlModel
-#if WinCopies3
-        : IControlModel
-#endif
-    {
-        /// <summary>
-        /// Gets or sets the items of this <see cref="IItemsControlModel"/>.
-        /// </summary>
-        IEnumerable Items { get; set; }
-    }
-
-    /// <summary>
-    /// Represents a model that corresponds to a default view for <see cref="ItemsControl"/>s.
-    /// </summary>
     [TypeForDataTemplate(typeof(IItemsControlModel))]
     public class ItemsControlModel : Control, IItemsControlModel, IDataTemplateSelectorsModel
     {
         private IEnumerable _items;
-
-        public bool IsEnabled { get; set; } = true;
 
         /// <summary>
         /// Gets or sets the items of this <see cref="ItemsControlModel"/>.
@@ -468,11 +378,11 @@ namespace WinCopies.GUI.Controls.Models
         /// </summary>
         public ItemsControlModel() { /* Left empty. */ }
 
-        public ItemsControlModel(IEnumerable items) => Items = items;
+        public ItemsControlModel(in IEnumerable items) => Items = items;
 
-        public ItemsControlModel(BindingDirection bindingDirection) => BindingDirection = bindingDirection;
+        public ItemsControlModel(in BindingDirection bindingDirection) => BindingDirection = bindingDirection;
 
-        public ItemsControlModel(IEnumerable items, BindingDirection bindingDirection)
+        public ItemsControlModel(in IEnumerable items, in BindingDirection bindingDirection)
         {
             Items = items;
 
@@ -491,23 +401,10 @@ namespace WinCopies.GUI.Controls.Models
     /// <summary>
     /// Represents a model that corresponds to a default view for <see cref="ItemsControl"/>s.
     /// </summary>
-    public interface IItemsControlModel<T> : IItemsControlModel
-    {
-        /// <summary>
-        /// Gets or sets the items of this <see cref="IItemsControlModel{T}"/>.
-        /// </summary>
-        new IEnumerable<T> Items { get; set; }
-    }
-
-    /// <summary>
-    /// Represents a model that corresponds to a default view for <see cref="ItemsControl"/>s.
-    /// </summary>
     [TypeForDataTemplate(typeof(IItemsControlModel))]
-    public class ItemsControlModel<T> : IItemsControlModel<T>, IDataTemplateSelectorsModel
+    public class ItemsControlModel<T> : ControlModel, IItemsControlModel<T>, IDataTemplateSelectorsModel
     {
         private IEnumerable<T> _items;
-
-        public bool IsEnabled { get; set; } = true;
 
         /// <summary>
         /// Gets or sets the items of this <see cref="ItemsControlModel{T}"/>.
@@ -527,11 +424,11 @@ namespace WinCopies.GUI.Controls.Models
         /// </summary>
         public ItemsControlModel() { /* Left empty. */ }
 
-        public ItemsControlModel(IEnumerable<T> items) => Items = items;
+        public ItemsControlModel(in IEnumerable<T> items) => Items = items;
 
-        public ItemsControlModel(BindingDirection bindingDirection) => BindingDirection = bindingDirection;
+        public ItemsControlModel(in BindingDirection bindingDirection) => BindingDirection = bindingDirection;
 
-        public ItemsControlModel(IEnumerable<T> items, BindingDirection bindingDirection)
+        public ItemsControlModel(in IEnumerable<T> items, in BindingDirection bindingDirection)
         {
             Items = items;
 
@@ -544,14 +441,6 @@ namespace WinCopies.GUI.Controls.Models
 
             this.TryUpdate(_items, BindingDirection);
         }
-    }
-
-    /// <summary>
-    /// Represents a model that corresponds to a default view for <see cref="HeaderedItemsControl"/>s.
-    /// </summary>
-    public interface IHeaderedItemsControlModel : IItemsControlModel, IHeaderedControlModel
-    {
-        // Left empty.
     }
 
     /// <summary>
@@ -572,11 +461,11 @@ namespace WinCopies.GUI.Controls.Models
         /// </summary>
         public HeaderedItemsControlModel() { /* Left empty. */ }
 
-        public HeaderedItemsControlModel(object header, IEnumerable items) : base(items) => Header = header;
+        public HeaderedItemsControlModel(in object header, in IEnumerable items) : base(items) => Header = header;
 
-        public HeaderedItemsControlModel(BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
+        public HeaderedItemsControlModel(in BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
 
-        public HeaderedItemsControlModel(object header, IEnumerable items, BindingDirection bindingDirection) : base(items, bindingDirection) => Header = header;
+        public HeaderedItemsControlModel(in object header, in IEnumerable items, in BindingDirection bindingDirection) : base(items, bindingDirection) => Header = header;
 
         protected virtual void OnHeaderChanged(object oldValue)
         {
@@ -584,14 +473,6 @@ namespace WinCopies.GUI.Controls.Models
 
             this.TryUpdate(_header, BindingDirection);
         }
-    }
-
-    /// <summary>
-    /// Represents a model that corresponds to a default view for <see cref="HeaderedItemsControl"/>s.
-    /// </summary>
-    public interface IHeaderedItemsControlModel<THeader, TItems> : IItemsControlModel<TItems>, IHeaderedControlModel<THeader>, IHeaderedItemsControlModel
-    {
-        // Left empty.
     }
 
     /// <summary>
@@ -614,11 +495,11 @@ namespace WinCopies.GUI.Controls.Models
         /// </summary>
         public HeaderedItemsControlModel() { /* Left empty. */ }
 
-        public HeaderedItemsControlModel(THeader header, IEnumerable<TItems> items) : base(items) => Header = header;
+        public HeaderedItemsControlModel(in THeader header, in IEnumerable<TItems> items) : base(items) => Header = header;
 
-        public HeaderedItemsControlModel(BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
+        public HeaderedItemsControlModel(in BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
 
-        public HeaderedItemsControlModel(THeader header, IEnumerable<TItems> items, BindingDirection bindingDirection) : base(items, bindingDirection) => Header = header;
+        public HeaderedItemsControlModel(in THeader header, in IEnumerable<TItems> items, in BindingDirection bindingDirection) : base(items, bindingDirection) => Header = header;
 
         protected virtual void OnHeaderChanged(THeader oldValue)
         {
@@ -626,22 +507,6 @@ namespace WinCopies.GUI.Controls.Models
 
             this.TryUpdate(_header, BindingDirection);
         }
-    }
-
-    /// <summary>
-    /// Represents a model that corresponds to a default view for <see cref="GroupBox"/> controls.
-    /// </summary>
-    public interface IGroupBoxModel : IHeaderedContentControlModel
-    {
-        // Left empty.
-    }
-
-    /// <summary>
-    /// Represents a model that corresponds to a default view for <see cref="GroupBox"/> controls.
-    /// </summary>
-    public interface IGroupBoxModel<THeader, TContent> : IGroupBoxModel, IHeaderedContentControlModel<THeader, TContent>
-    {
-        // Left empty.
     }
 
     /// <summary>
@@ -655,11 +520,11 @@ namespace WinCopies.GUI.Controls.Models
         /// </summary>
         public GroupBoxModel() { /* Left empty. */ }
 
-        public GroupBoxModel(object header, object content) : base(header, content) { /* Left empty. */ }
+        public GroupBoxModel(in object header, in object content) : base(header, content) { /* Left empty. */ }
 
-        public GroupBoxModel(BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
+        public GroupBoxModel(in BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
 
-        public GroupBoxModel(object header, object content, BindingDirection bindingDirection) : base(header, content, bindingDirection) { /* Left empty. */ }
+        public GroupBoxModel(in object header, in object content, in BindingDirection bindingDirection) : base(header, content, bindingDirection) { /* Left empty. */ }
     }
 
     /// <summary>
@@ -673,27 +538,11 @@ namespace WinCopies.GUI.Controls.Models
         /// </summary>
         public GroupBoxModel() { /* Left empty. */ }
 
-        public GroupBoxModel(THeader header, TContent content) : base(header, content) { /* Left empty. */ }
+        public GroupBoxModel(in THeader header, in TContent content) : base(header, content) { /* Left empty. */ }
 
-        public GroupBoxModel(BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
+        public GroupBoxModel(in BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
 
-        public GroupBoxModel(THeader header, TContent content, BindingDirection bindingDirection) : base(header, content, bindingDirection) { /* Left empty. */ }
-    }
-
-    /// <summary>
-    /// Represents a model that corresponds to a default view for <see cref="TabItem"/> controls.
-    /// </summary>
-    public interface ITabItemModel : IHeaderedContentControlModel
-    {
-        // Left empty.
-    }
-
-    /// <summary>
-    /// Represents a model that corresponds to a default view for <see cref="TabItem"/> controls.
-    /// </summary>
-    public interface ITabItemModel<THeader, TContent> : ITabItemModel, IHeaderedContentControlModel<THeader, TContent>
-    {
-        // Left empty.
+        public GroupBoxModel(in THeader header, in TContent content, in BindingDirection bindingDirection) : base(header, content, bindingDirection) { /* Left empty. */ }
     }
 
     /// <summary>
@@ -707,11 +556,11 @@ namespace WinCopies.GUI.Controls.Models
         /// </summary>
         public TabItemModel() { /* Left empty. */ }
 
-        public TabItemModel(object header, object content) : base(header, content) { /* Left empty. */ }
+        public TabItemModel(in object header, in object content) : base(header, content) { /* Left empty. */ }
 
-        public TabItemModel(BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
+        public TabItemModel(in BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
 
-        public TabItemModel(object header, object content, BindingDirection bindingDirection) : base(header, content, bindingDirection) { /* Left empty. */ }
+        public TabItemModel(in object header, in object content, in BindingDirection bindingDirection) : base(header, content, bindingDirection) { /* Left empty. */ }
     }
 
     /// <summary>
@@ -725,11 +574,11 @@ namespace WinCopies.GUI.Controls.Models
         /// </summary>
         public TabItemModel() { /* Left empty. */ }
 
-        public TabItemModel(THeader header, TContent content) : base(header, content) { /* Left empty. */ }
+        public TabItemModel(in THeader header, in TContent content) : base(header, content) { /* Left empty. */ }
 
-        public TabItemModel(BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
+        public TabItemModel(in BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
 
-        public TabItemModel(THeader header, TContent content, BindingDirection bindingDirection) : base(header, content, bindingDirection) { /* Left empty. */ }
+        public TabItemModel(in THeader header, in TContent content, in BindingDirection bindingDirection) : base(header, content, bindingDirection) { /* Left empty. */ }
     }
 
     ///// <summary>
@@ -798,26 +647,6 @@ namespace WinCopies.GUI.Controls.Models
     /// <summary>
     /// Represents a model that corresponds to a default view for <see cref="Button"/>s.
     /// </summary>
-    public interface IButtonModel : IContentControlModel, ICommandSource
-    {
-        new ICommand Command { get; set; }
-
-        new object CommandParameter { get; set; }
-
-        new IInputElement CommandTarget { get; set; }
-
-#if CS8
-        ICommand ICommandSource.Command => Command;
-
-        object ICommandSource.CommandParameter => CommandParameter;
-
-        IInputElement ICommandSource.CommandTarget => CommandTarget;
-#endif
-    }
-
-    /// <summary>
-    /// Represents a model that corresponds to a default view for <see cref="Button"/>s.
-    /// </summary>
     [TypeForDataTemplate(typeof(IButtonModel))]
     public class ButtonModel : ContentControlModel, IButtonModel
     {
@@ -844,32 +673,24 @@ namespace WinCopies.GUI.Controls.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="ButtonModel"/> class with a custom content.
         /// </summary>
-        public ButtonModel(object content) : base(content) { /* Left empty. */ }
+        public ButtonModel(in object content) : base(content) { /* Left empty. */ }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ButtonModel"/> class with a custom <see cref="BindingDirection"/>.
         /// </summary>
-        public ButtonModel(BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
+        public ButtonModel(in BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ButtonModel"/> class with a custom content and <see cref="BindingDirection"/>.
         /// </summary>
-        public ButtonModel(object content, BindingDirection bindingDirection) : base(content, bindingDirection) { /* Left empty. */ }
-    }
-
-    /// <summary>
-    /// Represents a model that corresponds to a default view for <see cref="Button"/>s.
-    /// </summary>
-    public interface IButtonModel<TContent, TCommandParameter> : IButtonModel, ICommandSource<TCommandParameter>, IContentControlModel<TContent>
-    {
-        // Left empty.
+        public ButtonModel(in object content, in BindingDirection bindingDirection) : base(content, bindingDirection) { /* Left empty. */ }
     }
 
     /// <summary>
     /// Represents a model that corresponds to a default view for <see cref="Button"/>s.
     /// </summary>
     [TypeForDataTemplate(typeof(IButtonModel))]
-    public class ButtonModel<TContent, TCommandParameter> : ContentControlModel<TContent>, IButtonModel<TContent, TCommandParameter>
+    public class ButtonModel<TContent> : ContentControlModel<TContent>, IButtonModel<TContent>
     {
         /// <summary>
         /// Gets or sets the command of this <see cref="ButtonModel{TContent,TCommandParameter}"/>.
@@ -879,11 +700,7 @@ namespace WinCopies.GUI.Controls.Models
         /// <summary>
         /// Gets or sets the command parameter of this <see cref="ButtonModel{TContent,TCommandParameter}"/>.
         /// </summary>
-        public TCommandParameter CommandParameter { get; set; }
-
-        object ICommandSource.CommandParameter => CommandParameter;
-
-        object IButtonModel.CommandParameter { get => CommandParameter; set => CommandParameter = value is TCommandParameter _value ? _value : throw new ArgumentException($"The given value is not a {typeof(TCommandParameter).Name}."); }
+        public object CommandParameter { get; set; }
 
         /// <summary>
         /// Gets or sets the command target of this <see cref="ButtonModel{TContent,TCommandParameter}"/>.
@@ -895,11 +712,71 @@ namespace WinCopies.GUI.Controls.Models
         /// </summary>
         public ButtonModel() { /* Left empty. */ }
 
-        public ButtonModel(TContent content) : base(content) { /* Left empty. */ }
+        public ButtonModel(in TContent content) : base(content) { /* Left empty. */ }
 
-        public ButtonModel(BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
+        public ButtonModel(in BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
 
-        public ButtonModel(TContent content, BindingDirection bindingDirection) : base(content, bindingDirection) { /* Left empty. */ }
+        public ButtonModel(in TContent content, in BindingDirection bindingDirection) : base(content, bindingDirection) { /* Left empty. */ }
+    }
+
+    /// <summary>
+    /// Represents a model that corresponds to a default view for <see cref="Button"/>s.
+    /// </summary>
+    [TypeForDataTemplate(typeof(IButtonModel))]
+    public class ButtonModel<TContent, TCommandParameter> : ContentControlModel<TContent>, IButtonModel<TContent, TCommandParameter>
+    {
+        /// <summary>
+        /// Gets or sets the command of this <see cref="ButtonModel{TContent,TCommandParameter}"/>.
+        /// </summary>
+        public ICommand<TCommandParameter> Command { get; set; }
+
+        /// <summary>
+        /// Gets or sets the command parameter of this <see cref="ButtonModel{TContent,TCommandParameter}"/>.
+        /// </summary>
+        public TCommandParameter CommandParameter { get; set; }
+
+        object ICommandSource.CommandParameter => CommandParameter;
+
+        object IButtonModel.CommandParameter { get => CommandParameter; set => CommandParameter = (TCommandParameter)value; }
+
+        /// <summary>
+        /// Gets or sets the command target of this <see cref="ButtonModel{TContent,TCommandParameter}"/>.
+        /// </summary>
+        public IInputElement CommandTarget { get; set; }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ButtonModel{TContent,TCommandParameter}"/> class.
+        /// </summary>
+        public ButtonModel() { /* Left empty. */ }
+
+        public ButtonModel(in TContent content) : base(content) { /* Left empty. */ }
+
+        public ButtonModel(in BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
+
+        public ButtonModel(in TContent content, in BindingDirection bindingDirection) : base(content, bindingDirection) { /* Left empty. */ }
+
+#if CS8
+        ICommand ICommandSource.Command => Command;
+#else
+        ICommand IButtonModel.Command { get => Command; set => Command = (ICommand<TCommandParameter>)value; }
+
+        ICommand ICommandSource.Command => Command;
+#endif
+    }
+
+    public class ExtendedButtonModel<TContent, TCommandParameter> : ButtonModel<TContent, TCommandParameter>, IExtendedButtonModel<TContent, TCommandParameter>
+    {
+        public object ToolTip { get; set; }
+
+        public object ContentDecoration { get; set; }
+
+        public ExtendedButtonModel() { /* Left empty. */ }
+
+        public ExtendedButtonModel(in TContent content) : base(content) { /* Left empty. */ }
+
+        public ExtendedButtonModel(in BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
+
+        public ExtendedButtonModel(in TContent content, in BindingDirection bindingDirection) : base(content, bindingDirection) { /* Left empty. */ }
     }
 
     /// <summary>
@@ -939,19 +816,11 @@ namespace WinCopies.GUI.Controls.Models
         /// </summary>
         public ToggleButtonModel() { /* Left empty. */ }
 
-        public ToggleButtonModel(object content) : base(content) { /* Left empty. */ }
+        public ToggleButtonModel(in object content) : base(content) { /* Left empty. */ }
 
-        public ToggleButtonModel(BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
+        public ToggleButtonModel(in BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
 
-        public ToggleButtonModel(object content, BindingDirection bindingDirection) : base(content, bindingDirection) { /* Left empty. */ }
-    }
-
-    /// <summary>
-    /// Represents a model that corresponds to a default view for <see cref="ToggleButton"/>s.
-    /// </summary>
-    public interface IToggleButtonModel<TContent, TCommandParameter> : IToggleButtonModel, IButtonModel<TContent, TCommandParameter>
-    {
-        // Left empty.
+        public ToggleButtonModel(in object content, in BindingDirection bindingDirection) : base(content, bindingDirection) { /* Left empty. */ }
     }
 
     /// <summary>
@@ -975,19 +844,11 @@ namespace WinCopies.GUI.Controls.Models
         /// </summary>
         public ToggleButtonModel() { /* Left empty. */ }
 
-        public ToggleButtonModel(TContent content) : base(content) { /* Left empty. */ }
+        public ToggleButtonModel(in TContent content) : base(content) { /* Left empty. */ }
 
-        public ToggleButtonModel(BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
+        public ToggleButtonModel(in BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
 
-        public ToggleButtonModel(TContent content, BindingDirection bindingDirection) : base(content, bindingDirection) { /* Left empty. */ }
-    }
-
-    /// <summary>
-    /// Represents a model that corresponds to a default view for <see cref="CheckBox"/>'s.
-    /// </summary>
-    public interface ICheckBoxModel : IToggleButtonModel
-    {
-        // Left empty.
+        public ToggleButtonModel(in TContent content, in BindingDirection bindingDirection) : base(content, bindingDirection) { /* Left empty. */ }
     }
 
     /// <summary>
@@ -1001,19 +862,11 @@ namespace WinCopies.GUI.Controls.Models
         /// </summary>
         public CheckBoxModel() { /* Left empty. */ }
 
-        public CheckBoxModel(object content) : base(content) { /* Left empty. */ }
+        public CheckBoxModel(in object content) : base(content) { /* Left empty. */ }
 
-        public CheckBoxModel(BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
+        public CheckBoxModel(in BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
 
-        public CheckBoxModel(object content, BindingDirection bindingDirection) : base(content, bindingDirection) { /* Left empty. */ }
-    }
-
-    /// <summary>
-    /// Represents a model that corresponds to a default view for <see cref="CheckBox"/>'.
-    /// </summary>
-    public interface ICheckBoxModel<TContent, TCommandParameter> : IToggleButtonModel<TContent, TCommandParameter>, ICheckBoxModel
-    {
-        // Left empty.
+        public CheckBoxModel(in object content, in BindingDirection bindingDirection) : base(content, bindingDirection) { /* Left empty. */ }
     }
 
     /// <summary>
@@ -1027,40 +880,19 @@ namespace WinCopies.GUI.Controls.Models
         /// </summary>
         public CheckBoxModel() { /* Left empty. */ }
 
-        public CheckBoxModel(TContent content) : base(content) { /* Left empty. */ }
+        public CheckBoxModel(in TContent content) : base(content) { /* Left empty. */ }
 
-        public CheckBoxModel(BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
+        public CheckBoxModel(in BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
 
-        public CheckBoxModel(TContent content, BindingDirection bindingDirection) : base(content, bindingDirection) { /* Left empty. */ }
-    }
-
-    /// <summary>
-    /// Represents a model that corresponds to a default view for <see cref="TextBox"/>'s.
-    /// </summary>
-    public interface ITextBoxModelTextOriented
-#if WinCopies3
-        : IControlModel
-#endif
-    {
-        /// <summary>
-        /// Gets or sets the text of this <see cref="ITextBoxModelTextOriented"/>.
-        /// </summary>
-        string Text { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value that indicates whether this <see cref="ITextBoxModelTextOriented"/> is read-only.
-        /// </summary>
-        bool IsReadOnly { get; set; }
+        public CheckBoxModel(in TContent content, in BindingDirection bindingDirection) : base(content, bindingDirection) { /* Left empty. */ }
     }
 
     /// <summary>
     /// Represents a model that corresponds to a default view for <see cref="TextBox"/>'s.
     /// </summary>
     [TypeForDataTemplate(typeof(ITextBoxModelTextOriented))]
-    public class TextBoxModelTextOriented : ITextBoxModelTextOriented
+    public class TextBoxModelTextOriented : ControlModel, ITextBoxModelTextOriented
     {
-        public bool IsEnabled { get; set; } = true;
-
         /// <summary>
         /// Gets or sets the text of this <see cref="TextBoxModelTextOriented"/>.
         /// </summary>
@@ -1070,26 +902,6 @@ namespace WinCopies.GUI.Controls.Models
         /// Gets or sets a value that indicates whether this <see cref="TextBoxModelTextOriented"/> is read-only.
         /// </summary>
         public bool IsReadOnly { get; set; }
-    }
-
-    /// <summary>
-    /// Represents a model that corresponds to a default view for <see cref="TextBox"/>'s.
-    /// </summary>
-    public interface ITextBoxModelSelectionOriented : ITextBoxModelTextOriented
-    {
-        bool IsReadOnlyCaretVisible { get; set; }
-
-        bool AutoWordSelection { get; set; }
-
-        Brush SelectionBrush { get; set; }
-
-        double SelectionOpacity { get; set; }
-
-        Brush SelectionTextBrush { get; set; }
-
-        Brush CaretBrush { get; set; }
-
-        bool IsInactiveSelectionHighlightEnabled { get; set; }
     }
 
     /// <summary>
@@ -1124,34 +936,6 @@ namespace WinCopies.GUI.Controls.Models
     /// <summary>
     /// Represents a model that corresponds to a default view for <see cref="TextBox"/>'s.
     /// </summary>
-    public interface ITextBoxModelTextEditingOriented : ITextBoxModelTextOriented
-    {
-        int MinLines { get; set; }
-
-        int MaxLines { get; set; }
-
-        CharacterCasing CharacterCasing { get; set; }
-
-        int MaxLength { get; set; }
-
-        TextAlignment TextAlignment { get; set; }
-
-        TextDecorationCollection TextDecorations { get; set; }
-
-        TextWrapping TextWrapping { get; set; }
-
-        bool AcceptsReturn { get; set; }
-
-        bool AcceptsTab { get; set; }
-
-        bool IsUndoEnabled { get; set; }
-
-        int UndoLimit { get; set; }
-    }
-
-    /// <summary>
-    /// Represents a model that corresponds to a default view for <see cref="TextBox"/>'s.
-    /// </summary>
     [TypeForDataTemplate(typeof(ITextBoxModelTextEditingOriented))]
     public class TextBoxModelTextEditingOriented : TextBoxModelTextOriented, ITextBoxModelTextEditingOriented
     {
@@ -1176,14 +960,6 @@ namespace WinCopies.GUI.Controls.Models
         public bool IsUndoEnabled { get; set; }
 
         public int UndoLimit { get; set; }
-    }
-
-    /// <summary>
-    /// Represents a model that corresponds to a default view for <see cref="TextBox"/>'s.
-    /// </summary>
-    public interface ITextBoxModel : ITextBoxModelTextOriented, ITextBoxModelTextEditingOriented, ITextBoxModelSelectionOriented
-    {
-        // Left empty.
     }
 
     /// <summary>
@@ -1248,26 +1024,10 @@ namespace WinCopies.GUI.Controls.Models
     /// <summary>
     /// Represents a model that corresponds to a default view for <see cref="RadioButton"/> collection.
     /// </summary>
-    public interface IRadioButtonCollection : IEnumerable<IRadioButtonModel>
-    {
-        string GroupName { get; set; }
-    }
-
-    /// <summary>
-    /// Represents a model that corresponds to a default view for <see cref="RadioButton"/> collection.
-    /// </summary>
     [TypeForDataTemplate(typeof(IRadioButtonCollection))]
     public class RadioButtonCollection : System.Collections.Generic.List<IRadioButtonModel>, IRadioButtonCollection
     {
         public string GroupName { get; set; }
-    }
-
-    /// <summary>
-    /// Represents a model that corresponds to a default view for <see cref="RadioButton"/> collection.
-    /// </summary>
-    public interface IRadioButtonCollection<TContent, TCommandParameter> : IRadioButtonCollection, IEnumerable<IRadioButtonModel<TContent, TCommandParameter>>
-    {
-        // Left empty.
     }
 
     /// <summary>
@@ -1284,14 +1044,6 @@ namespace WinCopies.GUI.Controls.Models
     /// <summary>
     /// Represents a model that corresponds to a default view for <see cref="RadioButton"/>s.
     /// </summary>
-    public interface IRadioButtonModel : IToggleButtonModel
-    {
-        // Left empty.
-    }
-
-    /// <summary>
-    /// Represents a model that corresponds to a default view for <see cref="RadioButton"/>s.
-    /// </summary>
     [TypeForDataTemplate(typeof(IRadioButtonModel))]
     public class RadioButtonModel : ToggleButtonModel, IRadioButtonModel
     {
@@ -1300,19 +1052,11 @@ namespace WinCopies.GUI.Controls.Models
         /// </summary>
         public RadioButtonModel() { /* Left empty. */ }
 
-        public RadioButtonModel(object content) : base(content) { /* Left empty. */ }
+        public RadioButtonModel(in object content) : base(content) { /* Left empty. */ }
 
-        public RadioButtonModel(BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
+        public RadioButtonModel(in BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
 
-        public RadioButtonModel(object content, BindingDirection bindingDirection) : base(content, bindingDirection) { /* Left empty. */ }
-    }
-
-    /// <summary>
-    /// Represents a model that corresponds to a default view for <see cref="RadioButton"/>s.
-    /// </summary>
-    public interface IRadioButtonModel<TContent, TCommandParameter> : IRadioButtonModel, IToggleButtonModel<TContent, TCommandParameter>
-    {
-        // Left empty.
+        public RadioButtonModel(in object content, in BindingDirection bindingDirection) : base(content, bindingDirection) { /* Left empty. */ }
     }
 
     /// <summary>
@@ -1326,27 +1070,11 @@ namespace WinCopies.GUI.Controls.Models
         /// </summary>
         public RadioButtonModel() { /* Left empty. */ }
 
-        public RadioButtonModel(TContent content) : base(content) { /* Left empty. */ }
+        public RadioButtonModel(in TContent content) : base(content) { /* Left empty. */ }
 
-        public RadioButtonModel(BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
+        public RadioButtonModel(in BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
 
-        public RadioButtonModel(TContent content, BindingDirection bindingDirection) : base(content, bindingDirection) { /* Left empty. */ }
-    }
-
-    /// <summary>
-    /// Represents a model that corresponds to a default view for <see cref="RadioButton"/>s.
-    /// </summary>
-    public interface IGroupingRadioButtonModel : IRadioButtonModel
-    {
-        string GroupName { get; set; }
-    }
-
-    /// <summary>
-    /// Represents a model that corresponds to a default view for <see cref="RadioButton"/>s.
-    /// </summary>
-    public interface IGroupingRadioButtonModel<TContent, TCommandParameter> : IGroupingRadioButtonModel, IRadioButtonModel<TContent, TCommandParameter>
-    {
-        // Left empty.
+        public RadioButtonModel(in TContent content, in BindingDirection bindingDirection) : base(content, bindingDirection) { /* Left empty. */ }
     }
 
     /// <summary>
@@ -1362,11 +1090,11 @@ namespace WinCopies.GUI.Controls.Models
         /// </summary>
         public GroupingRadioButtonModel() { /* Left empty. */ }
 
-        public GroupingRadioButtonModel(object content) : base(content) { /* Left empty. */ }
+        public GroupingRadioButtonModel(in object content) : base(content) { /* Left empty. */ }
 
-        public GroupingRadioButtonModel(BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
+        public GroupingRadioButtonModel(in BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
 
-        public GroupingRadioButtonModel(object content, BindingDirection bindingDirection) : base(content, bindingDirection) { /* Left empty. */ }
+        public GroupingRadioButtonModel(in object content, in BindingDirection bindingDirection) : base(content, bindingDirection) { /* Left empty. */ }
     }
 
     /// <summary>
@@ -1382,10 +1110,73 @@ namespace WinCopies.GUI.Controls.Models
         /// </summary>
         public GroupingRadioButtonModel() { /* Left empty. */ }
 
-        public GroupingRadioButtonModel(TContent content) : base(content) { /* Left empty. */ }
+        public GroupingRadioButtonModel(in TContent content) : base(content) { /* Left empty. */ }
 
-        public GroupingRadioButtonModel(BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
+        public GroupingRadioButtonModel(in BindingDirection bindingDirection) : base(bindingDirection) { /* Left empty. */ }
 
-        public GroupingRadioButtonModel(TContent content, BindingDirection bindingDirection) : base(content, bindingDirection) { /* Left empty. */ }
+        public GroupingRadioButtonModel(in TContent content, in BindingDirection bindingDirection) : base(content, bindingDirection) { /* Left empty. */ }
+    }
+
+    public abstract class MenuItemModelBase<T> : ControlModel
+    {
+        public T Header { get; set; }
+
+        protected MenuItemModelBase() { /* Left empty. */ }
+
+        protected MenuItemModelBase(in T header) => Header = header;
+    }
+
+    [TypeForDataTemplate(typeof(IMenuItemModel))]
+    public class MenuItemModel<T> : MenuItemModelBase<T>, IMenuItemModel<T>
+    {
+        public IEnumerable Items { get; set; }
+
+        public ICommand Command { get; set; }
+
+        public object CommandParameter { get; set; }
+
+        public IInputElement CommandTarget { get; set; }
+
+        public MenuItemModel() { /* Left empty. */ }
+
+        public MenuItemModel(in T header, in ICommand command) : base(header) => Command = command;
+
+        public MenuItemModel(in T header, in ICommand command, in object commandParameter) : this(header, command) => CommandParameter = commandParameter;
+
+#if !CS8
+        object IHeaderedControlModel.Header { get => Header; set => Header = (T)value; }
+#endif
+    }
+
+    [TypeForDataTemplate(typeof(IMenuItemModel))]
+    public class MenuItemModel<THeader, TItems, TCommandParameter> : MenuItemModelBase<THeader>, IMenuItemModel<THeader, TItems, TCommandParameter>
+    {
+        public System.Collections.Generic.IEnumerable<TItems> Items { get; set; }
+
+        public ICommand<TCommandParameter> Command { get; set; }
+
+        public TCommandParameter CommandParameter { get; set; }
+
+        public IInputElement CommandTarget { get; set; }
+
+        public MenuItemModel() { /* Left empty. */ }
+
+        public MenuItemModel(in THeader header, in ICommand<TCommandParameter> command) : base(header) => Command = command;
+
+        public MenuItemModel(in THeader header, in ICommand<TCommandParameter> command, in TCommandParameter commandParameter) : this(header, command) => CommandParameter = commandParameter;
+
+#if !CS8
+        object IHeaderedControlModel.Header { get => Header; set => Header = (THeader)value; }
+
+        ICommand ICommandSource.Command => Command;
+
+        ICommand IMenuItemModel.Command { get => Command; set => Command = (ICommand<TCommandParameter>)value; }
+
+        object ICommandSource.CommandParameter => CommandParameter;
+
+        object IMenuItemModel.CommandParameter { get => CommandParameter; set => CommandParameter = (TCommandParameter)value; }
+
+        IEnumerable IItemsControlModel.Items { get => Items; set => Items=(IEnumerable<TItems>)value; }
+#endif
     }
 }
