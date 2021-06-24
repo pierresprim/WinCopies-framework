@@ -29,7 +29,7 @@ namespace WinCopies.IO.Process
     {
         ProcessTypes<T>.IProcessQueue IProcessPathCollectionFactory.GetProcessCollection<T>() => new ProcessTypes<T>.ProcessCollection();
 
-        WinCopies.IO.Process.IProcessLinkedList<TItems, TError> IProcessPathCollectionFactory.GetProcessLinkedList<TItems, TError>() => new ProcessLinkedCollection<TItems, TError>();
+        IProcessLinkedList<TItems, TError, TErrorItems, TAction> IProcessPathCollectionFactory.GetProcessLinkedList<TItems, TError, TErrorItems, TAction>() => new ProcessLinkedCollection<TItems, TError, TErrorItems, TAction>();
     }
 
     public interface IProcessQueue

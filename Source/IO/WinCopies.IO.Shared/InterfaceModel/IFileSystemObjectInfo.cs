@@ -33,12 +33,12 @@ namespace WinCopies.IO
             BitmapSource TryGetBitmapSource(in int size);
         }
 
-        public interface IFileSystemObjectInfo<T> : IFileSystemObjectInfo, IBrowsableObjectInfo<T> where T : IFileSystemObjectInfoProperties
+        public interface IFileSystemObjectInfo<out T> : IFileSystemObjectInfo, IBrowsableObjectInfo<T> where T : IFileSystemObjectInfoProperties
         {
             // Left empty.
         }
 
-        public interface IFileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : IFileSystemObjectInfo<TObjectProperties>, IBrowsableObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IFileSystemObjectInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
+        public interface IFileSystemObjectInfo<out TObjectProperties, out TInnerObject, out TPredicateTypeParameter, out TSelectorDictionary, out TDictionaryItems> : IFileSystemObjectInfo<TObjectProperties>, IBrowsableObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IFileSystemObjectInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
         {
             // Left empty.
         }

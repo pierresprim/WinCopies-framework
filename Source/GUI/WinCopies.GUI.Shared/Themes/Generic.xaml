@@ -33,6 +33,12 @@
                 <MenuItem Command="{x:Static ApplicationCommands.Delete}" Icon="{x:Static icons:Resources.delete}" />
                 <Separator />
                 <MenuItem Command="{x:Static ApplicationCommands.SelectAll}" />
+                <MenuItem Header="Case">
+                    <MenuItem Command="{x:Static commands:TextCommands.Upper}" Icon="{x:Static icons:Resources.text_uppercase}" />
+                    <MenuItem Command="{x:Static commands:TextCommands.Lower}" Icon="{x:Static icons:Resources.text_lowercase}" />
+                    <MenuItem Command="{x:Static commands:TextCommands.FirstCharUpper}" />
+                    <MenuItem Command="{x:Static commands:TextCommands.FirstCharOfEachWordUpper}" />
+                </MenuItem>
             </ContextMenu>
             <!--Colors-->
             <SolidColorBrush x:Key="TextBox.Static.Border" Color="#FFABAdB3"/>
@@ -876,8 +882,8 @@
         <Setter Property="IsChecked">
             <Setter.Value>
                 <MultiBinding Converter="{StaticResource EqualsConverter}" Mode="OneWay">
-                    <Binding Path="Node.Value" />
-                    <Binding Path="ItemsSource.Current.Node.Value" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type local:NavigationButton}}" />
+                    <Binding Mode="OneWay" />
+                    <Binding Path="ItemsSource.Current" Mode="OneWay" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type local:NavigationButton}}" />
                 </MultiBinding>
             </Setter.Value>
         </Setter>

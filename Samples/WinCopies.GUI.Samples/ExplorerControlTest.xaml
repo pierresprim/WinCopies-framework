@@ -28,13 +28,8 @@ along with the WinCopies Framework.  If not, see<https://www.gnu.org/licenses/>.
     <DockPanel>
         <StackPanel DockPanel.Dock="Top">
             <Menu>
-                <MenuItem Header="_Edit">
-                    <MenuItem Header="Copy" Command="Copy" />
-                    <MenuItem Header="Paste" Command="Paste" />
-                </MenuItem>
-                <MenuItem Header="_Tools" ItemsSource="{Binding SelectedItem.CustomProcesses, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ExplorerControlTest}}}">
-                    <MenuItem.ItemContainerStyle>
-                        <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}">
+                <Menu.Resources>
+                    <Style x:Key="MenuItemItemContainerStyle" TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}">
                             <Setter Property="IsEnabled" Value="{Binding IsEnabled}" />
                             <Setter Property="Header" Value="{Binding Header}" />
                             <Setter Property="ItemsSource" Value="{Binding Items}" />
@@ -42,8 +37,13 @@ along with the WinCopies Framework.  If not, see<https://www.gnu.org/licenses/>.
                             <Setter Property="CommandParameter" Value="{Binding CommandParameter}" />
                             <Setter Property="CommandTarget" Value="{Binding CommandTarget}" />
                         </Style>
-                    </MenuItem.ItemContainerStyle>
+                </Menu.Resources>
+                <MenuItem Header="_Edit">
+                    <MenuItem Header="Copy" Command="Copy" />
+                    <MenuItem Header="Paste" Command="Paste" />
                 </MenuItem>
+                <MenuItem Header="Open _with" ItemsSource="{Binding SelectedItem.BrowsabilityPaths, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ExplorerControlTest}}}" ItemContainerStyle="{StaticResource MenuItemItemContainerStyle}" />
+                <MenuItem Header="_Tools" ItemsSource="{Binding SelectedItem.CustomProcesses, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ExplorerControlTest}}}" ItemContainerStyle="{StaticResource MenuItemItemContainerStyle}" />
             </Menu>
             <StackPanel Orientation="Horizontal">
                 <RadioButton Content="Shell" IsChecked="True" GroupName="View" Checked="RadioButton_Checked" />

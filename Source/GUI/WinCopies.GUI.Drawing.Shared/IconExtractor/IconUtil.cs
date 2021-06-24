@@ -31,11 +31,11 @@ using System.Drawing;
 using System.IO;
 
 using static WinCopies.
-    #if !WinCopies3
+#if !WinCopies3
     Util.Util
 #else
     ThrowHelper
-    #endif
+#endif
     ;
 
 namespace WinCopies.GUI.Drawing
@@ -145,10 +145,13 @@ namespace WinCopies.GUI.Drawing
 
             if (tryResize || tryRedefineBitsCount)
             {
-                Icon icon = null;
+                Icon icon = icons[0];
+                Icon i;
 
-                foreach (Icon i in icons)
+                for (int _i = 0; _i < icons.Length; _i++)
                 {
+                    i = icons[_i];
+
                     bool result = (i.Size == size || tryResize) && ((i.Size.Height > size.Height && (icon == null || i.Size.Height > icon.Size.Height)) || (i.Size.Height < size.Height && (icon == null || i.Size.Height > icon.Size.Height)));
 
                     if (!result)

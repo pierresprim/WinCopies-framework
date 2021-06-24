@@ -65,14 +65,90 @@
               Looks up a localized string similar to Include empty directories.
             </summary>
         </member>
+        <member name="P:WinCopies.GUI.IO.Properties.Resources.ItemCouldNotBeCreated">
+            <summary>
+              Looks up a localized string similar to The item could not be created..
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.Properties.Resources.ItemCreationError">
+            <summary>
+              Looks up a localized string similar to Item creation error.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.Properties.Resources.NewItemCommandToolTip">
+            <summary>
+              Looks up a localized string similar to Opens a dialog for item creation..
+            </summary>
+        </member>
         <member name="P:WinCopies.GUI.IO.Properties.Resources.PreserveDirectoryRoot">
             <summary>
               Looks up a localized string similar to Preserve directory root.
             </summary>
         </member>
+        <member name="T:WinCopies.GUI.IO.Resources.ExceptionMessages">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.Resources.ExceptionMessages.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.Resources.ExceptionMessages.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.Resources.ExceptionMessages.BackgroundWorkerOperationNotSupported">
+            <summary>
+              Looks up a localized string similar to &quot;This operation is not supported for this type of BackgroundWorker.&quot;.
+            </summary>
+        </member>
         <member name="T:WinCopies.GUI.IO.Controls.Process.ProcessControl">
             <summary>
-            Represents an I/O process control.
+            Represents a process control.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.Process.ProcessControl.PathsProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.Process.ProcessControl.Paths"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.Process.ProcessControl.ProcessNameProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.Process.ProcessControl.ProcessName"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.Process.ProcessControl.ErrorProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.Process.ProcessControl.Error"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.Process.ProcessControl.ErrorPathsProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.Process.ProcessControl.ErrorPaths"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.Process.ProcessControl.InitialTotalSizeProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.Process.ProcessControl.InitialTotalSize"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.Process.ProcessControl.ActualRemainingSizeProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.Process.ProcessControl.ActualRemainingSize"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.Process.ProcessControl.IsCompletedProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.Process.ProcessControl.IsCompleted"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.Process.ProcessControl.IsPausedProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.Process.ProcessControl.IsPaused"/> dependency property.
             </summary>
         </member>
         <member name="F:WinCopies.GUI.IO.Controls.Process.ProcessControl.SourcePathProperty">
@@ -153,6 +229,16 @@
         <member name="F:WinCopies.GUI.IO.Controls.Process.ProcessControl.CurrentPathProgressPercentageProperty">
             <summary>
             Identifies the <see cref="P:WinCopies.GUI.IO.Controls.Process.ProcessControl.CurrentPathProgressPercentage"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.Process.ProcessControl.ActionsProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.Process.ProcessControl.Actions"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.Process.ProcessControl.CustomActionsProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.Process.ProcessControl.CustomActions"/> dependency property.
             </summary>
         </member>
         <member name="F:WinCopies.GUI.IO.Controls.ExplorerControl.PathProperty">

@@ -25,7 +25,6 @@ using WinCopies.IO.Process;
 using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Reflection;
 using WinCopies.IO.Reflection.PropertySystem;
-using WinCopies.IO.Selectors;
 using WinCopies.IO.Selectors.Reflection;
 using WinCopies.PropertySystem;
 
@@ -36,12 +35,14 @@ namespace WinCopies.IO.ObjectModel.Reflection
 {
     public abstract class DotNetTypeInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : BrowsableDotNetItemInfo<TObjectProperties, TypeInfo, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IDotNetTypeInfoBase where TObjectProperties : IDotNetTypeInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
     {
+        private TypeInfo _typeInfo;
+
         #region Properties
-        public override IProcessFactory ProcessFactory => Process.ProcessFactory.DefaultProcessFactory;
+        protected override IProcessFactory ProcessFactoryOverride => Process.ProcessFactory.DefaultProcessFactory;
 
-        public sealed override TypeInfo InnerObjectGeneric { get; }
+        protected sealed override TypeInfo InnerObjectGenericOverride => _typeInfo;
 
-        public override string ItemTypeName => Properties.Resources.DotNetType;
+        protected override string ItemTypeNameOverride => Properties.Resources.DotNetType;
         #endregion
 
         protected DotNetTypeInfo(in TypeInfo type, in IBrowsableObjectInfo parent) : base(parent is IDotNetAssemblyInfo ? type.Name : $"{parent.Path}{PathSeparator}{type.Name}", type.Name, parent)
@@ -54,7 +55,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
         =>
 #endif
 
-            InnerObjectGeneric = type ?? throw GetArgumentNullException(nameof(type));
+            _typeInfo = type ?? throw GetArgumentNullException(nameof(type));
 #if DEBUG
         }
 #endif
@@ -63,11 +64,20 @@ namespace WinCopies.IO.ObjectModel.Reflection
         {
             // Left empty.
         }
+
+        protected override void DisposeManaged()
+        {
+            _typeInfo = null;
+
+            base.DisposeManaged();
+        }
     }
 
     public class DotNetTypeInfo : DotNetTypeInfo<IDotNetTypeInfoProperties, DotNetTypeInfoItemProvider, IEnumerableSelectorDictionary<DotNetTypeInfoItemProvider, IBrowsableObjectInfo>, DotNetTypeInfoItemProvider>, IDotNetTypeInfo
     {
         private static DotNetItemType[] _defaultTypesToEnumerate;
+
+        private IDotNetTypeInfoProperties _properties;
 
         #region Properties
         public static DotNetItemType[] DefaultTypesToEnumerate => _defaultTypesToEnumerate
@@ -84,9 +94,9 @@ namespace WinCopies.IO.ObjectModel.Reflection
 
         public static IEnumerableSelectorDictionary<DotNetTypeInfoItemProvider, IBrowsableObjectInfo> DefaultItemSelectorDictionary { get; } = new DotNetTypeInfoSelectorDictionary();
 
-        public sealed override IDotNetTypeInfoProperties ObjectPropertiesGeneric { get; }
+        protected sealed override IDotNetTypeInfoProperties ObjectPropertiesGenericOverride => _properties;
 
-        public override IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystem => null;
+        protected override IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystemOverride => null;
         #endregion Properties
 
         protected internal DotNetTypeInfo(in TypeInfo type, in DotNetItemType itemType, in bool isRootType, in IBrowsableObjectInfo parent) : base(type, parent)
@@ -129,18 +139,26 @@ namespace WinCopies.IO.ObjectModel.Reflection
         =>
 #endif
 
-            ObjectPropertiesGeneric = new DotNetTypeInfoProperties<IDotNetTypeInfo>(this, itemType, isRootType);
+            _properties = new DotNetTypeInfoProperties<IDotNetTypeInfo>(this, itemType, isRootType);
 
 #if DEBUG
         }
 #endif
 
-        public override IEnumerableSelectorDictionary<DotNetTypeInfoItemProvider, IBrowsableObjectInfo> GetSelectorDictionary() => DefaultItemSelectorDictionary;
+        protected override IEnumerableSelectorDictionary<DotNetTypeInfoItemProvider, IBrowsableObjectInfo> GetSelectorDictionaryOverride() => DefaultItemSelectorDictionary;
 
         protected virtual System.Collections.Generic.IEnumerable<DotNetTypeInfoItemProvider> GetItemProviders(System.Collections.Generic.IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetTypeInfoItemProvider> func) => DotNetTypeInfoEnumeration.From(this, typesToEnumerate, func);
 
         protected override System.Collections.Generic.IEnumerable<DotNetTypeInfoItemProvider> GetItemProviders(Predicate<DotNetTypeInfoItemProvider> predicate) => GetItemProviders(DefaultTypesToEnumerate, predicate);
 
         protected override System.Collections.Generic.IEnumerable<DotNetTypeInfoItemProvider> GetItemProviders() => GetItemProviders(DefaultTypesToEnumerate, null);
+
+        protected override void DisposeUnmanaged()
+        {
+            _properties.Dispose();
+            _properties = null;
+
+            base.DisposeUnmanaged();
+        }
     }
 }

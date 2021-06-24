@@ -16,6 +16,7 @@
 //* along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading;
 
@@ -23,6 +24,7 @@ using WinCopies.DotNetFix;
 using WinCopies.IO;
 using WinCopies.IO.Process;
 using WinCopies.Util;
+using WinCopies.Util.Commands.Primitives;
 
 namespace WinCopies.GUI.IO.Process
 {
@@ -31,17 +33,20 @@ namespace WinCopies.GUI.IO.Process
         #region Fields
         private bool _isCompleted;
         private WinCopies.IO.Process.ObjectModel.IProcess _process;
-        private int _progress;
+        private uint _progress;
         private IPathCommon _currentPath;
+        private sbyte _currentPathProgressPercentage;
         private bool _arePathsLoaded;
         private bool _isPaused;
-        private ProcessStatus _status = ProcessStatus.None;
+        private IProcessActions _processActions;
+        private object _commonDelegate;
+        private object _progressDelegate;
         #endregion Fields
 
         #region Properties
         protected WinCopies.IO.Process.ObjectModel.IProcess InnerProcess => this.GetIfNotDisposed(_process);
 
-        public ProcessStatus Status => _status;
+        public ProcessStatus Status => InnerProcess.Status;
 
         public IProcessErrorFactoryBase Factory => InnerProcess.Factory;
 
@@ -69,17 +74,7 @@ namespace WinCopies.GUI.IO.Process
 
         public ProcessTypes<IProcessErrorItem>.IProcessQueue ErrorPaths => InnerProcess.ErrorPaths;
 
-        public bool IsCompleted
-        {
-            get => _isCompleted;
-
-            private set
-            {
-                UpdateValue(ref _isCompleted, value, nameof(IsCompleted));
-
-                UpdateValue(ref _status, object.Equals(InnerProcess.Error.Error, InnerProcess.ProcessErrorFactoryData.NoError) ? ProcessStatus.Succeeded : InnerProcess.Error.Error == InnerProcess.ProcessErrorFactoryData.CancelledByUserError ? ProcessStatus.CancelledByUser : ProcessStatus.Error, nameof(Status));
-            }
-        }
+        public bool IsCompleted { get => _isCompleted; private set => UpdateValue(ref _isCompleted, value, nameof(IsCompleted)); }
 
         // public ApartmentState ApartmentState { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
 
@@ -87,21 +82,23 @@ namespace WinCopies.GUI.IO.Process
 
         public bool IsPaused { get => !IsBusy && _isPaused; private set => UpdateValue(ref _isPaused, value, nameof(IsPaused)); }
 
-        public int Progress { get => _progress; private set { UpdateValue(ref _progress, value, nameof(Progress)); OnPropertyChanged(nameof(ProgressPercentage)); } }
+        public uint ProgressPercentage { get => _progress; private set { UpdateValue(ref _progress, value, nameof(Progress)); OnPropertyChanged(nameof(ProgressPercentage)); } }
 
-        public int ProgressPercentage => Progress;
+        public int Progress => (int)ProgressPercentage;
 
         public IPathCommon CurrentPath { get => _currentPath; private set => UpdateValue(ref _currentPath, value, nameof(CurrentPath)); }
 
-        public Action PauseAction => PauseAsync;
+        public sbyte CurrentPathProgressPercentage { get => _currentPathProgressPercentage; private set => UpdateValue(ref _currentPathProgressPercentage, value, nameof(CurrentPathProgressPercentage)); }
 
-        public Action RunAction => RunWorkerAsync;
+        public IProcessActions ProcessActions => this.GetIfNotDisposed(_processActions);
 
-        public Action CancelAction => CancelAsync;
-
-        ApartmentState IBackgroundWorker.ApartmentState { get => throw new InvalidOperationException(); set => throw new InvalidOperationException(); }
+        ApartmentState IBackgroundWorker.ApartmentState { get => throw new NotSupportedException(); set => throw new NotSupportedException(); }
 
         public string Guid => InnerProcess.Guid;
+
+        public IEnumerable<ICommand<IProcessErrorItem>> Actions => InnerProcess.Actions;
+
+        IEnumerable<ICommand<IProcessErrorItem>> WinCopies.IO.Process.ObjectModel.IProcess.Actions => throw new NotImplementedException();
         #endregion Properties
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -109,9 +106,7 @@ namespace WinCopies.GUI.IO.Process
         public Process(in WinCopies.IO.Process.ObjectModel.IProcess process)
         {
             _process = process;
-            _process.AddPropertyChangedDelegate(OnPropertyChanged);
-            _process.ProcessEventDelegates.AddCommonDelegate(new QueryDelegateDelegate<IProcessProgressDelegateParameter, bool>(UpdateProgress, (value, previousResult) => UpdateProgress(value)));
-            _process.ProcessEventDelegates.AddProgressDelegate(path => CurrentPath = path);
+            _processActions = new ProcessActions(this);
 
             DoWork += Process_DoWork;
 
@@ -119,6 +114,23 @@ namespace WinCopies.GUI.IO.Process
         }
 
         #region Methods
+        protected virtual bool RunWorkerAsync(Func<bool> func)
+        {
+            if (IsBusy)
+
+                return func();
+
+            RunWorkerAsync((object)func);
+
+            return true;
+        }
+
+        public bool RetryFirst() => RunWorkerAsync(InnerProcess.RetryFirst);
+
+        public bool Ignore() => RunWorkerAsync(InnerProcess.Ignore);
+
+        public bool IgnoreFirst() => RunWorkerAsync(InnerProcess.IgnoreFirst);
+
         public void AddPropertyChangedDelegate(Action<string> action) => InnerProcess.AddPropertyChangedDelegate(action);
 
         public void RemovePropertyChangedDelegate(Action<string> action) => InnerProcess.RemovePropertyChangedDelegate(action);
@@ -129,7 +141,9 @@ namespace WinCopies.GUI.IO.Process
 
         private bool UpdateProgress(IProcessProgressDelegateParameter value)
         {
-            Progress = value.Progress;
+            ProgressPercentage = value.Progress;
+
+            CurrentPathProgressPercentage = (sbyte)(value.CurrentPathProgress ?? 0);
 
             if (PausePending)
             {
@@ -141,22 +155,35 @@ namespace WinCopies.GUI.IO.Process
             return !CancellationPending;
         }
 
+        protected virtual void LoadPathsOverride()
+        {
+            if (InnerProcess.LoadPaths())
+
+                ArePathsLoaded = InnerProcess.ArePathsLoaded;
+        }
+
         protected virtual void OnDoWork(in DoWorkEventArgs e)
         {
             IsCompleted = false;
             IsPaused = false;
 
-            UpdateValue(ref _status, ProcessStatus.InProgress, nameof(Status));
+            _process.AddPropertyChangedDelegate(OnPropertyChanged);
+            _commonDelegate = _process.ProcessEventDelegates.AddCommonDelegate(new QueryDelegateDelegate<IProcessProgressDelegateParameter, bool>(UpdateProgress, (value, previousResult) => UpdateProgress(value)));
+            _progressDelegate = _process.ProcessEventDelegates.AddProgressDelegate(path => CurrentPath = path);
 
-            if (ArePathsLoaded)
+            OnPropertyChanged(nameof(Status));
+
+            if (e.Argument is Func<bool> func)
+
+                _ = func();
+
+            else if (ArePathsLoaded)
 
                 _ = InnerProcess.Start();
 
             else
             {
-                _ = LoadPaths();
-
-                ArePathsLoaded = InnerProcess.ArePathsLoaded;
+                LoadPathsOverride();
 
                 if (InnerProcess.ArePathsLoaded)
 
@@ -164,7 +191,25 @@ namespace WinCopies.GUI.IO.Process
             }
         }
 
-        protected virtual void OnRunWorkerCompleted() => IsCompleted = true;
+        protected virtual void RemoveDelegates()
+        {
+            _process.RemovePropertyChangedDelegate(OnPropertyChanged);
+            _process.ProcessEventDelegates.RemoveCommonDelegate(_commonDelegate);
+            _process.ProcessEventDelegates.RemoveProgressDelegate(_progressDelegate);
+        }
+
+        protected virtual void OnRunWorkerCompleted()
+        {
+            IsCompleted = true;
+
+            RemoveDelegates();
+
+            CurrentPath = null;
+
+            CurrentPathProgressPercentage = 0;
+
+            OnPropertyChanged(nameof(Status));
+        }
 
         protected virtual void OnPropertyChanged(string propertyName) => OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
 
@@ -174,34 +219,39 @@ namespace WinCopies.GUI.IO.Process
 
         protected virtual void UpdateValue<T>(ref T value, in T newValue, string propertyName) => UtilHelpers.UpdateValue(ref value, newValue, () => OnPropertyChanged(propertyName));
 
-        public bool LoadPaths() => InnerProcess.LoadPaths();
+        public bool LoadPaths() => RunWorkerAsync(InnerProcess.LoadPaths);
 
-        public bool Start() => InnerProcess.Start();
+        public bool Start() => RunWorkerAsync(InnerProcess.Start);
 
         public void Reset() => InnerProcess.Reset();
 
-        protected virtual void DisposeManaged()
+        protected virtual void DisposeManaged() => IsDisposed = true;
+
+        protected virtual void DisposeUnmanaged()
         {
+            if (_commonDelegate != null)
+
+                RemoveDelegates();
+
+            _processActions.Dispose();
+            _processActions = null;
+
             _process.Dispose();
             _process = null;
-
-            IsDisposed = true;
         }
-
-        protected virtual void DisposeUnmanaged() { /* Left empty. */ }
 
         protected override void Dispose(bool disposing)
         {
-            base.Dispose(disposing);
-
             if (disposing)
 
                 DisposeManaged();
 
             DisposeUnmanaged();
+
+            base.Dispose(disposing);
         }
 
-        private static void ThrowNotSupportedException() => throw new NotSupportedException("This operation is not supported for this type of BackgroundWorker.");
+        private static void ThrowNotSupportedException() => throw new NotSupportedException(Resources.ExceptionMessages.BackgroundWorkerOperationNotSupported);
 
         void IBackgroundWorker.Cancel() => ThrowNotSupportedException();
 

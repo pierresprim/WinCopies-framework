@@ -48,26 +48,48 @@ namespace WinCopies.IO.ObjectModel
     /// </summary>
     public abstract class ArchiveItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : ArchiveItemInfoProvider<TObjectProperties, ArchiveFileInfo?, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IArchiveItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IFileSystemObjectInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
     {
-        #region Private fields
+        protected class BrowsableObjectInfoBitmapSources : BrowsableObjectInfoBitmapSources<IArchiveItemInfo>
+        {
+            /// <summary>
+            /// Gets the small <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
+            /// </summary>
+            protected override BitmapSource SmallBitmapSourceOverride => InnerObject.TryGetBitmapSource(SmallIconSize);
+
+            /// <summary>
+            /// Gets the medium <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
+            /// </summary>
+            protected override BitmapSource MediumBitmapSourceOverride => InnerObject.TryGetBitmapSource(MediumIconSize);
+
+            /// <summary>
+            /// Gets the large <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
+            /// </summary>
+            protected override BitmapSource LargeBitmapSourceOverride => InnerObject.TryGetBitmapSource(LargeIconSize);
+
+            /// <summary>
+            /// Gets the extra large <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
+            /// </summary>
+            protected override BitmapSource ExtraLargeBitmapSourceOverride => InnerObject.TryGetBitmapSource(ExtraLargeIconSize);
+
+            public BrowsableObjectInfoBitmapSources(in IArchiveItemInfo archiveItemInfo) : base(archiveItemInfo) { /* Left empty. */ }
+        }
+
+        #region Fields
         private ArchiveFileInfo? _innerObject;
         private IBrowsableObjectInfo _parent;
         private IBrowsabilityOptions _browsability;
+        private IBrowsableObjectInfoBitmapSources _bitmapSources;
         #endregion
 
         #region Properties
-        //IShellObjectInfo IArchiveItemInfoProvider.ArchiveShellObject => ArchiveShellObjectOverride;
-
         #region Overrides
-        public override IProcessFactory ProcessFactory => Process.ProcessFactory.DefaultProcessFactory;
-
         /// <summary>
-        /// The <see cref="ArchiveFileInfo"/> that this <see cref="ArchiveItemInfo"/> represents.
+        /// The parent <see cref="IShellObjectInfoBase"/> of the current archive item.
         /// </summary>
-        public sealed override ArchiveFileInfo? InnerObjectGeneric => IsDisposed ? throw GetExceptionForDispose(false) : _innerObject;
+        public override IShellObjectInfoBase ArchiveShellObject { get; }
 
-        // public override FileSystemType ItemFileSystemType => FileSystemType.Archive;
+        protected override IBrowsableObjectInfoBitmapSources BitmapSourcesOverride => _bitmapSources;
 
-        public override IBrowsabilityOptions Browsability
+        protected override IBrowsabilityOptions BrowsabilityOverride
 #if CS8
                 => _browsability ??= ObjectPropertiesGeneric.FileType switch
                 {
@@ -109,61 +131,23 @@ namespace WinCopies.IO.ObjectModel
         }
 #endif
 
-        public override IBrowsableObjectInfo Parent => IsDisposed ? throw GetExceptionForDispose(false) : _parent
-#if CS8
-            ??= GetParent();
-#else
-            ?? (_parent = GetParent());
-#endif
+        /// <summary>
+        /// Not applicable for this item type.
+        /// </summary>
+        protected override string DescriptionOverride => UtilHelpers.NotApplicable;
 
         /// <summary>
-        /// Returns the same value as <see cref="Name"/>.
+        /// The <see cref="ArchiveFileInfo"/> that this <see cref="ArchiveItemInfo"/> represents.
         /// </summary>
-        public override string LocalizedName => Name;
-
-        /// <summary>
-        /// Gets the name of this <see cref="ArchiveItemInfo"/>.
-        /// </summary>
-        public override string Name => System.IO.Path.GetFileName(Path);
-
-        #region BitmapSources
-        /// <summary>
-        /// Gets the small <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
-        /// </summary>
-        public override BitmapSource SmallBitmapSource => TryGetBitmapSource(SmallIconSize);
-
-        /// <summary>
-        /// Gets the medium <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
-        /// </summary>
-        public override BitmapSource MediumBitmapSource => TryGetBitmapSource(MediumIconSize);
-
-        /// <summary>
-        /// Gets the large <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
-        /// </summary>
-        public override BitmapSource LargeBitmapSource => TryGetBitmapSource(LargeIconSize);
-
-        /// <summary>
-        /// Gets the extra large <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
-        /// </summary>
-        public override BitmapSource ExtraLargeBitmapSource => TryGetBitmapSource(ExtraLargeIconSize);
-        #endregion // BitmapSources
-
-        public override string ItemTypeName => FileSystemObjectInfo.GetItemTypeName(System.IO.Path.GetExtension(Path), ObjectPropertiesGeneric.FileType);
-
-        /// <summary>
-        /// Not applicable for this item kind.
-        /// </summary>
-        public override string Description => UtilHelpers.NotApplicable;
+        protected sealed override ArchiveFileInfo? InnerObjectGenericOverride => _innerObject;
 
         /// <summary>
         /// Gets a value that indicates whether this item is a hidden or system item.
         /// </summary>
-        public override bool IsSpecialItem
+        protected override bool IsSpecialItemOverride
         {
             get
             {
-                ThrowIfDisposed(this);
-
                 if (_innerObject.HasValue)
                 {
                     var value = (FileAttributes)_innerObject.Value.Attributes;
@@ -177,12 +161,28 @@ namespace WinCopies.IO.ObjectModel
             }
         }
 
+        protected override string ItemTypeNameOverride => FileSystemObjectInfo.GetItemTypeName(System.IO.Path.GetExtension(Path), ObjectPropertiesGeneric.FileType);
+
         /// <summary>
-        /// The parent <see cref="IShellObjectInfoBase"/> of the current archive item.
+        /// Returns the same value as <see cref="Name"/>.
         /// </summary>
-        public override IShellObjectInfoBase ArchiveShellObject { get; }
-        #endregion // Overrides
-        #endregion // Properties
+        public override string LocalizedName => Name;
+
+        /// <summary>
+        /// Gets the name of this <see cref="ArchiveItemInfo"/>.
+        /// </summary>
+        public override string Name => System.IO.Path.GetFileName(Path);
+
+        protected override IBrowsableObjectInfo ParentOverride => _parent
+#if CS8
+            ??= GetParent();
+#else
+            ?? (_parent = GetParent());
+#endif
+
+        protected override IProcessFactory ProcessFactoryOverride => Process.ProcessFactory.DefaultProcessFactory;
+        #endregion Overrides
+        #endregion Properties
 
         protected ArchiveItemInfo(in string path, in IShellObjectInfoBase archiveShellObject, in ArchiveFileInfo? archiveFileInfo, in ClientVersion clientVersion/*, DeepClone<ArchiveFileInfo?> archiveFileInfoDelegate*/) : base(path, clientVersion)
         {
@@ -192,6 +192,8 @@ namespace WinCopies.IO.ObjectModel
         }
 
         #region Methods
+        protected override System.Collections.Generic.IEnumerable<IProcessInfo> CustomProcessesOverride => ArchiveItemInfo.DefaultCustomProcessesSelectorDictionary.Select(this);
+
         private IBrowsableObjectInfo GetParent()
         {
             if (Path.Length > ArchiveShellObject.Path.Length)
@@ -212,23 +214,40 @@ namespace WinCopies.IO.ObjectModel
 
         protected override void DisposeManaged()
         {
-            base.DisposeManaged();
-
             _innerObject = null;
+
+            base.DisposeManaged();
         }
-        #endregion // Methods
+
+        protected override void DisposeUnmanaged()
+        {
+            _parent = null;
+            _browsability = null;
+            _bitmapSources = null;
+
+            base.DisposeUnmanaged();
+        }
+        #endregion Methods
     }
 
     public class ArchiveItemInfo : ArchiveItemInfo<IFileSystemObjectInfoProperties, ArchiveFileInfoEnumeratorStruct, IEnumerableSelectorDictionary<ArchiveItemInfoItemProvider, IBrowsableObjectInfo>, ArchiveItemInfoItemProvider>, IArchiveItemInfo
     {
+        private static readonly BrowsabilityPathStack<IArchiveItemInfo> __browsabilityPathStack = new BrowsabilityPathStack<IArchiveItemInfo>();
+
         private IFileSystemObjectInfoProperties _objectProperties;
 
         #region Properties
+        public static IBrowsabilityPathStack<IArchiveItemInfo> BrowsabilityPathStack { get; } = __browsabilityPathStack.AsWriteOnly();
+
+        protected override System.Collections.Generic.IEnumerable<IBrowsabilityPath> BrowsabilityPathsOverride => __browsabilityPathStack.GetBrowsabilityPaths(this);
+
+        public static ISelectorDictionary<IArchiveItemInfoBase, System.Collections.Generic.IEnumerable<IProcessInfo>> DefaultCustomProcessesSelectorDictionary { get; } = new DefaultNullableValueSelectorDictionary<IArchiveItemInfoBase, System.Collections.Generic.IEnumerable<IProcessInfo>>();
+
         public static IEnumerableSelectorDictionary<ArchiveItemInfoItemProvider, IBrowsableObjectInfo> DefaultItemSelectorDictionary { get; } = new ArchiveItemInfoSelectorDictionary();
 
-        public sealed override IFileSystemObjectInfoProperties ObjectPropertiesGeneric => IsDisposed ? throw GetExceptionForDispose(false) : _objectProperties;
+        protected sealed override IFileSystemObjectInfoProperties ObjectPropertiesGenericOverride => _objectProperties;
 
-        public override IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystem => null;
+        protected override IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystemOverride => null;
         #endregion Properties
 
         protected internal ArchiveItemInfo(in string path, in FileType fileType, in IShellObjectInfoBase archiveShellObject, in ArchiveFileInfo? archiveFileInfo, ClientVersion clientVersion/*, DeepClone<ArchiveFileInfo?> archiveFileInfoDelegate*/) : base(path, archiveShellObject, archiveFileInfo, clientVersion)
@@ -272,7 +291,7 @@ namespace WinCopies.IO.ObjectModel
         }
         #endregion
 
-        public override IEnumerableSelectorDictionary<ArchiveItemInfoItemProvider, IBrowsableObjectInfo> GetSelectorDictionary() => DefaultItemSelectorDictionary;
+        protected override IEnumerableSelectorDictionary<ArchiveItemInfoItemProvider, IBrowsableObjectInfo> GetSelectorDictionaryOverride() => DefaultItemSelectorDictionary;
 
         protected override void DisposeManaged()
         {

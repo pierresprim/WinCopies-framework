@@ -120,6 +120,12 @@
   <data name="CancelledByUser" xml:space="preserve">
     <value>The operation was cancelled by user.</value>
   </data>
+  <data name="CopyDidNotSucceeded" xml:space="preserve">
+    <value>The copy operation did not succeeded.</value>
+  </data>
+  <data name="CouldNotCreateItem" xml:space="preserve">
+    <value>Could not create item.</value>
+  </data>
   <data name="Destination" xml:space="preserve">
     <value>destination</value>
   </data>
@@ -141,8 +147,17 @@
   <data name="GivenItemInnerObjectIsNotFromSupportedType" xml:space="preserve">
     <value>The given item's inner object is not a(n) {0}.</value>
   </data>
+  <data name="GivenShellObjectIsNotAFile" xml:space="preserve">
+    <value>The given ShellObject is not a file.</value>
+  </data>
+  <data name="ItemDoesNotRepresentARegistryKey" xml:space="preserve">
+    <value>This item does not represent a registry key.</value>
+  </data>
   <data name="NoError" xml:space="preserve">
     <value>Process completed successfully.</value>
+  </data>
+  <data name="NoProcessCouldBeGenerated" xml:space="preserve">
+    <value>No process could be generated.</value>
   </data>
   <data name="NotEnoughSpace" xml:space="preserve">
     <value>There is not enough space on the destination drive or the total size cannot be determined.</value>
@@ -167,6 +182,9 @@
   </data>
   <data name="RegistryKeyNotExists" xml:space="preserve">
     <value>The specified registry key does not exist.</value>
+  </data>
+  <data name="ShellObjectIsNotSupported" xml:space="preserve">
+    <value>The given ShellObject is not supported.</value>
   </data>
   <data name="Source" xml:space="preserve">
     <value>source</value>

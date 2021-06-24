@@ -68,9 +68,6 @@ namespace WinCopies.IO.ObjectModel
     public abstract class BrowsableObjectInfo : BrowsableObjectInfoBase, IBrowsableObjectInfo
     {
         protected static void EmptyVoid() { /* Left empty. */ }
-
-        public static bool Predicate(in ProcessFactorySelectorDictionaryParameters item, in Type t) => WinCopies.Extensions.UtilHelpers.ContainsFieldValue(t, null, item.ProcessParameters.Guid.ToString());
-
         #region Consts
         public const ushort SmallIconSize = 16;
         public const ushort MediumIconSize = 48;
@@ -82,15 +79,26 @@ namespace WinCopies.IO.ObjectModel
         public const int FolderIcon = 3;
         #endregion
 
+        private BrowsableObjectInfoCallbackQueue _callbackQueue;
+
         #region Properties
+        #region Static Properties
         public static ISelectorDictionary<ProcessFactorySelectorDictionaryParameters, IProcess> DefaultProcessSelectorDictionary { get; } = new DefaultNullableValueSelectorDictionary<ProcessFactorySelectorDictionaryParameters, IProcess>();
 
-        public static Action RegisterDefaultSelectors { get; private set; } = () =>
-        {
-            DotNetAssemblyInfo.RegisterSelectors();
+        public static Action RegisterDefaultBrowsabilityPaths { get; private set; } = () =>
+          {
+              ShellObjectInfo.BrowsabilityPathStack.Push(new MultiIconInfo.BrowsabilityPath());
+              ShellObjectInfo.BrowsabilityPathStack.Push(new DotNetAssemblyInfo.BrowsabilityPath());
 
-            RegisterDefaultSelectors = EmptyVoid;
-        };
+              RegisterDefaultBrowsabilityPaths = EmptyVoid;
+          };
+
+        //public static Action RegisterDefaultSelectors { get; private set; } = () =>
+        //{
+        //    DotNetAssemblyInfo.RegisterSelectors();
+
+        //    RegisterDefaultSelectors = EmptyVoid;
+        //};
 
         public static Action RegisterDefaultProcessSelectors { get; private set; } = () =>
         {
@@ -98,59 +106,72 @@ namespace WinCopies.IO.ObjectModel
 
             RegisterDefaultProcessSelectors = EmptyVoid;
         };
+        #endregion
 
-        public abstract IProcessFactory ProcessFactory { get; }
+        #region Protected Properties
+        protected abstract IBrowsableObjectInfoBitmapSources BitmapSourcesOverride { get; }
 
-        IBrowsableObjectInfo Collections.Generic.IRecursiveEnumerable<IBrowsableObjectInfo>.Value => this;
+        protected abstract IBrowsabilityOptions BrowsabilityOverride { get; }
 
-        public abstract object InnerObject { get; }
+        protected abstract System.Collections.Generic.IEnumerable<IBrowsabilityPath> BrowsabilityPathsOverride { get; }
 
-        public abstract IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystem { get; }
+        protected abstract System.Collections.Generic.IEnumerable<IProcessInfo> CustomProcessesOverride { get; }
 
-        public abstract object ObjectProperties { get; }
+        protected abstract string DescriptionOverride { get; }
 
-        public abstract IBrowsabilityOptions Browsability { get; }
+        protected abstract object InnerObjectOverride { get; }
 
-        public abstract bool IsRecursivelyBrowsable { get; }
+        protected abstract bool IsRecursivelyBrowsableOverride { get; }
+
+        protected abstract bool IsSpecialItemOverride { get; }
+
+        protected abstract string ItemTypeNameOverride { get; }
+
+        protected abstract object ObjectPropertiesOverride { get; }
+
+        protected abstract IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystemOverride { get; }
+
+        protected abstract IBrowsableObjectInfo ParentOverride { get; }
+
+        protected abstract IProcessFactory ProcessFactoryOverride { get; }
+        #endregion
+
+        #region Public Properties
+        public IBrowsableObjectInfoBitmapSources BitmapSources => GetValueIfNotDisposed(() => BitmapSourcesOverride);
+
+        public IBrowsabilityOptions Browsability => GetValueIfNotDisposed(() => BrowsabilityOverride);
+
+        public System.Collections.Generic.IEnumerable<IBrowsabilityPath> BrowsabilityPaths => GetValueIfNotDisposed(() => BrowsabilityPathsOverride);
+
+        public ClientVersion ClientVersion { get; }
+
+        public System.Collections.Generic.IEnumerable<IProcessInfo> CustomProcesses => GetValueIfNotDisposed(() => CustomProcessesOverride);
+
+        public string Description => GetValueIfNotDisposed(() => DescriptionOverride);
+
+        public object InnerObject => GetValueIfNotDisposed(() => InnerObjectOverride);
+
+        public bool IsBrowsable => GetValueIfNotDisposed(() => _IsBrowsable(this));
+
+        public bool IsRecursivelyBrowsable => GetValueIfNotDisposed(() => IsRecursivelyBrowsableOverride);
+
+        public bool IsSpecialItem => GetValueIfNotDisposed(() => IsSpecialItemOverride);
+
+        public string ItemTypeName => GetValueIfNotDisposed(() => ItemTypeNameOverride);
+
+        public object ObjectProperties => GetValueIfNotDisposed(() => ObjectPropertiesOverride);
+
+        public IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystem => GetValueIfNotDisposed(() => ObjectPropertySystemOverride);
 
         /// <summary>
         /// Gets the <see cref="IBrowsableObjectInfo"/> parent of this <see cref="BrowsableObjectInfo"/>. Returns <see langword="null"/> if this object is the root object of a hierarchy.
         /// </summary>
-        public abstract IBrowsableObjectInfo Parent { get; }
+        public IBrowsableObjectInfo Parent => GetValueIfNotDisposed(() => ParentOverride);
 
-        #region BitmapSources
-        /// <summary>
-        /// When overridden in a derived class, gets the small <see cref="BitmapSource"/> of this <see cref="BrowsableObjectInfo"/>.
-        /// </summary>
-        public abstract BitmapSource SmallBitmapSource { get; }
+        public IProcessFactory ProcessFactory => GetValueIfNotDisposed(() => ProcessFactoryOverride);
 
-        /// <summary>
-        /// When overridden in a derived class, gets the medium <see cref="BitmapSource"/> of this <see cref="BrowsableObjectInfo"/>.
-        /// </summary>
-        public abstract BitmapSource MediumBitmapSource { get; }
-
-        /// <summary>
-        /// When overridden in a derived class, gets the large <see cref="BitmapSource"/> of this <see cref="BrowsableObjectInfo"/>.
-        /// </summary>
-        public abstract BitmapSource LargeBitmapSource { get; }
-
-        /// <summary>
-        /// When overridden in a derived class, gets the extra large <see cref="BitmapSource"/> of this <see cref="BrowsableObjectInfo"/>.
-        /// </summary>
-        public abstract BitmapSource ExtraLargeBitmapSource { get; }
+        IBrowsableObjectInfo Collections.Generic.IRecursiveEnumerable<IBrowsableObjectInfo>.Value => this;
         #endregion
-
-        public abstract string ItemTypeName { get; }
-
-        public abstract string Description { get; }
-
-        public abstract bool IsSpecialItem { get; }
-
-        public ClientVersion ClientVersion { get; }
-
-        public abstract System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> RootItems { get; }
-
-        // public abstract Predicate<IBrowsableObjectInfo> RootItemsBrowsableObjectInfoPredicate { get; }
         #endregion
 
         #region Constructors
@@ -163,11 +184,8 @@ namespace WinCopies.IO.ObjectModel
         #endregion
 
         #region Methods
-        protected T GetValueIfNotDisposed<T>(in T value) => IsDisposed ? throw GetExceptionForDispose(false) : value;
-
+        #region Static Methods
         internal static bool _IsBrowsable(in IBrowsableObjectInfo browsableObjectInfo) => browsableObjectInfo.Browsability != null && (browsableObjectInfo.Browsability.Browsability == IO.Browsability.BrowsableByDefault || browsableObjectInfo.Browsability.Browsability == IO.Browsability.Browsable);
-
-        public bool IsBrowsable() => _IsBrowsable(this);
 
         public static ClientVersion GetDefaultClientVersion()
         {
@@ -180,7 +198,17 @@ namespace WinCopies.IO.ObjectModel
             return new ClientVersion(assemblyName.Name, (uint)assemblyVersion.Major, (uint)assemblyVersion.Minor, (uint)assemblyVersion.Revision);
         }
 
-        public static Icon TryGetIcon(in int iconIndex, in string dll, in System.Drawing.Size size) => new IconExtractor(IO.Path.GetRealPathFromEnvironmentVariables(IO.Path.System32Path + dll)).GetIcon(iconIndex).Split()?.TryGetIcon(size, 32, true, true);
+        public static bool Predicate(in ProcessFactorySelectorDictionaryParameters item, in Type t) => WinCopies.Extensions.UtilHelpers.ContainsFieldValue(t, null, item.ProcessParameters.Guid.ToString());
+
+        public static Icon TryGetIcon(in Icon[] icons, in System.Drawing.Size size) => icons?.TryGetIcon(size, 32, true, true);
+
+        public static Icon TryGetIcon(in Icon[] icons, in ushort size) => TryGetIcon(icons, new System.Drawing.Size(size, size));
+
+        public static Icon TryGetIcon(in Icon icon, in System.Drawing.Size size) => TryGetIcon(icon?.Split(), size);
+
+        public static Icon TryGetIcon(in Icon icon, in ushort size) => TryGetIcon(icon, new System.Drawing.Size(size, size));
+
+        public static Icon TryGetIcon(in int iconIndex, in string dll, in System.Drawing.Size size) => TryGetIcon(new IconExtractor(IO.Path.GetRealPathFromEnvironmentVariables(IO.Path.System32Path + dll)).GetIcon(iconIndex), size);
 
         public static BitmapSource TryGetBitmapSource(in int iconIndex, in string dllName, in int size)
         {
@@ -195,9 +223,63 @@ namespace WinCopies.IO.ObjectModel
             )
 #endif
 
-            return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+                return TryGetBitmapSource(icon);
         }
 
+        public static BitmapSource TryGetBitmapSource(in Icon icon) => icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+        #endregion
+
+        #region Protected Methods
+        protected virtual void RaiseCallbacksOverride(IBrowsableObjectInfo browsableObjectInfo, BrowsableObjectInfoCallbackReason callbackReason) => _callbackQueue?.RaiseCallbacks(browsableObjectInfo, callbackReason);
+
+        protected void RaiseCallbacks(in IBrowsableObjectInfo browsableObjectInfo, BrowsableObjectInfoCallbackReason callbackReason)
+        {
+            ThrowIfDisposed(this);
+
+            RaiseCallbacksOverride(browsableObjectInfo, callbackReason);
+        }
+
+        protected T GetValueIfNotDisposed<T>(in T value) => IsDisposed ? throw GetExceptionForDispose(false) : value;
+
+        protected T GetValueIfNotDisposed<T>(in Func<T> value) => IsDisposed ? throw GetExceptionForDispose(false) : value();
+
+        /// <summary>
+        /// When overridden in a derived class, returns the items of this <see cref="BrowsableObjectInfo"/>.
+        /// </summary>
+        /// <returns>An <see cref="System.Collections.Generic.IEnumerable{IBrowsableObjectInfo}"/> that enumerates through the items of this <see cref="BrowsableObjectInfo"/>.</returns>
+        protected abstract System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItemsOverride();
+
+        protected abstract ArrayBuilder<IBrowsableObjectInfo> GetRootItemsOverride();
+
+        protected abstract System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetSubRootItemsOverride();
+        #endregion
+
+        #region Public Methods
+        public System.IDisposable RegisterCallback(Action<IBrowsableObjectInfo, BrowsableObjectInfoCallbackReason> action)
+        {
+            ThrowIfDisposed(this);
+
+            return (_callbackQueue
+#if CS8
+                ??=
+#else
+                ?? (_callbackQueue =
+#endif
+                new BrowsableObjectInfoCallbackQueue()
+#if !CS8
+                )
+#endif
+                ).Enqueue(action);
+        }
+
+        public ArrayBuilder<IBrowsableObjectInfo> GetRootItems() => GetValueIfNotDisposed(GetRootItemsOverride);
+
+        public System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems() => GetValueIfNotDisposed(GetItemsOverride);
+
+        public System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetSubRootItems() => GetValueIfNotDisposed(GetSubRootItemsOverride);
+        #endregion
+
+        #region Enumeration
         System.Collections.Generic.IEnumerator<Collections.Generic.IRecursiveEnumerable<IBrowsableObjectInfo>> IRecursiveEnumerableProviderEnumerable<IBrowsableObjectInfo>.GetRecursiveEnumerator() => GetItems().GetEnumerator();
 
         RecursiveEnumerator<IBrowsableObjectInfo> IRecursiveEnumerable<IBrowsableObjectInfo>.GetEnumerator() => IsRecursivelyBrowsable ? new RecursiveEnumerator<IBrowsableObjectInfo>(this) : throw new NotSupportedException("The current BrowsableObjectInfo does not support recursive browsing.");
@@ -205,14 +287,7 @@ namespace WinCopies.IO.ObjectModel
         System.Collections.Generic.IEnumerator<IBrowsableObjectInfo> System.Collections.Generic.IEnumerable<IBrowsableObjectInfo>.GetEnumerator() => GetItems().GetEnumerator();
 
         IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetItems().GetEnumerator();
-
-        /// <summary>
-        /// When overridden in a derived class, returns the items of this <see cref="BrowsableObjectInfo"/>.
-        /// </summary>
-        /// <returns>An <see cref="System.Collections.Generic.IEnumerable{IBrowsableObjectInfo}"/> that enumerates through the items of this <see cref="BrowsableObjectInfo"/>.</returns>
-        public abstract System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems();
-
-        public abstract System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetSubRootItems();
+        #endregion
 
         #region IDisposable
         /// <summary>
@@ -226,9 +301,9 @@ namespace WinCopies.IO.ObjectModel
 
                 return;
 
-            DisposeUnmanaged();
-
             DisposeManaged();
+
+            DisposeUnmanaged();
 
             GC.SuppressFinalize(this);
         }
@@ -272,9 +347,11 @@ namespace WinCopies.IO.ObjectModel
     public abstract class BrowsableObjectInfo<T> : BrowsableObjectInfo, IBrowsableObjectInfo<T>
     {
         #region Properties
-        public abstract T ObjectPropertiesGeneric { get; }
+        protected abstract T ObjectPropertiesGenericOverride { get; }
 
-        public sealed override object ObjectProperties => ObjectPropertiesGeneric;
+        public T ObjectPropertiesGeneric => ObjectPropertiesGenericOverride;
+
+        protected sealed override object ObjectPropertiesOverride => ObjectPropertiesGenericOverride;
 
         T IBrowsableObjectInfo<T>.ObjectProperties => ObjectPropertiesGeneric;
         #endregion
@@ -292,11 +369,13 @@ namespace WinCopies.IO.ObjectModel
     public abstract class BrowsableObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : BrowsableObjectInfo<TObjectProperties>, IBrowsableObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
     {
         #region Properties
-        public abstract TInnerObject InnerObjectGeneric { get; }
+        protected abstract TInnerObject InnerObjectGenericOverride { get; }
 
-        TInnerObject IEncapsulatorBrowsableObjectInfo<TInnerObject>.InnerObject => InnerObjectGeneric;
+        public TInnerObject InnerObjectGeneric => GetValueIfNotDisposed(() => InnerObjectGenericOverride);
 
-        public sealed override object InnerObject => InnerObjectGeneric;
+        TInnerObject IEncapsulatorBrowsableObjectInfo<TInnerObject>.InnerObject => InnerObjectGenericOverride;
+
+        protected sealed override object InnerObjectOverride => InnerObjectGenericOverride;
 
         // public abstract Predicate<TPredicateTypeParameter> RootItemsPredicate { get; }
         #endregion
@@ -308,18 +387,26 @@ namespace WinCopies.IO.ObjectModel
         /// <param name="clientVersion">A custom <see cref="ClientVersion"/>. This parameter can be null for non-file system and portable devices-related types.</param>
         protected BrowsableObjectInfo(in string path, in ClientVersion clientVersion) : base(path, clientVersion) { /* Left empty. */ }
 
-        public abstract TSelectorDictionary GetSelectorDictionary();
+        #region Methods
+        public static System.Collections.Generic.IEnumerable<TDictionaryItems> GetEmptyEnumerable() => GetEmptyEnumerable<TDictionaryItems>();
 
-        protected System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(System.Collections.Generic.IEnumerable<TDictionaryItems> items) => GetSelectorDictionary().Select(items);
-
+        #region Protected Methods
         protected abstract System.Collections.Generic.IEnumerable<TDictionaryItems> GetItemProviders();
-
-        public sealed override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems() => GetItems(GetItemProviders());
 
         protected abstract System.Collections.Generic.IEnumerable<TDictionaryItems> GetItemProviders(Predicate<TPredicateTypeParameter> predicate);
 
-        public System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<TPredicateTypeParameter> predicate) => predicate == null ? GetItems(GetItemProviders(item => true)) : GetItems(GetItemProviders(predicate));
+        protected sealed override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItemsOverride() => GetItems(GetItemProviders());
 
-        protected System.Collections.Generic.IEnumerable<TDictionaryItems> GetEmptyEnumerable() => GetEmptyEnumerable<TDictionaryItems>();
+        protected System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(System.Collections.Generic.IEnumerable<TDictionaryItems> items) => GetSelectorDictionary().Select(items);
+
+        protected abstract TSelectorDictionary GetSelectorDictionaryOverride();
+        #endregion
+
+        #region Public Methods
+        public TSelectorDictionary GetSelectorDictionary() => GetValueIfNotDisposed(GetSelectorDictionaryOverride);
+
+        public System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<TPredicateTypeParameter> predicate) => GetValueIfNotDisposed(() => predicate == null ? GetItems(GetItemProviders(item => true)) : GetItems(GetItemProviders(predicate)));
+        #endregion
+        #endregion
     }
 }

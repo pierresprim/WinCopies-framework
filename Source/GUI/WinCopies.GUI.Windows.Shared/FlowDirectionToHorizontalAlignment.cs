@@ -24,9 +24,9 @@ namespace WinCopies.GUI
 {
     public class FlowDirectionToHorizontalAlignment : AlwaysConvertibleTwoWayConverter<FlowDirection, object, HorizontalAlignment>
     {
-        public override ConversionOptions ConvertOptions => ConverterHelper.ParameterCanBeNull;
+        public override IReadOnlyConversionOptions ConvertOptions => ConverterHelper.ParameterCanBeNull;
 
-        public override ConversionOptions ConvertBackOptions => ConverterHelper.ParameterCanBeNull;
+        public override IReadOnlyConversionOptions ConvertBackOptions => ConverterHelper.ParameterCanBeNull;
 
         protected override HorizontalAlignment Convert(FlowDirection value, object parameter, CultureInfo culture) => value == FlowDirection.LeftToRight ? HorizontalAlignment.Right : HorizontalAlignment.Left;
 

@@ -48,7 +48,7 @@ namespace WinCopies.IO.PropertySystem
 
                     return _size;
 
-                if (BrowsableObjectInfo.InnerObject.Properties.TryGetValue(Microsoft.WindowsAPICodePack.PortableDevices.PropertySystem.Properties.Legacy.Object.Common.Size, out Property value) && value.TryGetValue(out ulong _value))
+                if (InnerObject.InnerObject.Properties.TryGetValue(Microsoft.WindowsAPICodePack.PortableDevices.PropertySystem.Properties.Legacy.Object.Common.Size, out Property value) && value.TryGetValue(out ulong _value))
 
                     _size = new Size(_value);
 

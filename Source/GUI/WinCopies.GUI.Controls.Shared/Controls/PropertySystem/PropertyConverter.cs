@@ -27,9 +27,9 @@ namespace WinCopies.GUI.Controls.PropertySystem
 {
     public class PropertyConverter : AlwaysConvertibleTwoWayConverter<IProperty, object, PropertyViewModel>
     {
-        public override ConversionOptions ConvertOptions => AllowNull;
+        public override IReadOnlyConversionOptions ConvertOptions => AllowNull;
 
-        public override ConversionOptions ConvertBackOptions => ParameterCanBeNull;
+        public override IReadOnlyConversionOptions ConvertBackOptions => ParameterCanBeNull;
 
         public static PropertyViewModel TryConvert(IProperty property)
         {
@@ -47,7 +47,7 @@ namespace WinCopies.GUI.Controls.PropertySystem
             {
                 var _value = (Array)property.Value;
 
-                return _value == null ? null : _value.Rank != 1 ? null : (PropertyViewModel)ArrayPropertyViewModel.CreateFromArrayProperty(property);
+                return _value == null ? null : _value.Rank != 1 ? null : ArrayPropertyViewModel.CreateFromArrayProperty(property);
             }
 
             return typeof(System.Collections.IEnumerable).IsAssignableFrom(type) ? ArrayPropertyViewModel.CreateFromEnumerableProperty(property)

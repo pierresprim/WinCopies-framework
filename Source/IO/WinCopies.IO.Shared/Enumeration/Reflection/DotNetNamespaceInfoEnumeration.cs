@@ -189,7 +189,7 @@ namespace WinCopies.IO.Enumeration.Reflection
 
             if (dotNetItemInfo is IDotNetAssemblyInfo dotNetAssemblyInfo)
             {
-                enumerable = dotNetAssemblyInfo.Assembly.DefinedTypes;
+                enumerable = ((IEncapsulatorBrowsableObjectInfo<Assembly>)dotNetAssemblyInfo).InnerObject.DefinedTypes;
 
                 if (enumerable == null)
 
@@ -200,7 +200,7 @@ namespace WinCopies.IO.Enumeration.Reflection
 
             else if (dotNetItemInfo is IDotNetNamespaceInfoBase dotNetNamespaceInfo)
             {
-                enumerable = dotNetNamespaceInfo.ParentDotNetAssemblyInfo.Assembly.DefinedTypes;
+                enumerable = ((IEncapsulatorBrowsableObjectInfo<Assembly>)dotNetNamespaceInfo.ParentDotNetAssemblyInfo).InnerObject.DefinedTypes;
 
                 if (enumerable == null)
 
@@ -287,7 +287,7 @@ namespace WinCopies.IO.Enumeration.Reflection
                     addEnumerable(typeToEnumerate);
             }
 
-            return namespaces.Merge<string>().Select(_namespace => new DotNetNamespaceInfoItemProvider(_namespace, dotNetItemInfo)).AppendValues(types.Merge<TypeInfoItemProvider>().Select(type => new DotNetNamespaceInfoItemProvider(type, dotNetItemInfo)));
+            return namespaces.Merge().Select(_namespace => new DotNetNamespaceInfoItemProvider(_namespace, dotNetItemInfo)).AppendValues(types.Merge<TypeInfoItemProvider>().Select(type => new DotNetNamespaceInfoItemProvider(type, dotNetItemInfo)));
         }
     }
 }

@@ -16,12 +16,12 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows.Media.Imaging;
 
+using WinCopies.Collections.Generic;
+using WinCopies.IO.Process;
 using WinCopies.IO.Reflection.PropertySystem;
-using WinCopies.IO.Selectors;
 
 using static WinCopies.UtilHelpers;
 using static WinCopies.ThrowHelper;
@@ -31,21 +31,25 @@ namespace WinCopies.IO.ObjectModel.Reflection
 {
     public abstract class DotNetItemInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : BrowsableObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IDotNetItemInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IDotNetItemInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
     {
-        private static System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> _defaultRootItems;
+        protected class BrowsableObjectInfoBitmapSources : BrowsableObjectInfoBitmapSources<DotNetItemInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>>
+        {
+            protected sealed override BitmapSource SmallBitmapSourceOverride => InnerObject.TryGetBitmapSource(SmallIconSize);
+
+            protected sealed override BitmapSource MediumBitmapSourceOverride => InnerObject.TryGetBitmapSource(MediumIconSize);
+
+            protected sealed override BitmapSource LargeBitmapSourceOverride => InnerObject.TryGetBitmapSource(LargeIconSize);
+
+            protected sealed override BitmapSource ExtraLargeBitmapSourceOverride => InnerObject.TryGetBitmapSource(ExtraLargeIconSize);
+
+            public BrowsableObjectInfoBitmapSources(in DotNetItemInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> dotNetItemInfo) : base(dotNetItemInfo) { /* Left empty. */ }
+        }
+
+        private static ArrayBuilder<IBrowsableObjectInfo> _defaultRootItems;
+        private IBrowsableObjectInfo _parent;
+        private IDotNetAssemblyInfo _parentAssembly;
+        private IBrowsableObjectInfoBitmapSources _bitmapSources;
 
         #region Properties
-        public override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> RootItems => _defaultRootItems
-#if CS8
-            ??=
-#else
-            ?? (_defaultRootItems =
-#endif
-            FileSystemObjectInfo.GetRootItems()
-#if !CS8
-            )
-#endif
-            ;
-
         //public override Predicate<TPredicateTypeParameter> RootItemsPredicate => item => false;
 
         //public override Predicate<IBrowsableObjectInfo> RootItemsBrowsableObjectInfoPredicate => null;
@@ -63,75 +67,34 @@ namespace WinCopies.IO.ObjectModel.Reflection
         /// <summary>
         /// Gets the <see cref="NotApplicable"/> value.
         /// </summary>
-        public override string Description => NotApplicable;
+        protected override string DescriptionOverride => NotApplicable;
 
         /// <summary>
         /// Gets the <see langword="false"/> value.
         /// </summary>
-        public override bool IsSpecialItem => false;
+        protected override bool IsSpecialItemOverride => false;
 
-        public sealed override IBrowsableObjectInfo Parent { get; }
+        protected sealed override IBrowsableObjectInfo ParentOverride => _parent;
 
-        public IDotNetAssemblyInfo ParentDotNetAssemblyInfo { get; }
+        public IDotNetAssemblyInfo ParentDotNetAssemblyInfo => _parentAssembly;
 
-        public sealed override bool IsRecursivelyBrowsable => IsBrowsable();
+        protected sealed override bool IsRecursivelyBrowsableOverride => IsBrowsable;
 
-        #region BitmapSources
-        protected abstract BitmapSource TryGetBitmapSource(in int size);
-
-        private BitmapSource _smallBitmapSource;
-        private BitmapSource _mediumBitmapSource;
-        private BitmapSource _largeBitmapSource;
-        private BitmapSource _extraLargeBitmapSource;
-
-        public sealed override BitmapSource SmallBitmapSource => _smallBitmapSource
+        protected override IBrowsableObjectInfoBitmapSources BitmapSourcesOverride => _bitmapSources
 #if CS8
             ??=
 #else
-            ?? (_smallBitmapSource =
+            ?? (_bitmapSources =
 #endif
-            TryGetBitmapSource(SmallIconSize)
+            new BrowsableObjectInfoBitmapSources(this)
 #if !CS8
             )
 #endif
             ;
 
-        public sealed override BitmapSource MediumBitmapSource => _mediumBitmapSource
-#if CS8
-            ??=
-#else
-            ?? (_mediumBitmapSource =
-#endif
-            TryGetBitmapSource(MediumIconSize)
-#if !CS8
-            )
-#endif
-            ;
+        protected override System.Collections.Generic.IEnumerable<IBrowsabilityPath> BrowsabilityPathsOverride => null;
 
-        public sealed override BitmapSource LargeBitmapSource => _largeBitmapSource
-#if CS8
-            ??=
-#else
-            ?? (_largeBitmapSource =
-#endif
-            TryGetBitmapSource(LargeIconSize)
-#if !CS8
-            )
-#endif
-            ;
-
-        public sealed override BitmapSource ExtraLargeBitmapSource => _extraLargeBitmapSource
-#if CS8
-            ??=
-#else
-            ?? (_extraLargeBitmapSource =
-#endif
-            TryGetBitmapSource(ExtraLargeIconSize)
-#if !CS8
-            )
-#endif
-            ;
-        #endregion
+        protected override System.Collections.Generic.IEnumerable<IProcessInfo> CustomProcessesOverride => null;
         #endregion
 
         protected DotNetItemInfo(in string path, in string name, in IBrowsableObjectInfo parent) : base(path, parent.ClientVersion)
@@ -142,19 +105,43 @@ namespace WinCopies.IO.ObjectModel.Reflection
 
             Name = name;
 
-            Parent = parent;
+            _parent = parent;
 
             // todo: provide two constructors:
 
-            ParentDotNetAssemblyInfo = parent is IDotNetItemInfo dotNetItemInfo ? dotNetItemInfo.ParentDotNetAssemblyInfo ?? throw new ArgumentException(string.Format(PropertyCannotBeNullOnObject, nameof(IDotNetItemInfo.ParentDotNetAssemblyInfo), nameof(dotNetItemInfo))) : parent is IDotNetAssemblyInfo dotNetAssemblyInfo ? dotNetAssemblyInfo : throw new ArgumentException(ParentMustBeAnIDotNetAssemblyInfoOrAnIDotNetItemInfoBase, nameof(parent));
+            _parentAssembly = parent is IDotNetItemInfo dotNetItemInfo ? dotNetItemInfo.ParentDotNetAssemblyInfo ?? throw new ArgumentException(string.Format(PropertyCannotBeNullOnObject, nameof(IDotNetItemInfo.ParentDotNetAssemblyInfo), nameof(dotNetItemInfo))) : parent is IDotNetAssemblyInfo dotNetAssemblyInfo ? dotNetAssemblyInfo : throw new ArgumentException(ParentMustBeAnIDotNetAssemblyInfoOrAnIDotNetItemInfoBase, nameof(parent));
         }
 
-        public override IEnumerable<IBrowsableObjectInfo> GetSubRootItems() => null;
+        protected abstract BitmapSource TryGetBitmapSource(in int size);
+
+        protected override ArrayBuilder<IBrowsableObjectInfo> GetRootItemsOverride() => _defaultRootItems
+#if CS8
+            ??=
+#else
+            ?? (_defaultRootItems =
+#endif
+            FileSystemObjectInfo.GetRootItems()
+#if !CS8
+            )
+#endif
+            ;
+
+        protected override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetSubRootItemsOverride() => null;
+
+        protected override void DisposeUnmanaged()
+        {
+            _parent = null;
+            _parentAssembly = null;
+
+            _bitmapSources = null;
+
+            base.DisposeUnmanaged();
+        }
     }
 
     public abstract class BrowsableDotNetItemInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : DotNetItemInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IDotNetItemInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
     {
-        public sealed override IBrowsabilityOptions Browsability => BrowsabilityOptions.BrowsableByDefault;
+        protected sealed override IBrowsabilityOptions BrowsabilityOverride => BrowsabilityOptions.BrowsableByDefault;
 
         protected BrowsableDotNetItemInfo(in string path, in string name, in IBrowsableObjectInfo parent) : base(path, name, parent)
         {

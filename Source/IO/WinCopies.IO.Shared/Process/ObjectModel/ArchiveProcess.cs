@@ -29,7 +29,7 @@ using WinCopies.Collections.DotNetFix.Generic;
 
 namespace WinCopies.IO.Process.ObjectModel
 {
-    public abstract class ArchiveProcess<T> : ProcessObjectModelTypes<IPathInfo, IPathInfo, T, ProcessError, ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessDelegates<ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessEventDelegates>, ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessEventDelegates, IProcessProgressDelegateParameter>.DefaultDestinationProcess where T : ProcessTypes<IPathInfo>.ProcessErrorTypes<ProcessError>.IProcessErrorFactories
+    public abstract class ArchiveProcess<T> : ProcessObjectModelTypes<IPathInfo, IPathInfo, T, ProcessError, object, ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessDelegates<ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessEventDelegates>, ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessEventDelegates, IProcessProgressDelegateParameter>.DefaultDestinationProcess where T : ProcessTypes<IPathInfo>.ProcessErrorTypes<ProcessError, object>.IProcessErrorFactories
         // <T, TCollection, TReadOnlyCollection, TErrorPathCollection, TReadOnlyErrorPathCollection
         //#if DEBUG
         //         , TSimulationParameters
@@ -51,14 +51,16 @@ namespace WinCopies.IO.Process.ObjectModel
     {
         public bool CancellationPending { get; protected set; }
 
-        protected ArchiveProcess(in IEnumerableQueue<IPathInfo> initialPaths, in IPathInfo sourcePath, in IPathInfo destinationPath, in ProcessTypes<IPathInfo>.IProcessQueue paths, in IProcessLinkedList<IPathInfo, ProcessError> errorsQueue, in ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessDelegates<ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessEventDelegates> progressDelegate, T factory) : base(initialPaths, sourcePath, destinationPath.IsDirectory ? destinationPath : throw new ArgumentException($"{nameof(destinationPath)} must be a directory."), paths, errorsQueue, progressDelegate, factory)
+        protected ArchiveProcess(in IEnumerableQueue<IPathInfo> initialPaths, in IPathInfo sourcePath, in IPathInfo destinationPath, in ProcessTypes<IPathInfo>.IProcessQueue paths, in IProcessLinkedList<IPathInfo, ProcessError, ProcessTypes<IPathInfo, ProcessError, object>.ProcessErrorItem, object> errorsQueue, in ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessDelegates<ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessEventDelegates> progressDelegate, T factory) : base(initialPaths, sourcePath, destinationPath.IsDirectory ? destinationPath : throw new ArgumentException($"{nameof(destinationPath)} must be a directory."), paths, errorsQueue, progressDelegate, factory)
         {
             // Left empty.
         }
 
         protected virtual bool OnFileProcessStarted(int percentDone) => ProcessDelegates.CancellationPendingDelegate.RaiseEvent(null);
 
-        protected virtual bool OnFileProcessCompleted() => CancellationPending = ProcessDelegates.CommonDelegate.RaiseEvent(new ProcessProgressDelegateParameter(100));
+        protected virtual bool OnFileProcessCompleted() => CancellationPending = ProcessDelegates.CommonDelegate.RaiseEvent(new ProcessProgressDelegateParameter(100u, null));
+
+        protected override IProcessProgressDelegateParameter GetNotifyCompletionParameters() => new ProcessProgressDelegateParameter(100u, null);
 
         //        protected ArchiveProcess(in PathCollection<T> pathsToExtract, in string destPath, in TCollection pathCollection, in TReadOnlyCollection readOnlyPathCollection, in TErrorPathCollection errorPathCollection, TReadOnlyErrorPathCollection readOnlyErrorPathCollection
         //#if DEBUG

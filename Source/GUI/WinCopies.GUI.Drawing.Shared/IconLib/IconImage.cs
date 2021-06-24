@@ -34,6 +34,7 @@ using static Microsoft.WindowsAPICodePack.Win32Native.GDI.GDI;
 using static System.Math;
 
 using static WinCopies.GUI.Drawing.Tools;
+using static WinCopies.GUI.Drawing.Resources.ExceptionMessages;
 
 namespace WinCopies.GUI.Drawing
 {
@@ -64,7 +65,7 @@ namespace WinCopies.GUI.Drawing
                 16 => PixelFormat.Format16bppRgb565,
                 24 => PixelFormat.Format24bppRgb,
                 32 => PixelFormat.Format32bppArgb,
-                _ => PixelFormat.Undefined,
+                _ => PixelFormat.Undefined
             };
 #else
         {
@@ -139,15 +140,14 @@ namespace WinCopies.GUI.Drawing
                 IntPtr hDCScreen = HandlerNativeMethods.GetDC(IntPtr.Zero);
 
                 // Image
-                var bitmapInfo = new BitmapInfo();
-                bitmapInfo.bmiHeader = Encoder.Header;
+                var bitmapInfo = new BitmapInfo { bmiHeader = Encoder.Header };
                 bitmapInfo.bmiHeader.biHeight /= 2;
                 bitmapInfo.bmiHeader.biBitCount = 1;
                 bitmapInfo.bmiColors = new RGBQuad[256];
                 bitmapInfo.bmiColors[0].Set(0, 0, 0);
                 bitmapInfo.bmiColors[1].Set(255, 255, 255);
-                IntPtr hDCScreenOUTBmp = GDI.CreateCompatibleDC(hDCScreen);
-                IntPtr hBitmapOUTBmp = GDI.CreateDIBSection(hDCScreenOUTBmp, ref bitmapInfo, 0, out IntPtr bits, IntPtr.Zero, 0);
+                IntPtr hDCScreenOUTBmp = CreateCompatibleDC(hDCScreen);
+                IntPtr hBitmapOUTBmp = CreateDIBSection(hDCScreenOUTBmp, ref bitmapInfo, 0, out IntPtr bits, IntPtr.Zero, 0);
                 Marshal.Copy(Encoder.AND, 0, bits, Encoder.AND.Length);
                 var OutputBmp = Bitmap.FromHbitmap(hBitmapOUTBmp);
 
@@ -162,6 +162,7 @@ namespace WinCopies.GUI.Drawing
         public IconImageFormat IconImageFormat
         {
             get => Encoder.IconImageFormat;
+
             set
             {
                 if (value == IconImageFormat.UNKNOWN)
@@ -188,7 +189,6 @@ namespace WinCopies.GUI.Drawing
                 Encoder = newEncoder;
             }
         }
-
         #endregion
 
         #region Internal Properties
@@ -351,7 +351,7 @@ namespace WinCopies.GUI.Drawing
 
                                     break;
                                 case 16:
-                                    throw new NotSupportedException("16 bpp images are not supported for Icons");
+                                    throw new NotSupportedException(ImageNotSupported);
                                 case 24:
                                     posCX = x * 3;
                                     tColor = Color.FromArgb(0, Encoder.XOR[posCX + posCY + 0],
@@ -417,16 +417,17 @@ namespace WinCopies.GUI.Drawing
             switch (GetIconImageFormat(stream))
             {
                 case IconImageFormat.BMP:
-                    {
-                        (Encoder = new BMPEncoder()).Read(stream, resourceSize);
-                        break;
-                    }
+
+                    Encoder = new BMPEncoder();
+                    break;
+
                 case IconImageFormat.PNG:
-                    {
-                        (Encoder = new PNGEncoder()).Read(stream, resourceSize);
-                        break;
-                    }
+
+                    Encoder = new PNGEncoder();
+                    break;
             }
+
+            Encoder.Read(stream, resourceSize);
         }
 
         internal unsafe void Write(in System.IO.Stream stream) => Encoder.Write(stream);

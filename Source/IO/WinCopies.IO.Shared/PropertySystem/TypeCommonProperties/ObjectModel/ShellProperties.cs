@@ -114,7 +114,7 @@ namespace WinCopies.IO.PropertySystem
 
         public string DirectoryName => InnerProperties.DirectoryName;
 
-        public sealed override Size? Size => new Size(BrowsableObjectInfo.InnerObject.Properties.System.Size.Value.Value);
+        public sealed override Size? Size => new Size(InnerObject.InnerObject.Properties.System.Size.Value.Value);
 
         public FileShellObjectInfoProperties(in T shellObjectInfo, in FileType fileType) : base(shellObjectInfo, fileType, new FileInfo(shellObjectInfo.Path))
         {

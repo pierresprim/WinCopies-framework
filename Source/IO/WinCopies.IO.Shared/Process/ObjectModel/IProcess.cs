@@ -15,10 +15,18 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+using System.Collections.Generic;
+
+using WinCopies.Util.Commands.Primitives;
+
 namespace WinCopies.IO.Process.ObjectModel
 {
     public interface IProcess : IPropertyObservable
     {
+        ProcessStatus Status { get; }
+
+        IEnumerable<ICommand<IProcessErrorItem>> Actions { get; }
+
         string Guid { get; }
 
         IProcessErrorFactoryBase Factory { get; }
@@ -50,6 +58,12 @@ namespace WinCopies.IO.Process.ObjectModel
         bool LoadPaths();
 
         bool Start();
+
+        bool RetryFirst();
+
+        bool Ignore();
+
+        bool IgnoreFirst();
 
         void Reset();
     }

@@ -15,17 +15,19 @@
 * You should have received a copy of the GNU General Public License
 * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-using WinCopies.Collections.AbstractionInterop.Generic;
-using WinCopies.Collections.DotNetFix;
-using WinCopies.Collections.DotNetFix.Generic;
+using System.Collections.Generic;
+
+using WinCopies.Util.Commands.Primitives;
 
 namespace WinCopies.IO.Process.ObjectModel
 {
-    public static partial class ProcessInterfaceModelTypes<TItemsIn, TItemsOut, TError> where TItemsIn : IPathInfo where TItemsOut : IPathInfo
+    public static partial class ProcessInterfaceModelTypes<TItemsIn, TItemsOut, TError, TAction> where TItemsIn : IPathInfo where TItemsOut : IPathInfo
     {
-        public interface IProcess<TParam,TProcessEventDelegates> : IProcess where TParam : IProcessProgressDelegateParameter where TProcessEventDelegates : ProcessDelegateTypes<TItemsOut, TParam>.IProcessEventDelegates
+        public interface IProcess<TParam, TProcessEventDelegates> : IProcess where TParam : IProcessProgressDelegateParameter where TProcessEventDelegates : ProcessDelegateTypes<TItemsOut, TParam>.IProcessEventDelegates
         {
-            new IProcessErrorFactory<TError> Factory { get; }
+            IReadOnlyDictionary<string, ICommand<IProcessErrorItem<IPathInfo, ProcessError, TAction>>> Actions { get; }
+
+            new IProcessErrorFactory<TError, TAction> Factory { get; }
 
             new TProcessEventDelegates ProcessEventDelegates { get; }
 
@@ -33,11 +35,13 @@ namespace WinCopies.IO.Process.ObjectModel
 
             new ProcessTypes<TItemsOut>.IProcessQueue Paths { get; }
 
-            new IProcessError<TError> Error { get; }
+            new IProcessError<TError, TAction> Error { get; }
 
             new IProcessErrorFactoryData<TError> ProcessErrorFactoryData { get; }
 
-            new ProcessTypes<IProcessErrorItem<TItemsOut, TError>>.IProcessQueue ErrorPaths { get; }
+            new ProcessTypes<IProcessErrorItem<TItemsOut, TError, TAction>>.IProcessQueue ErrorPaths { get; }
+
+            bool RetryFirst();
 
 #if CS8
             IProcessErrorFactoryBase IProcess.Factory => Factory;
@@ -52,7 +56,7 @@ namespace WinCopies.IO.Process.ObjectModel
 
             IProcessErrorFactoryData IProcess.ProcessErrorFactoryData => ProcessErrorFactoryData;
 
-            ProcessTypes<IProcessErrorItem>.IProcessQueue IProcess.ErrorPaths => new AbstractionProcessCollection<IProcessErrorItem<TItemsOut, TError>, IProcessErrorItem>(ErrorPaths);
+            ProcessTypes<IProcessErrorItem>.IProcessQueue IProcess.ErrorPaths => new AbstractionProcessCollection<IProcessErrorItem<TItemsOut, TError, TAction>, IProcessErrorItem>(ErrorPaths);
 #endif
         }
 

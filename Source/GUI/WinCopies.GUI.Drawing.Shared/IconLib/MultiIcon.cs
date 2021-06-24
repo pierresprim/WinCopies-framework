@@ -31,42 +31,19 @@ using static WinCopies.
     ThrowHelper
 #endif
     ;
+using static WinCopies.GUI.Drawing.Resources.ExceptionMessages;
 
 namespace WinCopies.GUI.Drawing
 {
     [Author("Franco, Gustavo")]
     public class MultiIcon : List<SingleIcon>
     {
-        #region Variables Declaration
+        #region Fields
         private int mSelectedIndex = -1;
         #endregion
 
-        #region Constructors
-        public MultiIcon() { }
-
-        public MultiIcon(in IEnumerable<SingleIcon> collection) => AddRange(collection);
-
-        public MultiIcon(in SingleIcon singleIcon)
-        {
-            Add(singleIcon ?? throw GetArgumentNullException(nameof(singleIcon)));
-            SelectedName = singleIcon.Name;
-        }
-        #endregion
-
         #region Properties
-        public int SelectedIndex
-        {
-            get => mSelectedIndex;
-
-            set
-            {
-                if (value >= Count)
-
-                    throw new ArgumentOutOfRangeException(nameof(SelectedIndex));
-
-                mSelectedIndex = value;
-            }
-        }
+        public int SelectedIndex { get => mSelectedIndex; set => mSelectedIndex = value >= Count ? throw new ArgumentOutOfRangeException(nameof(SelectedIndex)) : value; }
 
         public string SelectedName
         {
@@ -93,13 +70,13 @@ namespace WinCopies.GUI.Drawing
         {
             get
             {
-                var names = new List<string>(Count);
+                var names = new string[Count];
 
-                foreach (SingleIcon icon in this)
+                for (int i = 0; i < Count; i++)
 
-                    names.Add(icon.Name);
+                    names[i] = this[i].Name;
 
-                return names.ToArray();
+                return names;
             }
         }
         #endregion
@@ -117,6 +94,19 @@ namespace WinCopies.GUI.Drawing
 
                 return null;
             }
+        }
+        #endregion
+
+        #region Constructors
+        public MultiIcon() { }
+
+        public MultiIcon(in IEnumerable<SingleIcon> collection) => AddRange(collection);
+
+        public MultiIcon(in SingleIcon singleIcon)
+        {
+            Add(singleIcon ?? throw GetArgumentNullException(nameof(singleIcon)));
+
+            SelectedName = singleIcon.Name;
         }
         #endregion
 
@@ -234,25 +224,33 @@ namespace WinCopies.GUI.Drawing
             switch (format)
             {
                 case MultiIconFormat.ICO:
-                    if (mSelectedIndex == -1)
 
-                        throw new InvalidIconSelectionException();
+                    (mSelectedIndex == -1 ? throw new InvalidIconSelectionException() : new IconFormat()).Save(this, stream);
 
-                    new IconFormat().Save(this, stream);
                     break;
+
                 case MultiIconFormat.ICL:
+
                     new NEFormat().Save(this, stream);
+
                     break;
+
                 case MultiIconFormat.DLL:
+
                     new PEFormat().Save(this, stream);
+
                     break;
+
                 case MultiIconFormat.EXE:
                 case MultiIconFormat.OCX:
                 case MultiIconFormat.CPL:
                 case MultiIconFormat.SRC:
-                    throw new NotSupportedException("File format not supported");
+
+                    throw new NotSupportedException(FileFormatNotSupported);
+
                 default:
-                    throw new NotSupportedException("Unknow file type destination, Icons can't be saved");
+
+                    throw new NotSupportedException(UnknownFileTypeDestination);
             }
         }
         #endregion

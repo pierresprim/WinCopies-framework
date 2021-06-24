@@ -6,6 +6,7 @@
     xmlns:localProcess="clr-namespace:WinCopies.GUI.IO.Process"
     xmlns:localProcessControls="clr-namespace:WinCopies.GUI.IO.Controls.Process"
     xmlns:controls="clr-namespace:WinCopies.GUI.Controls;assembly=WinCopies.GUI"
+    xmlns:process="clr-namespace:WinCopies.IO.Process;assembly=WinCopies.IO"
     xmlns:icons="clr-namespace:WinCopies.GUI.Icons.Properties;assembly=WinCopies.GUI.Icons"
     xmlns:data="clr-namespace:WinCopies.Util.Data;assembly=WinCopies.Util.Desktop"
     xmlns:markup="clr-namespace:WinCopies.Markup;assembly=WinCopies.Util.Desktop"
@@ -14,7 +15,8 @@
     xmlns:util="clr-namespace:WinCopies;assembly=WinCopies.Util.Desktop"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:properties="clr-namespace:WinCopies.GUI.IO.Properties"
-    xmlns:sevenZip="clr-namespace:SevenZip;assembly=SevenZipSharp">
+    xmlns:sevenZip="clr-namespace:SevenZip;assembly=SevenZipSharp"
+    xmlns:utilCommands="clr-namespace:WinCopies.Util.Commands.Primitives;assembly=WinCopies.Util">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/wincopies.gui;component/Themes/Generic.xaml" />
         <ResourceDictionary Source="pack://application:,,,/wincopies.gui.templates;component/Themes/Generic.xaml" />
@@ -48,6 +50,7 @@
             <propertySystem:PropertyArrayToListConverter x:Key="PropertyArrayToListConverter" />
             <propertySystem:ObjectToPropertyCollectionConverter x:Key="ObjectToPropertyCollectionConverter" />
             <data:EnumToArrayConverter x:Key="EnumToArrayConverter" />
+            <data:ActionToDelegateCommand2Converter x:Key="ActionToDelegateCommand2Converter" />
 
             <!--String resources-->
 
@@ -111,10 +114,10 @@
     </Style>-->
 
     <Style x:Key="WinCopies.GUI.IO.NavigationButtonItemContainerStyle" TargetType="{x:Type MenuItem}" BasedOn="{StaticResource NavigationButtonItemContainerStyle}">
-        <Setter Property="Header" Value="{Binding Node.Value.Path}" />
+        <Setter Property="Header" Value="{Binding Path}" />
     </Style>
 
-    <ControlTemplate x:Key="ExplorerControlTemplate" TargetType="{x:Type localControls:ExplorerControl}" x:Shared="false">
+    <ControlTemplate x:Key="ExplorerControlTemplate" TargetType="{x:Type localControls:ExplorerControl}">
         <!--<DataTemplate DataType="{x:Type local:BrowsableObjectInfo}">-->
         <Grid>
             <Grid.ColumnDefinitions>
@@ -167,39 +170,7 @@
                 <Button Grid.Column="2" Command="{TemplateBinding GoButtonCommand}" CommandParameter="{TemplateBinding GoButtonCommandParameter}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{x:Static icons:Resources.accept}" />
             </Grid>
             <localControls:ExplorerControlTreeView Grid.Row="2" Style="{TemplateBinding TreeViewStyle}" />
-            <!--<TreeView.ItemTemplate>
-                    <DataTemplate DataType="{x:Type local:BrowsableObjectInfoViewModel}">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="auto" />
-                                <ColumnDefinition />
-                            </Grid.ColumnDefinitions>
-                            <Image Source="{Binding MediumBitmapSource}" />
-                            <controls:Label Content="{Binding Name}" />
-                        </Grid>
-                    </DataTemplate>
-                </TreeView.ItemTemplate>-->
             <localControls:ExplorerControlListView Grid.Column="1" Grid.Row="2" SelectedIndex="{Binding SelectedIndex, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" SelectedItem="{Binding SelectedItem, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" Style="{TemplateBinding ListViewStyle}" />
-            <!--<Style TargetType="{x:Type ListView}" BasedOn="{StaticResource {x:Type ListView}}">-->
-            <!--<Setter Property="ItemTemplate" Value="{StaticResource ExplorerControlSizeThreeListViewItemTemplate}" />-->
-            <!--<Setter Property="ItemsPanel">
-
-                                </Setter>-->
-            <!--<Style.Triggers>
-                                    <DataTrigger Binding="{Binding ViewStyle, RelativeSource={RelativeSource Mode=Self}}" Value="{x:Static local:ViewStyle.SizeOne}">
-                                        <Setter Property="ItemTemplate" Value="{StaticResource ExplorerControlSizeOneListViewItemTemplate}" />
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding ViewStyle, RelativeSource={RelativeSource Mode=Self}}" Value="{x:Static local:ViewStyle.SizeTwo}">
-                                        <Setter Property="ItemTemplate" Value="{StaticResource ExplorerControlSizeTwoListViewItemTemplate}" />
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding ViewStyle, RelativeSource={RelativeSource Mode=Self}}" Value="{x:Static local:ViewStyle.SizeFour}">
-                                        <Setter Property="ItemTemplate" Value="{StaticResource ExplorerControlSizeFourListViewItemTemplate}" />
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding ViewStyle, RelativeSource={RelativeSource Mode=Self}}" Value="{x:Static local:ViewStyle.Tiles}">
-                                        <Setter Property="ItemTemplate" Value="{StaticResource ExplorerControlSizeOneListViewItemTemplate}" />
-                                    </DataTrigger>
-                                </Style.Triggers>-->
-            <!--</Style>-->
             <GridSplitter Grid.Column="1" Grid.Row="2" Width="5" HorizontalAlignment="Left" />
             <localControls:ExplorerControlPropertyGrid Grid.Column="2" Grid.Row="2" Item="{TemplateBinding PropertyGridItem}" Description="{TemplateBinding PropertyGridDescription}" />
             <GridSplitter Grid.Column="2" Grid.Row="2" Width="5" HorizontalAlignment="Left" />
@@ -225,23 +196,23 @@
         <Setter Property="Template" Value="{StaticResource ExplorerControlPropertyGridTemplate}" />
     </Style>
 
-    <DataTemplate x:Key="TreeViewItemHeaderDataTemplate" DataType="{x:Type localObjectModel:IBrowsableObjectInfoViewModel}" x:Shared="false">
+    <DataTemplate x:Key="TreeViewItemHeaderDataTemplate" DataType="{x:Type localObjectModel:IBrowsableObjectInfoViewModel}">
         <localControls:ExplorerControlTreeViewItemHeader>
             <localControls:ExplorerControlTreeViewItemHeader.Style>
                 <Style TargetType="{x:Type localControls:ExplorerControlTreeViewItemHeader}" >
-                    <Setter Property="Icon" Value="{Binding SmallBitmapSource}" />
+                    <Setter Property="Icon" Value="{Binding BitmapSources.SmallBitmapSource}" />
                     <Setter Property="ItemName" Value="{Binding LocalizedName}" />
                 </Style>
             </localControls:ExplorerControlTreeViewItemHeader.Style>
         </localControls:ExplorerControlTreeViewItemHeader>
     </DataTemplate>
 
-    <DataTemplate x:Key="ListViewItemContentDataTemplate" DataType="{x:Type localObjectModel:IBrowsableObjectInfoViewModel}" x:Shared="false">
+    <DataTemplate x:Key="ListViewItemContentDataTemplate" DataType="{x:Type localObjectModel:IBrowsableObjectInfoViewModel}">
         <localControls:ExplorerControlListViewItemContent>
             <localControls:ExplorerControlListViewItemContent.Style>
                 <Style TargetType="{x:Type localControls:ExplorerControlListViewItemContent}" >
-                    <Setter Property="SmallIcon" Value="{Binding SmallBitmapSource}" />
-                    <Setter Property="LargeIcon" Value="{Binding LargeBitmapSource}" />
+                    <Setter Property="SmallIcon" Value="{Binding BitmapSources.SmallBitmapSource}" />
+                    <Setter Property="LargeIcon" Value="{Binding BitmapSources.LargeBitmapSource}" />
                     <Setter Property="ItemName" Value="{Binding LocalizedName}" />
                     <Setter Property="HasTransparency" Value="{Binding IsSpecialItem}" />
                     <Setter Property="IsCheckBoxVisible" Value="{Binding IsCheckBoxVisible, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type localControls:ExplorerControl}}}" />
@@ -429,20 +400,51 @@
 
     <!--Processes-->
 
-    <ControlTemplate x:Key="ProcessTemplate" TargetType="{x:Type localProcessControls:ProcessControl}">
+    <ControlTemplate x:Key="ProcessErrorItemTemplate" TargetType="{x:Type localProcessControls:ProcessErrorItemControl}">
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto" />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
+
+            <Image Source="{TemplateBinding Icon}" />
+
+            <StackPanel Grid.Column="1">
+                <TextBlock Text="{TemplateBinding Path}" />
+                <TextBlock Text="{TemplateBinding ErrorMessage}" />
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="Try again" Command="{x:Static commands:ProcessCommands.TryAgain}" />
+                    <Button Content="Ignore" Command="{x:Static commands:ProcessCommands.Ignore}" />
+                    <Button Content="Cancel" Command="{Binding Actions.Cancel, RelativeSource={RelativeSource Mode=TemplatedParent}, Converter={StaticResource ActionToDelegateCommand2Converter}}" />
+                </StackPanel>
+                <ItemsControl ItemsSource="{Binding CustomActions, RelativeSource={RelativeSource Mode=TemplatedParent}}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type utilCommands:ICommand}">
+                            <Button Content="{Binding Name}" ToolTip="{Binding Description}" Command="{x:Static commands:Commands.CommonCommand}" CommandParameter="{Binding}" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <CheckBox IsChecked="{Binding ApplyToAll, Mode=TwoWay, RelativeSource={RelativeSource Mode=TemplatedParent}}">Apply to all</CheckBox>
+            </StackPanel>
+        </Grid>
+    </ControlTemplate>
+
+    <Style TargetType="{x:Type localProcessControls:ProcessErrorItemControl}">
+        <Setter Property="Template" Value="{StaticResource ProcessErrorItemTemplate}" />
+    </Style>
+
+    <ControlTemplate x:Key="ProcessTemplate" TargetType="{x:Type localProcessControls:ProcessControl}">
+        <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
-                <RowDefinition Height="auto" />
-                <RowDefinition Height="auto" />
-                <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
-            <Grid Grid.ColumnSpan="2">
+            <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition />
                     <ColumnDefinition Width="auto" />
@@ -452,28 +454,73 @@
                     <RowDefinition Height="auto" />
                     <RowDefinition Height="auto" />
                 </Grid.RowDefinitions>
-                <TextBlock Text="{Binding Description, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                <!--<TextBlock Text="{Binding Description, RelativeSource={RelativeSource Mode=TemplatedParent}}" />-->
                 <StackPanel Grid.Row="1" Orientation="Horizontal">
-                    <Button x:Name="PART_Run_PauseButton" Content="{x:Static icons:Resources.control_pause}" Command="{x:Static commands:Commands.CommonCommand}" CommandParameter="{TemplateBinding PauseAction}" />
-                    <Button Content="{x:Static icons:Resources.cancel}" Command="{x:Static commands:Commands.CommonCommand}" CommandParameter="{TemplateBinding CancelAction}" />
+                    <Button x:Name="PART_Run_PauseButton" Content="{x:Static icons:Resources.control_pause}" Command="{x:Static commands:Commands.CommonCommand}" CommandParameter="{Binding Actions.Pause, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                    <Button Content="{x:Static icons:Resources.cancel}" Command="{x:Static commands:Commands.CommonCommand}" CommandParameter="{Binding Actions.Cancel, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
                 </StackPanel>
                 <ProgressBar x:Name="PART_ProgressBar" Grid.Row="2" Value="{Binding ProgressPercentage, RelativeSource={RelativeSource Mode=TemplatedParent}}" Maximum="100" Height="30" />
             </Grid>
 
-            <Label Grid.Row="1" Content="{StaticResource SourcePath}" />
-            <Label Grid.Column="1" Grid.Row="1" Content="{Binding SourcePath, Mode=OneTime, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+            <Control Grid.Row="1">
+                <Control.Style>
+                    <Style TargetType="{x:Type Control}">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="auto" />
+                                            <ColumnDefinition />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="auto" />
+                                            <RowDefinition Height="auto" />
+                                            <RowDefinition Height="auto" />
+                                            <RowDefinition Height="auto" />
+                                        </Grid.RowDefinitions>
 
-            <Label Grid.Row="2" Content="{StaticResource Status}" />
-            <Label Grid.Column="1" Grid.Row="2" Content="{Binding Status, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                                        <Label Content="{StaticResource SourcePath}" />
+                                        <Label Grid.Column="1" Content="{Binding SourcePath, Mode=OneTime, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type localProcessControls:ProcessControl}}}" />
 
-            <Label Grid.Row="3" Content="{StaticResource CurrentPath}" />
-            <TextBlock Grid.Column="1" Grid.Row="3">
-                <Run Text="{Binding CurrentPath, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
-                <Run Text="{Binding CurrentPathProgressPercentage, StringFormat= ({0} %), RelativeSource={RelativeSource Mode=TemplatedParent}}" />
-            </TextBlock>
+                                        <Label Grid.Row="1" Content="{StaticResource Status}" />
+                                        <Label Grid.Column="1" Grid.Row="1" Content="{Binding Status, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type localProcessControls:ProcessControl}}}" />
 
-            <Label Grid.Row="4" Content="{StaticResource ActualRemainingSize}" />
-            <Label Grid.Column="1" Grid.Row="4" Content="{Binding ActualRemainingSize, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                                        <Label Grid.Row="2" Content="{StaticResource CurrentPath}" />
+                                        <controls:Label Grid.Column="1" Grid.Row="2" RecognizesAccessKey="False">
+                                            <controls:Label.Content>
+                                                <MultiBinding Converter="{StaticResource MultiStringConverter}" ConverterParameter="{}{0} ({1} %)">
+                                                    <Binding Path="CurrentPath" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type localProcessControls:ProcessControl}}" />
+                                                    <Binding Path="CurrentPathProgressPercentage" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type localProcessControls:ProcessControl}}" />
+                                                </MultiBinding>
+                                            </controls:Label.Content>
+                                        </controls:Label>
+
+                                        <Label Grid.Row="3" Content="{StaticResource ActualRemainingSize}" />
+                                        <Label Grid.Column="1" Grid.Row="3" Content="{Binding ActualRemainingSize, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type localProcessControls:ProcessControl}}}" />
+                                    </Grid>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+
+                        <Style.Triggers>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding ErrorPaths, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type localProcessControls:ProcessControl}}, Converter={StaticResource IsNullConverter}}" Value="{markup:FalseValue}" />
+                                    <Condition Binding="{Binding Status, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type localProcessControls:ProcessControl}}}" Value="{x:Static process:ProcessStatus.Error}" />
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate>
+                                            <localProcessControls:ProcessErrorItemControl DataContext="{Binding ErrorPaths, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type localProcessControls:ProcessControl}}, Converter={data:SimpleLinkedListConverter}}" Path="{Binding Item.Path}" ErrorMessage="{Binding Error.ErrorMessage}" Actions="{Binding Actions, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type localProcessControls:ProcessControl}}}" CustomActions="{Binding CustomActions, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type localProcessControls:ProcessControl}}}" />
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </MultiDataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Control.Style>
+            </Control>
         </Grid>
         <!--<ControlTemplate.Triggers>
             <DataTrigger Binding="{Binding Status, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="{x:Static localProcessControls:ProcessStatus.None}">
@@ -493,15 +540,16 @@
     </Style>
 
     <DataTemplate DataType="{x:Type localProcess:IProcess}" x:Shared="false">
-        <localProcessControls:ProcessControl SourcePath="{Binding SourcePath}"
+        <localProcessControls:ProcessControl SourcePath="{Binding SourcePath.Path}"
                                              ArePathsLoaded="{Binding ArePathsLoaded}"
-                                             CurrentPath="{Binding CurrentPath}"
+                                             CurrentPath="{Binding CurrentPath.Path}"
+                                             CurrentPathProgressPercentage="{Binding CurrentPathProgressPercentage}"
                                              ProgressPercentage="{Binding ProgressPercentage}"
                                              Status="{Binding Status}"
                                              ActualRemainingSize="{Binding ActualRemainingSize}"
-                                             RunAction="{Binding RunAction}"
-                                             PauseAction="{Binding PauseAction}"
-                                             CancelAction="{Binding CancelAction}"/>
+                                             ErrorPaths="{Binding ErrorPaths}"
+                                             Actions="{Binding ProcessActions}"
+                                             CustomActions="{Binding Actions}" />
     </DataTemplate>
 
 

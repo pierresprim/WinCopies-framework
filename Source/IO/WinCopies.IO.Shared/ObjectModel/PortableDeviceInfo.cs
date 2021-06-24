@@ -36,41 +36,61 @@ using static WinCopies.ThrowHelper;
 
 namespace WinCopies.IO.ObjectModel
 {
-    public abstract class PortableDeviceInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : FileSystemObjectInfo<TObjectProperties, IPortableDevice, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IPortableDeviceInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IPortableDeviceInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems,IBrowsableObjectInfo>
+    public abstract class PortableDeviceInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : FileSystemObjectInfo<TObjectProperties, IPortableDevice, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IPortableDeviceInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IPortableDeviceInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
     {
+        protected class BrowsableObjectInfoBitmapSources : BrowsableObjectInfoBitmapSources<IPortableDeviceInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>>
+        {
+            protected override BitmapSource SmallBitmapSourceOverride => InnerObject.TryGetBitmapSource(SmallIconSize);
+
+            protected override BitmapSource MediumBitmapSourceOverride => InnerObject.TryGetBitmapSource(MediumIconSize);
+
+            protected override BitmapSource LargeBitmapSourceOverride => InnerObject.TryGetBitmapSource(LargeIconSize);
+
+            protected override BitmapSource ExtraLargeBitmapSourceOverride => InnerObject.TryGetBitmapSource(ExtraLargeIconSize);
+
+            public BrowsableObjectInfoBitmapSources(in IPortableDeviceInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> portableDeviceInfo) : base(portableDeviceInfo) { /* Left empty. */ }
+        }
+
         private const int PortableDeviceIcon = 42;
         private const string PortableDeviceIconDllName = "imageres.dll";
         private IPortableDevice _portableDevice;
+        private IBrowsableObjectInfoBitmapSources _bitmapSources;
 
         #region Properties
-        public override IProcessFactory ProcessFactory => Process.ProcessFactory.DefaultProcessFactory;
+        protected override IBrowsableObjectInfoBitmapSources BitmapSourcesOverride => _bitmapSources
+#if CS8
+            ??=
+#else
+            ?? (_bitmapSources =
+#endif
+            new BrowsableObjectInfoBitmapSources(this)
+#if !CS8
+            )
+#endif
+            ;
 
-        public sealed override IPortableDevice InnerObjectGeneric => IsDisposed ? throw GetExceptionForDispose(false) : _portableDevice;
+        protected override IProcessFactory ProcessFactoryOverride => Process.ProcessFactory.DefaultProcessFactory;
 
-        public override bool IsSpecialItem => false;
+        protected sealed override IPortableDevice InnerObjectGenericOverride => _portableDevice;
 
-        public override BitmapSource SmallBitmapSource => TryGetBitmapSource(SmallIconSize);
+        protected override bool IsSpecialItemOverride => false;
 
-        public override BitmapSource MediumBitmapSource => TryGetBitmapSource(MediumIconSize);
+        protected override IBrowsabilityOptions BrowsabilityOverride => BrowsabilityOptions.BrowsableByDefault;
 
-        public override BitmapSource LargeBitmapSource => TryGetBitmapSource(LargeIconSize);
+        protected override string ItemTypeNameOverride => Properties.Resources.PortableDevice;
 
-        public override BitmapSource ExtraLargeBitmapSource => TryGetBitmapSource(ExtraLargeIconSize);
+        protected override string DescriptionOverride => UtilHelpers.NotApplicable;
 
-        public override IBrowsabilityOptions Browsability => BrowsabilityOptions.BrowsableByDefault;
-
-        public override string ItemTypeName => Properties.Resources.PortableDevice;
-
-        public override string Description => UtilHelpers.NotApplicable;
-
-        public override IBrowsableObjectInfo Parent => ShellObjectInfo.From(ShellObjectFactory.Create(KnownFolders.Computer.ParsingName),  ClientVersion);
+        protected override IBrowsableObjectInfo ParentOverride => ShellObjectInfo.From(ShellObjectFactory.Create(KnownFolders.Computer.ParsingName), ClientVersion);
 
         public override string LocalizedName => Name;
 
         public override string Name => InnerObjectGeneric.DeviceFriendlyName;
+
+        protected override System.Collections.Generic.IEnumerable<IProcessInfo> CustomProcessesOverride => PortableDeviceInfo.DefaultCustomProcessesSelectorDictionary.Select(this);
         #endregion Properties
 
-        public PortableDeviceInfo(in IPortableDevice portableDevice, in ClientVersion clientVersion) : base((portableDevice ?? throw GetArgumentNullException(nameof(portableDevice))).DeviceFriendlyName,  clientVersion) => _portableDevice = portableDevice;
+        public PortableDeviceInfo(in IPortableDevice portableDevice, in ClientVersion clientVersion) : base((portableDevice ?? throw GetArgumentNullException(nameof(portableDevice))).DeviceFriendlyName, clientVersion) => _portableDevice = portableDevice;
 
         private BitmapSource TryGetBitmapSource(in int size)
         {
@@ -87,46 +107,64 @@ namespace WinCopies.IO.ObjectModel
                 ;
 #endif
 
-                return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+            return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+        }
+
+        protected override void DisposeUnmanaged()
+        {
+            if (_bitmapSources != null)
+            {
+                _bitmapSources.Dispose();
+                _bitmapSources = null;
+            }
+
+            base.DisposeUnmanaged();
         }
 
         protected override void DisposeManaged()
         {
-            base.DisposeManaged();
-
             _portableDevice.Dispose();
-
             _portableDevice = null;
+
+            base.DisposeManaged();
         }
     }
 
-    public class PortableDeviceInfo : PortableDeviceInfo<IPortableDeviceInfoProperties, IPortableDeviceObject, IEnumerableSelectorDictionary<PortableDeviceObjectInfoItemProvider,IBrowsableObjectInfo>, PortableDeviceObjectInfoItemProvider>, IPortableDeviceInfo
+    public class PortableDeviceInfo : PortableDeviceInfo<IPortableDeviceInfoProperties, IPortableDeviceObject, IEnumerableSelectorDictionary<PortableDeviceObjectInfoItemProvider, IBrowsableObjectInfo>, PortableDeviceObjectInfoItemProvider>, IPortableDeviceInfo
     {
+        private static readonly BrowsabilityPathStack<IPortableDeviceInfo> __browsabilityPathStack = new BrowsabilityPathStack<IPortableDeviceInfo>();
+
         private IPortableDeviceInfoProperties _objectProperties;
 
         #region Properties
-        public static IEnumerableSelectorDictionary<PortableDeviceObjectInfoItemProvider,IBrowsableObjectInfo> DefaultItemSelectorDictionary { get; } = new PortableDeviceInfoSelectorDictionary();
+        public static ISelectorDictionary<IPortableDeviceInfoBase, System.Collections.Generic.IEnumerable<IProcessInfo>> DefaultCustomProcessesSelectorDictionary { get; } = new DefaultNullableValueSelectorDictionary<IPortableDeviceInfoBase, System.Collections.Generic.IEnumerable<IProcessInfo>>();
 
-        public sealed override IPortableDeviceInfoProperties ObjectPropertiesGeneric => IsDisposed ? throw GetExceptionForDispose(false) : _objectProperties;
+        public static IBrowsabilityPathStack<IPortableDeviceInfo> BrowsabilityPathStack { get; } = __browsabilityPathStack.AsWriteOnly();
 
-        public override IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystem => null;
+        protected override System.Collections.Generic.IEnumerable<IBrowsabilityPath> BrowsabilityPathsOverride => __browsabilityPathStack.GetBrowsabilityPaths(this);
+
+        public static IEnumerableSelectorDictionary<PortableDeviceObjectInfoItemProvider, IBrowsableObjectInfo> DefaultItemSelectorDictionary { get; } = new PortableDeviceInfoSelectorDictionary();
+
+        protected sealed override IPortableDeviceInfoProperties ObjectPropertiesGenericOverride => _objectProperties;
+
+        protected override IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystemOverride => null;
         #endregion // Properties
 
-        public PortableDeviceInfo(in IPortableDevice portableDevice, in PortableDeviceOpeningOptions openingOptions,  in ClientVersion clientVersion) : base(portableDevice, clientVersion) => _objectProperties = new PortableDeviceInfoProperties<IPortableDeviceInfo>(this, openingOptions);
+        public PortableDeviceInfo(in IPortableDevice portableDevice, in PortableDeviceOpeningOptions openingOptions, in ClientVersion clientVersion) : base(portableDevice, clientVersion) => _objectProperties = new PortableDeviceInfoProperties<IPortableDeviceInfo>(this, openingOptions);
 
-        public PortableDeviceInfo(in IPortableDevice portableDevice, in ClientVersion clientVersion) : this(portableDevice, new PortableDeviceOpeningOptions(GenericRights.Read, FileShareOptions.Read, true),  clientVersion)
+        public PortableDeviceInfo(in IPortableDevice portableDevice, in ClientVersion clientVersion) : this(portableDevice, new PortableDeviceOpeningOptions(GenericRights.Read, FileShareOptions.Read, true), clientVersion)
         {
             // Left empty.
         }
 
         #region Methods
-        public override IEnumerableSelectorDictionary<PortableDeviceObjectInfoItemProvider, IBrowsableObjectInfo> GetSelectorDictionary() => DefaultItemSelectorDictionary;
+        protected override IEnumerableSelectorDictionary<PortableDeviceObjectInfoItemProvider, IBrowsableObjectInfo> GetSelectorDictionaryOverride() => DefaultItemSelectorDictionary;
 
         protected override void DisposeManaged()
         {
-            base.DisposeManaged();
-
             _objectProperties = null;
+
+            base.DisposeManaged();
         }
 
         #region GetItems
@@ -140,7 +178,7 @@ namespace WinCopies.IO.ObjectModel
         }
 
         protected override System.Collections.Generic.IEnumerable<PortableDeviceObjectInfoItemProvider> GetItemProviders() => GetItemProviders(null);
-        #endregion // GetItems
-        #endregion // Methods
+        #endregion GetItems
+        #endregion Methods
     }
 }

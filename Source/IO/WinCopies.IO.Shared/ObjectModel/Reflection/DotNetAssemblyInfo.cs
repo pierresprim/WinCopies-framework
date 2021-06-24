@@ -19,21 +19,27 @@ using Microsoft.WindowsAPICodePack.PortableDevices;
 using Microsoft.WindowsAPICodePack.Shell;
 
 using System;
-using System.Collections.Generic;
+using System.Drawing;
 using System.Reflection;
 using System.Security;
+using System.Windows.Media.Imaging;
 
 using WinCopies.Collections;
+using WinCopies.Collections.Generic;
+using WinCopies.IO.AbstractionInterop;
 using WinCopies.IO.AbstractionInterop.Reflection;
+using WinCopies.IO.Enumeration;
 using WinCopies.IO.Enumeration.Reflection;
 using WinCopies.IO.Process;
 using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Reflection;
-using WinCopies.IO.Selectors;
+using WinCopies.PropertySystem;
 using WinCopies.Util;
 
 using static WinCopies.IO.DotNetAssemblyInfoHandledExtensions;
+using static WinCopies.IO.Resources.ExceptionMessages;
 using static WinCopies.UtilHelpers;
+using static WinCopies.ThrowHelper;
 
 namespace WinCopies.IO
 {
@@ -42,73 +48,167 @@ namespace WinCopies.IO
         public const string Exe = ".exe";
         public const string Dll = ".dll";
     }
-}
 
-namespace WinCopies.IO.ObjectModel.Reflection
-{
-    public class DotNetAssemblyInfo : ShellObjectInfo<IFileSystemObjectInfoProperties2, DotNetNamespaceInfoItemProvider, IEnumerableSelectorDictionary<DotNetNamespaceInfoItemProvider,IBrowsableObjectInfo>, DotNetNamespaceInfoItemProvider>, IDotNetAssemblyInfo // <IFileSystemObjectInfoProperties>
+    namespace ObjectModel.Reflection
     {
-        #region Properties
-        //public override Predicate<DotNetNamespaceInfoItemProvider> RootItemsPredicate => item => !IsNullEmptyOrWhiteSpace(item.NamespaceName);
-
-        //public override Predicate<IBrowsableObjectInfo> RootItemsBrowsableObjectInfoPredicate => null;
-
-        public static Action RegisterSelectors { get; private set; } = () =>
+        public class DotNetAssemblyInfo : BrowsableObjectInfo<IFileSystemObjectInfoProperties2, Assembly, DotNetNamespaceInfoItemProvider, IEnumerableSelectorDictionary<DotNetNamespaceInfoItemProvider, IBrowsableObjectInfo>, DotNetNamespaceInfoItemProvider>, IDotNetAssemblyInfo // <IFileSystemObjectInfoProperties>
         {
-            ShellObjectInfo.DefaultItemSelectorDictionary.Push(item => item.ShellObject is ShellFile shellFile && shellFile.Path.EndsWithOR(Exe, Dll), _item => new DotNetAssemblyInfo(ShellObjectInfo.GetInitInfo(_item.ShellObject).Path, _item.ShellObject, _item.ClientVersion.Value));
-
-            RegisterSelectors = () => { /* Left empty. */ };
-        };
-
-        public override IProcessFactory ProcessFactory => Process.ProcessFactory.DefaultProcessFactory;
-
-        public override IBrowsabilityOptions Browsability => BrowsabilityOptions.Browsable;
-
-        public sealed override bool IsRecursivelyBrowsable => false;
-
-        public Assembly Assembly { get; private set; }
-
-        public override IFileSystemObjectInfoProperties2 ObjectPropertiesGeneric { get; }
-        #endregion Properties
-
-        protected DotNetAssemblyInfo(in string path, in ShellObject shellObject, in ClientVersion clientVersion) : base(path, shellObject,  clientVersion) => ObjectPropertiesGeneric = new FileShellObjectInfoProperties<IShellObjectInfoBase2>(this, FileType.File);
-
-        #region Methods
-        public static DotNetAssemblyInfo From(in ShellObject shellObject, in ClientVersion clientVersion)
-        {
-            ShellObjectInitInfo initInfo = ShellObjectInfo.GetInitInfo(shellObject);
-
-            return initInfo.FileType == FileType.File ? initInfo.Path.EndsWithOR(Exe, Dll) ? new DotNetAssemblyInfo(initInfo.Path, shellObject, clientVersion) : throw new ArgumentException($"{nameof(shellObject)} must be an exe (.exe) or a dll (.dll).") : throw new ArgumentException($"{nameof(shellObject)} is not a file.");
-        }
-
-        public override IEnumerableSelectorDictionary<DotNetNamespaceInfoItemProvider, IBrowsableObjectInfo> GetSelectorDictionary() => DotNetNamespaceInfo.DefaultItemSelectorDictionary;
-
-        public void OpenAssembly()
-        {
-            try
+            protected internal class BrowsabilityPath : IBrowsabilityPath<IShellObjectInfo>
             {
-                Assembly = Assembly.LoadFrom(Path);
+                string IBrowsabilityPathBase.Name => ".Net Parser";
+
+                IBrowsableObjectInfo IBrowsabilityPath<IShellObjectInfo>.GetPath(IShellObjectInfo browsableObjectInfo) => new DotNetAssemblyInfo(browsableObjectInfo, browsableObjectInfo.ClientVersion);
+
+                bool IBrowsabilityPath<IShellObjectInfo>.IsValidFor(IShellObjectInfo browsableObjectInfo)
+                {
+                    if (browsableObjectInfo.InnerObject is ShellFile shellFile && shellFile.Path.EndsWithOR(Exe, Dll))
+
+                        try
+                        {
+                            _ = Assembly.LoadFrom(browsableObjectInfo.Path);
+
+                            return true;
+                        }
+
+                        catch (Exception ex) when (ex.Is(false, typeof(FileNotFoundException), typeof(FileLoadException), typeof(BadImageFormatException), typeof(SecurityException), typeof(PathTooLongException)))
+                        {
+
+                        }
+
+                    return false;
+                }
             }
 
-            catch (Exception ex) when (ex.Is(false, typeof(FileNotFoundException), typeof(FileLoadException), typeof(BadImageFormatException), typeof(SecurityException)))
+            private Assembly _assembly;
+            private ShellObjectInfo _shellObjectInfo;
+
+            #region Properties
+            //public override Predicate<DotNetNamespaceInfoItemProvider> RootItemsPredicate => item => !IsNullEmptyOrWhiteSpace(item.NamespaceName);
+
+            //public override Predicate<IBrowsableObjectInfo> RootItemsBrowsableObjectInfoPredicate => null;
+
+            protected IShellObjectInfo ShellObjectInfo => GetValueIfNotDisposed(_shellObjectInfo);
+
+            protected override Assembly InnerObjectGenericOverride => _assembly;
+
+            protected override IProcessFactory ProcessFactoryOverride => Process.ProcessFactory.DefaultProcessFactory;
+
+            protected override IBrowsabilityOptions BrowsabilityOverride => BrowsabilityOptions.Browsable;
+
+            protected sealed override bool IsRecursivelyBrowsableOverride => false;
+
+            protected override IFileSystemObjectInfoProperties2 ObjectPropertiesGenericOverride { get; }
+
+            protected override IBrowsableObjectInfoBitmapSources BitmapSourcesOverride => _shellObjectInfo.BitmapSources;
+
+            protected override System.Collections.Generic.IEnumerable<IBrowsabilityPath> BrowsabilityPathsOverride => _shellObjectInfo.BrowsabilityPaths;
+
+            protected override System.Collections.Generic.IEnumerable<IProcessInfo> CustomProcessesOverride => _shellObjectInfo.CustomProcesses;
+
+            protected override string DescriptionOverride => _shellObjectInfo.Description;
+
+            protected override bool IsSpecialItemOverride => _shellObjectInfo.IsSpecialItem;
+
+            protected override string ItemTypeNameOverride => _shellObjectInfo.ItemTypeName;
+
+            public override string LocalizedName => _shellObjectInfo.LocalizedName;
+
+            public override string Name => _shellObjectInfo.Name;
+
+            protected override IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystemOverride => _shellObjectInfo.ObjectPropertySystem;
+
+            protected override IBrowsableObjectInfo ParentOverride => _shellObjectInfo.Parent;
+
+            System.IO.Stream IShellObjectInfoBase.ArchiveFileStream => ShellObjectInfo.ArchiveFileStream;
+
+            IShellObjectInfoBase IArchiveItemInfoProvider.ArchiveShellObject => ShellObjectInfo.ArchiveShellObject;
+
+            IFileSystemObjectInfoProperties IBrowsableObjectInfo<IFileSystemObjectInfoProperties>.ObjectProperties => ShellObjectInfo.ObjectProperties;
+
+            ShellObject IEncapsulatorBrowsableObjectInfo<ShellObject>.InnerObject => ShellObjectInfo.InnerObject;
+            #endregion Properties
+
+            protected DotNetAssemblyInfo(in IShellObjectInfo shellObjectInfo, in ClientVersion clientVersion) : base(shellObjectInfo.Path, clientVersion) => ObjectPropertiesGenericOverride = new FileShellObjectInfoProperties<IShellObjectInfoBase2>(this, FileType.File);
+
+            #region Methods
+            public static DotNetAssemblyInfo From(in ShellObject shellObject, in ClientVersion clientVersion)
             {
-                Assembly = null;
+                ShellObjectInitInfo initInfo = ObjectModel.ShellObjectInfo.GetInitInfo(shellObject);
+
+                return initInfo.FileType == FileType.File ? initInfo.Path.EndsWithOR(Exe, Dll) ? new DotNetAssemblyInfo(new ShellObjectInfo(initInfo.Path, initInfo.FileType, shellObject, clientVersion), clientVersion) : throw new ArgumentException($"{nameof(shellObject)} must be an exe (.exe) or a dll (.dll).") : throw new ArgumentException(GivenShellObjectIsNotAFile, nameof(shellObject));
             }
+
+            protected override ArrayBuilder<IBrowsableObjectInfo> GetRootItemsOverride()
+            {
+                var arrayBuilder = new ArrayBuilder<IBrowsableObjectInfo>();
+
+                _ = arrayBuilder.AddLast(new DotNetAssemblyInfo(ObjectModel.ShellObjectInfo.From(_shellObjectInfo.InnerObjectGeneric, _shellObjectInfo.ClientVersion), ClientVersion));
+
+                return arrayBuilder;
+            }
+
+            protected override IEnumerableSelectorDictionary<DotNetNamespaceInfoItemProvider, IBrowsableObjectInfo> GetSelectorDictionaryOverride() => DotNetNamespaceInfo.DefaultItemSelectorDictionary;
+
+            public void OpenAssembly()
+            {
+                ThrowIfDisposed(this);
+
+                try
+                {
+                    _assembly = Assembly.LoadFrom(Path);
+                }
+
+                catch (Exception ex) when (ex.Is(false, typeof(FileNotFoundException), typeof(FileLoadException), typeof(BadImageFormatException), typeof(SecurityException)))
+                {
+                    _assembly = null;
+                }
+            }
+
+            public void CloseAssembly()
+            {
+                ThrowIfDisposed(this);
+
+                _assembly = null;
+            }
+
+            public static System.Collections.Generic.IEnumerable<DotNetItemType> GetDefaultItemTypes() => new DotNetItemType[] { DotNetItemType.Namespace, DotNetItemType.Struct, DotNetItemType.Enum, DotNetItemType.Class, DotNetItemType.Interface, DotNetItemType.Delegate };
+
+            protected virtual System.Collections.Generic.IEnumerable<DotNetNamespaceInfoItemProvider> GetItemProviders(System.Collections.Generic.IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetNamespaceInfoItemProvider> func) => DotNetNamespaceInfoEnumeration.From(this, typesToEnumerate, func);
+
+            public System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(System.Collections.Generic.IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetNamespaceInfoItemProvider> func) => GetItems(GetItemProviders(typesToEnumerate, func));
+
+            protected override System.Collections.Generic.IEnumerable<DotNetNamespaceInfoItemProvider> GetItemProviders(Predicate<DotNetNamespaceInfoItemProvider> predicate) => GetItemProviders(GetDefaultItemTypes(), predicate);
+
+            protected override System.Collections.Generic.IEnumerable<DotNetNamespaceInfoItemProvider> GetItemProviders() => GetItemProviders(GetDefaultItemTypes(), null);
+
+            protected override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetSubRootItemsOverride() => GetItems(GetItemProviders(item => !IsNullEmptyOrWhiteSpace(item.NamespaceName)));
+
+            protected override void DisposeManaged()
+            {
+                CloseAssembly();
+
+                base.DisposeManaged();
+            }
+
+            protected override void DisposeUnmanaged()
+            {
+                _shellObjectInfo = null;
+
+                base.DisposeUnmanaged();
+            }
+
+            void IShellObjectInfoBase.OpenArchive(System.IO.FileMode fileMode, System.IO.FileAccess fileAccess, System.IO.FileShare fileShare, int? bufferSize, System.IO.FileOptions fileOptions) => ShellObjectInfo.OpenArchive(fileMode, fileAccess, fileShare, bufferSize, fileOptions);
+
+            void IShellObjectInfoBase.CloseArchive() => ShellObjectInfo.CloseArchive();
+
+            Icon IFileSystemObjectInfo.TryGetIcon(in int size) => ShellObjectInfo.TryGetIcon(size);
+
+            BitmapSource IFileSystemObjectInfo.TryGetBitmapSource(in int size) => ShellObjectInfo.TryGetBitmapSource(size);
+
+            System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> IBrowsableObjectInfo<IFileSystemObjectInfoProperties, ShellObject, ShellObjectInfoEnumeratorStruct, IEnumerableSelectorDictionary<ShellObjectInfoItemProvider, IBrowsableObjectInfo>, ShellObjectInfoItemProvider>.GetItems(Predicate<ShellObjectInfoEnumeratorStruct> predicate) => ShellObjectInfo.GetItems(predicate);
+
+            IEnumerableSelectorDictionary<ShellObjectInfoItemProvider, IBrowsableObjectInfo> IBrowsableObjectInfo<IFileSystemObjectInfoProperties, ShellObject, ShellObjectInfoEnumeratorStruct, IEnumerableSelectorDictionary<ShellObjectInfoItemProvider, IBrowsableObjectInfo>, ShellObjectInfoItemProvider>.GetSelectorDictionary() => ShellObjectInfo.GetSelectorDictionary();
+            #endregion
         }
-
-        public void CloseAssembly() => Assembly = null;
-
-        public static System.Collections.Generic.IEnumerable<DotNetItemType> GetDefaultItemTypes() => new DotNetItemType[] { DotNetItemType.Namespace, DotNetItemType.Struct, DotNetItemType.Enum, DotNetItemType.Class, DotNetItemType.Interface, DotNetItemType.Delegate };
-
-        protected virtual System.Collections.Generic.IEnumerable<DotNetNamespaceInfoItemProvider> GetItemProviders(System.Collections.Generic.IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetNamespaceInfoItemProvider> func) => DotNetNamespaceInfoEnumeration.From(this, typesToEnumerate, func);
-
-        public System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(System.Collections.Generic.IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetNamespaceInfoItemProvider> func) => GetItems(GetItemProviders(typesToEnumerate, func));
-
-        protected override System.Collections.Generic.IEnumerable<DotNetNamespaceInfoItemProvider> GetItemProviders(Predicate<DotNetNamespaceInfoItemProvider> predicate) => GetItemProviders(GetDefaultItemTypes(), predicate);
-
-        protected override System.Collections.Generic.IEnumerable<DotNetNamespaceInfoItemProvider> GetItemProviders() => GetItemProviders(GetDefaultItemTypes(), null);
-
-        public override IEnumerable<IBrowsableObjectInfo> GetSubRootItems() => GetItems(GetItemProviders(item => !IsNullEmptyOrWhiteSpace(item.NamespaceName)));
-        #endregion
     }
 }

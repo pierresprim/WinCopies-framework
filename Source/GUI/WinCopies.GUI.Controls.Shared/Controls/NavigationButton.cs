@@ -17,11 +17,13 @@
 
 using System;
 using System.Collections;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
-using WinCopies.Collections.Generic;
 using WinCopies.Commands;
 using WinCopies.Desktop;
 
@@ -87,7 +89,69 @@ namespace WinCopies.GUI.Controls
 #endif
     }
 
-    public class NavigationButton : CommandItemsControl<ILinkedListEnumerable, object>
+    public interface IHistoryCollection : IList
+    {
+        int CurrentIndex { get; set; }
+
+        object Current { get; }
+
+        bool CanMovePreviousFromCurrent { get; }
+
+        bool CanMoveNextFromCurrent { get; }
+
+        bool NotifyOnPropertyChanged { get; }
+    }
+
+    public class HistoryObservableCollection<T> : ObservableCollection<T>, IHistoryCollection, INotifyPropertyChanged, INotifyCollectionChanged
+    {
+        private int _currentIndex;
+        private bool _notifyOnPropertyChanged = true;
+
+        public int CurrentIndex
+        {
+            get => _currentIndex; set => UtilHelpers.UpdateValue(ref _currentIndex, value, OnPropertyChanged);
+        }
+
+        public T Current => this[CurrentIndex];
+
+        object IHistoryCollection.Current => Current;
+
+        public bool CanMovePreviousFromCurrent => CurrentIndex < Count - 1;
+
+        public bool CanMoveNextFromCurrent => CurrentIndex > 0;
+
+        public bool NotifyOnPropertyChanged
+        {
+            get => _notifyOnPropertyChanged; set => UtilHelpers.UpdateValue(ref _notifyOnPropertyChanged, value, () =>
+{
+if (value)
+
+OnPropertyChanged();
+});
+        }
+
+        protected virtual void OnPropertyChanged()
+        {
+            OnPropertyChanged(new PropertyChangedEventArgs(nameof(CurrentIndex)));
+            OnPropertyChanged(new PropertyChangedEventArgs(nameof(Current)));
+            OnPropertyChanged(new PropertyChangedEventArgs(nameof(CanMovePreviousFromCurrent)));
+            OnPropertyChanged(new PropertyChangedEventArgs(nameof(CanMoveNextFromCurrent)));
+        }
+
+        protected override void OnPropertyChanged(PropertyChangedEventArgs e)
+        {
+            if (NotifyOnPropertyChanged)
+            {
+                base.OnPropertyChanged(e);
+
+                if (e.PropertyName == nameof(Count))
+
+                    OnPropertyChanged();
+            }
+        }
+    }
+
+    public class NavigationButton : CommandItemsControl<IHistoryCollection, object>
     {
         public static readonly DependencyProperty GoBackButtonStyleProperty = Register<Style, NavigationButton>(nameof(GoBackButtonStyle));
 
@@ -108,7 +172,7 @@ namespace WinCopies.GUI.Controls
 
         protected virtual void OnCanBrowseBack(CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = ItemsSource?.Current?.CanMovePreviousFromCurrent == true;
+            e.CanExecute = ItemsSource?.CanMovePreviousFromCurrent == true;
 
             e.Handled = true;
         }
@@ -121,14 +185,14 @@ namespace WinCopies.GUI.Controls
 
                 return;
 
-            if (ItemsSource.MovePrevious())
+            ItemsSource.CurrentIndex++;
 
-                _ = Command?.TryExecute(CommandParameter, CommandTarget);
+            _ = Command?.TryExecute(CommandParameter, CommandTarget);
         }
 
         protected virtual void OnCanBrowseForward(CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = ItemsSource?.Current?.CanMoveNextFromCurrent == true;
+            e.CanExecute = ItemsSource?.CanMoveNextFromCurrent == true;
 
             e.Handled = true;
         }
@@ -141,9 +205,9 @@ namespace WinCopies.GUI.Controls
 
                 return;
 
-            if (ItemsSource.MoveNext())
+            ItemsSource.CurrentIndex--;
 
-                _ = Command?.TryExecute(CommandParameter, CommandTarget);
+            _ = Command?.TryExecute(CommandParameter, CommandTarget);
         }
 
         protected virtual void OnCanGoToPage(CanExecuteRoutedEventArgs e)
@@ -161,7 +225,7 @@ namespace WinCopies.GUI.Controls
 
                 return;
 
-            ItemsSource.UpdateCurrent(((ILinkedListNodeEnumerable)e.Parameter).Node);
+            ItemsSource.CurrentIndex = ItemsSource.IndexOf(e.Parameter);
 
             _ = Command?.TryExecute(CommandParameter, CommandTarget);
         }

@@ -37,12 +37,14 @@ namespace WinCopies.IO.ObjectModel.Reflection
 {
     public abstract class DotNetMemberInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : BrowsableDotNetItemInfo<TObjectProperties, MemberInfo, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IDotNetMemberInfoBase where TObjectProperties : IDotNetTypeOrMemberInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
     {
+        private MemberInfo _memberInfo;
+
         #region Properties
-        public sealed override MemberInfo InnerObjectGeneric { get; }
+        protected sealed override MemberInfo InnerObjectGenericOverride => _memberInfo;
 
-        public override IProcessFactory ProcessFactory => Process.ProcessFactory.DefaultProcessFactory;
+        protected override IProcessFactory ProcessFactoryOverride => Process.ProcessFactory.DefaultProcessFactory;
 
-        public override string ItemTypeName => Properties.Resources.DotNetMember;
+        protected override string ItemTypeNameOverride => Properties.Resources.DotNetMember;
         #endregion
 
         protected DotNetMemberInfo(in MemberInfo memberInfo, in IDotNetItemInfo parent) : base($"{(parent ?? throw GetArgumentNullException(nameof(parent))).Path}{IO.Path.PathSeparator}{(memberInfo ?? throw GetArgumentNullException(nameof(memberInfo))).Name}", memberInfo.Name, parent)
@@ -53,26 +55,35 @@ namespace WinCopies.IO.ObjectModel.Reflection
 =>
 #endif
 
-            InnerObjectGeneric = memberInfo;
+            _memberInfo = memberInfo;
 #if DEBUG
         }
 #endif
+
+        protected override void DisposeManaged()
+        {
+            _memberInfo = null;
+
+            base.DisposeManaged();
+        }
     }
 
     public class DotNetMemberInfo : DotNetMemberInfo<IDotNetTypeOrMemberInfoProperties, DotNetMemberInfoItemProvider, IEnumerableSelectorDictionary<DotNetMemberInfoItemProvider, IBrowsableObjectInfo>, DotNetMemberInfoItemProvider>, IDotNetMemberInfo
     {
+        private IDotNetTypeOrMemberInfoProperties _properties;
+
         #region Properties
         public static IEnumerableSelectorDictionary<DotNetMemberInfoItemProvider, IBrowsableObjectInfo> DefaultItemSelectorDictionary { get; } = new DotNetMemberInfoSelectorDictionary();
 
-        public sealed override IDotNetTypeOrMemberInfoProperties ObjectPropertiesGeneric { get; }
+        protected sealed override IDotNetTypeOrMemberInfoProperties ObjectPropertiesGenericOverride => _properties;
 
-        public override IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystem => null;
+        protected override IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystemOverride => null;
 
         #endregion
 
         protected internal DotNetMemberInfo(in MemberInfo memberInfo, in IDotNetItemInfo parent) : base(memberInfo, parent)
 #if CS9
-        => ObjectPropertiesGeneric =
+        => _properties =
 #else
         {
             if (
@@ -85,7 +96,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
 #else
                 )
 
-                ObjectPropertiesGeneric =
+                _properties =
 #endif
 
 DotNetPropertyOrMethodItemInfoProperties<IDotNetMemberInfo>.From(this)
@@ -97,7 +108,7 @@ DotNetPropertyOrMethodItemInfoProperties<IDotNetMemberInfo>.From(this)
 
             else
 
-                ObjectPropertiesGeneric =
+                _properties =
 #endif
 
                 new DotNetFieldItemInfoProperties<IDotNetMemberInfo>(this);
@@ -108,7 +119,7 @@ DotNetPropertyOrMethodItemInfoProperties<IDotNetMemberInfo>.From(this)
         #region Methods
         public static System.Collections.Generic.IEnumerable<DotNetItemType> GetDefaultItemTypes() => new DotNetItemType[] { DotNetItemType.Parameter, DotNetItemType.Attribute };
 
-        public override IEnumerableSelectorDictionary<DotNetMemberInfoItemProvider, IBrowsableObjectInfo> GetSelectorDictionary() => DefaultItemSelectorDictionary;
+        protected override IEnumerableSelectorDictionary<DotNetMemberInfoItemProvider, IBrowsableObjectInfo> GetSelectorDictionaryOverride() => DefaultItemSelectorDictionary;
 
         protected virtual System.Collections.Generic.IEnumerable<DotNetMemberInfoItemProvider> GetItemProviders(System.Collections.Generic.IEnumerable<DotNetItemType> enumerable, Predicate<DotNetMemberInfoItemProvider> func) => DotNetMemberInfoEnumeration.From(this, enumerable, func);
 
@@ -117,6 +128,14 @@ DotNetPropertyOrMethodItemInfoProperties<IDotNetMemberInfo>.From(this)
         protected override IEnumerable<DotNetMemberInfoItemProvider> GetItemProviders(Predicate<DotNetMemberInfoItemProvider> predicate) => GetItemProviders(GetDefaultItemTypes(), predicate);
 
         protected override System.Collections.Generic.IEnumerable<DotNetMemberInfoItemProvider> GetItemProviders() => GetItemProviders(GetDefaultItemTypes(), null);
+
+        protected override void DisposeUnmanaged()
+        {
+            _properties.Dispose();
+            _properties = null;
+
+            base.DisposeUnmanaged();
+        }
         #endregion
     }
 }

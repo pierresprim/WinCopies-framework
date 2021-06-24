@@ -23,7 +23,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Runtime.InteropServices;
+using System.Linq;
 
 using WinCopies.GUI.Drawing.Exceptions;
 using WinCopies.GUI.Drawing.EncodingFormats;
@@ -40,7 +40,6 @@ using static WinCopies.
     ;
 
 using Size = System.Drawing.Size;
-using System.Linq;
 
 namespace WinCopies.GUI.Drawing
 {

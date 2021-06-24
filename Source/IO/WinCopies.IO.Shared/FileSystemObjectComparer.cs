@@ -24,14 +24,6 @@ using WinCopies.IO.ObjectModel;
 using WinCopies.IO.PropertySystem;
 using WinCopies.Util;
 
-using static WinCopies.
-    #if !WinCopies3
-    Util.Util
-#else
-    UtilHelpers
-#endif
-    ;
-
 namespace WinCopies.IO
 {
     public class FileSystemObjectComparer<T> : Comparer<T>, IFileSystemObjectComparer<T> where T : IBrowsableObjectInfoBase
@@ -59,13 +51,13 @@ namespace WinCopies.IO
 
         public FileSystemObjectComparer(StringComparer stringComparer) => StringComparer = stringComparer;
 
-        public int Validate(in T x, in T y)
+        public int? Validate(in T x, in T y)
         {
             if (x == null) return y == null ? 0 : -1;
 
             if (y == null) return 1;
 
-            return CompareLocalizedNames(x, y);
+            return null;
         }
 
         public int CompareLocalizedNames(in T x, in T y) => StringComparer.Compare(x.LocalizedName.RemoveAccents(), y.LocalizedName.RemoveAccents());
@@ -101,6 +93,10 @@ namespace WinCopies.IO
 
         //public StringComparer StringComparer { get; }
 
+        public static FileType[] FolderItemTypes { get; } = new FileType[] { FileType.Folder, FileType.KnownFolder, FileType.Other };
+
+        public static FileType[] FileItemTypes { get; } = new FileType[] { FileType.File, FileType.Archive, FileType.Library, FileType.Link };
+
         public FileSystemObjectInfoComparer() : base() { }
 
         public FileSystemObjectInfoComparer(StringComparer stringComparer) : base(stringComparer) { }
@@ -115,34 +111,22 @@ namespace WinCopies.IO
 
             if (x is IBrowsableObjectInfo<IFileSystemObjectInfoProperties> _x && y is IBrowsableObjectInfo<IFileSystemObjectInfoProperties> _y)
             {
-                if (_x.ObjectProperties.FileType == _y.ObjectProperties.FileType) return CompareLocalizedNames(x, y);
+                FileType xFileType = _x.ObjectProperties.FileType;
+                FileType yFileType = _y.ObjectProperties.FileType;
 
-                if (_x.ObjectProperties.FileType.IsValidEnumValue())
-                {
-#if CS8
-                    static
-#endif
-                        FileType[] getFileItemTypes() => new FileType[] { FileType.File, FileType.Archive, FileType.Library, FileType.Link };
+                if (xFileType == yFileType) return CompareLocalizedNames(x, y);
 
-                    if (_y.ObjectProperties.FileType.IsValidEnumValue())
-                    {
-                        FileType[] fileTypes = getFileItemTypes();
+                if (xFileType.IsValidEnumValue())
 
-                        if (_x.ObjectProperties.FileType.IsValidEnumValue(true, fileTypes))
+                    return yFileType.IsValidEnumValue()
+                        ? xFileType.IsValidEnumValue(true, FileItemTypes)
+                            ? yFileType.IsValidEnumValue(true, FileItemTypes) ? CompareLocalizedNames(x, y) : 1
+                            : xFileType.IsValidEnumValue(true, FolderItemTypes)
+                            ? yFileType.IsValidEnumValue(true, FolderItemTypes) ? CompareLocalizedNames(x, y) : -1
+                            : yFileType == FileType.Drive ? CompareLocalizedNames(x, y) : 1
+                        : 1;
 
-                            return _y.ObjectProperties.FileType.IsValidEnumValue(true, fileTypes) ? CompareLocalizedNames(x, y) : 1;
-
-                        fileTypes = new FileType[] { FileType.Folder, FileType.KnownFolder, FileType.Drive, FileType.Other };
-
-                        if (_x.ObjectProperties.FileType.IsValidEnumValue(true, fileTypes))
-
-                            return _y.ObjectProperties.FileType.IsValidEnumValue(true, fileTypes) ? CompareLocalizedNames(x, y) : -1;
-                    }
-
-                    return 1;
-                }
-
-                if (_y.ObjectProperties.FileType.IsValidEnumValue()) return -1;
+                if (yFileType.IsValidEnumValue()) return -1;
             }
 
             return CompareLocalizedNames(x, y);

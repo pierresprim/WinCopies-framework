@@ -11,6 +11,7 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AssemblyInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\ExplorerControlPropertyGrid.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\Process\ProcessErrorItemControl.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\Process\ProcessWindow.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\BrowsableObjectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\BrowsableObjectInfoViewModel.cs" />

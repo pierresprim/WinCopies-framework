@@ -15,10 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+using System;
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Drawing;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -27,14 +29,55 @@ using WinCopies.Commands;
 using WinCopies.GUI.Controls.Models;
 using WinCopies.Linq;
 
+using static WinCopies.Commands.TextCommands;
 using static WinCopies.GUI.Controls.ButtonTextBoxModel;
 
 namespace WinCopies.GUI.Controls
 {
-    /// <summary>
-    /// Represents a <see cref="System.Windows.Controls.TextBox"/> that can display items on the left and right of the text.
-    /// </summary>
-    public class TextBox : System.Windows.Controls.TextBox
+    internal static class TextBoxHelper
+    {
+#if !WinCopies4
+        public static string FirstCharOfEachWordToUpper(this string s, params char[] separators)
+        {
+            string[] text = s.Split(separators);
+
+            char[] c = new char[s.Length];
+
+            int _j;
+
+            string _text;
+
+            for (int i = 0, j = 0; i < text.Length; i++)
+            {
+                _text = text[i];
+
+                c[j] = char.ToUpper(_text[0], CultureInfo.CurrentCulture);
+
+                for (j++, _j = 1; _j < _text.Length; j++, _j++)
+
+                    c[j] = _text[_j];
+            }
+
+            return new string(c);
+        }
+
+        public static string _Reverse(this string s)
+        {
+            char[] c = new char[s.Length];
+
+            for (int i = 0; i < s.Length; i++)
+
+                c[i] = s[s.Length - i - 1];
+
+            return new string(c);
+        }
+#endif
+    }
+
+        /// <summary>
+        /// Represents a <see cref="System.Windows.Controls.TextBox"/> that can display items on the left and right of the text.
+        /// </summary>
+        public class TextBox : System.Windows.Controls.TextBox
     {
         /// <summary>
         /// Identifies the <see cref="LeftItems"/> dependency property.
@@ -80,6 +123,64 @@ namespace WinCopies.GUI.Controls
         public DataTemplateSelector RightItemsTemplateSelector { get => (DataTemplateSelector)GetValue(RightItemsTemplateSelectorProperty); set => SetValue(RightItemsTemplateSelectorProperty, value); }
 
         static TextBox() => DefaultStyleKeyProperty.OverrideMetadata(typeof(TextBox), new FrameworkPropertyMetadata(typeof(TextBox)));
+
+        public TextBox() => RegisterCommandBindings();
+
+        protected virtual void AddCaseCommandBinding(ICommand command, Action<ExecutedRoutedEventArgs> action) => CommandBindings.Add(new CommandBinding(command, (object sender, ExecutedRoutedEventArgs e) => action(e), (object _sender, CanExecuteRoutedEventArgs _e) => OnUpperCommandCanExecute(_e)));
+
+        protected virtual void RegisterCommandBindings()
+        {
+            AddCaseCommandBinding(Upper, OnUpperCommandExecuted);
+            AddCaseCommandBinding(Lower, OnLowerCommandExecuted);
+            AddCaseCommandBinding(FirstCharUpper, OnFirstCharUpperCommandExecuted);
+            AddCaseCommandBinding(FirstCharOfEachWordUpper, OnFirstCharOfEachWordUpperCommandExecuted);
+            AddCaseCommandBinding(Reverse, OnReverseExecuted);
+        }
+
+        protected virtual void OnUpperCommandExecuted(ExecutedRoutedEventArgs e)
+        {
+            Text = Text.ToUpper(CultureInfo.CurrentCulture);
+
+            e.Handled = true;
+        }
+
+        protected virtual void OnLowerCommandExecuted(ExecutedRoutedEventArgs e)
+        {
+            Text = Text.ToLower(CultureInfo.CurrentCulture);
+
+            e.Handled = true;
+        }
+        private static string ToUpper(in char c) => char.ToUpper(c, CultureInfo.CurrentCulture).ToString();
+
+        protected virtual void OnFirstCharUpperCommandExecuted(ExecutedRoutedEventArgs e)
+        {
+            string toUpper() => ToUpper(Text[0]);
+
+            Text = Text.Length == 1 ? toUpper() : $"{toUpper()}{Text.Substring(1)}";
+
+            e.Handled = true;
+        }
+
+        protected virtual void OnFirstCharOfEachWordUpperCommandExecuted(ExecutedRoutedEventArgs e)
+        {
+            Text = Text.FirstCharOfEachWordToUpper( ' ');
+
+            e.Handled = true;
+        }
+
+        protected virtual void OnReverseExecuted(ExecutedRoutedEventArgs e)
+        {
+            Text = Text._Reverse();
+
+            e.Handled = true;
+        }
+
+        protected virtual void OnUpperCommandCanExecute(CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = !UtilHelpers.IsNullEmptyOrWhiteSpace(Text);
+
+            e.Handled = true;
+        }
     }
 
     public class ButtonTextBox : TextBox

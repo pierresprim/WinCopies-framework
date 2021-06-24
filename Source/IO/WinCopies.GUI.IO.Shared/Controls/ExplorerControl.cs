@@ -20,7 +20,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
-using WinCopies.Collections.Generic;
+using WinCopies.GUI.Controls;
 using WinCopies.GUI.Controls.Models;
 using WinCopies.IO.ObjectModel;
 using WinCopies.Util.Data;
@@ -28,6 +28,8 @@ using WinCopies.Util.Data;
 using static System.Windows.RoutingStrategy;
 
 using static WinCopies.Util.Desktop.UtilHelpers;
+
+using ListView = System.Windows.Controls.ListView;
 
 namespace WinCopies.GUI.IO.Controls
 {
@@ -55,9 +57,9 @@ namespace WinCopies.GUI.IO.Controls
 
         public string Text { get => (string)GetValue(TextProperty); set => SetValue(TextProperty, value); }
 
-        public static readonly DependencyProperty HistoryProperty = Register<ObservableLinkedCollectionEnumerable<IBrowsableObjectInfo>>(nameof(History));
+        public static readonly DependencyProperty HistoryProperty = Register<HistoryObservableCollection<IBrowsableObjectInfo>>(nameof(History));
 
-        public ObservableLinkedCollectionEnumerable<IBrowsableObjectInfo> History { get => (ObservableLinkedCollectionEnumerable<IBrowsableObjectInfo>)GetValue(HistoryProperty); set => SetValue(HistoryProperty, value); }
+        public HistoryObservableCollection<IBrowsableObjectInfo> History { get => (HistoryObservableCollection<IBrowsableObjectInfo>)GetValue(HistoryProperty); set => SetValue(HistoryProperty, value); }
 
         /// <summary>
         /// Identifies the <see cref="TreeViewStyle"/> dependency property.

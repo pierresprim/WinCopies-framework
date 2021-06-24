@@ -22,47 +22,80 @@ using WinCopies.IO;
 
 namespace WinCopies.GUI.IO.Process
 {
-    public enum ProcessStatus : sbyte
+    public interface IProcessActions : DotNetFix.IDisposable
     {
-        None,
+        Action Run { get; }
 
-        InProgress,
+        Action Pause { get; }
 
-        Succeeded,
+        Action Cancel { get; }
 
-        CancelledByUser,
+        Action<bool> TryAgain { get; }
 
-        Error
+        Action<bool> Ignore { get; }
+    }
+
+    public sealed class ProcessActions : IProcessActions
+    {
+        private IProcess _process;
+
+        private IProcess Process => IsDisposed ? throw ThrowHelper.GetExceptionForDispose(false) : _process;
+
+        public bool IsDisposed => _process == null;
+
+        public Action Run => Process.RunWorkerAsync;
+
+        public Action Pause { get; }
+
+        public Action Cancel => Process.CancelAsync;
+
+        public Action<bool> TryAgain => _TryAgain;
+
+        public Action<bool> Ignore => _Ignore;
+
+        public ProcessActions(in IProcess process) => _process = process;
+
+        public void Dispose() => _process = null;
+
+        private void _TryAgain(bool parameter)
+        {
+            if (parameter)
+
+                _ = Process.Start();
+
+            else
+
+                _ = Process.RetryFirst();
+        }
+
+        private void _Ignore(bool parameter)
+        {
+            if (parameter)
+
+                _ = Process.Ignore();
+
+            else
+
+                _ = Process.IgnoreFirst();
+        }
+
+        ~ProcessActions() => Dispose();
     }
 
     public interface IProcess : WinCopies.IO.Process.ObjectModel.IProcess, IBackgroundWorker, INotifyPropertyChanged
     {
         #region Properties
-        ProcessStatus Status { get; }
-
         bool IsCompleted { get; }
 
         bool IsPaused { get; }
 
         IPathCommon CurrentPath { get; }
 
-        int ProgressPercentage { get; }
+        sbyte CurrentPathProgressPercentage { get; }
 
-        Action RunAction
-#if CS8
-            => RunWorkerAsync;
-#else
-            { get; }
-#endif
+        uint ProgressPercentage { get; }
 
-        Action PauseAction { get; }
-
-        Action CancelAction
-#if CS8
-            => CancelAsync;
-#else
-            { get; }
-#endif
+        IProcessActions ProcessActions { get; }
         #endregion
 
         void RunWorkerAsync();

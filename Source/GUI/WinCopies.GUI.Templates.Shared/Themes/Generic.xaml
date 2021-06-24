@@ -22,15 +22,17 @@
     xmlns:media="clr-namespace:System.Windows.Media;assembly=PresentationCore"
     xmlns:drawing="clr-namespace:System.Drawing;assembly=System.Drawing"
     xmlns:controls="clr-namespace:WinCopies.GUI.Controls.Models;assembly=WinCopies.GUI.Models"
-    xmlns:controlViewModels="clr-namespace:WinCopies.GUI.Controls.ViewModels;assembly=WinCopies.GUI.ViewModels"
     xmlns:util="clr-namespace:WinCopies;assembly=WinCopies.Util.Desktop"
-    xmlns:converters="clr-namespace:WinCopies.Util.Data;assembly=WinCopies.Util.Desktop">
+    xmlns:converters="clr-namespace:WinCopies.Util.Data;assembly=WinCopies.Util.Desktop"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    xmlns:input="clr-namespace:System.Windows.Input;assembly=PresentationCore">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary>
             <!--Data converters-->
             <local:ModelToBooleanConverter x:Key="DefaultModelToBooleanConverter" />
             <converters:BitmapToImageSourceConverter x:Key="BitmapToImageSourceConverter" />
             <converters:IconToImageSourceConverter x:Key="IconToImageSourceConverter" />
+            <converters:ActionToDelegateCommand2Converter x:Key="ActionToDelegateCommand2Converter" />
             <!--End of Data Converters Section-->
             <Style x:Key="ControlStyle" TargetType="{x:Type Control}" x:Shared="false">
                 <Setter Property="IsEnabled" Value="{Binding IsEnabled}" />
@@ -114,6 +116,12 @@
         </ResourceDictionary>
     </ResourceDictionary.MergedDictionaries>
 
+    <DataTemplate DataType="{x:Type sys:Action}">
+        <Button Command="{Binding Converter={StaticResource ActionToDelegateCommand2Converter}}" />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type input:ICommandSource}">
+        <Button Command="{Binding Command}" CommandParameter="{Binding CommandParameter}" CommandTarget="{Binding CommandTarget}" />
+    </DataTemplate>
     <ControlTemplate x:Key="DecoratedContentControlContentTemplate" TargetType="{x:Type local:DecoratedContentControlContent}" x:Shared="false">
         <DockPanel>
             <ContentControl DockPanel.Dock="Left" Content="{TemplateBinding ContentDecoration}" />

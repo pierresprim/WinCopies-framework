@@ -70,6 +70,24 @@ namespace WinCopies.IO.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The copy operation did not succeeded..
+        /// </summary>
+        public static string CopyDidNotSucceeded {
+            get {
+                return ResourceManager.GetString("CopyDidNotSucceeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not create item..
+        /// </summary>
+        public static string CouldNotCreateItem {
+            get {
+                return ResourceManager.GetString("CouldNotCreateItem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to destination.
         /// </summary>
         public static string Destination {
@@ -133,11 +151,38 @@ namespace WinCopies.IO.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The given ShellObject is not a file..
+        /// </summary>
+        public static string GivenShellObjectIsNotAFile {
+            get {
+                return ResourceManager.GetString("GivenShellObjectIsNotAFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This item does not represent a registry key..
+        /// </summary>
+        public static string ItemDoesNotRepresentARegistryKey {
+            get {
+                return ResourceManager.GetString("ItemDoesNotRepresentARegistryKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Process completed successfully..
         /// </summary>
         public static string NoError {
             get {
                 return ResourceManager.GetString("NoError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No process could be generated..
+        /// </summary>
+        public static string NoProcessCouldBeGenerated {
+            get {
+                return ResourceManager.GetString("NoProcessCouldBeGenerated", resourceCulture);
             }
         }
         
@@ -210,6 +255,15 @@ namespace WinCopies.IO.Resources {
         public static string RegistryKeyNotExists {
             get {
                 return ResourceManager.GetString("RegistryKeyNotExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The given ShellObject is not supported..
+        /// </summary>
+        public static string ShellObjectIsNotSupported {
+            get {
+                return ResourceManager.GetString("ShellObjectIsNotSupported", resourceCulture);
             }
         }
         

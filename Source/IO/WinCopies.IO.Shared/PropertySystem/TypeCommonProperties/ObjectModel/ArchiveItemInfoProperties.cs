@@ -23,15 +23,15 @@ namespace WinCopies.IO.PropertySystem
 {
     public class ArchiveItemInfoProperties<T> : FileSystemObjectInfoProperties<T>, IFileSystemObjectInfoProperties2 where T : IArchiveItemInfoBase
     {
-        public DateTime CreationTime => BrowsableObjectInfo.InnerObject.Value.CreationTime;
+        public DateTime CreationTime => InnerObject.InnerObject.Value.CreationTime;
 
-        public DateTime LastAccessTime => BrowsableObjectInfo.InnerObject.Value.LastAccessTime;
+        public DateTime LastAccessTime => InnerObject.InnerObject.Value.LastAccessTime;
 
-        public DateTime LastWriteTime => BrowsableObjectInfo.InnerObject.Value.LastWriteTime;
+        public DateTime LastWriteTime => InnerObject.InnerObject.Value.LastWriteTime;
 
-        public System.IO.FileAttributes Attributes => (System.IO.FileAttributes)BrowsableObjectInfo.InnerObject.Value.Attributes;
+        public System.IO.FileAttributes Attributes => (System.IO.FileAttributes)InnerObject.InnerObject.Value.Attributes;
 
-        public sealed override Size? Size => new IO.Size(BrowsableObjectInfo.InnerObject.Value.Size);
+        public sealed override Size? Size => new IO.Size(InnerObject.InnerObject.Value.Size);
 
         public ArchiveItemInfoProperties(in T fileSystemObjectInfo, in FileType fileType) : base(fileSystemObjectInfo, fileType)
         {

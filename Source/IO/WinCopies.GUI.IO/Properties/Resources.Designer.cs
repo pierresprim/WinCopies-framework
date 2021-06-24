@@ -142,6 +142,33 @@ namespace WinCopies.GUI.IO.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The item could not be created..
+        /// </summary>
+        public static string ItemCouldNotBeCreated {
+            get {
+                return ResourceManager.GetString("ItemCouldNotBeCreated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Item creation error.
+        /// </summary>
+        public static string ItemCreationError {
+            get {
+                return ResourceManager.GetString("ItemCreationError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Opens a dialog for item creation..
+        /// </summary>
+        public static string NewItemCommandToolTip {
+            get {
+                return ResourceManager.GetString("NewItemCommandToolTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Preserve directory root.
         /// </summary>
         public static string PreserveDirectoryRoot {

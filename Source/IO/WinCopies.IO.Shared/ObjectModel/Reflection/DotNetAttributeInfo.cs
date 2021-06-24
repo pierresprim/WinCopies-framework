@@ -25,7 +25,6 @@ using WinCopies.IO.Process;
 using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Reflection;
 using WinCopies.IO.Reflection.PropertySystem;
-using WinCopies.IO.Selectors;
 using WinCopies.PropertySystem;
 
 #if DEBUG
@@ -38,14 +37,16 @@ namespace WinCopies.IO.ObjectModel.Reflection
 {
     public abstract class DotNetAttributeInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : DotNetItemInfo<TObjectProperties, CustomAttributeData, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IDotNetAttributeInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IDotNetItemInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
     {
+        private CustomAttributeData _data;
+
         #region Properties
-        public sealed override CustomAttributeData InnerObjectGeneric { get; }
+        protected sealed override CustomAttributeData InnerObjectGenericOverride => _data;
 
-        public override IProcessFactory ProcessFactory => Process.ProcessFactory.DefaultProcessFactory;
+        protected override IProcessFactory ProcessFactoryOverride => Process.ProcessFactory.DefaultProcessFactory;
 
-        public override IBrowsabilityOptions Browsability => BrowsabilityOptions.NotBrowsable;
+        protected override IBrowsabilityOptions BrowsabilityOverride => BrowsabilityOptions.NotBrowsable;
 
-        public override string ItemTypeName => Properties.Resources.DotNetAttribute;
+        protected override string ItemTypeNameOverride => Properties.Resources.DotNetAttribute;
         #endregion
 
         protected DotNetAttributeInfo(in CustomAttributeData customAttributeData, in IDotNetItemInfo parent) : base($"{parent.Path}{IO.Path.PathSeparator}{customAttributeData.AttributeType.Name}", customAttributeData.AttributeType.Name, parent)
@@ -56,23 +57,32 @@ namespace WinCopies.IO.ObjectModel.Reflection
 =>
 #endif
 
-            InnerObjectGeneric = customAttributeData;
+            _data = customAttributeData;
 #if DEBUG
         }
 #endif
 
-        protected sealed override BitmapSource TryGetBitmapSource(in int size) => TryGetBitmapSource(FileIcon, Microsoft.WindowsAPICodePack.NativeAPI.Consts.DllNames.Shell32, size);
+        protected sealed override BitmapSource TryGetBitmapSource(in int size) => Icons.File.TryGetFileBitmapSource(size);
+
+        protected override void DisposeManaged()
+        {
+            _data = null;
+
+            base.DisposeManaged();
+        }
     }
 
     public class DotNetAttributeInfo : DotNetAttributeInfo<IDotNetItemInfoProperties, object, IEnumerableSelectorDictionary<object, IBrowsableObjectInfo>, object>
     {
-        #region Properties
-        public override IDotNetItemInfoProperties ObjectPropertiesGeneric { get; }
+        private IDotNetItemInfoProperties _properties;
 
-        public override IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystem => null;
+        #region Properties
+        protected override IDotNetItemInfoProperties ObjectPropertiesGenericOverride => _properties;
+
+        protected override IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystemOverride => null;
         #endregion Properties
 
-        protected internal DotNetAttributeInfo(in CustomAttributeData customAttributeData, in IDotNetItemInfo parent) : base(customAttributeData, parent) => ObjectPropertiesGeneric = new DotNetItemInfoProperties<IDotNetItemInfo>(this, DotNetItemType.Attribute);
+        protected internal DotNetAttributeInfo(in CustomAttributeData customAttributeData, in IDotNetItemInfo parent) : base(customAttributeData, parent) => _properties = new DotNetItemInfoProperties<IDotNetItemInfo>(this, DotNetItemType.Attribute);
 
         /// <summary>
         /// Returns <see langword="null"/> as this item does not contain any item.
@@ -90,6 +100,14 @@ namespace WinCopies.IO.ObjectModel.Reflection
         /// Returns <see langword="null"/> as this item does not contain any item.
         /// </summary>
         /// <returns>A <see langword="null"/> value.</returns>
-        public override IEnumerableSelectorDictionary<object, IBrowsableObjectInfo> GetSelectorDictionary() => null;
+        protected override IEnumerableSelectorDictionary<object, IBrowsableObjectInfo> GetSelectorDictionaryOverride() => null;
+
+        protected override void DisposeUnmanaged()
+        {
+            _properties.Dispose();
+            _properties = null;
+
+            base.DisposeUnmanaged();
+        }
     }
 }

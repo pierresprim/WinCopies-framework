@@ -22,7 +22,6 @@ using System;
 
 using WinCopies.IO;
 using WinCopies.IO.ObjectModel;
-using WinCopies.IO.Process;
 
 namespace WinCopies.GUI.IO.ObjectModel
 {
@@ -78,7 +77,7 @@ namespace WinCopies.GUI.IO.ObjectModel
             throw new ArgumentException("The factory cannot create an object for the given path.");
         }
 
-        protected virtual IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo, bool rootParentIsRootNode) => new BrowsableObjectInfoViewModel(browsableObjectInfo, rootParentIsRootNode) { SortComparison = SortComparison };
+        protected virtual IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo, bool rootParentIsRootNode) => new BrowsableObjectInfoViewModel(browsableObjectInfo, rootParentIsRootNode) { SortComparison = SortComparison, Factory = this };
 
         public virtual IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(string path) => GetBrowsableObjectInfoViewModel(GetBrowsableObjectInfo(path), false);
 

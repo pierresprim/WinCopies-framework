@@ -20,7 +20,6 @@ using System.Windows.Controls;
 using System.Windows.Input;
 
 using WinCopies.Desktop;
-using WinCopies.Util;
 
 namespace WinCopies.GUI.IO.Controls
 {

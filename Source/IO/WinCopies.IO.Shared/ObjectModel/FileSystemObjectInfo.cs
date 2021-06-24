@@ -28,8 +28,6 @@ using System.Windows.Media.Imaging;
 using WinCopies.Collections.Generic;
 using WinCopies.GUI.Drawing;
 using WinCopies.IO.PropertySystem;
-using WinCopies.IO.Selectors;
-using WinCopies.IO.Process;
 
 namespace WinCopies.IO
 {
@@ -46,22 +44,8 @@ namespace WinCopies.IO
     {
         public abstract class FileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : BrowsableObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IFileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IFileSystemObjectInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
         {
-            private System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> _defaultRootItems;
-
             #region Properties
-            public override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> RootItems => IsDisposed ? throw WinCopies.ThrowHelper.GetExceptionForDispose(false) : _defaultRootItems
-#if CS8
-                ??=
-#else
-                ?? (_defaultRootItems =
-#endif
-               FileSystemObjectInfo.GetRootItems()
-#if !CS8
-                )
-#endif
-                ;
-
-            public override bool IsRecursivelyBrowsable => true;
+            protected override bool IsRecursivelyBrowsableOverride => true;
 
             // public override Predicate<TPredicateTypeParameter> RootItemsPredicate => null;
 
@@ -121,7 +105,9 @@ namespace WinCopies.IO
 
             public override IComparer<IBrowsableObjectInfoBase> GetDefaultComparer() => new FileSystemObjectInfoComparer<IBrowsableObjectInfoBase>();
 
-            public override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetSubRootItems() => GetItems().Where(item => item.Browsability?.Browsability == IO.Browsability.BrowsableByDefault);
+            protected override ArrayBuilder<IBrowsableObjectInfo> GetRootItemsOverride() => FileSystemObjectInfo.GetRootItems();
+
+            protected override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetSubRootItemsOverride() => GetItems().Where(item => item.Browsability?.Browsability == IO.Browsability.BrowsableByDefault);
             #endregion
             #endregion
 
@@ -178,39 +164,35 @@ namespace WinCopies.IO
 
         public static class FileSystemObjectInfo
         {
-            public static System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetRootItems()
+            public static ArrayBuilder<IBrowsableObjectInfo> GetRootItems()
             {
-#if WinCopies4
-                EnumerableHelper<IBrowsableObjectInfo>.IEnumerableQueue queue = EnumerableHelper<IBrowsableObjectInfo>.GetEnumerableQueue();
-#else
-                var queue = new Queue<IBrowsableObjectInfo>();
-#endif
+                var arrayBuilder = new ArrayBuilder<IBrowsableObjectInfo>();
 
                 ClientVersion clientVersion = BrowsableObjectInfo.GetDefaultClientVersion();
 
-                void enqueue(in IKnownFolder knownFolder) => queue.Enqueue(new ShellObjectInfo(knownFolder, clientVersion));
+                void add(in IKnownFolder knownFolder) => arrayBuilder.AddLast(new ShellObjectInfo(knownFolder, clientVersion));
 
-                enqueue(KnownFolders.UserPinned);
-                enqueue(KnownFolders.Desktop);
-                enqueue(KnownFolders.Libraries);
-                enqueue(KnownFolders.Profile);
-                enqueue(KnownFolders.Computer);
-                enqueue(KnownFolders.RecycleBin);
+                add(KnownFolders.UserPinned);
+                add(KnownFolders.Desktop);
+                add(KnownFolders.Libraries);
+                add(KnownFolders.Profile);
+                add(KnownFolders.Computer);
+                add(KnownFolders.RecycleBin);
 
-                return queue;
+                return arrayBuilder;
             }
 
             private static Icon TryGetIcon(in int index, in System.Drawing.Size size) => BrowsableObjectInfo.TryGetIcon(index, Microsoft.WindowsAPICodePack.NativeAPI.Consts.DllNames.Shell32, size);
 
             public static string GetItemTypeName(in string extension, in FileType fileType) => fileType == FileType.Folder
-                        ? FileOperation.GetFileInfo(string.Empty, Microsoft.WindowsAPICodePack.Win32Native.Shell.FileAttributes.Directory, GetFileInfoOptions.TypeName).TypeName
-                        : FileOperation.GetFileInfo(extension, Microsoft.WindowsAPICodePack.Win32Native.Shell.FileAttributes.Normal, GetFileInfoOptions.TypeName).TypeName;
+                        ? FileOperation.GetFileInfo(string.Empty, FileAttributes.Directory, GetFileInfoOptions.TypeName).TypeName
+                        : FileOperation.GetFileInfo(extension, FileAttributes.Normal, GetFileInfoOptions.TypeName).TypeName;
 
             public static Icon TryGetIcon(in string extension, in FileType fileType, in System.Drawing.Size size) =>
 
                // if (System.IO.Path.HasExtension(Path))
 
-               fileType == FileType.Folder ? TryGetIcon(3, size) : FileOperation.GetFileInfo(extension, Microsoft.WindowsAPICodePack.Win32Native.Shell.FileAttributes.Normal, GetFileInfoOptions.Icon | GetFileInfoOptions.UseFileAttributes).Icon?.TryGetIcon(size, 32, true, true) ?? TryGetIcon(0, size);// else// return TryGetIcon(FileType == FileType.Folder ? 3 : 0, "SHELL32.dll", size);
+               fileType == FileType.Folder ? TryGetIcon(3, size) : FileOperation.GetFileInfo(extension, FileAttributes.Normal, GetFileInfoOptions.Icon | GetFileInfoOptions.UseFileAttributes).Icon?.TryGetIcon(size, 32, true, true) ?? TryGetIcon(0, size);// else// return TryGetIcon(FileType == FileType.Folder ? 3 : 0, "SHELL32.dll", size);
 
             public static BitmapSource TryGetBitmapSource(in string extension, in FileType fileType, in int size)
             {

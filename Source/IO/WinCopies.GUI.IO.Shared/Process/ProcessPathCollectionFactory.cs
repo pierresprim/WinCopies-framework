@@ -25,6 +25,6 @@ namespace WinCopies.GUI.IO.Process
 
         ProcessTypes<T>.IProcessQueue IProcessPathCollectionFactory.GetProcessCollection<T>() => new ProcessCollections<T>.ObservableProcessCollection();
 
-        WinCopies.IO.Process.IProcessLinkedList<TItems, TError> IProcessPathCollectionFactory.GetProcessLinkedList<TItems, TError>() => new ObservableProcessLinkedCollection<TItems, TError>();
+        WinCopies.IO.Process.IProcessLinkedList<TItems, TError, TErrorItems, TAction> IProcessPathCollectionFactory.GetProcessLinkedList<TItems, TError, TErrorItems, TAction>() => new ObservableProcessLinkedCollection<TItems, TError, TErrorItems, TAction>();
     }
 }

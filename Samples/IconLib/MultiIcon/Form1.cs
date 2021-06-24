@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace MultiIconTester
 {
     public partial class FormIconBrowser : Form
     {
-        #region Variables Declaration
+        #region Fields
         private string mFolder = string.Empty;
         private readonly MultiIcon mMultiIcon = new MultiIcon();
         #endregion
@@ -101,7 +102,7 @@ namespace MultiIconTester
 
                 foreach (IconImage iconImage in mMultiIcon[lbxIcons.SelectedIndex])
                 {
-                    _ = lbxImages.Items.Add(iconImage.Size.Width + "x" + iconImage.Size.Height + " " + GetFriendlyBitDepth(iconImage.PixelFormat));
+                    _ = lbxImages.Items.Add($"{iconImage.Size.Width}x{iconImage.Size.Height} {GetFriendlyBitDepth(iconImage.PixelFormat)}");
                 }
             }
             catch (Exception ex)
@@ -165,7 +166,11 @@ namespace MultiIconTester
             }
         }
 
-        private void btnExportAND_Click(object sender, EventArgs e)
+        private void btnExportAND_Click(object sender, EventArgs e) => ExportBitmap(mMultiIcon[mMultiIcon.SelectedIndex][lbxImages.SelectedIndex].Mask);
+
+        private void btnExportBMP_Click(object sender, EventArgs e) => ExportBitmap(mMultiIcon[mMultiIcon.SelectedIndex][lbxImages.SelectedIndex].Image);
+
+        private void ExportBitmap(in Bitmap bmp)
         {
             dlgSave.DefaultExt = "bmp";
             dlgSave.Filter = "Windows Bitmap File (*.bmp)|*.bmp";
@@ -176,21 +181,7 @@ namespace MultiIconTester
 
             if (dlgSave.ShowDialog(this) == DialogResult.OK)
 
-                mMultiIcon[mMultiIcon.SelectedIndex][lbxImages.SelectedIndex].Mask.Save(dlgSave.FileName, ImageFormat.Bmp);
-        }
-
-        private void btnExportBMP_Click(object sender, EventArgs e)
-        {
-            dlgSave.DefaultExt = "bmp";
-            dlgSave.Filter = "Windows Bitmap File (*.bmp)|*.bmp";
-
-            if (mMultiIcon.SelectedIndex == -1 || lbxImages.SelectedIndex == -1)
-
-                return;
-
-            if (dlgSave.ShowDialog(this) == DialogResult.OK)
-
-                mMultiIcon[mMultiIcon.SelectedIndex][lbxImages.SelectedIndex].Image.Save(dlgSave.FileName, ImageFormat.Bmp);
+                bmp.Save(dlgSave.FileName, ImageFormat.Bmp);
         }
         #endregion
 

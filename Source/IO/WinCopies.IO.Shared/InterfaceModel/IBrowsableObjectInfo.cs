@@ -18,257 +18,29 @@
 using Microsoft.WindowsAPICodePack.PortableDevices;
 
 using System;
-using System.Windows.Media.Imaging;
 
 using WinCopies.Collections.Generic;
-using WinCopies.IO.ObjectModel;
 using WinCopies.IO.Process;
-using WinCopies.IO.Process.ObjectModel;
 using WinCopies.IO.PropertySystem;
 using WinCopies.PropertySystem;
 
 namespace WinCopies.IO
 {
-#if !WinCopies3
-    public interface IBrowsableObjectEncapsulator
-    {
-        object InnerObject { get; }
-    }
-
-    public interface IBrowsableObjectEncapsulator<T> : IBrowsableObjectEncapsulator
-    {
-        T InnerObject { get; }
-    }
-
-    public abstract class BrowsableObjectEncapsulator<T> : IBrowsableObjectEncapsulator<T>
-    {
-        public T InnerObject { get; }
-
-        object IBrowsableObjectEncapsulator.InnerObject => InnerObject;
-
-        public BrowsableObjectEncapsulator(T obj) => InnerObject = obj;
-    }
-#endif
-
-    public interface IRecursiveEnumerable<T> : WinCopies.Collections.Generic.IRecursiveEnumerable<T>
-    {
-        RecursiveEnumerator<T> GetEnumerator();
-    }
-
-    /// <summary>
-    /// Indicates the browsing ability for an <see cref="IBrowsableObjectInfo"/>.
-    /// </summary>
-    public enum Browsability : byte
-    {
-        /// <summary>
-        /// The item is not browsable.
-        /// </summary>
-        NotBrowsable = 0,
-
-        /// <summary>
-        /// The item is browsable by default.
-        /// </summary>
-        BrowsableByDefault = 1,
-
-        /// <summary>
-        /// The item is browsable but browsing should not be the default action to perform on this item.
-        /// </summary>
-        Browsable = 2,
-
-        /// <summary>
-        /// The item redirects to an other item, with this item browsable.
-        /// </summary>
-        RedirectsToBrowsableItem = 3
-    }
-
-    public interface IBrowsabilityOptions
-    {
-        Browsability Browsability { get; }
-
-        IBrowsableObjectInfo RedirectToBrowsableItem();
-    }
-
-    public static class BrowsabilityOptions
-    {
-        private class _Browsability : IBrowsabilityOptions
-        {
-            public Browsability Browsability { get; }
-
-            public IBrowsableObjectInfo RedirectToBrowsableItem() => null;
-
-            internal _Browsability(Browsability browsability) => Browsability = browsability;
-        }
-
-        public static IBrowsabilityOptions NotBrowsable { get; } = new _Browsability(Browsability.NotBrowsable);
-
-        public static IBrowsabilityOptions BrowsableByDefault { get; } = new _Browsability(Browsability.BrowsableByDefault);
-
-        public static IBrowsabilityOptions Browsable { get; } = new _Browsability(Browsability.Browsable);
-
-        public static bool IsBrowsable(this Browsability browsability)
-#if CS8
-            => browsability switch
-            {
-#if CS9
-                Browsability.BrowsableByDefault or Browsability.Browsable => true,
-#else
-                Browsability.BrowsableByDefault => true,
-                Browsability.Browsable => true,
-#endif
-                _ => false,
-            };
-#else
-        {
-            switch (browsability)
-            {
-                case Browsability.BrowsableByDefault:
-                case Browsability.Browsable:
-
-                    return true;
-            }
-
-            return false;
-        }
-#endif
-    }
-
-    namespace Process
-    {
-        public interface IProcessParameters
-        {
-            Guid Guid { get; }
-
-            System.Collections.Generic.IEnumerable<string> Parameters { get; }
-        }
-
-        public class ProcessParameters : IProcessParameters
-        {
-            public Guid Guid { get; }
-
-            public System.Collections.Generic.IEnumerable<string> Parameters { get; }
-
-            public ProcessParameters(Guid guid, System.Collections.Generic.IEnumerable<string> parameters)
-            {
-                Guid = guid;
-
-                Parameters = parameters;
-            }
-
-            public ProcessParameters(string guid, System.Collections.Generic.IEnumerable<string> parameters) : this(new Guid(guid), parameters) { /* Left empty. */ }
-        }
-
-        [Flags]
-        public enum ProcessValidityScopeFlags
-        {
-            Global = 1,
-
-            Local = 2
-        }
-
-        public interface IProcessInfo
-        {
-            string GroupName { get; }
-
-            string Name { get; }
-
-            bool CanRun(object parameter, IBrowsableObjectInfo sourcePath, System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths);
-
-            IProcessParameters GetProcessParameters(object parameter, IBrowsableObjectInfo sourcePath, System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths);
-
-            IProcessParameters TryGetProcessParameters(object parameter, IBrowsableObjectInfo sourcePath, System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths);
-        }
-
-        public interface IProcessCommands : WinCopies.DotNetFix.IDisposable
-        {
-            string Name { get; }
-
-            string Caption { get; }
-
-            bool CanCreateNewItem();
-
-            bool TryCreateNewItem(string name, out IProcessParameters result);
-
-            IProcessParameters CreateNewItem(string name);
-        }
-
-        public interface IProcessFactory : WinCopies.DotNetFix.IDisposable
-        {
-            IProcessCommands NewItemProcessCommands { get; }
-
-            System.Collections.Generic.IEnumerable<IProcessInfo> CustomProcesses { get; }
-
-            bool CanCopy(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths);
-
-            bool TryCopy(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths, uint count);
-
-            void Copy(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths, uint count);
-
-            bool CanPaste(uint count);
-
-            IProcessParameters GetCopyProcessParameters(uint count);
-
-            IProcessParameters TryGetCopyProcessParameters(uint count);
-
-            IProcess GetProcess(ProcessFactorySelectorDictionaryParameters processParameters);
-
-            IProcess TryGetProcess(ProcessFactorySelectorDictionaryParameters processParameters);
-        }
-
-        public static class ProcessFactory
-        {
-            private class _DefaultProcessFactory : IProcessFactory
-            {
-                bool WinCopies.DotNetFix.IDisposable.IsDisposed => false;
-
-                System.Collections.Generic.IEnumerable<IProcessInfo> IProcessFactory.CustomProcesses => null;
-
-                IProcessCommands IProcessFactory.NewItemProcessCommands => null;
-
-                bool IProcessFactory.CanCopy(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths) => false;
-
-                bool IProcessFactory.CanPaste(uint count) => false;
-
-                void IProcessFactory.Copy(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths, uint count) => throw new InvalidOperationException();
-
-                IProcessParameters IProcessFactory.GetCopyProcessParameters(uint count) => throw new InvalidOperationException();
-
-                bool IProcessFactory.TryCopy(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths, uint count) => false;
-
-                IProcessParameters IProcessFactory.TryGetCopyProcessParameters(uint count) => null;
-
-                IProcess IProcessFactory.GetProcess(ProcessFactorySelectorDictionaryParameters processParameters) => throw new InvalidOperationException();
-
-                IProcess IProcessFactory.TryGetProcess(ProcessFactorySelectorDictionaryParameters processParameters) => null;
-
-                void System.IDisposable.Dispose() { /* Left empty. */ }
-            }
-
-            public static IProcessFactory DefaultProcessFactory { get; } = new _DefaultProcessFactory();
-        }
-
-        public interface IProcessPathCollectionFactory
-        {
-            ProcessTypes<T>.IProcessQueue GetProcessCollection<T>() where T : IPathInfo;
-
-            IProcessLinkedList<TItems, TError> GetProcessLinkedList<TItems, TError>() where TItems : IPathInfo;
-        }
-    }
 
     namespace ObjectModel
     {
         /// <summary>
         /// Provides interoperability for interacting with browsable items.
         /// </summary>
-        public interface IBrowsableObjectInfo : IBrowsableObjectInfoBase, IRecursiveEnumerable<IBrowsableObjectInfo>,
-WinCopies.
-#if !WinCopies3
-    Util.
-#endif
-    DotNetFix.IDisposable
+        public interface IBrowsableObjectInfo : IBrowsableObjectInfoBase, IRecursiveEnumerable<IBrowsableObjectInfo>, DotNetFix.IDisposable
         {
             IBrowsabilityOptions Browsability { get; }
 
+            System.Collections.Generic.IEnumerable<IBrowsabilityPath> BrowsabilityPaths { get; }
+
             IProcessFactory ProcessFactory { get; }
+
+            System.Collections.Generic.IEnumerable<IProcessInfo> CustomProcesses { get; }
 
             /// <summary>
             /// Gets a value indicating whether this <see cref="IBrowsableObjectInfo"/> is recursively browsable.
@@ -297,25 +69,7 @@ WinCopies.
             /// </summary>
             IBrowsableObjectInfo Parent { get; }
 
-            /// <summary>
-            /// Gets the small <see cref="BitmapSource"/> of this <see cref="IBrowsableObjectInfo"/>.
-            /// </summary>
-            BitmapSource SmallBitmapSource { get; }
-
-            /// <summary>
-            /// Gets the medium <see cref="BitmapSource"/> of this <see cref="IBrowsableObjectInfo"/>.
-            /// </summary>
-            BitmapSource MediumBitmapSource { get; }
-
-            /// <summary>
-            /// Gets the large <see cref="BitmapSource"/> of this <see cref="IBrowsableObjectInfo"/>.
-            /// </summary>
-            BitmapSource LargeBitmapSource { get; }
-
-            /// <summary>
-            /// Gets the extra large <see cref="BitmapSource"/> of this <see cref="IBrowsableObjectInfo"/>.
-            /// </summary>
-            BitmapSource ExtraLargeBitmapSource { get; }
+            IBrowsableObjectInfoBitmapSources BitmapSources { get; }
 
             string ItemTypeName { get; }
 
@@ -324,8 +78,6 @@ WinCopies.
             bool IsSpecialItem { get; }
 
             ClientVersion ClientVersion { get; }
-
-            System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> RootItems { get; }
 
             ///// <summary>
             ///// Gets or sets the factory for this <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>. This factory is used to create new <see cref="IBrowsableObjectInfo"/>s from the current <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>.
@@ -345,7 +97,11 @@ WinCopies.
             ///// </summary>
             //IReadOnlyCollection<IBrowsableObjectInfo> Items { get; }
 
+            System.IDisposable RegisterCallback(Action<IBrowsableObjectInfo, BrowsableObjectInfoCallbackReason> callback);
+
             System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems();
+
+            ArrayBuilder<IBrowsableObjectInfo> GetRootItems();
 
             System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetSubRootItems();
 
@@ -388,12 +144,12 @@ WinCopies.
             //void Dispose(bool disposeItemsLoader, bool disposeParent, bool disposeItems, bool recursively);
         }
 
-        public interface IBrowsableObjectInfo<T> : IBrowsableObjectInfo
+        public interface IBrowsableObjectInfo<out T> : IBrowsableObjectInfo
         {
             T ObjectProperties { get; }
         }
 
-        public interface IEncapsulatorBrowsableObjectInfo<
+        public interface IEncapsulatorBrowsableObjectInfo<out
 #if WinCopies3
             T
 #else
@@ -410,16 +166,11 @@ TInnerObject
             { get; }
         }
 
-        public interface IBrowsableObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : IBrowsableObjectInfo<TObjectProperties>, IEncapsulatorBrowsableObjectInfo<TInnerObject> where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
+        public interface IBrowsableObjectInfo<out TObjectProperties, out TInnerObject, out TPredicateTypeParameter, out TSelectorDictionary, out TDictionaryItems> : IBrowsableObjectInfo<TObjectProperties>, IEncapsulatorBrowsableObjectInfo<TInnerObject> where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
         {
             System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<TPredicateTypeParameter> predicate);
 
             TSelectorDictionary GetSelectorDictionary();
         }
-
-        //public interface IBrowsableObjectInfo<TFactory> : IBrowsableObjectInfo where TFactory : IBrowsableObjectInfoFactory
-        //{
-
-        //}
     }
 }

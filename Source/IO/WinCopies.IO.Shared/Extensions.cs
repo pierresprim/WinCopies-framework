@@ -74,8 +74,11 @@ namespace WinCopies.IO
             }
 
             if (ignoreRoot && merger.Count > 0)
+            {
+                merger.RemoveFirst();
 
                 merger.RemoveFirst();
+            }
 
             _ = merger.AddLast(new UIntCountableEnumerable<char>(new StringCharArray(path.RelativePath)));
 

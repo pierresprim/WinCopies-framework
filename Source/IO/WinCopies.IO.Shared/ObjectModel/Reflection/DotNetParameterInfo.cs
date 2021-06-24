@@ -32,36 +32,55 @@ namespace WinCopies.IO.ObjectModel.Reflection
 {
     public abstract class DotNetParameterInfo<TObjectProperties, TSelectorDictionary> : BrowsableDotNetItemInfo<TObjectProperties, ParameterInfo, CustomAttributeData, TSelectorDictionary, DotNetParameterInfoItemProvider>, IDotNetParameterInfo<TObjectProperties, TSelectorDictionary> where TObjectProperties : IDotNetParameterInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<DotNetParameterInfoItemProvider, IBrowsableObjectInfo>
     {
-        #region Properties
-        public override IProcessFactory ProcessFactory => Process.ProcessFactory.DefaultProcessFactory;
+        private ParameterInfo _parameterInfo;
 
-        public override string ItemTypeName => Properties.Resources.DotNetParameter;
+        #region Properties
+        protected override IProcessFactory ProcessFactoryOverride => Process.ProcessFactory.DefaultProcessFactory;
+
+        protected override string ItemTypeNameOverride => Properties.Resources.DotNetParameter;
 
         /// <summary>
         /// Gets the inner <see cref="ParameterInfo"/>.
         /// </summary>
-        public sealed override ParameterInfo InnerObjectGeneric { get; }
+        protected sealed override ParameterInfo InnerObjectGenericOverride => _parameterInfo;
         #endregion
 
-        internal DotNetParameterInfo(in ParameterInfo parameterInfo, in IDotNetItemInfo parent) : base($"{(parent ?? throw GetArgumentNullException(nameof(parent))).Path}{WinCopies.IO.Path.PathSeparator}{(parameterInfo ?? throw GetArgumentNullException(nameof(parameterInfo))).Name}", parameterInfo.Name, parent) => InnerObjectGeneric = parameterInfo;
+        internal DotNetParameterInfo(in ParameterInfo parameterInfo, in IDotNetItemInfo parent) : base($"{(parent ?? throw GetArgumentNullException(nameof(parent))).Path}{WinCopies.IO.Path.PathSeparator}{(parameterInfo ?? throw GetArgumentNullException(nameof(parameterInfo))).Name}", parameterInfo.Name, parent) => _parameterInfo = parameterInfo;
+
+        protected override void DisposeManaged()
+        {
+            _parameterInfo = null;
+
+            base.DisposeManaged();
+        }
     }
 
     public class DotNetParameterInfo : DotNetParameterInfo<IDotNetParameterInfoProperties, IEnumerableSelectorDictionary<DotNetParameterInfoItemProvider, IBrowsableObjectInfo>>, IDotNetParameterInfo
     {
-        #region Properties
-        public sealed override IDotNetParameterInfoProperties ObjectPropertiesGeneric { get; }
+        private IDotNetParameterInfoProperties _properties;
 
-        public override IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystem => null;
+        #region Properties
+        protected sealed override IDotNetParameterInfoProperties ObjectPropertiesGenericOverride => _properties;
+
+        protected override IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystemOverride => null;
         #endregion Properties
 
-        internal DotNetParameterInfo(in ParameterInfo parameterInfo, in bool isReturn, in IDotNetItemInfo parent) : base(parameterInfo, parent) => ObjectPropertiesGeneric = new DotNetParameterInfoProperties<IDotNetParameterInfo>(this, isReturn);
+        internal DotNetParameterInfo(in ParameterInfo parameterInfo, in bool isReturn, in IDotNetItemInfo parent) : base(parameterInfo, parent) => _properties = new DotNetParameterInfoProperties<IDotNetParameterInfo>(this, isReturn);
 
         #region Methods
         protected override System.Collections.Generic.IEnumerable<DotNetParameterInfoItemProvider> GetItemProviders(Predicate<CustomAttributeData> func) => (func == null ? InnerObjectGeneric.GetCustomAttributesData() : InnerObjectGeneric.GetCustomAttributesData().WherePredicate(func)).Select(a => new DotNetParameterInfoItemProvider(a, this));
 
         protected override System.Collections.Generic.IEnumerable<DotNetParameterInfoItemProvider> GetItemProviders() => GetItemProviders(null);
 
-        public override IEnumerableSelectorDictionary<DotNetParameterInfoItemProvider, IBrowsableObjectInfo> GetSelectorDictionary() => null;
+        protected override IEnumerableSelectorDictionary<DotNetParameterInfoItemProvider, IBrowsableObjectInfo> GetSelectorDictionaryOverride() => null;
+
+        protected override void DisposeUnmanaged()
+        {
+            _properties.Dispose();
+            _properties = null;
+
+            base.DisposeUnmanaged();
+        }
         #endregion Methods
     }
 }

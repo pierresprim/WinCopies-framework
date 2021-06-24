@@ -113,7 +113,7 @@ namespace WinCopies.IO.Reflection.PropertySystem
 #else
             ?? (_accessModifier =
 #endif
-            GetAccessModifier(BrowsableObjectInfo.InnerObject)
+            GetAccessModifier(InnerObject.InnerObject)
 #if !CS8
             ).Value
 #endif
@@ -121,11 +121,11 @@ namespace WinCopies.IO.Reflection.PropertySystem
 
         public bool? IsRootType { get; }
 
-        public override bool IsAbstract => BrowsableObjectInfo.InnerObject.IsAbstract;
+        public override bool IsAbstract => InnerObject.InnerObject.IsAbstract;
 
-        public override bool IsSealed => BrowsableObjectInfo.InnerObject.IsSealed;
+        public override bool IsSealed => InnerObject.InnerObject.IsSealed;
 
-        public override Type DeclaringType => BrowsableObjectInfo.InnerObject.DeclaringType;
+        public override Type DeclaringType => InnerObject.InnerObject.DeclaringType;
 
         public DotNetTypeInfoProperties(in T dotNetTypeInfo, in DotNetItemType itemType, bool? isRootType) : base(dotNetTypeInfo, itemType) => IsRootType = isRootType;
     }

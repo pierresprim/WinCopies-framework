@@ -21,10 +21,10 @@ using System.ComponentModel;
 using System.Windows.Controls;
 
 using WinCopies.Collections.Generic;
+using WinCopies.GUI.Controls;
 using WinCopies.GUI.Controls.Models;
 using WinCopies.IO.ObjectModel;
 using WinCopies.IO.Process;
-using WinCopies.Util.Data;
 
 namespace WinCopies.GUI.IO
 {
@@ -42,27 +42,31 @@ namespace WinCopies.GUI.IO
             bool IsSelected { get; set; }
         }
 
-        public interface IExplorerControlBrowsableObjectInfoViewModel : IBrowsableObjectInfoViewModelCommon, WinCopies.DotNetFix.IDisposable
+        public interface IExplorerControlBrowsableObjectInfoViewModel : IBrowsableObjectInfoViewModelCommon, DotNetFix.IDisposable
         {
-            System.Collections.Generic.IEnumerable<IBrowsableObjectInfoViewModel> TreeViewItems { get; set; }
+            System.Collections.Generic.IEnumerable<IMenuItemModel<string>> BrowsabilityPaths { get; }
 
-            string Text { get; set; }
+            System.Collections.Generic.IEnumerable<IButtonModel> CommonCommands { get; }
 
-            IBrowsableObjectInfoViewModel Path { get; set; }
-
-            ObservableLinkedCollectionEnumerable<IBrowsableObjectInfo> History { get; }
+            System.Collections.Generic.IEnumerable<IMenuItemModel<string, IMenuItemModel<string>, object>> CustomProcesses { get; }
 
             IBrowsableObjectInfoFactory Factory { get; set; }
 
-            SelectionMode SelectionMode { get; set; }
-
-            IList SelectedItems { get; set; }
+            HistoryObservableCollection<IBrowsableObjectInfo> History { get; }
 
             bool IsCheckBoxVisible { get; set; }
 
             IButtonModel NewItemCommand { get; }
 
-            System.Collections.Generic.IEnumerable<IButtonModel> CommonCommands { get; }
+            IBrowsableObjectInfoViewModel Path { get; set; }
+
+            IList SelectedItems { get; set; }
+
+            SelectionMode SelectionMode { get; set; }
+
+            string Text { get; set; }
+
+            System.Collections.Generic.IEnumerable<IBrowsableObjectInfoViewModel> TreeViewItems { get; set; }
 
             event System.EventHandler<CustomProcessParametersGeneratedEventArgs> CustomProcessParametersGeneratedEventHandler;
         }

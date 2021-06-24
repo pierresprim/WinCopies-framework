@@ -30,9 +30,9 @@ namespace WinCopies.IO.Process
 {
     public static class ProcessErrorHelper
     {
-        public static IProcessError<ProcessError> GetError(in ProcessError error, in ErrorCode errorCode, in IProcessErrorFactory<ProcessError> factory) => factory.GetError(error, GetErrorMessageFromProcessError(error), errorCode);
+        public static IProcessError<ProcessError, TAction> GetError<TAction>(in ProcessError error, in ErrorCode errorCode, in IProcessErrorFactory<ProcessError, TAction> factory) => factory.GetError(error, GetErrorMessageFromProcessError(error), errorCode);
 
-        public static IProcessError<ProcessError> GetError(in ProcessError error, in HResult hResult, in IProcessErrorFactory<ProcessError> factory) => factory.GetError(error, GetErrorMessageFromProcessError(error), hResult);
+        public static IProcessError<ProcessError, TAction> GetError<TAction>(in ProcessError error, in HResult hResult, in IProcessErrorFactory<ProcessError, TAction> factory) => factory.GetError(error, GetErrorMessageFromProcessError(error), hResult);
 
         public static string GetErrorMessageFromProcessError(ProcessError error)
         {
@@ -44,13 +44,15 @@ namespace WinCopies.IO.Process
 #if !CS8
         public static IProcessError GetNoErrorError(this IProcessErrorFactory factory) => factory.GetError(factory.NoError, ExceptionMessages.NoError, ErrorCode.NoError);
 
-        public static IProcessError<T> GetNoErrorError<T>(this IProcessErrorFactory<T> factory) => factory.GetError(factory.NoError, ExceptionMessages.NoError, ErrorCode.NoError);
+        public static IProcessError<T, TAction> GetNoErrorError<T, TAction>(this IProcessErrorFactory<T, TAction> factory) => factory.GetError(factory.NoError, ExceptionMessages.NoError, ErrorCode.NoError);
 #endif
     }
 
-    public sealed class ProcessError<TError> : IProcessError<TError>
+    public sealed class ProcessError<TError, TAction> : IProcessError<TError, TAction>
     {
         private readonly string _message;
+
+        public TAction Action { get; set; }
 
         public TError Error { get; }
 
@@ -115,6 +117,11 @@ namespace WinCopies.IO.Process
 #endif
     }
 
+    public interface IProcessErrorFactoryData<T, TAction> : IProcessErrorFactoryData<T>
+    {
+        TAction IgnoreAction { get; }
+    }
+
     public interface IProcessErrorFactoryBase
     {
         IProcessError GetError(object error, Exception exception, ErrorCode errorCode);
@@ -126,15 +133,15 @@ namespace WinCopies.IO.Process
         IProcessError GetError(object error, string message, HResult hResult);
     }
 
-    public interface IProcessErrorFactoryBase<T> : IProcessErrorFactoryBase
+    public interface IProcessErrorFactoryBase<T, TAction> : IProcessErrorFactoryBase
     {
-        IProcessError<T> GetError(T error, Exception exception, ErrorCode errorCode);
+        IProcessError<T, TAction> GetError(T error, Exception exception, ErrorCode errorCode);
 
-        IProcessError<T> GetError(T error, Exception exception, HResult hResult);
+        IProcessError<T, TAction> GetError(T error, Exception exception, HResult hResult);
 
-        IProcessError<T> GetError(T error, string message, ErrorCode errorCode);
+        IProcessError<T, TAction> GetError(T error, string message, ErrorCode errorCode);
 
-        IProcessError<T> GetError(T error, string message, HResult hResult);
+        IProcessError<T, TAction> GetError(T error, string message, HResult hResult);
 
 #if CS8
         private static T GetError(in object error, in string argumentName) => error is T _error ? _error : throw GetInvalidTypeArgumentException(argumentName);
@@ -156,10 +163,10 @@ namespace WinCopies.IO.Process
 #endif
     }
 
-    public interface IProcessErrorFactory<T> : IProcessErrorFactoryData<T>, IProcessErrorFactoryBase<T>, IProcessErrorFactory
+    public interface IProcessErrorFactory<T, TAction> : IProcessErrorFactoryData<T, TAction>, IProcessErrorFactoryBase<T, TAction>, IProcessErrorFactory
     {
 #if CS8
-        new IProcessError<T> GetNoErrorError() => GetError(NoError, ExceptionMessages.NoError, ErrorCode.NoError);
+        new IProcessError<T, TAction> GetNoErrorError() => GetError(NoError, ExceptionMessages.NoError, ErrorCode.NoError);
 #endif
     }
 }

@@ -18,11 +18,12 @@
 using System;
 using System.Collections.ObjectModel;
 
+using WinCopies.GUI.Controls.Models;
 using WinCopies.IO.ObjectModel;
 
 namespace WinCopies.GUI.IO.ObjectModel
 {
-    public interface IBrowsableObjectInfoViewModel : IBrowsableObjectInfo, IBrowsableObjectInfoViewModelCommon
+    public interface IBrowsableObjectInfoViewModel : IBrowsableObjectInfo, IBrowsableObjectInfoViewModelCommon, IEquatable<IBrowsableObjectInfoViewModel>, IComparable<IBrowsableObjectInfoViewModel>
     {
         bool RootParentIsRootNode { get; }
 
@@ -32,10 +33,12 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         int SelectedIndex { get; set; }
 
-        object SelectedItem { get; set; }
+        IBrowsableObjectInfo SelectedItem { get; set; }
 
         ObservableCollection<IBrowsableObjectInfoViewModel> Items { get; }
 
         Comparison<IBrowsableObjectInfo> SortComparison { get; set; }
+
+        IBrowsableObjectInfoFactory Factory { get; set; }
     }
 }

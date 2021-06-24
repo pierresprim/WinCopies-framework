@@ -26,7 +26,7 @@ namespace WinCopies.GUI.IO.Process
     [ValueConversion(typeof(IPathCommon),typeof(string))]
     public class PathCommonToStringConverter : AlwaysConvertibleOneWayConverter<IPathCommon, object, string>
     {
-        public override ConversionOptions ConvertOptions => ConverterHelper.ParameterCanBeNull;
+        public override IReadOnlyConversionOptions ConvertOptions => ConverterHelper.ParameterCanBeNull;
 
         protected override string Convert(IPathCommon value, object parameter, CultureInfo culture) => value.Path;
     }

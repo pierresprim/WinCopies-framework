@@ -16,7 +16,6 @@
 * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using System;
-using WinCopies.IO.ObjectModel;
 
 using static WinCopies.ThrowHelper;
 
@@ -30,25 +29,25 @@ namespace WinCopies.IO
 
 namespace WinCopies.IO.PropertySystem
 {
-    public abstract class BrowsableObjectInfoProperties<T> : WinCopies.DotNetFix.IDisposable where T : IBrowsableObjectInfo
+    public abstract class BrowsableObjectInfoProperties<T> : DotNetFix.IDisposable
     {
-        private T _browsableObjectInfo;
+        private T _innerObject;
 
-        public bool IsDisposed => _browsableObjectInfo == null;
+        public bool IsDisposed => _innerObject == null;
 
         protected TValue GetValueIfNotDisposed<TValue>(in TValue value) => IsDisposed ? throw GetExceptionForDispose(false) : value;
 
-        protected T BrowsableObjectInfo => GetValueIfNotDisposed(_browsableObjectInfo);
+        protected T InnerObject=> GetValueIfNotDisposed(_innerObject);
 
-        protected BrowsableObjectInfoProperties(in T browsableObjectInfo) => _browsableObjectInfo = browsableObjectInfo
+        protected BrowsableObjectInfoProperties(in T innerObject) => _innerObject = innerObject
 #if CS9
         ??
 #else
             == null ? 
 #endif
-            throw GetArgumentNullException(nameof(browsableObjectInfo))
+            throw GetArgumentNullException(nameof(innerObject))
 #if !CS9
-: browsableObjectInfo
+: innerObject
 #endif
             ;
 
@@ -59,7 +58,7 @@ namespace WinCopies.IO.PropertySystem
 
         protected virtual void DisposeUnmanaged()
         {
-            _browsableObjectInfo = default;
+            _innerObject = default;
         }
 
         public void Dispose()

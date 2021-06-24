@@ -16,7 +16,6 @@
  * along with the WinCopies Framework. If not, see <https://www.gnu.org/licenses/>. */
 
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Management;
@@ -25,7 +24,9 @@ using System.Windows.Media.Imaging;
 using Microsoft.WindowsAPICodePack.PortableDevices;
 using Microsoft.WindowsAPICodePack.Shell;
 
+using WinCopies.Collections.Generic;
 using WinCopies.IO.AbstractionInterop;
+using WinCopies.IO.Process;
 using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Selectors;
 using WinCopies.Linq;
@@ -35,7 +36,6 @@ using WinCopies.Util;
 using static WinCopies.IO.ObjectModel.WMIItemInfo;
 using static WinCopies.UtilHelpers;
 using static WinCopies.ThrowHelper;
-using WinCopies.IO.Process;
 
 namespace WinCopies.IO
 {
@@ -57,37 +57,50 @@ namespace WinCopies.IO
     {
         public abstract class WMIItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : BrowsableObjectInfo<TObjectProperties, ManagementBaseObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IWMIItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IWMIItemInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
         {
+            protected class BrowsableObjectInfoBitmapSources : BrowsableObjectInfoBitmapSources<WMIItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>>
+            {
+                /// <summary>
+                /// Gets the small <see cref="BitmapSource"/> of this <see cref="WMIItemInfo"/>.
+                /// </summary>
+                protected override BitmapSource SmallBitmapSourceOverride => InnerObject.TryGetBitmapSource(SmallIconSize);
+
+                /// <summary>
+                /// Gets the medium <see cref="BitmapSource"/> of this <see cref="WMIItemInfo"/>.
+                /// </summary>
+                protected override BitmapSource MediumBitmapSourceOverride => InnerObject.TryGetBitmapSource(MediumIconSize);
+
+                /// <summary>
+                /// Gets the large <see cref="BitmapSource"/> of this <see cref="WMIItemInfo"/>.
+                /// </summary>
+                protected override BitmapSource LargeBitmapSourceOverride => InnerObject.TryGetBitmapSource(LargeIconSize);
+
+                /// <summary>
+                /// Gets the extra large <see cref="BitmapSource"/> of this <see cref="WMIItemInfo"/>.
+                /// </summary>
+                protected override BitmapSource ExtraLargeBitmapSourceOverride => InnerObject.TryGetBitmapSource(ExtraLargeIconSize);
+
+                public BrowsableObjectInfoBitmapSources(in WMIItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> wmiItemInfo) : base(wmiItemInfo) { /* Left empty. */ }
+            }
+
             #region Fields
-            private System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> _defaultRootItems;
             private ManagementBaseObject _managementObject;
             private IBrowsableObjectInfo _parent;
             private string _itemTypeName;
             private IBrowsabilityOptions _browsability;
             private string _description;
+            private IBrowsableObjectInfoBitmapSources _bitmapSources;
             #endregion
 
             #region Properties
-            public override IProcessFactory ProcessFactory => Process.ProcessFactory.DefaultProcessFactory;
+            protected override IBrowsableObjectInfoBitmapSources BitmapSourcesOverride => _bitmapSources;
 
-            public override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> RootItems => _defaultRootItems
-#if CS8
-                ??=
-#else
-                ?? (_defaultRootItems =
-#endif
-                GetRootItems()
-#if !CS8
-                )
-#endif
-                ;
+            protected override IProcessFactory ProcessFactoryOverride => Process.ProcessFactory.DefaultProcessFactory;
 
-            //public override Predicate<TPredicateTypeParameter> RootItemsPredicate => null;
+            protected override ArrayBuilder<IBrowsableObjectInfo> GetRootItemsOverride() => GetDefaultRootItems();
 
-            //public override Predicate<IBrowsableObjectInfo> RootItemsBrowsableObjectInfoPredicate => item => item.Browsability?.Browsability == IO.Browsability.BrowsableByDefault;
+            protected override bool IsSpecialItemOverride => false;
 
-            public override bool IsSpecialItem => false;
-
-            public override string ItemTypeName
+            protected override string ItemTypeNameOverride
             {
                 get
                 {
@@ -121,7 +134,7 @@ namespace WinCopies.IO
                 }
             }
 
-            public override string Description
+            protected override string DescriptionOverride
             {
                 get
                 {
@@ -136,7 +149,7 @@ namespace WinCopies.IO
                 }
             }
 
-            public override IBrowsableObjectInfo Parent => _parent
+            protected override IBrowsableObjectInfo ParentOverride => _parent
 #if CS8
                 ??=
 #else
@@ -158,32 +171,10 @@ namespace WinCopies.IO
             /// </summary>
             public override string Name { get; }
 
-            #region BitmapSources
-            /// <summary>
-            /// Gets the small <see cref="BitmapSource"/> of this <see cref="WMIItemInfo"/>.
-            /// </summary>
-            public override BitmapSource SmallBitmapSource => TryGetBitmapSource(SmallIconSize);
-
-            /// <summary>
-            /// Gets the medium <see cref="BitmapSource"/> of this <see cref="WMIItemInfo"/>.
-            /// </summary>
-            public override BitmapSource MediumBitmapSource => TryGetBitmapSource(MediumIconSize);
-
-            /// <summary>
-            /// Gets the large <see cref="BitmapSource"/> of this <see cref="WMIItemInfo"/>.
-            /// </summary>
-            public override BitmapSource LargeBitmapSource => TryGetBitmapSource(LargeIconSize);
-
-            /// <summary>
-            /// Gets the extra large <see cref="BitmapSource"/> of this <see cref="WMIItemInfo"/>.
-            /// </summary>
-            public override BitmapSource ExtraLargeBitmapSource => TryGetBitmapSource(ExtraLargeIconSize);
-            #endregion
-
             /// <summary>
             /// Gets a value that indicates whether this <see cref="WMIItemInfo"/> is browsable.
             /// </summary>
-            public override IBrowsabilityOptions Browsability
+            protected override IBrowsabilityOptions BrowsabilityOverride
             {
                 get
                 {
@@ -218,12 +209,14 @@ namespace WinCopies.IO
                 }
             }
 
-            public override bool IsRecursivelyBrowsable => true;
+            protected override bool IsRecursivelyBrowsableOverride => true;
 
             /// <summary>
             /// Gets the <see cref="ManagementBaseObject"/> that this <see cref="WMIItemInfo"/> represents.
             /// </summary>
-            public sealed override ManagementBaseObject InnerObjectGeneric => _managementObject;
+            protected sealed override ManagementBaseObject InnerObjectGenericOverride => _managementObject;
+
+            protected override System.Collections.Generic.IEnumerable<IProcessInfo> CustomProcessesOverride => DefaultCustomProcessesSelectorDictionary.Select(this);
             #endregion // Properties
 
             #region Constructors
@@ -256,14 +249,19 @@ namespace WinCopies.IO
 
                 _managementObject = initializer.ManagementObject;
 
-                if (!IsNullEmptyOrWhiteSpace(name))
-
-                    Name = name;
+                Name = IsNullEmptyOrWhiteSpace(name) ? Path : name;
             }
-            #endregion // Constructors
+            #endregion Constructors
 
             #region Methods
-            public static System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetRootItems() => new IBrowsableObjectInfo[] { new WMIItemInfo(null, GetDefaultClientVersion()) };
+            public static ArrayBuilder<IBrowsableObjectInfo> GetDefaultRootItems()
+            {
+                var arrayBuilder = new ArrayBuilder<IBrowsableObjectInfo>();
+
+                _ = arrayBuilder.AddLast(new WMIItemInfo(null, GetDefaultClientVersion()));
+
+                return arrayBuilder;
+            }
 
             private static WMIItemInfoInitializer GetRootInitializer()
             {
@@ -340,18 +338,26 @@ namespace WinCopies.IO
                 }
             }
 
-            protected override void DisposeManaged()
+            protected override void DisposeUnmanaged()
             {
-                base.DisposeManaged();
+                if (_bitmapSources != null)
+                {
+                    _bitmapSources.Dispose();
+                    _bitmapSources = null;
+                }
 
-                _managementObject.Dispose();
-
-                _managementObject = null;
-
-                //_managementObjectDelegate = null;
+                base.DisposeUnmanaged();
             }
 
-            private BitmapSource TryGetBitmapSource(in ushort size) => TryGetBitmapSource(IsBrowsable() ? FolderIcon : FileIcon, Microsoft.WindowsAPICodePack.NativeAPI.Consts.DllNames.Shell32, size);
+            protected override void DisposeManaged()
+            {
+                _managementObject.Dispose();
+                _managementObject = null;
+
+                base.DisposeManaged();
+            }
+
+            private BitmapSource TryGetBitmapSource(in ushort size) => TryGetBitmapSource(IsBrowsable ? FolderIcon : FileIcon, Microsoft.WindowsAPICodePack.NativeAPI.Consts.DllNames.Shell32, size);
 
             // public override bool CheckFilter(string path) => throw new NotImplementedException();
 
@@ -359,7 +365,7 @@ namespace WinCopies.IO
 
             public override WinCopies.Collections.Generic.IComparer<IBrowsableObjectInfoBase> GetDefaultComparer() => new WMIItemInfoComparer<IBrowsableObjectInfoBase>();
 
-            public override IEnumerable<IBrowsableObjectInfo> GetSubRootItems() => GetItems().Where(item => item.Browsability?.Browsability == IO.Browsability.BrowsableByDefault);
+            protected override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetSubRootItemsOverride() => GetItems().Where(item => item.Browsability?.Browsability == IO.Browsability.BrowsableByDefault);
             #endregion Methods
         }
 
@@ -373,14 +379,22 @@ namespace WinCopies.IO
             public const string ROOT = "ROOT";
             #endregion
 
+            private static readonly BrowsabilityPathStack<IWMIItemInfo> __browsabilityPathStack = new BrowsabilityPathStack<IWMIItemInfo>();
+
             private IWMIItemInfoProperties _objectProperties;
 
             #region Properties
+            public static IBrowsabilityPathStack<IWMIItemInfo> BrowsabilityPathStack { get; } = __browsabilityPathStack.AsWriteOnly();
+
+            protected override System.Collections.Generic.IEnumerable<IBrowsabilityPath> BrowsabilityPathsOverride => __browsabilityPathStack.GetBrowsabilityPaths(this);
+
+            public static ISelectorDictionary<IWMIItemInfoBase, System.Collections.Generic.IEnumerable<IProcessInfo>> DefaultCustomProcessesSelectorDictionary { get; } = new DefaultNullableValueSelectorDictionary<IWMIItemInfoBase, System.Collections.Generic.IEnumerable<IProcessInfo>>();
+
             public static IEnumerableSelectorDictionary<WMIItemInfoItemProvider, IBrowsableObjectInfo> DefaultItemSelectorDictionary { get; } = new WMIItemInfoSelectorDictionary();
 
-            public sealed override IWMIItemInfoProperties ObjectPropertiesGeneric => IsDisposed ? throw GetExceptionForDispose(false) : _objectProperties;
+            protected sealed override IWMIItemInfoProperties ObjectPropertiesGenericOverride => _objectProperties;
 
-            public override IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystem => null;
+            protected override IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystemOverride => null;
             #endregion
 
             #region Constructors
@@ -446,7 +460,7 @@ namespace WinCopies.IO
 
                 string _getPath(in string format) => $"{path}{format}:{managementObject.ClassPath.ClassName}";
 
-                path = name == null ? _getPath("") : _getPath($"{WinCopies.IO.Path.PathSeparator}{name}");
+                path = name == null ? _getPath(string.Empty) : _getPath($"{WinCopies.IO.Path.PathSeparator}{name}");
 
                 return path;
             }
@@ -472,7 +486,7 @@ namespace WinCopies.IO
                     new ManagementClass(options?.ConnectionOptions == null ? new ManagementScope(path) : new ManagementScope(path, options.ConnectionOptions), new ManagementPath(path), options?.ObjectGetOptions);
             // #pragma warning restore IDE0067 // Dispose objects before losing scope
 
-            public override IEnumerableSelectorDictionary<WMIItemInfoItemProvider, IBrowsableObjectInfo> GetSelectorDictionary() => DefaultItemSelectorDictionary;
+            protected override IEnumerableSelectorDictionary<WMIItemInfoItemProvider, IBrowsableObjectInfo> GetSelectorDictionaryOverride() => DefaultItemSelectorDictionary;
 
             protected override void DisposeManaged()
             {
@@ -515,15 +529,15 @@ namespace WinCopies.IO
 #if CS8
                     static
 #endif
-                    IEnumerable<ManagementBaseObject> enumerateInstances(in ManagementClass _managementClass, in IWMIItemInfoOptions _options) => _as(_options?.EnumerationOptions == null ? _managementClass.GetInstances() : _managementClass.GetInstances(_options?.EnumerationOptions));
+                    System.Collections.Generic.IEnumerable<ManagementBaseObject> enumerateInstances(in ManagementClass _managementClass, in IWMIItemInfoOptions _options) => _as(_options?.EnumerationOptions == null ? _managementClass.GetInstances() : _managementClass.GetInstances(_options?.EnumerationOptions));
 
-                    IEnumerable<WMIItemInfoItemProvider> getEnumerable(in IEnumerable<ManagementBaseObject> enumerable, WMIItemType itemType) => enumerable.SelectConverter(item => new WMIItemInfoItemProvider(null, item, itemType, ObjectPropertiesGeneric.Options, ClientVersion));
+                    System.Collections.Generic.IEnumerable<WMIItemInfoItemProvider> getEnumerable(in System.Collections.Generic.IEnumerable<ManagementBaseObject> enumerable, WMIItemType itemType) => enumerable.SelectConverter(item => new WMIItemInfoItemProvider(null, item, itemType, ObjectPropertiesGeneric.Options, ClientVersion));
 
                     if (ObjectPropertiesGeneric.ItemType == WMIItemType.Namespace)
                     {
-                        IEnumerable<ManagementBaseObject> namespaces = enumerateInstances(managementClass, options);
+                        System.Collections.Generic.IEnumerable<ManagementBaseObject> namespaces = enumerateInstances(managementClass, options);
 
-                        IEnumerable<ManagementBaseObject> classes = _as(options?.EnumerationOptions == null ? managementClass.GetSubclasses() : managementClass.GetSubclasses(options?.EnumerationOptions));
+                        System.Collections.Generic.IEnumerable<ManagementBaseObject> classes = _as(options?.EnumerationOptions == null ? managementClass.GetSubclasses() : managementClass.GetSubclasses(options?.EnumerationOptions));
 
                         if (predicate != null)
                         {
@@ -539,7 +553,7 @@ namespace WinCopies.IO
                     {
                         managementClass.Get();
 
-                        IEnumerable<ManagementBaseObject> items = enumerateInstances(managementClass, options);
+                        System.Collections.Generic.IEnumerable<ManagementBaseObject> items = enumerateInstances(managementClass, options);
 
                         if (predicate != null)
 
@@ -559,9 +573,9 @@ namespace WinCopies.IO
                 }
             }
 
-            public IEnumerable<IBrowsableObjectInfo> GetItems(in Predicate<ManagementBaseObject> predicate, in IWMIItemInfoOptions options) => GetItems(GetItemProviders(predicate, options));
+            public System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(in Predicate<ManagementBaseObject> predicate, in IWMIItemInfoOptions options) => GetItems(GetItemProviders(predicate, options));
 
-            public IEnumerable<IBrowsableObjectInfo> GetItems(in IWMIItemInfoOptions options) => GetItems(item => true, options);
+            public System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(in IWMIItemInfoOptions options) => GetItems(item => true, options);
             #endregion GetItems
             #endregion Methods
         }

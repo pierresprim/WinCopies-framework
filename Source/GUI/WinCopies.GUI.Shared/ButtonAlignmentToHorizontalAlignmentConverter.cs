@@ -18,81 +18,74 @@
 using System;
 using System.Globalization;
 using System.Windows.Data;
+
 using WinCopies.Util.Data;
 
 namespace WinCopies.GUI.Windows
 {
     [ValueConversion(typeof(HorizontalAlignment), typeof(System.Windows.HorizontalAlignment))]
-    public class ButtonAlignmentToHorizontalAlignmentConverter : ConverterBase
+    public class ButtonAlignmentToHorizontalAlignmentConverter : AlwaysConvertibleTwoWayConverter<HorizontalAlignment, object, System.Windows.HorizontalAlignment>
     {
-        public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        public override IReadOnlyConversionOptions ConvertOptions => ConverterHelper.ParameterCanBeNull;
+
+        public override IReadOnlyConversionOptions ConvertBackOptions => ConverterHelper.ParameterCanBeNull;
+
+        protected override System.Windows.HorizontalAlignment Convert(HorizontalAlignment value, object parameter, CultureInfo culture)
         {
-            if (value is HorizontalAlignment _value)
-
 #if NETFRAMEWORK
-                switch (_value)
-                {
-                    case HorizontalAlignment.Left:
+            switch (value)
+            {
+                case HorizontalAlignment.Left:
 
-                        return System.Windows.HorizontalAlignment.Left;
+                    return System.Windows.HorizontalAlignment.Left;
 
-                    case HorizontalAlignment.Right:
-                
-                        return System.Windows.HorizontalAlignment.Right;
+                case HorizontalAlignment.Right:
 
-                    default:
-                
-                        throw new ArgumentException("Invalid value for HorizontalAlignment.");
-                }
+                    return System.Windows.HorizontalAlignment.Right;
+
+                default:
+
+                    throw new ArgumentException("Invalid value for HorizontalAlignment.");
+            }
 #else
-                return _value switch
-                {
-                    HorizontalAlignment.Left => System.Windows.HorizontalAlignment.Left,
+            return value switch
+            {
+                HorizontalAlignment.Left => System.Windows.HorizontalAlignment.Left,
 
-                    HorizontalAlignment.Right => System.Windows.HorizontalAlignment.Right,
+                HorizontalAlignment.Right => System.Windows.HorizontalAlignment.Right,
 
-                    _ => throw new ArgumentException("Invalid value for HorizontalAlignment.")
-                };
+                _ => throw new ArgumentException("Invalid value for HorizontalAlignment.")
+            };
 #endif
-
-            else
-
-                return null;
         }
 
-        public override object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        protected override HorizontalAlignment ConvertBack(System.Windows.HorizontalAlignment value, object parameter, CultureInfo culture)
         {
-            if (value is System.Windows.HorizontalAlignment _value)
-
 #if NETFRAMEWORK
-                switch (_value)
-                {
-                    case System.Windows.HorizontalAlignment.Left:
+            switch (value)
+            {
+                case System.Windows.HorizontalAlignment.Left:
 
-                        return HorizontalAlignment.Left;
+                    return HorizontalAlignment.Left;
 
-                    case System.Windows.HorizontalAlignment.Right:
-                
-                        return HorizontalAlignment.Right;
+                case System.Windows.HorizontalAlignment.Right:
 
-                    default:
-                
-                        throw new ArgumentException("Invalid value for HorizontalAlignment.");
-                }
+                    return HorizontalAlignment.Right;
+
+                default:
+
+                    throw new ArgumentException("Invalid value for HorizontalAlignment.");
+            }
 #else
-                return _value switch
-                {
-                    System.Windows.HorizontalAlignment.Left => HorizontalAlignment.Left,
+            return value switch
+            {
+                System.Windows.HorizontalAlignment.Left => HorizontalAlignment.Left,
 
-                    System.Windows.HorizontalAlignment.Right => HorizontalAlignment.Right,
+                System.Windows.HorizontalAlignment.Right => HorizontalAlignment.Right,
 
-                    _ => throw new ArgumentException("Invalid value for HorizontalAlignment.")
-                };
+                _ => throw new ArgumentException("Invalid value for HorizontalAlignment.")
+            };
 #endif
-
-            else
-
-                return null;
         }
     }
 }

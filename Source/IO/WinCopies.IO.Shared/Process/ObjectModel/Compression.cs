@@ -16,10 +16,15 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using Microsoft.WindowsAPICodePack.Win32Native;
+
 using SevenZip;
+
+using System.Collections.Generic;
 
 using WinCopies.Collections.DotNetFix.Generic;
 using WinCopies.Collections.Generic;
+using WinCopies.Util.Commands;
+using WinCopies.Util.Commands.Primitives;
 
 namespace WinCopies.IO.Process
 {
@@ -30,6 +35,11 @@ namespace WinCopies.IO.Process
         public ArchiveCompressionPathInfo(in string[] fileNames) : base(new PathTypes<IPathInfo>.RootPath("..\\", true)) => FileNames = fileNames;
     }
 
+    public class CompressionProcessErrorFactory : ProcessErrorFactory<IPathInfo, object>
+    {
+        public override object IgnoreAction => null;
+    }
+
     namespace ObjectModel
     {
         [ProcessGuid(Guids.Process.ArchiveCompression)]
@@ -38,17 +48,19 @@ namespace WinCopies.IO.Process
                                       // , ProcessSimulationParameters
                                       // #endif
                                       // >
-           ArchiveProcess<T> where T : ProcessTypes<IPathInfo>.ProcessErrorTypes<ProcessError>.IProcessErrorFactories
+           ArchiveProcess<T> where T : ProcessTypes<IPathInfo>.ProcessErrorTypes<ProcessError, object>.IProcessErrorFactories
         {
+            public override IReadOnlyDictionary<string, ICommand<IProcessErrorItem<IPathInfo, ProcessError, object>>> Actions => null;
+
             protected SevenZipCompressor ArchiveCompressor { get; }
 
             public override string Guid => Guids.Process.ArchiveCompression;
 
             public override string Name => Properties.Resources.Compression;
 
-            public Compression(in IEnumerableQueue<IPathInfo> initialPaths, in IPathInfo sourcePath, in IPathInfo destinationPath, in ProcessTypes<IPathInfo>.IProcessQueue paths, in IProcessLinkedList<IPathInfo, ProcessError> errorsQueue, in ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessDelegates<ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessEventDelegates> progressDelegate, T factory, in SevenZipCompressor archiveCompressor) : base(initialPaths, sourcePath, destinationPath, paths, errorsQueue, progressDelegate, factory) => ArchiveCompressor = archiveCompressor;
+            public Compression(in IEnumerableQueue<IPathInfo> initialPaths, in IPathInfo sourcePath, in IPathInfo destinationPath, in ProcessTypes<IPathInfo>.IProcessQueue paths, in IProcessLinkedList<IPathInfo, ProcessError, ProcessTypes<IPathInfo, ProcessError, object>.ProcessErrorItem, object> errorsQueue, in ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessDelegates<ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessEventDelegates> progressDelegate, T factory, in SevenZipCompressor archiveCompressor) : base(initialPaths, sourcePath, destinationPath, paths, errorsQueue, progressDelegate, factory) => ArchiveCompressor = archiveCompressor;
 
-            protected override bool LoadPathsOverride(out IProcessError<ProcessError> error, out bool clearOnError)
+            protected override bool LoadPathsOverride(out IProcessError<ProcessError, object> error, out bool clearOnError)
             {
                 var fileNames = new ArrayBuilder<string>();
 
@@ -73,13 +85,13 @@ namespace WinCopies.IO.Process
                 return true;
             }
 
-            protected override bool Check(out IProcessError<ProcessError> error)
+            protected override bool Check(out IProcessError<ProcessError, object> error)
             {
                 try
                 {
-                 if (System.IO.File.Exists(DestinationPath.Path) || System.IO.Directory.Exists(DestinationPath.Path))
+                    if (System.IO.File.Exists(DestinationPath.Path) || System.IO.Directory.Exists(DestinationPath.Path))
                     {
-                        error = new ProcessError<ProcessError>(ProcessError.FileSystemEntryAlreadyExists, "An item already exists with the same path.", ErrorCode.FileExists);
+                        error = new ProcessError<ProcessError, object>(ProcessError.FileSystemEntryAlreadyExists, "An item already exists with the same path.", ErrorCode.FileExists);
 
                         return false;
                     }
@@ -103,7 +115,7 @@ namespace WinCopies.IO.Process
                 return true;
             }
 
-            protected override bool DoWork(IPathInfo path, out IProcessError<ProcessError> error, out bool isErrorGlobal)
+            protected override bool DoWork(IPathInfo path, out IProcessError<ProcessError, object> error, out bool isErrorGlobal)
             {
                 isErrorGlobal = false;
 
@@ -124,9 +136,9 @@ namespace WinCopies.IO.Process
                 return CancellationPending ? (CancellationPending = false) : true;
             }
 
-            protected override bool DoWork(IProcessErrorItem<IPathInfo, ProcessError> path, out IProcessError<ProcessError> error, out bool isErrorGlobal) => DoWork(path.Item, out error, out isErrorGlobal);
+            protected override bool DoWork(IProcessErrorItem<IPathInfo, ProcessError, object> path, out IProcessError<ProcessError, object> error, out bool isErrorGlobal) => DoWork(path.Item, out error, out isErrorGlobal);
 
-            protected override bool OnRunWorkerCompleted()
+            protected override bool OnRunWorkerCompleted(bool? result)
             {
                 ArchiveCompressor.FileCompressionStarted -= ArchiveCompressor_FileCompressionStarted;
 
@@ -134,10 +146,10 @@ namespace WinCopies.IO.Process
 
                 ArchiveCompressor.FileCompressionFinished -= ArchiveCompressor_FileCompressionFinished;
 
-                return true;
+                return base.OnRunWorkerCompleted(result);
             }
 
-            private void ArchiveCompressor_Compressing(object sender, ProgressEventArgs e) => CancellationPending = ProcessDelegates.CommonDelegate.RaiseEvent(new ProcessProgressDelegateParameter(e.PercentDone));
+            private void ArchiveCompressor_Compressing(object sender, ProgressEventArgs e) => CancellationPending = ProcessDelegates.CommonDelegate.RaiseEvent(new ProcessProgressDelegateParameter(e.PercentDone, null));
 
             private void ArchiveCompressor_FileCompressionStarted(object sender, FileNameEventArgs e)
             {

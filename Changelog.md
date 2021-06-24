@@ -6,6 +6,28 @@ The WinCopies® software framework
 CHANGELOG
 ---------
 
+### 3.4-preview
+
+- Additions:
+	- New commands to TextBox context menu.
+	- New DataTemplates.
+	- New types.
+- NavigationButton uses IHistoryCollection.
+- Bug fixed in IconUtil.
+- ButtonAlignmentToHorizontalAlignmentConverter inherits from AlwaysConvertibleTwoWayConverter\<HorizontalAlignment, object, System.Windows.HorizontalAlignment>. The value cannot be null.
+- Update properties of ProcessControl, ExplorerControl, ExplorerControlListViewItemContent, IExplorerControlBrowsableObjectInfoViewModel, IBrowsableObjectInfoViewModel and WinCopies.GUI.IO.Process.IProcess.
+- BrowsableObjectInfoViewModel's and WinCopies.GUI.IO.Process: update properties and add methods.
+- Item sorting bug fixed in BrowsableObjectInfoViewModel.
+- BrowsableObjectInfo.RegisterAllSelectors is now called RegisterDefaultSelectors.
+- Update process linked lists and collections and ProcessStatus.
+- Add ActionToDelegateCommand2Converter static resource to WinCopies.GUI.IO merged dictionaries.
+- Update DotNetAssemblyInfo, IBrowsableObjectInfo, WinCopies.IO.BrowsableObjectInfo, generic version of FileSystemObjectInfo, RegistryItemInfo and IDotNetAssemblyInfo.
+- Type parameters of the generic version of IArchiveItemInfoProvider, IShellObjectInfo and IFileSystemObjectInfo have the out attribute.
+- Fixed memory leak in DotNetAttributeInfo, DotNetNamespaceInfo, DotNetParameterInfo, DotNetTypeInfo, DotNetMemberInfo and FileSystemObjectComparer.
+- Update Process API.
+- BrowsableObjectInfoProperties.BrowsableObjectInfo is now InnerObject.
+- Bug fixed in WinCopies.IO.Extensions.GetPath and in Path.RenameDuplicate.
+
 ### 3.3.0-preview
 
 - Add new types.

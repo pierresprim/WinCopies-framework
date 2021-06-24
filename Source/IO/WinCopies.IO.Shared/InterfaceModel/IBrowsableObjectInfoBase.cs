@@ -36,8 +36,8 @@ namespace WinCopies.IO.ObjectModel
         /// </summary>
         string Name { get; }
 
-        WinCopies.Collections.Generic.IEqualityComparer<IBrowsableObjectInfoBase> GetDefaultEqualityComparer();
+        Collections.Generic.IEqualityComparer<IBrowsableObjectInfoBase> GetDefaultEqualityComparer();
 
-        WinCopies.Collections.Generic.IComparer<IBrowsableObjectInfoBase> GetDefaultComparer();
+        Collections.Generic.IComparer<IBrowsableObjectInfoBase> GetDefaultComparer();
     }
 }

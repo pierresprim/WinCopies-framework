@@ -24,7 +24,6 @@ using WinCopies.IO.Process;
 using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Reflection;
 using WinCopies.IO.Reflection.PropertySystem;
-using WinCopies.IO.Selectors;
 using WinCopies.IO.Selectors.Reflection;
 using WinCopies.PropertySystem;
 
@@ -35,11 +34,11 @@ namespace WinCopies.IO.ObjectModel.Reflection
     public abstract class DotNetNamespaceInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : BrowsableDotNetItemInfo<TObjectProperties, object, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IDotNetNamespaceInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IDotNetItemInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
     {
         #region Properties
-        public override IProcessFactory ProcessFactory => Process.ProcessFactory.DefaultProcessFactory;
+        protected override IProcessFactory ProcessFactoryOverride => Process.ProcessFactory.DefaultProcessFactory;
 
-        public override string ItemTypeName { get; } = Properties.Resources.DotNetNamespace;
+        protected override string ItemTypeNameOverride { get; } = Properties.Resources.DotNetNamespace;
 
-        public sealed override object InnerObjectGeneric => null;
+        protected sealed override object InnerObjectGenericOverride => null;
         #endregion
 
         protected DotNetNamespaceInfo(in string name, in IBrowsableObjectInfo parent) : base(parent is IDotNetAssemblyInfo ? name : parent == null ? throw GetArgumentNullException(nameof(parent)) : $"{parent.Path}{IO.Path.PathSeparator}{name}", name, parent)
@@ -54,12 +53,14 @@ namespace WinCopies.IO.ObjectModel.Reflection
 
     public class DotNetNamespaceInfo : DotNetNamespaceInfo<IDotNetItemInfoProperties, DotNetNamespaceInfoItemProvider, IEnumerableSelectorDictionary<DotNetNamespaceInfoItemProvider, IBrowsableObjectInfo>, DotNetNamespaceInfoItemProvider>, IDotNetNamespaceInfo
     {
+        private IDotNetItemInfoProperties _properties;
+
         #region Properties
         public static IEnumerableSelectorDictionary<DotNetNamespaceInfoItemProvider, IBrowsableObjectInfo> DefaultItemSelectorDictionary { get; } = new DotNetNamespaceInfoSelectorDictionary();
 
-        public override IDotNetItemInfoProperties ObjectPropertiesGeneric { get; }
+        protected override IDotNetItemInfoProperties ObjectPropertiesGenericOverride { get; }
 
-        public override IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystem => null;
+        protected override IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystemOverride => null;
         #endregion Properties
 
         protected internal DotNetNamespaceInfo(in string name, in IBrowsableObjectInfo parent) : base(name, parent)
@@ -68,19 +69,27 @@ namespace WinCopies.IO.ObjectModel.Reflection
             Debug.Assert(Path.EndsWith(WinCopies.IO.Path.PathSeparator + name, StringComparison.CurrentCulture) || name == Path);
 #endif
 
-            ObjectPropertiesGeneric = new DotNetItemInfoProperties<IDotNetNamespaceInfo>(this, DotNetItemType.Namespace);
+            _properties = new DotNetItemInfoProperties<IDotNetNamespaceInfo>(this, DotNetItemType.Namespace);
         }
 
         #region Methods
         public static DotNetItemType[] GetDefaultItemTypes() => new DotNetItemType[] { DotNetItemType.Namespace, DotNetItemType.Struct, DotNetItemType.Enum, DotNetItemType.Class, DotNetItemType.Interface, DotNetItemType.Delegate };
 
-        public override IEnumerableSelectorDictionary<DotNetNamespaceInfoItemProvider, IBrowsableObjectInfo> GetSelectorDictionary() => DefaultItemSelectorDictionary;
+        protected override IEnumerableSelectorDictionary<DotNetNamespaceInfoItemProvider, IBrowsableObjectInfo> GetSelectorDictionaryOverride() => DefaultItemSelectorDictionary;
 
         protected override System.Collections.Generic.IEnumerable<DotNetNamespaceInfoItemProvider> GetItemProviders(System.Collections.Generic.IEnumerable<DotNetItemType> typesToEnumerate, Predicate<DotNetNamespaceInfoItemProvider> func) => DotNetNamespaceInfoEnumeration.From(this, typesToEnumerate, func);
 
         protected override System.Collections.Generic.IEnumerable<DotNetNamespaceInfoItemProvider> GetItemProviders(Predicate<DotNetNamespaceInfoItemProvider> predicate) => GetItemProviders(GetDefaultItemTypes(), predicate);
 
         protected override System.Collections.Generic.IEnumerable<DotNetNamespaceInfoItemProvider> GetItemProviders() => GetItemProviders(GetDefaultItemTypes(), null);
+
+        protected override void DisposeUnmanaged()
+        {
+            _properties.Dispose();
+            _properties = null;
+
+            base.DisposeUnmanaged();
+        }
         #endregion Methods
     }
 }

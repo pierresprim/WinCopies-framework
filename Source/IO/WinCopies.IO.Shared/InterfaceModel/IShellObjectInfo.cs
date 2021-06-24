@@ -39,7 +39,12 @@ namespace WinCopies.IO.ObjectModel
         // Left empty.
     }
 
-    public interface IShellObjectInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : IShellObjectInfoBase2, IArchiveItemInfoProvider<TObjectProperties, ShellObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IFileSystemObjectInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
+    public interface IShellObjectInfo<out TObjectProperties> : IShellObjectInfoBase2, IBrowsableObjectInfo<TObjectProperties> where TObjectProperties : IFileSystemObjectInfoProperties
+    {
+        // Left empty.
+    }
+
+    public interface IShellObjectInfo<out TObjectProperties, out TPredicateTypeParameter, out TSelectorDictionary, out TDictionaryItems> : IShellObjectInfo<TObjectProperties>, IArchiveItemInfoProvider<TObjectProperties, ShellObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IFileSystemObjectInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
     {
         ///// <summary>
         ///// Gets a <see cref="FileSystemInfo"/> object that provides info for the folders and files. This property returns <see langword="null"/> when this <see cref="IShellObjectInfo"/> is not a folder, drive or file. See the <see cref="IFileSystemObjectInfo.FileType"/> property for more details.

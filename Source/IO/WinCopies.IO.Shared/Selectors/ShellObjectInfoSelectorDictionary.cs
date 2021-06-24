@@ -24,18 +24,52 @@ using static WinCopies.ThrowHelper;
 
 namespace WinCopies.IO.Selectors
 {
-    public class ShellObjectInfoSelectorDictionary : EnumerableSelectorDictionary<ShellObjectInfoItemProvider,IBrowsableObjectInfo>
+    public class ShellObjectInfoSelectorDictionary : EnumerableSelectorDictionary<ShellObjectInfoItemProvider, IBrowsableObjectInfo>
     {
-        public static IBrowsableObjectInfo Convert(ShellObjectInfoItemProvider item) => (item ?? throw GetArgumentNullException(nameof(item))).ShellObject != null ? ShellObjectInfo.From(item.ShellObject,  item.ClientVersion.Value)
+        public static IBrowsableObjectInfo Convert(ShellObjectInfoItemProvider item) => (item ?? throw GetArgumentNullException(nameof(item))).ShellObject != null ? ShellObjectInfo.From(item.ShellObject, item.ClientVersion.Value)
             : item.ArchiveFileInfo.HasValue ? ArchiveItemInfo.From(item.ShellObjectInfo, item.ArchiveFileInfo.Value)
             : !UtilHelpers.IsNullEmptyOrWhiteSpace(item.ArchiveFilePath) ? ArchiveItemInfo.From(item.ShellObjectInfo, item.ArchiveFilePath)
-            : item.PortableDevice != null ? new PortableDeviceInfo(item.PortableDevice,  item.ClientVersion.Value)
-            : item.NonShellObjectRootItemType == NonShellObjectRootItemType.Registry ? new RegistryItemInfo( item.ClientVersion.Value)
+            : item.PortableDevice != null ? new PortableDeviceInfo(item.PortableDevice, item.ClientVersion.Value)
+            : item.NonShellObjectRootItemType == NonShellObjectRootItemType.Registry ? new RegistryItemInfo(item.ClientVersion.Value)
             : (IBrowsableObjectInfo)(item.NonShellObjectRootItemType == NonShellObjectRootItemType.WMI ? new WMIItemInfo(null, item.ClientVersion.Value)
             : throw SelectorDictionary.GetInvalidItemException());
 
         protected override Converter<ShellObjectInfoItemProvider, IBrowsableObjectInfo> DefaultSelectorOverride => Convert;
 
         public ShellObjectInfoSelectorDictionary() { /* Left empty. */ }
+    }
+
+    public class MultiIconInfoSelectorDictionary : EnumerableSelectorDictionary<MultiIconInfoItemProvider, IBrowsableObjectInfo>
+    {
+        public static IBrowsableObjectInfo Convert(MultiIconInfoItemProvider multiIconInfoItemProvider) => new SingleIconInfo(multiIconInfoItemProvider.MultiIconInfo.Path, multiIconInfoItemProvider.MultiIconInfo.ClientVersion, multiIconInfoItemProvider.Icon);
+
+        protected override Converter<MultiIconInfoItemProvider, IBrowsableObjectInfo> DefaultSelectorOverride => Convert;
+
+        public MultiIconInfoSelectorDictionary() { /* Left empty. */ }
+    }
+
+    public class SingleIconInfoSelectorDictionary : EnumerableSelectorDictionary<SingleIconInfoItemProvider, IBrowsableObjectInfo>
+    {
+        public static IBrowsableObjectInfo Convert(SingleIconInfoItemProvider icon) => new IconImageInfo(icon.Icon, icon.Parent);
+
+        protected override Converter<SingleIconInfoItemProvider, IBrowsableObjectInfo> DefaultSelectorOverride => Convert;
+
+        public SingleIconInfoSelectorDictionary() { /* Left empty. */ }
+    }
+
+    public class IconImageInfoSelectorDictionary : EnumerableSelectorDictionary<IconImageInfoItemProvider, IBrowsableObjectInfo>
+    {
+        public static IBrowsableObjectInfo Convert(IconImageInfoItemProvider icon)
+        {
+            if (icon.Bitmap == null)
+
+                return new IconInfo(icon.Parent, icon.Name, icon.Icon);
+
+            return new BitmapInfo(icon.Parent, icon.Name, icon.Bitmap);
+        }
+
+        protected override Converter<IconImageInfoItemProvider, IBrowsableObjectInfo> DefaultSelectorOverride => Convert;
+
+        public IconImageInfoSelectorDictionary() { /* Left empty. */ }
     }
 }

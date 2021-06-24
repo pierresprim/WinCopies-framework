@@ -24,7 +24,6 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\GUI\WinCopies.GUI.Drawing\WinCopies.GUI.Drawing.csproj" />
-		<ProjectReference Include="..\..\GUI\WinCopies.GUI.Models\WinCopies.GUI.Models.csproj" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)'=='Debug'">
@@ -62,9 +61,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="WinCopies.Util" Version="3.8-preview" />
-		<PackageReference Include="WinCopies.Collections" Version="3.8-preview" />
-		<PackageReference Include="WinCopies.Util.Extensions" Version="3.8-preview" />
+		<PackageReference Include="WinCopies.Util" Version="3.9-preview" />
+		<PackageReference Include="WinCopies.Collections" Version="3.9.1-preview" />
+		<PackageReference Include="WinCopies.Util.Extensions" Version="3.9-preview" />
     
 		<PackageReference Include="Squid-Box.SevenZipSharp" Version="1.2.231" />
     

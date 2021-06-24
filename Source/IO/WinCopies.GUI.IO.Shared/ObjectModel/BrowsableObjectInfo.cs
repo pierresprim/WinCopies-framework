@@ -47,16 +47,18 @@ namespace WinCopies.GUI.IO.ObjectModel
 
                         var parameters = ArchiveCompressionParameters.FromProcessParameters(enumerator);
 
-                        return new WinCopies.IO.Process.ObjectModel.Compression<ProcessErrorFactory<IPathInfo>>(
+                        return new WinCopies.IO.Process.ObjectModel.Compression<ProcessErrorFactory<IPathInfo, object>>(
                             GetInitialPaths(enumerator, sourcePath),
                             sourcePath,
                             new PathTypes<IPathInfo>.RootPath(parameters.DestinationPath, true),
                             processParameters.Factory.GetProcessCollection<IPathInfo>(),
                             processParameters.Factory.GetProcessLinkedList<
                                 IPathInfo,
-                                ProcessError>(),
+                                ProcessError,
+                                ProcessTypes<IPathInfo, ProcessError, object>.ProcessErrorItem,
+                                object>(),
                             GetDefaultProcessDelegates(),
-                            new ProcessErrorFactory<IPathInfo>(),
+                            new CompressionProcessErrorFactory(),
                             parameters.ToArchiveCompressor());
                 }
             }
@@ -80,9 +82,9 @@ namespace WinCopies.GUI.IO.ObjectModel
             WinCopies.IO.ObjectModel.BrowsableObjectInfo.DefaultProcessSelectorDictionary.Push(item => WinCopies.IO.ObjectModel.BrowsableObjectInfo.Predicate(item, typeof(WinCopies.IO.Guids.Process)), TryGetArchiveProcess);
         }
 
-        public static void RegisterAllSelectors()
+        public static void RegisterDefaultSelectors()
         {
-            WinCopies.IO.ObjectModel.BrowsableObjectInfo.RegisterDefaultSelectors();
+            WinCopies.IO.ObjectModel.BrowsableObjectInfo.RegisterDefaultBrowsabilityPaths();
 
             RegisterAllProcessSelectors();
         }

@@ -37,6 +37,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\Reflection\IDotNetTypeInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enumeration\ArchiveItemInfoEnumerator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enumeration\WMIItemInfoEnumerator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Misc.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\Icons.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\BrowsableObjectInfoProcessFactoryDictionary.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ObjectModel\ArchiveProcess.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ObjectModel\Compression.cs" />

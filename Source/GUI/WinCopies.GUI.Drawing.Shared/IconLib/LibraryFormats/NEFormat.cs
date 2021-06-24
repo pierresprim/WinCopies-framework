@@ -120,7 +120,6 @@ namespace WinCopies.GUI.Drawing.EncodingFormats
 
             for (int i = 0; i < singleIcons.Length; i++)
             {
-
                 if (i < groupNames.Count)
 
                     singleIcons[i] = new SingleIcon(groupNames[i]);

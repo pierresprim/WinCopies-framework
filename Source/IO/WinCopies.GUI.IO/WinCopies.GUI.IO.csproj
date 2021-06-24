@@ -20,8 +20,8 @@
   <Import Project="..\WinCopies.GUI.IO.Shared\WinCopies.GUI.IO.Shared.projitems" Label="Shared" />
 
   <ItemGroup>
-    <PackageReference Include="WinCopies.Util" Version="3.8-preview" />
-    <PackageReference Include="WinCopies.Util.Desktop" Version="3.8-preview" />
+    <PackageReference Include="WinCopies.Util" Version="3.9-preview" />
+    <PackageReference Include="WinCopies.Util.Desktop" Version="3.9.1-preview" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(Configuration)'=='Debug'">
@@ -49,6 +49,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Resources\ExceptionMessages.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ExceptionMessages.resx</DependentUpon>
+    </Compile>
     <Compile Update="Properties\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -57,6 +62,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Update="Resources\ExceptionMessages.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ExceptionMessages.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Update="Properties\Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

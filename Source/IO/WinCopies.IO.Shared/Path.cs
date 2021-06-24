@@ -37,10 +37,12 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Globalization;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 
 using WinCopies.Collections;
+using WinCopies.Linq;
 
 #if !WinCopies3
 using WinCopies.Util;
@@ -896,7 +898,7 @@ namespace WinCopies.IO
 
         public static string RenameDuplicate(string path, in uint first = 2)
         {
-            if (IsFileSystemPath(path))
+            if (!IsFileSystemPath(path))
 
                 throw new ArgumentException($"{nameof(path)} is not a file system path.");
 
@@ -910,13 +912,30 @@ namespace WinCopies.IO
 
                 throw new ArgumentException($"{nameof(path)} is a root path.");
 
+            string parentPath = path.Remove(path.LastIndexOf('\\'));
             string fileName = System.IO.Path.GetFileNameWithoutExtension(path);
+            string _fileName;
+            uint result;
 
-            uint? result = _FileNameContainsParenthesesNumber(fileName);
+            bool value = System.IO.Directory.GetDirectories(parentPath).AppendValues(System.IO.Directory.GetFiles(parentPath)).SelectIfNotNullStruct<string, uint>(p =>
+              {
+                  _fileName = System.IO.Path.GetFileNameWithoutExtension(p);
+
+                  if (_fileName.Length > fileName.Length && _fileName.StartsWith(fileName))
+                  {
+                      _fileName = _fileName.Substring(fileName.Length);
+
+                      if (_fileName.Length > 3 && _fileName.StartsWith(" (") && _fileName.EndsWith(')') && uint.TryParse(_fileName.Substring(2, _fileName.Length - 3), out result))
+
+                          return result;
+                  }
+
+                  return null;
+              }).OrderByDescending(_value => _value).FirstOrDefaultValue(out result);
 
             string getResult(in uint number) => $"{System.IO.Path.GetDirectoryName(path)}{PathSeparator}{fileName} ({number}){System.IO.Path.GetExtension(path)}";
 
-            return result.HasValue ? getResult(result.Value > first ? result.Value + 1 : first) : getResult(first);
+            return value ? getResult(result < first ? first : result + 1) : getResult(first);
         }
 
         //        //public static string GetShortcutPath(string path)

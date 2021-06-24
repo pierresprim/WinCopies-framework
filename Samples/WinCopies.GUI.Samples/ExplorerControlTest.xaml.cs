@@ -26,6 +26,7 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+
 using WinCopies.GUI.IO;
 using WinCopies.GUI.IO.Controls.Process;
 using WinCopies.GUI.IO.ObjectModel;
@@ -41,7 +42,7 @@ namespace WinCopies.GUI.Samples
     /// </summary>
     public partial class ExplorerControlTest : Window
     {
-        public static WinCopies.IO.Process.IProcessPathCollectionFactory DefaultProcessPathCollectionFactory { get; } = new IO.Process.ProcessPathCollectionFactory();
+        public static IProcessPathCollectionFactory DefaultProcessPathCollectionFactory { get; } = new ProcessPathCollectionFactory();
 
         public static ClientVersion ClientVersion { get; } = GetClientVersion();
 
@@ -60,7 +61,7 @@ namespace WinCopies.GUI.Samples
 
         public IExplorerControlBrowsableObjectInfoViewModel SelectedItem { get => (IExplorerControlBrowsableObjectInfoViewModel)GetValue(SelectedItemProperty); set => SetValue(SelectedItemProperty, value); }
 
-        static ExplorerControlTest() => IO.ObjectModel.BrowsableObjectInfo.RegisterAllSelectors();
+        static ExplorerControlTest() => IO.ObjectModel.BrowsableObjectInfo.RegisterDefaultSelectors();
 
         public ExplorerControlTest()
         {
@@ -110,7 +111,7 @@ namespace WinCopies.GUI.Samples
 
         public static ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> GetShellItems() => new() { { GetExplorerControlBrowsableObjectInfoViewModel(GetBrowsableObjectInfoViewModel(ShellObjectInfo.From(ShellObjectFactory.Create("C:\\"), ClientVersion)), true, SelectionMode.Extended, true) } };
 
-        private static IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo) => new BrowsableObjectInfoViewModel(browsableObjectInfo) { Factory = new BrowsableObjectInfoFactory(ClientVersion) { SortComparison = BrowsableObjectInfoViewModel.DefaultComparison }, SortComparison = BrowsableObjectInfoViewModel.DefaultComparison };
+        private static IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo)=>new BrowsableObjectInfoViewModel(browsableObjectInfo);
 
         public static IExplorerControlBrowsableObjectInfoViewModel GetExplorerControlBrowsableObjectInfoViewModel(in IBrowsableObjectInfoViewModel browsableObjectInfo, in bool isSelected, in SelectionMode selectionMode, in bool isCheckBoxVisible)
         {
@@ -123,9 +124,9 @@ namespace WinCopies.GUI.Samples
             return result;
         }
 
-        public static ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> GetRegistryItems() => new() { { GetExplorerControlBrowsableObjectInfoViewModel(new BrowsableObjectInfoViewModel(new RegistryItemInfo()), true, SelectionMode.Extended, true) } };
+        public static ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> GetRegistryItems()=>new() { { GetExplorerControlBrowsableObjectInfoViewModel(new BrowsableObjectInfoViewModel(new RegistryItemInfo()), true, SelectionMode.Extended, true) } };
 
-        public static ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> GetWMIItems() => new() { { GetExplorerControlBrowsableObjectInfoViewModel(new BrowsableObjectInfoViewModel(new WMIItemInfo()), true, SelectionMode.Extended, true) } };
+        public static ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> GetWMIItems()=>new() { { GetExplorerControlBrowsableObjectInfoViewModel(new BrowsableObjectInfoViewModel(new WMIItemInfo()), true, SelectionMode.Extended, true) } };
 
         private void RadioButton_Checked(object sender, RoutedEventArgs e)
         {
