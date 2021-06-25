@@ -411,13 +411,13 @@ namespace WinCopies.IO
 
     public class BrowsableObjectInfoBitmapBitmapSources : BrowsableObjectInfoBitmapSources<Bitmap>
     {
-        protected override BitmapSource SmallBitmapSourceOverride => (BitmapSource)InnerObject.ToImageSource();
+        protected override BitmapSource SmallBitmapSourceOverride => InnerObject.ToImageSource();
 
-        protected override BitmapSource MediumBitmapSourceOverride => (BitmapSource)InnerObject.ToImageSource();
+        protected override BitmapSource MediumBitmapSourceOverride => InnerObject.ToImageSource();
 
-        protected override BitmapSource LargeBitmapSourceOverride => (BitmapSource)InnerObject.ToImageSource();
+        protected override BitmapSource LargeBitmapSourceOverride => InnerObject.ToImageSource();
 
-        protected override BitmapSource ExtraLargeBitmapSourceOverride => (BitmapSource)InnerObject.ToImageSource();
+        protected override BitmapSource ExtraLargeBitmapSourceOverride => InnerObject.ToImageSource();
 
         public BrowsableObjectInfoBitmapBitmapSources(in Bitmap bitmap) : base(bitmap) { /* Left empty. */ }
     }
