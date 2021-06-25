@@ -13,10 +13,10 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>WinCopies.GUI.snk</AssemblyOriginatorKeyFile>
     <DefineConstants>WinCopies2;WinCopies3;$(DefineConstants)</DefineConstants>
-    <VersionPrefix>3.3</VersionPrefix>
+    <VersionPrefix>3.4</VersionPrefix>
     <VersionSuffix>preview</VersionSuffix>
-    <AssemblyVersion>3.3</AssemblyVersion>
-    <FileVersion>3.3</FileVersion>
+    <AssemblyVersion>3.4</AssemblyVersion>
+    <FileVersion>3.4</FileVersion>
     <PackageIcon>WinCopies.png</PackageIcon>
   </PropertyGroup>
 
