@@ -14,6 +14,7 @@ CHANGELOG
 - Add recursiveEnumerationOrder parameter to all recursive enumeration methods.
 - IRecursiveEnumerable\<T>: GetEnumerator() return type is RecursiveEnumeratorAbstract\<T>.
 - Re-design path types.
+- Bug fixed when disposing ExplorerControlBrowsableObjectInfoViewModel.
 - Add new types.
 - Processes:
 	- Optimize process collections.

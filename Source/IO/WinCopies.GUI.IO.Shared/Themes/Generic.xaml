@@ -558,9 +558,9 @@
 
     <ControlTemplate x:Key="ProcessManagerControlTemplate" TargetType="{x:Type localProcessControls:ProcessManagerControl}">
         <DockPanel Background="White">
-            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
-                <CheckBox IsChecked="{Binding ClearCompletedProcessesAutomatically, Mode=TwoWay, RelativeSource={RelativeSource Mode=TemplatedParent}}">Clear completed processes automatically</CheckBox>
-                <Button IsEnabled="{Binding ClearCompletedProcessesAutomatically, Mode=TwoWay, RelativeSource={RelativeSource Mode=TemplatedParent}, Converter={StaticResource ReverseBooleanConverter}}" Command="{TemplateBinding ClearCompletedProcesses}">Clear all completed processes</Button>
+            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" VerticalAlignment="Center">
+                <CheckBox IsChecked="{Binding ClearCompletedProcessesAutomatically, Mode=TwoWay, RelativeSource={RelativeSource Mode=TemplatedParent}}" Margin="0,0,10,0">Clear completed processes automatically</CheckBox>
+                <Button Command="{TemplateBinding ClearCompletedProcesses}">Clear all completed processes</Button>
             </StackPanel>
             <Grid>
                 <Grid.RowDefinitions>

@@ -91,7 +91,21 @@ namespace WinCopies.GUI.IO
 
         public class ProcessManager<TItems> : ProcessManager<ObservableCollection<TItems>, TItems> where TItems : IProcess
         {
-            public override ICommand ClearCompletedProcesses => new DelegateCommand(Bool.True, parameter => OnClearCompletedProcesses());
+            public override ICommand ClearCompletedProcesses => new DelegateCommand(parameter =>
+            {
+                if (ClearCompletedProcessesAutomatically)
+                {
+                    foreach (TItems process in Processes)
+
+                        if (process.Status == WinCopies.IO.Process.ProcessStatus.Succeeded)
+
+                            return true;
+
+                    return false;
+                }
+
+                return true;
+            }, parameter => OnClearCompletedProcesses());
 
             protected virtual void OnClearCompletedProcesses()
             {
@@ -215,7 +229,14 @@ namespace WinCopies.GUI.IO
                 }
             }
 
-            private void Process_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e) => Processes.Remove((TItems)sender);
+            private void Process_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
+            {
+                var process = (TItems)sender;
+
+                if (process.Status == WinCopies.IO.Process.ProcessStatus.Succeeded)
+
+                    _ = Processes.Remove(process);
+            }
         }
     }
 }

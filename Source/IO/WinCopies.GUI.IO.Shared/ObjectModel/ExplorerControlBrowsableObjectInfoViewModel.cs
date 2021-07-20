@@ -25,7 +25,6 @@ using System.Drawing;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-
 using WinCopies.Collections.Generic;
 using WinCopies.Commands;
 using WinCopies.GUI.Controls;
@@ -306,14 +305,21 @@ namespace WinCopies.GUI.IO.ObjectModel
             _path = null;
 
             _historyObservable.NotifyOnPropertyChanged = false;
-            _historyObservable.Clear();
+
+            if (disposing)
+
+                _historyObservable.Clear();
+
             _historyObservable = null;
 
             _factory = null;
 
             if (_selectedItems != null)
             {
-                _selectedItems.Clear();
+                if (disposing)
+
+                    _selectedItems.Clear();
+
                 _selectedItems = null;
             }
 
