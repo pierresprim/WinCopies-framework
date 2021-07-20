@@ -719,7 +719,9 @@ namespace WinCopies.IO
         private readonly SearchOption _searchOption;
         private readonly FileSystemEntryEnumerationOrder _enumerationOrder;
         private readonly bool _safeEnumeration;
+#if DEBUG
         private readonly FileSystemEntryEnumeratorProcessSimulation _simulationParameters;
+#endif
 #if CS8
         private readonly EnumerationOptions _enumerationOptions;
 #endif
