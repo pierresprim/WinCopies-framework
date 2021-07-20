@@ -23,8 +23,6 @@ using WinCopies.IO.ObjectModel;
 using WinCopies.IO.Process;
 using WinCopies.IO.Resources;
 
-using static WinCopies.IO.Process.ProcessHelper;
-
 namespace WinCopies.GUI.IO.ObjectModel
 {
     public static class BrowsableObjectInfo
@@ -48,7 +46,7 @@ namespace WinCopies.GUI.IO.ObjectModel
                         var parameters = ArchiveCompressionParameters.FromProcessParameters(enumerator);
 
                         return new WinCopies.IO.Process.ObjectModel.Compression<ProcessErrorFactory<IPathInfo, object>>(
-                            GetInitialPaths(enumerator, sourcePath),
+                            ProcessHelper<IPathInfo>.GetInitialPaths(enumerator, sourcePath, path => path),
                             sourcePath,
                             new PathTypes<IPathInfo>.RootPath(parameters.DestinationPath, true),
                             processParameters.Factory.GetProcessCollection<IPathInfo>(),
@@ -57,7 +55,7 @@ namespace WinCopies.GUI.IO.ObjectModel
                                 ProcessError,
                                 ProcessTypes<IPathInfo, ProcessError, object>.ProcessErrorItem,
                                 object>(),
-                            GetDefaultProcessDelegates(),
+                            ProcessHelper<IPathInfo>.GetDefaultProcessDelegates(),
                             new CompressionProcessErrorFactory(),
                             parameters.ToArchiveCompressor());
                 }

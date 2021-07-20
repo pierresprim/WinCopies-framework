@@ -64,12 +64,6 @@ namespace WinCopies.GUI.Controls
 
     public abstract class Selector : ViewModelBase
     {
-#if DEBUG && WinCopies3
-        protected virtual void UpdateValue<TValue>(ref TValue value, in TValue newValue, PropertyChangedEventArgs propertyChangedEventArgs) => UtilHelpers.UpdateValue(ref value, newValue, () => OnPropertyChanged(propertyChangedEventArgs));
-
-        protected virtual void UpdateValue<TValue>(ref TValue value, in TValue newValue, string propertyName) => UtilHelpers.UpdateValue(ref value, newValue, () => OnPropertyChanged(propertyName));
-#endif
-
         private bool _isChecked;
 
         public bool IsChecked { get => _isChecked; set => UpdateValue(ref _isChecked, value, nameof(IsChecked)); }

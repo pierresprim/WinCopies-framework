@@ -52,6 +52,7 @@ namespace WinCopies.IO
             public static class Shell
             {
                 public const string Copy = "084ff8d5-c66e-40bc-8ea4-7fa2dd30bd21";
+                public const string Deletion = "af5a27a6-dda3-49f3-b287-cfe6f070a812";
             }
 
             public const string ArchiveCompression = "02d03025-8cec-49b7-a639-46b9dcb2569b";
@@ -282,7 +283,7 @@ namespace WinCopies.IO.ObjectModel
         #region Enumeration
         System.Collections.Generic.IEnumerator<Collections.Generic.IRecursiveEnumerable<IBrowsableObjectInfo>> IRecursiveEnumerableProviderEnumerable<IBrowsableObjectInfo>.GetRecursiveEnumerator() => GetItems().GetEnumerator();
 
-        RecursiveEnumerator<IBrowsableObjectInfo> IRecursiveEnumerable<IBrowsableObjectInfo>.GetEnumerator() => IsRecursivelyBrowsable ? new RecursiveEnumerator<IBrowsableObjectInfo>(this) : throw new NotSupportedException("The current BrowsableObjectInfo does not support recursive browsing.");
+        RecursiveEnumeratorAbstract<IBrowsableObjectInfo> IRecursiveEnumerable<IBrowsableObjectInfo>.GetEnumerator() => IsRecursivelyBrowsable ? new RecursiveEnumerator<IBrowsableObjectInfo>(this, RecursiveEnumerationOrder.ParentThenChildren) : throw new NotSupportedException("The current BrowsableObjectInfo does not support recursive browsing.");
 
         System.Collections.Generic.IEnumerator<IBrowsableObjectInfo> System.Collections.Generic.IEnumerable<IBrowsableObjectInfo>.GetEnumerator() => GetItems().GetEnumerator();
 

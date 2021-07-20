@@ -16,6 +16,7 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 using static WinCopies.ThrowHelper;
 
@@ -34,6 +35,8 @@ namespace WinCopies.IO
     {
         bool IsDirectory { get; }
 
+        bool AlreadyPushed { get; }
+
         Size? Size { get; }
     }
 
@@ -44,7 +47,7 @@ namespace WinCopies.IO
 
     public static class PathHelper
     {
-        public static string ToString(in IPathCommon path) => path.Path;
+        public static string ToString(in IPathCommon path) => (path ?? throw GetArgumentNullException(nameof(path))).Path;
 
         private static bool _Equals(in IPathCommon path, in IPathCommon other) => path.Path == other.Path;
 
@@ -52,7 +55,53 @@ namespace WinCopies.IO
 
         public static bool Equals(in IPathCommon path, in object obj) => obj is IPathCommon other && _Equals(path, other);
 
-        public static int GetHashCode(in IPathCommon path) => path.Path.GetHashCode();
+        public static int GetHashCode(in IPathCommon path) => (path ?? throw GetArgumentNullException(nameof(path))).Path.GetHashCode();
+    }
+
+    public abstract class PathInfoBase
+    {
+        private NullableGeneric<Size?> _size;
+
+        public string RelativePath { get; }
+
+        public bool IsDirectory { get; }
+
+        public bool AlreadyPushed { get; protected internal set; }
+
+        public abstract string Path { get; }
+
+        public Size? Size
+        {
+            get
+            {
+                if (IsDirectory)
+
+                    return null;
+
+                if (_size == null)
+
+                    try
+                    {
+                        _size = new NullableGeneric<Size?>(new Size((ulong)new System.IO.FileInfo(Path).Length));
+                    }
+
+                    catch
+                    {
+                        _size = new NullableGeneric<Size?>(null);
+                    }
+
+                return _size.Value;
+            }
+        }
+
+        public PathInfoBase(in string relativePath, in bool isDirectory)
+        {
+            ThrowIfNullEmptyOrWhiteSpace(relativePath, nameof(relativePath));
+
+            RelativePath = relativePath;
+
+            IsDirectory = isDirectory;
+        }
     }
 
     public static class PathTypes<T> where T : IPathCommon
@@ -117,53 +166,32 @@ namespace WinCopies.IO
 #endif
         }
 
-        public abstract class PathInfoBase
+        public abstract class PathInfoBase : IO.PathInfoBase, IPathInfo
         {
-            private NullableGeneric<Size?> _size;
+            public abstract NullableGeneric<T> Parent { get; }
 
-            public string RelativePath { get; }
+            public PathInfoBase(in string relativePath, in bool isDirectory) : base(relativePath, isDirectory) { /* Left empty. */ }
 
-            public bool IsDirectory { get; }
+            public override int GetHashCode() => PathHelper.GetHashCode(this);
 
-            public abstract string Path { get; }
+            public override string ToString() => PathHelper.ToString(this);
 
-            public Size? Size
-            {
-                get
-                {
-                    if (IsDirectory)
+            public bool Equals(
+#if CS8
+                [AllowNull]
+            #endif
+            IO.IPathCommon other) => PathHelper.Equals(this, other);
 
-                        return null;
+            public override bool Equals(object obj) => PathHelper.Equals(this, obj);
 
-                    if (_size == null)
-
-                        try
-                        {
-                            _size = new NullableGeneric<Size?>(new Size((ulong)new System.IO.FileInfo(Path).Length));
-                        }
-
-                        catch
-                        {
-                            _size = new NullableGeneric<Size?>(null);
-                        }
-
-                    return _size.Value;
-                }
-            }
-
-            public PathInfoBase(in string relativePath, in bool isDirectory)
-            {
-                ThrowIfNullEmptyOrWhiteSpace(relativePath, nameof(relativePath));
-
-                RelativePath = relativePath;
-
-                IsDirectory = isDirectory;
-            }
+#if !CS8
+            IO.IPathCommon IO.IPathCommon.Parent => Parent.Value;
+#endif
         }
 
-        public class PathInfo : PathInfoBase, IPathInfo
+        public class PathInfo : PathInfoBase
         {
-            public NullableGeneric<T> Parent { get; }
+            public override NullableGeneric<T> Parent { get; }
 
             public override string Path => this.GetPath(false);
 
@@ -181,14 +209,6 @@ namespace WinCopies.IO
                 // Left empty.
             }
 
-            public override string ToString() => PathHelper.ToString(this);
-
-            public bool Equals(IO.IPathCommon other) => PathHelper.Equals(this, other);
-
-            public override bool Equals(object obj) => PathHelper.Equals(this, obj);
-
-            public override int GetHashCode() => PathHelper.GetHashCode(this);
-
             internal static bool GetIsDirectory(in string path)
             {
                 try
@@ -201,39 +221,17 @@ namespace WinCopies.IO
                     return false;
                 }
             }
-
-#if !CS8
-            IO.IPathCommon IO.IPathCommon.Parent => Parent.Value;
-#endif
         }
 
         public class RootPath : PathInfoBase, IPathInfo
         {
-            public NullableGeneric<T> Parent => null;
+            public override NullableGeneric<T> Parent => null;
 
             public override string Path => RelativePath;
 
-            public RootPath(in string path, in bool isDirectory) : base(path, isDirectory)
-            {
-                // Left empty.
-            }
+            public RootPath(in string path, in bool isDirectory) : base(path, isDirectory) { /* Left empty. */ }
 
-            public RootPath(in string path) : this(path, PathInfo.GetIsDirectory(path))
-            {
-                // Left empty.
-            }
-
-            public override string ToString() => PathHelper.ToString(this);
-
-            public bool Equals(IO.IPathCommon other) => PathHelper.Equals(this, other);
-
-            public override bool Equals(object obj) => PathHelper.Equals(this, obj);
-
-            public override int GetHashCode() => PathHelper.GetHashCode(this);
-
-#if !CS8
-            IO.IPathCommon IO.IPathCommon.Parent => Parent == null ? default : Parent.Value;
-#endif
+            public RootPath(in string path) : this(path, PathInfo.GetIsDirectory(path)) { /* Left empty. */ }
         }
     }
 }

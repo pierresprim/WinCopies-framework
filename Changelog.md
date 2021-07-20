@@ -6,6 +6,39 @@ The WinCopies® software framework
 CHANGELOG
 ---------
 
+### 3.5-preview
+
+- TextBox.OnUpperCommandCanExecute is now TextBox.OnCaseCommandCanExecute.
+- Replace ProcessWindow by ProcessManagerControl and add default view models for this control.
+- ShellObjectInfo: some protected subclasses are now in the WinCopies.IO namespace.
+- Add recursiveEnumerationOrder parameter to all recursive enumeration methods.
+- IRecursiveEnumerable\<T>: GetEnumerator() return type is RecursiveEnumeratorAbstract\<T>.
+- Re-design path types.
+- Add new types.
+- Processes:
+	- Optimize process collections.
+	- Re-design process factories.
+	- ProcessInterfaceModelTypes\<TItemsIn, TItemsOut, TError, TAction>.IProcess\<TParam, TProcessEventDelegates>.Actions has the following return type: IReadOnlyDictionary\<string, ICommand\<IProcessErrorItem\<TItemsOut, TError, TAction>>>.
+	- WinCopies.IO.Process:
+		- AbstractionProcessCollection\<TSource, TDestination> has the new property HasItems.
+		- ProcessTypes\<T>.ProcessErrorTypes\<TError, TAction>: TAction generic type parameter removed.
+		- ProcessTypes\<TPath, TError, TAction>:
+			- TAction generic type parameter removed.
+			- Remove protected constructors and add new public constructor.
+		- ProcessErrorFactory\<T, TAction> and IProcessErrorItem/Factory:
+			- TAction generic type parameter removed.
+			- This class is not abstract anymore.
+		- IProcessErrorItem: add Item property.
+		- ProcessError: add fields.
+	- Object model:
+		- WinCopies.IO.Process:
+			- initial path collection passed to constructor must be writable.
+			- add new abstract and virtual methods.
+			- LoadPaths and Start are now virtual.
+		- Copy process can move file system items to another file system directory.
+		- Deletion process added.
+		- WinCopies.GUI.IO.Process.Process: add null check in constructor.
+
 ### 3.4-preview
 
 - Additions:

@@ -51,6 +51,7 @@
             <propertySystem:ObjectToPropertyCollectionConverter x:Key="ObjectToPropertyCollectionConverter" />
             <data:EnumToArrayConverter x:Key="EnumToArrayConverter" />
             <data:ActionToDelegateCommand2Converter x:Key="ActionToDelegateCommand2Converter" />
+            <data:ReverseBooleanConverter x:Key="ReverseBooleanConverter" />
 
             <!--String resources-->
 
@@ -304,7 +305,7 @@
         <Setter Property="ItemContainerStyle" Value="{StaticResource ExplorerControlListViewItemStyle}" />
     </Style>
 
-    <DataTemplate DataType="{x:Type localObjectModel:IExplorerControlBrowsableObjectInfoViewModel}" x:Shared="false">
+    <DataTemplate DataType="{x:Type localObjectModel:IExplorerControlBrowsableObjectInfoViewModel}">
         <localControls:ExplorerControl x:Name="ExplorerControl" Path="{Binding Path.Path}" Text="{Binding Text, Mode=TwoWay}"
                                        TreeViewStyle="{StaticResource ExplorerControlTreeViewStyle}" ListViewStyle="{StaticResource ExplorerControlListViewStyle}"
                                        Commands="{Binding CommonCommands}"
@@ -380,7 +381,7 @@
         </Style.Triggers>
     </Style>
 
-    <ControlTemplate x:Key="ExplorerControlSizeThreeListViewItemContentTemplate" TargetType="{x:Type localControls:ExplorerControlListViewItemContent}" x:Shared="false">
+    <ControlTemplate x:Key="ExplorerControlSizeThreeListViewItemContentTemplate" TargetType="{x:Type localControls:ExplorerControlListViewItemContent}">
         <Grid Width="100">
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto" />
@@ -507,6 +508,7 @@
                             <MultiDataTrigger>
                                 <MultiDataTrigger.Conditions>
                                     <Condition Binding="{Binding ErrorPaths, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type localProcessControls:ProcessControl}}, Converter={StaticResource IsNullConverter}}" Value="{markup:FalseValue}" />
+                                    <Condition Binding="{Binding ErrorPaths.HasItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type localProcessControls:ProcessControl}}}" Value="{markup:TrueValue}" />
                                     <Condition Binding="{Binding Status, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type localProcessControls:ProcessControl}}}" Value="{x:Static process:ProcessStatus.Error}" />
                                 </MultiDataTrigger.Conditions>
                                 <Setter Property="Template">
@@ -539,7 +541,7 @@
         <Setter Property="Template" Value="{StaticResource ProcessTemplate}" />
     </Style>
 
-    <DataTemplate DataType="{x:Type localProcess:IProcess}" x:Shared="false">
+    <DataTemplate DataType="{x:Type localProcess:IProcess}">
         <localProcessControls:ProcessControl SourcePath="{Binding SourcePath.Path}"
                                              ArePathsLoaded="{Binding ArePathsLoaded}"
                                              CurrentPath="{Binding CurrentPath.Path}"
@@ -554,47 +556,57 @@
 
 
 
-    <ControlTemplate x:Key="ProcessWindowTemplate" TargetType="{x:Type localProcessControls:ProcessWindow}">
-        <Grid Background="White">
-            <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition Height="100" />
-            </Grid.RowDefinitions>
-            <ListView ItemsSource="{TemplateBinding Processes}" SelectedItem="{Binding SelectedItem, RelativeSource={RelativeSource TemplatedParent}}">
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn Header="Type" DisplayMemberBinding="{Binding Name}" />
-                        <GridViewColumn Header="Source Path" DisplayMemberBinding="{Binding SourcePath, Converter={localProcess:PathCommonToStringConverter}}" />
-                        <GridViewColumn Header="Status" DisplayMemberBinding="{Binding Status, Converter={data:ToStringConverter}}" />
-                        <GridViewColumn Header="Progress">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate DataType="{x:Type localProcess:IProcess}">
-                                    <ProgressBar x:Name="PART_ProgressBar" Value="{Binding ProgressPercentage, Mode=OneWay}" Maximum="100" Height="30" Width="100" />
-                                    <!--<DataTemplate.Triggers>
+    <ControlTemplate x:Key="ProcessManagerControlTemplate" TargetType="{x:Type localProcessControls:ProcessManagerControl}">
+        <DockPanel Background="White">
+            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+                <CheckBox IsChecked="{Binding ClearCompletedProcessesAutomatically, Mode=TwoWay, RelativeSource={RelativeSource Mode=TemplatedParent}}">Clear completed processes automatically</CheckBox>
+                <Button IsEnabled="{Binding ClearCompletedProcessesAutomatically, Mode=TwoWay, RelativeSource={RelativeSource Mode=TemplatedParent}, Converter={StaticResource ReverseBooleanConverter}}" Command="{TemplateBinding ClearCompletedProcesses}">Clear all completed processes</Button>
+            </StackPanel>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition Height="300" />
+                </Grid.RowDefinitions>
+                <ListView ItemsSource="{TemplateBinding Processes}" SelectedItem="{Binding SelectedItem, RelativeSource={RelativeSource TemplatedParent}}">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="Type" DisplayMemberBinding="{Binding Name}" />
+                            <GridViewColumn Header="Source Path" DisplayMemberBinding="{Binding SourcePath, Converter={localProcess:PathCommonToStringConverter}}" />
+                            <GridViewColumn Header="Status" DisplayMemberBinding="{Binding Status, Converter={data:ToStringConverter}}" />
+                            <GridViewColumn Header="Progress">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate DataType="{x:Type localProcess:IProcess}">
+                                        <ProgressBar x:Name="PART_ProgressBar" Value="{Binding ProgressPercentage, Mode=OneWay}" Maximum="100" Height="30" Width="100" />
+                                        <!--<DataTemplate.Triggers>
                                     <DataTrigger Binding="{Binding Status, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="{x:Static localProcessControls:ProcessStatus.InProgress}">
                                         <Setter Property="IsIndeterminate" TargetName="PART_ProgressBar" Value="False" />
                                         <Setter Property="Value" TargetName="PART_ProgressBar" Value="{Binding ProgressPercentage}" />
                                     </DataTrigger>
                                 </DataTemplate.Triggers>-->
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                    </GridView>
-                </ListView.View>
-            </ListView>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
 
-            <GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Top" ResizeDirection="Rows" />
-            <ContentControl Grid.Row="1" Content="{TemplateBinding SelectedItem}" Margin="0,5,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                <ContentControl.ContentTemplateSelector>
-                    <util:InterfaceDataTemplateSelector />
-                </ContentControl.ContentTemplateSelector>
-            </ContentControl>
-        </Grid>
+                <GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Top" ResizeDirection="Rows" />
+                <ContentControl Grid.Row="1" Content="{TemplateBinding SelectedItem}" Margin="0,5,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                    <ContentControl.ContentTemplateSelector>
+                        <util:InterfaceDataTemplateSelector />
+                    </ContentControl.ContentTemplateSelector>
+                </ContentControl>
+            </Grid>
+        </DockPanel>
     </ControlTemplate>
 
-    <Style TargetType="{x:Type localProcessControls:ProcessWindow}" BasedOn="{StaticResource {x:Type Window}}" >
-        <Setter Property="Template" Value="{StaticResource ProcessWindowTemplate}" />
+    <Style TargetType="{x:Type localProcessControls:ProcessManagerControl}">
+        <Setter Property="Template" Value="{StaticResource ProcessManagerControlTemplate}" />
     </Style>
+
+    <DataTemplate DataType="{x:Type localProcess:IProcessManager}">
+        <localProcessControls:ProcessManagerControl Processes="{Binding Processes, Mode=TwoWay}" SelectedItem="{Binding SelectedItem, Mode=TwoWay}" ClearCompletedProcessesAutomatically="{Binding ClearCompletedProcessesAutomatically, Mode=TwoWay}" ClearCompletedProcesses="{Binding ClearCompletedProcesses}" />
+    </DataTemplate>
 
     <ControlTemplate x:Key="ArchiveCompressionProcessParametersControlTemplate" TargetType="{x:Type localProcessControls:ArchiveCompressionProcessParametersControl}">
         <Grid>
@@ -658,7 +670,7 @@
         <Setter Property="Template" Value="{StaticResource ArchiveCompressionProcessParametersControlTemplate}" />
     </Style>
 
-    <DataTemplate DataType="{x:Type localProcess:IArchiveCompressionParameters}" x:Shared="false">
+    <DataTemplate DataType="{x:Type localProcess:IArchiveCompressionParameters}">
         <localProcessControls:ArchiveCompressionProcessParametersControl DestinationPath="{Binding DestinationPath, Mode=TwoWay}"
                                                                          ArchiveFormat="{Binding ArchiveFormat, Mode=TwoWay}" CompressionLevel="{Binding CompressionLevel, Mode=TwoWay}" CompressionMethod="{Binding CompressionMethod, Mode=TwoWay}" FastCompression="{Binding FastCompression, Mode=TwoWay}"
                                                                          IncludeEmptyDirectories="{Binding IncludeEmptyDirectories, Mode=TwoWay}" PreserveDirectoryRoot="{Binding PreserveDirectoryRoot, Mode=TwoWay}" />

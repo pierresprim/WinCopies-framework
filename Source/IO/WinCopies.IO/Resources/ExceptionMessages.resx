@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AccessDenied" xml:space="preserve">
+    <value>The process cannot access to the file.</value>
+  </data>
   <data name="CancelledByUser" xml:space="preserve">
     <value>The operation was cancelled by user.</value>
   </data>
@@ -129,6 +132,9 @@
   <data name="Destination" xml:space="preserve">
     <value>destination</value>
   </data>
+  <data name="DirectoryNotEmpty" xml:space="preserve">
+    <value>The directory contains items.</value>
+  </data>
   <data name="DiskError" xml:space="preserve">
     <value>A disk error occurred.</value>
   </data>
@@ -137,6 +143,9 @@
   </data>
   <data name="EncryptionFailed" xml:space="preserve">
     <value>The encryption failed.</value>
+  </data>
+  <data name="FileReadOnly" xml:space="preserve">
+    <value>The file is read-only.</value>
   </data>
   <data name="FileRenamingFailed" xml:space="preserve">
     <value>The file could not be renamed.</value>
@@ -152,6 +161,9 @@
   </data>
   <data name="ItemDoesNotRepresentARegistryKey" xml:space="preserve">
     <value>This item does not represent a registry key.</value>
+  </data>
+  <data name="ItemIsNotDirectory" xml:space="preserve">
+    <value>The item is not a directory.</value>
   </data>
   <data name="NoError" xml:space="preserve">
     <value>Process completed successfully.</value>
@@ -182,6 +194,15 @@
   </data>
   <data name="RegistryKeyNotExists" xml:space="preserve">
     <value>The specified registry key does not exist.</value>
+  </data>
+  <data name="SharingViolation" xml:space="preserve">
+    <value>The file is open in another process.</value>
+  </data>
+  <data name="SharingViolationFileOpenInMultipleProcesses" xml:space="preserve">
+    <value>The file is open in multiple processes.</value>
+  </data>
+  <data name="SharingViolationFileOpenInProcess" xml:space="preserve">
+    <value>The file is open in {0}.</value>
   </data>
   <data name="ShellObjectIsNotSupported" xml:space="preserve">
     <value>The given ShellObject is not supported.</value>

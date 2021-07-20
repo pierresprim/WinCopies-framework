@@ -46,6 +46,8 @@ namespace WinCopies.IO.Process
 
     public interface IProcessErrorItem : IPathInfo
     {
+        object Item { get; }
+
         IProcessError Error { get; }
     }
 
@@ -56,6 +58,8 @@ namespace WinCopies.IO.Process
         IProcessError<TError, TAction> Error { get; }
 
 #if CS8
+        object IProcessErrorItem.Item => Item;
+
         IProcessError IProcessErrorItem.Error => Error;
 #endif
     }

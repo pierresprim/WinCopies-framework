@@ -79,6 +79,15 @@ namespace WinCopies.IO.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Deletion.
+        /// </summary>
+        public static string Deletion {
+            get {
+                return ResourceManager.GetString("Deletion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to .Net Attribute.
         /// </summary>
         public static string DotNetAttribute {
@@ -129,6 +138,15 @@ namespace WinCopies.IO.Properties {
         public static string Extraction {
             get {
                 return ResourceManager.GetString("Extraction", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move.
+        /// </summary>
+        public static string Move {
+            get {
+                return ResourceManager.GetString("Move", resourceCulture);
             }
         }
         

@@ -61,6 +61,15 @@ namespace WinCopies.IO.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The process cannot access to the file..
+        /// </summary>
+        public static string AccessDenied {
+            get {
+                return ResourceManager.GetString("AccessDenied", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The operation was cancelled by user..
         /// </summary>
         public static string CancelledByUser {
@@ -97,6 +106,15 @@ namespace WinCopies.IO.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The directory contains items..
+        /// </summary>
+        public static string DirectoryNotEmpty {
+            get {
+                return ResourceManager.GetString("DirectoryNotEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to A disk error occurred..
         /// </summary>
         public static string DiskError {
@@ -120,6 +138,15 @@ namespace WinCopies.IO.Resources {
         public static string EncryptionFailed {
             get {
                 return ResourceManager.GetString("EncryptionFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The file is read-only..
+        /// </summary>
+        public static string FileReadOnly {
+            get {
+                return ResourceManager.GetString("FileReadOnly", resourceCulture);
             }
         }
         
@@ -165,6 +192,15 @@ namespace WinCopies.IO.Resources {
         public static string ItemDoesNotRepresentARegistryKey {
             get {
                 return ResourceManager.GetString("ItemDoesNotRepresentARegistryKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The item is not a directory..
+        /// </summary>
+        public static string ItemIsNotDirectory {
+            get {
+                return ResourceManager.GetString("ItemIsNotDirectory", resourceCulture);
             }
         }
         
@@ -255,6 +291,33 @@ namespace WinCopies.IO.Resources {
         public static string RegistryKeyNotExists {
             get {
                 return ResourceManager.GetString("RegistryKeyNotExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The file is open in another process..
+        /// </summary>
+        public static string SharingViolation {
+            get {
+                return ResourceManager.GetString("SharingViolation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The file is open in multiple processes..
+        /// </summary>
+        public static string SharingViolationFileOpenInMultipleProcesses {
+            get {
+                return ResourceManager.GetString("SharingViolationFileOpenInMultipleProcesses", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The file is open in {0}..
+        /// </summary>
+        public static string SharingViolationFileOpenInProcess {
+            get {
+                return ResourceManager.GetString("SharingViolationFileOpenInProcess", resourceCulture);
             }
         }
         

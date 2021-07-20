@@ -201,6 +201,8 @@ namespace WinCopies.IO.Process
     {
         Size IProcessQueue.TotalSize => InnerQueue.TotalSize;
 
+        public bool HasItems => InnerQueue.HasItems;
+
         public AbstractionProcessCollection(in ProcessTypes<TSource>.IProcessQueue queue) : base(queue)
         {
             // Left empty.

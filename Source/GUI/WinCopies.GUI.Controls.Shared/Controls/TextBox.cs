@@ -21,6 +21,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Drawing;
 using System.Globalization;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -74,10 +75,10 @@ namespace WinCopies.GUI.Controls
 #endif
     }
 
-        /// <summary>
-        /// Represents a <see cref="System.Windows.Controls.TextBox"/> that can display items on the left and right of the text.
-        /// </summary>
-        public class TextBox : System.Windows.Controls.TextBox
+    /// <summary>
+    /// Represents a <see cref="System.Windows.Controls.TextBox"/> that can display items on the left and right of the text.
+    /// </summary>
+    public class TextBox : System.Windows.Controls.TextBox
     {
         /// <summary>
         /// Identifies the <see cref="LeftItems"/> dependency property.
@@ -126,7 +127,7 @@ namespace WinCopies.GUI.Controls
 
         public TextBox() => RegisterCommandBindings();
 
-        protected virtual void AddCaseCommandBinding(ICommand command, Action<ExecutedRoutedEventArgs> action) => CommandBindings.Add(new CommandBinding(command, (object sender, ExecutedRoutedEventArgs e) => action(e), (object _sender, CanExecuteRoutedEventArgs _e) => OnUpperCommandCanExecute(_e)));
+        protected virtual void AddCaseCommandBinding(ICommand command, Action<ExecutedRoutedEventArgs> action) => CommandBindings.Add(new CommandBinding(command, (object sender, ExecutedRoutedEventArgs e) => action(e), (object _sender, CanExecuteRoutedEventArgs _e) => OnCaseCommandCanExecute(_e)));
 
         protected virtual void RegisterCommandBindings()
         {
@@ -137,45 +138,58 @@ namespace WinCopies.GUI.Controls
             AddCaseCommandBinding(Reverse, OnReverseExecuted);
         }
 
-        protected virtual void OnUpperCommandExecuted(ExecutedRoutedEventArgs e)
+        protected virtual void OnUpperCommandExecuted(ExecutedRoutedEventArgs e) => UpdateText((in string s) => s.ToUpper(CultureInfo.CurrentCulture), e);
+
+        private void UpdateText(in FuncIn<string, string> action, in ExecutedRoutedEventArgs e)
         {
-            Text = Text.ToUpper(CultureInfo.CurrentCulture);
+            if (SelectionLength == 0)
+
+                Text = action(Text);
+
+            else
+            {
+                var sb = new StringBuilder();
+
+                if (SelectionStart > 0)
+
+                    _ = sb.Append(Text.Substring(0, SelectionStart));
+
+                _ = sb.Append(action(Text.Substring(SelectionStart, SelectionLength)));
+
+                int l = SelectionStart + SelectionLength;
+
+                if (Text.Length >= l)
+
+                    _ = sb.Append(Text.Substring(l));
+
+                int selectionStart = SelectionStart;
+
+                int selectionLength = SelectionLength;
+
+                Text = sb.ToString();
+
+                Select(selectionStart, selectionLength);
+            }
 
             e.Handled = true;
         }
 
-        protected virtual void OnLowerCommandExecuted(ExecutedRoutedEventArgs e)
-        {
-            Text = Text.ToLower(CultureInfo.CurrentCulture);
+        protected virtual void OnLowerCommandExecuted(ExecutedRoutedEventArgs e) => UpdateText((in string s) => s.ToLower(CultureInfo.CurrentCulture), e);
 
-            e.Handled = true;
-        }
         private static string ToUpper(in char c) => char.ToUpper(c, CultureInfo.CurrentCulture).ToString();
 
-        protected virtual void OnFirstCharUpperCommandExecuted(ExecutedRoutedEventArgs e)
+        protected virtual void OnFirstCharUpperCommandExecuted(ExecutedRoutedEventArgs e) => UpdateText((in string s) =>
         {
             string toUpper() => ToUpper(Text[0]);
 
-            Text = Text.Length == 1 ? toUpper() : $"{toUpper()}{Text.Substring(1)}";
+            return s.Length == 1 ? toUpper() : $"{toUpper()}{Text.Substring(1)}";
+        }, e);
 
-            e.Handled = true;
-        }
+        protected virtual void OnFirstCharOfEachWordUpperCommandExecuted(ExecutedRoutedEventArgs e) => UpdateText((in string s) => s.FirstCharOfEachWordToUpper(' '), e);
 
-        protected virtual void OnFirstCharOfEachWordUpperCommandExecuted(ExecutedRoutedEventArgs e)
-        {
-            Text = Text.FirstCharOfEachWordToUpper( ' ');
+        protected virtual void OnReverseExecuted(ExecutedRoutedEventArgs e) => UpdateText((in string s) => s._Reverse(), e);
 
-            e.Handled = true;
-        }
-
-        protected virtual void OnReverseExecuted(ExecutedRoutedEventArgs e)
-        {
-            Text = Text._Reverse();
-
-            e.Handled = true;
-        }
-
-        protected virtual void OnUpperCommandCanExecute(CanExecuteRoutedEventArgs e)
+        protected virtual void OnCaseCommandCanExecute(CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = !UtilHelpers.IsNullEmptyOrWhiteSpace(Text);
 

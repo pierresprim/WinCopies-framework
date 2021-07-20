@@ -29,7 +29,7 @@ using WinCopies.Collections.DotNetFix.Generic;
 
 namespace WinCopies.IO.Process.ObjectModel
 {
-    public abstract class ArchiveProcess<T> : ProcessObjectModelTypes<IPathInfo, IPathInfo, T, ProcessError, object, ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessDelegates<ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessEventDelegates>, ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessEventDelegates, IProcessProgressDelegateParameter>.DefaultDestinationProcess where T : ProcessTypes<IPathInfo>.ProcessErrorTypes<ProcessError, object>.IProcessErrorFactories
+    public abstract class ArchiveProcess<T> : ProcessObjectModelTypes<IPathInfo, IPathInfo, T, ProcessError, object, ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessDelegates<ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessEventDelegates>, ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessEventDelegates, IProcessProgressDelegateParameter>.DefaultDestinationProcess where T : ProcessErrorTypes<IPathInfo, ProcessError, object>.IProcessErrorFactories
         // <T, TCollection, TReadOnlyCollection, TErrorPathCollection, TReadOnlyErrorPathCollection
         //#if DEBUG
         //         , TSimulationParameters

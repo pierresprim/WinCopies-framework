@@ -24,49 +24,32 @@ using static WinCopies.ThrowHelper;
 
 namespace WinCopies.IO.Process
 {
-    public static partial class ProcessTypes<T> where T : IPath
+    public static class ProcessErrorTypes<T, TError, TAction> where T : IPath
     {
-        public static class ProcessErrorTypes<TError>
+        public interface IProcessErrorItemFactory
         {
-            public interface IProcessErrorItemFactory
-            {
-                IProcessErrorItem<T, TError> GetErrorItem(T item, IProcessError<TError> error);
-            }
+            IProcessErrorItem<T, TError, TAction> GetErrorItem(T item, IProcessError<TError, TAction> error);
+        }
 
-            public interface IProcessErrorFactories : IProcessErrorFactory<TError>, IProcessErrorItemFactory
-            {
-                // Left empty.
-            }
-
-            public class ProcessOptions
-            {
-                public Predicate<T> PathLoadedDelegate { get; }
-
-                public bool ClearOnError { get; }
-
-                public ProcessOptions(in Predicate<T> pathLoadedDelegate, in bool clearOnError)
-                {
-                    PathLoadedDelegate = pathLoadedDelegate;
-
-                    ClearOnError = clearOnError;
-                }
-            }
+        public interface IProcessErrorFactories : IProcessErrorFactory<TError, TAction>, IProcessErrorItemFactory
+        {
+            // Left empty.
         }
     }
 
-    public static class ProcessTypes<TPath, TError> where TPath : IPathInfo
+    public static class ProcessTypes<TPath, TError, TAction> where TPath : IPathInfo
     {
-        public class ProcessErrorFactoryBase : IProcessErrorFactoryBase<TError>
+        public class ProcessErrorFactoryBase : IProcessErrorFactoryBase<TError, TAction>
         {
-            public IProcessError<TError> GetError(TError error, Exception exception, ErrorCode errorCode) => new ProcessError<TError>(error, exception, errorCode);
+            public IProcessError<TError, TAction> GetError(TError error, Exception exception, ErrorCode errorCode) => new ProcessError<TError, TAction>(error, exception, errorCode);
 
-            public IProcessError<TError> GetError(TError error, Exception exception, HResult hResult) => new ProcessError<TError>(error, exception, hResult);
+            public IProcessError<TError, TAction> GetError(TError error, Exception exception, HResult hResult) => new ProcessError<TError, TAction>(error, exception, hResult);
 
-            public IProcessError<TError> GetError(TError error, string message, ErrorCode errorCode) => new ProcessError<TError>(error, message, errorCode);
+            public IProcessError<TError, TAction> GetError(TError error, string message, ErrorCode errorCode) => new ProcessError<TError, TAction>(error, message, errorCode);
 
-            public IProcessError<TError> GetError(TError error, string message, HResult hResult) => new ProcessError<TError>(error, message, hResult);
+            public IProcessError<TError, TAction> GetError(TError error, string message, HResult hResult) => new ProcessError<TError, TAction>(error, message, hResult);
 
-            public IProcessErrorItem<TPath, TError> GetErrorItem(TPath item, IProcessError<TError> error) => new ProcessErrorItem(item, error);
+            public IProcessErrorItem<TPath, TError, TAction> GetErrorItem(TPath item, IProcessError<TError, TAction> error) => new ProcessErrorItem(item, error);
 
 #if !CS8
             #region IProcessErrorFactoryBase Support
@@ -83,11 +66,11 @@ namespace WinCopies.IO.Process
 #endif
         }
 
-        public class ProcessErrorItem : IProcessErrorItem<TPath, TError>
+        public class ProcessErrorItem : IProcessErrorItem<TPath, TError, TAction>
         {
             public TPath Item { get; }
 
-            public IProcessError<TError> Error { get; }
+            public IProcessError<TError, TAction> Error { get; internal set; }
 
             string IPathCommon.RelativePath => Item.RelativePath;
 
@@ -99,12 +82,11 @@ namespace WinCopies.IO.Process
 
             Size? IPath.Size => Item.Size;
 
-            public ProcessErrorItem(in TPath path, in IProcessError<TError> error)
-            {
-                Item = path;
+            bool IPath.AlreadyPushed => Item.AlreadyPushed;
 
-                Error = error;
-            }
+            protected internal ProcessErrorItem(in TPath path) => Item = path;
+
+            protected internal ProcessErrorItem(in TPath path, in IProcessError<TError, TAction> error) : this(path) => Error = error;
 
             public override string ToString() => PathHelper.ToString(this);
 
@@ -116,13 +98,15 @@ namespace WinCopies.IO.Process
 
 #if !CS8
             #region IProcessErrorItem Support
+            object IProcessErrorItem.Item => Item;
+
             IProcessError IProcessErrorItem.Error => Error;
             #endregion
 #endif
         }
     }
 
-    public class ProcessErrorFactory<T> : ProcessTypes<T, ProcessError>.ProcessErrorFactoryBase, ProcessTypes<T>.ProcessErrorTypes<ProcessError>.IProcessErrorFactories where T : IPathInfo
+    public abstract class ProcessErrorFactory<T, TAction> : ProcessTypes<T, ProcessError, TAction>.ProcessErrorFactoryBase, ProcessErrorTypes<T, ProcessError, TAction>.IProcessErrorFactories where T : IPathInfo
     {
         public ProcessError NoError => ProcessError.None;
 
@@ -131,6 +115,8 @@ namespace WinCopies.IO.Process
         public ProcessError CancelledByUserError => ProcessError.CancelledByUser;
 
         public ProcessError WrongStatusError => ProcessError.WrongStatus;
+
+        public abstract TAction IgnoreAction { get; }
 
 #if !CS8
         object IProcessErrorFactoryData.NoError => NoError;
@@ -141,5 +127,10 @@ namespace WinCopies.IO.Process
 
         object IProcessErrorFactoryData.WrongStatusError => WrongStatusError;
 #endif
+    }
+
+    public class DefaultProcessErrorFactory<T> : ProcessErrorFactory<T, ErrorAction> where T : IPathInfo
+    {
+        public override ErrorAction IgnoreAction => ErrorAction.Ignore;
     }
 }

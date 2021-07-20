@@ -214,7 +214,7 @@ namespace WinCopies.GUI.IO.Process
 
         bool ISimpleLinkedListBase2.IsSynchronized => ((ISimpleLinkedListBase2)InnerLinkedCollection).IsSynchronized;
 
-        bool ISimpleLinkedListBase.HasItems => ((ISimpleLinkedListBase)InnerLinkedCollection).HasItems;
+        public bool HasItems => ((ISimpleLinkedListBase)InnerLinkedCollection).HasItems;
 
         public uint Count => InnerLinkedCollection.Count;
 

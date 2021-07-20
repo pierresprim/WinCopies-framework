@@ -30,6 +30,11 @@
               Looks up a localized string similar to Copy.
             </summary>
         </member>
+        <member name="P:WinCopies.IO.Properties.Resources.Deletion">
+            <summary>
+              Looks up a localized string similar to Deletion.
+            </summary>
+        </member>
         <member name="P:WinCopies.IO.Properties.Resources.DotNetAttribute">
             <summary>
               Looks up a localized string similar to .Net Attribute.
@@ -58,6 +63,11 @@
         <member name="P:WinCopies.IO.Properties.Resources.Extraction">
             <summary>
               Looks up a localized string similar to Extraction.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Properties.Resources.Move">
+            <summary>
+              Looks up a localized string similar to Move.
             </summary>
         </member>
         <member name="P:WinCopies.IO.Properties.Resources.PortableDevice">
@@ -111,6 +121,11 @@
               resource lookups using this strongly typed resource class.
             </summary>
         </member>
+        <member name="P:WinCopies.IO.Resources.ExceptionMessages.AccessDenied">
+            <summary>
+              Looks up a localized string similar to The process cannot access to the file..
+            </summary>
+        </member>
         <member name="P:WinCopies.IO.Resources.ExceptionMessages.CancelledByUser">
             <summary>
               Looks up a localized string similar to The operation was cancelled by user..
@@ -131,6 +146,11 @@
               Looks up a localized string similar to destination.
             </summary>
         </member>
+        <member name="P:WinCopies.IO.Resources.ExceptionMessages.DirectoryNotEmpty">
+            <summary>
+              Looks up a localized string similar to The directory contains items..
+            </summary>
+        </member>
         <member name="P:WinCopies.IO.Resources.ExceptionMessages.DiskError">
             <summary>
               Looks up a localized string similar to A disk error occurred..
@@ -144,6 +164,11 @@
         <member name="P:WinCopies.IO.Resources.ExceptionMessages.EncryptionFailed">
             <summary>
               Looks up a localized string similar to The encryption failed..
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Resources.ExceptionMessages.FileReadOnly">
+            <summary>
+              Looks up a localized string similar to The file is read-only..
             </summary>
         </member>
         <member name="P:WinCopies.IO.Resources.ExceptionMessages.FileRenamingFailed">
@@ -169,6 +194,11 @@
         <member name="P:WinCopies.IO.Resources.ExceptionMessages.ItemDoesNotRepresentARegistryKey">
             <summary>
               Looks up a localized string similar to This item does not represent a registry key..
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Resources.ExceptionMessages.ItemIsNotDirectory">
+            <summary>
+              Looks up a localized string similar to The item is not a directory..
             </summary>
         </member>
         <member name="P:WinCopies.IO.Resources.ExceptionMessages.NoError">
@@ -219,6 +249,21 @@
         <member name="P:WinCopies.IO.Resources.ExceptionMessages.RegistryKeyNotExists">
             <summary>
               Looks up a localized string similar to The specified registry key does not exist..
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Resources.ExceptionMessages.SharingViolation">
+            <summary>
+              Looks up a localized string similar to The file is open in another process..
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Resources.ExceptionMessages.SharingViolationFileOpenInMultipleProcesses">
+            <summary>
+              Looks up a localized string similar to The file is open in multiple processes..
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Resources.ExceptionMessages.SharingViolationFileOpenInProcess">
+            <summary>
+              Looks up a localized string similar to The file is open in {0}..
             </summary>
         </member>
         <member name="P:WinCopies.IO.Resources.ExceptionMessages.ShellObjectIsNotSupported">
@@ -713,26 +758,6 @@
             Represents a file system item.
             </summary>
         </member>
-        <member name="P:WinCopies.IO.ObjectModel.ShellObjectInfo`4.BrowsableObjectInfoBitmapSources.SmallBitmapSourceOverride">
-            <summary>
-            Gets the small <see cref="T:System.Windows.Media.Imaging.BitmapSource"/> of this <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/>.
-            </summary>
-        </member>
-        <member name="P:WinCopies.IO.ObjectModel.ShellObjectInfo`4.BrowsableObjectInfoBitmapSources.MediumBitmapSourceOverride">
-            <summary>
-            Gets the medium <see cref="T:System.Windows.Media.Imaging.BitmapSource"/> of this <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/>.
-            </summary>
-        </member>
-        <member name="P:WinCopies.IO.ObjectModel.ShellObjectInfo`4.BrowsableObjectInfoBitmapSources.LargeBitmapSourceOverride">
-            <summary>
-            Gets the large <see cref="T:System.Windows.Media.Imaging.BitmapSource"/> of this <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/>.
-            </summary>
-        </member>
-        <member name="P:WinCopies.IO.ObjectModel.ShellObjectInfo`4.BrowsableObjectInfoBitmapSources.ExtraLargeBitmapSourceOverride">
-            <summary>
-            Gets the extra large <see cref="T:System.Windows.Media.Imaging.BitmapSource"/> of this <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/>.
-            </summary>
-        </member>
         <member name="P:WinCopies.IO.ObjectModel.ShellObjectInfo`4.ArchiveShellObject">
             <summary>
             The parent <see cref="T:WinCopies.IO.ObjectModel.IShellObjectInfoBase"/> of the current archive item. If the current <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/> represents an archive file, this property returns the current <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/>, or <see langword="null"/> otherwise.
@@ -871,11 +896,6 @@
             The item redirects to an other item, with this item browsable.
             </summary>
         </member>
-        <member name="P:WinCopies.IO.Process.ObjectModel.CopyProcess`1.AutoRenameFiles">
-            <summary>
-            Gets a value that indicates whether files are automatically renamed when they conflict with existing paths.
-            </summary>
-        </member>
         <member name="F:WinCopies.IO.Process.ProcessError.None">
             <summary>
             No error occurred.
@@ -949,6 +969,11 @@
         <member name="F:WinCopies.IO.Process.ProcessError.DiskError">
             <summary>
             An unknown disk error occurred.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Process.CopyProcessOptions`1.AutoRenameFiles">
+            <summary>
+            Gets a value that indicates whether files are automatically renamed when they conflict with existing paths.
             </summary>
         </member>
         <member name="T:WinCopies.IO.IBrowsableObjectInfoBitmapSources">
@@ -1197,7 +1222,7 @@
         </member>
         <member name="F:WinCopies.IO.FileSystemEntryEnumerationOrder.None">
             <summary>
-            Do not enumerates any item.
+            Does not sort items.
             </summary>
         </member>
         <member name="F:WinCopies.IO.FileSystemEntryEnumerationOrder.FilesThenDirectories">

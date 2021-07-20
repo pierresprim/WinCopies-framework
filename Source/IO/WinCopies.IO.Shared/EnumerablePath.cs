@@ -17,11 +17,11 @@
 
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
+using WinCopies.Collections.DotNetFix.Generic;
 using WinCopies.Collections.Generic;
 using WinCopies.IO.Enumeration;
 
@@ -32,7 +32,7 @@ namespace WinCopies.IO
     public enum FileSystemEntryEnumerationOrder : byte
     {
         /// <summary>
-        /// Do not enumerates any item.
+        /// Does not sort items.
         /// </summary>
         None = 0,
 
@@ -92,7 +92,7 @@ namespace WinCopies.IO
 #if CS8
             , EnumerationOptions enumerationOptions
 #endif
-                , FileSystemEntryEnumerationOrder enumerationOrder, bool safeEnumeration
+                , FileSystemEntryEnumerationOrder enumerationOrder, RecursiveEnumerationOrder recursiveEnumerationOrder, bool safeEnumeration
 #if DEBUG
             , FileSystemEntryEnumeratorProcessSimulation simulationParameters
 #endif
@@ -360,13 +360,17 @@ namespace WinCopies.IO
 
         public FileSystemEntryEnumerationOrder EnumerationOrder { get; }
 
-        protected Func<IPathInfo, T> GetNewPathInfoDelegate { get; }
+        public RecursiveEnumerationOrder RecursiveEnumerationOrder { get; }
 
-        public EnumerablePath(in IPathInfo path, in     FileSystemEntryEnumerationOrder enumerationOrder , in Func<IPathInfo, T> getNewPathInfoDelegate)
+        protected Func<PathTypes<IPathInfo>.PathInfo, T> GetNewPathInfoDelegate { get; }
+
+        public EnumerablePath(in IPathInfo path, in FileSystemEntryEnumerationOrder enumerationOrder, in RecursiveEnumerationOrder recursiveEnumerationOrder, in Func<PathTypes<IPathInfo>.PathInfo, T> getNewPathInfoDelegate)
         {
             Path = path;
 
             EnumerationOrder = enumerationOrder;
+
+            RecursiveEnumerationOrder = recursiveEnumerationOrder;
 
             GetNewPathInfoDelegate = getNewPathInfoDelegate;
         }
@@ -429,7 +433,7 @@ namespace WinCopies.IO
 #if CS8
             , in EnumerationOptions enumerationOptions
 #endif
-                , in FileSystemEntryEnumerationOrder enumerationOrder, in bool safeEnumeration
+                , in FileSystemEntryEnumerationOrder enumerationOrder, in RecursiveEnumerationOrder recursiveEnumerationOrder, in bool safeEnumeration
 #if DEBUG
             , in FileSystemEntryEnumeratorProcessSimulation simulationParameters
 #endif
@@ -456,7 +460,7 @@ namespace WinCopies.IO
 #if CS8
             , EnumerationOptions enumerationOptions
 #endif
-                , FileSystemEntryEnumerationOrder enumerationOrder, bool safeEnumeration
+                , FileSystemEntryEnumerationOrder enumerationOrder, RecursiveEnumerationOrder recursiveEnumerationOrder, bool safeEnumeration
 #if DEBUG
             , FileSystemEntryEnumeratorProcessSimulation simulationParameters
 #endif
@@ -464,7 +468,7 @@ namespace WinCopies.IO
 #if CS8
                 , enumerationOptions
 #endif
-                , enumerationOrder, safeEnumeration
+                , enumerationOrder, recursiveEnumerationOrder, safeEnumeration
 #if DEBUG
                 , simulationParameters
 #endif
@@ -474,7 +478,7 @@ namespace WinCopies.IO
 #if CS8
             , null
 #endif
-            , EnumerationOrder, true
+            , EnumerationOrder, RecursiveEnumerationOrder, true
 #if DEBUG
             , null
 #endif
@@ -486,7 +490,7 @@ namespace WinCopies.IO
 #if CS8
             , null
 #endif
-            , EnumerationOrder, true
+            , EnumerationOrder, RecursiveEnumerationOrder, true
 #if DEBUG
             , null
 #endif
@@ -499,7 +503,7 @@ namespace WinCopies.IO
             private Func<bool> _moveNext;
             private T _current;
             internal const bool _isResetSupported = false;
-            private Func<IPathInfo, T> _func;
+            private Func<PathTypes<IPathInfo>.PathInfo, T> _func;
 
             protected override T CurrentOverride => _current;
 
@@ -508,9 +512,7 @@ namespace WinCopies.IO
             // public int Count => IsDisposed ? throw GetExceptionForDispose(false) : _directoryEnumerator.Count + _filesEnumerator.Count;
 
 #if DEBUG
-
             public FileSystemEntryEnumeratorProcessSimulation SimulationParameters { get; }
-
 #endif
 
             private class SubEnumerator
@@ -575,7 +577,7 @@ namespace WinCopies.IO
 
                 void initEnumeratorArray(in int length) => _enumerators = new SubEnumerator[length];
 
-                void updateCurrent() => _current = _func(new PathTypes<IPathInfo>.PathInfo(_currentEnumerator.Enumerator.Current, _currentEnumerator.PathType == PathType.Directories || (_currentEnumerator.PathType == PathType.Files ? false : IO.Path.Exists(_currentEnumerator.Enumerator.Current.Path))));
+                void updateCurrent() => _current = _func(new PathTypes<IPathInfo>.PathInfo(_currentEnumerator.Enumerator.Current, _currentEnumerator.PathType == PathType.Directories || (_currentEnumerator.PathType == PathType.Files ? false : System.IO.Directory.Exists(_currentEnumerator.Enumerator.Current.Path))));
 
                 void setMoveNext() => _moveNext = () =>
                 {
@@ -591,12 +593,9 @@ namespace WinCopies.IO
                         return false;
                     }
 
-                    if (_currentEnumerator.Enumerator.MoveNext())
-                    {
-                        updateCurrent();
+                    if (__moveNext())
 
                         return true;
-                    }
 
                     if (_enumerators.Length == 1)
 
@@ -703,7 +702,7 @@ namespace WinCopies.IO
             protected override void DisposeManaged()
             {
                 base.DisposeManaged();
-                
+
                 _currentEnumerator = null;
             }
         }
@@ -716,7 +715,14 @@ namespace WinCopies.IO
 
     public class RecursivelyEnumerablePath<T> : EnumerablePath<T>, IRecursivelyEnumerablePath<T> where T : IPathInfo
     {
-        private readonly Func<Enumerator> _getRecursiveEnumeratorDelegate;
+        private readonly string _searchPattern;
+        private readonly SearchOption _searchOption;
+        private readonly FileSystemEntryEnumerationOrder _enumerationOrder;
+        private readonly bool _safeEnumeration;
+        private readonly FileSystemEntryEnumeratorProcessSimulation _simulationParameters;
+#if CS8
+        private readonly EnumerationOptions _enumerationOptions;
+#endif
 
         public T Value { get; }
 
@@ -724,7 +730,7 @@ namespace WinCopies.IO
 #if CS8
             , EnumerationOptions enumerationOptions
 #endif
-                , FileSystemEntryEnumerationOrder enumerationOrder, in Func<IPathInfo, T> getNewPathInfoDelegate, bool safeEnumeration
+                , FileSystemEntryEnumerationOrder enumerationOrder, in RecursiveEnumerationOrder recursiveEnumerationOrder, in Func<PathTypes<IPathInfo>.PathInfo, T> getNewPathInfoDelegate, bool safeEnumeration
 #if DEBUG
             , FileSystemEntryEnumeratorProcessSimulation simulationParameters
 #endif
@@ -738,30 +744,21 @@ namespace WinCopies.IO
 #if !CS8
             : path
 #endif
-            ), enumerationOrder, getNewPathInfoDelegate)
-        {
-            Value = path;
+            ), enumerationOrder, recursiveEnumerationOrder, getNewPathInfoDelegate) => Value = path;
 
-            _getRecursiveEnumeratorDelegate = () => new Enumerator(this, searchPattern, searchOption
+        public virtual System.Collections.Generic.IEnumerator<WinCopies.Collections.Generic.IRecursiveEnumerable<T>> GetRecursiveEnumerator() => new Enumerator(this, _searchPattern, _searchOption
 #if CS8
-                , enumerationOptions
+                , _enumerationOptions
 #endif
-                , enumerationOrder, safeEnumeration
+                , _enumerationOrder, _safeEnumeration
 #if DEBUG
-                , simulationParameters
+                , _simulationParameters
 #endif
                 );
-        }
 
-        IEnumerator<WinCopies.Collections.Generic.IRecursiveEnumerable<T>> IRecursiveEnumerableProviderEnumerable<T>.GetRecursiveEnumerator() => _getRecursiveEnumeratorDelegate();
+        public virtual RecursiveEnumeratorAbstract<T> GetEnumerator() => new RecursiveEnumerator<T>(this, RecursiveEnumerationOrder);
 
-        RecursiveEnumerator<T> IRecursiveEnumerable<T>.GetEnumerator() => new
-#if !CS9
-            RecursiveEnumerator<T>
-#endif
-            (this);
-
-        IEnumerator<T> System.Collections.Generic.IEnumerable<T>.GetEnumerator() => GetEnumerator();
+        System.Collections.Generic.IEnumerator<T> System.Collections.Generic.IEnumerable<T>.GetEnumerator() => GetEnumerator();
 
         public sealed class Enumerator : Enumerator<T, IRecursivelyEnumerablePath<T>>
         {
@@ -793,7 +790,7 @@ namespace WinCopies.IO
 #if CS8
                     , enumerationOptions
 #endif
-                    , enumerationOrder, safeEnumeration
+                    , enumerationOrder, enumerablePath.RecursiveEnumerationOrder, safeEnumeration
 #if DEBUG
                     , simulationParameters
 #endif
@@ -806,7 +803,7 @@ namespace WinCopies.IO
 #if CS8
                     , enumerationOptions
 #endif
-                    , enumerationOrder, _path.GetNewPathInfoDelegate, safeEnumeration
+                    , enumerationOrder, _path.RecursiveEnumerationOrder, _path.GetNewPathInfoDelegate, safeEnumeration
 #if DEBUG
                     , simulationParameters
 #endif
@@ -858,5 +855,52 @@ namespace WinCopies.IO
                 _path = null;
             }
         }
+    }
+
+    public class MovingRecursivelyEnumerablePath<T> : RecursivelyEnumerablePath<T> where T : IPathInfo
+    {
+        protected class RecursiveEnumerator : RecursiveEnumeratorAbstract<T>
+        {
+            public RecursiveEnumerator(in System.Collections.Generic.IEnumerable<IRecursiveEnumerable<T>> enumerable) : base(enumerable, RecursiveEnumerationOrder.Both) { }
+
+            public RecursiveEnumerator(in IRecursiveEnumerableProviderEnumerable<T> enumerable) : base(enumerable, RecursiveEnumerationOrder.Both) { }
+
+            public RecursiveEnumerator(in System.Collections.Generic.IEnumerable<IRecursiveEnumerable<T>> enumerable, in IStack<RecursiveEnumeratorStruct<T>> stack) : base(enumerable, RecursiveEnumerationOrder.Both, stack) { }
+
+            public RecursiveEnumerator(IRecursiveEnumerableProviderEnumerable<T> enumerable, in IStack<RecursiveEnumeratorStruct<T>> stack) : base(enumerable, RecursiveEnumerationOrder.Both, stack) { /* Left empty. */ }
+
+            protected override bool AddAsDuplicate(T value) => value.IsDirectory;
+        }
+
+        public MovingRecursivelyEnumerablePath(in T path, string searchPattern, SearchOption? searchOption
+#if CS8
+            , EnumerationOptions enumerationOptions
+#endif
+                , FileSystemEntryEnumerationOrder enumerationOrder, in Func<PathTypes<IPathInfo>.PathInfo, T> getNewPathInfoDelegate, bool safeEnumeration
+#if DEBUG
+            , FileSystemEntryEnumeratorProcessSimulation simulationParameters
+#endif
+           ) : base((path
+#if CS8
+            ??
+#else
+            == null ?
+#endif
+            throw GetArgumentNullException(nameof(path))
+#if !CS8
+            : path
+#endif
+            ), searchPattern, searchOption
+#if CS8
+            , enumerationOptions
+#endif
+               , enumerationOrder, RecursiveEnumerationOrder.Both, getNewPathInfoDelegate, safeEnumeration
+#if DEBUG
+            , simulationParameters
+#endif
+      )
+        { /* Left empty. */ }
+
+        public override RecursiveEnumeratorAbstract<T> GetEnumerator() => new RecursiveEnumerator(this);
     }
 }

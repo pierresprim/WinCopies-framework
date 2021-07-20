@@ -16,19 +16,20 @@
 * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using SevenZip;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using WinCopies.GUI.Windows;
 using WinCopies.IO.ObjectModel;
 using WinCopies.IO.Process;
 using WinCopies.IO.Resources;
+using WinCopies.Linq;
 using WinCopies.Util;
 using WinCopies.Util.Data;
-using WinCopies.Linq;
 
 using static WinCopies.ThrowHelper;
-using System.IO;
 
 namespace WinCopies.GUI.IO.Process
 {

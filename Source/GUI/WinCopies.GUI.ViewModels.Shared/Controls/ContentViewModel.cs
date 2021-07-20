@@ -28,14 +28,14 @@ namespace WinCopies.GUI.Controls.ViewModels
         object Dialog { get; set; }
     }
 
-    public interface IContentModel<TContent,TDialog>: IContentModel
+    public interface IContentModel<TContent, TDialog> : IContentModel
     {
         new TContent Content { get; set; }
 
         new TDialog Dialog { get; set; }
 
 #if CS8
-        object IContentModel.Content { get => Content; set => Content=(TContent)value; }
+        object IContentModel.Content { get => Content; set => Content = (TContent)value; }
 
         object IContentModel.Dialog { get => Dialog; set => Dialog = (TDialog)value; }
 #endif
@@ -46,59 +46,19 @@ namespace WinCopies.GUI.Controls.ViewModels
         private object _content;
         private object _dialog;
 
-        public object Content
-        {
-            get => _content;
+        public object Content { get => _content; set => UpdateValue(ref _content, value, nameof(Content)); }
 
-            set
-            {
-                _content = value;
-
-                OnPropertyChanged(nameof(Content));
-            }
-        }
-
-        public object Dialog
-        {
-            get => _dialog;
-
-            set
-            {
-                _dialog = value;
-
-                OnPropertyChanged(nameof(Dialog));
-            }
-        }
+        public object Dialog { get => _dialog; set => UpdateValue(ref _dialog, value, nameof(Dialog)); }
     }
 
-    public class ContentViewModel<TContent, TDialog> : ViewModelBase, IContentModel<TContent,TDialog>
+    public class ContentViewModel<TContent, TDialog> : ViewModelBase, IContentModel<TContent, TDialog>
     {
         private TContent _content;
         private TDialog _dialog;
 
-        public TContent Content
-        {
-            get => _content;
+        public TContent Content { get => _content; set => UpdateValue(ref _content, value, nameof(Content)); }
 
-            set
-            {
-                _content = value;
-
-                OnPropertyChanged(nameof(Content));
-            }
-        }
-
-        public TDialog Dialog
-        {
-            get => _dialog;
-
-            set
-            {
-                _dialog = value;
-
-                OnPropertyChanged(nameof(Dialog));
-            }
-        }
+        public TDialog Dialog { get => _dialog; set => UpdateValue(ref _dialog, value, nameof(Dialog)); }
 
 #if !CS8
         object IContentModel.Content { get => Content; set => Content = (TContent)value; }

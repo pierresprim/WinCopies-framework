@@ -25,7 +25,7 @@ namespace WinCopies.IO.Process.ObjectModel
     {
         public interface IProcess<TParam, TProcessEventDelegates> : IProcess where TParam : IProcessProgressDelegateParameter where TProcessEventDelegates : ProcessDelegateTypes<TItemsOut, TParam>.IProcessEventDelegates
         {
-            IReadOnlyDictionary<string, ICommand<IProcessErrorItem<IPathInfo, ProcessError, TAction>>> Actions { get; }
+            IReadOnlyDictionary<string, ICommand<IProcessErrorItem<TItemsOut, TError, TAction>>> Actions { get; }
 
             new IProcessErrorFactory<TError, TAction> Factory { get; }
 

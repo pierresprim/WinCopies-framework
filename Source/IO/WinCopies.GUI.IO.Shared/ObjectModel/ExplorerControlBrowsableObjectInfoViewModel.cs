@@ -122,11 +122,11 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         public HistoryObservableCollection<IBrowsableObjectInfo> History => GetValueIfNotDisposed(_historyObservable);
 
-        public bool IsCheckBoxVisible { get => _isCheckBoxVisible; set { if (value && _selectionMode == SelectionMode.Single) throw new ArgumentException("Cannot apply the true value for the IsCheckBoxVisible when SelectionMode is set to Single.", nameof(value)); _isCheckBoxVisible = value; OnPropertyChanged(nameof(IsCheckBoxVisible)); } }
+        public bool IsCheckBoxVisible { get => _isCheckBoxVisible; set { if (value && _selectionMode == SelectionMode.Single) throw new ArgumentException("Cannot apply the true value for the IsCheckBoxVisible when SelectionMode is set to Single.", nameof(value)); UpdateValue(ref _isCheckBoxVisible, value, nameof(IsCheckBoxVisible)); } }
 
         public bool IsDisposed { get; private set; }
 
-        public bool IsSelected { get => _isSelected; set { _isSelected = value; OnPropertyChanged(nameof(IsSelected)); } }
+        public bool IsSelected { get => _isSelected; set { UpdateValue(ref _isSelected, value, nameof(IsSelected)); } }
 
         public DelegateCommand<IBrowsableObjectInfoViewModel> ItemClickCommand { get; }
 
@@ -136,7 +136,7 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         public IList SelectedItems { get => GetValueIfNotDisposed(_selectedItems); set => UpdateValueIfNotDisposed(ref _selectedItems, value, nameof(SelectedItems)); }
 
-        public SelectionMode SelectionMode { get => _selectionMode; set { _selectionMode = value; OnPropertyChanged(nameof(SelectionMode)); } }
+        public SelectionMode SelectionMode { get => _selectionMode; set { UpdateValue(ref _selectionMode, value, nameof(SelectionMode)); } }
 
         public string Text { get => GetValueIfNotDisposed(_text); set => UpdateValueIfNotDisposed(ref _text, value, nameof(Text)); }
 
@@ -195,7 +195,11 @@ namespace WinCopies.GUI.IO.ObjectModel
         {
             if (e.PropertyName == nameof(IBrowsableObjectInfoViewModel.SelectedItem))
 
-                OnPropertyChanged(nameof(BrowsabilityPaths));
+                OnPropertyChanged(nameof(BrowsabilityPaths)
+#if !WinCopies4
+                    , null, BrowsabilityPaths
+#endif
+                    );
         }
 
         private void Path_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) => OnPathPropertyChanged(e);
@@ -233,7 +237,11 @@ namespace WinCopies.GUI.IO.ObjectModel
 
                 command.Update();
 
-            OnPropertyChanged(nameof(CustomProcesses));
+            OnPropertyChanged(nameof(CustomProcesses)
+#if !WinCopies4
+                , null, CustomProcesses
+#endif
+                );
 
             if (_path.Path == History.Current.Path)
 
@@ -297,6 +305,7 @@ namespace WinCopies.GUI.IO.ObjectModel
 
             _path = null;
 
+            _historyObservable.NotifyOnPropertyChanged = false;
             _historyObservable.Clear();
             _historyObservable = null;
 

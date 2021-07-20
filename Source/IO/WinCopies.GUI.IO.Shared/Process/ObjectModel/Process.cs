@@ -105,7 +105,7 @@ namespace WinCopies.GUI.IO.Process
 
         public Process(in WinCopies.IO.Process.ObjectModel.IProcess process)
         {
-            _process = process;
+            _process = process ?? throw ThrowHelper.GetArgumentNullException(nameof(process));
             _processActions = new ProcessActions(this);
 
             DoWork += Process_DoWork;

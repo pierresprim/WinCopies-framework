@@ -69,22 +69,47 @@ namespace WinCopies.GUI.Samples
 
             DataContext = this;
 
-            IEnumerable<IBrowsableObjectInfo> getEnumerable() => SelectedItem.Path.Items.WhereSelect(item => item.IsSelected, item => item.Model);
+            void addCommandBinding(in ICommand command, Func<IProcessFactoryProcessInfo> getProcessInfo, string actionName) => CommandBindings.Add(new CommandBinding(command, (object sender, ExecutedRoutedEventArgs e) => StartProcess(getProcessInfo(), actionName), (object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = getProcessInfo().CanRun(GetEnumerable())));
 
-            _ = CommandBindings.Add(new CommandBinding(ApplicationCommands.Copy, (object sender, ExecutedRoutedEventArgs e) => SelectedItem.Path.ProcessFactory.Copy(getEnumerable(), 10u), (object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = SelectedItem.Path.ProcessFactory.CanCopy(getEnumerable())));
+            IProcessFactory getProcessFactory() => SelectedItem.Path.ProcessFactory;
 
-            _ = CommandBindings.Add(new CommandBinding(ApplicationCommands.Paste, (object sender, ExecutedRoutedEventArgs e) => AddProcess(SelectedItem.Path.ProcessFactory.TryGetCopyProcessParameters(10u)), (object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = SelectedItem.Path.ProcessFactory.CanPaste(10u)));
+            addCommandBinding(ApplicationCommands.Copy, () => getProcessFactory().Copy, null);
+
+            addCommandBinding(ApplicationCommands.Cut, () => getProcessFactory().Cut, null);
+
+            _ = CommandBindings.Add(new CommandBinding(ApplicationCommands.Paste, (object sender, ExecutedRoutedEventArgs e) => AddProcess(getProcessFactory().Copy.TryGetProcessParameters(10u)), (object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = SelectedItem.Path.ProcessFactory.CanPaste(10u)));
+
+            addCommandBinding(ApplicationCommands.Delete, () => getProcessFactory().Deletion, "permanently delete");
         }
 
-        private static ProcessWindow _processWindow;
+        IEnumerable<IBrowsableObjectInfo> GetEnumerable() => SelectedItem.Path.Items.WhereSelect(item => item.IsSelected, item => item.Model);
 
-        public static ProcessWindow ProcessWindow
+        protected void StartProcess(in IProcessFactoryProcessInfo processInfo, in string actionName)
+        {
+            if (processInfo.UserConfirmationRequired)
+
+                if (MessageBox.Show($"Are you sure you want to {actionName} the selected files?", Assembly.GetExecutingAssembly().GetName().Name, MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.No)
+
+                    return;
+
+            if (processInfo is IRunnableProcessFactoryProcessInfo runnableProcessInfo)
+
+                runnableProcessInfo.Run(GetEnumerable(), 10u);
+
+            else
+
+                AddProcess(((IDirectProcessFactoryProcessInfo)processInfo).TryGetProcessParameters(GetEnumerable()));
+        }
+
+        private static Windows.Window _processWindow;
+
+        public static Windows.Window ProcessWindow
         {
             get
             {
                 if (_processWindow == null)
                 {
-                    _processWindow = new ProcessWindow() { Processes = new ObservableCollection<IProcess>() };
+                    _processWindow = new Windows.Window() { ContentTemplateSelector = new InterfaceDataTemplateSelector(), Content = new ProcessManager<IProcess>() { Processes = new ObservableCollection<IProcess>() } };
 
                     _processWindow.Show();
                 }
@@ -93,11 +118,52 @@ namespace WinCopies.GUI.Samples
             }
         }
 
+        private void Command_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+
+            e.Handled = true;
+        }
+
+        private void AddNewTab(IExplorerControlBrowsableObjectInfoViewModel viewModel, ExecutedRoutedEventArgs e)
+        {
+            viewModel.IsSelected = true;
+
+            Items.Add(viewModel);
+
+            e.Handled = true;
+        }
+
+        public static IExplorerControlBrowsableObjectInfoViewModel GetDefaultExplorerControlBrowsableObjectInfoViewModel() => GetDefaultExplorerControlBrowsableObjectInfoViewModel(new ShellObjectInfo(KnownFolders.Desktop, ClientVersion));
+
+        public static IExplorerControlBrowsableObjectInfoViewModel GetDefaultExplorerControlBrowsableObjectInfoViewModel(in IBrowsableObjectInfo browsableObjectInfo)
+        {
+            IExplorerControlBrowsableObjectInfoViewModel viewModel = ExplorerControlBrowsableObjectInfoViewModel.From(new BrowsableObjectInfoViewModel(browsableObjectInfo));
+
+            return viewModel;
+        }
+
+        private void NewTab_Executed(object sender, ExecutedRoutedEventArgs e) => AddNewTab(GetDefaultExplorerControlBrowsableObjectInfoViewModel(), e);
+
+        private void CloseTab_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = Items.Count > 1;
+
+            e.Handled = true;
+        }
+
+        private void CloseTab_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            _ = Items.Remove((IExplorerControlBrowsableObjectInfoViewModel)(e.Parameter is Func func ? func() : e.Parameter));
+
+            e.Handled = true;
+        }
+
         private static void AddProcess(in IProcessParameters parameters)
         {
             IProcess result = new Process(WinCopies.IO.ObjectModel.BrowsableObjectInfo.DefaultProcessSelectorDictionary.Select(new ProcessFactorySelectorDictionaryParameters(parameters, DefaultProcessPathCollectionFactory)));
 
-            ((ObservableCollection<IProcess>)ProcessWindow.Processes).Add(result);
+            ((ProcessManager<IProcess>)ProcessWindow.Content).Processes.Add(result);
 
             result.RunWorkerAsync();
         }
@@ -111,7 +177,7 @@ namespace WinCopies.GUI.Samples
 
         public static ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> GetShellItems() => new() { { GetExplorerControlBrowsableObjectInfoViewModel(GetBrowsableObjectInfoViewModel(ShellObjectInfo.From(ShellObjectFactory.Create("C:\\"), ClientVersion)), true, SelectionMode.Extended, true) } };
 
-        private static IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo)=>new BrowsableObjectInfoViewModel(browsableObjectInfo);
+        private static IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo) => new BrowsableObjectInfoViewModel(browsableObjectInfo);
 
         public static IExplorerControlBrowsableObjectInfoViewModel GetExplorerControlBrowsableObjectInfoViewModel(in IBrowsableObjectInfoViewModel browsableObjectInfo, in bool isSelected, in SelectionMode selectionMode, in bool isCheckBoxVisible)
         {
@@ -124,9 +190,9 @@ namespace WinCopies.GUI.Samples
             return result;
         }
 
-        public static ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> GetRegistryItems()=>new() { { GetExplorerControlBrowsableObjectInfoViewModel(new BrowsableObjectInfoViewModel(new RegistryItemInfo()), true, SelectionMode.Extended, true) } };
+        public static ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> GetRegistryItems() => new() { { GetExplorerControlBrowsableObjectInfoViewModel(new BrowsableObjectInfoViewModel(new RegistryItemInfo()), true, SelectionMode.Extended, true) } };
 
-        public static ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> GetWMIItems()=>new() { { GetExplorerControlBrowsableObjectInfoViewModel(new BrowsableObjectInfoViewModel(new WMIItemInfo()), true, SelectionMode.Extended, true) } };
+        public static ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> GetWMIItems() => new() { { GetExplorerControlBrowsableObjectInfoViewModel(new BrowsableObjectInfoViewModel(new WMIItemInfo()), true, SelectionMode.Extended, true) } };
 
         private void RadioButton_Checked(object sender, RoutedEventArgs e)
         {
@@ -164,7 +230,7 @@ namespace WinCopies.GUI.Samples
             {
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
 
-                    foreach (var _item in e.NewItems)
+                    foreach (object _item in e.NewItems)
 
                         AddHandlers((IExplorerControlBrowsableObjectInfoViewModel)_item);
 
@@ -191,7 +257,7 @@ namespace WinCopies.GUI.Samples
 
         protected override void OnClosing(CancelEventArgs e)
         {
-            var items = Items;
+            ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> items = Items;
 
             items.CollectionChanged -= Items_CollectionChanged;
 

@@ -23,6 +23,7 @@ using System.Windows.Media.Imaging;
 using WinCopies.Collections.Generic;
 using WinCopies.Collections.DotNetFix.Generic;
 using WinCopies.Desktop;
+using WinCopies.Extensions;
 using WinCopies.IO.ObjectModel;
 using WinCopies.IO.Process.ObjectModel;
 
@@ -33,7 +34,7 @@ namespace WinCopies.IO
 {
     public interface IRecursiveEnumerable<T> : Collections.Generic.IRecursiveEnumerable<T>
     {
-        RecursiveEnumerator<T> GetEnumerator();
+        new RecursiveEnumeratorAbstract<T> GetEnumerator();
     }
 
     /// <summary>
@@ -260,21 +261,108 @@ namespace WinCopies.IO
             IProcessParameters CreateNewItem(string name);
         }
 
+        public interface IProcessFactoryProcessInfo
+        {
+            bool UserConfirmationRequired { get; }
+
+            bool CanRun(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths);
+        }
+
+        public interface IDirectProcessFactoryProcessInfo : IProcessFactoryProcessInfo
+        {
+            IProcessParameters GetProcessParameters(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths);
+
+            IProcessParameters TryGetProcessParameters(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths);
+        }
+
+        public interface IRunnableProcessFactoryProcessInfo : IProcessFactoryProcessInfo
+        {
+            bool TryRun(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths, uint count);
+
+            void Run(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths, uint count);
+
+            IProcessParameters GetProcessParameters(uint count);
+
+            IProcessParameters TryGetProcessParameters(uint count);
+        }
+
+        public static class ProcessFactoryProcessInfo
+        {
+            public static Exception GetProcessParametersGenerationException() => new InvalidOperationException("An unknown error occurred during process parameters generation.");
+        }
+
+        public abstract class ProcessFactoryProcessInfo<T> : IProcessFactoryProcessInfo where T : IBrowsableObjectInfo
+        {
+            protected T Path { get; private set; }
+
+            protected ProcessFactoryProcessInfo(in T path) => Path = path;
+
+            public abstract bool UserConfirmationRequired { get; }
+
+            public virtual bool CanRun(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths)
+            {
+                var enumerator = new EmptyCheckEnumerator<IBrowsableObjectInfo>((paths ?? throw GetArgumentNullException(nameof(paths))).GetEnumerator());
+
+                if (enumerator.HasItems)
+                {
+                    var enumerable = new CustomEnumeratorEnumerable<IBrowsableObjectInfo, System.Collections.Generic.IEnumerator<IBrowsableObjectInfo>>(enumerator);
+
+                    foreach (IBrowsableObjectInfo path in enumerable)
+
+                        if (!(path is IShellObjectInfoBase2 shellObjectInfo
+                            && shellObjectInfo.InnerObject.IsFileSystemObject
+                            && shellObjectInfo.Path.Validate(Path.Path, Path.Path.EndsWith(WinCopies.IO.Path.PathSeparator
+#if !CS8
+                                .ToString()
+#endif
+                                ) ? 1 : 0, null, null, 1, "\\")))
+
+                            return false;
+
+                    return true;
+                }
+
+                return false;
+            }
+
+            protected internal virtual void Dispose() => Path = default;
+
+            ~ProcessFactoryProcessInfo() => Dispose();
+        }
+
+        public abstract class DirectProcessFactoryProcessInfo<T> : ProcessFactoryProcessInfo<T>, IDirectProcessFactoryProcessInfo where T : IBrowsableObjectInfo
+        {
+            protected DirectProcessFactoryProcessInfo(in T path) : base(path) { /* Left empty. */ }
+
+            public virtual IProcessParameters GetProcessParameters(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths) => TryGetProcessParameters(paths) ?? throw ProcessFactoryProcessInfo.GetProcessParametersGenerationException();
+
+            public abstract IProcessParameters TryGetProcessParameters(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths);
+        }
+
+        public abstract class RunnableProcessFactoryProcessInfo<T> : ProcessFactoryProcessInfo<T>, IRunnableProcessFactoryProcessInfo where T : IBrowsableObjectInfo
+        {
+            protected RunnableProcessFactoryProcessInfo(in T path) : base(path) { /* Left empty. */ }
+
+            public abstract void Run(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths, uint count);
+
+            public abstract bool TryRun(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths, uint count);
+
+            public virtual IProcessParameters GetProcessParameters(uint count) => TryGetProcessParameters(count) ?? throw ProcessFactoryProcessInfo.GetProcessParametersGenerationException();
+
+            public abstract IProcessParameters TryGetProcessParameters(uint count);
+        }
+
         public interface IProcessFactory : DotNetFix.IDisposable
         {
             IProcessCommands NewItemProcessCommands { get; }
 
-            bool CanCopy(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths);
+            IRunnableProcessFactoryProcessInfo Copy { get; }
 
-            bool TryCopy(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths, uint count);
+            IRunnableProcessFactoryProcessInfo Cut { get; }
 
-            void Copy(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths, uint count);
+            IDirectProcessFactoryProcessInfo Deletion { get; }
 
             bool CanPaste(uint count);
-
-            IProcessParameters GetCopyProcessParameters(uint count);
-
-            IProcessParameters TryGetCopyProcessParameters(uint count);
 
             IProcess GetProcess(ProcessFactorySelectorDictionaryParameters processParameters);
 
@@ -283,25 +371,50 @@ namespace WinCopies.IO
 
         public static class ProcessFactory
         {
+            public static IDirectProcessFactoryProcessInfo DefaultProcessInfo { get; } = new _DefaultProcessFactory.DefaultDirectProcessInfo();
+
+            public static IRunnableProcessFactoryProcessInfo DefaultRunnableProcessFactoryProcessInfo { get; } = new _DefaultProcessFactory.DefaultRunnableProcessFactoryProcessInfo();
+
             private class _DefaultProcessFactory : IProcessFactory
             {
+                internal class DefaultProcessInfo : IProcessFactoryProcessInfo
+                {
+                    bool IProcessFactoryProcessInfo.UserConfirmationRequired => false;
+
+                    bool IProcessFactoryProcessInfo.CanRun(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths) => false;
+                }
+
+                internal class DefaultDirectProcessInfo : DefaultProcessInfo, IDirectProcessFactoryProcessInfo
+                {
+                    IProcessParameters IDirectProcessFactoryProcessInfo.GetProcessParameters(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths) => throw new NotSupportedException();
+
+                    IProcessParameters IDirectProcessFactoryProcessInfo.TryGetProcessParameters(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths) => null;
+                }
+
+                internal class DefaultRunnableProcessFactoryProcessInfo : DefaultProcessInfo, IRunnableProcessFactoryProcessInfo
+                {
+                    IProcessParameters IRunnableProcessFactoryProcessInfo.GetProcessParameters(uint count) => throw new NotSupportedException();
+
+                    IProcessParameters IRunnableProcessFactoryProcessInfo.TryGetProcessParameters(uint count) => null;
+
+                    void IRunnableProcessFactoryProcessInfo.Run(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths, uint count) => throw new NotSupportedException();
+
+                    bool IRunnableProcessFactoryProcessInfo.TryRun(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths, uint count) => false;
+                }
+
                 bool DotNetFix.IDisposable.IsDisposed => false;
 
                 IProcessCommands IProcessFactory.NewItemProcessCommands => null;
 
-                bool IProcessFactory.CanCopy(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths) => false;
+                IRunnableProcessFactoryProcessInfo IProcessFactory.Copy => ProcessFactory.DefaultRunnableProcessFactoryProcessInfo;
+
+                IRunnableProcessFactoryProcessInfo IProcessFactory.Cut => ProcessFactory.DefaultRunnableProcessFactoryProcessInfo;
+
+                IDirectProcessFactoryProcessInfo IProcessFactory.Deletion => ProcessFactory.DefaultProcessInfo;
 
                 bool IProcessFactory.CanPaste(uint count) => false;
 
-                void IProcessFactory.Copy(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths, uint count) => throw new InvalidOperationException();
-
-                IProcessParameters IProcessFactory.GetCopyProcessParameters(uint count) => throw new InvalidOperationException();
-
-                bool IProcessFactory.TryCopy(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths, uint count) => false;
-
-                IProcessParameters IProcessFactory.TryGetCopyProcessParameters(uint count) => null;
-
-                IProcess IProcessFactory.GetProcess(ProcessFactorySelectorDictionaryParameters processParameters) => throw new InvalidOperationException();
+                IProcess IProcessFactory.GetProcess(ProcessFactorySelectorDictionaryParameters processParameters) => throw new NotSupportedException();
 
                 IProcess IProcessFactory.TryGetProcess(ProcessFactorySelectorDictionaryParameters processParameters) => null;
 
@@ -433,11 +546,11 @@ namespace WinCopies.IO
 
     internal class BrowsableObjectInfoCallbackQueue : System.IDisposable
     {
-        private LinkedList<Action<IBrowsableObjectInfo, BrowsableObjectInfoCallbackReason>> _list = new LinkedList<Action<IBrowsableObjectInfo, BrowsableObjectInfoCallbackReason>>();
+        private Collections.DotNetFix.Generic.LinkedList<Action<IBrowsableObjectInfo, BrowsableObjectInfoCallbackReason>> _list = new Collections.DotNetFix.Generic.LinkedList<Action<IBrowsableObjectInfo, BrowsableObjectInfoCallbackReason>>();
 
         public BrowsableObjectInfoCallback Enqueue(in Action<IBrowsableObjectInfo, BrowsableObjectInfoCallbackReason> action)
         {
-            LinkedList<Action<IBrowsableObjectInfo, BrowsableObjectInfoCallbackReason>>.LinkedListNode node = (LinkedList<Action<IBrowsableObjectInfo, BrowsableObjectInfoCallbackReason>>.LinkedListNode)_list.AddLast(action);
+            Collections.DotNetFix.Generic.LinkedList<Action<IBrowsableObjectInfo, BrowsableObjectInfoCallbackReason>>.LinkedListNode node = (Collections.DotNetFix.Generic.LinkedList<Action<IBrowsableObjectInfo, BrowsableObjectInfoCallbackReason>>.LinkedListNode)_list.AddLast(action);
 
             return new BrowsableObjectInfoCallback(() => _list.Remove(node));
         }

@@ -123,6 +123,9 @@
   <data name="Copy" xml:space="preserve">
     <value>Copy</value>
   </data>
+  <data name="Deletion" xml:space="preserve">
+    <value>Deletion</value>
+  </data>
   <data name="DotNetAttribute" xml:space="preserve">
     <value>.Net Attribute</value>
   </data>
@@ -140,6 +143,9 @@
   </data>
   <data name="Extraction" xml:space="preserve">
     <value>Extraction</value>
+  </data>
+  <data name="Move" xml:space="preserve">
+    <value>Move</value>
   </data>
   <data name="PortableDevice" xml:space="preserve">
     <value>Portable Device</value>

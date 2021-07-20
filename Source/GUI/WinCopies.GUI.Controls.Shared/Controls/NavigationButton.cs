@@ -33,15 +33,17 @@ namespace WinCopies.GUI.Controls
 {
     public class CommandSourceControl<T> : Control, ICommandSource<T>
     {
-        public static readonly DependencyProperty CommandProperty = Register<ICommand, CommandSourceControl<T>>(nameof(Command));
+        private static DependencyProperty Register<T>(in string propertyName) => Register<T, CommandSourceControl<T>>(propertyName);
+
+        public static readonly DependencyProperty CommandProperty = Register<ICommand>(nameof(Command));
 
         public ICommand<T> Command { get => (ICommand<T>)GetValue(CommandProperty); set => SetValue(CommandProperty, value); }
 
-        public static readonly DependencyProperty CommandParameterProperty = Register<T, CommandSourceControl<T>>(nameof(CommandParameter));
+        public static readonly DependencyProperty CommandParameterProperty = Register<T>(nameof(CommandParameter));
 
         public T CommandParameter { get => (T)GetValue(CommandParameterProperty); set => SetValue(CommandParameterProperty, value); }
 
-        public static readonly DependencyProperty CommandTargetProperty = Register<IInputElement, CommandSourceControl<T>>(nameof(CommandParameter));
+        public static readonly DependencyProperty CommandTargetProperty = Register<IInputElement>(nameof(CommandParameter));
 
         public IInputElement CommandTarget { get => (IInputElement)GetValue(CommandTargetProperty); set => SetValue(CommandTargetProperty, value); }
 
@@ -70,15 +72,17 @@ namespace WinCopies.GUI.Controls
 
     public class CommandItemsControl<TEnumerable, TCommandParameter> : ItemsControl<TEnumerable>, ICommandSource<TCommandParameter> where TEnumerable : System.Collections.IEnumerable
     {
-        public static readonly DependencyProperty CommandProperty = Register<ICommand, CommandItemsControl<TEnumerable, TCommandParameter>>(nameof(Command));
+        private static DependencyProperty Register<T>(in string propertyName) => Register<T, CommandItemsControl<TEnumerable, TCommandParameter>>(propertyName);
+
+        public static readonly DependencyProperty CommandProperty = Register<ICommand>(nameof(Command));
 
         public ICommand<TCommandParameter> Command { get => (ICommand<TCommandParameter>)GetValue(CommandProperty); set => SetValue(CommandProperty, value); }
 
-        public static readonly DependencyProperty CommandParameterProperty = Register<TCommandParameter, CommandItemsControl<TEnumerable, TCommandParameter>>(nameof(CommandParameter));
+        public static readonly DependencyProperty CommandParameterProperty = Register<TCommandParameter>(nameof(CommandParameter));
 
         public TCommandParameter CommandParameter { get => (TCommandParameter)GetValue(CommandParameterProperty); set => SetValue(CommandParameterProperty, value); }
 
-        public static readonly DependencyProperty CommandTargetProperty = Register<IInputElement, CommandItemsControl<TEnumerable, TCommandParameter>>(nameof(CommandTarget));
+        public static readonly DependencyProperty CommandTargetProperty = Register<IInputElement>(nameof(CommandTarget));
 
         public IInputElement CommandTarget { get => (IInputElement)GetValue(CommandTargetProperty); set => SetValue(CommandTargetProperty, value); }
 
@@ -124,9 +128,9 @@ namespace WinCopies.GUI.Controls
         {
             get => _notifyOnPropertyChanged; set => UtilHelpers.UpdateValue(ref _notifyOnPropertyChanged, value, () =>
 {
-if (value)
+    if (value)
 
-OnPropertyChanged();
+        OnPropertyChanged();
 });
         }
 
@@ -153,11 +157,13 @@ OnPropertyChanged();
 
     public class NavigationButton : CommandItemsControl<IHistoryCollection, object>
     {
-        public static readonly DependencyProperty GoBackButtonStyleProperty = Register<Style, NavigationButton>(nameof(GoBackButtonStyle));
+        private static DependencyProperty Register(in string propertyName) => Register<Style, NavigationButton>(propertyName);
+
+        public static readonly DependencyProperty GoBackButtonStyleProperty = Register(nameof(GoBackButtonStyle));
 
         public Style GoBackButtonStyle { get => (Style)GetValue(GoBackButtonStyleProperty); set => SetValue(GoBackButtonStyleProperty, value); }
 
-        public static readonly DependencyProperty GoForwardButtonStyleProperty = Register<Style, NavigationButton>(nameof(GoForwardButtonStyle));
+        public static readonly DependencyProperty GoForwardButtonStyleProperty = Register(nameof(GoForwardButtonStyle));
 
         public Style GoForwardButtonStyle { get => (Style)GetValue(GoForwardButtonStyleProperty); set => SetValue(GoForwardButtonStyleProperty, value); }
 

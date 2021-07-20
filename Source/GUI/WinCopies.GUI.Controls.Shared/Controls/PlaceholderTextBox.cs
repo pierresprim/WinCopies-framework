@@ -15,27 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-//using System;
-//using System.Collections;
-//using System.ComponentModel;
-//using System.Drawing;
 using System.Windows;
 using System.Windows.Controls;
-using WinCopies.GUI.Controls.Models;
-//using System.Windows.Automation.Peers;
-//using System.Windows.Controls;
-//using System.Windows.Controls.Primitives;
-//using System.Windows.Documents;
-//using System.Windows.Input;
-//using System.Windows.Markup;
 
-using static WinCopies.
-#if WinCopies3
-    UtilHelpers
-#else
-    Util.Util
-#endif
-    ;
+using WinCopies.GUI.Controls.Models;
 
 namespace WinCopies.GUI.Controls
 {

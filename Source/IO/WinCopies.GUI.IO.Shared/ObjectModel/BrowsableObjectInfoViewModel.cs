@@ -235,7 +235,7 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)ModelGeneric).GetEnumerator();
 
-        public RecursiveEnumerator<IBrowsableObjectInfo> GetEnumerator() => ModelGeneric.GetEnumerator();
+        public RecursiveEnumeratorAbstract<IBrowsableObjectInfo> GetEnumerator() => ModelGeneric.GetEnumerator();
 
         public IEnumerator<Collections.Generic.IRecursiveEnumerable<IBrowsableObjectInfo>> GetRecursiveEnumerator() => ModelGeneric.GetRecursiveEnumerator();
 

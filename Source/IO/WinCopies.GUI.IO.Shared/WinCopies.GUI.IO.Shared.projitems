@@ -12,7 +12,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)AssemblyInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\ExplorerControlPropertyGrid.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\Process\ProcessErrorItemControl.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Controls\Process\ProcessWindow.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\Process\ProcessManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\BrowsableObjectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\BrowsableObjectInfoViewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ArchiveCompressionProcessInfo.cs" />
@@ -43,10 +43,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\IExplorerControlBrowsableObjectInfoViewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\Collections\PathCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PathInfo.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Process\ObjectModel\Deletion.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ObjectModel\DuplicateFinding.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Process\ObjectModel\MoveToDifferentDrive.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Process\ObjectModel\MoveToSameDrive.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ObjectModel\PathToPathProcess.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ObjectModel\Process.old.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\Process\ProcessControl.cs" />

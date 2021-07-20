@@ -23,8 +23,14 @@ along with the WinCopies Framework.  If not, see<https://www.gnu.org/licenses/>.
         xmlns:local="clr-namespace:WinCopies.GUI.Samples"
         xmlns:controls="clr-namespace:WinCopies.GUI.Controls;assembly=WinCopies.GUI"
         xmlns:util="clr-namespace:WinCopies;assembly=WinCopies.Util.Desktop"
+        xmlns:commands="clr-namespace:WinCopies.Commands;assembly=WinCopies.Util.Desktop"
+        xmlns:io="clr-namespace:WinCopies.GUI.IO.ObjectModel;assembly=WinCopies.GUI.IO"
         mc:Ignorable="d"
         Title="ExplorerControlTest" Height="450" Width="800">
+    <Window.CommandBindings>
+        <CommandBinding Command="{x:Static commands:ApplicationCommands.NewTab}" CanExecute="Command_CanExecute" Executed="NewTab_Executed" />
+        <CommandBinding Command="{x:Static commands:ApplicationCommands.CloseTab}" CanExecute="CloseTab_CanExecute" Executed="CloseTab_Executed" />
+    </Window.CommandBindings>
     <DockPanel>
         <StackPanel DockPanel.Dock="Top">
             <Menu>
@@ -38,9 +44,14 @@ along with the WinCopies Framework.  If not, see<https://www.gnu.org/licenses/>.
                             <Setter Property="CommandTarget" Value="{Binding CommandTarget}" />
                         </Style>
                 </Menu.Resources>
+                <MenuItem Header="File">
+                    <MenuItem Header="New tab" Command="{x:Static commands:ApplicationCommands.NewTab}" />
+                </MenuItem>
                 <MenuItem Header="_Edit">
                     <MenuItem Header="Copy" Command="Copy" />
+                    <MenuItem Header="Cut" Command="Cut" />
                     <MenuItem Header="Paste" Command="Paste" />
+                    <MenuItem Header="Delete" Command="Delete" />
                 </MenuItem>
                 <MenuItem Header="Open _with" ItemsSource="{Binding SelectedItem.BrowsabilityPaths, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ExplorerControlTest}}}" ItemContainerStyle="{StaticResource MenuItemItemContainerStyle}" />
                 <MenuItem Header="_Tools" ItemsSource="{Binding SelectedItem.CustomProcesses, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ExplorerControlTest}}}" ItemContainerStyle="{StaticResource MenuItemItemContainerStyle}" />
@@ -54,11 +65,15 @@ along with the WinCopies Framework.  If not, see<https://www.gnu.org/licenses/>.
         <TabControl ItemsSource="{Binding Items}" SelectedItem="{Binding SelectedItem, Mode=OneWayToSource}">
             <TabControl.ItemContainerStyle>
                 <Style TargetType="{x:Type TabItem}">
-                    <Setter Property="Header" Value="{Binding Path.Name}" />
+                    <Setter Property="Header" Value="{Binding}" />
                     <Setter Property="HeaderTemplate">
                         <Setter.Value>
-                            <DataTemplate>
-                                <controls:Label Content="{Binding}" RecognizesAccessKey="False" />
+                            <DataTemplate DataType="{x:Type io:IExplorerControlBrowsableObjectInfoViewModel}">
+                                <DockPanel>
+                                    <Image DockPanel.Dock="Left" Source="{Binding Path.BitmapSources.MediumBitmapSource}" Height="32" Width="32" />
+                                    <controls:Label Content="{Binding Path.Name}" RecognizesAccessKey="False" VerticalContentAlignment="Center" />
+                                    <Button DockPanel.Dock="Right" Content="X" Command="{x:Static commands:ApplicationCommands.CloseTab}" CommandParameter="{Binding}" Height="20" Width="20" />
+                                </DockPanel>
                             </DataTemplate>
                         </Setter.Value>
                     </Setter>

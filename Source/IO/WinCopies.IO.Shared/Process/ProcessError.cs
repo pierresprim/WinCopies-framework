@@ -96,6 +96,16 @@ namespace WinCopies.IO.Process
         /// </summary>
         DiskError = 15,
 
-        EncryptionFailed = 16
+        EncryptionFailed = 16,
+
+        DirectoryNotEmpty=17,
+
+        ItemIsNotDirectory=18,
+
+        SharingViolation=19,
+
+        FileReadOnly=20,
+
+        AccessDenied=21
     }
 }

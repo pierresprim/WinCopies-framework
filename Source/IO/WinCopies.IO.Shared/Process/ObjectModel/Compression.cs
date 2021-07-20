@@ -19,11 +19,11 @@ using Microsoft.WindowsAPICodePack.Win32Native;
 
 using SevenZip;
 
+using System;
 using System.Collections.Generic;
 
 using WinCopies.Collections.DotNetFix.Generic;
 using WinCopies.Collections.Generic;
-using WinCopies.Util.Commands;
 using WinCopies.Util.Commands.Primitives;
 
 namespace WinCopies.IO.Process
@@ -48,7 +48,7 @@ namespace WinCopies.IO.Process
                                       // , ProcessSimulationParameters
                                       // #endif
                                       // >
-           ArchiveProcess<T> where T : ProcessTypes<IPathInfo>.ProcessErrorTypes<ProcessError, object>.IProcessErrorFactories
+           ArchiveProcess<T> where T : ProcessErrorTypes<IPathInfo, ProcessError, object>.IProcessErrorFactories
         {
             public override IReadOnlyDictionary<string, ICommand<IProcessErrorItem<IPathInfo, ProcessError, object>>> Actions => null;
 
@@ -59,6 +59,16 @@ namespace WinCopies.IO.Process
             public override string Name => Properties.Resources.Compression;
 
             public Compression(in IEnumerableQueue<IPathInfo> initialPaths, in IPathInfo sourcePath, in IPathInfo destinationPath, in ProcessTypes<IPathInfo>.IProcessQueue paths, in IProcessLinkedList<IPathInfo, ProcessError, ProcessTypes<IPathInfo, ProcessError, object>.ProcessErrorItem, object> errorsQueue, in ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessDelegates<ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessEventDelegates> progressDelegate, T factory, in SevenZipCompressor archiveCompressor) : base(initialPaths, sourcePath, destinationPath, paths, errorsQueue, progressDelegate, factory) => ArchiveCompressor = archiveCompressor;
+
+            protected override IRecursiveEnumerable<IPathInfo> GetEnumerable(in IPathInfo path) => throw new NotSupportedException();
+
+            protected override bool OnPathLoaded(in IPathInfo path) => throw new NotSupportedException();
+
+            protected override RecursiveEnumerationOrder GetRecursiveEnumerationOrder() => throw new NotSupportedException();
+
+            protected override Predicate<IPathInfo> GetAddAsDuplicatePredicate() => throw new NotSupportedException();
+
+            protected override void GetPathsLoadingErrorParameters(in ProcessError error, in string message, in ErrorCode errorCode, out IProcessError<ProcessError, object> _error, out bool clearOnError) => throw new NotSupportedException();
 
             protected override bool LoadPathsOverride(out IProcessError<ProcessError, object> error, out bool clearOnError)
             {
@@ -161,6 +171,8 @@ namespace WinCopies.IO.Process
             private void ArchiveCompressor_FileCompressionFinished(object sender, System.EventArgs e) => _ = OnFileProcessCompleted();
 
             protected override void ResetStatus() { /* Left empty. */ }
+
+            protected override IPathInfo Convert(in IPathInfo path) => path;
         }
     }
 }

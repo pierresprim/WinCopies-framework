@@ -39,6 +39,7 @@
                     <MenuItem Command="{x:Static commands:TextCommands.FirstCharUpper}" />
                     <MenuItem Command="{x:Static commands:TextCommands.FirstCharOfEachWordUpper}" />
                 </MenuItem>
+                <MenuItem Command="{x:Static commands:TextCommands.Reverse}" />
             </ContextMenu>
             <!--Colors-->
             <SolidColorBrush x:Key="TextBox.Static.Border" Color="#FFABAdB3"/>
@@ -547,7 +548,7 @@
         </Setter>
     </Style>
 
-    <DataTemplate DataType="{x:Type local:ITextBoxModel2}" x:Shared="false">
+    <DataTemplate DataType="{x:Type local:ITextBoxModel2}">
         <TextBox>
             <TextBox.Style>
                 <util:MergedStyles>
@@ -565,7 +566,7 @@
         </TextBox>
     </DataTemplate>
 
-    <DataTemplate DataType="{x:Type local:IButtonTextBoxModel2}" x:Shared="false">
+    <DataTemplate DataType="{x:Type local:IButtonTextBoxModel2}">
         <TextBox>
             <TextBox.Style>
                 <util:MergedStyles>
@@ -584,7 +585,7 @@
         </TextBox>
     </DataTemplate>
 
-    <DataTemplate DataType="{x:Type local:IPlaceholderTextBoxModel2}" x:Shared="false">
+    <DataTemplate DataType="{x:Type local:IPlaceholderTextBoxModel2}">
         <TextBox>
             <TextBox.Style>
                 <util:MergedStyles>

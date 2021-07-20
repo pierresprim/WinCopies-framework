@@ -401,23 +401,19 @@ namespace WinCopies.IO.ObjectModel
 
             public IProcessCommands NewItemProcessCommands { get; }
 
-            public _ProcessFactory(in IRegistryItemInfo registryItemInfo) => NewItemProcessCommands = new _NewItemProcessCommands(registryItemInfo);
+            IRunnableProcessFactoryProcessInfo IProcessFactory.Copy => Process.ProcessFactory.DefaultRunnableProcessFactoryProcessInfo;
 
-            bool IProcessFactory.CanPaste(uint count) => false;
+            IRunnableProcessFactoryProcessInfo IProcessFactory.Cut => Process.ProcessFactory.DefaultRunnableProcessFactoryProcessInfo;
+
+            IDirectProcessFactoryProcessInfo IProcessFactory.Deletion => Process.ProcessFactory.DefaultProcessInfo;
+
+            public _ProcessFactory(in IRegistryItemInfo registryItemInfo) => NewItemProcessCommands = new _NewItemProcessCommands(registryItemInfo);
 
             IProcess IProcessFactory.GetProcess(ProcessFactorySelectorDictionaryParameters processParameters) => throw new NotSupportedException();
 
             IProcess IProcessFactory.TryGetProcess(ProcessFactorySelectorDictionaryParameters processParameters) => null;
 
-            bool IProcessFactory.CanCopy(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths) => false;
-
-            bool IProcessFactory.TryCopy(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths, uint count) => false;
-
-            void IProcessFactory.Copy(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths, uint count) => throw new NotSupportedException();
-
-            IProcessParameters IProcessFactory.GetCopyProcessParameters(uint count) => throw new NotSupportedException();
-
-            IProcessParameters IProcessFactory.TryGetCopyProcessParameters(uint count) => null;
+            bool IProcessFactory.CanPaste(uint count) => false;
 
             protected virtual void Dispose(bool disposing) => IsDisposed = true;
 
