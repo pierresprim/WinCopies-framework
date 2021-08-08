@@ -24,6 +24,7 @@ using WinCopies.Collections.Generic;
 using WinCopies.IO.AbstractionInterop;
 using WinCopies.IO.ObjectModel;
 using WinCopies.Util;
+
 using static WinCopies.ThrowHelper;
 
 namespace WinCopies.IO.Enumeration

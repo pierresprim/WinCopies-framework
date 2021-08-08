@@ -265,6 +265,8 @@ namespace WinCopies.IO
         {
             bool UserConfirmationRequired { get; }
 
+            string GetUserConfirmationText();
+
             bool CanRun(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths);
         }
 
@@ -298,6 +300,8 @@ namespace WinCopies.IO
             protected ProcessFactoryProcessInfo(in T path) => Path = path;
 
             public abstract bool UserConfirmationRequired { get; }
+
+            public abstract string GetUserConfirmationText();
 
             public virtual bool CanRun(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths)
             {
@@ -360,6 +364,8 @@ namespace WinCopies.IO
 
             IRunnableProcessFactoryProcessInfo Cut { get; }
 
+            IDirectProcessFactoryProcessInfo Recycling { get; }
+
             IDirectProcessFactoryProcessInfo Deletion { get; }
 
             bool CanPaste(uint count);
@@ -380,6 +386,8 @@ namespace WinCopies.IO
                 internal class DefaultProcessInfo : IProcessFactoryProcessInfo
                 {
                     bool IProcessFactoryProcessInfo.UserConfirmationRequired => false;
+
+                    string IProcessFactoryProcessInfo.GetUserConfirmationText() => null;
 
                     bool IProcessFactoryProcessInfo.CanRun(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths) => false;
                 }
@@ -409,6 +417,8 @@ namespace WinCopies.IO
                 IRunnableProcessFactoryProcessInfo IProcessFactory.Copy => ProcessFactory.DefaultRunnableProcessFactoryProcessInfo;
 
                 IRunnableProcessFactoryProcessInfo IProcessFactory.Cut => ProcessFactory.DefaultRunnableProcessFactoryProcessInfo;
+
+                IDirectProcessFactoryProcessInfo IProcessFactory.Recycling => ProcessFactory.DefaultProcessInfo;
 
                 IDirectProcessFactoryProcessInfo IProcessFactory.Deletion => ProcessFactory.DefaultProcessInfo;
 

@@ -159,6 +159,12 @@
   <data name="RegistryValue" xml:space="preserve">
     <value>Registry Value</value>
   </data>
+  <data name="UserConfirmationText" xml:space="preserve">
+    <value>Are you sure you want to {0} the selected files?</value>
+  </data>
+  <data name="UserConfirmationTextCurrentPath" xml:space="preserve">
+    <value>Are you sure you want to {0} the current path?</value>
+  </data>
   <data name="WMIClass" xml:space="preserve">
     <value>WMI Class</value>
   </data>

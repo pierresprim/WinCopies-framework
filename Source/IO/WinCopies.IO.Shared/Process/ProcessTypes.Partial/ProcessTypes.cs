@@ -41,9 +41,19 @@ namespace WinCopies.IO.Process
     {
         public class ProcessErrorFactoryBase : IProcessErrorFactoryBase<TError, TAction>
         {
+            public IProcessError<TError, TAction> GetError(TError error) => new ProcessError<TError, TAction>(error);
+
+            public IProcessError<TError, TAction> GetError(TError error, ErrorCode errorCode) => new ProcessError<TError, TAction>(error, errorCode);
+
+            public IProcessError<TError, TAction> GetError(TError error, HResult hResult) => new ProcessError<TError, TAction>(error, hResult);
+
+            public IProcessError<TError, TAction> GetError(TError error, Exception exception) => new ProcessError<TError, TAction>(error, exception);
+
             public IProcessError<TError, TAction> GetError(TError error, Exception exception, ErrorCode errorCode) => new ProcessError<TError, TAction>(error, exception, errorCode);
 
             public IProcessError<TError, TAction> GetError(TError error, Exception exception, HResult hResult) => new ProcessError<TError, TAction>(error, exception, hResult);
+
+            public IProcessError<TError, TAction> GetError(TError error, string message) => new ProcessError<TError, TAction>(error, message);
 
             public IProcessError<TError, TAction> GetError(TError error, string message, ErrorCode errorCode) => new ProcessError<TError, TAction>(error, message, errorCode);
 
@@ -55,9 +65,19 @@ namespace WinCopies.IO.Process
             #region IProcessErrorFactoryBase Support
             private static TError GetError(in object error, in string argumentName) => error is TError _error ? _error : throw GetInvalidTypeArgumentException(argumentName);
 
+            IProcessError IProcessErrorFactoryBase.GetError(object error) => GetError(GetError(error, nameof(error)));
+
+            IProcessError IProcessErrorFactoryBase.GetError(object error, ErrorCode errorCode) => GetError(GetError(error, nameof(error)), errorCode);
+
+            IProcessError IProcessErrorFactoryBase.GetError(object error, HResult hResult) => GetError(GetError(error, nameof(error)), hResult);
+
+            IProcessError IProcessErrorFactoryBase.GetError(object error, Exception exception) => GetError(GetError(error, nameof(error)), exception);
+
             IProcessError IProcessErrorFactoryBase.GetError(object error, Exception exception, ErrorCode errorCode) => GetError(GetError(error, nameof(error)), exception, errorCode);
 
             IProcessError IProcessErrorFactoryBase.GetError(object error, Exception exception, HResult hResult) => GetError(GetError(error, nameof(error)), exception, hResult);
+
+            IProcessError IProcessErrorFactoryBase.GetError(object error, string message) => GetError(GetError(error, nameof(error)), message);
 
             IProcessError IProcessErrorFactoryBase.GetError(object error, string message, ErrorCode errorCode) => GetError(GetError(error, nameof(error)), message, errorCode);
 
@@ -112,7 +132,7 @@ namespace WinCopies.IO.Process
 
         public ProcessError UnknownError => ProcessError.UnknownError;
 
-        public ProcessError CancelledByUserError => ProcessError.CancelledByUser;
+        public ProcessError CancelledByUserError => ProcessError.CanceledByUser;
 
         public ProcessError WrongStatusError => ProcessError.WrongStatus;
 

@@ -17,15 +17,17 @@
 
 using System;
 
+using WinCopies.IO.Process.ObjectModel;
+
 namespace WinCopies.IO.Process
 {
-    public class ProcessOptions<T>
+    public class ProcessOptionsBase<T>
     {
         public Predicate<T> PathLoadedDelegate { get; }
 
         public bool ClearOnError { get; }
 
-        public ProcessOptions(in Predicate<T> pathLoadedDelegate, in bool clearOnError)
+        public ProcessOptionsBase(in Predicate<T> pathLoadedDelegate, in bool clearOnError)
         {
             PathLoadedDelegate = pathLoadedDelegate;
 
@@ -33,31 +35,52 @@ namespace WinCopies.IO.Process
         }
     }
 
-    public class CopyProcessOptions<T> : ProcessOptions<T>
+    public class ProcessOptionsCommon<T> : ProcessOptionsBase<T>
     {
+        private IProcess _process;
+
+        public IProcess Process { get => _process; internal set => _process = _process == null ? value : throw new InvalidOperationException("Another process is already registered."); }
+
+        public ProcessOptionsCommon(in Predicate<T> pathsLoadedDelegate, in bool clearOnError) : base(pathsLoadedDelegate, clearOnError)
+        {
+            // Left empty.
+        }
+
+        protected virtual bool UpdateValue<TValue>(ref TValue value, in TValue newValue) => Process.Status == ProcessStatus.Running
+                ? throw new InvalidOperationException("The associated process is running.")
+                : Temp.Temp.UpdateValue(ref value, newValue);
+
+        internal void Dispose() => Process = default;
+    }
+
+    public class CopyOptions<T> : ProcessOptionsCommon<T>
+    {
+        private bool _autoRenameFiles;
         private int _bufferLength;
+        private bool _ignoreFolderFileNameConflicts;
 
         /// <summary>
         /// Gets a value that indicates whether files are automatically renamed when they conflict with existing paths.
         /// </summary>
-        public bool AutoRenameFiles { get; set; }
+        public bool AutoRenameFiles { get => _autoRenameFiles; set => UpdateValue(ref _autoRenameFiles, value); }
 
-        public int BufferLength
-        {
-            get => _bufferLength;
+        public int BufferLength { get => _bufferLength; set => UpdateValue(ref _bufferLength, value < 0 ? throw new ArgumentOutOfRangeException(nameof(value), $"{nameof(value)} cannot be less than zero.") : value); }
 
-            set
-            {
-                if (value < 0 ? throw new ArgumentOutOfRangeException(nameof(value), $"{nameof(value)} cannot be less than zero.") : value != _bufferLength)
-
-                    _bufferLength = value;
-            }
-        }
-
-        public bool IgnoreFolderFileNameConflicts { get; set; }
+        public bool IgnoreFolderFileNameConflicts { get => _ignoreFolderFileNameConflicts; set => UpdateValue(ref _ignoreFolderFileNameConflicts, value); }
 
         public bool Move { get; }
 
-        public CopyProcessOptions(in Predicate<T> pathLoadedDelegate, in bool clearOnError, in bool move = false) : base(pathLoadedDelegate, clearOnError) => Move = move;
+        public CopyOptions(in Predicate<T> pathLoadedDelegate, in bool clearOnError, in bool move = false) : base(pathLoadedDelegate, clearOnError) => Move = move;
+
+        public static CopyOptions<T> GetInstance(in Predicate<T> pathLoadedDelegate, in bool clearOnError, in bool move = false) => new CopyOptions<T>(pathLoadedDelegate, clearOnError, move);
+    }
+
+    public class DeletionOptions<T> : ProcessOptionsCommon<T>
+    {
+        public bool Recycle { get; }
+
+        public DeletionOptions(in Predicate<T> pathLoadedDelegate, in bool clearOnError, in bool recycle = true) : base(pathLoadedDelegate, clearOnError) => Recycle = recycle;
+
+        public static DeletionOptions<T> GetInstance(in Predicate<T> pathLoadedDelegate, in bool clearOnError, in bool recycle = false) => new DeletionOptions<T>(pathLoadedDelegate, clearOnError, recycle);
     }
 }

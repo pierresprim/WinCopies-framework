@@ -45,6 +45,10 @@ namespace WinCopies.IO.Process
         public static IProcessError GetNoErrorError(this IProcessErrorFactory factory) => factory.GetError(factory.NoError, ExceptionMessages.NoError, ErrorCode.NoError);
 
         public static IProcessError<T, TAction> GetNoErrorError<T, TAction>(this IProcessErrorFactory<T, TAction> factory) => factory.GetError(factory.NoError, ExceptionMessages.NoError, ErrorCode.NoError);
+
+        public static IProcessError GetUnknownError<T, TAction>(this IProcessErrorFactory factory) => factory.GetError(factory.UnknownError, ExceptionMessages.UnknownError, HResult.Fail);
+
+        public static IProcessError<T, TAction> GetUnknownError<T, TAction>(this IProcessErrorFactory<T, TAction> factory) => factory.GetError(factory.UnknownError, ExceptionMessages.UnknownError, HResult.Fail);
 #endif
     }
 
@@ -64,15 +68,19 @@ namespace WinCopies.IO.Process
 
         public HResult? HResult { get; }
 
-        private ProcessError(in TError error) => Error = error;
+        public ProcessError(in TError error) => Error = error;
 
-        private ProcessError(in TError error, in Exception exception) : this(error) => Exception = exception;
+        public ProcessError(in TError error, in Exception exception) : this(error) => Exception = exception;
+
+        public ProcessError(in TError error, in ErrorCode errorCode) : this(error) => ErrorCode = errorCode;
+
+        public ProcessError(in TError error, in HResult hResult) : this(error) => HResult = hResult;
 
         public ProcessError(in TError error, in Exception exception, in ErrorCode errorCode) : this(error, exception) => ErrorCode = errorCode;
 
         public ProcessError(in TError error, in Exception exception, in HResult hResult) : this(error, exception) => HResult = hResult;
 
-        private ProcessError(in TError error, in string message) : this(error) => _message = message;
+        public ProcessError(in TError error, in string message) : this(error) => _message = message;
 
         public ProcessError(in TError error, in string message, in ErrorCode errorCode) : this(error, message) => ErrorCode = errorCode;
 
@@ -124,9 +132,19 @@ namespace WinCopies.IO.Process
 
     public interface IProcessErrorFactoryBase
     {
+        IProcessError GetError(object error);
+
+        IProcessError GetError(object error, ErrorCode errorCode);
+
+        IProcessError GetError(object error, HResult hResult);
+
+        IProcessError GetError(object error, Exception exception);
+
         IProcessError GetError(object error, Exception exception, ErrorCode errorCode);
 
         IProcessError GetError(object error, Exception exception, HResult hResult);
+
+        IProcessError GetError(object error, string message);
 
         IProcessError GetError(object error, string message, ErrorCode errorCode);
 
@@ -135,9 +153,19 @@ namespace WinCopies.IO.Process
 
     public interface IProcessErrorFactoryBase<T, TAction> : IProcessErrorFactoryBase
     {
+        IProcessError<T, TAction> GetError(T error);
+
+        IProcessError<T, TAction> GetError(T error, ErrorCode errorCode);
+
+        IProcessError<T, TAction> GetError(T error, HResult hResult);
+
+        IProcessError<T, TAction> GetError(T error, Exception exception);
+
         IProcessError<T, TAction> GetError(T error, Exception exception, ErrorCode errorCode);
 
         IProcessError<T, TAction> GetError(T error, Exception exception, HResult hResult);
+
+        IProcessError<T, TAction> GetError(T error, string message);
 
         IProcessError<T, TAction> GetError(T error, string message, ErrorCode errorCode);
 
@@ -146,9 +174,19 @@ namespace WinCopies.IO.Process
 #if CS8
         private static T GetError(in object error, in string argumentName) => error is T _error ? _error : throw GetInvalidTypeArgumentException(argumentName);
 
+        IProcessError IProcessErrorFactoryBase.GetError(object error) => GetError(GetError(error, nameof(error)));
+
+        IProcessError IProcessErrorFactoryBase.GetError(object error, ErrorCode errorCode) => GetError(GetError(error, nameof(error)), errorCode);
+
+        IProcessError IProcessErrorFactoryBase.GetError(object error, HResult hResult) => GetError(GetError(error, nameof(error)), hResult);
+
+        IProcessError IProcessErrorFactoryBase.GetError(object error, Exception exception) => GetError(GetError(error, nameof(error)), exception);
+
         IProcessError IProcessErrorFactoryBase.GetError(object error, Exception exception, ErrorCode errorCode) => GetError(GetError(error, nameof(error)), exception, errorCode);
 
         IProcessError IProcessErrorFactoryBase.GetError(object error, Exception exception, HResult hResult) => GetError(GetError(error, nameof(error)), exception, hResult);
+
+        IProcessError IProcessErrorFactoryBase.GetError(object error, string message) => GetError(GetError(error, nameof(error)), message);
 
         IProcessError IProcessErrorFactoryBase.GetError(object error, string message, ErrorCode errorCode) => GetError(GetError(error, nameof(error)), message, errorCode);
 
@@ -160,6 +198,8 @@ namespace WinCopies.IO.Process
     {
 #if CS8
         IProcessError GetNoErrorError() => GetError(NoError, ExceptionMessages.NoError, ErrorCode.NoError);
+
+        IProcessError GetUnknownError() => GetError(UnknownError, ExceptionMessages.UnknownError, HResult.Fail);
 #endif
     }
 
@@ -167,6 +207,8 @@ namespace WinCopies.IO.Process
     {
 #if CS8
         new IProcessError<T, TAction> GetNoErrorError() => GetError(NoError, ExceptionMessages.NoError, ErrorCode.NoError);
+
+        new IProcessError<T, TAction> GetUnknownError() => GetError(UnknownError, ExceptionMessages.UnknownError, HResult.Fail);
 #endif
     }
 }

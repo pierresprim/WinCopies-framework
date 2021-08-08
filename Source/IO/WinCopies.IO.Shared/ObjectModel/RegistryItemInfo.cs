@@ -405,6 +405,8 @@ namespace WinCopies.IO.ObjectModel
 
             IRunnableProcessFactoryProcessInfo IProcessFactory.Cut => Process.ProcessFactory.DefaultRunnableProcessFactoryProcessInfo;
 
+            IDirectProcessFactoryProcessInfo IProcessFactory.Recycling => Process.ProcessFactory.DefaultProcessInfo;
+
             IDirectProcessFactoryProcessInfo IProcessFactory.Deletion => Process.ProcessFactory.DefaultProcessInfo;
 
             public _ProcessFactory(in IRegistryItemInfo registryItemInfo) => NewItemProcessCommands = new _NewItemProcessCommands(registryItemInfo);

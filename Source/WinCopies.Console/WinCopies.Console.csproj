@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netcoreapp3.0;netcoreapp3.1;net5.0-windows;net472;net48</TargetFrameworks>
+    <TargetPlatformIdentifier>windows</TargetPlatformIdentifier>
+  </PropertyGroup>
+
+  <ItemGroup Condition="!$(DefineConstants.Contains('CS8'))">
+    <PackageReference Include="System.Collections.Immutable" Version="1.36" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WinCopies.Util" Version="3.11-preview" />
+    <PackageReference Include="WinCopies.Collections" Version="3.11-preview" />
+    <PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="3.3.0-preview" />
+    <PackageReference Include="WinCopies.WindowsAPICodePack.Win32Native" Version="3.3.0-preview" />
+    <PackageReference Include="Squid-Box.SevenZipSharp" Version="1.2.231" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\IO\WinCopies.IO\WinCopies.IO.csproj" />
+    <ProjectReference Include="..\WinCopies.Util.Temp\WinCopies.Util.Temp.csproj" />
+  </ItemGroup>
+
+  <Import Project="..\WinCopies.Console.Shared\WinCopies.Console.Shared.projitems" Label="Shared" />
+
+</Project>

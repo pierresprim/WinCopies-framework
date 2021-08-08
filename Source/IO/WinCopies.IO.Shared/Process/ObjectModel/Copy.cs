@@ -103,9 +103,9 @@ namespace WinCopies.IO.Process
 
             Reset();
 
-            GC.SuppressFinalize(this);
-
             IsDisposed = true;
+
+            GC.SuppressFinalize(this);
         }
 
         ~CopyProgressRoutineStruct() => Dispose();
@@ -114,8 +114,9 @@ namespace WinCopies.IO.Process
     namespace ObjectModel
     {
         [ProcessGuid(Guids.Process.Shell.Copy)]
-        public class Copy<T> : ProcessObjectModelTypes<IPathInfo, IPathInfo, T, ProcessError, CopyErrorAction, ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessDelegates<ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessEventDelegates>, ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessEventDelegates, IProcessProgressDelegateParameter>.DefaultDestinationProcess where T : ProcessErrorTypes<IPathInfo, ProcessError, CopyErrorAction>.IProcessErrorFactories
+        public class Copy<T> : ProcessObjectModelTypes<IPathInfo, IPathInfo, T, ProcessError, CopyErrorAction, ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessDelegates<ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessEventDelegates>, ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessEventDelegates, IProcessProgressDelegateParameter>.DefaultProcesses<CopyOptions<IPathInfo>>.DefaultDestinationProcess2 where T : ProcessErrorTypes<IPathInfo, ProcessError, CopyErrorAction>.IProcessErrorFactories
         {
+            #region Types
             private class Dictionary : Dictionary<string, ICommand<IProcessErrorItem<IPathInfo, ProcessError, CopyErrorAction>>>
             {
                 public static IReadOnlyDictionary<string, ICommand<IProcessErrorItem<IPathInfo, ProcessError, CopyErrorAction>>> Instance { get; } = new Dictionary();
@@ -149,6 +150,7 @@ namespace WinCopies.IO.Process
                     NewPath = newPath;
                 }
             }
+            #endregion Types
 
             private CopyProgressRoutineStruct<IPathInfo> _copyProgressRoutineStruct;
             private FileDoWork _fileDoWork;
@@ -161,14 +163,15 @@ namespace WinCopies.IO.Process
 
             public override IReadOnlyDictionary<string, ICommand<IProcessErrorItem<IPathInfo, ProcessError, CopyErrorAction>>> Actions => Dictionary.Instance;
 
-            protected CopyProcessOptions<IPathInfo> Options { get; }
-
             protected NewPathStruct NewPath { get; set; }
             #endregion Properties
 
             protected delegate bool FileDoWork(IPathInfo path, string destPath, uint flags);
 
-            public Copy(in IEnumerableQueue<IPathInfo> initialPaths, in IPathInfo sourcePath, in IPathInfo destinationPath, in ProcessTypes<IPathInfo>.IProcessQueue paths, in IProcessLinkedList<IPathInfo, ProcessError, ProcessTypes<IPathInfo, ProcessError, CopyErrorAction>.ProcessErrorItem, CopyErrorAction> errorsQueue, in ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessDelegates<ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessEventDelegates> progressDelegate, in CopyProcessOptions<IPathInfo> processOptions, T factory) : base(initialPaths, sourcePath, destinationPath.IsDirectory ? destinationPath : throw new ArgumentException($"{nameof(destinationPath)} must be a directory."), paths, errorsQueue, progressDelegate, factory) => Options = processOptions ?? throw GetArgumentNullException(nameof(processOptions));
+            public Copy(in IEnumerableQueue<IPathInfo> initialPaths, in IPathInfo sourcePath, in IPathInfo destinationPath, in ProcessTypes<IPathInfo>.IProcessQueue paths, in IProcessLinkedList<IPathInfo, ProcessError, ProcessTypes<IPathInfo, ProcessError, CopyErrorAction>.ProcessErrorItem, CopyErrorAction> errorsQueue, in ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessDelegates<ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessEventDelegates> progressDelegate, in CopyOptions<IPathInfo> processOptions, T factory) : base(initialPaths, sourcePath, destinationPath.IsDirectory ? destinationPath : throw new ArgumentException($"{nameof(destinationPath)} must be a directory."), paths, errorsQueue, progressDelegate, factory, processOptions)
+            {
+                // Left empty.
+            }
 
             #region Methods
             protected override IPathInfo Convert(in IPathInfo path) => path;
@@ -199,7 +202,10 @@ namespace WinCopies.IO.Process
                 {
                     _copyProgressRoutineStruct = new CopyProgressRoutineStruct<IPathInfo>();
 
-                    bool createDirectory(in string destPath) => Shell.CreateDirectoryW(destPath, IntPtr.Zero);
+#if CS8
+                    static
+#endif
+                        bool createDirectory(in string destPath) => Shell.CreateDirectoryW(destPath, IntPtr.Zero);
 
                     if (Options.Move)
                     {
@@ -598,6 +604,13 @@ namespace WinCopies.IO.Process
 
                 _fileDoWork = null;
                 _directoryDoWork = null;
+            }
+
+            protected override void DisposeUnmanaged()
+            {
+                Options.Dispose();
+
+                base.DisposeUnmanaged();
             }
             #endregion Methods
         }

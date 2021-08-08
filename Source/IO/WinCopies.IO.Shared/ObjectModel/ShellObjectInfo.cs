@@ -23,6 +23,7 @@ using System;
 using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Media.Imaging;
 
@@ -88,17 +89,19 @@ namespace WinCopies.IO
     {
         public static ProcessParameters GetProcessParameters(in string processGuid, in string sourcePath, in string destinationPath, in bool move, in System.Collections.Generic.IEnumerable<string> paths) => new ProcessParameters(processGuid, paths.PrependValues(sourcePath, destinationPath, move ? "1" : "0"));
 
-        public static ProcessParameters GetProcessParameters(in string processGuid, in string sourcePath, in System.Collections.Generic.IEnumerable<string> paths) => new ProcessParameters(processGuid, paths.Prepend(sourcePath));
+        public static ProcessParameters GetProcessParameters(in string processGuid, in string sourcePath, in bool recycle, in System.Collections.Generic.IEnumerable<string> paths) => new ProcessParameters(processGuid, paths.PrependValues(sourcePath, recycle ? "1" : "0"));
 
         public static class ProcessFactoryTypes<T> where T : IShellObjectInfoBase2
         {
             public class Copy : RunnableProcessFactoryProcessInfo<T>
             {
-                private readonly bool _move;
-
                 public override bool UserConfirmationRequired => false;
 
-                public Copy(in T path, in bool move) : base(path) => _move = move;
+                public bool Move { get; }
+
+                public override string GetUserConfirmationText() => null;
+
+                public Copy(in T path, in bool move) : base(path) => Move = move;
 
                 private bool _Copy(in System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths, in uint count)
                 {
@@ -113,7 +116,7 @@ namespace WinCopies.IO
                         try
                         {
                             var dropEffect = new MemoryStream(4);
-                            dropEffect.Write(new byte[] { (byte)(_move ? DragDropEffects.Move : DragDropEffects.Copy | DragDropEffects.Link), 0, 0, 0 }, 0, 4);
+                            dropEffect.Write(new byte[] { (byte)(Move ? DragDropEffects.Move : DragDropEffects.Copy | DragDropEffects.Link), 0, 0, 0 }, 0, 4);
                             dropEffect.Flush();
 
                             var dataObject = new DataObject();
@@ -145,45 +148,67 @@ namespace WinCopies.IO
 
                 public override IProcessParameters TryGetProcessParameters(uint count)
                 {
-                    string sourcePath = CanPaste(count, out bool move, out StringCollection sc);
+                    string sourcePath = CanPaste(Path.InnerObject, count, out bool move, out StringCollection sc);
 
                     return sourcePath == null
                         ? null
-                     : ShellObjectInfoProcessFactory.GetProcessParameters(Guids.Process.Shell.Copy, sourcePath, Path.Path, move, new Enumerable<string>(() => new Collections.StringEnumerator(sc, Collections.DotNetFix.EnumerationDirection.FIFO)));
+                        : ShellObjectInfoProcessFactory.GetProcessParameters(Guids.Process.Shell.Copy, sourcePath, Path.Path, move, new Enumerable<string>(() => new Collections.StringEnumerator(sc, Collections.DotNetFix.EnumerationDirection.FIFO)));
                 }
             }
 
             public class Deletion : DirectProcessFactoryProcessInfo<T>
             {
-                public override bool UserConfirmationRequired => true;
+                public override bool UserConfirmationRequired => !Recycle;
 
-                public Deletion(in T path) : base(path) { /* Left empty. */ }
+                public bool Recycle { get; }
+
+                public override string GetUserConfirmationText() => Recycle ? null : string.Format(Properties.Resources.UserConfirmationText, "permanently delete");
+
+                public Deletion(in T path, in bool recycle) : base(path) => Recycle = recycle;
+
+                protected bool CheckRecycleBin()
+                {
+                    if (!Recycle)
+
+                        return true;
+
+                    if (Path.InnerObject.ParsingName == RecycleBin.ParsingName)
+
+                        return false;
+
+                    var recycleBinInfo = new WinCopies.Temp.Temp.SHQUERYRBINFO() { cbSize = Marshal.SizeOf<WinCopies.Temp.Temp.SHQUERYRBINFO>() };
+
+                    return Path.InnerObject.IsFileSystemObject && Microsoft.WindowsAPICodePack.Win32Native.CoreErrorHelper.Succeeded(WinCopies.Temp.Temp.SHQueryRecycleBin(Path.Path, ref recycleBinInfo));
+                }
+
+                public override bool CanRun(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths) => CheckRecycleBin() && base.CanRun(paths);
 
                 public override IProcessParameters TryGetProcessParameters(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths)
                 {
-                    System.Collections.Generic.IEnumerable<string> _paths = paths.Select(path => path.Path);
-
-                    var enumerator = new EmptyCheckEnumerator<string>(_paths.GetEnumerator());
-
-                    if (enumerator.HasItems)
+                    if (CheckRecycleBin())
                     {
-                        string sourcePath = null;
+                        System.Collections.Generic.IEnumerable<string> _paths = paths.Select(path => path.Path);
 
-                        Predicate<string> predicate = null;
+                        var enumerator = new EmptyCheckEnumerator<string>(_paths.GetEnumerator());
 
-                        predicate = path =>
-{
-    sourcePath = GetSourcePath(enumerator.Current, true, ref predicate);
+                        if (enumerator.HasItems)
+                        {
+                            string sourcePath = null;
 
-    return true;
-};
+                            Predicate<string> predicate = null;
 
-                        return new Enumerable<string>(() => enumerator).ForEachANDALSO(predicate) ? ShellObjectInfoProcessFactory.GetProcessParameters(Guids.Process.Shell.Deletion, sourcePath, _paths) : null;
+                            predicate = path =>
+    {
+        sourcePath = GetSourcePath(enumerator.Current, true, ref predicate);
+
+        return true;
+    };
+
+                            return new Enumerable<string>(() => enumerator).ForEachANDALSO(predicate) ? ShellObjectInfoProcessFactory.GetProcessParameters(Guids.Process.Shell.Deletion, sourcePath, Recycle, _paths) : null;
+                        }
                     }
 
-                    else
-
-                        return null;
+                    return null;
                 }
             }
         }
@@ -233,6 +258,7 @@ namespace WinCopies.IO
         private IShellObjectInfoBase2 _path;
         private ProcessFactoryTypes<IShellObjectInfoBase2>.Copy _copy;
         private ProcessFactoryTypes<IShellObjectInfoBase2>.Copy _cut;
+        private ProcessFactoryTypes<IShellObjectInfoBase2>.Deletion _recycling;
         private ProcessFactoryTypes<IShellObjectInfoBase2>.Deletion _deletion;
         private IProcessCommands _newItemProcessCommands;
         private const string PreferredDropEffect = "Preferred DropEffect";
@@ -240,6 +266,8 @@ namespace WinCopies.IO
         public IRunnableProcessFactoryProcessInfo Copy => _copy;
 
         public IRunnableProcessFactoryProcessInfo Cut => _cut;
+
+        public IDirectProcessFactoryProcessInfo Recycling => _recycling;
 
         public IDirectProcessFactoryProcessInfo Deletion => _deletion;
 
@@ -256,16 +284,24 @@ namespace WinCopies.IO
                     ProcessFactoryTypes<IShellObjectInfoBase2>.Copy
 #endif
                     (path, false);
+
             _cut = new
 #if !CS9
                     ProcessFactoryTypes<IShellObjectInfoBase2>.Copy
 #endif
                     (path, true);
+
+            _recycling = new
+#if !CS9
+                ProcessFactoryTypes<IShellObjectInfoBase2>.Deletion
+#endif
+                (path, true);
+
             _deletion = new
 #if !CS9
                 ProcessFactoryTypes<IShellObjectInfoBase2>.Deletion
 #endif
-                (path);
+                (path, false);
 
             _newItemProcessCommands = new _NewItemProcessCommands(path);
         }
@@ -321,8 +357,17 @@ namespace WinCopies.IO
             return sc;
         }
 
-        public static string CanPaste(in uint count, out bool move, out StringCollection sc)
+        public static string CanPaste(in ShellObject shellObject, in uint count, out bool move, out StringCollection sc)
         {
+            if (!(shellObject ?? throw GetArgumentNullException(nameof(shellObject))).IsFileSystemObject)
+            {
+                move = false;
+
+                sc = null;
+
+                return null;
+            }
+
             sc = TryGetFileDropList(count, out move);
 
             if (sc == null || sc.Count == 0)
@@ -351,7 +396,7 @@ namespace WinCopies.IO
             return new Enumerable<string>(() => new Collections.StringEnumerator(_sc, Collections.DotNetFix.EnumerationDirection.FIFO)).ForEachANDALSO(predicate) ? sourcePath : null;
         }
 
-        bool IProcessFactory.CanPaste(uint count) => CanPaste(count, out _, out _) != null;
+        bool IProcessFactory.CanPaste(uint count) => CanPaste(_path.InnerObject, count, out _, out _) != null;
 
         IProcess IProcessFactory.GetProcess(ProcessFactorySelectorDictionaryParameters processParameters) => GetProcess(processParameters);
 
@@ -794,6 +839,39 @@ namespace WinCopies.IO
 
                     PathTypes<IPathInfo>.PathInfoBase sourcePath;
 
+                    bool? option = null;
+
+                    void setOption()
+                    {
+                        _ = enumerator.MoveNext();
+
+                        switch (enumerator.Current)
+                        {
+                            case "1":
+
+                                option = true;
+
+                                break;
+
+                            case "0":
+
+                                option = false;
+
+                                break;
+                        }
+                    }
+
+                    TOptions getOptions<TPredicateItem, TOptions>(in FuncIn<Predicate<TPredicateItem>, bool, bool, TOptions> func) => func(Bool.True, true, option.Value);
+
+                    TOptions getOptions2<TPredicateItem, TOptions>(in FuncIn<Predicate<TPredicateItem>, bool, bool, TOptions> func, in ActionIn<TOptions> action)
+                    {
+                        TOptions result = getOptions(func);
+
+                        action(result);
+
+                        return result;
+                    }
+
                     switch (guid)
                     {
                         case Guids.Process.Shell.Copy:
@@ -803,49 +881,34 @@ namespace WinCopies.IO
                             sourcePath = getParameter();
                             destinationPath = getParameter();
 
-                            _ = enumerator.MoveNext();
+                            setOption();
 
-                            bool move;
-
-                            switch (enumerator.Current)
-                            {
-                                case "1":
-
-                                    move = true;
-
-                                    break;
-
-                                case "0":
-
-                                    move = false;
-
-                                    break;
-
-                                default:
-
-                                    return null;
-                            }
-
-                            return new Copy<ProcessErrorFactory<IPathInfo, CopyErrorAction>>(ProcessHelper<IPathInfo>.GetInitialPaths(enumerator, sourcePath, path => path),
-                                sourcePath,
-                                destinationPath,
-                                getProcessCollection<IPathInfo>(),
-                                getProcessLinkedList<IPathInfo, CopyErrorAction>(),
-                                ProcessHelper<IPathInfo>.GetDefaultProcessDelegates(),
-                                new CopyProcessOptions<IPathInfo>(Bool.True, true, move) { IgnoreFolderFileNameConflicts = true },
-                                new CopyProcessErrorFactory<IPathInfo>());
+                            return option.HasValue
+                                ? new Copy<ProcessErrorFactory<IPathInfo, CopyErrorAction>>(ProcessHelper<IPathInfo>.GetInitialPaths(enumerator, sourcePath, path => path),
+                                    sourcePath,
+                                    destinationPath,
+                                    getProcessCollection<IPathInfo>(),
+                                    getProcessLinkedList<IPathInfo, CopyErrorAction>(),
+                                    ProcessHelper<IPathInfo>.GetDefaultProcessDelegates(),
+                                    getOptions2<IPathInfo, CopyOptions<IPathInfo>>(CopyOptions<IPathInfo>.GetInstance, (in CopyOptions<IPathInfo> options) => options.IgnoreFolderFileNameConflicts = true),
+                                    new CopyProcessErrorFactory<IPathInfo>())
+                                : null;
 
                         case Guids.Process.Shell.Deletion:
 
                             sourcePath = getParameter();
 
-                            return new Deletion<ProcessErrorFactory<IPathInfo, ErrorAction>>(ProcessHelper<IPathInfo>.GetInitialPaths(enumerator, sourcePath, path => path),
-                                sourcePath,
-                                getProcessCollection<IPathInfo>(),
-                                getProcessLinkedList<IPathInfo, ErrorAction>(),
-                                ProcessHelper<IPathInfo>.GetDefaultProcessDelegates(),
-                                new ProcessOptions<IPathInfo>(Bool.True, true),
-                                new DefaultProcessErrorFactory<IPathInfo>());
+                            setOption();
+
+                            return option.HasValue
+                                ? new Deletion<ProcessErrorFactory<IPathInfo, ErrorAction>>(ProcessHelper<IPathInfo>.GetInitialPaths(enumerator, sourcePath, path => path),
+                                    sourcePath,
+                                    getProcessCollection<IPathInfo>(),
+                                    getProcessLinkedList<IPathInfo, ErrorAction>(),
+                                    ProcessHelper<IPathInfo>.GetDefaultProcessDelegates(),
+                                    getOptions<IPathInfo, DeletionOptions<IPathInfo>>(DeletionOptions<IPathInfo>.GetInstance),
+                                    new DefaultProcessErrorFactory<IPathInfo>())
+                                : null;
                     }
                 }
 
@@ -878,11 +941,17 @@ namespace WinCopies.IO
             {
                 base.DisposeUnmanaged();
 
-                _processFactory.Dispose();
-                _processFactory = null;
+                if (_processFactory != null)
+                {
+                    _processFactory.Dispose();
+                    _processFactory = null;
+                }
 
-                _objectProperties.Dispose();
-                _objectProperties = null;
+                if (_objectProperties != null)
+                {
+                    _objectProperties.Dispose();
+                    _objectProperties = null;
+                }
             }
 
             #region GetItems
@@ -895,22 +964,22 @@ namespace WinCopies.IO
                 : GetEmptyEnumerable();
 
             protected virtual System.Collections.Generic.IEnumerable<ShellObjectInfoItemProvider> GetItemProviders(Predicate<ArchiveFileInfoEnumeratorStruct> func)
-#if NETFRAMEWORK
+#if CS8
+             => ObjectPropertiesGeneric.FileType switch
+             {
+                 Archive => ArchiveItemInfo.GetArchiveItemInfoItems(this, func).Select(ShellObjectInfoItemProvider.ToShellObjectInfoItemProvider),
+                 _ => GetEmptyEnumerable()
+             };
+#else
             {
                 switch (ObjectPropertiesGeneric.FileType)
                 {
                     case Archive:
                         return ArchiveItemInfo.GetArchiveItemInfoItems(this, func).Select(ShellObjectInfoItemProvider.ToShellObjectInfoItemProvider);
                     default:
-                        return null;
+                        return GetEmptyEnumerable();
                 }
             }
-#else
-             => ObjectPropertiesGeneric.FileType switch
-             {
-                 Archive => ArchiveItemInfo.GetArchiveItemInfoItems(this, func).Select(ShellObjectInfoItemProvider.ToShellObjectInfoItemProvider),
-                 _ => GetEmptyEnumerable()
-             };
 #endif
 
             protected override System.Collections.Generic.IEnumerable<ShellObjectInfoItemProvider> GetItemProviders() => GetItemProviders((Predicate<ShellObjectInfoEnumeratorStruct>)(obj => true));

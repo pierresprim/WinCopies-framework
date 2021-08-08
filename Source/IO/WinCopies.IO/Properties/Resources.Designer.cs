@@ -187,6 +187,24 @@ namespace WinCopies.IO.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Are you sure you want to {0} the selected files?.
+        /// </summary>
+        public static string UserConfirmationText {
+            get {
+                return ResourceManager.GetString("UserConfirmationText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Are you sure you want to {0} the current path?.
+        /// </summary>
+        public static string UserConfirmationTextCurrentPath {
+            get {
+                return ResourceManager.GetString("UserConfirmationTextCurrentPath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to WMI Class.
         /// </summary>
         public static string WMIClass {

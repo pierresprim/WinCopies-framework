@@ -16,20 +16,24 @@
     <PackageIcon>WinCopies.png</PackageIcon>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'!='netcoreapp3.1'">
+  <ItemGroup Condition="$(DefineConstants.Contains('CS8'))">
     <!--<PackageReference Include="Microsoft.Win32.Registry" Version="4.7.0" />-->
     <PackageReference Include="System.Drawing.Common" Version="4.7.0" />
     <!--<PackageReference Include="System.Management" Version="4.7.0" />-->
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'!='netcoreapp3.0'">
+  <ItemGroup Condition="$(DefineConstants.Contains('CS9'))">
+    <PackageReference Include="System.Drawing.Common" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.0'">
     <!--<PackageReference Include="Microsoft.Win32.Registry" Version="4.6.0" />-->
     <PackageReference Include="System.Drawing.Common" Version="4.6.0" />
     <!--<PackageReference Include="System.Management" Version="4.6.0" />-->
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WinCopies.Util.Desktop" Version="3.10-preview" />
+    <PackageReference Include="WinCopies.Util.Desktop" Version="3.11-preview" />
   </ItemGroup>
 
   <ItemGroup>

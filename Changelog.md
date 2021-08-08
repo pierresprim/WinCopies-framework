@@ -6,6 +6,24 @@ The WinCopies® software framework
 CHANGELOG
 ---------
 
+### 3.6-preview
+
+- Add new types.
+- IProcessFactoryProcessInfo: add GetUserConfirmationText() method.
+- IProcessFactory: add Recycling property.
+- Re-design process options and error types.
+- ProcessError.CancelledByUser => ProcessError.CanceledByUser
+- Update Deletion to add recycling option.
+- Process base class:
+	- Add protected methods.
+	- Dispose method is not virtual anymore. Override DisposeManaged and the new DisposeUnmanaged methods instead.
+	- Some dispose operations are performed by the new method DisposeUnmanaged.
+	- Add deconstructor, which call Dispose method.
+- (Default)DestinationProcess: constructor is now protected.
+- ShellObjectInfo:
+	- Update processes handling.
+	- Bug fixes.
+
 ### 3.5-preview
 
 - TextBox.OnUpperCommandCanExecute is now TextBox.OnCaseCommandCanExecute.

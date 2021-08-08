@@ -26,14 +26,11 @@ using System.Linq;
 
 using WinCopies.IO.AbstractionInterop;
 using WinCopies.IO.ObjectModel;
+using WinCopies.Linq;
 
 using static Microsoft.WindowsAPICodePack.Shell.KnownFolders;
-using WinCopies.Linq;
-using WinCopies.IO.Process;
 
 #if WinCopies3
-using WinCopies.Collections.Generic;
-
 using static WinCopies.ThrowHelper;
 #else
 using System.Collections.Generic;

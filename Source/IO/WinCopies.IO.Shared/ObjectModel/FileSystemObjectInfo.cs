@@ -196,14 +196,17 @@ namespace WinCopies.IO
 
             public static BitmapSource TryGetBitmapSource(in string extension, in FileType fileType, in int size)
             {
-#if NETFRAMEWORK
+                using
+#if !CS8
+                    (
+#endif
 
-                using (Icon icon = TryGetIcon(extension, fileType, new System.Drawing.Size(size, size)))
+                Icon icon = TryGetIcon(extension, fileType, new System.Drawing.Size(size, size))
 
+#if CS8
+                    ;
 #else
-
-                using Icon icon = TryGetIcon(extension, fileType, new System.Drawing.Size(size, size));
-
+                    )
 #endif
                 return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
             }

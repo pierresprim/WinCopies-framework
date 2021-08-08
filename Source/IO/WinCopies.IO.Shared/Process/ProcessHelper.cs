@@ -78,7 +78,7 @@ namespace WinCopies.IO.Process
             return error.Error == processErrorFactoryData.NoError;
         }
 
-        public static void GetDefaultPathsLoadingErrorParameters<TPath, TError, TErrorAction, TFactory>(in TError error, in string message, in ErrorCode errorCode, in ProcessOptions<TPath> options, in TFactory factory, out IProcessError<TError, TErrorAction> _error, out bool clearOnError) where TPath : IPath where TFactory : ProcessErrorTypes<TPath, TError, TErrorAction>.IProcessErrorFactories
+        public static void GetDefaultPathsLoadingErrorParameters<TPath, TError, TErrorAction, TFactory>(in TError error, in string message, in ErrorCode errorCode, in ProcessOptionsCommon<TPath> options, in TFactory factory, out IProcessError<TError, TErrorAction> _error, out bool clearOnError) where TPath : IPath where TFactory : ProcessErrorTypes<TPath, TError, TErrorAction>.IProcessErrorFactories
         {
             _error = factory.GetError(error, message, errorCode);
 
@@ -116,7 +116,7 @@ namespace WinCopies.IO.Process
 
         public static class ProcessHelper2<TError, TAction, TProcessDelegateParam, TProcessEventDelegates> where TProcessEventDelegates : ProcessDelegateTypes<T, TProcessDelegateParam>.IProcessEventDelegates where TProcessDelegateParam : IProcessProgressDelegateParameter
         {
-            public static bool OnPathLoaded(in T path, in ProcessOptions<T> options, in ProcessDelegateTypes<T, TProcessDelegateParam>.IProcessDelegates<TProcessEventDelegates> processDelegates, in object cancellationPendingDelegateParam, in Action<T> action)
+            public static bool OnPathLoaded(in T path, in ProcessOptionsCommon<T> options, in ProcessDelegateTypes<T, TProcessDelegateParam>.IProcessDelegates<TProcessEventDelegates> processDelegates, in object cancellationPendingDelegateParam, in Action<T> action)
             {
                 if ((options ?? throw ThrowHelper.GetArgumentNullException(nameof(options))).PathLoadedDelegate(path) && !processDelegates.CancellationPendingDelegate.RaiseEvent(cancellationPendingDelegateParam))
                 {
@@ -128,13 +128,13 @@ namespace WinCopies.IO.Process
                 return false;
             }
 
-            public static bool OnPathLoaded(in T path, in ProcessOptions<T> options, in ProcessDelegateTypes<T, TProcessDelegateParam>.IProcessDelegates<TProcessEventDelegates> processDelegates, in Action<T> action) => OnPathLoaded(path, options, processDelegates, null, action);
+            public static bool OnPathLoaded(in T path, in ProcessOptionsCommon<T> options, in ProcessDelegateTypes<T, TProcessDelegateParam>.IProcessDelegates<TProcessEventDelegates> processDelegates, in Action<T> action) => OnPathLoaded(path, options, processDelegates, null, action);
         }
     }
 
     public static class ProcessHelper<TPath, TAction> where TPath : IPath
     {
-        public static FileStream TryGetFileStream(in ProcessErrorTypes<TPath, ProcessError, TAction>.IProcessErrorFactories factory, in string path, in int bufferLength, out IProcessError<ProcessError, TAction> error) 
+        public static FileStream TryGetFileStream(in ProcessErrorTypes<TPath, ProcessError, TAction>.IProcessErrorFactories factory, in string path, in int bufferLength, out IProcessError<ProcessError, TAction> error)
         {
             try
             {

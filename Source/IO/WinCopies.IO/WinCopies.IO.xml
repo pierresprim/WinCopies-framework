@@ -90,6 +90,16 @@
               Looks up a localized string similar to Registry Value.
             </summary>
         </member>
+        <member name="P:WinCopies.IO.Properties.Resources.UserConfirmationText">
+            <summary>
+              Looks up a localized string similar to Are you sure you want to {0} the selected files?.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Properties.Resources.UserConfirmationTextCurrentPath">
+            <summary>
+              Looks up a localized string similar to Are you sure you want to {0} the current path?.
+            </summary>
+        </member>
         <member name="P:WinCopies.IO.Properties.Resources.WMIClass">
             <summary>
               Looks up a localized string similar to WMI Class.
@@ -906,7 +916,7 @@
             An unknown error occurred.
             </summary>
         </member>
-        <member name="F:WinCopies.IO.Process.ProcessError.CancelledByUser">
+        <member name="F:WinCopies.IO.Process.ProcessError.CanceledByUser">
             <summary>
             The process was aborted by user.
             </summary>
@@ -971,7 +981,7 @@
             An unknown disk error occurred.
             </summary>
         </member>
-        <member name="P:WinCopies.IO.Process.CopyProcessOptions`1.AutoRenameFiles">
+        <member name="P:WinCopies.IO.Process.CopyOptions`1.AutoRenameFiles">
             <summary>
             Gets a value that indicates whether files are automatically renamed when they conflict with existing paths.
             </summary>

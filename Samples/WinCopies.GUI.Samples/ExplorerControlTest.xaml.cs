@@ -79,7 +79,9 @@ namespace WinCopies.GUI.Samples
 
             _ = CommandBindings.Add(new CommandBinding(ApplicationCommands.Paste, (object sender, ExecutedRoutedEventArgs e) => AddProcess(getProcessFactory().Copy.TryGetProcessParameters(10u)), (object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = SelectedItem.Path.ProcessFactory.CanPaste(10u)));
 
-            addCommandBinding(ApplicationCommands.Delete, () => getProcessFactory().Deletion, "permanently delete");
+            addCommandBinding(ApplicationCommands.Delete, () => getProcessFactory().Recycling, null);
+
+            addCommandBinding(WinCopies.Commands.TEMP.ApplicationCommands.DeletePermanently, () => getProcessFactory().Deletion, "permanently delete");
         }
 
         IEnumerable<IBrowsableObjectInfo> GetEnumerable() => SelectedItem.Path.Items.WhereSelect(item => item.IsSelected, item => item.Model);

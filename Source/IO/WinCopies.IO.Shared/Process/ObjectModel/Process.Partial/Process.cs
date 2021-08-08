@@ -244,11 +244,34 @@ namespace WinCopies.IO.Process
 
                 protected abstract Predicate<TItemsIn> GetAddAsDuplicatePredicate();
 
+                protected bool LoadPathsDirectly(out IProcessError<TError, TAction> error, out bool clearOnError)
+                {
+                    foreach (TItemsIn path in InitialPaths)
+
+                        if (!OnPathLoaded(Convert(path)))
+                        {
+                            SetCancelErrorParameters(out error, out clearOnError);
+
+                            return false;
+                        }
+
+                    SetNoErrorErrorParameters(out error, out clearOnError);
+
+                    return true;
+                }
+
+                protected void SetNoErrorErrorParameters(out IProcessError<TError, TAction> error, out bool clearOnError)
+                {
+                    error = Factory.GetError(Factory.NoError, NoError, ErrorCode.NoError);
+
+                    clearOnError = false;
+                }
+
+                protected void SetCancelErrorParameters(out IProcessError<TError, TAction> error, out bool clearOnError) => GetPathsLoadingErrorParameters(Factory.CancelledByUserError, CancelledByUser, ErrorCode.Cancelled, out error, out clearOnError);
+
                 protected virtual bool LoadPathsOverride(out IProcessError<TError, TAction> error, out bool clearOnError)
                 {
                     clearOnError = true;
-
-                    void setParameters(out IProcessError<TError, TAction> _error, out bool _clearOnError) => GetPathsLoadingErrorParameters(Factory.CancelledByUserError, CancelledByUser, ErrorCode.Cancelled, out _error, out _clearOnError);
 
                     IRecursiveEnumerable<TItemsIn> recursivePathEnumerable;
 
@@ -266,7 +289,7 @@ namespace WinCopies.IO.Process
 
                             if (!OnPathLoaded(Convert(path)))
                             {
-                                setParameters(out error, out clearOnError);
+                                SetCancelErrorParameters(out error, out clearOnError);
 
                                 return false;
                             }
@@ -279,7 +302,7 @@ namespace WinCopies.IO.Process
 
                                 continue;
 
-                            setParameters(out error, out clearOnError);
+                            SetCancelErrorParameters(out error, out clearOnError);
 
                             return false;
                         }
@@ -294,15 +317,13 @@ namespace WinCopies.IO.Process
 
                                 continue;
 
-                            setParameters(out error, out clearOnError);
+                            SetCancelErrorParameters(out error, out clearOnError);
 
                             return false;
                         }
                     }
 
-                    error = Factory.GetError(Factory.NoError, NoError, ErrorCode.NoError);
-
-                    clearOnError = false;
+                    SetNoErrorErrorParameters(out error, out clearOnError);
 
                     return true;
                 }
@@ -556,39 +577,47 @@ namespace WinCopies.IO.Process
                 #region IDisposable Support
                 public bool IsDisposed { get; private set; }
 
-                protected virtual void DisposeManaged()
+                protected virtual void DisposeUnmanaged()
                 {
-                    IsDisposed = true;
-
                     _initialPaths.Clear();
-                    _initialPaths = null;
-
-                    _initialPathsReadOnly = null;
 
                     _paths.Clear();
-                    _paths = null;
-
-                    _pathsReadOnly = null;
 
                     _errorPaths.Clear();
-                    _errorPaths = null;
 
+                    _propertyEventDelegate.Dispose();
+                }
+
+                protected virtual void DisposeManaged()
+                {
+                    _initialPaths = null;
+                    _initialPathsReadOnly = null;
+
+                    _paths = null;
+                    _pathsReadOnly = null;
+
+                    _errorPaths = null;
                     _errorPathsReadOnly = null;
 
                     _processDelegates = null;
                     _processEventDelegates = null;
                     _factory = null;
 
-                    _propertyEventDelegate.Dispose();
                     _propertyEventDelegate = null;
+
+                    IsDisposed = true;
                 }
 
-                public virtual void Dispose()
+                public void Dispose()
                 {
+                    DisposeUnmanaged();
+
                     DisposeManaged();
 
                     GC.SuppressFinalize(this);
                 }
+
+                ~Process() => DisposeUnmanaged();
                 #endregion IDisposable Support
 
 #if !CS8
@@ -616,7 +645,7 @@ namespace WinCopies.IO.Process
             {
                 public abstract TItemsIn DestinationPath { get; }
 
-                public DestinationProcess(in IEnumerableQueue<TItemsIn> initialPaths, in ProcessTypes<TItemsOut>.IProcessQueue paths, in IProcessLinkedList<TItemsOut, TError, ProcessTypes<TItemsOut, TError, TAction>.ProcessErrorItem, TAction> errorsQueue, in TProcessDelegates processDelegates, TFactory factory) : base(initialPaths, paths, errorsQueue, processDelegates, factory)
+                protected DestinationProcess(in IEnumerableQueue<TItemsIn> initialPaths, in ProcessTypes<TItemsOut>.IProcessQueue paths, in IProcessLinkedList<TItemsOut, TError, ProcessTypes<TItemsOut, TError, TAction>.ProcessErrorItem, TAction> errorsQueue, in TProcessDelegates processDelegates, TFactory factory) : base(initialPaths, paths, errorsQueue, processDelegates, factory)
                 {
                     // Left empty.
                 }
@@ -628,13 +657,20 @@ namespace WinCopies.IO.Process
 #endif
             }
 
+            public abstract class DefaultProcess : Process
+            {
+                public override TItemsIn SourcePath { get; }
+
+                protected DefaultProcess(in IEnumerableQueue<TItemsIn> initialPaths, in TItemsIn sourcePath, in ProcessTypes<TItemsOut>.IProcessQueue paths, in IProcessLinkedList<TItemsOut, TError, ProcessTypes<TItemsOut, TError, TAction>.ProcessErrorItem, TAction> errorsQueue, in TProcessDelegates processDelegates, in TFactory factory) : base(initialPaths, paths, errorsQueue, processDelegates, factory) => SourcePath = sourcePath;
+            }
+
             public abstract class DefaultDestinationProcess : DestinationProcess
             {
                 public override TItemsIn SourcePath { get; }
 
                 public override TItemsIn DestinationPath { get; }
 
-                public DefaultDestinationProcess(in IEnumerableQueue<TItemsIn> initialPaths, in TItemsIn sourcePath, in TItemsIn destinationPath, in ProcessTypes<TItemsOut>.IProcessQueue paths, in IProcessLinkedList<TItemsOut, TError, ProcessTypes<TItemsOut, TError, TAction>.ProcessErrorItem, TAction> errorsQueue, in TProcessDelegates processDelegates, TFactory factory) : base(initialPaths, paths, errorsQueue, processDelegates, factory)
+                protected DefaultDestinationProcess(in IEnumerableQueue<TItemsIn> initialPaths, in TItemsIn sourcePath, in TItemsIn destinationPath, in ProcessTypes<TItemsOut>.IProcessQueue paths, in IProcessLinkedList<TItemsOut, TError, ProcessTypes<TItemsOut, TError, TAction>.ProcessErrorItem, TAction> errorsQueue, in TProcessDelegates processDelegates, in TFactory factory) : base(initialPaths, paths, errorsQueue, processDelegates, factory)
                 {
                     SourcePath = sourcePath;
 
@@ -642,6 +678,23 @@ namespace WinCopies.IO.Process
                 }
 
                 public string GetDestinationPath(in IPathInfo path) => ProcessHelper.GetDestinationPath(DestinationPath, path);
+            }
+
+            public static class DefaultProcesses<TOptions> where TOptions : ProcessOptionsCommon<TItemsOut>
+            {
+                public abstract class DefaultProcess2 : DefaultProcess
+                {
+                    public TOptions Options { get; }
+
+                    protected DefaultProcess2(in IEnumerableQueue<TItemsIn> initialPaths, in TItemsIn sourcePath, in ProcessTypes<TItemsOut>.IProcessQueue paths, in IProcessLinkedList<TItemsOut, TError, ProcessTypes<TItemsOut, TError, TAction>.ProcessErrorItem, TAction> errorsQueue, in TProcessDelegates processDelegates, in TFactory factory, in TOptions options) : base(initialPaths, sourcePath, paths, errorsQueue, processDelegates, factory) => (Options = options ?? throw GetArgumentNullException(nameof(options))).Process = this;
+                }
+
+                public abstract class DefaultDestinationProcess2 : DefaultDestinationProcess
+                {
+                    public TOptions Options { get; }
+
+                    protected DefaultDestinationProcess2(in IEnumerableQueue<TItemsIn> initialPaths, in TItemsIn sourcePath, in TItemsIn destinationPath, in ProcessTypes<TItemsOut>.IProcessQueue paths, in IProcessLinkedList<TItemsOut, TError, ProcessTypes<TItemsOut, TError, TAction>.ProcessErrorItem, TAction> errorsQueue, in TProcessDelegates processDelegates, in TFactory factory, in TOptions options) : base(initialPaths, sourcePath, destinationPath, paths, errorsQueue, processDelegates, factory) => (Options = options ?? throw GetArgumentNullException(nameof(options))).Process = this;
+                }
             }
         }
     }
