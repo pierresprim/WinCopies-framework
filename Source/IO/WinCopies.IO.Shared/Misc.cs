@@ -204,6 +204,17 @@ namespace WinCopies.IO
 
     namespace Process
     {
+        public enum RemoveOption : sbyte
+        {
+            None = 0,
+
+            Recycle = 1,
+
+            Delete = 2,
+
+            Clear = 3
+        }
+
         public interface IProcessParameters
         {
             Guid Guid { get; }
@@ -303,13 +314,11 @@ namespace WinCopies.IO
 
             public abstract string GetUserConfirmationText();
 
-            public virtual bool CanRun(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths)
+            protected virtual bool CanRun(EmptyCheckEnumerator<IBrowsableObjectInfo> enumerator)
             {
-                var enumerator = new EmptyCheckEnumerator<IBrowsableObjectInfo>((paths ?? throw GetArgumentNullException(nameof(paths))).GetEnumerator());
-
                 if (enumerator.HasItems)
                 {
-                    var enumerable = new CustomEnumeratorEnumerable<IBrowsableObjectInfo, System.Collections.Generic.IEnumerator<IBrowsableObjectInfo>>(enumerator);
+                    var enumerable = new CustomEnumeratorEnumerable<IBrowsableObjectInfo, EmptyCheckEnumerator<IBrowsableObjectInfo>>(enumerator);
 
                     foreach (IBrowsableObjectInfo path in enumerable)
 
@@ -324,10 +333,13 @@ namespace WinCopies.IO
                             return false;
 
                     return true;
+
                 }
 
                 return false;
             }
+
+            public virtual bool CanRun(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths) => CanRun(new EmptyCheckEnumerator<IBrowsableObjectInfo>((paths ?? throw GetArgumentNullException(nameof(paths))).GetEnumerator()));
 
             protected internal virtual void Dispose() => Path = default;
 
@@ -367,6 +379,8 @@ namespace WinCopies.IO
             IDirectProcessFactoryProcessInfo Recycling { get; }
 
             IDirectProcessFactoryProcessInfo Deletion { get; }
+
+            IDirectProcessFactoryProcessInfo Clearing { get; }
 
             bool CanPaste(uint count);
 
@@ -421,6 +435,8 @@ namespace WinCopies.IO
                 IDirectProcessFactoryProcessInfo IProcessFactory.Recycling => ProcessFactory.DefaultProcessInfo;
 
                 IDirectProcessFactoryProcessInfo IProcessFactory.Deletion => ProcessFactory.DefaultProcessInfo;
+
+                IDirectProcessFactoryProcessInfo IProcessFactory.Clearing => ProcessFactory.DefaultProcessInfo;
 
                 bool IProcessFactory.CanPaste(uint count) => false;
 

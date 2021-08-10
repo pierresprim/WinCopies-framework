@@ -60,7 +60,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessTypes.Partial\ProcessTypes.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\PropertyId.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enumeration\ArchiveFileInfoEnumeratorStruct.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)FileInfoLoader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FileSystemObjectEqualityComparer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\ArchiveItemInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Directory.cs" />
@@ -134,6 +133,5 @@
     <Compile Include="$(MSBuildThisFileDirectory)Size.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\WMIItemInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\WMIItemInfoFactory.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)WMIItemTypes.cs" />
   </ItemGroup>
 </Project>

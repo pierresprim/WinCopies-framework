@@ -87,10 +87,7 @@ namespace WinCopies.IO
 
     public class ShellObjectInfoProcessFactory : IProcessFactory
     {
-        public static ProcessParameters GetProcessParameters(in string processGuid, in string sourcePath, in string destinationPath, in bool move, in System.Collections.Generic.IEnumerable<string> paths) => new ProcessParameters(processGuid, paths.PrependValues(sourcePath, destinationPath, move ? "1" : "0"));
-
-        public static ProcessParameters GetProcessParameters(in string processGuid, in string sourcePath, in bool recycle, in System.Collections.Generic.IEnumerable<string> paths) => new ProcessParameters(processGuid, paths.PrependValues(sourcePath, recycle ? "1" : "0"));
-
+        #region Types
         public static class ProcessFactoryTypes<T> where T : IShellObjectInfoBase2
         {
             public class Copy : RunnableProcessFactoryProcessInfo<T>
@@ -158,13 +155,15 @@ namespace WinCopies.IO
 
             public class Deletion : DirectProcessFactoryProcessInfo<T>
             {
+                public bool Recycle => RemoveOption == RemoveOption.Recycle;
+
                 public override bool UserConfirmationRequired => !Recycle;
 
-                public bool Recycle { get; }
+                public RemoveOption RemoveOption { get; }
 
                 public override string GetUserConfirmationText() => Recycle ? null : string.Format(Properties.Resources.UserConfirmationText, "permanently delete");
 
-                public Deletion(in T path, in bool recycle) : base(path) => Recycle = recycle;
+                public Deletion(in T path, in RemoveOption removeOption) : base(path) => RemoveOption = removeOption == RemoveOption.None || !removeOption.IsValidEnumValue() ? throw new ArgumentOutOfRangeException(nameof(removeOption)) : removeOption;
 
                 protected bool CheckRecycleBin()
                 {
@@ -180,6 +179,8 @@ namespace WinCopies.IO
 
                     return Path.InnerObject.IsFileSystemObject && Microsoft.WindowsAPICodePack.Win32Native.CoreErrorHelper.Succeeded(WinCopies.Temp.Temp.SHQueryRecycleBin(Path.Path, ref recycleBinInfo));
                 }
+
+                protected override bool CanRun(EmptyCheckEnumerator<IBrowsableObjectInfo> enumerator) => RemoveOption == RemoveOption.Clear ? !enumerator.HasItems : base.CanRun(enumerator);
 
                 public override bool CanRun(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths) => CheckRecycleBin() && base.CanRun(paths);
 
@@ -254,14 +255,18 @@ namespace WinCopies.IO
 
             ~_NewItemProcessCommands() => Dispose();
         }
+        #endregion Types
 
+        #region Fields
         private IShellObjectInfoBase2 _path;
         private ProcessFactoryTypes<IShellObjectInfoBase2>.Copy _copy;
         private ProcessFactoryTypes<IShellObjectInfoBase2>.Copy _cut;
         private ProcessFactoryTypes<IShellObjectInfoBase2>.Deletion _recycling;
         private ProcessFactoryTypes<IShellObjectInfoBase2>.Deletion _deletion;
+        private ProcessFactoryTypes<IShellObjectInfoBase2>.Deletion _clearing;
         private IProcessCommands _newItemProcessCommands;
         private const string PreferredDropEffect = "Preferred DropEffect";
+        #endregion
 
         public IRunnableProcessFactoryProcessInfo Copy => _copy;
 
@@ -270,6 +275,8 @@ namespace WinCopies.IO
         public IDirectProcessFactoryProcessInfo Recycling => _recycling;
 
         public IDirectProcessFactoryProcessInfo Deletion => _deletion;
+
+        public IDirectProcessFactoryProcessInfo Clearing => _recycling;
 
         public bool IsDisposed => _path == null;
 
@@ -295,16 +302,27 @@ namespace WinCopies.IO
 #if !CS9
                 ProcessFactoryTypes<IShellObjectInfoBase2>.Deletion
 #endif
-                (path, true);
+                (path, RemoveOption.Recycle);
 
             _deletion = new
 #if !CS9
                 ProcessFactoryTypes<IShellObjectInfoBase2>.Deletion
 #endif
-                (path, false);
+                (path, RemoveOption.Delete);
+
+            _clearing = new
+#if !CS9
+                ProcessFactoryTypes<IShellObjectInfoBase2>.Deletion
+#endif
+                (path, RemoveOption.Clear);
 
             _newItemProcessCommands = new _NewItemProcessCommands(path);
         }
+
+        public static ProcessParameters GetProcessParameters(in string processGuid, in string sourcePath, in string destinationPath, in bool move, in System.Collections.Generic.IEnumerable<string> paths) => new ProcessParameters(processGuid, paths.PrependValues(sourcePath, destinationPath, move ? "1" : "0"));
+
+        public static ProcessParameters GetProcessParameters(in string processGuid, in string sourcePath, in bool recycle, in System.Collections.Generic.IEnumerable<string> paths) => new ProcessParameters(processGuid, paths.PrependValues(sourcePath, recycle ? "1" : "0"));
+
 
         public static string GetSourcePath(in string path, in bool updatePredicate, ref Predicate<string> predicate)
         {
@@ -416,8 +434,14 @@ namespace WinCopies.IO
             _cut.Dispose();
             _cut = null;
 
+            _recycling.Dispose();
+            _recycling = null;
+
             _deletion.Dispose();
             _deletion = null;
+
+            _clearing.Dispose();
+            _clearing = null;
 
             _newItemProcessCommands.Dispose();
             _newItemProcessCommands = null;
