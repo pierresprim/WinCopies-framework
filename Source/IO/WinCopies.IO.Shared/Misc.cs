@@ -259,6 +259,17 @@ namespace WinCopies.IO
 
     namespace Process
     {
+        public enum RemoveOption : sbyte
+        {
+            None = 0,
+
+            Recycle = 1,
+
+            Delete = 2,
+
+            Clear = 3
+        }
+
         public interface IProcessParameters
         {
             Guid Guid { get; }
@@ -358,16 +369,35 @@ namespace WinCopies.IO
 
             public abstract string GetUserConfirmationText();
 
-            protected abstract bool CanRun(System.Collections.Generic.IEnumerator<IBrowsableObjectInfo> enumerator);
-
-            public virtual bool CanRun(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths)
+            protected virtual bool CanRun(EmptyCheckEnumerator<IBrowsableObjectInfo> enumerator)
             {
-                var enumerator = new EmptyCheckEnumerator<IBrowsableObjectInfo>((paths ?? throw GetArgumentNullException(nameof(paths))).GetEnumerator());
+                if (enumerator.HasItems)
+                {
+                    var enumerable = new CustomEnumeratorEnumerable<IBrowsableObjectInfo, EmptyCheckEnumerator<IBrowsableObjectInfo>>(enumerator);
 
-                return enumerator.HasItems && CanRun(enumerator);
+                    foreach (IBrowsableObjectInfo path in enumerable)
+
+                        if (!(path is IShellObjectInfoBase2 shellObjectInfo
+                            && shellObjectInfo.InnerObject.IsFileSystemObject
+                            && shellObjectInfo.Path.Validate(Path.Path, Path.Path.EndsWith(WinCopies.IO.Path.PathSeparator
+#if !CS8
+                                .ToString()
+#endif
+                                ) ? 1 : 0, null, null, 1, "\\")))
+
+                            return false;
+
+                    return true;
+
+                }
+
+                return false;
+                return false;
             }
+            public virtual bool CanRun(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths) => CanRun(new EmptyCheckEnumerator<IBrowsableObjectInfo>((paths ?? throw GetArgumentNullException(nameof(paths))).GetEnumerator()));
 
-            protected virtual void Dispose() => Path = default;
+            protected internal virtual void Dispose() => Path = default;
+            protected internal virtual void Dispose() => Path = default;
 
             ~ProcessFactoryProcessInfo() => Dispose();
         }
@@ -405,6 +435,8 @@ namespace WinCopies.IO
             IDirectProcessFactoryProcessInfo Recycling { get; }
 
             IDirectProcessFactoryProcessInfo Deletion { get; }
+
+            IDirectProcessFactoryProcessInfo Clearing { get; }
 
             bool CanPaste(uint count);
 
@@ -459,6 +491,8 @@ namespace WinCopies.IO
                 IDirectProcessFactoryProcessInfo IProcessFactory.Recycling => ProcessFactory.DefaultProcessInfo;
 
                 IDirectProcessFactoryProcessInfo IProcessFactory.Deletion => ProcessFactory.DefaultProcessInfo;
+
+                IDirectProcessFactoryProcessInfo IProcessFactory.Clearing => ProcessFactory.DefaultProcessInfo;
 
                 bool IProcessFactory.CanPaste(uint count) => false;
 
