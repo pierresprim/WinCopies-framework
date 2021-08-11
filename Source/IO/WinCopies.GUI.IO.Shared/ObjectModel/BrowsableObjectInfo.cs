@@ -41,7 +41,7 @@ namespace WinCopies.GUI.IO.ObjectModel
 
                         enumerator = processParameters.ProcessParameters.Parameters.GetEnumerator();
 
-                        IPathInfo sourcePath = enumerator.MoveNext() ? new PathTypes<IPathInfo>.RootPath(enumerator.Current, true) : throw new InvalidOperationException(ExceptionMessages.ProcessParametersCouldNotBeParsedCorrectly);
+                        IPathInfo sourcePath = enumerator.MoveNext() ? new PathTypes<IPathInfo>.RootPath(enumerator.Current, true) : throw new InvalidOperationException(WinCopies.IO.Shell.Resources.ExceptionMessages.ProcessParametersCouldNotBeParsedCorrectly);
 
                         var parameters = ArchiveCompressionParameters.FromProcessParameters(enumerator);
 
@@ -73,7 +73,7 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         public static void RegisterAllProcessSelectors()
         {
-            WinCopies.IO.ObjectModel.BrowsableObjectInfo.RegisterDefaultProcessSelectors();
+            WinCopies.IO.Shell.ObjectModel.BrowsableObjectInfo.RegisterDefaultProcessSelectors();
 
             ShellObjectInfo.DefaultCustomProcessesSelectorDictionary.Push(item => item.InnerObject.IsFileSystemObject, item => new IProcessInfo[] { new ArchiveCompressionProcessInfo() });
 
@@ -82,7 +82,7 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         public static void RegisterDefaultSelectors()
         {
-            WinCopies.IO.ObjectModel.BrowsableObjectInfo.RegisterDefaultBrowsabilityPaths();
+            WinCopies.IO.Shell.ObjectModel.BrowsableObjectInfo.RegisterDefaultBrowsabilityPaths();
 
             RegisterAllProcessSelectors();
         }

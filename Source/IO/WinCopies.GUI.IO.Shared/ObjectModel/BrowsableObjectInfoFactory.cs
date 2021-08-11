@@ -27,7 +27,7 @@ namespace WinCopies.GUI.IO.ObjectModel
 {
     public interface IBrowsableObjectInfoFactory
     {
-        ClientVersion ClientVersion { get; }
+        WinCopies.IO.ClientVersion ClientVersion { get; }
 
         Comparison<IBrowsableObjectInfo> SortComparison { get; set; }
 
@@ -45,7 +45,7 @@ namespace WinCopies.GUI.IO.ObjectModel
         /// <summary>
         /// Gets the <see cref="Microsoft.WindowsAPICodePack.PortableDevices.ClientVersion"/> value associated to this factory. This value is used for <see cref="PortableDeviceInfo"/> and <see cref="PortableDeviceItemInfo"/> creation when browsing the Computer folder with a <see cref="ShellObjectInfo"/> item.
         /// </summary>
-        public ClientVersion ClientVersion { get; }
+        public WinCopies.IO.ClientVersion ClientVersion { get; }
 
         public Comparison<IBrowsableObjectInfo> SortComparison { get; set; }
 
@@ -53,7 +53,7 @@ namespace WinCopies.GUI.IO.ObjectModel
         /// Initializes a new instance of the <see cref="BrowsableObjectInfoFactory"/> class.
         /// </summary>
         /// <param name="clientVersion">The <see cref="Microsoft.WindowsAPICodePack.PortableDevices.ClientVersion"/> value for PortableDevice items creation. See <see cref="ClientVersion"/>.</param>
-        public BrowsableObjectInfoFactory(in ClientVersion clientVersion) => ClientVersion = clientVersion;
+        public BrowsableObjectInfoFactory(in WinCopies.IO.ClientVersion clientVersion) => ClientVersion = clientVersion;
 
         public BrowsableObjectInfoFactory() : this(WinCopies.IO.ObjectModel.BrowsableObjectInfo.GetDefaultClientVersion()) { /* Left empty. */ }
 

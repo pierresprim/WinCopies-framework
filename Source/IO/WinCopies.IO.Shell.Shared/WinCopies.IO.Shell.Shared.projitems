@@ -1,0 +1,116 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>5c6a8e8f-21ab-4c80-b898-5fb090cb72bd</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>WinCopies.IO</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)AbstractionInterop\ArchiveItemInfoProviderItemProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AbstractionInterop\Reflection\DotNetMemberInfoItemProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AbstractionInterop\Reflection\DotNetParameterInfoItemProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AbstractionInterop\Reflection\DotNetNamespaceInfoItemProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AbstractionInterop\ArchiveItemInfoItemProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AbstractionInterop\Reflection\DotNetTypeInfoEnumeratorProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AbstractionInterop\RegistryItemInfoItemProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AbstractionInterop\PortableDeviceObjectInfoItemProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AbstractionInterop\WMIItemInfoItemProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AbstractionInterop\ShellObjectInfoItemProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FileSystemEntryEnumeratorProcessSimulation.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Enumeration\Reflection\DotNetEnumeration.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Enumeration\RegistryItemInfoEnumeratorStruct.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Icons.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\IArchiveItemInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\IArchiveItemInfoProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\IFileSystemObjectInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\IPortableDeviceInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\IPortableDeviceObjectInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\Reflection\IDotNetAssemblyInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\Reflection\IDotNetAttributeInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\Reflection\IDotNetMemberInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\Reflection\IDotNetNamespaceInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\Reflection\IDotNetParameterInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\Reflection\IDotNetTypeInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Enumeration\ArchiveItemInfoEnumerator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Enumeration\WMIItemInfoEnumerator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\Icons.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PathInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ObjectModel\ArchiveProcess.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ObjectModel\Compression.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ObjectModel\Copy.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ObjectModel\Deletion.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ObjectModel\Extraction.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessError.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessErrorFactory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessOptions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Enumeration\ArchiveFileInfoEnumeratorStruct.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FileInfoLoader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\ArchiveItemInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Enumeration\Enumerators.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\ArchiveItemInfoProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)File.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\Shell\ShellProperty.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\TypeCommonProperties\ObjectModel\PortableDeviceProperties.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\TypeCommonProperties\ObjectModel\WMIItemInfoProperties.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ReflectionHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RegistryItemInfoComparer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Selectors\PortableDeviceSelectorDictionaries.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Selectors\Reflection\DotNetTypeInfoSelectorDictionary.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Selectors\Reflection\DotNetNamespaceInfoSelectorDictionary.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Selectors\Reflection\DotNetMemberInfoSelectorDictionary.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Selectors\WMIItemInfoSelectorDictionary.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WMIItemInfoComparer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Enumeration\ShellObjectInfoEnumeration.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\Reflection\DotNetAssemblyInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\Reflection\DotNetAttributeInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\Reflection\IDotNetItemInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\Reflection\DotNetItemInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DotNetItemType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\Reflection\DotNetMemberInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\Reflection\DotNetNamespaceInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\Reflection\DotNetParameterInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\Reflection\DotNetTypeInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Enumeration\Reflection\DotNetMemberInfoEnumeration.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Enumeration\Reflection\DotNetNamespaceInfoEnumeration.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Enumeration\Reflection\DotNetTypeInfoEnumeration.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\FileSystemObjectInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FolderLoader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Exceptions\DirectoryNotFoundException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Exceptions\DriveNotFoundException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Exceptions\EndOfStreamException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Exceptions\FileLoadException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Exceptions\FileNotFoundException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Exceptions\PathTooLongException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Exceptions\PipeException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\IRegistryItemInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\IShellObjectInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\IWMIItemInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Path.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\PortableDeviceInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\PortableDeviceObjectInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\Shell\ShellObjectPropertySystemCollection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\TypeCommonProperties\InterfaceModel\ReflectionProperties.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\TypeCommonProperties\InterfaceModel\FileSystemProperties.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\TypeCommonProperties\ObjectModel\ArchiveItemInfoProperties.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\TypeCommonProperties\ObjectModel\ReflectionProperties.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\TypeCommonProperties\ObjectModel\RegistryItemInfoProperties.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\TypeCommonProperties\ObjectModel\ShellProperties.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Registry.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Exceptions\RegistryException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\RegistryItemInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\ShellObjectInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Enumeration\ShellObjectInfoEnumeratorStruct.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Selectors\ArchiveItemInfoSelectorDictionary.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Selectors\RegistryItemInfoSelectorDictionary.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Selectors\ShellObjectInfoSelectorDictionary.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\WMIItemInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\WMIItemInfoFactory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WMIItemTypes.cs" />
+  </ItemGroup>
+</Project>

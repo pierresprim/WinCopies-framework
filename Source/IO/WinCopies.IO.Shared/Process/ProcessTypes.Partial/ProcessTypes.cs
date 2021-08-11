@@ -102,8 +102,6 @@ namespace WinCopies.IO.Process
 
             Size? IPath.Size => Item.Size;
 
-            bool IPath.AlreadyPushed => Item.AlreadyPushed;
-
             protected internal ProcessErrorItem(in TPath path) => Item = path;
 
             protected internal ProcessErrorItem(in TPath path, in IProcessError<TError, TAction> error) : this(path) => Error = error;
@@ -124,33 +122,5 @@ namespace WinCopies.IO.Process
             #endregion
 #endif
         }
-    }
-
-    public abstract class ProcessErrorFactory<T, TAction> : ProcessTypes<T, ProcessError, TAction>.ProcessErrorFactoryBase, ProcessErrorTypes<T, ProcessError, TAction>.IProcessErrorFactories where T : IPathInfo
-    {
-        public ProcessError NoError => ProcessError.None;
-
-        public ProcessError UnknownError => ProcessError.UnknownError;
-
-        public ProcessError CancelledByUserError => ProcessError.CanceledByUser;
-
-        public ProcessError WrongStatusError => ProcessError.WrongStatus;
-
-        public abstract TAction IgnoreAction { get; }
-
-#if !CS8
-        object IProcessErrorFactoryData.NoError => NoError;
-
-        object IProcessErrorFactoryData.UnknownError => UnknownError;
-
-        object IProcessErrorFactoryData.CancelledByUserError => CancelledByUserError;
-
-        object IProcessErrorFactoryData.WrongStatusError => WrongStatusError;
-#endif
-    }
-
-    public class DefaultProcessErrorFactory<T> : ProcessErrorFactory<T, ErrorAction> where T : IPathInfo
-    {
-        public override ErrorAction IgnoreAction => ErrorAction.Ignore;
     }
 }

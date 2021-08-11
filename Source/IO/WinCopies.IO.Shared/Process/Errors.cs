@@ -18,7 +18,6 @@
 using Microsoft.WindowsAPICodePack.Win32Native;
 
 using System;
-using System.Linq;
 
 using WinCopies.IO.Resources;
 
@@ -28,30 +27,6 @@ using static WinCopies.ThrowHelper;
 
 namespace WinCopies.IO.Process
 {
-    public static class ProcessErrorHelper
-    {
-        public static IProcessError<ProcessError, TAction> GetError<TAction>(in ProcessError error, in ErrorCode errorCode, in IProcessErrorFactory<ProcessError, TAction> factory) => factory.GetError(error, GetErrorMessageFromProcessError(error), errorCode);
-
-        public static IProcessError<ProcessError, TAction> GetError<TAction>(in ProcessError error, in HResult hResult, in IProcessErrorFactory<ProcessError, TAction> factory) => factory.GetError(error, GetErrorMessageFromProcessError(error), hResult);
-
-        public static string GetErrorMessageFromProcessError(ProcessError error)
-        {
-            System.Reflection.PropertyInfo property = typeof(ExceptionMessages).GetProperties().FirstOrDefault(p => p.Name == error.ToString());
-
-            return property == null ? error.ToString() : (string)property.GetValue(null);
-        }
-
-#if !CS8
-        public static IProcessError GetNoErrorError(this IProcessErrorFactory factory) => factory.GetError(factory.NoError, ExceptionMessages.NoError, ErrorCode.NoError);
-
-        public static IProcessError<T, TAction> GetNoErrorError<T, TAction>(this IProcessErrorFactory<T, TAction> factory) => factory.GetError(factory.NoError, ExceptionMessages.NoError, ErrorCode.NoError);
-
-        public static IProcessError GetUnknownError<T, TAction>(this IProcessErrorFactory factory) => factory.GetError(factory.UnknownError, ExceptionMessages.UnknownError, HResult.Fail);
-
-        public static IProcessError<T, TAction> GetUnknownError<T, TAction>(this IProcessErrorFactory<T, TAction> factory) => factory.GetError(factory.UnknownError, ExceptionMessages.UnknownError, HResult.Fail);
-#endif
-    }
-
     public sealed class ProcessError<TError, TAction> : IProcessError<TError, TAction>
     {
         private readonly string _message;

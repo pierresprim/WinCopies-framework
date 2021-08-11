@@ -104,5 +104,7 @@ namespace WinCopies.IO
 
             return path;
         }
+
+        public static T GetPathOrThrowIfInvalid<T>(this NullableGeneric<T> path, in string argumentName) where T : IPathCommon => path.GetOrThrowIfInvalidPath(argumentName).Value;
     }
 }

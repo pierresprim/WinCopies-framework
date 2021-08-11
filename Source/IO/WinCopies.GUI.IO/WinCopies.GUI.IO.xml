@@ -418,7 +418,7 @@
             Gets the <see cref="T:Microsoft.WindowsAPICodePack.PortableDevices.ClientVersion"/> value associated to this factory. This value is used for <see cref="T:WinCopies.IO.ObjectModel.PortableDeviceInfo"/> and <see cref="!:PortableDeviceItemInfo"/> creation when browsing the Computer folder with a <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/> item.
             </summary>
         </member>
-        <member name="M:WinCopies.GUI.IO.ObjectModel.BrowsableObjectInfoFactory.#ctor(Microsoft.WindowsAPICodePack.PortableDevices.ClientVersion@)">
+        <member name="M:WinCopies.GUI.IO.ObjectModel.BrowsableObjectInfoFactory.#ctor(WinCopies.IO.ClientVersion@)">
             <summary>
             Initializes a new instance of the <see cref="T:WinCopies.GUI.IO.ObjectModel.BrowsableObjectInfoFactory"/> class.
             </summary>
@@ -432,6 +432,36 @@
             <returns>An <see cref="T:WinCopies.IO.ObjectModel.IBrowsableObjectInfo"/> for <paramref name="path"/>.</returns>
             <remarks>This method cannot create <see cref="T:WinCopies.IO.ObjectModel.IBrowsableObjectInfo"/> for WMI paths.</remarks>
             <exception cref="T:System.ArgumentException"><paramref name="path"/> is not a Shell or a Registry path.</exception>
+        </member>
+        <member name="T:XamlGeneratedNamespace.GeneratedInternalTypeHelper">
+            <summary>
+            GeneratedInternalTypeHelper
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateInstance(System.Type,System.Globalization.CultureInfo)">
+            <summary>
+            CreateInstance
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.GetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            GetPropertyValue
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.SetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            SetPropertyValue
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateDelegate(System.Type,System.Object,System.String)">
+            <summary>
+            CreateDelegate
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.AddEventHandler(System.Reflection.EventInfo,System.Object,System.Delegate)">
+            <summary>
+            AddEventHandler
+            </summary>
         </member>
     </members>
 </doc>

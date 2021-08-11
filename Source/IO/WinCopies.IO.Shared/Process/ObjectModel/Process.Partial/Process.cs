@@ -24,6 +24,7 @@ using System.Linq;
 using WinCopies.Collections.DotNetFix;
 using WinCopies.Collections.DotNetFix.Generic;
 using WinCopies.Collections.Generic;
+using WinCopies.IO.Resources;
 using WinCopies.Util;
 using WinCopies.Util.Commands.Primitives;
 
@@ -60,6 +61,19 @@ namespace WinCopies.IO.Process
 
         Error
     }
+
+#if !CS8
+    public static class ProcessErrorHelper
+    {
+        public static IProcessError GetNoErrorError(this IProcessErrorFactory factory) => factory.GetError(factory.NoError, ExceptionMessages.NoError, ErrorCode.NoError);
+
+        public static IProcessError<T, TAction> GetNoErrorError<T, TAction>(this IProcessErrorFactory<T, TAction> factory) => factory.GetError(factory.NoError, ExceptionMessages.NoError, ErrorCode.NoError);
+
+        public static IProcessError GetUnknownError<T, TAction>(this IProcessErrorFactory factory) => factory.GetError(factory.UnknownError, ExceptionMessages.UnknownError, HResult.Fail);
+
+        public static IProcessError<T, TAction> GetUnknownError<T, TAction>(this IProcessErrorFactory<T, TAction> factory) => factory.GetError(factory.UnknownError, ExceptionMessages.UnknownError, HResult.Fail);
+    }
+#endif
 
     namespace ObjectModel
     {

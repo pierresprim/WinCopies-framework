@@ -100,12 +100,12 @@ namespace WinCopies.GUI.IO.Process
 
                     else
 
-                        throw new InvalidOperationException(ExceptionMessages.ProcessParametersCouldNotBeParsedCorrectly);
+                        throw new InvalidOperationException(WinCopies.IO.Shell.Resources.ExceptionMessages.ProcessParametersCouldNotBeParsedCorrectly);
             }
 
             catch (Exception ex) when (ex.Is(false, typeof(InvalidCastException), typeof(FormatException), typeof(OverflowException), typeof(ArgumentNullException)))
             {
-                throw new InvalidOperationException(ExceptionMessages.ProcessParametersCouldNotBeParsedCorrectly, ex);
+                throw new InvalidOperationException(WinCopies.IO.Shell.Resources.ExceptionMessages.ProcessParametersCouldNotBeParsedCorrectly, ex);
             }
 
             return result;
@@ -115,7 +115,7 @@ namespace WinCopies.GUI.IO.Process
         {
             using (System.Collections.Generic.IEnumerator<string> enumerator = (processParameters ?? throw GetArgumentNullException(nameof(processParameters))).Parameters.GetEnumerator())
 
-                return enumerator.MoveNext() ? FromProcessParameters(enumerator) : throw new InvalidOperationException(ExceptionMessages.ProcessParametersCouldNotBeParsedCorrectly);
+                return enumerator.MoveNext() ? FromProcessParameters(enumerator) : throw new InvalidOperationException(WinCopies.IO.Shell.Resources.ExceptionMessages.ProcessParametersCouldNotBeParsedCorrectly);
         }
     }
 

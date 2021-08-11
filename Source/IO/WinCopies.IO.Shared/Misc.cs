@@ -18,20 +18,75 @@
 using System;
 using System.Drawing;
 using System.Linq;
+using System.Reflection;
 using System.Windows.Media.Imaging;
 
 using WinCopies.Collections.Generic;
 using WinCopies.Collections.DotNetFix.Generic;
 using WinCopies.Desktop;
-using WinCopies.Extensions;
 using WinCopies.IO.ObjectModel;
 using WinCopies.IO.Process.ObjectModel;
 
-using static WinCopies.IO.ObjectModel.BrowsableObjectInfo;
 using static WinCopies.ThrowHelper;
+using System.IO;
 
 namespace WinCopies.IO
 {
+    public enum FileSystemEntryEnumerationOrder : byte
+    {
+        /// <summary>
+        /// Does not sort items.
+        /// </summary>
+        None = 0,
+
+        /// <summary>
+        /// Enumerates files then directories.
+        /// </summary>
+        FilesThenDirectories = 1,
+
+        /// <summary>
+        /// Enumerates directories then files.
+        /// </summary>
+        DirectoriesThenFiles = 2
+    }
+
+    public struct ClientVersion
+    {
+        public string ClientName { get; }
+        public uint MajorVersion { get; }
+        public uint MinorVersion { get; }
+        public uint Revision { get; }
+
+        public ClientVersion(in string clientName, in uint majorVersion, in uint minorVersion, in uint revision)
+        {
+            ClientName = clientName;
+
+            MajorVersion = majorVersion;
+
+            MinorVersion = minorVersion;
+
+            Revision = revision;
+        }
+
+        public ClientVersion(in string clientName, in Version version) : this(clientName, (uint)version.Major, (uint)version.Minor, (uint)version.Revision)
+        {
+            // Left empty.
+        }
+
+        public ClientVersion(in AssemblyName assemblyName) : this(assemblyName.Name, assemblyName.Version)
+        {
+            // Left empty.
+        }
+
+        public override bool Equals(object obj) => obj is ClientVersion _obj ? _obj.ClientName == ClientName && _obj.MajorVersion == MajorVersion && _obj.MinorVersion == MinorVersion && _obj.Revision == Revision : false;
+
+        public override int GetHashCode() => ClientName.GetHashCode() ^ MajorVersion.GetHashCode() ^ MinorVersion.GetHashCode() ^ Revision.GetHashCode();
+
+        public static bool operator ==(ClientVersion left, ClientVersion right) => left.Equals(right);
+
+        public static bool operator !=(ClientVersion left, ClientVersion right) => !(left == right);
+    }
+
     public interface IRecursiveEnumerable<T> : Collections.Generic.IRecursiveEnumerable<T>
     {
         new RecursiveEnumeratorAbstract<T> GetEnumerator();
@@ -303,33 +358,16 @@ namespace WinCopies.IO
 
             public abstract string GetUserConfirmationText();
 
+            protected abstract bool CanRun(System.Collections.Generic.IEnumerator<IBrowsableObjectInfo> enumerator);
+
             public virtual bool CanRun(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths)
             {
                 var enumerator = new EmptyCheckEnumerator<IBrowsableObjectInfo>((paths ?? throw GetArgumentNullException(nameof(paths))).GetEnumerator());
 
-                if (enumerator.HasItems)
-                {
-                    var enumerable = new CustomEnumeratorEnumerable<IBrowsableObjectInfo, System.Collections.Generic.IEnumerator<IBrowsableObjectInfo>>(enumerator);
-
-                    foreach (IBrowsableObjectInfo path in enumerable)
-
-                        if (!(path is IShellObjectInfoBase2 shellObjectInfo
-                            && shellObjectInfo.InnerObject.IsFileSystemObject
-                            && shellObjectInfo.Path.Validate(Path.Path, Path.Path.EndsWith(WinCopies.IO.Path.PathSeparator
-#if !CS8
-                                .ToString()
-#endif
-                                ) ? 1 : 0, null, null, 1, "\\")))
-
-                            return false;
-
-                    return true;
-                }
-
-                return false;
+                return enumerator.HasItems && CanRun(enumerator);
             }
 
-            protected internal virtual void Dispose() => Path = default;
+            protected virtual void Dispose() => Path = default;
 
             ~ProcessFactoryProcessInfo() => Dispose();
         }
@@ -517,19 +555,6 @@ namespace WinCopies.IO
         }
 
         ~BrowsableObjectInfoBitmapSources() => Dispose(false);
-    }
-
-    public class BrowsableObjectInfoIconBitmapSources : BrowsableObjectInfoBitmapSources<Icon>
-    {
-        protected override BitmapSource SmallBitmapSourceOverride => TryGetBitmapSource(InnerObject);
-
-        protected override BitmapSource MediumBitmapSourceOverride => TryGetBitmapSource(InnerObject);
-
-        protected override BitmapSource LargeBitmapSourceOverride => TryGetBitmapSource(InnerObject);
-
-        protected override BitmapSource ExtraLargeBitmapSourceOverride => TryGetBitmapSource(InnerObject);
-
-        public BrowsableObjectInfoIconBitmapSources(in Icon icon) : base(icon) { /* Left empty. */ }
     }
 
     public class BrowsableObjectInfoBitmapBitmapSources : BrowsableObjectInfoBitmapSources<Bitmap>

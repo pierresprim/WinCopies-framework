@@ -203,17 +203,17 @@ namespace WinCopies.IO
 
 
         public static System.Collections.Generic.IEnumerable<T> Enumerate<T>(in System.Collections.Generic.IEnumerable<T> paths, RecursiveEnumerationOrder recursiveEnumerationOrder, in Func<IPathInfo, T> getNewPathInfoDelegate, in bool safeEnumeration
-#if DEBUG
-            , FileSystemEntryEnumeratorProcessSimulation simulationParameters
-#endif
+            //#if DEBUG
+            //            , FileSystemEntryEnumeratorProcessSimulation simulationParameters
+            //#endif
             ) where T : IPathInfo => Enumerate(paths, null, null
 #if CS8
             , null
 #endif
                 , FileSystemEntryEnumerationOrder.None, recursiveEnumerationOrder, getNewPathInfoDelegate, safeEnumeration
-#if DEBUG
-                , simulationParameters
-#endif
+            //#if DEBUG
+            //                , simulationParameters
+            //#endif
             );
 
         ///// <summary>
@@ -224,17 +224,17 @@ namespace WinCopies.IO
             , EnumerationOptions enumerationOptions
 #endif
             , FileSystemEntryEnumerationOrder enumerationOrder, RecursiveEnumerationOrder recursiveEnumerationOrder, Func<IPathInfo, T> getNewPathInfoDelegate, bool safeEnumeration
-#if DEBUG
-            , FileSystemEntryEnumeratorProcessSimulation simulationParameters
-#endif
+            //#if DEBUG
+            //            , FileSystemEntryEnumeratorProcessSimulation simulationParameters
+            //#endif
             ) where T : IPathInfo => new Enumerable<T>(() => new RecursiveEnumerator<T>(paths.Select(item => new RecursivelyEnumerablePath<T>(item, searchPattern, searchOption
 #if CS8
                 , enumerationOptions
 #endif
                 , enumerationOrder, recursiveEnumerationOrder, getNewPathInfoDelegate, safeEnumeration
-#if DEBUG
-                , simulationParameters
-#endif
+                //#if DEBUG
+                //                , simulationParameters
+                //#endif
                 )), recursiveEnumerationOrder));
 
         #region Old

@@ -12,7 +12,6 @@ CHANGELOG
 - IProcessFactoryProcessInfo: add GetUserConfirmationText() method.
 - IProcessFactory: add Recycling property.
 - Re-design process options and error types.
-- ProcessError.CancelledByUser => ProcessError.CanceledByUser
 - Update Deletion to add recycling option.
 - Process base class:
 	- Add protected methods.

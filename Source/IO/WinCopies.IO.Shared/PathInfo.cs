@@ -35,8 +35,6 @@ namespace WinCopies.IO
     {
         bool IsDirectory { get; }
 
-        bool AlreadyPushed { get; }
-
         Size? Size { get; }
     }
 
@@ -65,8 +63,6 @@ namespace WinCopies.IO
         public string RelativePath { get; }
 
         public bool IsDirectory { get; }
-
-        public bool AlreadyPushed { get; protected internal set; }
 
         public abstract string Path { get; }
 
@@ -179,7 +175,7 @@ namespace WinCopies.IO
             public bool Equals(
 #if CS8
                 [AllowNull]
-            #endif
+#endif
             IO.IPathCommon other) => PathHelper.Equals(this, other);
 
             public override bool Equals(object obj) => PathHelper.Equals(this, obj);
@@ -199,12 +195,12 @@ namespace WinCopies.IO
 
             public PathInfo(in string relativePath, in T parent) : this(relativePath, parent, GetIsDirectory(new PathInfoCommon(relativePath, parent).Path)) { /* Left empty. */ }
 
-            public PathInfo(in IPathCommon path, in bool isDirectory) : this((path ?? throw GetArgumentNullException(nameof(path))).RelativePath, path.Parent.GetOrThrowIfInvalidPath(nameof(path)).Value, isDirectory)
+            public PathInfo(in IPathCommon path, in bool isDirectory) : this((path ?? throw GetArgumentNullException(nameof(path))).RelativePath, path.Parent.GetPathOrThrowIfInvalid(nameof(path)), isDirectory)
             {
                 // Left empty.
             }
 
-            public PathInfo(in IPathCommon path) : this((path ?? throw GetArgumentNullException(nameof(path))).RelativePath, path.Parent.GetOrThrowIfInvalidPath(nameof(path)).Value, GetIsDirectory(path.Path))
+            public PathInfo(in IPathCommon path) : this((path ?? throw GetArgumentNullException(nameof(path))).RelativePath, path.Parent.GetPathOrThrowIfInvalid(nameof(path)), GetIsDirectory(path.Path))
             {
                 // Left empty.
             }
@@ -223,7 +219,7 @@ namespace WinCopies.IO
             }
         }
 
-        public class RootPath : PathInfoBase, IPathInfo
+        public class RootPath : PathInfoBase
         {
             public override NullableGeneric<T> Parent => null;
 

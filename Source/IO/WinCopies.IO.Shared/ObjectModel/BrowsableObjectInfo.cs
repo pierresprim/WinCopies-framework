@@ -16,8 +16,6 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 
-using Microsoft.WindowsAPICodePack.PortableDevices;
-
 using System;
 using System.Collections;
 using System.Drawing;
@@ -29,7 +27,6 @@ using System.Windows.Media.Imaging;
 using WinCopies.Collections.Generic;
 using WinCopies.GUI.Drawing;
 using WinCopies.IO.ObjectModel;
-using WinCopies.IO.ObjectModel.Reflection;
 using WinCopies.IO.Process;
 using WinCopies.IO.Process.ObjectModel;
 using WinCopies.IO.PropertySystem;
@@ -69,6 +66,7 @@ namespace WinCopies.IO.ObjectModel
     public abstract class BrowsableObjectInfo : BrowsableObjectInfoBase, IBrowsableObjectInfo
     {
         protected static void EmptyVoid() { /* Left empty. */ }
+
         #region Consts
         public const ushort SmallIconSize = 16;
         public const ushort MediumIconSize = 48;
@@ -86,27 +84,12 @@ namespace WinCopies.IO.ObjectModel
         #region Static Properties
         public static ISelectorDictionary<ProcessFactorySelectorDictionaryParameters, IProcess> DefaultProcessSelectorDictionary { get; } = new DefaultNullableValueSelectorDictionary<ProcessFactorySelectorDictionaryParameters, IProcess>();
 
-        public static Action RegisterDefaultBrowsabilityPaths { get; private set; } = () =>
-          {
-              ShellObjectInfo.BrowsabilityPathStack.Push(new MultiIconInfo.BrowsabilityPath());
-              ShellObjectInfo.BrowsabilityPathStack.Push(new DotNetAssemblyInfo.BrowsabilityPath());
-
-              RegisterDefaultBrowsabilityPaths = EmptyVoid;
-          };
-
         //public static Action RegisterDefaultSelectors { get; private set; } = () =>
         //{
         //    DotNetAssemblyInfo.RegisterSelectors();
 
         //    RegisterDefaultSelectors = EmptyVoid;
         //};
-
-        public static Action RegisterDefaultProcessSelectors { get; private set; } = () =>
-        {
-            ShellObjectInfo.RegisterProcessSelectors();
-
-            RegisterDefaultProcessSelectors = EmptyVoid;
-        };
         #endregion
 
         #region Protected Properties
@@ -176,11 +159,11 @@ namespace WinCopies.IO.ObjectModel
         #endregion
 
         #region Constructors
+        // /// <param name="clientVersion">The <see cref="ClientVersion"/> that will be used to initialize new <see cref="PortableDeviceInfo"/>s and <see cref="PortableDeviceObjectInfo"/>s.</param>
         /// <summary>
         /// Initializes a new instance of the <see cref="BrowsableObjectInfo"/> class.
         /// </summary>
         /// <param name="path">The path of the new item.</param>
-        /// <param name="clientVersion">The <see cref="Microsoft.WindowsAPICodePack.PortableDevices.ClientVersion"/> that will be used to initialize new <see cref="PortableDeviceInfo"/>s and <see cref="PortableDeviceObjectInfo"/>s.</param>
         protected BrowsableObjectInfo(in string path, in ClientVersion clientVersion) : base(path) => ClientVersion = clientVersion;
         #endregion
 
@@ -200,34 +183,6 @@ namespace WinCopies.IO.ObjectModel
         }
 
         public static bool Predicate(in ProcessFactorySelectorDictionaryParameters item, in Type t) => WinCopies.Extensions.UtilHelpers.ContainsFieldValue(t, null, item.ProcessParameters.Guid.ToString());
-
-        public static Icon TryGetIcon(in Icon[] icons, in System.Drawing.Size size) => icons?.TryGetIcon(size, 32, true, true);
-
-        public static Icon TryGetIcon(in Icon[] icons, in ushort size) => TryGetIcon(icons, new System.Drawing.Size(size, size));
-
-        public static Icon TryGetIcon(in Icon icon, in System.Drawing.Size size) => TryGetIcon(icon?.Split(), size);
-
-        public static Icon TryGetIcon(in Icon icon, in ushort size) => TryGetIcon(icon, new System.Drawing.Size(size, size));
-
-        public static Icon TryGetIcon(in int iconIndex, in string dll, in System.Drawing.Size size) => TryGetIcon(new IconExtractor(IO.Path.GetRealPathFromEnvironmentVariables(IO.Path.System32Path + dll)).GetIcon(iconIndex), size);
-
-        public static BitmapSource TryGetBitmapSource(in int iconIndex, in string dllName, in int size)
-        {
-            using
-#if !CS8
-            (
-#endif
-                Icon icon = TryGetIcon(iconIndex, dllName, new System.Drawing.Size(size, size))
-#if CS8
-            ;
-#else
-            )
-#endif
-
-                return TryGetBitmapSource(icon);
-        }
-
-        public static BitmapSource TryGetBitmapSource(in Icon icon) => icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
         #endregion
 
         #region Protected Methods

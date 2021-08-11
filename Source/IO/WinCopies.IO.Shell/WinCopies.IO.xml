@@ -1,0 +1,926 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>WinCopies.IO.Shell</name>
+    </assembly>
+    <members>
+        <member name="T:WinCopies.IO.Shell.Properties.Resources">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Properties.Resources.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Properties.Resources.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Properties.Resources.Compression">
+            <summary>
+              Looks up a localized string similar to Compression.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Properties.Resources.Copy">
+            <summary>
+              Looks up a localized string similar to Copy.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Properties.Resources.Deletion">
+            <summary>
+              Looks up a localized string similar to Deletion.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Properties.Resources.DotNetAttribute">
+            <summary>
+              Looks up a localized string similar to .Net Attribute.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Properties.Resources.DotNetMember">
+            <summary>
+              Looks up a localized string similar to .Net Member.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Properties.Resources.DotNetNamespace">
+            <summary>
+              Looks up a localized string similar to .Net Namespace.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Properties.Resources.DotNetParameter">
+            <summary>
+              Looks up a localized string similar to .Net Parameter.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Properties.Resources.DotNetType">
+            <summary>
+              Looks up a localized string similar to .Net Type.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Properties.Resources.Extraction">
+            <summary>
+              Looks up a localized string similar to Extraction.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Properties.Resources.Move">
+            <summary>
+              Looks up a localized string similar to Move.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Properties.Resources.PortableDevice">
+            <summary>
+              Looks up a localized string similar to Portable Device.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Properties.Resources.RegistryKey">
+            <summary>
+              Looks up a localized string similar to Registry Key.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Properties.Resources.RegistryRoot">
+            <summary>
+              Looks up a localized string similar to Registry Root.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Properties.Resources.RegistryValue">
+            <summary>
+              Looks up a localized string similar to Registry Value.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Properties.Resources.UserConfirmationText">
+            <summary>
+              Looks up a localized string similar to Are you sure you want to {0} the selected files?.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Properties.Resources.UserConfirmationTextCurrentPath">
+            <summary>
+              Looks up a localized string similar to Are you sure you want to {0} the current path?.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Properties.Resources.WMIClass">
+            <summary>
+              Looks up a localized string similar to WMI Class.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Properties.Resources.WMIInstance">
+            <summary>
+              Looks up a localized string similar to WMI Instance.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Properties.Resources.WMINamespace">
+            <summary>
+              Looks up a localized string similar to WMI Namespace.
+            </summary>
+        </member>
+        <member name="T:WinCopies.IO.Shell.Resources.ExceptionMessages">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Resources.ExceptionMessages.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Resources.ExceptionMessages.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Resources.ExceptionMessages.AccessDenied">
+            <summary>
+              Looks up a localized string similar to The process cannot access to the file..
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Resources.ExceptionMessages.CopyDidNotSucceeded">
+            <summary>
+              Looks up a localized string similar to The copy operation did not succeeded..
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Resources.ExceptionMessages.CouldNotCreateItem">
+            <summary>
+              Looks up a localized string similar to Could not create item..
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Resources.ExceptionMessages.Destination">
+            <summary>
+              Looks up a localized string similar to destination.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Resources.ExceptionMessages.DirectoryNotEmpty">
+            <summary>
+              Looks up a localized string similar to The directory contains items..
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Resources.ExceptionMessages.DiskError">
+            <summary>
+              Looks up a localized string similar to A disk error occurred..
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Resources.ExceptionMessages.DriveNotReady">
+            <summary>
+              Looks up a localized string similar to The source and/or the destination drive is not ready..
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Resources.ExceptionMessages.EncryptionFailed">
+            <summary>
+              Looks up a localized string similar to The encryption failed..
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Resources.ExceptionMessages.FileReadOnly">
+            <summary>
+              Looks up a localized string similar to The file is read-only..
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Resources.ExceptionMessages.FileRenamingFailed">
+            <summary>
+              Looks up a localized string similar to The file could not be renamed..
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Resources.ExceptionMessages.FileSystemEntryAlreadyExists">
+            <summary>
+              Looks up a localized string similar to There is already an item with this path..
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Resources.ExceptionMessages.GivenShellObjectIsNotAFile">
+            <summary>
+              Looks up a localized string similar to The given ShellObject is not a file..
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Resources.ExceptionMessages.ItemDoesNotRepresentARegistryKey">
+            <summary>
+              Looks up a localized string similar to This item does not represent a registry key..
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Resources.ExceptionMessages.ItemIsNotDirectory">
+            <summary>
+              Looks up a localized string similar to The item is not a directory..
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Resources.ExceptionMessages.NoProcessCouldBeGenerated">
+            <summary>
+              Looks up a localized string similar to No process could be generated..
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Resources.ExceptionMessages.NotEnoughSpace">
+            <summary>
+              Looks up a localized string similar to There is not enough space on the destination drive or the total size cannot be determined..
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Resources.ExceptionMessages.ParentMustBeAnIDotNetAssemblyInfoOrAnIDotNetItemInfoBase">
+            <summary>
+              Looks up a localized string similar to &apos;parent&apos; must be an IDotNetAssemblyInfo or an IDotNetItemInfoBase..
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Resources.ExceptionMessages.PathNotFound">
+            <summary>
+              Looks up a localized string similar to The path could not be found..
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Resources.ExceptionMessages.PathTooLong">
+            <summary>
+              Looks up a localized string similar to The destination path is too long..
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Resources.ExceptionMessages.ProcessParametersCouldNotBeParsedCorrectly">
+            <summary>
+              Looks up a localized string similar to The given parameters could not be parsed correctly..
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Resources.ExceptionMessages.PropertyCannotBeNullOnObject">
+            <summary>
+              Looks up a localized string similar to {0} cannot be null on {1}..
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Resources.ExceptionMessages.ReadProtection">
+            <summary>
+              Looks up a localized string similar to The {0} is protected from reading..
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Resources.ExceptionMessages.RegistryKeyNotExists">
+            <summary>
+              Looks up a localized string similar to The specified registry key does not exist..
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Resources.ExceptionMessages.SharingViolation">
+            <summary>
+              Looks up a localized string similar to The file is open in another process..
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Resources.ExceptionMessages.SharingViolationFileOpenInMultipleProcesses">
+            <summary>
+              Looks up a localized string similar to The file is open in multiple processes..
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Resources.ExceptionMessages.SharingViolationFileOpenInProcess">
+            <summary>
+              Looks up a localized string similar to The file is open in {0}..
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Resources.ExceptionMessages.ShellObjectIsNotSupported">
+            <summary>
+              Looks up a localized string similar to The given ShellObject is not supported..
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Resources.ExceptionMessages.Source">
+            <summary>
+              Looks up a localized string similar to source.
+            </summary>
+        </member>
+        <member name="T:WinCopies.IO.Shell.Resources.PropertyDescriptions">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Resources.PropertyDescriptions.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Resources.PropertyDescriptions.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Resources.PropertyDescriptions.FileType">
+            <summary>
+              Looks up a localized string similar to The type of the current item (folder, file, ...).
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Resources.PropertyDescriptions.FileTypeName">
+            <summary>
+              Looks up a localized string similar to File type.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Resources.PropertyDescriptions.Size">
+            <summary>
+              Looks up a localized string similar to The size on disk of the current item..
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Resources.PropertyDescriptions.SizeName">
+            <summary>
+              Looks up a localized string similar to Size.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Process.CopyOptions`1.AutoRenameFiles">
+            <summary>
+            Gets a value that indicates whether files are automatically renamed when they conflict with existing paths.
+            </summary>
+        </member>
+        <member name="T:WinCopies.IO.Enumeration.ArchiveFileInfoEnumeratorStruct">
+            <summary>
+            Represents an archive item. This struct is used in enumeration methods.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Enumeration.ArchiveFileInfoEnumeratorStruct.Path">
+            <summary>
+            Gets the path of the current archive item. This property is set only when <see cref="P:WinCopies.IO.Enumeration.ArchiveFileInfoEnumeratorStruct.ArchiveFileInfo"/> is <see langword="null"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Enumeration.ArchiveFileInfoEnumeratorStruct.ArchiveFileInfo">
+            <summary>
+            Gets the <see cref="T:SevenZip.ArchiveFileInfo"/> that represents the cyrrent archive item. This property is set only when <see cref="P:WinCopies.IO.Enumeration.ArchiveFileInfoEnumeratorStruct.Path"/> is <see langword="null"/>.
+            </summary>
+        </member>
+        <member name="M:WinCopies.IO.Enumeration.ArchiveFileInfoEnumeratorStruct.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:WinCopies.IO.Enumeration.ArchiveFileInfoEnumeratorStruct"/> struct with the given path.
+            </summary>
+            <param name="path">The path of the archive item.</param>
+        </member>
+        <member name="T:WinCopies.IO.ObjectModel.IArchiveItemInfo`4">
+            <summary>
+            Represents an archive item.
+            </summary>
+        </member>
+        <member name="M:WinCopies.IO.ObjectModel.Reflection.DotNetAttributeInfo.GetItemProviders">
+            <summary>
+            Returns <see langword="null"/> as this item does not contain any item.
+            </summary>
+            <returns>A <see langword="null"/> value.</returns>
+        </member>
+        <member name="M:WinCopies.IO.ObjectModel.Reflection.DotNetAttributeInfo.GetItemProviders(System.Predicate{System.Object})">
+            <summary>
+            Returns <see langword="null"/> as this item does not contain any item.
+            </summary>
+            <returns>A <see langword="null"/> value.</returns>
+        </member>
+        <member name="M:WinCopies.IO.ObjectModel.Reflection.DotNetAttributeInfo.GetSelectorDictionaryOverride">
+            <summary>
+            Returns <see langword="null"/> as this item does not contain any item.
+            </summary>
+            <returns>A <see langword="null"/> value.</returns>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.Reflection.DotNetItemInfo`5.Name">
+            <summary>
+            Gets the name of this <see cref="T:WinCopies.IO.ObjectModel.Reflection.IDotNetItemInfo"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.Reflection.DotNetItemInfo`5.LocalizedName">
+            <summary>
+            Gets the same value as <see cref="P:WinCopies.IO.ObjectModel.Reflection.DotNetItemInfo`5.Name"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.Reflection.DotNetItemInfo`5.DescriptionOverride">
+            <summary>
+            Gets the <see cref="F:WinCopies.UtilHelpers.NotApplicable"/> value.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.Reflection.DotNetItemInfo`5.IsSpecialItemOverride">
+            <summary>
+            Gets the <see langword="false"/> value.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.Reflection.DotNetParameterInfo`2.InnerObjectGenericOverride">
+            <summary>
+            Gets the inner <see cref="T:System.Reflection.ParameterInfo"/>.
+            </summary>
+        </member>
+        <member name="T:WinCopies.IO.ObjectModel.ArchiveItemInfo`4">
+            <summary>
+            Represents an archive item.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.ArchiveItemInfo`4.BrowsableObjectInfoBitmapSources.SmallBitmapSourceOverride">
+            <summary>
+            Gets the small <see cref="T:System.Windows.Media.Imaging.BitmapSource"/> of this <see cref="T:WinCopies.IO.ObjectModel.ArchiveItemInfo"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.ArchiveItemInfo`4.BrowsableObjectInfoBitmapSources.MediumBitmapSourceOverride">
+            <summary>
+            Gets the medium <see cref="T:System.Windows.Media.Imaging.BitmapSource"/> of this <see cref="T:WinCopies.IO.ObjectModel.ArchiveItemInfo"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.ArchiveItemInfo`4.BrowsableObjectInfoBitmapSources.LargeBitmapSourceOverride">
+            <summary>
+            Gets the large <see cref="T:System.Windows.Media.Imaging.BitmapSource"/> of this <see cref="T:WinCopies.IO.ObjectModel.ArchiveItemInfo"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.ArchiveItemInfo`4.BrowsableObjectInfoBitmapSources.ExtraLargeBitmapSourceOverride">
+            <summary>
+            Gets the extra large <see cref="T:System.Windows.Media.Imaging.BitmapSource"/> of this <see cref="T:WinCopies.IO.ObjectModel.ArchiveItemInfo"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.ArchiveItemInfo`4.ArchiveShellObject">
+            <summary>
+            The parent <see cref="T:WinCopies.IO.ObjectModel.IShellObjectInfoBase"/> of the current archive item.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.ArchiveItemInfo`4.DescriptionOverride">
+            <summary>
+            Not applicable for this item type.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.ArchiveItemInfo`4.InnerObjectGenericOverride">
+            <summary>
+            The <see cref="T:SevenZip.ArchiveFileInfo"/> that this <see cref="T:WinCopies.IO.ObjectModel.ArchiveItemInfo"/> represents.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.ArchiveItemInfo`4.IsSpecialItemOverride">
+            <summary>
+            Gets a value that indicates whether this item is a hidden or system item.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.ArchiveItemInfo`4.LocalizedName">
+            <summary>
+            Returns the same value as <see cref="P:WinCopies.IO.ObjectModel.ArchiveItemInfo`4.Name"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.ArchiveItemInfo`4.Name">
+            <summary>
+            Gets the name of this <see cref="T:WinCopies.IO.ObjectModel.ArchiveItemInfo"/>.
+            </summary>
+        </member>
+        <member name="M:WinCopies.IO.ObjectModel.ArchiveItemInfo.GetItemProviders">
+            <summary>
+            Returns the items of this <see cref="T:WinCopies.IO.ObjectModel.ArchiveItemInfo"/>.
+            </summary>
+            <returns>An <see cref="T:System.Collections.Generic.IEnumerable`1"/> that enumerates through the items of this <see cref="T:WinCopies.IO.ObjectModel.ArchiveItemInfo"/>.</returns>
+        </member>
+        <member name="T:WinCopies.IO.ObjectModel.ArchiveItemInfoProvider`5">
+            <summary>
+            The base class for archive item info provider objects.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.ArchiveItemInfoProvider`5.ArchiveShellObject">
+            <summary>
+            The parent <see cref="T:WinCopies.IO.ObjectModel.IShellObjectInfoBase"/> of this item. For <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/> items, this property returns the current object.
+            </summary>
+        </member>
+        <member name="M:WinCopies.IO.ObjectModel.ArchiveItemInfoProvider`5.#ctor(System.String@,WinCopies.IO.ClientVersion@)">
+            <summary>
+            Initializes a new instance of the <see cref="T:WinCopies.IO.ObjectModel.ArchiveItemInfoProvider`5"/> class.
+            </summary>
+            <param name="path">The path of this <see cref="T:WinCopies.IO.ObjectModel.ArchiveItemInfoProvider`5"/>.</param>
+            <param name="clientVersion">The <see cref="T:WinCopies.IO.ClientVersion"/> that will be used for <see cref="T:WinCopies.IO.ObjectModel.PortableDeviceInfo"/> and <see cref="T:WinCopies.IO.ObjectModel.PortableDeviceObjectInfo"/> initialization.</param>
+        </member>
+        <member name="M:WinCopies.IO.ObjectModel.FileSystemObjectInfo`5.op_Equality(WinCopies.IO.ObjectModel.FileSystemObjectInfo{`0,`1,`2,`3,`4}@,WinCopies.IO.ObjectModel.FileSystemObjectInfo{`0,`1,`2,`3,`4}@)">
+            <summary>
+            Checks if two <see cref="T:WinCopies.IO.ObjectModel.FileSystemObjectInfo`5"/>s are equal.
+            </summary>
+            <param name="left">Left operand.</param>
+            <param name="right">Right operand.</param>
+            <returns>A <see cref="T:System.Boolean"/> value that indicates whether the two <see cref="T:WinCopies.IO.ObjectModel.FileSystemObjectInfo`5"/>s are equal.</returns>
+        </member>
+        <member name="M:WinCopies.IO.ObjectModel.FileSystemObjectInfo`5.op_Inequality(WinCopies.IO.ObjectModel.FileSystemObjectInfo{`0,`1,`2,`3,`4}@,WinCopies.IO.ObjectModel.FileSystemObjectInfo{`0,`1,`2,`3,`4}@)">
+            <summary>
+            Checks if two <see cref="T:WinCopies.IO.ObjectModel.FileSystemObjectInfo`5"/>s are different.
+            </summary>
+            <param name="left">Left operand.</param>
+            <param name="right">Right operand.</param>
+            <returns>A <see cref="T:System.Boolean"/> value that indicates whether the two <see cref="T:WinCopies.IO.ObjectModel.FileSystemObjectInfo`5"/>s are different.</returns>
+        </member>
+        <member name="M:WinCopies.IO.ObjectModel.FileSystemObjectInfo`5.op_LessThan(WinCopies.IO.ObjectModel.FileSystemObjectInfo{`0,`1,`2,`3,`4}@,WinCopies.IO.ObjectModel.FileSystemObjectInfo{`0,`1,`2,`3,`4}@)">
+            <summary>
+            Checks if a given <see cref="T:WinCopies.IO.ObjectModel.FileSystemObjectInfo`5"/> is lesser than an other <see cref="T:WinCopies.IO.ObjectModel.FileSystemObjectInfo`5"/>.
+            </summary>
+            <param name="left">Left operand.</param>
+            <param name="right">Right operand.</param>
+            <returns>A <see cref="T:System.Boolean"/> value that indicates whether the given <see cref="T:WinCopies.IO.ObjectModel.FileSystemObjectInfo`5"/> is lesser than the <see cref="T:WinCopies.IO.ObjectModel.FileSystemObjectInfo`5"/> to compare with.</returns>
+        </member>
+        <member name="M:WinCopies.IO.ObjectModel.FileSystemObjectInfo`5.op_LessThanOrEqual(WinCopies.IO.ObjectModel.FileSystemObjectInfo{`0,`1,`2,`3,`4}@,WinCopies.IO.ObjectModel.FileSystemObjectInfo{`0,`1,`2,`3,`4}@)">
+            <summary>
+            Checks if a given <see cref="T:WinCopies.IO.ObjectModel.FileSystemObjectInfo`5"/> is lesser or equal to an other <see cref="T:WinCopies.IO.ObjectModel.FileSystemObjectInfo`5"/>.
+            </summary>
+            <param name="left">Left operand.</param>
+            <param name="right">Right operand.</param>
+            <returns>A <see cref="T:System.Boolean"/> value that indicates whether the given <see cref="T:WinCopies.IO.ObjectModel.FileSystemObjectInfo`5"/> is lesser or equal to the <see cref="T:WinCopies.IO.ObjectModel.FileSystemObjectInfo`5"/> to compare with.</returns>
+        </member>
+        <member name="M:WinCopies.IO.ObjectModel.FileSystemObjectInfo`5.op_GreaterThan(WinCopies.IO.ObjectModel.FileSystemObjectInfo{`0,`1,`2,`3,`4}@,WinCopies.IO.ObjectModel.FileSystemObjectInfo{`0,`1,`2,`3,`4}@)">
+            <summary>
+            Checks if a given <see cref="T:WinCopies.IO.ObjectModel.FileSystemObjectInfo`5"/> is greater than an other <see cref="T:WinCopies.IO.ObjectModel.FileSystemObjectInfo`5"/>.
+            </summary>
+            <param name="left">Left operand.</param>
+            <param name="right">Right operand.</param>
+            <returns>A <see cref="T:System.Boolean"/> value that indicates whether the given <see cref="T:WinCopies.IO.ObjectModel.FileSystemObjectInfo`5"/> is greater than the <see cref="T:WinCopies.IO.ObjectModel.FileSystemObjectInfo`5"/> to compare with.</returns>
+        </member>
+        <member name="M:WinCopies.IO.ObjectModel.FileSystemObjectInfo`5.op_GreaterThanOrEqual(WinCopies.IO.ObjectModel.FileSystemObjectInfo{`0,`1,`2,`3,`4}@,WinCopies.IO.ObjectModel.FileSystemObjectInfo{`0,`1,`2,`3,`4}@)">
+            <summary>
+            Checks if a given <see cref="T:WinCopies.IO.ObjectModel.FileSystemObjectInfo`5"/> is greater or equal to an other <see cref="T:WinCopies.IO.ObjectModel.FileSystemObjectInfo`5"/>.
+            </summary>
+            <param name="left">Left operand.</param>
+            <param name="right">Right operand.</param>
+            <returns>A <see cref="T:System.Boolean"/> value that indicates whether the given <see cref="T:WinCopies.IO.ObjectModel.FileSystemObjectInfo`5"/> is greater or equal to the <see cref="T:WinCopies.IO.ObjectModel.FileSystemObjectInfo`5"/> to compare with.</returns>
+        </member>
+        <member name="T:WinCopies.IO.ObjectModel.RegistryItemInfo`4">
+            <summary>
+            Represents a Windows registry item.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.RegistryItemInfo`4.LocalizedName">
+            <summary>
+            Gets the localized path of this <see cref="T:WinCopies.IO.ObjectModel.RegistryItemInfo"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.RegistryItemInfo`4.Name">
+            <summary>
+            Gets the name of this <see cref="T:WinCopies.IO.ObjectModel.RegistryItemInfo"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.RegistryItemInfo`4.BrowsabilityOverride">
+            <summary>
+            Gets a value that indicates whether this <see cref="T:WinCopies.IO.ObjectModel.RegistryItemInfo"/> is browsable.
+            </summary>
+        </member>
+        <member name="M:WinCopies.IO.ObjectModel.RegistryItemInfo`4.OpenKey">
+            <summary>
+            Opens the <see cref="T:Microsoft.Win32.RegistryKey"/> that this <see cref="T:WinCopies.IO.ObjectModel.RegistryItemInfo"/> represents.
+            </summary>
+        </member>
+        <member name="M:WinCopies.IO.ObjectModel.RegistryItemInfo`4.OpenKey(Microsoft.Win32.RegistryKeyPermissionCheck,System.Security.AccessControl.RegistryRights)">
+            <summary>
+            Opens the <see cref="T:Microsoft.Win32.RegistryKey"/> that this <see cref="T:WinCopies.IO.ObjectModel.RegistryItemInfo"/> represents using custom <see cref="T:Microsoft.Win32.RegistryKeyPermissionCheck"/> and <see cref="T:System.Security.AccessControl.RegistryRights"/>.
+            </summary>
+            <param name="registryKeyPermissionCheck">Specifies whether security checks are performed when opening the registry key and accessing its name/value pairs.</param>
+            <param name="registryRights">Specifies the access control rights that can be applied to the registry objects in registry key's scope.</param>
+        </member>
+        <member name="M:WinCopies.IO.ObjectModel.RegistryItemInfo`4.OpenKey(System.Boolean)">
+            <summary>
+            Opens the <see cref="T:Microsoft.Win32.RegistryKey"/> that this <see cref="T:WinCopies.IO.ObjectModel.RegistryItemInfo"/> represents with a <see cref="T:System.Boolean"/> value that indicates whether the registry key has to be opened with write-rights.
+            </summary>
+            <param name="writable">A <see cref="T:System.Boolean"/> value that indicates whether the registry key has to be opened with write-rights</param>
+        </member>
+        <member name="M:WinCopies.IO.ObjectModel.RegistryItemInfo`4.GetParent">
+            <summary>
+            Returns the parent of this <see cref="T:WinCopies.IO.ObjectModel.RegistryItemInfo"/>.
+            </summary>
+            <returns>The parent of this <see cref="T:WinCopies.IO.ObjectModel.RegistryItemInfo"/>.</returns>
+        </member>
+        <member name="M:WinCopies.IO.ObjectModel.RegistryItemInfo.#ctor(WinCopies.IO.ClientVersion@)">
+            <summary>
+            Initializes a new instance of the <see cref="T:WinCopies.IO.ObjectModel.RegistryItemInfo"/> class as the Registry root.
+            </summary>
+        </member>
+        <member name="T:WinCopies.IO.ObjectModel.ShellObjectInfo`4">
+            <summary>
+            Represents a file system item.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.ShellObjectInfo`4.ArchiveShellObject">
+            <summary>
+            The parent <see cref="T:WinCopies.IO.ObjectModel.IShellObjectInfoBase"/> of the current archive item. If the current <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/> represents an archive file, this property returns the current <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/>, or <see langword="null"/> otherwise.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.ShellObjectInfo`4.InnerObjectGenericOverride">
+            <summary>
+            Gets a <see cref="T:Microsoft.WindowsAPICodePack.Shell.ShellObject"/> that represents this <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.ShellObjectInfo`4.ItemTypeNameOverride">
+            <summary>
+            Gets the type name of the current <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/>. This value corresponds to the description of the file's extension.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.ShellObjectInfo`4.IsSpecialItemOverride">
+            <summary>
+            Gets a value that indicates whether the current item has particularities.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.ShellObjectInfo`4.LocalizedName">
+            <summary>
+            Gets the localized name of this <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/> depending the associated <see cref="T:Microsoft.WindowsAPICodePack.Shell.ShellObject"/> (see the <see cref="T:Microsoft.WindowsAPICodePack.Shell.ShellObject"/> property for more details.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.ShellObjectInfo`4.Name">
+            <summary>
+            Gets the name of this <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/> depending of the associated <see cref="T:Microsoft.WindowsAPICodePack.Shell.ShellObject"/> (see the <see cref="T:Microsoft.WindowsAPICodePack.Shell.ShellObject"/> property for more details.
+            </summary>
+        </member>
+        <member name="M:WinCopies.IO.ObjectModel.ShellObjectInfo`4.ToString">
+            <summary>
+            Gets a string representation of this <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/>.
+            </summary>
+            <returns>The <see cref="P:WinCopies.IO.ObjectModel.ShellObjectInfo`4.LocalizedName"/> of this <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/>.</returns>
+        </member>
+        <member name="M:WinCopies.IO.ObjectModel.ShellObjectInfo`4.GetParent">
+            <summary>
+            Returns the parent of this <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/>.
+            </summary>
+            <returns>The parent of this <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/>.</returns>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.WMIItemInfo`4.BrowsableObjectInfoBitmapSources.SmallBitmapSourceOverride">
+            <summary>
+            Gets the small <see cref="T:System.Windows.Media.Imaging.BitmapSource"/> of this <see cref="T:WinCopies.IO.ObjectModel.WMIItemInfo"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.WMIItemInfo`4.BrowsableObjectInfoBitmapSources.MediumBitmapSourceOverride">
+            <summary>
+            Gets the medium <see cref="T:System.Windows.Media.Imaging.BitmapSource"/> of this <see cref="T:WinCopies.IO.ObjectModel.WMIItemInfo"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.WMIItemInfo`4.BrowsableObjectInfoBitmapSources.LargeBitmapSourceOverride">
+            <summary>
+            Gets the large <see cref="T:System.Windows.Media.Imaging.BitmapSource"/> of this <see cref="T:WinCopies.IO.ObjectModel.WMIItemInfo"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.WMIItemInfo`4.BrowsableObjectInfoBitmapSources.ExtraLargeBitmapSourceOverride">
+            <summary>
+            Gets the extra large <see cref="T:System.Windows.Media.Imaging.BitmapSource"/> of this <see cref="T:WinCopies.IO.ObjectModel.WMIItemInfo"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.WMIItemInfo`4.LocalizedName">
+            <summary>
+            Gets the localized path of this <see cref="T:WinCopies.IO.ObjectModel.WMIItemInfo"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.WMIItemInfo`4.Name">
+            <summary>
+            Gets the name of this <see cref="T:WinCopies.IO.ObjectModel.WMIItemInfo"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.WMIItemInfo`4.BrowsabilityOverride">
+            <summary>
+            Gets a value that indicates whether this <see cref="T:WinCopies.IO.ObjectModel.WMIItemInfo"/> is browsable.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.WMIItemInfo`4.InnerObjectGenericOverride">
+            <summary>
+            Gets the <see cref="T:System.Management.ManagementBaseObject"/> that this <see cref="T:WinCopies.IO.ObjectModel.WMIItemInfo"/> represents.
+            </summary>
+        </member>
+        <member name="M:WinCopies.IO.ObjectModel.WMIItemInfo`4.#ctor(WinCopies.IO.ClientVersion@)">
+            <summary>
+            Initializes a new instance of the <see cref="T:WinCopies.IO.ObjectModel.WMIItemInfo"/> class as the WMI root item.
+            </summary>
+        </member>
+        <member name="M:WinCopies.IO.ObjectModel.WMIItemInfo.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:WinCopies.IO.ObjectModel.WMIItemInfo"/> class as the WMI root item.
+            </summary>
+        </member>
+        <member name="M:WinCopies.IO.ObjectModel.WMIItemInfo.#ctor(WinCopies.IO.PropertySystem.IWMIItemInfoOptions@,WinCopies.IO.ClientVersion@)">
+            <summary>
+            Initializes a new instance of the <see cref="T:WinCopies.IO.ObjectModel.WMIItemInfo"/> class as the WMI root item.
+            </summary>
+        </member>
+        <member name="M:WinCopies.IO.ObjectModel.WMIItemInfo.GetName(System.Management.ManagementBaseObject,WinCopies.IO.PropertySystem.WMIItemType)">
+            <summary>
+            Gets the name of the given <see cref="T:System.Management.ManagementBaseObject"/>.
+            </summary>
+            <param name="managementObject">The <see cref="T:System.Management.ManagementBaseObject"/> for which get the name.</param>
+            <param name="wmiItemType">The <see cref="T:WinCopies.IO.PropertySystem.WMIItemType"/> of <paramref name="managementObject"/>.</param>
+            <returns>The name of the given <see cref="T:System.Management.ManagementBaseObject"/>.</returns>
+        </member>
+        <member name="M:WinCopies.IO.ObjectModel.WMIItemInfo.GetPath(System.Management.ManagementBaseObject,WinCopies.IO.PropertySystem.WMIItemType)">
+            <summary>
+            Gets the path of the given <see cref="T:System.Management.ManagementBaseObject"/>.
+            </summary>
+            <param name="managementObject">The <see cref="T:System.Management.ManagementBaseObject"/> for which get the path.</param>
+            <param name="wmiItemType">The <see cref="T:WinCopies.IO.PropertySystem.WMIItemType"/> of <paramref name="managementObject"/>.</param>
+            <returns>The path of the given <see cref="T:System.Management.ManagementBaseObject"/>.</returns>
+        </member>
+        <member name="T:WinCopies.IO.PropertySystem.WMIItemType">
+            <summary>
+            The WMI item type.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.PropertySystem.WMIItemType.Namespace">
+            <summary>
+            The WMI item is a namespace.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.PropertySystem.WMIItemType.Class">
+            <summary>
+            The WMI item is a class.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.PropertySystem.WMIItemType.Instance">
+            <summary>
+            The WMI item is an instance.
+            </summary>
+        </member>
+        <member name="T:WinCopies.IO.PropertySystem.RegistryItemType">
+            <summary>
+            The Windows registry item type.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.PropertySystem.RegistryItemType.Root">
+            <summary>
+            The current instance represents the Windows registry root node.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.PropertySystem.RegistryItemType.Key">
+            <summary>
+            The current instance represents a Windows registry key.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.PropertySystem.RegistryItemType.Value">
+            <summary>
+            The current instance represents a Windows registry value.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.PropertySystem.FileSystemObjectInfoProperties`1.FileType">
+            <summary>
+            The type of the current item (folder, file, ...)
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.PropertySystem.FileSystemObjectInfoProperties`1.Size">
+            <summary>
+            The size on disk of the current item.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.Process.ProcessError.None">
+            <summary>
+            No error occurred.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.Process.ProcessError.UnknownError">
+            <summary>
+            An unknown error occurred.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.Process.ProcessError.CancelledByUser">
+            <summary>
+            The process was cancelled by the user.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.Process.ProcessError.PathNotFound">
+            <summary>
+            One part or all of the source or destination path was not found.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.Process.ProcessError.DriveNotReady">
+            <summary>
+            The source or destination drive is not ready.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.Process.ProcessError.ReadProtection">
+            <summary>
+            The source or destination path is read-protected.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.Process.ProcessError.DestinationReadProtection">
+            <summary>
+            The destination path is read-protected.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.Process.ProcessError.WriteProtection">
+            <summary>
+            The destination path is write-protected.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.Process.ProcessError.PathTooLong">
+            <summary>
+            The destination path is too long.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.Process.ProcessError.NotEnoughSpace">
+            <summary>
+            The destination disk has not enough space.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.Process.ProcessError.FileSystemEntryAlreadyExists">
+            <summary>
+            A file or folder already exists with the same name.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.Process.ProcessError.FileRenamingFailed">
+            <summary>
+            The file could not be renamed.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.Process.ProcessError.SourceAndDestPathAreEqual">
+            <summary>
+            The source and destination relative paths are equal.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.Process.ProcessError.DestPathIsASubPath">
+            <summary>
+            The destination path is a sub-path of the source path.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.Process.ProcessError.DiskError">
+            <summary>
+            An unknown disk error occurred.
+            </summary>
+        </member>
+        <member name="M:WinCopies.IO.File.IsDuplicate(System.IO.Stream@,System.IO.Stream@,System.Int32@)">
+            <summary>
+            Determines whether two files are duplicates by checking their size and content. For the exceptions that can occur, see the doc of the stream class that you use.
+            </summary>
+            <param name="leftStream">The left <see cref="T:WinCopies.Stream"/>.</param>
+            <param name="rightStream">The right <see cref="T:WinCopies.Stream"/>.</param>
+            <param name="bufferLength">The buffer length to use to read data.</param>
+            <returns><see langword="true"/> if the two files are duplicates; otherwise <see langword="false"/>.</returns>
+        </member>
+        <member name="M:WinCopies.IO.File.IsDuplicate(System.IO.Stream@,System.IO.Stream@,System.Int32@,System.Func{System.Boolean})">
+            <summary>
+            Determines whether two files are duplicates by checking their size and content. For the exceptions that can occur, see the doc of the stream class that you use.
+            </summary>
+            <param name="leftStream">The left <see cref="T:WinCopies.Stream"/>.</param>
+            <param name="rightStream">The right <see cref="T:WinCopies.Stream"/>.</param>
+            <param name="bufferLength">The buffer length to use to read data.</param>
+            <param name="callback">A delegate that is raised after each data block has been checked. If the returned value is <see langword="true"/>, then the process is stopped.</param>
+            <returns><see langword="true"/> if the two files are duplicates; <see langword="null"/> if the process has been canceled; otherwise <see langword="false"/>.</returns>
+        </member>
+        <member name="F:WinCopies.IO.Reflection.DotNetItemType.Namespace">
+            <summary>
+            The item is a .Net namespace.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.Reflection.DotNetItemType.Struct">
+            <summary>
+            The item is a .Net struct.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.Reflection.DotNetItemType.Enum">
+            <summary>
+            The item is a .Net enum.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.Reflection.DotNetItemType.Class">
+            <summary>
+            The item is a .Net class.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.Reflection.DotNetItemType.Interface">
+            <summary>
+            The item is a .Net interface.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.Reflection.DotNetItemType.Delegate">
+            <summary>
+            The item is a .Net delegate.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.Reflection.DotNetItemType.Attribute">
+            <summary>
+            The item is a .Net attribute.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.Reflection.DotNetItemType.Field">
+            <summary>
+            The item is a .Net field.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.Reflection.DotNetItemType.Property">
+            <summary>
+            The item is a .Net property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.Reflection.DotNetItemType.Event">
+            <summary>
+            The item is a .Net event.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.Reflection.DotNetItemType.Constructor">
+            <summary>
+            The item is a .Net constructor.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.Reflection.DotNetItemType.Method">
+            <summary>
+            The item is a .Net method.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.Reflection.DotNetItemType.Parameter">
+            <summary>
+            The item is a .Net parameter.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.Reflection.DotNetItemType.GenericParameter">
+            <summary>
+            The item is a .Net generic parameter.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.Reflection.DotNetItemType.GenericArgument">
+            <summary>
+            The item is a .Net generic argument.
+            </summary>
+        </member>
+        <member name="M:WinCopies.IO.RegistryException.#ctor">
+            Initializes a new instance of the <see cref="T:System.Exception"/> class.
+        </member>
+        <member name="M:WinCopies.IO.RegistryException.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.Exception"/> class with a specified error message.
+            </summary>
+            <param name="message">The message that describes the error.</param>
+        </member>
+        <member name="M:WinCopies.IO.RegistryException.#ctor(System.String,System.Exception)">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.Exception"/> class with a specified error message and a reference to the inner exception that is the cause of this exception.
+            </summary>
+            <param name="message">The error message that explains the reason for the exception.</param>
+            <param name="innerException">The exception that is the cause of the current exception, or a null reference (Nothing in Visual Basic) if no inner exception is specified.</param>
+        </member>
+        <member name="M:WinCopies.IO.RegistryException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+            <summary>
+            Initializes a new instance of the System.Exception class with serialized data.
+            </summary>
+            <param name="info">The <see cref="T:System.Runtime.Serialization.SerializationInfo"/> that holds the serialized object data about the exception being thrown.</param>
+            <param name="context">The <see cref="T:System.Runtime.Serialization.StreamingContext"/> that contains contextual information about the source or destination.</param>
+            <exception cref="T:System.ArgumentNullException">
+            The info parameter is <see langword="null"/>.
+            </exception>
+            <exception cref="T:System.Runtime.Serialization.SerializationException">
+            The class name is <see langword="null"/> or <see cref="P:System.Exception.HResult"/> is zero (0).
+            </exception>
+        </member>
+    </members>
+</doc>
