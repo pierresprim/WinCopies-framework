@@ -53,6 +53,8 @@ namespace WinCopies.IO.Process
     {
         None,
 
+        Loading,
+
         Running,
 
         Succeeded,
@@ -87,6 +89,7 @@ namespace WinCopies.IO.Process
                 private IProcessError<TError, TAction> _error;
                 private IEnumerableQueue<TItemsIn> _initialPaths;
                 private IEnumerableQueue<TItemsIn> _initialPathsReadOnly;
+                private ProcessStatus _status;
                 private Size _actualRemainingSize;
                 private ProcessTypes<TItemsOut>.IProcessQueue _paths;
                 private ProcessTypes<TItemsOut>.IProcessQueue _pathsReadOnly;
@@ -191,7 +194,17 @@ namespace WinCopies.IO.Process
                     }
                 }
 
-                public ProcessStatus Status { get; private set; }
+                public ProcessStatus Status
+                {
+                    get => _status;
+
+                    private set
+                    {
+                        _status = value;
+
+                        _propertyEventDelegate.RaiseEvent(nameof(Status));
+                    }
+                }
                 #endregion Properties
 
                 public Process(in IEnumerableQueue<TItemsIn> initialPaths, in ProcessTypes<TItemsOut>.IProcessQueue paths, in IProcessLinkedList<TItemsOut, TError, ProcessTypes<TItemsOut, TError, TAction>.ProcessErrorItem, TAction> errorsQueue, in TProcessDelegates processDelegates, in TFactory factory)
@@ -250,17 +263,17 @@ namespace WinCopies.IO.Process
 
                 protected abstract bool OnPathLoaded(in TItemsOut path);
 
-                protected abstract IRecursiveEnumerable<TItemsIn> GetEnumerable(in TItemsIn path);
+                protected abstract System.Collections.Generic.IEnumerable<TItemsOut> GetEnumerable(in TItemsOut path);
 
-                protected abstract TItemsOut Convert(in TItemsIn path);
+                protected abstract TItemsOut Convert(TItemsIn path);
 
                 protected abstract RecursiveEnumerationOrder GetRecursiveEnumerationOrder();
 
                 protected abstract Predicate<TItemsIn> GetAddAsDuplicatePredicate();
 
-                protected bool LoadPathsDirectly(out IProcessError<TError, TAction> error, out bool clearOnError)
+                protected virtual bool LoadPathsDirectly(in System.Collections.Generic.IEnumerable<TItemsIn> paths, out IProcessError<TError, TAction> error, out bool clearOnError)
                 {
-                    foreach (TItemsIn path in InitialPaths)
+                    foreach (TItemsIn path in paths)
 
                         if (!OnPathLoaded(Convert(path)))
                         {
@@ -274,6 +287,8 @@ namespace WinCopies.IO.Process
                     return true;
                 }
 
+                protected virtual bool LoadPathsDirectly(out IProcessError<TError, TAction> error, out bool clearOnError) => LoadPathsDirectly(InitialPaths, out error, out clearOnError);
+
                 protected void SetNoErrorErrorParameters(out IProcessError<TError, TAction> error, out bool clearOnError)
                 {
                     error = Factory.GetError(Factory.NoError, NoError, ErrorCode.NoError);
@@ -283,11 +298,11 @@ namespace WinCopies.IO.Process
 
                 protected void SetCancelErrorParameters(out IProcessError<TError, TAction> error, out bool clearOnError) => GetPathsLoadingErrorParameters(Factory.CancelledByUserError, CancelledByUser, ErrorCode.Cancelled, out error, out clearOnError);
 
-                protected virtual bool LoadPathsOverride(out IProcessError<TError, TAction> error, out bool clearOnError)
+                protected virtual bool LoadPaths(in System.Collections.Generic.IEnumerable<TItemsIn> paths, out IProcessError<TError, TAction> error, out bool clearOnError)
                 {
                     clearOnError = true;
 
-                    IRecursiveEnumerable<TItemsIn> recursivePathEnumerable;
+                    System.Collections.Generic.IEnumerable<TItemsOut> recursivePathEnumerable;
 
                     RecursiveEnumerationOrder recursiveEnumerationOrder = GetRecursiveEnumerationOrder();
 
@@ -297,22 +312,26 @@ namespace WinCopies.IO.Process
 
                         addAsDuplicate = GetAddAsDuplicatePredicate();
 
-                    foreach (TItemsIn path in InitialPaths)
+                    TItemsOut __path;
+
+                    foreach (TItemsIn path in paths)
                     {
+                        __path = Convert(path);
+
                         if (recursiveEnumerationOrder.HasFlag(RecursiveEnumerationOrder.ParentThenChildren))
 
-                            if (!OnPathLoaded(Convert(path)))
+                            if (!OnPathLoaded(__path))
                             {
                                 SetCancelErrorParameters(out error, out clearOnError);
 
                                 return false;
                             }
 
-                        recursivePathEnumerable = GetEnumerable(path);
+                        recursivePathEnumerable = GetEnumerable(__path);
 
-                        foreach (TItemsIn _path in recursivePathEnumerable)
+                        foreach (TItemsOut _path in recursivePathEnumerable)
                         {
-                            if (OnPathLoaded(Convert(_path)))
+                            if (OnPathLoaded(_path))
 
                                 continue;
 
@@ -327,7 +346,7 @@ namespace WinCopies.IO.Process
 
                                 continue;
 
-                            if (OnPathLoaded(Convert(path)))
+                            if (OnPathLoaded(__path))
 
                                 continue;
 
@@ -341,6 +360,8 @@ namespace WinCopies.IO.Process
 
                     return true;
                 }
+
+                protected virtual bool LoadPathsOverride(out IProcessError<TError, TAction> error, out bool clearOnError) => LoadPaths(InitialPaths, out error, out clearOnError);
 
                 protected void AddPath(TItemsOut path) => _paths.Enqueue(path);
 
@@ -371,32 +392,71 @@ namespace WinCopies.IO.Process
                         }
                     }
 
-                    return false;
+                    return OnRunWorkerCompleted(false);
+                }
+
+                private bool UpdateProcessStatus(in ProcessStatus processStatus, out IProcessError<TError, TAction> error, out bool clearOnError)
+                {
+                    Status = processStatus;
+
+                    error = Factory.GetNoErrorError();
+
+                    clearOnError = false;
+
+                    return true;
+                }
+
+                protected virtual bool OnPathsLoading(out IProcessError<TError, TAction> error, out bool clearOnError) => UpdateProcessStatus(ProcessStatus.Loading, out error, out clearOnError);
+
+                protected virtual bool OnPathsLoaded(out IProcessError<TError, TAction> error, out bool clearOnError) => UpdateProcessStatus(ProcessStatus.None, out error, out clearOnError);
+
+                private enum PathLoadingCheckEnum : sbyte
+                {
+                    Loading,
+
+                    Loaded,
+
+                    Exit
                 }
 
                 private bool _LoadPaths()
                 {
-                    bool result = LoadPathsOverride(out IProcessError<TError, TAction> error, out bool clearOnError);
+                    IProcessError<TError, TAction> error;
+                    bool clearOnError;
 
-                    Error = error;
-
-                    if (result && Equals(error.Error, _factory.Value.NoError))
+                    bool check(in PathLoadingCheckEnum value, in bool result)
                     {
-                        ArePathsLoaded = true;
+                        if (result && Equals(error.Error, _factory.Value.NoError))
+                        {
+                            if (value == PathLoadingCheckEnum.Loaded)
+                            {
+                                ArePathsLoaded = true;
 
-                        InitialTotalSize = Paths.TotalSize;
+                                InitialTotalSize = Paths.TotalSize;
 
-                        InitialItemCount = Paths.Count;
+                                InitialItemCount = Paths.Count;
+                            }
+                        }
+
+                        else
+                        {
+                            if (clearOnError)
+
+                                _paths.Clear();
+
+                            Error = _error;
+
+                            return result;
+                        }
+
+                        if (value == PathLoadingCheckEnum.Exit)
+
+                            Error = _error;
+
+                        return result;
                     }
 
-                    else if (clearOnError)
-                    {
-                        Error = error;
-
-                        _paths.Clear();
-                    }
-
-                    return result;
+                    return check(PathLoadingCheckEnum.Loading, OnPathsLoading(out error, out clearOnError)) && check(PathLoadingCheckEnum.Loaded, LoadPathsOverride(out error, out clearOnError)) && check(PathLoadingCheckEnum.Exit, OnPathsLoaded(out error, out clearOnError));
                 }
 
                 public virtual bool LoadPaths()

@@ -133,6 +133,15 @@ namespace WinCopies.IO.Shell.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Emptying Recycle Bin.
+        /// </summary>
+        public static string EmptyingRecycleBin {
+            get {
+                return ResourceManager.GetString("EmptyingRecycleBin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Extraction.
         /// </summary>
         public static string Extraction {
@@ -156,6 +165,15 @@ namespace WinCopies.IO.Shell.Properties {
         public static string PortableDevice {
             get {
                 return ResourceManager.GetString("PortableDevice", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Recycling.
+        /// </summary>
+        public static string Recycling {
+            get {
+                return ResourceManager.GetString("Recycling", resourceCulture);
             }
         }
         

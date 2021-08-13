@@ -37,13 +37,13 @@ along with the WinCopies Framework.  If not, see<https://www.gnu.org/licenses/>.
             <Menu>
                 <Menu.Resources>
                     <Style x:Key="MenuItemItemContainerStyle" TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}">
-                            <Setter Property="IsEnabled" Value="{Binding IsEnabled}" />
-                            <Setter Property="Header" Value="{Binding Header}" />
-                            <Setter Property="ItemsSource" Value="{Binding Items}" />
-                            <Setter Property="Command" Value="{Binding Command}" />
-                            <Setter Property="CommandParameter" Value="{Binding CommandParameter}" />
-                            <Setter Property="CommandTarget" Value="{Binding CommandTarget}" />
-                        </Style>
+                        <Setter Property="IsEnabled" Value="{Binding IsEnabled}" />
+                        <Setter Property="Header" Value="{Binding Header}" />
+                        <Setter Property="ItemsSource" Value="{Binding Items}" />
+                        <Setter Property="Command" Value="{Binding Command}" />
+                        <Setter Property="CommandParameter" Value="{Binding CommandParameter}" />
+                        <Setter Property="CommandTarget" Value="{Binding CommandTarget}" />
+                    </Style>
                 </Menu.Resources>
                 <MenuItem Header="File">
                     <MenuItem Header="New tab" Command="{x:Static commands:ApplicationCommands.NewTab}" />
@@ -53,6 +53,7 @@ along with the WinCopies Framework.  If not, see<https://www.gnu.org/licenses/>.
                     <MenuItem Header="Cut" Command="Cut" />
                     <MenuItem Header="Paste" Command="Paste" />
                     <MenuItem Header="Recycle" Command="Delete" />
+                    <MenuItem Header="Empty Recycle Bin" Command="{x:Static temp:ApplicationCommands.Empty}" />
                     <MenuItem Header="Delete" Command="{x:Static temp:ApplicationCommands.DeletePermanently}" />
                 </MenuItem>
                 <MenuItem Header="Open _with" ItemsSource="{Binding SelectedItem.BrowsabilityPaths, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ExplorerControlTest}}}" ItemContainerStyle="{StaticResource MenuItemItemContainerStyle}" />

@@ -38,6 +38,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\Reflection\IDotNetTypeInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enumeration\ArchiveItemInfoEnumerator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enumeration\WMIItemInfoEnumerator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Misc.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\Icons.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PathInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ObjectModel\ArchiveProcess.cs" />
@@ -50,7 +51,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessOptions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enumeration\ArchiveFileInfoEnumeratorStruct.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)FileInfoLoader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\ArchiveItemInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enumeration\Enumerators.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\ArchiveItemInfoProvider.cs" />
@@ -65,6 +65,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)Selectors\Reflection\DotNetNamespaceInfoSelectorDictionary.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Selectors\Reflection\DotNetMemberInfoSelectorDictionary.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Selectors\WMIItemInfoSelectorDictionary.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ShellObjectInfoProcessFactory\ProcessFactoryTypes.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ShellObjectInfoProcessFactory\ShellObjectInfoProcessFactory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ShellObjectInfoProcessFactory\NewItemProcessCommands.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)WMIItemInfoComparer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enumeration\ShellObjectInfoEnumeration.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\Reflection\DotNetAssemblyInfo.cs" />
@@ -111,6 +114,5 @@
     <Compile Include="$(MSBuildThisFileDirectory)Selectors\ShellObjectInfoSelectorDictionary.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\WMIItemInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\WMIItemInfoFactory.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)WMIItemTypes.cs" />
   </ItemGroup>
 </Project>

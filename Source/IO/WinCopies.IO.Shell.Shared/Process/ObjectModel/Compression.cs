@@ -60,7 +60,7 @@ namespace WinCopies.IO.Process
 
             public Compression(in IEnumerableQueue<IPathInfo> initialPaths, in IPathInfo sourcePath, in IPathInfo destinationPath, in ProcessTypes<IPathInfo>.IProcessQueue paths, in IProcessLinkedList<IPathInfo, ProcessError, ProcessTypes<IPathInfo, ProcessError, object>.ProcessErrorItem, object> errorsQueue, in ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessDelegates<ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessEventDelegates> progressDelegate, T factory, in SevenZipCompressor archiveCompressor) : base(initialPaths, sourcePath, destinationPath, paths, errorsQueue, progressDelegate, factory) => ArchiveCompressor = archiveCompressor;
 
-            protected override IRecursiveEnumerable<IPathInfo> GetEnumerable(in IPathInfo path) => throw new NotSupportedException();
+            protected override System.Collections.Generic.IEnumerable<IPathInfo> GetEnumerable(in IPathInfo path) => throw new NotSupportedException();
 
             protected override bool OnPathLoaded(in IPathInfo path) => throw new NotSupportedException();
 
@@ -172,7 +172,7 @@ namespace WinCopies.IO.Process
 
             protected override void ResetStatus() { /* Left empty. */ }
 
-            protected override IPathInfo Convert(in IPathInfo path) => path;
+            protected override IPathInfo Convert(IPathInfo path) => path;
         }
     }
 }

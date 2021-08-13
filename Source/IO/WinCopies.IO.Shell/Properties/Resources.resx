@@ -141,6 +141,9 @@
   <data name="DotNetType" xml:space="preserve">
     <value>.Net Type</value>
   </data>
+  <data name="EmptyingRecycleBin" xml:space="preserve">
+    <value>Emptying Recycle Bin</value>
+  </data>
   <data name="Extraction" xml:space="preserve">
     <value>Extraction</value>
   </data>
@@ -149,6 +152,9 @@
   </data>
   <data name="PortableDevice" xml:space="preserve">
     <value>Portable Device</value>
+  </data>
+  <data name="Recycling" xml:space="preserve">
+    <value>Recycling</value>
   </data>
   <data name="RegistryKey" xml:space="preserve">
     <value>Registry Key</value>

@@ -28,6 +28,14 @@ namespace WinCopies.Temp
 {
     public static class Temp
     {
+        public static TOut Convert<TIn, TOut>(TIn value) where TOut : TIn => (TOut)value;
+
+        public static TOut ConvertIn<TIn, TOut>(in TIn value) where TOut : TIn => (TOut)value;
+
+        public static TOut ConvertBack<TIn, TOut>(TIn value) where TIn : TOut => value;
+
+        public static TOut ConvertBackIn<TIn, TOut>(in TIn value) where TIn : TOut => value;
+
         [StructLayout(LayoutKind.Sequential, Pack = 8)]
         public struct SHQUERYRBINFO
         {
@@ -37,7 +45,7 @@ namespace WinCopies.Temp
         }
 
         [DllImport("shell32.dll")]
-     public   static extern HResult SHQueryRecycleBin(string pszRootPath, ref SHQUERYRBINFO
+        public static extern HResult SHQueryRecycleBin(string pszRootPath, ref SHQUERYRBINFO
  pSHQueryRBInfo);
 
         #region Delegates
@@ -100,6 +108,8 @@ namespace WinCopies.Commands.TEMP
 {
     public static class ApplicationCommands
     {
+        public static RoutedUICommand Empty { get; } = new RoutedUICommand("Empty", nameof(Empty), typeof(ApplicationCommands));
+
         public static RoutedUICommand DeletePermanently { get; } = new RoutedUICommand("Delete permanently", nameof(DeletePermanently), typeof(ApplicationCommands), new InputGestureCollection() { new System.Windows.Input.KeyGesture(Key.Delete, ModifierKeys.Alt) });
     }
 }

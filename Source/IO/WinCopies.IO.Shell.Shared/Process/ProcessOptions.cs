@@ -23,7 +23,7 @@ namespace WinCopies.IO.Shell.Process
     {
         public ProcessOptionsCommon(in Predicate<T> pathLoadedDelegate, in bool clearOnError) : base(pathLoadedDelegate, clearOnError)
         {
-
+            // Left empty.
         }
 
         protected internal new void Dispose() => base.Dispose();
@@ -47,16 +47,25 @@ namespace WinCopies.IO.Shell.Process
         public bool Move { get; }
 
         public CopyOptions(in Predicate<T> pathLoadedDelegate, in bool clearOnError, in bool move = false) : base(pathLoadedDelegate, clearOnError) => Move = move;
+    }
 
-        public static CopyOptions<T> GetInstance(in Predicate<T> pathLoadedDelegate, in bool clearOnError, in bool move = false) => new CopyOptions<T>(pathLoadedDelegate, clearOnError, move);
+    public enum RemoveOption : sbyte
+    {
+        None = 0,
+
+        Recycle = 1,
+
+        Delete = 2,
+
+        Clear = 3
     }
 
     public class DeletionOptions<T> : ProcessOptionsCommon<T>
     {
-        public bool Recycle { get; }
+        public RemoveOption RemoveOption { get; }
 
-        public DeletionOptions(in Predicate<T> pathLoadedDelegate, in bool clearOnError, in bool recycle = true) : base(pathLoadedDelegate, clearOnError) => Recycle = recycle;
+        public bool Recycle => RemoveOption == RemoveOption.Recycle;
 
-        public static DeletionOptions<T> GetInstance(in Predicate<T> pathLoadedDelegate, in bool clearOnError, in bool recycle = false) => new DeletionOptions<T>(pathLoadedDelegate, clearOnError, recycle);
+        public DeletionOptions(in Predicate<T> pathLoadedDelegate, in bool clearOnError, in RemoveOption removeOption) : base(pathLoadedDelegate, clearOnError) => RemoveOption = removeOption;
     }
 }

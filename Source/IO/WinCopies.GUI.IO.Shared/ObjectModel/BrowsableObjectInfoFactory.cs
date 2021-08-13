@@ -15,7 +15,6 @@
 * You should have received a copy of the GNU General Public License
 * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-using Microsoft.WindowsAPICodePack.PortableDevices;
 using Microsoft.WindowsAPICodePack.Shell;
 
 using System;
@@ -27,7 +26,7 @@ namespace WinCopies.GUI.IO.ObjectModel
 {
     public interface IBrowsableObjectInfoFactory
     {
-        WinCopies.IO.ClientVersion ClientVersion { get; }
+        ClientVersion ClientVersion { get; }
 
         Comparison<IBrowsableObjectInfo> SortComparison { get; set; }
 
@@ -70,7 +69,7 @@ namespace WinCopies.GUI.IO.ObjectModel
 
                 return ShellObjectInfo.From(ShellObjectFactory.Create(path), ClientVersion);
 
-            else if (Path.IsRegistryPath(path))
+            else if (WinCopies.IO.Shell.Path.IsRegistryPath(path))
 
                 return new RegistryItemInfo(path, WinCopies.IO.ObjectModel.BrowsableObjectInfo.GetDefaultClientVersion());
 

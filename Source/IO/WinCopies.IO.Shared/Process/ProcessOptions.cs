@@ -29,7 +29,7 @@ namespace WinCopies.IO.Process
             // Left empty.
         }
 
-        protected virtual bool UpdateValue<TValue>(ref TValue value, in TValue newValue) => Process.Status == ProcessStatus.Running
+        protected virtual bool UpdateValue<TValue>(ref TValue value, in TValue newValue) => Process?.Status == ProcessStatus.Running
                 ? throw new InvalidOperationException("The associated process is running.")
                 : Temp.Temp.UpdateValue(ref value, newValue);
 

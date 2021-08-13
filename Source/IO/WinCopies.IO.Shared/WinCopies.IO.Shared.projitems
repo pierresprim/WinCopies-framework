@@ -23,6 +23,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Misc.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\BrowsableObjectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\BrowsableObjectInfoBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Path.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PathInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\BrowsableObjectInfoProcessFactoryDictionary.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\Errors.cs" />

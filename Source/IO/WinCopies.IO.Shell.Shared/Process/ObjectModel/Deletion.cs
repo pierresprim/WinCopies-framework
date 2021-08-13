@@ -21,11 +21,13 @@ using Microsoft.WindowsAPICodePack.Win32Native;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Runtime.InteropServices;
-
+using WinCopies.Collections;
 using WinCopies.Collections.DotNetFix.Generic;
 using WinCopies.Collections.Generic;
 using WinCopies.IO.Shell.Process;
+using WinCopies.Linq;
 using WinCopies.Util.Commands.Primitives;
 
 using static Microsoft.WindowsAPICodePack.COMNative.Shell.ShellOperationFlags;
@@ -34,6 +36,7 @@ using static WinCopies.IO.Process.ProcessHelper;
 using static WinCopies.IO.Resources.ExceptionMessages;
 using static WinCopies.IO.Shell.Process.ProcessHelper;
 using static WinCopies.IO.Shell.Resources.ExceptionMessages;
+using static WinCopies.ThrowHelper;
 
 namespace WinCopies.IO.Process.ObjectModel
 {
@@ -48,17 +51,34 @@ namespace WinCopies.IO.Process.ObjectModel
         #region Properties
         public override string Guid => Guids.Process.Shell.Deletion;
 
-        public override string Name => Shell.Properties.Resources.Deletion;
+        public override string Name
+        {
+            get
+            {
+                switch (Options.RemoveOption)
+                {
+                    case RemoveOption.Recycle:
+
+                        return Shell.Properties.Resources.Recycling;
+
+                    case RemoveOption.Clear:
+
+                        return Shell.Properties.Resources.EmptyingRecycleBin;
+                }
+
+                return Shell.Properties.Resources.Deletion;
+            }
+        }
 
         public override IReadOnlyDictionary<string, ICommand<IProcessErrorItem<IPathInfo, ProcessError, ErrorAction>>> Actions => null;
         #endregion Properties
 
-        public Deletion(in IEnumerableQueue<IPathInfo> initialPaths, in IPathInfo sourcePath, in ProcessTypes<IPathInfo>.IProcessQueue paths, in IProcessLinkedList<IPathInfo, ProcessError, ProcessTypes<IPathInfo, ProcessError, ErrorAction>.ProcessErrorItem, ErrorAction> errorsQueue, in ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessDelegates<ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessEventDelegates> progressDelegate, DeletionOptions<IPathInfo> options, T factory) : base(initialPaths, sourcePath, paths, errorsQueue, progressDelegate, factory, options)
+        public Deletion(in IEnumerableQueue<IPathInfo> initialPaths, in IPathInfo sourcePath, in ProcessTypes<IPathInfo>.IProcessQueue paths, in IProcessLinkedList<IPathInfo, ProcessError, ProcessTypes<IPathInfo, ProcessError, ErrorAction>.ProcessErrorItem, ErrorAction> errorsQueue, in ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessDelegates<ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessEventDelegates> progressDelegate, DeletionOptions<IPathInfo> options, T factory) : base(options.RemoveOption == RemoveOption.Clear && ((IUIntCountable)(initialPaths ?? throw GetArgumentNullException(nameof(initialPaths)))).Count != 0 ? throw new ArgumentException($"The initial paths collection must be empty (not null) when {nameof(options)}.{nameof(DeletionOptions<IPathInfo>.RemoveOption)} is set to {nameof(RemoveOption.Clear)}.") : initialPaths, sourcePath, paths, errorsQueue, progressDelegate, factory, options)
         {
             // Left empty.
         }
 
-        protected override IRecursiveEnumerable<IPathInfo> GetEnumerable(in IPathInfo path) => GetDefaultEnumerable(path, RecursiveEnumerationOrder.ChildrenThenParent);
+        protected override System.Collections.Generic.IEnumerable<IPathInfo> GetEnumerable(in IPathInfo path) => GetDefaultEnumerable(path, RecursiveEnumerationOrder.ChildrenThenParent);
 
         protected override RecursiveEnumerationOrder GetRecursiveEnumerationOrder() => RecursiveEnumerationOrder.ChildrenThenParent;
 
@@ -218,20 +238,35 @@ namespace WinCopies.IO.Process.ObjectModel
 
         protected override bool Check(out IProcessError<ProcessError, ErrorAction> error)
         {
+            if (Options.RemoveOption == RemoveOption.Clear)
+            {
+                error = Factory.GetNoErrorError();
+
+                _func = Delete;
+
+                return true;
+            }
+
             if (DefaultCheck<IPathInfo, ProcessError, ErrorAction, T>(Paths, SourcePath, null, false, Factory, ProcessErrorFactoryData, out error))
             {
-                if (Options.Recycle)
+                switch (Options.RemoveOption)
                 {
-                    _fileOperation = new Microsoft.WindowsAPICodePack.Shell.TEMP.FileOperation();
+                    case RemoveOption.Delete:
 
-                    _fileOperation.SetOperationFlags(RecycleOnDelete | Silent | EarlyFailure | NoErrorUI);
+                        _func = Delete;
 
-                    _func = Recycle;
+                        break;
+
+                    case RemoveOption.Recycle:
+
+                        _fileOperation = new Microsoft.WindowsAPICodePack.Shell.TEMP.FileOperation();
+
+                        _fileOperation.SetOperationFlags(RecycleOnDelete | Silent | EarlyFailure | NoErrorUI);
+
+                        _func = Recycle;
+
+                        break;
                 }
-
-                else
-
-                    _func = Delete;
 
                 return true;
             }
@@ -247,7 +282,27 @@ namespace WinCopies.IO.Process.ObjectModel
 
         protected override IProcessProgressDelegateParameter GetNotifyCompletionParameters() => GetDefaultNotifyCompletionParameters();
 
-        protected override bool LoadPathsOverride(out IProcessError<ProcessError, ErrorAction> error, out bool clearOnError) => Options.Recycle ? LoadPathsDirectly(out error, out clearOnError) : base.LoadPathsOverride(out error, out clearOnError);
+        protected override bool LoadPathsOverride(out IProcessError<ProcessError, ErrorAction> error, out bool clearOnError)
+        {
+            switch (Options.RemoveOption)
+            {
+                case RemoveOption.Recycle:
+
+                    return LoadPathsDirectly(out error, out clearOnError);
+
+                case RemoveOption.Clear:
+
+                    return LoadPaths(KnownFolders.RecycleBin.Select(path => new PathTypes<IPathInfo>.PathInfo(path.ParsingName, null)), out error, out clearOnError);
+
+                case RemoveOption.Delete:
+
+                    return base.LoadPathsOverride(out error, out clearOnError);
+            }
+
+            SetCancelErrorParameters(out error, out clearOnError);
+
+            return false;
+        }
 
         protected override void ResetStatus()
         {
@@ -264,6 +319,6 @@ namespace WinCopies.IO.Process.ObjectModel
             _func = null;
         }
 
-        protected override IPathInfo Convert(in IPathInfo path) => path;
+        protected override IPathInfo Convert(IPathInfo path) => path;
     }
 }

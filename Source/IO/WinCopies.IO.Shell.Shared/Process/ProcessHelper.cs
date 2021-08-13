@@ -15,6 +15,7 @@
 * You should have received a copy of the GNU General Public License
 * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+using Microsoft.WindowsAPICodePack.Shell;
 using Microsoft.WindowsAPICodePack.Win32Native;
 
 using System;
@@ -52,23 +53,38 @@ namespace WinCopies.IO.Shell.Process
 
     public static class ProcessHelper
     {
-        public static bool CanRun(in string path, in System.Collections.Generic.IEnumerator<IBrowsableObjectInfo> enumerator)
+        public static bool CanRun(string path, in EmptyCheckEnumerator<IBrowsableObjectInfo> enumerator)
         {
-            var enumerable = new CustomEnumeratorEnumerable<IBrowsableObjectInfo, System.Collections.Generic.IEnumerator<IBrowsableObjectInfo>>(enumerator);
+            if (enumerator.HasItems)
+            {
+                var enumerable = new CustomEnumeratorEnumerable<IBrowsableObjectInfo, EmptyCheckEnumerator<IBrowsableObjectInfo>>(enumerator);
 
-            foreach (IBrowsableObjectInfo _path in enumerable)
+                Predicate<IBrowsableObjectInfo> func;
 
-                if (!(_path is IShellObjectInfoBase2 shellObjectInfo
-                    && shellObjectInfo.InnerObject.IsFileSystemObject
-                    && shellObjectInfo.Path.Validate(path, path.EndsWith(WinCopies.IO.Path.PathSeparator
+                if (path == KnownFolders.RecycleBin.ParsingName)
+
+                    func = _path => _path is IShellObjectInfoBase2 _shellObjectInfo && _shellObjectInfo.InnerObject.Parent.ParsingName == path;
+
+                else
+
+                    func = _path => _path is IShellObjectInfoBase2 shellObjectInfo
+                        && shellObjectInfo.InnerObject.IsFileSystemObject
+                        && shellObjectInfo.Path.Validate(path, path.EndsWith(WinCopies.IO.Path.PathSeparator
 #if !CS8
                                 .ToString()
 #endif
-                                ) ? 1 : 0, null, null, 1, "\\")))
+                                ) ? 1 : 0, null, null, 1, "\\");
 
-                    return false;
+                foreach (IBrowsableObjectInfo _path in enumerable)
 
-            return true;
+                    if (!func(_path))
+
+                        return false;
+
+                return true;
+            }
+
+            return false;
         }
 
         public static IProcessError<ProcessError, TErrorAction> CheckDrivesAndSpace<TPath, TErrorAction, TFactory>(in ProcessTypes<TPath>.IProcessQueue paths, in IPathCommon sourcePath, in IPathCommon destPath, in bool checkSize, TFactory factory, in IProcessErrorFactoryData<ProcessError> processErrorFactoryData) where TPath : IPath where TFactory : ProcessErrorTypes<TPath, ProcessError, TErrorAction>.IProcessErrorFactories

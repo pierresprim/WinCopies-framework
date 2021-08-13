@@ -15,7 +15,9 @@
 * You should have received a copy of the GNU General Public License
 * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+#if CS8
 using System.Diagnostics.CodeAnalysis;
+#endif
 
 namespace WinCopies.IO.Shell
 {
@@ -24,25 +26,25 @@ namespace WinCopies.IO.Shell
         bool AlreadyPushed { get; }
     }
 
-    public struct PathInfo : IPathInfo
+    public class PathInfo : IPathInfo
     {
-        public IO.IPathInfo Path { get; }
+        public IO.IPathInfo InnerPath { get; }
 
         public bool AlreadyPushed { get; internal set; }
 
-        public string RelativePath => Path.RelativePath;
+        public string RelativePath => InnerPath.RelativePath;
 
-        public IPathCommon Parent => Path.Parent;
+        public IPathCommon Parent => InnerPath.Parent;
 
-        string IPathCommon.Path => Path.Path;
+        public string Path => InnerPath.Path;
 
-        public bool IsDirectory => Path.IsDirectory;
+        public bool IsDirectory => InnerPath.IsDirectory;
 
-        public Size? Size => Path.Size;
+        public Size? Size => InnerPath.Size;
 
         public PathInfo(in IO.IPathInfo path)
         {
-            Path = path;
+            InnerPath = path;
 
             AlreadyPushed = false;
         }
@@ -51,6 +53,6 @@ namespace WinCopies.IO.Shell
 #if CS8
             [AllowNull]
 #endif
-        IPathCommon other) => Path.Equals(other);
+        IPathCommon other) => InnerPath.Equals(other);
     }
 }

@@ -1,9 +1,8 @@
 ﻿using Microsoft.WindowsAPICodePack.Win32Native;
+
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
+
 using WinCopies.Collections;
 using WinCopies.Collections.DotNetFix.Generic;
 using WinCopies.Collections.Generic;
@@ -17,7 +16,7 @@ namespace WinCopies.IO.Process
 
         public static IRecursiveEnumerable<IPathInfo> GetDefaultEnumerable(in IPathInfo path, in RecursiveEnumerationOrder recursiveEnumerationOrder) => ProcessHelper<IPathInfo>.GetDefaultEnumerable(path, recursiveEnumerationOrder, __path => __path);
 
-        public static string GetDestinationPath(in IPathInfo x, in IPathInfo y) => $"{x.Path}{Path.PathSeparator}{y.GetPath(true)}";
+        public static string GetDestinationPath(in IPathInfo x, in IPathInfo y) => $"{x.Path}{WinCopies.IO.Path.PathSeparator}{y.GetPath(true)}";
 
         public static void GetDefaultPathsLoadingErrorParameters<TPath, TError, TErrorAction, TFactory>(in TError error, in string message, in ErrorCode errorCode, in ProcessOptionsCommon<TPath> options, in TFactory factory, out IProcessError<TError, TErrorAction> _error, out bool clearOnError) where TPath : IPath where TFactory : ProcessErrorTypes<TPath, TError, TErrorAction>.IProcessErrorFactories
         {

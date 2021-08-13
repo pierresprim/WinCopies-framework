@@ -22,6 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security;
 
@@ -29,6 +30,7 @@ using WinCopies.Collections.DotNetFix.Generic;
 using WinCopies.Collections.Generic;
 using WinCopies.IO.Enumeration;
 using WinCopies.IO.Shell.Process;
+using WinCopies.Linq;
 using WinCopies.Util;
 using WinCopies.Util.Commands.Primitives;
 
@@ -178,7 +180,13 @@ namespace WinCopies.IO.Process
             }
 
             #region Methods
-            protected override IPathInfo Convert(in IPathInfo path) => new Shell.PathInfo(path);
+            private static Shell.PathInfo __Convert(IPathInfo path) => new Shell.PathInfo(path);
+
+            protected override IPathInfo Convert(IPathInfo path) => __Convert(path);
+
+            private static Shell.PathInfo _Convert(IPathInfo path) => Temp.Temp.Convert<IPathInfo, Shell.PathInfo>(path);
+
+            private static IPathInfo _ConvertBack(Shell.PathInfo path) => Temp.Temp.ConvertBackIn<Shell.PathInfo, IPathInfo>(path);
 
             protected override RecursiveEnumerationOrder GetRecursiveEnumerationOrder() => Options.Move ? RecursiveEnumerationOrder.Both : RecursiveEnumerationOrder.ParentThenChildren;
 
@@ -186,15 +194,15 @@ namespace WinCopies.IO.Process
 
             protected override bool OnPathLoaded(in IPathInfo path) => ProcessHelper<IPathInfo>.ProcessHelper2<ProcessError, CopyErrorAction, IProcessProgressDelegateParameter, ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessEventDelegates>.OnPathLoaded(path, Options, ProcessDelegates, null, AddPath);
 
-            protected override IRecursiveEnumerable<IPathInfo> GetEnumerable(in IPathInfo path) => Options.Move ? new MovingRecursivelyEnumerablePath<IPathInfo>(path, null, null
+            protected override System.Collections.Generic.IEnumerable<IPathInfo> GetEnumerable(in IPathInfo path) => (Options.Move ? new MovingRecursivelyEnumerablePath<Shell.PathInfo>(_Convert(path), null, null
 #if CS8
                 , null
 #endif
-                , FileSystemEntryEnumerationOrder.FilesThenDirectories, _path => _path, true
+                , FileSystemEntryEnumerationOrder.FilesThenDirectories, __Convert, true
                 //#if DEBUG
                 //                , null
                 //#endif
-                ) : ProcessHelper<IPathInfo>.GetDefaultEnumerable(path, RecursiveEnumerationOrder.ParentThenChildren, _path => _path);
+                ) : ProcessHelper<Shell.PathInfo>.GetDefaultEnumerable(_Convert(path), RecursiveEnumerationOrder.ParentThenChildren, __Convert)).Select(_ConvertBack);
 
             protected override void GetPathsLoadingErrorParameters(in ProcessError error, in string message, in ErrorCode errorCode, out IProcessError<ProcessError, CopyErrorAction> _error, out bool clearOnError) => GetDefaultPathsLoadingErrorParameters(error, message, errorCode, Options, Factory, out _error, out clearOnError);
 
@@ -219,7 +227,7 @@ namespace WinCopies.IO.Process
 
                             if (path.AlreadyPushed)
 
-                                result = Microsoft.WindowsAPICodePack.Win32Native.Shell.Shell.RemoveDirectoryW(path.Path.Path);
+                                result = Microsoft.WindowsAPICodePack.Win32Native.Shell.Shell.RemoveDirectoryW(path.InnerPath.Path);
 
                             else
                             {
@@ -504,7 +512,7 @@ namespace WinCopies.IO.Process
 
                 // sourcePath = $"{SourcePath}{WinCopies.IO.Path.PathSeparator}{CurrentPath.Path}";
 
-                destPath = GetDestinationPath(path);
+                destPath = ((Shell.PathInfo)path).AlreadyPushed ? null : GetDestinationPath(path);
 
                 uint flags = Options.Move ? 0u : (uint)GetDefaultCopyFileFlags();
 

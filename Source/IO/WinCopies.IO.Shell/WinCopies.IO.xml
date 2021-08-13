@@ -60,6 +60,11 @@
               Looks up a localized string similar to .Net Type.
             </summary>
         </member>
+        <member name="P:WinCopies.IO.Shell.Properties.Resources.EmptyingRecycleBin">
+            <summary>
+              Looks up a localized string similar to Emptying Recycle Bin.
+            </summary>
+        </member>
         <member name="P:WinCopies.IO.Shell.Properties.Resources.Extraction">
             <summary>
               Looks up a localized string similar to Extraction.
@@ -73,6 +78,11 @@
         <member name="P:WinCopies.IO.Shell.Properties.Resources.PortableDevice">
             <summary>
               Looks up a localized string similar to Portable Device.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Shell.Properties.Resources.Recycling">
+            <summary>
+              Looks up a localized string similar to Recycling.
             </summary>
         </member>
         <member name="P:WinCopies.IO.Shell.Properties.Resources.RegistryKey">

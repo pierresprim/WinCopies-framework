@@ -8,12 +8,16 @@ CHANGELOG
 
 ### 3.6-preview
 
+- Add Loading process status.
 - Add new types.
 - IProcessFactoryProcessInfo: add GetUserConfirmationText() method.
 - IProcessFactory: add Recycling property.
 - Re-design process options and error types.
 - Update Deletion to add recycling option.
 - Process base class:
+	- The property event delegate of the Process base class is called when the Status property is updated.
+	- The GetEnumerable method is now defined as: System.Collections.Generic.IEnumerable<TItemsOut> GetEnumerable(in TItemsOut path).
+	- The Convert method parameter does not have the 'in' modifier anymore.
 	- Add protected methods.
 	- Dispose method is not virtual anymore. Override DisposeManaged and the new DisposeUnmanaged methods instead.
 	- Some dispose operations are performed by the new method DisposeUnmanaged.
@@ -22,6 +26,10 @@ CHANGELOG
 - ShellObjectInfo:
 	- Update processes handling.
 	- Bug fixes.
+- Update Process factories definitions.
+- Add 'Empty Recycle Bin' feature.
+- Update Shell ProcessHelper class CanRun method.
+- Move part of IO types to the new WinCopies.IO.Shell package and, for some types among them, also to the WinCopies.IO.Shell.* namespace.
 
 ### 3.5-preview
 

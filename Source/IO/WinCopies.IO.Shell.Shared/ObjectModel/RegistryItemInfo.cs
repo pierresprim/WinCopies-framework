@@ -319,20 +319,65 @@ namespace WinCopies.IO.ObjectModel
         }
 
         private BitmapSource TryGetBitmapSource(in int size)
+#if CS8
+            =>
+#else
         {
-            switch (ObjectPropertiesGeneric.RegistryItemType)
+            switch (
+#endif
+            ObjectPropertiesGeneric.RegistryItemType
+#if CS8
+            switch
+#else
+            )
+#endif
             {
-                case RegistryItemType.Root:
+#if !CS8
+                case
+#endif
+                RegistryItemType.Root
+#if CS8
+                    =>
+#else
+                    :
 
-                    return Icons.Computer.TryGetComputerBitmapSource(size);
+                    return
+#endif
+                        Icons.Computer.TryGetComputerBitmapSource(size)
+#if CS8
+                    ,
+#else
+                    ;
 
-                case RegistryItemType.Key:
+                case
+#endif
+                RegistryItemType.Key
+#if CS8
+                =>
+#else
+                :
 
-                    return Icons.Folder.TryGetFolderBitmapSource(size);
+                    return
+#endif
+                        Icons.Folder.TryGetFolderBitmapSource(size)
+#if CS8
+                        ,
+
+                        _ =>
+#else
+                        ;
             }
 
-            return Icons.File.TryGetFileBitmapSource(size);
-        }
+            return
+#endif
+                    Icons.File.TryGetFileBitmapSource(size)
+#if CS8
+            }
+#endif
+                    ;
+#if !CS8
+    }
+#endif
 
         public override IEqualityComparer<IBrowsableObjectInfoBase> GetDefaultEqualityComparer() => new RegistryItemInfoEqualityComparer<IBrowsableObjectInfoBase>();
 
@@ -350,7 +395,7 @@ namespace WinCopies.IO.ObjectModel
 
             base.DisposeUnmanaged();
         }
-        #endregion // Methods
+        #endregion Methods
     }
 
     public class RegistryItemInfo : RegistryItemInfo<IRegistryItemInfoProperties, RegistryItemInfoItemProvider, IEnumerableSelectorDictionary<RegistryItemInfoItemProvider, IBrowsableObjectInfo>, RegistryItemInfoItemProvider>, IRegistryItemInfo
@@ -408,6 +453,8 @@ namespace WinCopies.IO.ObjectModel
             IDirectProcessFactoryProcessInfo IProcessFactory.Recycling => Process.ProcessFactory.DefaultProcessInfo;
 
             IDirectProcessFactoryProcessInfo IProcessFactory.Deletion => Process.ProcessFactory.DefaultProcessInfo;
+
+            IDirectProcessFactoryProcessInfo IProcessFactory.Clearing => Process.ProcessFactory.DefaultProcessInfo;
 
             public _ProcessFactory(in IRegistryItemInfo registryItemInfo) => NewItemProcessCommands = new _NewItemProcessCommands(registryItemInfo);
 

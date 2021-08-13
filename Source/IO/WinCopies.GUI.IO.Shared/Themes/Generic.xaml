@@ -460,7 +460,7 @@
                     <Button x:Name="PART_Run_PauseButton" Content="{x:Static icons:Resources.control_pause}" Command="{x:Static commands:Commands.CommonCommand}" CommandParameter="{Binding Actions.Pause, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
                     <Button Content="{x:Static icons:Resources.cancel}" Command="{x:Static commands:Commands.CommonCommand}" CommandParameter="{Binding Actions.Cancel, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
                 </StackPanel>
-                <ProgressBar x:Name="PART_ProgressBar" Grid.Row="2" Value="{Binding ProgressPercentage, RelativeSource={RelativeSource Mode=TemplatedParent}}" Maximum="100" Height="30" />
+                <ProgressBar x:Name="PART_ProgressBar" Grid.Row="2" Value="{Binding ProgressPercentage, RelativeSource={RelativeSource Mode=TemplatedParent}}" Maximum="100" Height="30" IsIndeterminate="{Binding Status, RelativeSource={RelativeSource Mode=TemplatedParent}, Mode=OneWay, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static process:ProcessStatus.Loading}}" />
             </Grid>
 
             <Control Grid.Row="1">
@@ -577,12 +577,12 @@
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate DataType="{x:Type localProcess:IProcess}">
                                         <ProgressBar x:Name="PART_ProgressBar" Value="{Binding ProgressPercentage, Mode=OneWay}" Maximum="100" Height="30" Width="100" />
-                                        <!--<DataTemplate.Triggers>
-                                    <DataTrigger Binding="{Binding Status, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="{x:Static localProcessControls:ProcessStatus.InProgress}">
-                                        <Setter Property="IsIndeterminate" TargetName="PART_ProgressBar" Value="False" />
-                                        <Setter Property="Value" TargetName="PART_ProgressBar" Value="{Binding ProgressPercentage}" />
-                                    </DataTrigger>
-                                </DataTemplate.Triggers>-->
+                                        <DataTemplate.Triggers>
+                                            <DataTrigger Binding="{Binding Status, Mode=OneWay}" Value="{x:Static process:ProcessStatus.Loading}">
+                                                <Setter Property="IsIndeterminate" TargetName="PART_ProgressBar" Value="true" />
+                                                <!--<Setter Property="Value" TargetName="PART_ProgressBar" Value="{Binding ProgressPercentage}" />-->
+                                            </DataTrigger>
+                                        </DataTemplate.Triggers>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>

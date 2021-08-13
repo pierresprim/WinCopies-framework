@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-using Microsoft.WindowsAPICodePack.PortableDevices;
 using Microsoft.WindowsAPICodePack.Shell;
 
 using System;
@@ -28,7 +27,6 @@ using System.Windows.Controls;
 using System.Windows.Input;
 
 using WinCopies.GUI.IO;
-using WinCopies.GUI.IO.Controls.Process;
 using WinCopies.GUI.IO.ObjectModel;
 using WinCopies.GUI.IO.Process;
 using WinCopies.IO.ObjectModel;
@@ -44,7 +42,7 @@ namespace WinCopies.GUI.Samples
     {
         public static IProcessPathCollectionFactory DefaultProcessPathCollectionFactory { get; } = new ProcessPathCollectionFactory();
 
-        public static ClientVersion ClientVersion { get; } = GetClientVersion();
+        public static WinCopies.IO.ClientVersion ClientVersion { get; } = GetClientVersion();
 
         public static readonly DependencyProperty ItemsProperty = DependencyProperty.Register(nameof(Items), typeof(ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel>), typeof(ExplorerControlTest), new PropertyMetadata(null, (DependencyObject d, DependencyPropertyChangedEventArgs e) =>
         {
@@ -69,28 +67,30 @@ namespace WinCopies.GUI.Samples
 
             DataContext = this;
 
-            void addCommandBinding(in ICommand command, Func<IProcessFactoryProcessInfo> getProcessInfo, string actionName) => CommandBindings.Add(new CommandBinding(command, (object sender, ExecutedRoutedEventArgs e) => StartProcess(getProcessInfo(), actionName), (object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = getProcessInfo().CanRun(GetEnumerable())));
+            void addCommandBinding(in ICommand command, Func<IProcessFactoryProcessInfo> getProcessInfo) => CommandBindings.Add(new CommandBinding(command, (object sender, ExecutedRoutedEventArgs e) => StartProcess(getProcessInfo()), (object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = getProcessInfo().CanRun(GetEnumerable())));
 
             IProcessFactory getProcessFactory() => SelectedItem.Path.ProcessFactory;
 
-            addCommandBinding(ApplicationCommands.Copy, () => getProcessFactory().Copy, null);
+            addCommandBinding(ApplicationCommands.Copy, () => getProcessFactory().Copy);
 
-            addCommandBinding(ApplicationCommands.Cut, () => getProcessFactory().Cut, null);
+            addCommandBinding(ApplicationCommands.Cut, () => getProcessFactory().Cut);
 
             _ = CommandBindings.Add(new CommandBinding(ApplicationCommands.Paste, (object sender, ExecutedRoutedEventArgs e) => AddProcess(getProcessFactory().Copy.TryGetProcessParameters(10u)), (object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = SelectedItem.Path.ProcessFactory.CanPaste(10u)));
 
-            addCommandBinding(ApplicationCommands.Delete, () => getProcessFactory().Recycling, null);
+            addCommandBinding(ApplicationCommands.Delete, () => getProcessFactory().Recycling);
 
-            addCommandBinding(WinCopies.Commands.TEMP.ApplicationCommands.DeletePermanently, () => getProcessFactory().Deletion, "permanently delete");
+            addCommandBinding(Commands.TEMP.ApplicationCommands.Empty, () => getProcessFactory().Clearing);
+
+            addCommandBinding(Commands.TEMP.ApplicationCommands.DeletePermanently, () => getProcessFactory().Deletion);
         }
 
-        IEnumerable<IBrowsableObjectInfo> GetEnumerable() => SelectedItem.Path.Items.WhereSelect(item => item.IsSelected, item => item.Model);
+        private IEnumerable<IBrowsableObjectInfo> GetEnumerable() => SelectedItem.Path.Items.WhereSelect(item => item.IsSelected, item => item.Model);
 
-        protected void StartProcess(in IProcessFactoryProcessInfo processInfo, in string actionName)
+        protected void StartProcess(in IProcessFactoryProcessInfo processInfo)
         {
             if (processInfo.UserConfirmationRequired)
 
-                if (MessageBox.Show($"Are you sure you want to {actionName} the selected files?", Assembly.GetExecutingAssembly().GetName().Name, MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.No)
+                if (MessageBox.Show(processInfo.GetUserConfirmationText(), Assembly.GetExecutingAssembly().GetName().Name, MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.No)
 
                     return;
 
@@ -170,17 +170,17 @@ namespace WinCopies.GUI.Samples
             result.RunWorkerAsync();
         }
 
-        private static ClientVersion GetClientVersion()
+        private static WinCopies.IO.ClientVersion GetClientVersion()
         {
             Version version = Assembly.GetExecutingAssembly().GetName().Version;
 
-            return new ClientVersion("WinCopies Framework Test App", (uint)version.Major, (uint)version.Minor, (uint)version.Revision);
+            return new WinCopies.IO.ClientVersion("WinCopies Framework Test App", (uint)version.Major, (uint)version.Minor, (uint)version.Revision);
         }
 
         public static ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> GetShellItems() => new
 #if !CS9
             ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel>
-            #endif
+#endif
             () { { GetExplorerControlBrowsableObjectInfoViewModel(GetBrowsableObjectInfoViewModel(ShellObjectInfo.From(ShellObjectFactory.Create("C:\\"), ClientVersion)), true, SelectionMode.Extended, true) } };
 
         private static IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo) => new BrowsableObjectInfoViewModel(browsableObjectInfo);
