@@ -13,7 +13,6 @@
     <VersionPrefix>3.6</VersionPrefix>
     <AssemblyVersion>3.6</AssemblyVersion>
     <FileVersion>3.6</FileVersion>
-    <PackageIcon>WinCopies.png</PackageIcon>
   </PropertyGroup>
 
   <Import Project="..\WinCopies.GUI.Drawing.Shared\WinCopies.GUI.Drawing.Shared.projitems" Label="Shared" />

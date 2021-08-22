@@ -16,7 +16,6 @@
     <VersionSuffix>preview</VersionSuffix>
     <AssemblyVersion>3.6</AssemblyVersion>
     <FileVersion>3.6</FileVersion>
-    <PackageIcon>WinCopies.png</PackageIcon>
     <AssemblyOriginatorKeyFile>WinCopies.GUI.IO.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 

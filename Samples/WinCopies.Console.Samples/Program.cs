@@ -5,7 +5,6 @@ using System.Reflection;
 using System.Threading;
 
 using WinCopies.Collections.Generic;
-using WinCopies.Temp;
 
 namespace WinCopies.Console.Samples
 {

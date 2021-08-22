@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using WinCopies.Temp;
+
+using WinCopies.Collections;
 
 using static System.Console;
 using static WinCopies.ThrowHelper;
 using static WinCopies.Console.Console;
-using WinCopies.Collections.Generic;
-using WinCopies.Collections;
 
 namespace WinCopies.Console
 {

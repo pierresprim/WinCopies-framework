@@ -1,7 +1,6 @@
 ﻿using System;
 
 using WinCopies.Collections.DotNetFix.Generic;
-using WinCopies.Temp;
 
 using static System.Console;
 

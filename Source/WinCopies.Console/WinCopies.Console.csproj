@@ -1,6 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <PackageId>WinCopies.Console</PackageId>
+    <AssemblyName>WinCopies.Console</AssemblyName>
     <TargetFrameworks>netcoreapp3.0;netcoreapp3.1;net5.0-windows;net6.0-windows;net472;net48</TargetFrameworks>
     <TargetPlatformIdentifier>windows</TargetPlatformIdentifier>
     <SignAssembly>true</SignAssembly>
@@ -9,7 +11,9 @@
     <VersionSuffix>preview</VersionSuffix>
     <AssemblyVersion>3.0</AssemblyVersion>
     <FileVersion>3.0</FileVersion>
-  </PropertyGroup>
+    <PackageTags>WinCopies, Console</PackageTags>
+    <DocumentationFile>WinCopies.Console.xml</DocumentationFile>
+    </PropertyGroup>
 
   <ItemGroup Condition="!$(DefineConstants.Contains('CS8'))">
     <PackageReference Include="System.Collections.Immutable" Version="1.36" />
@@ -28,5 +32,16 @@
   </ItemGroup>
 
   <Import Project="..\WinCopies.Console.Shared\WinCopies.Console.Shared.projitems" Label="Shared" />
+
+  <ItemGroup>
+    <None Include="..\..\LICENSE.md">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+    <None Include="..\WinCopies.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
 
 </Project>

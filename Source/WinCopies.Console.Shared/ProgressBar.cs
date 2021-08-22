@@ -1,10 +1,7 @@
 ﻿using System;
 
-using WinCopies.Temp;
-
 namespace WinCopies.Console
 {
-
     public class ProgressBar : ControlElement
     {
         private uint _size;

@@ -8,7 +8,7 @@
     <RepositoryUrl>https://github.com/pierresprim/WinCopies-framework.git</RepositoryUrl>
     <RepositoryType>Git</RepositoryType>
     <PackageReleaseNotes>See https://github.com/pierresprim/WinCopies-framework/blob/master/Changelog.md</PackageReleaseNotes>
-    <PackageIcon>WinCopies.ico</PackageIcon>
+    <PackageIcon>WinCopies.png</PackageIcon>
   </PropertyGroup>
 
   <!--Constants-->
