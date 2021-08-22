@@ -38,7 +38,7 @@ namespace WinCopies.GUI.Samples
     /// <summary>
     /// Interaction logic for ExplorerControlTest.xaml
     /// </summary>
-    public partial class ExplorerControlTest : Window
+    public partial class ExplorerControlTest : System.Windows.Window
     {
         public static IProcessPathCollectionFactory DefaultProcessPathCollectionFactory { get; } = new ProcessPathCollectionFactory();
 
@@ -59,7 +59,7 @@ namespace WinCopies.GUI.Samples
 
         public IExplorerControlBrowsableObjectInfoViewModel SelectedItem { get => (IExplorerControlBrowsableObjectInfoViewModel)GetValue(SelectedItemProperty); set => SetValue(SelectedItemProperty, value); }
 
-        static ExplorerControlTest() => IO.ObjectModel.BrowsableObjectInfo.RegisterDefaultSelectors();
+        static ExplorerControlTest() => WinCopies.GUI.Shell.ObjectModel.BrowsableObjectInfo.RegisterDefaultSelectors();
 
         public ExplorerControlTest()
         {
@@ -79,9 +79,9 @@ namespace WinCopies.GUI.Samples
 
             addCommandBinding(ApplicationCommands.Delete, () => getProcessFactory().Recycling);
 
-            addCommandBinding(Commands.TEMP.ApplicationCommands.Empty, () => getProcessFactory().Clearing);
+            addCommandBinding(Commands.ApplicationCommands.Empty, () => getProcessFactory().Clearing);
 
-            addCommandBinding(Commands.TEMP.ApplicationCommands.DeletePermanently, () => getProcessFactory().Deletion);
+            addCommandBinding(Commands.ApplicationCommands.DeletePermanently, () => getProcessFactory().Deletion);
         }
 
         private IEnumerable<IBrowsableObjectInfo> GetEnumerable() => SelectedItem.Path.Items.WhereSelect(item => item.IsSelected, item => item.Model);
@@ -90,7 +90,7 @@ namespace WinCopies.GUI.Samples
         {
             if (processInfo.UserConfirmationRequired)
 
-                if (MessageBox.Show(processInfo.GetUserConfirmationText(), Assembly.GetExecutingAssembly().GetName().Name, MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.No)
+                if (MessageBox.Show(processInfo.GetUserConfirmationText(), Assembly.GetExecutingAssembly().GetName().Name, MessageBoxButton.YesNo, MessageBoxImage.Question, System.Windows.MessageBoxResult.No) == System.Windows.MessageBoxResult.No)
 
                     return;
 
@@ -140,7 +140,7 @@ namespace WinCopies.GUI.Samples
 
         public static IExplorerControlBrowsableObjectInfoViewModel GetDefaultExplorerControlBrowsableObjectInfoViewModel(in IBrowsableObjectInfo browsableObjectInfo)
         {
-            IExplorerControlBrowsableObjectInfoViewModel viewModel = ExplorerControlBrowsableObjectInfoViewModel.From(new BrowsableObjectInfoViewModel(browsableObjectInfo));
+            IExplorerControlBrowsableObjectInfoViewModel viewModel = Shell.ObjectModel. ExplorerControlBrowsableObjectInfoViewModel.From(new BrowsableObjectInfoViewModel(browsableObjectInfo), path => ShellObjectInfo.From(ShellObjectFactory.Create(path), ClientVersion));
 
             return viewModel;
         }
@@ -187,7 +187,7 @@ namespace WinCopies.GUI.Samples
 
         public static IExplorerControlBrowsableObjectInfoViewModel GetExplorerControlBrowsableObjectInfoViewModel(in IBrowsableObjectInfoViewModel browsableObjectInfo, in bool isSelected, in SelectionMode selectionMode, in bool isCheckBoxVisible)
         {
-            IExplorerControlBrowsableObjectInfoViewModel result = ExplorerControlBrowsableObjectInfoViewModel.From(browsableObjectInfo);
+            IExplorerControlBrowsableObjectInfoViewModel result = Shell.ObjectModel. ExplorerControlBrowsableObjectInfoViewModel.From(browsableObjectInfo, path => ShellObjectInfo.From(ShellObjectFactory.Create(path), ClientVersion));
 
             result.IsSelected = isSelected;
             result.SelectionMode = selectionMode;
@@ -254,7 +254,7 @@ namespace WinCopies.GUI.Samples
 
                     IExplorerControlBrowsableObjectInfoViewModel item;
 
-                    foreach (var _item in e.OldItems)
+                    foreach (object _item in e.OldItems)
                     {
                         item = (IExplorerControlBrowsableObjectInfoViewModel)_item;
 

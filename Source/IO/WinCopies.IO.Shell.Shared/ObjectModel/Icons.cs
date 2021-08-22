@@ -31,7 +31,7 @@ using WinCopies.IO.Enumeration;
 using WinCopies.IO.Process;
 using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Selectors;
-using WinCopies.IO.Shell.ObjectModel;
+using WinCopies.IO.Shell;
 using WinCopies.Linq;
 using WinCopies.PropertySystem;
 
@@ -176,7 +176,11 @@ namespace WinCopies.IO
                 (_multiIcon = new MultiIcon()).Load(Path);
             }
 
-            public static MultiIconInfo From(in IShellObjectInfo shellObjectInfo) => new MultiIconInfo(IsValidFormat((shellObjectInfo.InnerObject is ShellFile shellFile
+            public static MultiIconInfo From(in IShellObjectInfo shellObjectInfo) => new
+#if !CS9
+                MultiIconInfo
+#endif
+                (IsValidFormat((shellObjectInfo.InnerObject is ShellFile shellFile
                 ? shellFile.IsFileSystemObject
                     ? shellObjectInfo
                     : throw new ArgumentException("The given ShellObject must be a file system object.", nameof(shellObjectInfo))
@@ -251,7 +255,11 @@ namespace WinCopies.IO
             }
             #endregion
 
-            private static readonly BrowsabilityPathStack<ISingleIconInfo> __browsabilityPathStack = new BrowsabilityPathStack<ISingleIconInfo>();
+            private static readonly BrowsabilityPathStack<ISingleIconInfo> __browsabilityPathStack = new
+#if !CS9
+                BrowsabilityPathStack<ISingleIconInfo>
+#endif
+                ();
             private static readonly WriteOnlyBrowsabilityPathStack<ISingleIconInfo> _browsabilityPathStack = __browsabilityPathStack.AsWriteOnly();
 
             public static IBrowsabilityPathStack<ISingleIconInfo> BrowsabilityPathStack => _browsabilityPathStack;
@@ -308,7 +316,7 @@ namespace WinCopies.IO
             {
                 var arrayBuilder = new ArrayBuilder<IBrowsableObjectInfo>();
 
-                _=arrayBuilder.AddLast(Parent);
+                _ = arrayBuilder.AddLast(Parent);
 
                 return arrayBuilder;
             }

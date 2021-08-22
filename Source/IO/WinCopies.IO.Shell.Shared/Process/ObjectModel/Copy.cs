@@ -184,9 +184,9 @@ namespace WinCopies.IO.Process
 
             protected override IPathInfo Convert(IPathInfo path) => __Convert(path);
 
-            private static Shell.PathInfo _Convert(IPathInfo path) => Temp.Temp.Convert<IPathInfo, Shell.PathInfo>(path);
+            private static Shell.PathInfo _Convert(IPathInfo path) => Delegates.Convert<IPathInfo, Shell.PathInfo>(path);
 
-            private static IPathInfo _ConvertBack(Shell.PathInfo path) => Temp.Temp.ConvertBackIn<Shell.PathInfo, IPathInfo>(path);
+            private static IPathInfo _ConvertBack(Shell.PathInfo path) => Delegates.ConvertBackIn<Shell.PathInfo, IPathInfo>(path);
 
             protected override RecursiveEnumerationOrder GetRecursiveEnumerationOrder() => Options.Move ? RecursiveEnumerationOrder.Both : RecursiveEnumerationOrder.ParentThenChildren;
 

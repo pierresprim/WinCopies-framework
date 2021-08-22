@@ -33,6 +33,8 @@ using WinCopies.Linq;
 using static WinCopies.Commands.TextCommands;
 using static WinCopies.GUI.Controls.ButtonTextBoxModel;
 
+using SystemApplicationCommands = System.Windows.Input.ApplicationCommands;
+
 namespace WinCopies.GUI.Controls
 {
     internal static class TextBoxHelper
@@ -75,10 +77,139 @@ namespace WinCopies.GUI.Controls
 #endif
     }
 
+    namespace DotNetFix
+    {
+        public class TextBox : System.Windows.Controls.TextBox
+        {
+            static TextBox() => DefaultStyleKeyProperty.OverrideMetadata(typeof(TextBox), new FrameworkPropertyMetadata(typeof(TextBox)));
+
+            public TextBox() => RegisterCommandBindings();
+
+            protected virtual void AddCommandBinding(ICommand command, Action<ExecutedRoutedEventArgs> action, Action<CanExecuteRoutedEventArgs> predicate) => CommandBindings.Add(new CommandBinding(command, (object sender, ExecutedRoutedEventArgs e) => action(e), (object _sender, CanExecuteRoutedEventArgs _e) => predicate(_e)));
+
+            protected virtual void AddCaseCommandBinding(ICommand command, Action<ExecutedRoutedEventArgs> action) => AddCommandBinding(command, action, OnCaseCommandCanExecute);
+
+            protected virtual void RegisterCommandBindings()
+            {
+                Action<ExecutedRoutedEventArgs> getAction(Action action) => e => OnExecuteCommand(action, e);
+
+                Action<ExecutedRoutedEventArgs> getActionGeneric<T>(Func<T> action) => e => OnExecuteCommand(() => action(), e);
+
+                void setPredicateValue(in CanExecuteRoutedEventArgs e, in bool value) => e.CanExecute = value;
+
+                void predicate(CanExecuteRoutedEventArgs e) => setPredicateValue(e, true);
+
+                Action<CanExecuteRoutedEventArgs> getPredicate(bool value) => e => setPredicateValue(e, value);
+
+                AddCommandBinding(SystemApplicationCommands.Undo, getActionGeneric(Undo), getPredicate(CanUndo));
+                AddCommandBinding(SystemApplicationCommands.Undo, getActionGeneric(Redo), getPredicate(CanRedo));
+
+                AddCommandBinding(SystemApplicationCommands.Copy, getAction(Copy), predicate);
+                AddCommandBinding(SystemApplicationCommands.Cut, getAction(Cut), predicate);
+                AddCommandBinding(SystemApplicationCommands.Paste, getAction(Paste), predicate);
+                AddCommandBinding(SystemApplicationCommands.Delete, getAction(Delete), predicate);
+
+                AddCommandBinding(SystemApplicationCommands.SelectAll, getAction(SelectAll), predicate);
+
+                AddCaseCommandBinding(Upper, OnUpperCommandExecuted);
+                AddCaseCommandBinding(Lower, OnLowerCommandExecuted);
+                AddCaseCommandBinding(FirstCharUpper, OnFirstCharUpperCommandExecuted);
+                AddCaseCommandBinding(FirstCharOfEachWordUpper, OnFirstCharOfEachWordUpperCommandExecuted);
+                AddCaseCommandBinding(Reverse, OnReverseExecuted);
+            }
+
+            protected virtual void OnDelete(ExecutedRoutedEventArgs e) => OnExecuteCommand(Delete, e);
+
+            public void Delete() => UpdateText(Delegates.NullIn);
+
+            protected virtual void OnExecuteCommand(Action action, ExecutedRoutedEventArgs e)
+            {
+                action();
+
+                e.Handled = true;
+            }
+
+            protected virtual void OnUpperCommandExecuted(ExecutedRoutedEventArgs e) => UpdateText((in string s) => s.ToUpper(CultureInfo.CurrentCulture), e);
+
+            private void UpdateText(in FuncIn<string, string> action)
+            {
+                if (SelectionLength == 0)
+
+                    Text = action(Text);
+
+                else
+                {
+                    var sb = new StringBuilder();
+
+                    if (SelectionStart > 0)
+
+                        _ = sb.Append(Text.
+#if CS8
+                            AsSpan
+#else
+                            Substring
+#endif
+                            (0, SelectionStart));
+
+                    _ = sb.Append(action(Text.Substring(SelectionStart, SelectionLength)));
+
+                    int l = SelectionStart + SelectionLength;
+
+                    if (Text.Length >= l)
+
+                        _ = sb.Append(Text.
+#if CS8
+                            AsSpan
+#else
+                            Substring
+#endif
+                            (l));
+
+                    int selectionStart = SelectionStart;
+
+                    int selectionLength = SelectionLength;
+
+                    Text = sb.ToString();
+
+                    Select(selectionStart, selectionLength);
+                }
+            }
+
+            private void UpdateText(in FuncIn<string, string> action, in ExecutedRoutedEventArgs e)
+            {
+                UpdateText(action);
+
+                e.Handled = true;
+            }
+
+            protected virtual void OnLowerCommandExecuted(ExecutedRoutedEventArgs e) => UpdateText((in string s) => s.ToLower(CultureInfo.CurrentCulture), e);
+
+            private static string ToUpper(in char c) => char.ToUpper(c, CultureInfo.CurrentCulture).ToString();
+
+            protected virtual void OnFirstCharUpperCommandExecuted(ExecutedRoutedEventArgs e) => UpdateText((in string s) =>
+            {
+                string toUpper() => ToUpper(Text[0]);
+
+                return s.Length == 1 ? toUpper() : $"{toUpper()}{Text.Substring(1)}";
+            }, e);
+
+            protected virtual void OnFirstCharOfEachWordUpperCommandExecuted(ExecutedRoutedEventArgs e) => UpdateText((in string s) => s.FirstCharOfEachWordToUpper(' '), e);
+
+            protected virtual void OnReverseExecuted(ExecutedRoutedEventArgs e) => UpdateText((in string s) => s._Reverse(), e);
+
+            protected virtual void OnCaseCommandCanExecute(CanExecuteRoutedEventArgs e)
+            {
+                e.CanExecute = !UtilHelpers.IsNullEmptyOrWhiteSpace(Text);
+
+                e.Handled = true;
+            }
+        }
+    }
+
     /// <summary>
     /// Represents a <see cref="System.Windows.Controls.TextBox"/> that can display items on the left and right of the text.
     /// </summary>
-    public class TextBox : System.Windows.Controls.TextBox
+    public class TextBox : DotNetFix.TextBox
     {
         /// <summary>
         /// Identifies the <see cref="LeftItems"/> dependency property.
@@ -124,77 +255,6 @@ namespace WinCopies.GUI.Controls
         public DataTemplateSelector RightItemsTemplateSelector { get => (DataTemplateSelector)GetValue(RightItemsTemplateSelectorProperty); set => SetValue(RightItemsTemplateSelectorProperty, value); }
 
         static TextBox() => DefaultStyleKeyProperty.OverrideMetadata(typeof(TextBox), new FrameworkPropertyMetadata(typeof(TextBox)));
-
-        public TextBox() => RegisterCommandBindings();
-
-        protected virtual void AddCaseCommandBinding(ICommand command, Action<ExecutedRoutedEventArgs> action) => CommandBindings.Add(new CommandBinding(command, (object sender, ExecutedRoutedEventArgs e) => action(e), (object _sender, CanExecuteRoutedEventArgs _e) => OnCaseCommandCanExecute(_e)));
-
-        protected virtual void RegisterCommandBindings()
-        {
-            AddCaseCommandBinding(Upper, OnUpperCommandExecuted);
-            AddCaseCommandBinding(Lower, OnLowerCommandExecuted);
-            AddCaseCommandBinding(FirstCharUpper, OnFirstCharUpperCommandExecuted);
-            AddCaseCommandBinding(FirstCharOfEachWordUpper, OnFirstCharOfEachWordUpperCommandExecuted);
-            AddCaseCommandBinding(Reverse, OnReverseExecuted);
-        }
-
-        protected virtual void OnUpperCommandExecuted(ExecutedRoutedEventArgs e) => UpdateText((in string s) => s.ToUpper(CultureInfo.CurrentCulture), e);
-
-        private void UpdateText(in FuncIn<string, string> action, in ExecutedRoutedEventArgs e)
-        {
-            if (SelectionLength == 0)
-
-                Text = action(Text);
-
-            else
-            {
-                var sb = new StringBuilder();
-
-                if (SelectionStart > 0)
-
-                    _ = sb.Append(Text.Substring(0, SelectionStart));
-
-                _ = sb.Append(action(Text.Substring(SelectionStart, SelectionLength)));
-
-                int l = SelectionStart + SelectionLength;
-
-                if (Text.Length >= l)
-
-                    _ = sb.Append(Text.Substring(l));
-
-                int selectionStart = SelectionStart;
-
-                int selectionLength = SelectionLength;
-
-                Text = sb.ToString();
-
-                Select(selectionStart, selectionLength);
-            }
-
-            e.Handled = true;
-        }
-
-        protected virtual void OnLowerCommandExecuted(ExecutedRoutedEventArgs e) => UpdateText((in string s) => s.ToLower(CultureInfo.CurrentCulture), e);
-
-        private static string ToUpper(in char c) => char.ToUpper(c, CultureInfo.CurrentCulture).ToString();
-
-        protected virtual void OnFirstCharUpperCommandExecuted(ExecutedRoutedEventArgs e) => UpdateText((in string s) =>
-        {
-            string toUpper() => ToUpper(Text[0]);
-
-            return s.Length == 1 ? toUpper() : $"{toUpper()}{Text.Substring(1)}";
-        }, e);
-
-        protected virtual void OnFirstCharOfEachWordUpperCommandExecuted(ExecutedRoutedEventArgs e) => UpdateText((in string s) => s.FirstCharOfEachWordToUpper(' '), e);
-
-        protected virtual void OnReverseExecuted(ExecutedRoutedEventArgs e) => UpdateText((in string s) => s._Reverse(), e);
-
-        protected virtual void OnCaseCommandCanExecute(CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = !UtilHelpers.IsNullEmptyOrWhiteSpace(Text);
-
-            e.Handled = true;
-        }
     }
 
     public class ButtonTextBox : TextBox
@@ -465,7 +525,11 @@ namespace WinCopies.GUI.Controls
     {
         public System.Collections.Generic.IEnumerable<IButtonModel> Buttons { get; set; }
 
-        public static ObservableCollection<IButtonModel> GetDefaultButtons() => new ObservableCollection<IButtonModel>() { new ButtonModel<Bitmap>(Icons.Properties.Resources.cancel) { Command = DialogCommands.Cancel } };
+        public static ObservableCollection<IButtonModel> GetDefaultButtons() => new
+#if !CS9
+            ObservableCollection<IButtonModel>
+#endif
+            () { new ButtonModel<Bitmap>(Icons.Properties.Resources.cancel) { Command = DialogCommands.Cancel } };
 
         public ButtonTextBoxModel() => Buttons = GetDefaultButtons();
 

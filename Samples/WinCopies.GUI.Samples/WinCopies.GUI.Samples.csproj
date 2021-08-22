@@ -9,7 +9,7 @@
   <Import Project="..\WinCopies.GUI.Samples.Shared\WinCopies.GUI.Samples.Shared.projitems" Label="Shared" />
 
   <ItemGroup>
-    <PackageReference Include="WinCopies.Util.Desktop" Version="3.11-preview" />
+    <PackageReference Include="WinCopies.Util.Desktop" Version="3.12-preview" />
   </ItemGroup>
 
   <ItemGroup>
@@ -22,8 +22,41 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Source\GUI\WinCopies.GUI.Templates\WinCopies.GUI.Templates.csproj" />
     <ProjectReference Include="..\..\Source\GUI\WinCopies.GUI\WinCopies.GUI.csproj" />
-    <ProjectReference Include="..\..\Source\IO\WinCopies.GUI.IO\WinCopies.GUI.IO.csproj" />
+    <ProjectReference Include="..\..\Source\IO\WinCopies.GUI.Shell\WinCopies.GUI.Shell.csproj" />
     <ProjectReference Include="..\..\Source\IO\WinCopies.IO\WinCopies.IO.csproj" />
+    <ProjectReference Include="..\..\Source\IO\WinCopies.IO.Shell\WinCopies.IO.Shell.csproj" />
   </ItemGroup>
+
+  <!--Constants-->
+
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+    <DefineConstants>TRACE;$(DefineConstants)</DefineConstants>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <!-- SourceLink related properties https://github.com/dotnet/SourceLink#using-sourcelink -->
+    <!-- Optional: Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element) -->
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+
+    <!-- Optional: Embed source files that are not tracked by the source control manager in the PDB -->
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+
+    <!-- Optional: Build symbol package (.snupkg) to distribute the PDB containing Source Link -->
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <DefineConstants>CS4;CS5;CS6;CS7;CS8;CS9;NET5;$(DefineConstants)</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Platform)'=='x64'">
+    <DefineConstants>WIN64;$(DefineConstants)</DefineConstants>
+  </PropertyGroup>
+
+  <!--End Constants-->
 
 </Project>

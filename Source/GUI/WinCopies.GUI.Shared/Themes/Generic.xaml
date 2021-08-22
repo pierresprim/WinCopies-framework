@@ -3,6 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:gui="clr-namespace:WinCopies.GUI"
     xmlns:local="clr-namespace:WinCopies.GUI.Controls"
+    xmlns:dotNetFix="clr-namespace:WinCopies.GUI.Controls.DotNetFix"
     xmlns:commands="clr-namespace:WinCopies.Commands;assembly=WinCopies.Util.Desktop"
     xmlns:icons="clr-namespace:WinCopies.GUI.Icons.Properties;assembly=WinCopies.GUI.Icons"
     xmlns:util="clr-namespace:WinCopies;assembly=WinCopies.Util.Desktop"
@@ -420,7 +421,11 @@
         </Setter>
     </Style>
 
-    <Style BasedOn="{StaticResource {x:Type TextBox}}" TargetType="{x:Type local:TextBox}">
+    <Style BasedOn="{StaticResource {x:Type TextBox}}" TargetType="{x:Type dotNetFix:TextBox}">
+        <Setter Property="ContextMenu" Value="{StaticResource TextBoxContextMenu}" />
+    </Style>
+
+    <Style BasedOn="{StaticResource {x:Type dotNetFix:TextBox}}" TargetType="{x:Type local:TextBox}">
         <Setter Property="ContextMenu" Value="{StaticResource TextBoxContextMenu}" />
         <Setter Property="Template">
             <Setter.Value>

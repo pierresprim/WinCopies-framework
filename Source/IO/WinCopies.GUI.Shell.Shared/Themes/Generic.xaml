@@ -1,0 +1,79 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:localProcess="clr-namespace:WinCopies.GUI.IO.Process"
+    xmlns:localProcessControls="clr-namespace:WinCopies.GUI.IO.Controls.Process"
+    xmlns:properties="clr-namespace:WinCopies.GUI.Shell.Properties"
+    xmlns:sevenZip="clr-namespace:SevenZip;assembly=SevenZipSharp">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/wincopies.gui.io;component/Themes/Generic.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+    <ControlTemplate x:Key="ArchiveCompressionProcessParametersControlTemplate" TargetType="{x:Type localProcessControls:ArchiveCompressionProcessParametersControl}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Label Content="{x:Static properties:Resources.DestinationPath}" />
+                <TextBox Grid.Column="1" Text="{Binding DestinationPath, Mode=TwoWay, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+            </Grid>
+            <GroupBox Grid.Row="1" Header="{x:Static properties:Resources.Compression}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+
+                    <Label Content="{x:Static properties:Resources.ArchiveFormat}" />
+                    <ComboBox Grid.Column="1" ItemsSource="{Binding Mode=OneTime, Converter={StaticResource EnumToArrayConverter}, ConverterParameter={x:Type sevenZip:OutArchiveFormat}}" SelectedItem="{Binding ArchiveFormat, Mode=TwoWay, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                    <Label Grid.Row="1" Content="{x:Static properties:Resources.CompressionLevel}" />
+                    <ComboBox Grid.Column="1" Grid.Row="1" ItemsSource="{Binding Mode=OneTime, Converter={StaticResource EnumToArrayConverter}, ConverterParameter={x:Type sevenZip:CompressionLevel}}" SelectedItem="{Binding CompressionLevel, Mode=TwoWay, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                    <Label Grid.Row="2" Content="{x:Static properties:Resources.CompressionMethod}" />
+                    <ComboBox Grid.Column="1" Grid.Row="2" ItemsSource="{Binding Mode=OneTime, Converter={StaticResource EnumToArrayConverter}, ConverterParameter={x:Type sevenZip:CompressionMethod}}" SelectedItem="{Binding CompressionMethod, Mode=TwoWay, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                    <Label Grid.Row="4" Content="{x:Static properties:Resources.FastCompression}" />
+                    <CheckBox Grid.Column="1" Grid.Row="4" IsChecked="{Binding FastCompression, Mode=TwoWay, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                </Grid>
+            </GroupBox>
+            <GroupBox Grid.Row="2" Header="{x:Static properties:Resources.DirectoryStructure}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+
+                    <Label Content="{x:Static properties:Resources.IncludeEmptyDirectories}" />
+                    <CheckBox Grid.Column="1" IsChecked="{Binding IncludeEmptyDirectories, Mode=TwoWay,RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                    <Label Grid.Row="1" Content="{x:Static properties:Resources.PreserveDirectoryRoot}" />
+                    <CheckBox Grid.Column="1" Grid.Row="1" IsChecked="{Binding PreserveDirectoryRoot, Mode=TwoWay,RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                </Grid>
+            </GroupBox>
+        </Grid>
+    </ControlTemplate>
+
+    <Style TargetType="{x:Type localProcessControls:ArchiveCompressionProcessParametersControl}">
+        <Setter Property="Template" Value="{StaticResource ArchiveCompressionProcessParametersControlTemplate}" />
+    </Style>
+
+    <DataTemplate DataType="{x:Type localProcess:IArchiveCompressionParameters}">
+        <localProcessControls:ArchiveCompressionProcessParametersControl DestinationPath="{Binding DestinationPath, Mode=TwoWay}"
+                                                                         ArchiveFormat="{Binding ArchiveFormat, Mode=TwoWay}" CompressionLevel="{Binding CompressionLevel, Mode=TwoWay}" CompressionMethod="{Binding CompressionMethod, Mode=TwoWay}" FastCompression="{Binding FastCompression, Mode=TwoWay}"
+                                                                         IncludeEmptyDirectories="{Binding IncludeEmptyDirectories, Mode=TwoWay}" PreserveDirectoryRoot="{Binding PreserveDirectoryRoot, Mode=TwoWay}" />
+    </DataTemplate>
+</ResourceDictionary>

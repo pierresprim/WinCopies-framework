@@ -16,6 +16,9 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using Microsoft.WindowsAPICodePack.Shell;
+using Microsoft.WindowsAPICodePack.Win32Native;
+using Microsoft.WindowsAPICodePack.Win32Native.Shell;
+
 using System;
 using System.Collections.Specialized;
 using System.IO;
@@ -150,9 +153,9 @@ namespace WinCopies.IO
 
                                 return false;
 
-                            var recycleBinInfo = new WinCopies.Temp.Temp.SHQUERYRBINFO() { cbSize = Marshal.SizeOf<WinCopies.Temp.Temp.SHQUERYRBINFO>() };
+                            var recycleBinInfo = new SHQUERYRBINFO() { cbSize = Marshal.SizeOf<SHQUERYRBINFO>() };
 
-                            return Path.InnerObject.IsFileSystemObject && Microsoft.WindowsAPICodePack.Win32Native.CoreErrorHelper.Succeeded(WinCopies.Temp.Temp.SHQueryRecycleBin(Path.Path, ref recycleBinInfo));
+                            return Path.InnerObject.IsFileSystemObject && CoreErrorHelper.Succeeded(Microsoft.WindowsAPICodePack.Win32Native.Shell.Shell.SHQueryRecycleBin(Path.Path, ref recycleBinInfo));
 
                         case RemoveOption.Clear:
 

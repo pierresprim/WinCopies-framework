@@ -4,7 +4,7 @@
     <PackageId>WinCopies.GUI</PackageId>
     <AssemblyName>WinCopies.GUI</AssemblyName>
     <RootNamespace>WinCopies.GUI</RootNamespace>
-    <TargetFrameworks>netcoreapp3.0;netcoreapp3.1;net5.0-windows;net472;net48</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.0;netcoreapp3.1;net5.0-windows;net6.0-windows;net472;net48</TargetFrameworks>
     <UseWPF>true</UseWPF>
     <Description>Some basic visual types. This is a dependency package for other packages of the WinCopies framework.</Description>
     <Copyright>Copyright © 2021 Pierre Sprimont</Copyright>
@@ -25,10 +25,10 @@
   <Import Project="..\WinCopies.GUI.Controls.Shared\WinCopies.GUI.Controls.Shared.projitems" Label="Shared" />
 
   <ItemGroup>
-    <PackageReference Include="WinCopies.Util" Version="3.11-preview" />
-    <PackageReference Include="WinCopies.Collections" Version="3.11-preview" />
-    <PackageReference Include="WinCopies.Util.Extensions" Version="3.11-preview" />
-    <PackageReference Include="WinCopies.Util.Desktop" Version="3.11-preview" />
+    <PackageReference Include="WinCopies.Util" Version="3.12-preview" />
+    <PackageReference Include="WinCopies.Collections" Version="3.12-preview" />
+    <PackageReference Include="WinCopies.Util.Extensions" Version="3.12-preview" />
+    <PackageReference Include="WinCopies.Util.Desktop" Version="3.12-preview" />
     
     <PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="3.1.2-preview" />
   </ItemGroup>

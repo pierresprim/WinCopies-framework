@@ -15,29 +15,8 @@
 * You should have received a copy of the GNU General Public License
 * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-using SevenZip;
-
-using System;
-using System.Management;
-using System.Security;
-
-using WinCopies.IO.ObjectModel;
-
-#if !WinCopies3
-using System.Collections;
-using System.Collections.Generic;
-
-using WinCopies.Collections;
-using WinCopies.Collections.DotNetFix.Generic;
-using WinCopies.Util;
-
-using static WinCopies.Util.Util;
-#else
-using WinCopies.Collections.Generic;
-#endif
-
-namespace WinCopies.IO.Enumeration
-{
+//namespace WinCopies.IO.Enumeration
+//{
     //    public sealed class RecursiveSubEnumerator<T> : IEnumerator<T>
     //    {
     //        private IEnumerator<IEnumerator<T>> _enumerator;
@@ -124,4 +103,4 @@ namespace WinCopies.IO.Enumeration
 
     //        public bool IsDisposed { get; private set; }
     //    }
-}
+//}

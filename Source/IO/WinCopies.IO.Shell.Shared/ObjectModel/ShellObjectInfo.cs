@@ -286,7 +286,11 @@ namespace WinCopies.IO
         public class ShellObjectInfo : ShellObjectInfo<IFileSystemObjectInfoProperties, ShellObjectInfoEnumeratorStruct, IEnumerableSelectorDictionary<ShellObjectInfoItemProvider, IBrowsableObjectInfo>, ShellObjectInfoItemProvider>, IShellObjectInfo
         {
             #region Fields
-            private static readonly BrowsabilityPathStack<IShellObjectInfo> __browsabilityPathStack = new BrowsabilityPathStack<IShellObjectInfo>();
+            private static readonly BrowsabilityPathStack<IShellObjectInfo> __browsabilityPathStack = new
+#if !CS9
+                BrowsabilityPathStack<IShellObjectInfo>
+#endif
+                ();
 
             private IFileSystemObjectInfoProperties _objectProperties;
             private IProcessFactory _processFactory;

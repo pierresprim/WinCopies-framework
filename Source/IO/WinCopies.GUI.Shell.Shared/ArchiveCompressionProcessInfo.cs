@@ -24,7 +24,6 @@ using System.Linq;
 using WinCopies.GUI.Windows;
 using WinCopies.IO.ObjectModel;
 using WinCopies.IO.Process;
-using WinCopies.IO.Resources;
 using WinCopies.Linq;
 using WinCopies.Util;
 using WinCopies.Util.Data;
@@ -71,7 +70,12 @@ namespace WinCopies.GUI.IO.Process
 
         public bool PreserveDirectoryRoot { get; set; }
 
-        public SevenZipCompressor ToArchiveCompressor() => new SevenZipCompressor() { ArchiveFormat = ArchiveFormat, CompressionLevel = CompressionLevel, CompressionMethod = CompressionMethod, FastCompression = FastCompression, IncludeEmptyDirectories = IncludeEmptyDirectories, PreserveDirectoryRoot = PreserveDirectoryRoot };
+        public SevenZipCompressor ToArchiveCompressor() => new
+#if !CS9
+            SevenZipCompressor
+#endif
+            ()
+        { ArchiveFormat = ArchiveFormat, CompressionLevel = CompressionLevel, CompressionMethod = CompressionMethod, FastCompression = FastCompression, IncludeEmptyDirectories = IncludeEmptyDirectories, PreserveDirectoryRoot = PreserveDirectoryRoot };
 
         public IProcessParameters ToProcessParameters(string sourcePath, System.Collections.Generic.IEnumerable<string> paths)
         {

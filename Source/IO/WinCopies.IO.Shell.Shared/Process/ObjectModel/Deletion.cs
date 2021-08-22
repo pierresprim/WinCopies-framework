@@ -45,7 +45,7 @@ namespace WinCopies.IO.Process.ObjectModel
     {
         private delegate bool Func(IPathInfo path, out IProcessError<ProcessError, ErrorAction> error, out bool isErrorGlobal);
 
-        private Microsoft.WindowsAPICodePack.Shell.TEMP.FileOperation _fileOperation;
+        private FileOperation _fileOperation;
         private Func _func;
 
         #region Properties
@@ -259,7 +259,7 @@ namespace WinCopies.IO.Process.ObjectModel
 
                     case RemoveOption.Recycle:
 
-                        _fileOperation = new Microsoft.WindowsAPICodePack.Shell.TEMP.FileOperation();
+                        _fileOperation = new FileOperation();
 
                         _fileOperation.SetOperationFlags(RecycleOnDelete | Silent | EarlyFailure | NoErrorUI);
 

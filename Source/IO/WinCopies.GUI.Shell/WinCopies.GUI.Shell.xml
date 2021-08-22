@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>WinCopies.GUI.Shell</name>
+    </assembly>
+    <members>
+        <member name="T:WinCopies.GUI.Shell.Properties.Resources">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Shell.Properties.Resources.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Shell.Properties.Resources.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Shell.Properties.Resources.ArchiveFormat">
+            <summary>
+              Looks up a localized string similar to Archive format:.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Shell.Properties.Resources.Compression">
+            <summary>
+              Looks up a localized string similar to Compression.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Shell.Properties.Resources.CompressionLevel">
+            <summary>
+              Looks up a localized string similar to Compression level:.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Shell.Properties.Resources.CompressionMethod">
+            <summary>
+              Looks up a localized string similar to Compression method:.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Shell.Properties.Resources.CompressionMode">
+            <summary>
+              Looks up a localized string similar to Compression mode:.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Shell.Properties.Resources.DestinationPath">
+            <summary>
+              Looks up a localized string similar to Destination path:.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Shell.Properties.Resources.DirectoryStructure">
+            <summary>
+              Looks up a localized string similar to Directory structure.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Shell.Properties.Resources.FastCompression">
+            <summary>
+              Looks up a localized string similar to Fast compression.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Shell.Properties.Resources.IncludeEmptyDirectories">
+            <summary>
+              Looks up a localized string similar to Include empty directories.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Shell.Properties.Resources.PreserveDirectoryRoot">
+            <summary>
+              Looks up a localized string similar to Preserve directory root.
+            </summary>
+        </member>
+        <member name="M:WinCopies.GUI.Shell.BrowsableObjectInfoFactory.#ctor(WinCopies.IO.ClientVersion@)">
+            <summary>
+            Initializes a new instance of the <see cref="T:WinCopies.GUI.Shell.BrowsableObjectInfoFactory"/> class.
+            </summary>
+            <param name="clientVersion">The <see cref="T:WinCopies.IO.ClientVersion"/> value for PortableDevice items creation. See <see cref="T:WinCopies.IO.ClientVersion"/>.</param>
+        </member>
+        <member name="M:WinCopies.GUI.Shell.BrowsableObjectInfoFactory.GetBrowsableObjectInfo(System.String)">
+            <summary>
+            Creates an <see cref="T:WinCopies.IO.ObjectModel.IBrowsableObjectInfo"/> for a given path. See Remarks section.
+            </summary>
+            <param name="path">The path of the <see cref="T:WinCopies.IO.ObjectModel.IBrowsableObjectInfo"/> to create.</param>
+            <returns>An <see cref="T:WinCopies.IO.ObjectModel.IBrowsableObjectInfo"/> for <paramref name="path"/>.</returns>
+            <remarks>This method cannot create <see cref="T:WinCopies.IO.ObjectModel.IBrowsableObjectInfo"/> for WMI paths.</remarks>
+            <exception cref="T:System.ArgumentException"><paramref name="path"/> is not a Shell or a Registry path.</exception>
+        </member>
+    </members>
+</doc>

@@ -28,14 +28,20 @@ namespace WinCopies.IO.Process
 
     public static class ProcessHelper<T> where T : IPathInfo
     {
-        public static ProcessDelegateTypes<T, IProcessProgressDelegateParameter>.ProcessDelegates GetDefaultProcessDelegates() => new ProcessDelegateTypes<T, IProcessProgressDelegateParameter>
-                                .ProcessDelegates(
-                                    new EventDelegate<T>(),
-                                    EventAndQueryDelegate<bool>.GetANDALSO_Delegate(true),
-                                    EventAndQueryDelegate<object>.GetANDALSO_Delegate(false),
-                                    EventAndQueryDelegate<IProcessProgressDelegateParameter>.GetANDALSO_Delegate(true));
+        public static ProcessDelegateTypes<T, IProcessProgressDelegateParameter>.ProcessDelegates GetDefaultProcessDelegates() => new
+#if !CS9
+            ProcessDelegateTypes<T, IProcessProgressDelegateParameter>.ProcessDelegates
+#endif
+                (new EventDelegate<T>(),
+                 EventAndQueryDelegate<bool>.GetANDALSO_Delegate(true),
+                 EventAndQueryDelegate<object>.GetANDALSO_Delegate(false),
+                 EventAndQueryDelegate<IProcessProgressDelegateParameter>.GetANDALSO_Delegate(true));
 
-        public static EnumerableQueueCollection<T> GetInitialPaths(System.Collections.Generic.IEnumerator<string> enumerator, IPathInfo sourcePath, Converter<PathTypes<IPathInfo>.PathInfoBase, T> converter) => new EnumerableQueueCollection<T>(new QueueCollection<IEnumerableQueue<T>, T>(
+        public static EnumerableQueueCollection<T> GetInitialPaths(System.Collections.Generic.IEnumerator<string> enumerator, IPathInfo sourcePath, Converter<PathTypes<IPathInfo>.PathInfoBase, T> converter) => new
+#if !CS9
+            EnumerableQueueCollection<T>
+#endif
+            (new QueueCollection<IEnumerableQueue<T>, T>(
                 new Enumerable<string>(
                     () => enumerator
                     ).Select(

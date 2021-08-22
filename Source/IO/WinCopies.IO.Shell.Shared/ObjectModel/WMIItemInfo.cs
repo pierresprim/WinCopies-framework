@@ -15,14 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework. If not, see <https://www.gnu.org/licenses/>. */
 
+using Microsoft.WindowsAPICodePack.Shell;
+
 using System;
 using System.Globalization;
 using System.Linq;
 using System.Management;
 using System.Windows.Media.Imaging;
-
-using Microsoft.WindowsAPICodePack.PortableDevices;
-using Microsoft.WindowsAPICodePack.Shell;
 
 using WinCopies.Collections.Generic;
 using WinCopies.IO.AbstractionInterop;
@@ -272,11 +271,23 @@ namespace WinCopies.IO
 
             public WMIItemInfo GetWMIItemInfo(in string serverName, in string serverRelativePath) => WMIItemInfo.GetWMIItemInfo(serverName, serverRelativePath, ObjectPropertiesGeneric.Options, ClientVersion);
 
-            public WMIItemInfo GetWMIItemInfo(in WMIItemType itemType, in ManagementBaseObject managementObject) => new WMIItemInfo(itemType, managementObject, ObjectPropertiesGeneric.Options, ClientVersion);
+            public WMIItemInfo GetWMIItemInfo(in WMIItemType itemType, in ManagementBaseObject managementObject) => new
+#if !CS9
+                WMIItemInfo
+#endif
+                (itemType, managementObject, ObjectPropertiesGeneric.Options, ClientVersion);
 
-            public WMIItemInfo GetWMIItemInfo(in string path, in WMIItemType itemType) => new WMIItemInfo(path, itemType, ObjectPropertiesGeneric.Options, ClientVersion);
+            public WMIItemInfo GetWMIItemInfo(in string path, in WMIItemType itemType) => new
+#if !CS9
+                WMIItemInfo
+#endif
+                (path, itemType, ObjectPropertiesGeneric.Options, ClientVersion);
 
-            public WMIItemInfo GetRootWMIItemInfo() => new WMIItemInfo(ObjectPropertiesGeneric.Options, ClientVersion);
+            public WMIItemInfo GetRootWMIItemInfo() => new
+#if !CS9
+                WMIItemInfo
+#endif
+                (ObjectPropertiesGeneric.Options, ClientVersion);
 
             /*public override bool Equals(object obj) => ReferenceEquals(this, obj) || (obj is IWMIItemInfo _obj && WMIItemType == _obj.WMIItemType && Path.ToLower() == _obj.Path.ToLower());
 
@@ -379,7 +390,11 @@ namespace WinCopies.IO
             public const string ROOT = "ROOT";
             #endregion
 
-            private static readonly BrowsabilityPathStack<IWMIItemInfo> __browsabilityPathStack = new BrowsabilityPathStack<IWMIItemInfo>();
+            private static readonly BrowsabilityPathStack<IWMIItemInfo> __browsabilityPathStack = new
+#if !CS9
+                BrowsabilityPathStack<IWMIItemInfo>
+#endif
+                ();
 
             private IWMIItemInfoProperties _objectProperties;
 
@@ -483,7 +498,11 @@ namespace WinCopies.IO
             public static ManagementClass GetManagementClassFromPath(in string path, in IWMIItemInfoOptions options) =>
 
                     // #pragma warning disable IDE0067 // Dispose objects before losing scope
-                    new ManagementClass(options?.ConnectionOptions == null ? new ManagementScope(path) : new ManagementScope(path, options.ConnectionOptions), new ManagementPath(path), options?.ObjectGetOptions);
+                    new
+#if !CS9
+                ManagementClass
+#endif
+                (options?.ConnectionOptions == null ? new ManagementScope(path) : new ManagementScope(path, options.ConnectionOptions), new ManagementPath(path), options?.ObjectGetOptions);
             // #pragma warning restore IDE0067 // Dispose objects before losing scope
 
             protected override IEnumerableSelectorDictionary<WMIItemInfoItemProvider, IBrowsableObjectInfo> GetSelectorDictionaryOverride() => DefaultItemSelectorDictionary;

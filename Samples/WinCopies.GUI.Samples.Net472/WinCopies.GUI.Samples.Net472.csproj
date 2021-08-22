@@ -9,7 +9,7 @@
   <Import Project="..\WinCopies.GUI.Samples.Shared\WinCopies.GUI.Samples.Shared.projitems" Label="Shared" />
 
   <ItemGroup>
-    <PackageReference Include="WinCopies.Util.Desktop" Version="3.11-preview" />
+    <PackageReference Include="WinCopies.Util.Desktop" Version="3.12-preview" />
   </ItemGroup>
 
   <ItemGroup>
@@ -22,8 +22,9 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Source\GUI\WinCopies.GUI.Templates\WinCopies.GUI.Templates.csproj" />
     <ProjectReference Include="..\..\Source\GUI\WinCopies.GUI\WinCopies.GUI.csproj" />
-    <ProjectReference Include="..\..\Source\IO\WinCopies.GUI.IO\WinCopies.GUI.IO.csproj" />
+    <ProjectReference Include="..\..\Source\IO\WinCopies.GUI.Shell\WinCopies.GUI.Shell.csproj" />
     <ProjectReference Include="..\..\Source\IO\WinCopies.IO\WinCopies.IO.csproj" />
+    <ProjectReference Include="..\..\Source\IO\WinCopies.IO.Shell\WinCopies.IO.Shell.csproj" />
   </ItemGroup>
 
 </Project>

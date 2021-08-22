@@ -25,7 +25,6 @@ along with the WinCopies Framework.  If not, see<https://www.gnu.org/licenses/>.
         xmlns:util="clr-namespace:WinCopies;assembly=WinCopies.Util.Desktop"
         xmlns:commands="clr-namespace:WinCopies.Commands;assembly=WinCopies.Util.Desktop"
         xmlns:io="clr-namespace:WinCopies.GUI.IO.ObjectModel;assembly=WinCopies.GUI.IO"
-        xmlns:temp="clr-namespace:WinCopies.Commands.TEMP;assembly=WinCopies.Util.Temp"
         mc:Ignorable="d"
         Title="ExplorerControlTest" Height="450" Width="800">
     <Window.CommandBindings>
@@ -53,8 +52,8 @@ along with the WinCopies Framework.  If not, see<https://www.gnu.org/licenses/>.
                     <MenuItem Header="Cut" Command="Cut" />
                     <MenuItem Header="Paste" Command="Paste" />
                     <MenuItem Header="Recycle" Command="Delete" />
-                    <MenuItem Header="Empty Recycle Bin" Command="{x:Static temp:ApplicationCommands.Empty}" />
-                    <MenuItem Header="Delete" Command="{x:Static temp:ApplicationCommands.DeletePermanently}" />
+                    <MenuItem Header="Empty Recycle Bin" Command="{x:Static commands:ApplicationCommands.Empty}" />
+                    <MenuItem Header="Delete" Command="{x:Static commands:ApplicationCommands.DeletePermanently}" />
                 </MenuItem>
                 <MenuItem Header="Open _with" ItemsSource="{Binding SelectedItem.BrowsabilityPaths, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ExplorerControlTest}}}" ItemContainerStyle="{StaticResource MenuItemItemContainerStyle}" />
                 <MenuItem Header="_Tools" ItemsSource="{Binding SelectedItem.CustomProcesses, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ExplorerControlTest}}}" ItemContainerStyle="{StaticResource MenuItemItemContainerStyle}" />

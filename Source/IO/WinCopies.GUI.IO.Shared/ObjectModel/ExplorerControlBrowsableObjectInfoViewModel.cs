@@ -25,6 +25,7 @@ using System.Drawing;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+
 using WinCopies.Collections.Generic;
 using WinCopies.Commands;
 using WinCopies.GUI.Controls;
@@ -42,7 +43,7 @@ using static WinCopies.ThrowHelper;
 
 namespace WinCopies.GUI.IO.ObjectModel
 {
-    public class ExplorerControlBrowsableObjectInfoViewModel : ViewModelBase, IExplorerControlBrowsableObjectInfoViewModel
+    public abstract class ExplorerControlBrowsableObjectInfoViewModel : ViewModelBase, IExplorerControlBrowsableObjectInfoViewModel
     {
         //protected override void OnPropertyChanged(string propertyName, object oldValue, object newValue) => OnPropertyChanged(new WinCopies.Util.Data.PropertyChangedEventArgs(propertyName, oldValue, newValue));
 
@@ -97,6 +98,8 @@ namespace WinCopies.GUI.IO.ObjectModel
         #endregion
 
         #region Properties
+        protected Converter<string, IBrowsableObjectInfo> GetBrowsableObjectInfoViewModelConverter { get; }
+
         public System.Collections.Generic.IEnumerable<IMenuItemModel<string>> BrowsabilityPaths => Path.SelectedItem?.BrowsabilityPaths?.Select(path => new MenuItemModel<string>(path.Name, new DelegateCommand(obj => path.IsValid(), obj => Path = new BrowsableObjectInfoViewModel(path.GetPath()) { SortComparison = Path.SortComparison, Factory = Path.Factory })));
 
         public System.Collections.Generic.IEnumerable<IButtonModel> CommonCommands => GetValueIfNotDisposed(_commonCommands);
@@ -144,9 +147,13 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         public event System.EventHandler<CustomProcessParametersGeneratedEventArgs> CustomProcessParametersGeneratedEventHandler;
 
-        protected ExplorerControlBrowsableObjectInfoViewModel(in IBrowsableObjectInfoViewModel path, in System.Collections.Generic.IEnumerable<IBrowsableObjectInfoViewModel> treeViewItems, in IBrowsableObjectInfoFactory factory)
+        protected ExplorerControlBrowsableObjectInfoViewModel(in IBrowsableObjectInfoViewModel path, in System.Collections.Generic.IEnumerable<IBrowsableObjectInfoViewModel> treeViewItems, in IBrowsableObjectInfoFactory factory, in Converter<string, IBrowsableObjectInfo> converter)
         {
+            ThrowIfNull(converter, nameof(converter));
+
             _path = path;
+
+            GetBrowsableObjectInfoViewModelConverter = converter;
 
             _commonCommands = new ButtonModel[] { new ButtonModel(() => Path.ProcessFactory.NewItemProcessCommands?.Name, Icons.Properties.Resources.folder_add)
             {
@@ -202,14 +209,6 @@ namespace WinCopies.GUI.IO.ObjectModel
         }
 
         private void Path_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) => OnPathPropertyChanged(e);
-
-        public static IExplorerControlBrowsableObjectInfoViewModel From(in IBrowsableObjectInfoViewModel path, in IDisposableEnumerable<IBrowsableObjectInfoViewModel> treeViewItems) => new ExplorerControlBrowsableObjectInfoViewModel(path ?? throw GetArgumentNullException(nameof(path)), treeViewItems, new BrowsableObjectInfoFactory(path.ClientVersion) { SortComparison = path.SortComparison });
-
-        public static IExplorerControlBrowsableObjectInfoViewModel From(in IBrowsableObjectInfoViewModel path, in IDisposableEnumerable<IBrowsableObjectInfoViewModel> treeViewItems, IBrowsableObjectInfoFactory factory) => new ExplorerControlBrowsableObjectInfoViewModel(path ?? throw GetArgumentNullException(nameof(path)), treeViewItems, factory ?? throw GetArgumentNullException(nameof(factory)));
-
-        public static IExplorerControlBrowsableObjectInfoViewModel From(in IBrowsableObjectInfoViewModel path, in IBrowsableObjectInfoFactory factory) => new ExplorerControlBrowsableObjectInfoViewModel(path, path.GetRootItems().Select<IBrowsableObjectInfo, IBrowsableObjectInfoViewModel>(factory.GetBrowsableObjectInfoViewModel), factory);
-
-        public static IExplorerControlBrowsableObjectInfoViewModel From(in IBrowsableObjectInfoViewModel path) => From(path, new BrowsableObjectInfoFactory(path.ClientVersion) { SortComparison = path.SortComparison });
 
         protected void UpdateValueIfNotDisposed<T>(ref T value, in T newValue, in string propertyName)
         {
@@ -286,7 +285,7 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         protected virtual bool OnGoCommandCanExecute() => true;
 
-        protected virtual void OnGoCommandExecuted() => Path = _factory.GetBrowsableObjectInfoViewModel(Text);
+        protected void OnGoCommandExecuted() => Path = _factory.GetBrowsableObjectInfoViewModel(GetBrowsableObjectInfoViewModelConverter(Text));
 
         protected virtual void Dispose(bool disposing)
         {

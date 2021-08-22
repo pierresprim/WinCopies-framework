@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="3.3.0-preview" />
+    <PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="3.4-preview" />
   </ItemGroup>
 
 </Project>

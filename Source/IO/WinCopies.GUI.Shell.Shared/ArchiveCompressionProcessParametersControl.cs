@@ -16,6 +16,7 @@
 * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using SevenZip;
+
 using System.Windows;
 using System.Windows.Controls;
 

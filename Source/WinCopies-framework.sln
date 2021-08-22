@@ -84,6 +84,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinCopies.IO", "IO\WinCopie
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "WinCopies.IO.Shared", "IO\WinCopies.IO.Shared\WinCopies.IO.Shared.shproj", "{76656453-C025-42E6-86A0-DFBB520ED7D9}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinCopies.GUI.Shell", "IO\WinCopies.GUI.Shell\WinCopies.GUI.Shell.csproj", "{E380DA41-F29E-4C5E-A20E-55F520EB0397}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "WinCopies.GUI.Shell.Shared", "IO\WinCopies.GUI.Shell.Shared\WinCopies.GUI.Shell.Shared.shproj", "{D5DDACC8-7290-4F0C-9505-78822411E6BA}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		IO\WinCopies.IO.Shared\WinCopies.IO.Shared.projitems*{052042fd-198a-499b-80df-c045c743a614}*SharedItemsImports = 5
@@ -91,7 +95,6 @@ Global
 		GUI\WinCopies.GUI.Shared\WinCopies.GUI.Shared.projitems*{0def65ea-68d9-4698-a552-a94c636c4098}*SharedItemsImports = 5
 		GUI\WinCopies.GUI.Windows.Shared\WinCopies.GUI.Windows.Shared.projitems*{0def65ea-68d9-4698-a552-a94c636c4098}*SharedItemsImports = 5
 		GUI\WinCopies.GUI.Templates.Shared\WinCopies.GUI.Templates.Shared.projitems*{1af939a9-d753-48e4-b114-fb59e5f3f7fb}*SharedItemsImports = 13
-		GUI\WinCopies.GUI.Models.Shared\WinCopies.GUI.Models.Shared.projitems*{3aaf402a-7c4a-455f-8f42-6f4f13c5e185}*SharedItemsImports = 13
 		GUI\WinCopies.GUI.Shared\WinCopies.GUI.Shared.projitems*{3aaf402a-7c4a-455f-8f42-6f4f13c5e185}*SharedItemsImports = 13
 		GUI\WinCopies.GUI.Windows.Shared\WinCopies.GUI.Windows.Shared.projitems*{3fa63940-0513-455d-a3d1-fba954c22869}*SharedItemsImports = 13
 		WinCopies.Console.Shared\WinCopies.Console.Shared.projitems*{41dcc223-d715-4631-b32d-7a55b03077a0}*SharedItemsImports = 13
@@ -111,8 +114,10 @@ Global
 		GUI\WinCopies.GUI.Models.Shared\WinCopies.GUI.Models.Shared.projitems*{a43aee04-0665-4d64-a4b9-7ff1e471bf29}*SharedItemsImports = 13
 		GUI\WinCopies.GUI.Drawing.Shared\WinCopies.GUI.Drawing.Shared.projitems*{abf2fbe7-3ad4-4a53-bdd1-fb2752eff9b7}*SharedItemsImports = 5
 		GUI\WinCopies.GUI.ViewModels.Shared\WinCopies.GUI.ViewModels.Shared.projitems*{d5b59647-738b-4239-96f4-68cde29e8bee}*SharedItemsImports = 5
+		IO\WinCopies.GUI.Shell.Shared\WinCopies.GUI.Shell.Shared.projitems*{d5ddacc8-7290-4f0c-9505-78822411e6ba}*SharedItemsImports = 13
 		IO\WinCopies.IO.Shell.Shared\WinCopies.IO.Shell.Shared.projitems*{dbc6761d-3117-41ca-8b22-ad99c908f82e}*SharedItemsImports = 5
 		WinCopies.Util.Temp.Shared\WinCopies.Util.Temp.Shared.projitems*{de307a15-a22b-44ec-b769-1afb568e0c79}*SharedItemsImports = 5
+		IO\WinCopies.GUI.Shell.Shared\WinCopies.GUI.Shell.Shared.projitems*{e380da41-f29e-4c5e-a20e-55f520eb0397}*SharedItemsImports = 5
 		GUI\WinCopies.GUI.Drawing.Shared\WinCopies.GUI.Drawing.Shared.projitems*{f96f9167-8d67-49f6-a4fb-cffd49725150}*SharedItemsImports = 13
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -258,6 +263,14 @@ Global
 		{052042FD-198A-499B-80DF-C045C743A614}.Release|Any CPU.Build.0 = Release|Any CPU
 		{052042FD-198A-499B-80DF-C045C743A614}.Release|x64.ActiveCfg = Release|Any CPU
 		{052042FD-198A-499B-80DF-C045C743A614}.Release|x64.Build.0 = Release|Any CPU
+		{E380DA41-F29E-4C5E-A20E-55F520EB0397}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E380DA41-F29E-4C5E-A20E-55F520EB0397}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E380DA41-F29E-4C5E-A20E-55F520EB0397}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E380DA41-F29E-4C5E-A20E-55F520EB0397}.Debug|x64.Build.0 = Debug|Any CPU
+		{E380DA41-F29E-4C5E-A20E-55F520EB0397}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E380DA41-F29E-4C5E-A20E-55F520EB0397}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E380DA41-F29E-4C5E-A20E-55F520EB0397}.Release|x64.ActiveCfg = Release|Any CPU
+		{E380DA41-F29E-4C5E-A20E-55F520EB0397}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -292,6 +305,8 @@ Global
 		{495F47F1-C0E0-4CA3-8C33-C25DF67385F4} = {B43D9434-F1F2-483C-BF76-7C6A4F062594}
 		{052042FD-198A-499B-80DF-C045C743A614} = {22EAF32C-9029-42A6-8040-2E3338937ED7}
 		{76656453-C025-42E6-86A0-DFBB520ED7D9} = {22EAF32C-9029-42A6-8040-2E3338937ED7}
+		{E380DA41-F29E-4C5E-A20E-55F520EB0397} = {22EAF32C-9029-42A6-8040-2E3338937ED7}
+		{D5DDACC8-7290-4F0C-9505-78822411E6BA} = {22EAF32C-9029-42A6-8040-2E3338937ED7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {75922CA2-98D5-4443-BE25-39062994E598}

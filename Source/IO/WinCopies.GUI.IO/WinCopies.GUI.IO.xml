@@ -413,18 +413,18 @@
             The model for this view model instance.
             </summary>
         </member>
-        <member name="P:WinCopies.GUI.IO.ObjectModel.BrowsableObjectInfoFactory.ClientVersion">
+        <member name="P:WinCopies.GUI.IO.BrowsableObjectInfoFactory.ClientVersion">
             <summary>
-            Gets the <see cref="T:Microsoft.WindowsAPICodePack.PortableDevices.ClientVersion"/> value associated to this factory. This value is used for <see cref="T:WinCopies.IO.ObjectModel.PortableDeviceInfo"/> and <see cref="!:PortableDeviceItemInfo"/> creation when browsing the Computer folder with a <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/> item.
+            Gets the <see cref="P:WinCopies.GUI.IO.BrowsableObjectInfoFactory.ClientVersion"/> value associated to this factory. This value is used for <see cref="!:PortableDeviceInfo"/> and <see cref="!:PortableDeviceItemInfo"/> creation when browsing the Computer folder with a <see cref="!:ShellObjectInfo"/> item.
             </summary>
         </member>
-        <member name="M:WinCopies.GUI.IO.ObjectModel.BrowsableObjectInfoFactory.#ctor(WinCopies.IO.ClientVersion@)">
+        <member name="M:WinCopies.GUI.IO.BrowsableObjectInfoFactory.#ctor(WinCopies.IO.ClientVersion@)">
             <summary>
-            Initializes a new instance of the <see cref="T:WinCopies.GUI.IO.ObjectModel.BrowsableObjectInfoFactory"/> class.
+            Initializes a new instance of the <see cref="T:WinCopies.GUI.IO.BrowsableObjectInfoFactory"/> class.
             </summary>
-            <param name="clientVersion">The <see cref="T:Microsoft.WindowsAPICodePack.PortableDevices.ClientVersion"/> value for PortableDevice items creation. See <see cref="P:WinCopies.GUI.IO.ObjectModel.BrowsableObjectInfoFactory.ClientVersion"/>.</param>
+            <param name="clientVersion">The <see cref="P:WinCopies.GUI.IO.BrowsableObjectInfoFactory.ClientVersion"/> value for PortableDevice items creation. See <see cref="P:WinCopies.GUI.IO.BrowsableObjectInfoFactory.ClientVersion"/>.</param>
         </member>
-        <member name="M:WinCopies.GUI.IO.ObjectModel.BrowsableObjectInfoFactory.GetBrowsableObjectInfo(System.String)">
+        <member name="M:WinCopies.GUI.IO.BrowsableObjectInfoFactory.GetBrowsableObjectInfo(System.String)">
             <summary>
             Creates an <see cref="T:WinCopies.IO.ObjectModel.IBrowsableObjectInfo"/> for a given path. See Remarks section.
             </summary>

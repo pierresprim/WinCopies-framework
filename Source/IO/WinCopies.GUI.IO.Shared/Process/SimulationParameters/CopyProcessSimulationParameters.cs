@@ -60,7 +60,7 @@ namespace WinCopies.GUI.IO.Process
 
     public class CopyProcessSimulationParameters : PathToPathProcessSimulationParameters 
     {
-        private FileSystemEntryEnumeratorProcessSimulation _fileSystemEntryEnumeratorProcessSimulation;
+        //private FileSystemEntryEnumeratorProcessSimulation _fileSystemEntryEnumeratorProcessSimulation;
         private Func<WinCopies.IO.IPathInfo, IPathInfo> _ioPathInfoToGUIIOPathInfoAction;
         private Func<string, string> _renameOnDuplicateAction;
         private CopyFileEx _copyFileExAction;
@@ -69,7 +69,7 @@ namespace WinCopies.GUI.IO.Process
         private Func<string, PathDirectoryType, Exception> _creatingFileStreamSucceedsAction;
         private Func<string, string, Func<bool>, bool?> _isDuplicateAction;
 
-        public FileSystemEntryEnumeratorProcessSimulation FileSystemEntryEnumeratorProcessSimulation { get => _fileSystemEntryEnumeratorProcessSimulation ?? throw GetInvalidOperationException(); set => _fileSystemEntryEnumeratorProcessSimulation = value ?? throw GetInvalidOperationException(); }
+        //public FileSystemEntryEnumeratorProcessSimulation FileSystemEntryEnumeratorProcessSimulation { get => _fileSystemEntryEnumeratorProcessSimulation ?? throw GetInvalidOperationException(); set => _fileSystemEntryEnumeratorProcessSimulation = value ?? throw GetInvalidOperationException(); }
 
         public Func<WinCopies.IO.IPathInfo, IPathInfo> IOPathInfoToGUIIOPathInfoAction { get => _ioPathInfoToGUIIOPathInfoAction ?? throw GetInvalidOperationException(); set => _ioPathInfoToGUIIOPathInfoAction = value ?? throw GetInvalidOperationException(); }
 

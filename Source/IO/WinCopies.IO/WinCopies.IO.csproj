@@ -4,7 +4,7 @@
     <PackageId>WinCopies.IO</PackageId>
     <AssemblyName>WinCopies.IO</AssemblyName>
     <RootNamespace>WinCopies.IO</RootNamespace>
-    <TargetFrameworks>netcoreapp3.0;netcoreapp3.1;net5.0-windows;net472;net48</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.0;netcoreapp3.1;net5.0-windows;net6.0-windows;net472;net48</TargetFrameworks>
     <UseWPF>true</UseWPF>
     <Description>WinCopies framework's assembly for basic I/O operations</Description>
     <Copyright>Copyright © 2021 Pierre Sprimont</Copyright>
@@ -17,6 +17,7 @@
     <AssemblyVersion>3.5</AssemblyVersion>
     <FileVersion>3.5</FileVersion>
     <PackageIcon>WinCopies.png</PackageIcon>
+    <AssemblyOriginatorKeyFile>WinCopies.IO.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <Import Project="..\WinCopies.IO.Shared\WinCopies.IO.Shared.projitems" Label="Shared" />
@@ -30,10 +31,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WinCopies.Util" Version="3.11-preview" />
-    <PackageReference Include="WinCopies.Collections" Version="3.11-preview" />
-    <PackageReference Include="WinCopies.Util.Extensions" Version="3.11-preview" />
-    <PackageReference Include="WinCopies.Util.Desktop" Version="3.11-preview" />
+    <PackageReference Include="WinCopies.Util" Version="3.12-preview" />
+    <PackageReference Include="WinCopies.Collections" Version="3.12-preview" />
+    <PackageReference Include="WinCopies.Util.Extensions" Version="3.12-preview" />
+    <PackageReference Include="WinCopies.Util.Desktop" Version="3.12-preview" />
   </ItemGroup>
 
   <ItemGroup>

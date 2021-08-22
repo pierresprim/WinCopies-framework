@@ -194,8 +194,12 @@ namespace WinCopies.GUI.IO.Process
         protected virtual void RemoveDelegates()
         {
             _process.RemovePropertyChangedDelegate(OnPropertyChanged);
+
             _process.ProcessEventDelegates.RemoveCommonDelegate(_commonDelegate);
+            _commonDelegate = null;
+
             _process.ProcessEventDelegates.RemoveProgressDelegate(_progressDelegate);
+            _progressDelegate = null;
         }
 
         protected virtual void OnRunWorkerCompleted()

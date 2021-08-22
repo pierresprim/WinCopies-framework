@@ -9,9 +9,6 @@ using System.Linq;
 #endif
 using System.Runtime.InteropServices;
 using WinCopies.Collections.Generic;
-using WinCopies.Temp;
-
-using static Microsoft.WindowsAPICodePack.COMNative.Shell.ShellOperationFlags;
 
 using static System.Console;
 
@@ -198,7 +195,7 @@ namespace WinCopies.Console
                         //    updateProgress(_progress);
                         //};
 
-                        fileOperation.DeleteItem(ShellObjectFactory.Create(Path), null /* progress */);
+                        fileOperation.DeleteItem(ShellObjectFactory.Create(Path), pfopsItem: null /* progress */);
 
                         // fileOperation.SetOperationFlags(ShowElevationPrompt |  NoConfirmation | NoErrorUI );
 
@@ -219,7 +216,7 @@ namespace WinCopies.Console
 
                     _ = addLabel("Extracting files...");
 
-                    extractor= new SevenZipExtractor(stream, InArchiveFormat);
+                    extractor = new SevenZipExtractor(stream, InArchiveFormat);
 
                     initProgressBar(ref totalProgress, extractor.FilesCount);
 

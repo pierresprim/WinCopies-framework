@@ -21,9 +21,8 @@ using WinCopies.GUI.IO.Process;
 using WinCopies.IO;
 using WinCopies.IO.ObjectModel;
 using WinCopies.IO.Process;
-using WinCopies.IO.Resources;
 
-namespace WinCopies.GUI.IO.ObjectModel
+namespace WinCopies.GUI.Shell.ObjectModel
 {
     public static class BrowsableObjectInfo
     {
@@ -41,21 +40,21 @@ namespace WinCopies.GUI.IO.ObjectModel
 
                         enumerator = processParameters.ProcessParameters.Parameters.GetEnumerator();
 
-                        IPathInfo sourcePath = enumerator.MoveNext() ? new PathTypes<IPathInfo>.RootPath(enumerator.Current, true) : throw new InvalidOperationException(WinCopies.IO.Shell.Resources.ExceptionMessages.ProcessParametersCouldNotBeParsedCorrectly);
+                        WinCopies.IO.IPathInfo sourcePath = enumerator.MoveNext() ? new PathTypes<WinCopies.IO.IPathInfo>.RootPath(enumerator.Current, true) : throw new InvalidOperationException(WinCopies.IO.Shell.Resources.ExceptionMessages.ProcessParametersCouldNotBeParsedCorrectly);
 
                         var parameters = ArchiveCompressionParameters.FromProcessParameters(enumerator);
 
-                        return new WinCopies.IO.Process.ObjectModel.Compression<ProcessErrorFactory<IPathInfo, object>>(
-                            ProcessHelper<IPathInfo>.GetInitialPaths(enumerator, sourcePath, path => path),
+                        return new WinCopies.IO.Process.ObjectModel.Compression<ProcessErrorFactory<WinCopies.IO.IPathInfo, object>>(
+                            ProcessHelper<WinCopies.IO.IPathInfo>.GetInitialPaths(enumerator, sourcePath, path => path),
                             sourcePath,
-                            new PathTypes<IPathInfo>.RootPath(parameters.DestinationPath, true),
-                            processParameters.Factory.GetProcessCollection<IPathInfo>(),
+                            new PathTypes<WinCopies.IO.IPathInfo>.RootPath(parameters.DestinationPath, true),
+                            processParameters.Factory.GetProcessCollection<WinCopies.IO.IPathInfo>(),
                             processParameters.Factory.GetProcessLinkedList<
-                                IPathInfo,
+                                WinCopies.IO.IPathInfo,
                                 ProcessError,
-                                ProcessTypes<IPathInfo, ProcessError, object>.ProcessErrorItem,
+                                ProcessTypes<WinCopies.IO.IPathInfo, ProcessError, object>.ProcessErrorItem,
                                 object>(),
-                            ProcessHelper<IPathInfo>.GetDefaultProcessDelegates(),
+                            ProcessHelper<WinCopies.IO.IPathInfo>.GetDefaultProcessDelegates(),
                             new CompressionProcessErrorFactory(),
                             parameters.ToArchiveCompressor());
                 }

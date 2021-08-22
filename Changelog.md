@@ -8,6 +8,7 @@ CHANGELOG
 
 ### 3.6-preview
 
+- Add WinCopies.Console project.
 - Add Loading process status.
 - Add new types.
 - IProcessFactoryProcessInfo: add GetUserConfirmationText() method.
@@ -30,6 +31,15 @@ CHANGELOG
 - Add 'Empty Recycle Bin' feature.
 - Update Shell ProcessHelper class CanRun method.
 - Move part of IO types to the new WinCopies.IO.Shell package and, for some types among them, also to the WinCopies.IO.Shell.* namespace.
+- BrowsableObjectInfoFactory: the class and its GetBrowsableObjectInfo(string path) method are is now abstract.
+- ExplorerControlBrowsableObjectInfoViewModel:
+	- is now abstract.
+	- add GetBrowsableObjectInfoViewModelConverter property and add parameter in constructor for the property set-up.
+	- OnGoCommandExecuted is not virtual anymore.
+	- From static methods has been removed.
+- WinCopies.GUI.IO.Process.Process: bug fixed when disposing.
+- ExplorerControl: update TextBox.
+- Remove ArchiveCompressionProcessParametersControlTemplate resource from WinCopies.GUI.IO
 
 ### 3.5-preview
 

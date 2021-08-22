@@ -15,14 +15,13 @@
 * You should have received a copy of the GNU General Public License
 * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-using Microsoft.WindowsAPICodePack.Shell;
-
 using System;
 
+using WinCopies.GUI.IO.ObjectModel;
 using WinCopies.IO;
 using WinCopies.IO.ObjectModel;
 
-namespace WinCopies.GUI.IO.ObjectModel
+namespace WinCopies.GUI.IO
 {
     public interface IBrowsableObjectInfoFactory
     {
@@ -39,10 +38,10 @@ namespace WinCopies.GUI.IO.ObjectModel
         IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo, IBrowsableObjectInfoViewModel parent);
     }
 
-    public class BrowsableObjectInfoFactory : IBrowsableObjectInfoFactory
+    public abstract class BrowsableObjectInfoFactory : IBrowsableObjectInfoFactory
     {
         /// <summary>
-        /// Gets the <see cref="Microsoft.WindowsAPICodePack.PortableDevices.ClientVersion"/> value associated to this factory. This value is used for <see cref="PortableDeviceInfo"/> and <see cref="PortableDeviceItemInfo"/> creation when browsing the Computer folder with a <see cref="ShellObjectInfo"/> item.
+        /// Gets the <see cref="ClientVersion"/> value associated to this factory. This value is used for <see cref="PortableDeviceInfo"/> and <see cref="PortableDeviceItemInfo"/> creation when browsing the Computer folder with a <see cref="ShellObjectInfo"/> item.
         /// </summary>
         public WinCopies.IO.ClientVersion ClientVersion { get; }
 
@@ -51,10 +50,10 @@ namespace WinCopies.GUI.IO.ObjectModel
         /// <summary>
         /// Initializes a new instance of the <see cref="BrowsableObjectInfoFactory"/> class.
         /// </summary>
-        /// <param name="clientVersion">The <see cref="Microsoft.WindowsAPICodePack.PortableDevices.ClientVersion"/> value for PortableDevice items creation. See <see cref="ClientVersion"/>.</param>
-        public BrowsableObjectInfoFactory(in WinCopies.IO.ClientVersion clientVersion) => ClientVersion = clientVersion;
+        /// <param name="clientVersion">The <see cref="ClientVersion"/> value for PortableDevice items creation. See <see cref="ClientVersion"/>.</param>
+        protected BrowsableObjectInfoFactory(in ClientVersion clientVersion) => ClientVersion = clientVersion;
 
-        public BrowsableObjectInfoFactory() : this(WinCopies.IO.ObjectModel.BrowsableObjectInfo.GetDefaultClientVersion()) { /* Left empty. */ }
+        protected BrowsableObjectInfoFactory() : this(BrowsableObjectInfo.GetDefaultClientVersion()) { /* Left empty. */ }
 
         /// <summary>
         /// Creates an <see cref="IBrowsableObjectInfo"/> for a given path. See Remarks section.
@@ -63,18 +62,7 @@ namespace WinCopies.GUI.IO.ObjectModel
         /// <returns>An <see cref="IBrowsableObjectInfo"/> for <paramref name="path"/>.</returns>
         /// <remarks>This method cannot create <see cref="IBrowsableObjectInfo"/> for WMI paths.</remarks>
         /// <exception cref="ArgumentException"><paramref name="path"/> is not a Shell or a Registry path.</exception>
-        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string path)
-        {
-            if (Path.IsFileSystemPath(path))
-
-                return ShellObjectInfo.From(ShellObjectFactory.Create(path), ClientVersion);
-
-            else if (WinCopies.IO.Shell.Path.IsRegistryPath(path))
-
-                return new RegistryItemInfo(path, WinCopies.IO.ObjectModel.BrowsableObjectInfo.GetDefaultClientVersion());
-
-            throw new ArgumentException("The factory cannot create an object for the given path.");
-        }
+        public abstract IBrowsableObjectInfo GetBrowsableObjectInfo(string path);
 
         protected virtual IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo, bool rootParentIsRootNode) => new BrowsableObjectInfoViewModel(browsableObjectInfo, rootParentIsRootNode) { SortComparison = SortComparison, Factory = this };
 

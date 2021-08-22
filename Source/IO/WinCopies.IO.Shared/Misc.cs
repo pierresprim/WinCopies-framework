@@ -361,7 +361,7 @@ namespace WinCopies.IO
 
             public virtual bool CanRun(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths) => CanRun(new EmptyCheckEnumerator<IBrowsableObjectInfo>((paths ?? throw GetArgumentNullException(nameof(paths))).GetEnumerator()));
 
-            protected  virtual void Dispose() => Path = default;
+            protected virtual void Dispose() => Path = default;
 
             ~ProcessFactoryProcessInfo() => Dispose();
         }
@@ -579,7 +579,11 @@ namespace WinCopies.IO
 
     internal class BrowsableObjectInfoCallbackQueue : System.IDisposable
     {
-        private Collections.DotNetFix.Generic.LinkedList<Action<IBrowsableObjectInfo, BrowsableObjectInfoCallbackReason>> _list = new Collections.DotNetFix.Generic.LinkedList<Action<IBrowsableObjectInfo, BrowsableObjectInfoCallbackReason>>();
+        private Collections.DotNetFix.Generic.LinkedList<Action<IBrowsableObjectInfo, BrowsableObjectInfoCallbackReason>> _list = new
+#if !CS9
+            Collections.DotNetFix.Generic.LinkedList<Action<IBrowsableObjectInfo, BrowsableObjectInfoCallbackReason>>
+#endif
+            ();
 
         public BrowsableObjectInfoCallback Enqueue(in Action<IBrowsableObjectInfo, BrowsableObjectInfoCallbackReason> action)
         {

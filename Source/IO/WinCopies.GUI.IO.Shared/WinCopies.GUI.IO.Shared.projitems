@@ -13,10 +13,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Controls\ExplorerControlPropertyGrid.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\Process\ProcessErrorItemControl.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\Process\ProcessManager.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\BrowsableObjectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\BrowsableObjectInfoViewModel.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Process\ArchiveCompressionProcessInfo.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Controls\Process\ArchiveCompressionProcessParametersControl.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\DuplicateFindingOptions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\Collections\ProcessCollections.Partial\EnumerableInfoLinkedCollections.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\Collections\IProcessCollections.cs" />

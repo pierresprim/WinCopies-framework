@@ -139,9 +139,7 @@ namespace WinCopies.Console
 
     public class Control : ControlBase
     {
-        private Collections.Generic.IEnumerable<ControlElement> _controls;
-
-        protected internal Collections.Generic.IEnumerable<ControlElement> Controls => _controls;
+        protected internal Collections.Generic.IEnumerable<ControlElement> Controls { get; private set; }
 
         public bool Rendering { get; private set; }
 
@@ -168,7 +166,7 @@ namespace WinCopies.Console
                 control.screen = Screen;
             }
 
-            _controls = controls;
+            Controls = controls;
         }
 
         protected virtual void OnRenderedItem(ControlElement control) => Render(control);
@@ -181,7 +179,7 @@ namespace WinCopies.Console
 
             int length = 0;
 
-            foreach (ControlElement _control in _controls)
+            foreach (ControlElement _control in Controls)
 
                 if (_control?.Text != null)
 
@@ -193,7 +191,7 @@ namespace WinCopies.Console
 
             try
             {
-                foreach (ControlElement _control in _controls)
+                foreach (ControlElement _control in Controls)
 
                     if (_control != null)
                     {
