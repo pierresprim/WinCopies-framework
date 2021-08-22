@@ -1,12 +1,12 @@
-﻿WinCopies-framework (WinCopies.Console package)
-===============================================
+﻿WinCopies-framework (WinCopies.GUI.Shell package)
+=================================================
 
 The WinCopies® software framework
 
 README
 ======
 
-[![NuGet Badge](https://buildstats.info/nuget/WinCopies.Console)](https://www.nuget.org/packages/WinCopies.Console/)
+[![NuGet Badge](https://buildstats.info/nuget/WinCopies.GUI.IO)](https://www.nuget.org/packages/WinCopies.GUI.IO/)
 
 Updates
 -------
@@ -16,7 +16,7 @@ See the Change log.
 Description
 -----------
 
-Dependency package for other packages of the WinCopies framework.
+Provides a WPF GUI for the WinCopies.IO package.
 
 Project link
 ------------
