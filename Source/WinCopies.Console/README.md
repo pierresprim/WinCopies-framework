@@ -1,4 +1,4 @@
-﻿WinCopies-framework (WinCopies.GUI package)
+﻿WinCopies-framework (WinCopies.Console package)
 ===========================================
 
 The WinCopies® software framework
