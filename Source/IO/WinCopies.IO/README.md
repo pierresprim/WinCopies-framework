@@ -1,5 +1,5 @@
-﻿WinCopies-framework (.IO package)
-=================================
+﻿WinCopies-framework (WinCopies.IO package)
+==========================================
 
 The WinCopies® software framework
 
