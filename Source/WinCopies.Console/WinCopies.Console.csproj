@@ -5,6 +5,10 @@
     <TargetPlatformIdentifier>windows</TargetPlatformIdentifier>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>WinCopies.Console.snk</AssemblyOriginatorKeyFile>
+    <VersionPrefix>3.0</VersionPrefix>
+    <VersionSuffix>preview</VersionSuffix>
+    <AssemblyVersion>3.0</AssemblyVersion>
+    <FileVersion>3.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup Condition="!$(DefineConstants.Contains('CS8'))">

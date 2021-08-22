@@ -12,10 +12,10 @@
     <DocumentationFile>WinCopies.IO.xml</DocumentationFile>
     <SignAssembly>true</SignAssembly>
     <DefineConstants>WinCopies2;WinCopies3;$(DefineConstants)</DefineConstants>
-    <VersionPrefix>3.5</VersionPrefix>
+    <VersionPrefix>3.6</VersionPrefix>
     <VersionSuffix>preview</VersionSuffix>
-    <AssemblyVersion>3.5</AssemblyVersion>
-    <FileVersion>3.5</FileVersion>
+    <AssemblyVersion>3.6</AssemblyVersion>
+    <FileVersion>3.6</FileVersion>
     <PackageIcon>WinCopies.png</PackageIcon>
     <AssemblyOriginatorKeyFile>WinCopies.IO.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
