@@ -25,7 +25,7 @@ using System.Drawing;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-
+using System.Windows.Input;
 using WinCopies.Collections.Generic;
 using WinCopies.Commands;
 using WinCopies.GUI.Controls;
@@ -47,7 +47,6 @@ namespace WinCopies.GUI.IO.ObjectModel
     {
         //protected override void OnPropertyChanged(string propertyName, object oldValue, object newValue) => OnPropertyChanged(new WinCopies.Util.Data.PropertyChangedEventArgs(propertyName, oldValue, newValue));
 
-        #region Classes
         [InterfaceDataTemplateSelector.Ignore]
         private class ButtonModel : ExtendedButtonViewModel<IExtendedButtonModel<string, object>, string, object>, DotNetFix.IDisposable
         {
@@ -81,7 +80,6 @@ namespace WinCopies.GUI.IO.ObjectModel
 
             ~ButtonModel() => Dispose();
         }
-        #endregion
 
         #region Fields
         private System.Collections.Generic.IReadOnlyList<ButtonModel> _commonCommands;
@@ -99,6 +97,8 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         #region Properties
         protected Converter<string, IBrowsableObjectInfo> GetBrowsableObjectInfoViewModelConverter { get; }
+
+        public ICommand BrowseToParent { get; }
 
         public System.Collections.Generic.IEnumerable<IMenuItemModel<string>> BrowsabilityPaths => Path.SelectedItem?.BrowsabilityPaths?.Select(path => new MenuItemModel<string>(path.Name, new DelegateCommand(obj => path.IsValid(), obj => Path = new BrowsableObjectInfoViewModel(path.GetPath()) { SortComparison = Path.SortComparison, Factory = Path.Factory })));
 
@@ -128,7 +128,7 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         public bool IsDisposed { get; private set; }
 
-        public bool IsSelected { get => _isSelected; set { UpdateValue(ref _isSelected, value, nameof(IsSelected)); } }
+        public bool IsSelected { get => _isSelected; set => UpdateValue(ref _isSelected, value, nameof(IsSelected)); }
 
         public DelegateCommand<IBrowsableObjectInfoViewModel> ItemClickCommand { get; }
 
@@ -154,6 +154,8 @@ namespace WinCopies.GUI.IO.ObjectModel
             _path = path;
 
             GetBrowsableObjectInfoViewModelConverter = converter;
+
+            BrowseToParent = new DelegateCommand(o => Path.Parent != null, o => Path = new BrowsableObjectInfoViewModel(Path.Parent));
 
             _commonCommands = new ButtonModel[] { new ButtonModel(() => Path.ProcessFactory.NewItemProcessCommands?.Name, Icons.Properties.Resources.folder_add)
             {

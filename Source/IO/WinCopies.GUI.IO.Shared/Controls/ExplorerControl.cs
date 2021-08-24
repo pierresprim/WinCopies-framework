@@ -43,6 +43,10 @@ namespace WinCopies.GUI.IO.Controls
 
         private static RoutedEvent RegisterRoutedEvent<T>(in string eventName, in RoutingStrategy routingStrategy) => RegisterRoutedEvent<T, ExplorerControl>(eventName, routingStrategy);
 
+        public static readonly DependencyProperty BrowseToParentProperty = Register<ICommand>(nameof(BrowseToParent));
+
+        public ICommand BrowseToParent { get => (ICommand)GetValue(BrowseToParentProperty); set => SetValue(BrowseToParentProperty, value); }
+
         /// <summary>
         /// Identifies the <see cref="Path"/> dependency property.
         /// </summary>
@@ -165,7 +169,12 @@ namespace WinCopies.GUI.IO.Controls
 
         public ExplorerControl() => OnInit();
 
-        protected virtual void OnInit() => AddHandler(System.Windows.Controls.Primitives.Selector.SelectionChangedEvent, new SelectionChangedEventHandler(ListView_SelectionChanged));
+        protected virtual void OnInit()
+        {
+            AddHandler(System.Windows.Controls.Primitives.Selector.SelectionChangedEvent, new SelectionChangedEventHandler(ListView_SelectionChanged));
+
+            _ = CommandBindings.Add(new CommandBinding(Temp.Temp.BrowseToParent, (object sender, ExecutedRoutedEventArgs e) => { BrowseToParent?.Execute(null); e.Handled = true; }, (object sender, CanExecuteRoutedEventArgs e) => { e.CanExecute = BrowseToParent?.CanExecute(null) == true; e.Handled = true; }));
+        }
 
         protected virtual void OnGoToPageCanExecute(CanExecuteRoutedEventArgs e)
         {

@@ -6,6 +6,19 @@ The WinCopies® software framework
 CHANGELOG
 ---------
 
+### 3.7-preview
+
+- Add properties and methods to NavigationButton.
+- Add ability for Window to handle the mouse XButtons events.
+- Add BrowseToParent property to (I)ExplorerControl(BrowsableObjectInfoViewModel) classes and interface.
+- Add button for browsing to the current path's parent to the ExplorerControl.
+- Add new types.
+- The process error panel is displayed when a process does not succeed, even if the error was a global process error.
+- Bug fixed:
+	- in ShellObjectInfo\<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>.GetParent().
+	- in ProcessDelegateTypes\<T, TParam>.ProcessEventDelegates.GetNotContainedActionException method: the argument name that was passed to the exception constructor was those of the actual method and not the value of that argument.
+	- in IProcess data template binding.
+
 ### 3.6-preview
 
 - Add WinCopies.Console project.

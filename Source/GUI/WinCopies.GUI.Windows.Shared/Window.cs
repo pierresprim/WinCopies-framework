@@ -17,31 +17,54 @@
 
 using Microsoft.WindowsAPICodePack;
 using Microsoft.WindowsAPICodePack.Shell;
+using Microsoft.WindowsAPICodePack.Win32Native;
 using Microsoft.WindowsAPICodePack.Win32Native.Shell.DesktopWindowManager;
 
 using System;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
+using WinCopies.Temp;
 
 using static Microsoft.WindowsAPICodePack.Shell.DesktopWindowManager;
 
+using static WinCopies.Util.Desktop.UtilHelpers;
+
 namespace WinCopies.GUI.Windows
 {
+    public enum XButton : sbyte
+    {
+        One = 1,
+
+        Two = 2
+    }
+
+    public enum XButtonClick : sbyte
+    {
+        Down = 1,
+
+        Up = 2,
+
+        DoubleClick = 3
+    }
+
     public class Window : System.Windows.Window
     {
-        public static readonly DependencyProperty CloseButtonProperty = DependencyProperty.Register(nameof(CloseButton), typeof(bool), typeof(Window), new PropertyMetadata(true, (DependencyObject d, DependencyPropertyChangedEventArgs e) => _ = (bool)e.NewValue ? EnableCloseMenuItem((Window)d) : DisableCloseMenuItem((Window)d)));
+        private static DependencyProperty Register<T>(in string propertyName, in PropertyMetadata propertyMetadata) => Register<T, Window>(propertyName, propertyMetadata);
+
+        public static readonly DependencyProperty CloseButtonProperty = Register<bool>(nameof(CloseButton), new PropertyMetadata(true, (DependencyObject d, DependencyPropertyChangedEventArgs e) => _ = (bool)e.NewValue ? EnableCloseMenuItem((Window)d) : DisableCloseMenuItem((Window)d)));
 
         public bool CloseButton { get => (bool)GetValue(CloseButtonProperty); set => SetValue(CloseButtonProperty, value); }
 
         /// <summary>
         /// Identifies the <see cref="HelpButton"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty HelpButtonProperty = DependencyProperty.Register(nameof(HelpButton), typeof(bool), typeof(Window), new PropertyMetadata(false));
+        public static readonly DependencyProperty HelpButtonProperty = Register<bool>(nameof(HelpButton), new PropertyMetadata(false));
 
         public bool HelpButton { get => (bool)GetValue(HelpButtonProperty); set => SetValue(HelpButtonProperty, value); }
 
-        private static readonly DependencyPropertyKey IsInHelpModePropertyKey = DependencyProperty.RegisterReadOnly(nameof(IsInHelpMode), typeof(bool), typeof(Window), new PropertyMetadata(false));
+        private static readonly DependencyPropertyKey IsInHelpModePropertyKey = RegisterReadOnly<bool, Window>(nameof(IsInHelpMode), new PropertyMetadata(false));
 
         /// <summary>
         /// Identifies the <see cref="IsInHelpMode"/> dependency property.
@@ -50,7 +73,7 @@ namespace WinCopies.GUI.Windows
 
         public bool IsInHelpMode => (bool)GetValue(IsInHelpModeProperty);
 
-        public static readonly DependencyProperty NotInHelpModeCursorProperty = DependencyProperty.Register(nameof(NotInHelpModeCursor), typeof(Cursor), typeof(Window), new PropertyMetadata(Cursors.Arrow));
+        public static readonly DependencyProperty NotInHelpModeCursorProperty = Register<Cursor>(nameof(NotInHelpModeCursor), new PropertyMetadata(Cursors.Arrow));
 
         public Cursor NotInHelpModeCursor { get => (Cursor)GetValue(NotInHelpModeCursorProperty); set => SetValue(NotInHelpModeCursorProperty, value); }
 
@@ -151,34 +174,62 @@ namespace WinCopies.GUI.Windows
             return result;
         }
 
+        protected virtual bool OnXButtonClick(XButton button, XButtonClick buttonClick)
+        {
+            if (buttonClick == XButtonClick.Up)
+
+                switch (button)
+                {
+                    case XButton.One:
+
+                        NavigationCommands.BrowseBack.Execute(null, null);
+
+                        break;
+
+                    case XButton.Two:
+
+                        NavigationCommands.BrowseForward.Execute(null, null);
+
+                        break;
+                }
+
+            return true;
+        }
+
         protected virtual IntPtr OnSourceHook(IntPtr hwnd, WindowMessage msg, IntPtr wParam, IntPtr lParam, out bool handled)
         {
-            switch (msg)
-            {
-                case WindowMessage.SystemCommand:
+            if (((ushort)msg).BetweenA((ushort)WindowMessage.XBUTTONDOWN, (ushort)WindowMessage.XBUTTONDBLCLK, true, true))
 
-                    handled = OnSystemCommandMessage(wParam);
+                handled = OnXButtonClick((XButton)Temp.Temp.HIWORD(wParam), (XButtonClick)((ushort)msg - ((ushort)WindowMessage.XBUTTONDOWN - 1)));
 
-                    break;
+            else
 
-                case WindowMessage.ShowWindow:
+                switch (msg)
+                {
+                    case WindowMessage.SystemCommand:
 
-                    handled = OnShowWindowMessage();
+                        handled = OnSystemCommandMessage(wParam);
 
-                    break;
+                        break;
 
-                case WindowMessage.Close:
+                    case WindowMessage.ShowWindow:
 
-                    handled = !CloseButton;
+                        handled = OnShowWindowMessage();
 
-                    break;
+                        break;
 
-                default:
+                    case WindowMessage.Close:
 
-                    handled = false;
+                        handled = !CloseButton;
 
-                    break;
-            }
+                        break;
+
+                    default:
+
+                        handled = false;
+
+                        break;
+                }
 
             return IntPtr.Zero;
         }

@@ -15,19 +15,38 @@
 //* You should have received a copy of the GNU General Public License
 //* along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+using System;
 using System.Globalization;
+using System.Windows;
 using System.Windows.Data;
 
 using WinCopies.IO;
+using WinCopies.IO.Process;
 using WinCopies.Util.Data;
 
 namespace WinCopies.GUI.IO.Process
 {
-    [ValueConversion(typeof(IPathCommon),typeof(string))]
+    [ValueConversion(typeof(IPathCommon), typeof(string))]
     public class PathCommonToStringConverter : AlwaysConvertibleOneWayConverter<IPathCommon, object, string>
     {
         public override IReadOnlyConversionOptions ConvertOptions => ConverterHelper.ParameterCanBeNull;
 
         protected override string Convert(IPathCommon value, object parameter, CultureInfo culture) => value.Path;
+    }
+
+    [ValueConversion(typeof(ProcessTypes<IProcessErrorItem>.IProcessQueue), typeof(bool))]
+    public class ErrorPathsToBooleanConverter : AlwaysConvertibleOneWayConverter<ProcessTypes<IProcessErrorItem>.IProcessQueue, object, bool>
+    {
+        public override IReadOnlyConversionOptions ConvertOptions => ConverterHelper.AllowNull;
+
+        protected override bool Convert(ProcessTypes<IProcessErrorItem>.IProcessQueue value, object parameter, CultureInfo culture) => value?.HasItems == true;
+    }
+
+    [ValueConversion(typeof(object), typeof(Visibility))]
+    public class ObjectToVisibilityConverter : ConverterBase
+    {
+        public override object Convert(object value, Type targetType, object parameter, CultureInfo culture) => value == null || ((string)value).Length == 0 ? Visibility.Collapsed : Visibility.Visible;
+
+        public override object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotSupportedException();
     }
 }

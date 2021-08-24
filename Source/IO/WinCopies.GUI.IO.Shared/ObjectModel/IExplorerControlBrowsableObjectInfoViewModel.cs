@@ -19,8 +19,8 @@ using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Windows.Controls;
+using System.Windows.Input;
 
-using WinCopies.Collections.Generic;
 using WinCopies.GUI.Controls;
 using WinCopies.GUI.Controls.Models;
 using WinCopies.IO.ObjectModel;
@@ -45,6 +45,8 @@ namespace WinCopies.GUI.IO
         public interface IExplorerControlBrowsableObjectInfoViewModel : IBrowsableObjectInfoViewModelCommon, DotNetFix.IDisposable
         {
             System.Collections.Generic.IEnumerable<IMenuItemModel<string>> BrowsabilityPaths { get; }
+
+            ICommand BrowseToParent { get; }
 
             System.Collections.Generic.IEnumerable<IButtonModel> CommonCommands { get; }
 

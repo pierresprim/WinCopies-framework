@@ -15,7 +15,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with the WinCopies Framework.  If not, see<https://www.gnu.org/licenses/>. -->
 
-<Window x:Class="WinCopies.GUI.Samples.ExplorerControlTest"
+<windows:Window x:Class="WinCopies.GUI.Samples.ExplorerControlTest"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -25,11 +25,14 @@ along with the WinCopies Framework.  If not, see<https://www.gnu.org/licenses/>.
         xmlns:util="clr-namespace:WinCopies;assembly=WinCopies.Util.Desktop"
         xmlns:commands="clr-namespace:WinCopies.Commands;assembly=WinCopies.Util.Desktop"
         xmlns:io="clr-namespace:WinCopies.GUI.IO.ObjectModel;assembly=WinCopies.GUI.IO"
+        xmlns:windows="clr-namespace:WinCopies.GUI.Windows;assembly=WinCopies.GUI"
         mc:Ignorable="d"
         Title="ExplorerControlTest" Height="450" Width="800">
     <Window.CommandBindings>
         <CommandBinding Command="{x:Static commands:ApplicationCommands.NewTab}" CanExecute="Command_CanExecute" Executed="NewTab_Executed" />
         <CommandBinding Command="{x:Static commands:ApplicationCommands.CloseTab}" CanExecute="CloseTab_CanExecute" Executed="CloseTab_Executed" />
+        <CommandBinding Command="{x:Static NavigationCommands.BrowseBack}" CanExecute="Window_PreviousCanExecute" Executed="Window_PreviousExecuted" />
+        <CommandBinding Command="{x:Static NavigationCommands.BrowseForward}" CanExecute="Window_NextCanExecute" Executed="Window_NextExecuted" />
     </Window.CommandBindings>
     <DockPanel>
         <StackPanel DockPanel.Dock="Top">
@@ -89,4 +92,4 @@ along with the WinCopies Framework.  If not, see<https://www.gnu.org/licenses/>.
             </TabControl.ItemContainerStyle>
         </TabControl>
     </DockPanel>
-</Window>
+</windows:Window>

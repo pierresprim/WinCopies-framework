@@ -268,7 +268,7 @@ namespace WinCopies.IO
 
                         case KnownFolder:
 
-                            return _shellObject.IsFileSystemObject || ((IKnownFolder)_shellObject).FolderId.ToString() != Microsoft.WindowsAPICodePack.Shell.Guids.KnownFolders.Computer;
+                            return _shellObject.IsFileSystemObject || ((ShellNonFileSystemFolder)_shellObject).ParsingName != Computer.ParsingName;
                     }
 
                     return false;

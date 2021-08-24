@@ -28,8 +28,9 @@
     <PackageReference Include="WinCopies.Collections" Version="3.12-preview" />
     <PackageReference Include="WinCopies.Util.Extensions" Version="3.12-preview" />
     <PackageReference Include="WinCopies.Util.Desktop" Version="3.12-preview" />
-    
-    <PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="3.1.2-preview" />
+
+    <PackageReference Include="WinCopies.WindowsAPICodePack.Win32Native" Version="3.4-preview" />
+    <PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="3.4-preview" />
   </ItemGroup>
 
   <ItemGroup>

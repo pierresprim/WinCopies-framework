@@ -159,6 +159,10 @@ namespace WinCopies.GUI.Controls
     {
         private static DependencyProperty Register(in string propertyName) => Register<Style, NavigationButton>(propertyName);
 
+        public bool CanBrowseBack => ItemsSource?.CanMovePreviousFromCurrent == true;
+
+        public bool CanBrowseForward => ItemsSource?.CanMoveNextFromCurrent == true;
+
         public static readonly DependencyProperty GoBackButtonStyleProperty = Register(nameof(GoBackButtonStyle));
 
         public Style GoBackButtonStyle { get => (Style)GetValue(GoBackButtonStyleProperty); set => SetValue(GoBackButtonStyleProperty, value); }
@@ -178,15 +182,13 @@ namespace WinCopies.GUI.Controls
 
         protected virtual void OnCanBrowseBack(CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = ItemsSource?.CanMovePreviousFromCurrent == true;
+            e.CanExecute = CanBrowseBack;
 
             e.Handled = true;
         }
 
-        protected virtual void OnBrowseBack(ExecutedRoutedEventArgs e)
+        protected virtual void OnBrowseBack()
         {
-            e.Handled = true;
-
             if (ItemsSource == null)
 
                 return;
@@ -196,17 +198,41 @@ namespace WinCopies.GUI.Controls
             _ = Command?.TryExecute(CommandParameter, CommandTarget);
         }
 
-        protected virtual void OnCanBrowseForward(CanExecuteRoutedEventArgs e)
+        public bool TryBrowseBack()
         {
-            e.CanExecute = ItemsSource?.CanMoveNextFromCurrent == true;
+            if (CanBrowseBack)
+            {
+                OnBrowseBack();
+
+                return true;
+            }
+
+            return false;
+        }
+
+        public void BrowseBack()
+        {
+            if (!TryBrowseBack())
+
+                throw new InvalidOperationException("Cannot browse back.");
+        }
+
+        protected virtual void OnBrowseBack(ExecutedRoutedEventArgs e)
+        {
+            OnBrowseBack();
 
             e.Handled = true;
         }
 
-        protected virtual void OnBrowseForward(ExecutedRoutedEventArgs e)
+        protected virtual void OnCanBrowseForward(CanExecuteRoutedEventArgs e)
         {
-            e.Handled = true;
+            e.CanExecute = CanBrowseForward;
 
+            e.Handled = true;
+        }
+
+        protected virtual void OnBrowseForward()
+        {
             if (ItemsSource == null)
 
                 return;
@@ -214,6 +240,32 @@ namespace WinCopies.GUI.Controls
             ItemsSource.CurrentIndex--;
 
             _ = Command?.TryExecute(CommandParameter, CommandTarget);
+        }
+
+        public bool TryBrowseForward()
+        {
+            if (CanBrowseForward)
+            {
+                OnBrowseForward();
+
+                return true;
+            }
+
+            return false;
+        }
+
+        public void BrowseForward()
+        {
+            if (!TryBrowseForward())
+
+                throw new InvalidOperationException("Cannot browse forward.");
+        }
+
+        protected virtual void OnBrowseForward(ExecutedRoutedEventArgs e)
+        {
+            OnBrowseForward();
+
+            e.Handled = true;
         }
 
         protected virtual void OnCanGoToPage(CanExecuteRoutedEventArgs e)

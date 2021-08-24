@@ -150,7 +150,7 @@ QueryDelegateDelegate
 
             object Process.IProcessEventDelegates.AddProgressDelegate(Action<IPathCommon> action) 
             {
-                var _action = GetDelegate(action);
+                Action<T> _action = GetDelegate(action);
                 
                 AddProgressDelegate(_action);
 
@@ -196,7 +196,7 @@ QueryDelegateDelegate
 
             public void RemoveProgressDelegate(Action<T> action) => Delegates.ProgressDelegate.Remove(action);
 
-            protected static ArgumentException GetNotContainedActionException(in string argumentName) => new ArgumentException("The given action is not contained in the common delegates.", nameof(argumentName));
+            protected static ArgumentException GetNotContainedActionException(in string argumentName) => new ArgumentException("The given action is not contained in the common delegates.", argumentName);
 
             void Process.IProcessEventDelegates.RemoveProgressDelegate(object action) => Delegates.ProgressDelegate.Remove(action is Action<T> _action ? _action : throw GetNotContainedActionException(nameof(action)));
 

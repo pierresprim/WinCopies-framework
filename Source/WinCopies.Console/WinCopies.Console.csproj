@@ -23,7 +23,7 @@
     <PackageReference Include="WinCopies.Util" Version="3.12-preview" />
     <PackageReference Include="WinCopies.Collections" Version="3.12-preview" />
     <PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="3.4-preview" />
-    <PackageReference Include="WinCopies.WindowsAPICodePack.Win32Native" Version="3.4.0-preview" />
+    <PackageReference Include="WinCopies.WindowsAPICodePack.Win32Native" Version="3.4-preview" />
     <PackageReference Include="Squid-Box.SevenZipSharp" Version="1.2.231" />
   </ItemGroup>
 

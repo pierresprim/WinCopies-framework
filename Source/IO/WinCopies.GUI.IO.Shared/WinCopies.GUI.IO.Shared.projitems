@@ -44,8 +44,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Process\ObjectModel\PathToPathProcess.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ObjectModel\Process.old.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\Process\ProcessControl.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Process\ObjectModel\Recycling.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SourcePathConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="$(MSBuildThisFileDirectory)Process\Collections\" />

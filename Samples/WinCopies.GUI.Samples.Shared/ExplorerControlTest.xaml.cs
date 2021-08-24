@@ -38,7 +38,7 @@ namespace WinCopies.GUI.Samples
     /// <summary>
     /// Interaction logic for ExplorerControlTest.xaml
     /// </summary>
-    public partial class ExplorerControlTest : System.Windows.Window
+    public partial class ExplorerControlTest : WinCopies.GUI.Windows.Window
     {
         public static IProcessPathCollectionFactory DefaultProcessPathCollectionFactory { get; } = new ProcessPathCollectionFactory();
 
@@ -140,7 +140,7 @@ namespace WinCopies.GUI.Samples
 
         public static IExplorerControlBrowsableObjectInfoViewModel GetDefaultExplorerControlBrowsableObjectInfoViewModel(in IBrowsableObjectInfo browsableObjectInfo)
         {
-            IExplorerControlBrowsableObjectInfoViewModel viewModel = Shell.ObjectModel. ExplorerControlBrowsableObjectInfoViewModel.From(new BrowsableObjectInfoViewModel(browsableObjectInfo), path => ShellObjectInfo.From(ShellObjectFactory.Create(path), ClientVersion));
+            IExplorerControlBrowsableObjectInfoViewModel viewModel = Shell.ObjectModel.ExplorerControlBrowsableObjectInfoViewModel.From(new BrowsableObjectInfoViewModel(browsableObjectInfo), path => ShellObjectInfo.From(ShellObjectFactory.Create(path), ClientVersion));
 
             return viewModel;
         }
@@ -181,13 +181,14 @@ namespace WinCopies.GUI.Samples
 #if !CS9
             ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel>
 #endif
-            () { { GetExplorerControlBrowsableObjectInfoViewModel(GetBrowsableObjectInfoViewModel(ShellObjectInfo.From(ShellObjectFactory.Create("C:\\"), ClientVersion)), true, SelectionMode.Extended, true) } };
+            ()
+        { { GetExplorerControlBrowsableObjectInfoViewModel(GetBrowsableObjectInfoViewModel(ShellObjectInfo.From(ShellObjectFactory.Create("C:\\"), ClientVersion)), true, SelectionMode.Extended, true) } };
 
         private static IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo) => new BrowsableObjectInfoViewModel(browsableObjectInfo);
 
         public static IExplorerControlBrowsableObjectInfoViewModel GetExplorerControlBrowsableObjectInfoViewModel(in IBrowsableObjectInfoViewModel browsableObjectInfo, in bool isSelected, in SelectionMode selectionMode, in bool isCheckBoxVisible)
         {
-            IExplorerControlBrowsableObjectInfoViewModel result = Shell.ObjectModel. ExplorerControlBrowsableObjectInfoViewModel.From(browsableObjectInfo, path => ShellObjectInfo.From(ShellObjectFactory.Create(path), ClientVersion));
+            IExplorerControlBrowsableObjectInfoViewModel result = Shell.ObjectModel.ExplorerControlBrowsableObjectInfoViewModel.From(browsableObjectInfo, path => ShellObjectInfo.From(ShellObjectFactory.Create(path), ClientVersion));
 
             result.IsSelected = isSelected;
             result.SelectionMode = selectionMode;
@@ -200,13 +201,15 @@ namespace WinCopies.GUI.Samples
 #if !CS9
             ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel>
 #endif
-            () { { GetExplorerControlBrowsableObjectInfoViewModel(new BrowsableObjectInfoViewModel(new RegistryItemInfo()), true, SelectionMode.Extended, true) } };
+            ()
+        { { GetExplorerControlBrowsableObjectInfoViewModel(new BrowsableObjectInfoViewModel(new RegistryItemInfo()), true, SelectionMode.Extended, true) } };
 
         public static ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> GetWMIItems() => new
 #if !CS9
             ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel>
 #endif
-            () { { GetExplorerControlBrowsableObjectInfoViewModel(new BrowsableObjectInfoViewModel(new WMIItemInfo()), true, SelectionMode.Extended, true) } };
+            ()
+        { { GetExplorerControlBrowsableObjectInfoViewModel(new BrowsableObjectInfoViewModel(new WMIItemInfo()), true, SelectionMode.Extended, true) } };
 
         private void RadioButton_Checked(object sender, RoutedEventArgs e)
         {
@@ -280,6 +283,38 @@ namespace WinCopies.GUI.Samples
             items.Clear();
 
             base.OnClosing(e);
+        }
+
+        private void Window_PreviousCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = SelectedItem.History.CanMovePreviousFromCurrent;
+
+            e.Handled = true;
+        }
+
+        private void Window_NextCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = SelectedItem.History.CanMoveNextFromCurrent;
+
+            e.Handled = true;
+        }
+
+        private void Window_PreviousExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            SelectedItem.History.CurrentIndex++;
+
+            CommandManager.InvalidateRequerySuggested();
+
+            e.Handled = true;
+        }
+
+        private void Window_NextExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            SelectedItem.History.CurrentIndex--;
+
+            CommandManager.InvalidateRequerySuggested();
+
+            e.Handled = true;
         }
     }
 }

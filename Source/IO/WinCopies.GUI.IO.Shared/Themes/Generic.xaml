@@ -15,7 +15,9 @@
     xmlns:commands="clr-namespace:WinCopies.Commands;assembly=WinCopies.Util.Desktop"
     xmlns:util="clr-namespace:WinCopies;assembly=WinCopies.Util.Desktop"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
-    xmlns:utilCommands="clr-namespace:WinCopies.Util.Commands.Primitives;assembly=WinCopies.Util">
+    xmlns:utilCommands="clr-namespace:WinCopies.Util.Commands.Primitives;assembly=WinCopies.Util"
+    xmlns:i="clr-namespace:Microsoft.Xaml.Behaviors;assembly=Microsoft.Xaml.Behaviors"
+    xmlns:temp="clr-namespace:WinCopies.Temp;assembly=WinCopies.Util.Temp">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/wincopies.gui;component/Themes/Generic.xaml" />
         <ResourceDictionary Source="pack://application:,,,/wincopies.gui.templates;component/Themes/Generic.xaml" />
@@ -143,18 +145,21 @@
                     <ColumnDefinition />
                     <ColumnDefinition Width="auto" />
                 </Grid.ColumnDefinitions>
-                <controls:NavigationButton ItemsSource="{Binding History, RelativeSource={RelativeSource TemplatedParent}}" ItemContainerStyle="{StaticResource WinCopies.GUI.IO.NavigationButtonItemContainerStyle}">
-                    <controls:NavigationButton.GoBackButtonStyle>
-                        <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
-                            <Setter Property="Content" Value="{x:Static icons:Resources.resultset_previous}" />
-                        </Style>
-                    </controls:NavigationButton.GoBackButtonStyle>
-                    <controls:NavigationButton.GoForwardButtonStyle>
-                        <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
-                            <Setter Property="Content" Value="{x:Static icons:Resources.resultset_next}" />
-                        </Style>
-                    </controls:NavigationButton.GoForwardButtonStyle>
-                </controls:NavigationButton>
+                <StackPanel Orientation="Horizontal">
+                    <controls:NavigationButton ItemsSource="{Binding History, RelativeSource={RelativeSource TemplatedParent}}" ItemContainerStyle="{StaticResource WinCopies.GUI.IO.NavigationButtonItemContainerStyle}">
+                        <controls:NavigationButton.GoBackButtonStyle>
+                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
+                                <Setter Property="Content" Value="{x:Static icons:Resources.resultset_previous}" />
+                            </Style>
+                        </controls:NavigationButton.GoBackButtonStyle>
+                        <controls:NavigationButton.GoForwardButtonStyle>
+                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
+                                <Setter Property="Content" Value="{x:Static icons:Resources.resultset_next}" />
+                            </Style>
+                        </controls:NavigationButton.GoForwardButtonStyle>
+                    </controls:NavigationButton>
+                    <Button Content="{x:Static icons:Resources.arrow_up}" Command="{x:Static temp:Temp.BrowseToParent}" />
+                </StackPanel>
                 <dotNetFix:TextBox Grid.Column="1">
                     <TextBox.Style>
                         <Style TargetType="{x:Type TextBox}">
@@ -311,7 +316,8 @@
                                        History="{Binding History}" GoButtonCommand="{x:Static localObjectModel:ExplorerControlBrowsableObjectInfoViewModel.GoCommand}" GoButtonCommandParameter="{Binding}"
                                        IsCheckBoxVisible="{Binding IsCheckBoxVisible}"
                                        SelectedIndex="{Binding Path.SelectedIndex, Mode=TwoWay}" SelectedItem="{Binding Path.SelectedItem, Mode=TwoWay}"
-                                       PropertyGridItem="{Binding Path}" PropertyGridDescription="{Binding Path.Items.Count, StringFormat={}{0} items}">
+                                       PropertyGridItem="{Binding Path}" PropertyGridDescription="{Binding Path.Items.Count, StringFormat={}{0} items}"
+                                       BrowseToParent="{Binding BrowseToParent}">
             <data:PushBindingManager.PushBindings>
                 <data:PushBinding TargetProperty="SelectedItems" Path="SelectedItems" />
             </data:PushBindingManager.PushBindings>
@@ -407,10 +413,10 @@
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
 
-            <Image Source="{TemplateBinding Icon}" />
+            <!--<Image Source="{TemplateBinding Icon}" />-->
 
             <StackPanel Grid.Column="1">
-                <TextBlock Text="{TemplateBinding Path}" />
+                <TextBlock Text="{TemplateBinding Path}" Visibility="{Binding Text, RelativeSource={RelativeSource Self}, Converter={localProcess:ObjectToVisibilityConverter}}" />
                 <TextBlock Text="{TemplateBinding ErrorMessage}" />
                 <StackPanel Orientation="Horizontal">
                     <Button Content="Try again" Command="{x:Static commands:ProcessCommands.TryAgain}" />
@@ -518,6 +524,20 @@
                                     </Setter.Value>
                                 </Setter>
                             </MultiDataTrigger>
+
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding ErrorPaths, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type localProcessControls:ProcessControl}}, Converter={localProcess:ErrorPathsToBooleanConverter}}" Value="{markup:FalseValue}" />
+                                    <Condition Binding="{Binding Status, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type localProcessControls:ProcessControl}}}" Value="{x:Static process:ProcessStatus.Error}" />
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate>
+                                            <localProcessControls:ProcessErrorItemControl ErrorMessage="{Binding Error.ErrorMessage, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type localProcessControls:ProcessControl}}}" Actions="{Binding Actions, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type localProcessControls:ProcessControl}}}" />
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </MultiDataTrigger>
                         </Style.Triggers>
                     </Style>
                 </Control.Style>
@@ -548,6 +568,7 @@
                                              ProgressPercentage="{Binding ProgressPercentage}"
                                              Status="{Binding Status}"
                                              ActualRemainingSize="{Binding ActualRemainingSize}"
+                                             Error="{Binding Error}"
                                              ErrorPaths="{Binding ErrorPaths}"
                                              Actions="{Binding ProcessActions}"
                                              CustomActions="{Binding Actions}" />
