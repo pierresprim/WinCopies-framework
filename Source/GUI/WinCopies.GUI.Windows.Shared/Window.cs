@@ -21,15 +21,29 @@ using Microsoft.WindowsAPICodePack.Win32Native;
 using Microsoft.WindowsAPICodePack.Win32Native.Shell.DesktopWindowManager;
 
 using System;
+using System.Collections.Specialized;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
+
+using WinCopies.Collections;
+using WinCopies.Collections.DotNetFix.Generic;
+using WinCopies.Commands;
 using WinCopies.Temp;
+using WinCopies.Util.Data;
 
 using static Microsoft.WindowsAPICodePack.Shell.DesktopWindowManager;
+using static Microsoft.WindowsAPICodePack.Win32Native.Menus.Menus;
+using static Microsoft.WindowsAPICodePack.Win32Native.Shell.DesktopWindowManager.DesktopWindowManager;
 
+using static WinCopies.Delegates;
 using static WinCopies.Util.Desktop.UtilHelpers;
+using static WinCopies.ThrowHelper;
+using static WinCopies.Temp.Temp;
+using WinCopies.Linq;
 
 namespace WinCopies.GUI.Windows
 {
@@ -49,8 +63,115 @@ namespace WinCopies.GUI.Windows
         DoubleClick = 3
     }
 
+    public class TitleBarMenuItem : ViewModelBase, ICommandSource, DotNetFix.IDisposable
+    {
+        private ICommand _command;
+        private object _commandParameter;
+        private IInputElement _commandTarget;
+        private string _header;
+
+        public uint Id { get; internal set; }
+
+        public TitleBarMenuItemQueue Collection { get; internal set; }
+
+        public string Header { get => _header; set => UpdateValue(ref _header, value, nameof(Header)); }
+
+        public ICommand Command { get => _command; set => UpdateValue(ref _command, value, nameof(Command)); }
+
+        public object CommandParameter { get => _commandParameter; set => UpdateValue(ref _commandParameter, value, nameof(CommandParameter)); }
+
+        public IInputElement CommandTarget { get => _commandTarget; set => UpdateValue(ref _commandTarget, value, nameof(CommandTarget)); }
+
+        public bool IsDisposed => Command == null;
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (IsDisposed)
+
+                return;
+
+            if (disposing)
+            {
+                if (Collection == null)
+
+                    Id = 0u;
+
+                _command = null;
+                _commandParameter = null;
+                _commandTarget = null;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+
+            GC.SuppressFinalize(this);
+        }
+    }
+
+    public class TitleBarMenuItemQueue : Collections.DotNetFix.Generic.TEMP.EnumerableQueueCollection<TitleBarMenuItem>
+    {
+        public uint LastId { get; private set; }
+
+        protected override void EnqueueItem(TitleBarMenuItem item)
+        {
+            ThrowIfNull(item, nameof(item));
+
+            if (item.Collection == null)
+            {
+                item.Collection = this;
+                item.Id = ++LastId;
+
+                base.EnqueueItem(item);
+
+                LastId = item.Id;
+            }
+
+            else
+
+                throw new ArgumentException("The given item is already in a collection.");
+        }
+
+        private static void ResetItem(in TitleBarMenuItem item)
+        {
+            item.Collection = null;
+            item.Id = 0u;
+        }
+
+        protected override bool TryDequeueItem([MaybeNullWhen(false)] out TitleBarMenuItem result)
+        {
+            if (base.TryDequeueItem(out result))
+            {
+                ResetItem(result);
+
+                return true;
+            }
+
+            return false;
+        }
+
+        protected override TitleBarMenuItem DequeueItem()
+        {
+            TitleBarMenuItem item = base.DequeueItem();
+
+            ResetItem(item);
+
+            return item;
+        }
+
+        protected override void ClearItems()
+        {
+            while (((IUIntCountable)InnerQueue).Count > 0)
+
+                DequeueItem();
+        }
+    }
+
     public class Window : System.Windows.Window
     {
+        private static DependencyProperty Register<T>(in string propertyName) => Register<T, Window>(propertyName);
+
         private static DependencyProperty Register<T>(in string propertyName, in PropertyMetadata propertyMetadata) => Register<T, Window>(propertyName, propertyMetadata);
 
         public static readonly DependencyProperty CloseButtonProperty = Register<bool>(nameof(CloseButton), new PropertyMetadata(true, (DependencyObject d, DependencyPropertyChangedEventArgs e) => _ = (bool)e.NewValue ? EnableCloseMenuItem((Window)d) : DisableCloseMenuItem((Window)d)));
@@ -60,7 +181,7 @@ namespace WinCopies.GUI.Windows
         /// <summary>
         /// Identifies the <see cref="HelpButton"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty HelpButtonProperty = Register<bool>(nameof(HelpButton), new PropertyMetadata(false));
+        public static readonly DependencyProperty HelpButtonProperty = Register<bool>(nameof(HelpButton));
 
         public bool HelpButton { get => (bool)GetValue(HelpButtonProperty); set => SetValue(HelpButtonProperty, value); }
 
@@ -77,6 +198,10 @@ namespace WinCopies.GUI.Windows
 
         public Cursor NotInHelpModeCursor { get => (Cursor)GetValue(NotInHelpModeCursorProperty); set => SetValue(NotInHelpModeCursorProperty, value); }
 
+        public static readonly DependencyProperty TitleBarMenuItemsProperty = Register<TitleBarMenuItemQueue>(nameof(TitleBarMenuItem), new PropertyMetadata(null, (DependencyObject d, DependencyPropertyChangedEventArgs e) => ((Window)d).OnTitleBarMenuItemsCollectionChanged((TitleBarMenuItemQueue)e.OldValue, (TitleBarMenuItemQueue)e.NewValue)));
+
+        public TitleBarMenuItemQueue TitleBarMenuItems { get => (TitleBarMenuItemQueue)GetValue(TitleBarMenuItemsProperty); set => SetValue(TitleBarMenuItemsProperty, value); }
+
         /// <summary>
         /// Identifies the <see cref="HelpButtonClick"/> routed event.
         /// </summary>
@@ -90,6 +215,117 @@ namespace WinCopies.GUI.Windows
         }
 
         static Window() => DefaultStyleKeyProperty.OverrideMetadata(typeof(Window), new FrameworkPropertyMetadata(typeof(Window)));
+
+        protected virtual void OnTitleBarMenuItemsCollectionChanged(TitleBarMenuItemQueue oldValue, TitleBarMenuItemQueue newValue)
+        {
+            void onCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => OnTitleBarMenuItemsChanged(e);
+
+            if (oldValue != null)
+            {
+                if (oldValue is INotifyCollectionChanged _oldValue)
+
+                    _oldValue.CollectionChanged -= onCollectionChanged;
+
+                OnRemoveMenuItems(oldValue);
+            }
+
+            if (newValue != null)
+            {
+                OnAddMenuItems(newValue);
+
+                if (newValue is INotifyCollectionChanged _newValue)
+
+                    _newValue.CollectionChanged += onCollectionChanged;
+            }
+        }
+
+        private void OnAddMenuItems(in System.Collections.Generic.IEnumerable<TitleBarMenuItem> menuItems)
+        {
+            void onPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) => TitleBarMenuItem_PropertyChanged((TitleBarMenuItem)sender, e);
+
+            IntPtr menu = GetSystemMenu(new WindowInteropHelper(this).Handle, false);
+
+            uint id;
+            int count = GetMenuItemCount(menu);
+            uint i;
+            MenuItemInfo menuItemInfo;
+
+            foreach (TitleBarMenuItem item in menuItems)
+            {
+                id = item.Id == 0u ? item.Collection.LastId + 1 : item.Id;
+
+                menuItemInfo = new MenuItemInfo() { cbSize = (uint)Marshal.SizeOf<MenuItemInfo>() };
+
+                bool ok = true;
+
+                while (true)
+                {
+                    for (i = 0u; i < count; i++)
+                    {
+                        GetMenuItemInfoW(menu, i, true, ref menuItemInfo);
+
+                        if (menuItemInfo.wID == id)
+
+                            if (id == uint.MaxValue)
+
+                                throw new InvalidOperationException("Too much items.");
+
+                            else
+                            {
+                                id++;
+
+                                ok = false;
+
+                                break;
+                            }
+                    }
+
+                    if (ok)
+
+                        break;
+                }
+
+                item.Id = id;
+
+                AppendMenuW(menu, MenuFlags.String, id, item.Header ?? (item.Command is RoutedCommand command ? command.Name : null));
+
+                item.PropertyChanged += onPropertyChanged;
+            }
+        }
+
+        private void OnRemoveMenuItems(in System.Collections.Generic.IEnumerable<TitleBarMenuItem> menuItems)
+        {
+            void onPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) => TitleBarMenuItem_PropertyChanged((TitleBarMenuItem)sender, e);
+
+            IntPtr menu = GetSystemMenu(new WindowInteropHelper(this).Handle, false);
+
+            foreach (TitleBarMenuItem item in menuItems)
+            {
+                item.PropertyChanged -= onPropertyChanged;
+
+                DeleteMenu(menu, (SystemMenuCommands)item.Id, MenuFlags.ByCommand);
+            }
+        }
+
+        protected virtual void OnTitleBarMenuItemsChanged(NotifyCollectionChangedEventArgs e)
+        {
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+
+                    OnAddMenuItems(e.NewItems.Select(Convert<object, TitleBarMenuItem>));
+
+                    break;
+
+                case NotifyCollectionChangedAction.Remove:
+
+                    OnRemoveMenuItems(e.OldItems.Select(Convert<object, TitleBarMenuItem>));
+
+                    break;
+            }
+        }
+
+        protected void TitleBarMenuItem_PropertyChanged(TitleBarMenuItem sender, System.ComponentModel.PropertyChangedEventArgs e) => ;
 
         protected virtual void OnSourceInitialized(HwndSource hwndSource)
         {
