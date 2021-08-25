@@ -402,7 +402,7 @@ namespace WinCopies.IO
 
                             case ShellNonFileSystemFolder _:
 
-                                return new ShellObjectInitInfo(shellObject.ParsingName, Folder);
+                                return new ShellObjectInitInfo(shellObject.ParsingName, KnownFolder);
                         }
 
                         break;

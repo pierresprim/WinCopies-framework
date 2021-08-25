@@ -163,6 +163,10 @@ namespace WinCopies.GUI.Windows
 
         protected virtual IntPtr OnSourceHook(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
+            if (handled)
+
+                return IntPtr.Zero;
+
             var _msg = (WindowMessage)msg;
 
             IntPtr result = OnSourceHook(hwnd, _msg, wParam, lParam, out bool _handled);

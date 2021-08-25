@@ -67,7 +67,7 @@ along with the WinCopies Framework.  If not, see<https://www.gnu.org/licenses/>.
                 <RadioButton Content="WMI" GroupName="View" Margin="10,0,0,0" Checked="RadioButton_Checked" />
             </StackPanel>
         </StackPanel>
-        <TabControl ItemsSource="{Binding Items}" SelectedItem="{Binding SelectedItem, Mode=OneWayToSource}">
+        <TabControl ItemsSource="{Binding Items}" SelectedItem="{Binding SelectedItem, Mode=OneWayToSource}" Style="{StaticResource WinCopies.TabControlStyle}">
             <TabControl.ItemContainerStyle>
                 <Style TargetType="{x:Type TabItem}">
                     <Setter Property="Header" Value="{Binding}" />
