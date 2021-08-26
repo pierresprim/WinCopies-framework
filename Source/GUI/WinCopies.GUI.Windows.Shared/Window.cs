@@ -32,6 +32,7 @@ using System.Windows.Interop;
 using WinCopies.Collections;
 using WinCopies.Collections.DotNetFix.Generic;
 using WinCopies.Commands;
+using WinCopies.Linq;
 using WinCopies.Temp;
 using WinCopies.Util.Data;
 
@@ -43,7 +44,7 @@ using static WinCopies.Delegates;
 using static WinCopies.Util.Desktop.UtilHelpers;
 using static WinCopies.ThrowHelper;
 using static WinCopies.Temp.Temp;
-using WinCopies.Linq;
+using WinCopies.Desktop;
 
 namespace WinCopies.GUI.Windows
 {
@@ -69,12 +70,15 @@ namespace WinCopies.GUI.Windows
         private object _commandParameter;
         private IInputElement _commandTarget;
         private string _header;
+        private bool _isEnabled = true;
 
         public uint Id { get; internal set; }
 
         public TitleBarMenuItemQueue Collection { get; internal set; }
 
         public string Header { get => _header; set => UpdateValue(ref _header, value, nameof(Header)); }
+
+        public bool IsEnabled { get => _isEnabled; set => UpdateValue(ref _isEnabled, value, nameof(IsEnabled)); }
 
         public ICommand Command { get => _command; set => UpdateValue(ref _command, value, nameof(Command)); }
 
@@ -139,7 +143,11 @@ namespace WinCopies.GUI.Windows
             item.Id = 0u;
         }
 
-        protected override bool TryDequeueItem([MaybeNullWhen(false)] out TitleBarMenuItem result)
+        protected override bool TryDequeueItem(
+#if CS8
+            [MaybeNullWhen(false)]
+#endif
+            out TitleBarMenuItem result)
         {
             if (base.TryDequeueItem(out result))
             {
@@ -164,7 +172,7 @@ namespace WinCopies.GUI.Windows
         {
             while (((IUIntCountable)InnerQueue).Count > 0)
 
-                DequeueItem();
+                _ = DequeueItem();
         }
     }
 
@@ -173,6 +181,14 @@ namespace WinCopies.GUI.Windows
         private static DependencyProperty Register<T>(in string propertyName) => Register<T, Window>(propertyName);
 
         private static DependencyProperty Register<T>(in string propertyName, in PropertyMetadata propertyMetadata) => Register<T, Window>(propertyName, propertyMetadata);
+
+        private static DependencyPropertyKey RegisterReadOnly<T>(in string propertyName, in PropertyMetadata propertyMetadata) => RegisterReadOnly<T, Window>(propertyName, propertyMetadata);
+
+        private static readonly DependencyPropertyKey IsSourceInitializedPropertyKey = RegisterReadOnly<bool>(nameof(IsSourceInitialized), new PropertyMetadata(false));
+
+        public static readonly DependencyProperty IsSourceInitializedProperty = IsSourceInitializedPropertyKey.DependencyProperty;
+
+        public bool IsSourceInitialized { get => (bool)GetValue(IsSourceInitializedProperty); }
 
         public static readonly DependencyProperty CloseButtonProperty = Register<bool>(nameof(CloseButton), new PropertyMetadata(true, (DependencyObject d, DependencyPropertyChangedEventArgs e) => _ = (bool)e.NewValue ? EnableCloseMenuItem((Window)d) : DisableCloseMenuItem((Window)d)));
 
@@ -185,7 +201,7 @@ namespace WinCopies.GUI.Windows
 
         public bool HelpButton { get => (bool)GetValue(HelpButtonProperty); set => SetValue(HelpButtonProperty, value); }
 
-        private static readonly DependencyPropertyKey IsInHelpModePropertyKey = RegisterReadOnly<bool, Window>(nameof(IsInHelpMode), new PropertyMetadata(false));
+        private static readonly DependencyPropertyKey IsInHelpModePropertyKey = RegisterReadOnly<bool>(nameof(IsInHelpMode), new PropertyMetadata(false));
 
         /// <summary>
         /// Identifies the <see cref="IsInHelpMode"/> dependency property.
@@ -198,7 +214,12 @@ namespace WinCopies.GUI.Windows
 
         public Cursor NotInHelpModeCursor { get => (Cursor)GetValue(NotInHelpModeCursorProperty); set => SetValue(NotInHelpModeCursorProperty, value); }
 
-        public static readonly DependencyProperty TitleBarMenuItemsProperty = Register<TitleBarMenuItemQueue>(nameof(TitleBarMenuItem), new PropertyMetadata(null, (DependencyObject d, DependencyPropertyChangedEventArgs e) => ((Window)d).OnTitleBarMenuItemsCollectionChanged((TitleBarMenuItemQueue)e.OldValue, (TitleBarMenuItemQueue)e.NewValue)));
+        public static readonly DependencyProperty TitleBarMenuItemsProperty = Register<TitleBarMenuItemQueue>(nameof(TitleBarMenuItem), new PropertyMetadata(null, (DependencyObject d, DependencyPropertyChangedEventArgs e) =>
+        {
+            var window = (Window)d;
+
+            (window.IsSourceInitialized ? window : throw new InvalidOperationException("The window's source is not initialized.")).OnTitleBarMenuItemsCollectionChanged((TitleBarMenuItemQueue)e.OldValue, (TitleBarMenuItemQueue)e.NewValue);
+        }));
 
         public TitleBarMenuItemQueue TitleBarMenuItems { get => (TitleBarMenuItemQueue)GetValue(TitleBarMenuItemsProperty); set => SetValue(TitleBarMenuItemsProperty, value); }
 
@@ -243,7 +264,7 @@ namespace WinCopies.GUI.Windows
         {
             void onPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) => TitleBarMenuItem_PropertyChanged((TitleBarMenuItem)sender, e);
 
-            IntPtr menu = GetSystemMenu(new WindowInteropHelper(this).Handle, false);
+            IntPtr menu = GetSystemMenu();
 
             uint id;
             int count = GetMenuItemCount(menu);
@@ -262,7 +283,7 @@ namespace WinCopies.GUI.Windows
                 {
                     for (i = 0u; i < count; i++)
                     {
-                        GetMenuItemInfoW(menu, i, true, ref menuItemInfo);
+                        _ = GetMenuItemInfoW(menu, i, true, ref menuItemInfo);
 
                         if (menuItemInfo.wID == id)
 
@@ -287,23 +308,25 @@ namespace WinCopies.GUI.Windows
 
                 item.Id = id;
 
-                AppendMenuW(menu, MenuFlags.String, id, item.Header ?? (item.Command is RoutedCommand command ? command.Name : null));
+                _ = AppendMenuW(menu, MenuFlags.String, id, item.Header ?? (item.Command is RoutedCommand command ? command.Name : null));
 
                 item.PropertyChanged += onPropertyChanged;
             }
         }
 
+        public IntPtr GetSystemMenu() => Microsoft.WindowsAPICodePack.Win32Native.Shell.DesktopWindowManager.DesktopWindowManager.GetSystemMenu(new WindowInteropHelper(this).Handle, false);
+
         private void OnRemoveMenuItems(in System.Collections.Generic.IEnumerable<TitleBarMenuItem> menuItems)
         {
             void onPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) => TitleBarMenuItem_PropertyChanged((TitleBarMenuItem)sender, e);
 
-            IntPtr menu = GetSystemMenu(new WindowInteropHelper(this).Handle, false);
+            IntPtr menu = GetSystemMenu();
 
             foreach (TitleBarMenuItem item in menuItems)
             {
                 item.PropertyChanged -= onPropertyChanged;
 
-                DeleteMenu(menu, (SystemMenuCommands)item.Id, MenuFlags.ByCommand);
+                _ = DeleteMenu(menu, (SystemMenuCommands)item.Id, MenuFlags.ByCommand);
             }
         }
 
@@ -325,7 +348,25 @@ namespace WinCopies.GUI.Windows
             }
         }
 
-        protected void TitleBarMenuItem_PropertyChanged(TitleBarMenuItem sender, System.ComponentModel.PropertyChangedEventArgs e) => ;
+        protected void TitleBarMenuItem_PropertyChanged(TitleBarMenuItem sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(TitleBarMenuItem.IsEnabled):
+
+                    _ = EnableMenuItemByCommand(GetSystemMenu(), (SystemMenuCommands)sender.Id, sender.IsEnabled ? MenuFlags.Enabled : MenuFlags.Disabled);
+
+                    break;
+
+                case nameof(TitleBarMenuItem.Header):
+
+                    var menuItemInfo = new MenuItemInfo() { cbSize = (uint)Marshal.SizeOf<MenuItemInfo>(), fMask = MenuItemInfoFlags.String, dwTypeData = sender.Header };
+
+                    _ = SetMenuItemInfo(GetSystemMenu(), (SystemMenuCommands)sender.Id, ref menuItemInfo);
+
+                    break;
+            }
+        }
 
         protected virtual void OnSourceInitialized(HwndSource hwndSource)
         {
@@ -358,6 +399,8 @@ namespace WinCopies.GUI.Windows
             if (PresentationSource.FromVisual(this) is HwndSource hwndSource)
 
                 OnSourceInitialized(hwndSource);
+
+            SetValue(IsSourceInitializedPropertyKey, true);
         }
 
         // todo: really needed?
@@ -378,11 +421,28 @@ namespace WinCopies.GUI.Windows
 
         protected virtual bool OnSystemCommandMessage(IntPtr wParam)
         {
-            if (Microsoft.WindowsAPICodePack.Win32Native.Shell.DesktopWindowManager.DesktopWindowManager.GetSystemCommandWParam(wParam) == (int)SystemCommand.ContextHelp)
+            if (GetSystemCommandWParam(wParam) == (int)SystemCommand.ContextHelp)
             {
                 OnHelpButtonClick();
 
                 return true;
+            }
+
+            else if (TitleBarMenuItems != null)
+            {
+                int menuId = LOWORD(wParam);
+
+                var menuItems = (System.Collections.Generic.IEnumerable<TitleBarMenuItem>)TitleBarMenuItems;
+
+                foreach (var menuItem in menuItems)
+                {
+                    if (menuItem.Id == menuId && menuItem.IsEnabled)
+                    {
+                        _ = menuItem.Command?.TryExecute(menuItem.CommandParameter, menuItem.CommandTarget);
+
+                        break;
+                    }
+                }
             }
 
             return false;
@@ -440,7 +500,7 @@ namespace WinCopies.GUI.Windows
         {
             if (((ushort)msg).BetweenA((ushort)WindowMessage.XBUTTONDOWN, (ushort)WindowMessage.XBUTTONDBLCLK, true, true))
 
-                handled = OnXButtonClick((XButton)Temp.Temp.HIWORD(wParam), (XButtonClick)((ushort)msg - ((ushort)WindowMessage.XBUTTONDOWN - 1)));
+                handled = OnXButtonClick((XButton)HIWORD(wParam), (XButtonClick)((ushort)msg - ((ushort)WindowMessage.XBUTTONDOWN - 1)));
 
             else
 

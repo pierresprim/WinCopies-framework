@@ -23,18 +23,68 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
+
 using static Microsoft.WindowsAPICodePack.NativeAPI.Consts.DllNames;
 
 using static System.Runtime.InteropServices.UnmanagedType;
 
 namespace WinCopies.Temp
 {
+    public enum MenuItemInfoFlags : uint
+    {
+        /// <summary>
+        /// Retrieves or sets the <see cref="MenuItemInfo.fState"/> member.
+        /// </summary>
+        State = 0x00000001,
+
+        /// <summary>
+        /// Retrieves or sets the <see cref="MenuItemInfo.wID"/> member.
+        /// </summary>
+        ID = 0x00000002,
+
+        /// <summary>
+        /// Retrieves or sets the <see cref="MenuItemInfo.hSubMenu"/> member.
+        /// </summary>
+        SubMenu = 0x00000004,
+
+        /// <summary>
+        /// Retrieves or sets the <see cref="MenuItemInfo.hbmpChecked"/> and <see cref="MenuItemInfo.hbmpUnchecked"/> members.
+        /// </summary>
+        CheckMarks = 0x00000008,
+
+        /// <summary>
+        /// <para>Retrieves or sets the <see cref="MenuItemInfo.fType"/> and <see cref="MenuItemInfo.dwTypeData"/> members.</para>
+        /// <para>MIIM_TYPE is replaced by <see cref="Bitmap"/>, <see cref="FType"/>, and <see cref="String"/>.</para>
+        /// </summary>
+        Type = 0x00000010,
+
+        /// <summary>
+        /// Retrieves or sets the <see cref="MenuItemInfo.dwItemData"/> member.
+        /// </summary>
+        Data = 0x00000020,
+
+        /// <summary>
+        /// Retrieves or sets the <see cref="MenuItemInfo.dwTypeData"/> member.
+        /// </summary>
+        String = 0x00000040,
+
+        /// <summary>
+        /// Retrieves or sets the <see cref="MenuItemInfo.hbmpItem"/> member.
+        /// </summary>
+        Bitmap = 0x00000080,
+
+        /// <summary>
+        /// Retrieves or sets the <see cref="MenuItemInfo.fType"/> member.
+        /// </summary>
+        FType = 0x00000100
+    }
+
     public struct MenuItemInfo
     {
         [MarshalAs(U4)]
         public uint cbSize;
         [MarshalAs(U4)]
-        public uint fMask;
+        public MenuItemInfoFlags fMask;
         [MarshalAs(U4)]
         public uint fType;         // used if MIIM_TYPE (4.0) or MIIM_FTYPE (>4.0)
         [MarshalAs(U4)]
@@ -79,7 +129,23 @@ namespace WinCopies.Temp
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool AppendMenuW([In] IntPtr hMenu, [In, MarshalAs(U4)] MenuFlags uFlags, [In] UIntPtr uIDNewItem, [In, MarshalAs(LPWStr)] string lpNewItem);
 
-        public static bool AppendMenuW(in IntPtr hMenu, in MenuFlags uFlags, in uint uIDNewItem, in string lpNewItem) => AppendMenuW(hMenu, uFlags, (UIntPtr) uIDNewItem, lpNewItem);
+        public static bool AppendMenuW(in IntPtr hMenu, in MenuFlags uFlags, in uint uIDNewItem, in string lpNewItem) => AppendMenuW(hMenu, uFlags, (UIntPtr)uIDNewItem, lpNewItem);
+
+        [DllImport(User32)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool EnableMenuItem([In] IntPtr hMenu, [In, MarshalAs(U4)] uint uIDEnableItem, [In, MarshalAs(U4)] MenuFlags uEnable);
+
+        public static bool EnableMenuItemByCommand(in IntPtr hMenu, in SystemMenuCommands uIDEnableItem, in MenuFlags uEnable) => EnableMenuItem(hMenu, (uint)uIDEnableItem, MenuFlags.ByCommand | uEnable);
+
+        public static bool EnableMenuItemByPosition(in IntPtr hMenu, in uint uIDEnableItem, in MenuFlags uEnable) => EnableMenuItem(hMenu, uIDEnableItem, MenuFlags.ByPosition | uEnable);
+
+        [DllImport(User32, SetLastError = true, CharSet = CharSet.Unicode, ExactSpelling = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool SetMenuItemInfoW([In] IntPtr hmenu, [In, MarshalAs(U4)] uint item, [In, MarshalAs(UnmanagedType.Bool)] bool fByPositon, [In] ref MenuItemInfo lpmii);
+
+        public static bool SetMenuItemInfo(IntPtr hmenu, uint item, ref MenuItemInfo lpmii) => SetMenuItemInfoW(hmenu, item, true, ref lpmii);
+
+        public static bool SetMenuItemInfo(IntPtr hmenu, SystemMenuCommands item, ref MenuItemInfo lpmii) => SetMenuItemInfoW(hmenu, (uint)item, false, ref lpmii);
 
         public static RoutedUICommand BrowseToParent { get; } = new RoutedUICommand("Browse to parent", nameof(BrowseToParent), typeof(Temp), new InputGestureCollection() { new KeyGesture(Key.Up, ModifierKeys.Alt) });
 

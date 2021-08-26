@@ -30,6 +30,8 @@ namespace WinCopies.GUI.Samples
     /// </summary>
     public partial class MainWindow : WinCopies.GUI.Windows.Window
     {
+        private TitleBarMenuItem _menuItem;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -37,6 +39,37 @@ namespace WinCopies.GUI.Samples
             HelpButton = true;
 
             CloseButton = false;
+        }
+
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            base.OnSourceInitialized(e);
+
+            var menuItems = new TitleBarMenuItemQueue();
+
+            menuItems.Enqueue(_menuItem = new TitleBarMenuItem() { Header = "Menu 1", Command = new DelegateCommand(o => true, o => MessageBox.Show("You clicked on the menu item 1.")) });
+            menuItems.Enqueue(new TitleBarMenuItem()
+            {
+                Header = "Menu 2",
+                Command = new DelegateCommand(o => true, o =>
+{
+    _menuItem.IsEnabled = !_menuItem.IsEnabled;
+
+    _ = MessageBox.Show($"The menu item 1 has been {(_menuItem.IsEnabled ? "enabled" : "disabled")}.");
+})
+            });
+            menuItems.Enqueue(new TitleBarMenuItem()
+            {
+                Header = "Menu 3",
+                Command = new DelegateCommand(o => true, o =>
+                {
+                    _menuItem.Header = _menuItem.Header == "Menu 1" ? "Alternative Menu 1 Header" : "Menu 1";
+
+                    _ = MessageBox.Show("The menu item 1 header has been changed.");
+                })
+            });
+
+            TitleBarMenuItems = menuItems;
         }
 
         private void Window_HelpButtonClick(object sender, RoutedEventArgs e) => _ = MessageBox.Show($"The window is currently in help mode: { IsInHelpMode }.");

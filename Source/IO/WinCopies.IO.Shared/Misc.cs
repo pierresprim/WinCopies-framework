@@ -532,7 +532,7 @@ namespace WinCopies.IO
 
         public BrowsableObjectInfoBitmapSources(in T browsableObjectInfo) => _innerObject = browsableObjectInfo;
 
-        protected T GetValueIfNotDisposed<T>(in Func<T> func) => IsDisposed ? throw GetExceptionForDispose(false) : func();
+        protected TParam GetValueIfNotDisposed<TParam>(in Func<TParam> func) => IsDisposed ? throw GetExceptionForDispose(false) : func();
 
         protected virtual void Dispose(bool disposing)
         {
