@@ -29,6 +29,7 @@ using System.Windows.Input;
 using WinCopies.GUI.IO;
 using WinCopies.GUI.IO.ObjectModel;
 using WinCopies.GUI.IO.Process;
+using WinCopies.GUI.Windows;
 using WinCopies.IO.ObjectModel;
 using WinCopies.IO.Process;
 using WinCopies.Linq;
@@ -38,7 +39,7 @@ namespace WinCopies.GUI.Samples
     /// <summary>
     /// Interaction logic for ExplorerControlTest.xaml
     /// </summary>
-    public partial class ExplorerControlTest : WinCopies.GUI.Windows.Window
+    public partial class ExplorerControlTest : Windows.Window
     {
         public static IProcessPathCollectionFactory DefaultProcessPathCollectionFactory { get; } = new ProcessPathCollectionFactory();
 
@@ -59,7 +60,7 @@ namespace WinCopies.GUI.Samples
 
         public IExplorerControlBrowsableObjectInfoViewModel SelectedItem { get => (IExplorerControlBrowsableObjectInfoViewModel)GetValue(SelectedItemProperty); set => SetValue(SelectedItemProperty, value); }
 
-        static ExplorerControlTest() => WinCopies.GUI.Shell.ObjectModel.BrowsableObjectInfo.RegisterDefaultSelectors();
+        static ExplorerControlTest() => Shell.ObjectModel.BrowsableObjectInfo.RegisterDefaultSelectors();
 
         public ExplorerControlTest()
         {
@@ -82,6 +83,19 @@ namespace WinCopies.GUI.Samples
             addCommandBinding(Commands.ApplicationCommands.Empty, () => getProcessFactory().Clearing);
 
             addCommandBinding(Commands.ApplicationCommands.DeletePermanently, () => getProcessFactory().Deletion);
+        }
+
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            base.OnSourceInitialized(e);
+
+            var menuItems = new TitleBarMenuItemQueue();
+
+            menuItems.Enqueue(new TitleBarMenuItem() { Header = "New tab", Command = Commands.ApplicationCommands.NewTab });
+
+            menuItems.Enqueue(new TitleBarMenuItem() { Header = "Close tab", Command = Commands.ApplicationCommands.CloseTab, CommandParameter = SelectedItem });
+
+            TitleBarMenuItems = menuItems;
         }
 
         private IEnumerable<IBrowsableObjectInfo> GetEnumerable() => SelectedItem.Path.Items.WhereSelect(item => item.IsSelected, item => item.Model);
@@ -163,7 +177,7 @@ namespace WinCopies.GUI.Samples
 
         private static void AddProcess(in IProcessParameters parameters)
         {
-            IProcess result = new Process(WinCopies.IO.ObjectModel.BrowsableObjectInfo.DefaultProcessSelectorDictionary.Select(new ProcessFactorySelectorDictionaryParameters(parameters, DefaultProcessPathCollectionFactory)));
+            IProcess result = new Process(BrowsableObjectInfo.DefaultProcessSelectorDictionary.Select(new ProcessFactorySelectorDictionaryParameters(parameters, DefaultProcessPathCollectionFactory)));
 
             ((ProcessManager<IProcess>)ProcessWindow.Content).Processes.Add(result);
 

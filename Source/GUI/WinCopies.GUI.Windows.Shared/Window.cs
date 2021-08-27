@@ -80,13 +80,49 @@ namespace WinCopies.GUI.Windows
 
         public bool IsEnabled { get => _isEnabled; set => UpdateValue(ref _isEnabled, value, nameof(IsEnabled)); }
 
-        public ICommand Command { get => _command; set => UpdateValue(ref _command, value, nameof(Command)); }
+        public ICommand Command
+        {
+            get => _command;
+
+            set
+            {
+                ICommand oldValue = _command;
+
+#if WinCopies4
+                if (
+#endif
+                UpdateValue(ref _command, value, nameof(Command))
+#if WinCopies4
+                    )
+#else
+                    ;
+
+                if (oldValue != value)
+#endif
+                    OnCommandChanged(oldValue);
+            }
+        }
 
         public object CommandParameter { get => _commandParameter; set => UpdateValue(ref _commandParameter, value, nameof(CommandParameter)); }
 
         public IInputElement CommandTarget { get => _commandTarget; set => UpdateValue(ref _commandTarget, value, nameof(CommandTarget)); }
 
         public bool IsDisposed => Command == null;
+
+        protected virtual void OnCommandChanged(ICommand oldValue)
+        {
+            void onCommandCanExecuteChanged(object sender, EventArgs e) => OnCommandCanExecuteChanged(e);
+
+            if (oldValue != null)
+
+                oldValue.CanExecuteChanged -= onCommandCanExecuteChanged;
+
+            if (_command != null)
+
+                _command.CanExecuteChanged += onCommandCanExecuteChanged;
+        }
+
+        protected virtual void OnCommandCanExecuteChanged(EventArgs e) => IsEnabled = _command.CanExecute(_commandParameter, _commandTarget);
 
         protected virtual void Dispose(bool disposing)
         {
