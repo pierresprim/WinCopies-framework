@@ -7,10 +7,10 @@
     <TargetPlatformIdentifier>windows</TargetPlatformIdentifier>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>WinCopies.Console.snk</AssemblyOriginatorKeyFile>
-    <VersionPrefix>3.0</VersionPrefix>
+    <VersionPrefix>3.1</VersionPrefix>
     <VersionSuffix>preview</VersionSuffix>
-    <AssemblyVersion>3.0</AssemblyVersion>
-    <FileVersion>3.0</FileVersion>
+    <AssemblyVersion>3.1</AssemblyVersion>
+    <FileVersion>3.1</FileVersion>
     <PackageTags>WinCopies, Console</PackageTags>
     <DocumentationFile>WinCopies.Console.xml</DocumentationFile>
     </PropertyGroup>

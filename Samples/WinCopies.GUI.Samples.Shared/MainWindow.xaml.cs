@@ -28,7 +28,7 @@ namespace WinCopies.GUI.Samples
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : WinCopies.GUI.Windows.Window
+    public partial class MainWindow : Windows.Window
     {
         private TitleBarMenuItem _menuItem;
 
@@ -48,8 +48,8 @@ namespace WinCopies.GUI.Samples
             var menuItems = new TitleBarMenuItemQueue();
 
             menuItems.Enqueue(_menuItem = new TitleBarMenuItem() { Header = "Menu 1" });
-            
-            _menuItem.Click+=(object sender, EventArgs _e)=>  MessageBox.Show("You clicked on the menu item 1.");
+
+            _menuItem.Click += (object sender, EventArgs _e) => MessageBox.Show("You clicked on the menu item 1.");
 
             menuItems.Enqueue(new TitleBarMenuItem()
             {
@@ -61,6 +61,7 @@ namespace WinCopies.GUI.Samples
     _ = MessageBox.Show($"The menu item 1 has been {(_menuItem.IsEnabled ? "enabled" : "disabled")}.");
 })
             });
+
             menuItems.Enqueue(new TitleBarMenuItem()
             {
                 Header = "Menu 3",
