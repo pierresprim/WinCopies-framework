@@ -173,11 +173,11 @@ namespace WinCopies.GUI.Controls
 
         public NavigationButton()
         {
-            _ = CommandBindings.Add(new CommandBinding(NavigationCommands.BrowseBack, (object sender, ExecutedRoutedEventArgs e) => OnBrowseBack(e), (object sender, CanExecuteRoutedEventArgs e) => OnCanBrowseBack(e)));
+            _ = CommandBindings.Add(new CommandBinding(System.Windows.Input.NavigationCommands.BrowseBack, (object sender, ExecutedRoutedEventArgs e) => OnBrowseBack(e), (object sender, CanExecuteRoutedEventArgs e) => OnCanBrowseBack(e)));
 
-            _ = CommandBindings.Add(new CommandBinding(NavigationCommands.BrowseForward, (object sender, ExecutedRoutedEventArgs e) => OnBrowseForward(e), (object sender, CanExecuteRoutedEventArgs e) => OnCanBrowseForward(e)));
+            _ = CommandBindings.Add(new CommandBinding(System.Windows.Input.NavigationCommands.BrowseForward, (object sender, ExecutedRoutedEventArgs e) => OnBrowseForward(e), (object sender, CanExecuteRoutedEventArgs e) => OnCanBrowseForward(e)));
 
-            _ = CommandBindings.Add(new CommandBinding(NavigationCommands.GoToPage, (object sender, ExecutedRoutedEventArgs e) => OnGoToPage(e), (object sender, CanExecuteRoutedEventArgs e) => OnCanGoToPage(e)));
+            _ = CommandBindings.Add(new CommandBinding(System.Windows.Input.NavigationCommands.GoToPage, (object sender, ExecutedRoutedEventArgs e) => OnGoToPage(e), (object sender, CanExecuteRoutedEventArgs e) => OnCanGoToPage(e)));
         }
 
         protected virtual void OnCanBrowseBack(CanExecuteRoutedEventArgs e)

@@ -23,6 +23,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Dialogs\DialogWindow.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FlowDirectionToHorizontalAlignment.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ResourcesHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TitleBarMenuItem.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Window.cs" />
   </ItemGroup>
 </Project>

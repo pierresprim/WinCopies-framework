@@ -120,7 +120,7 @@ namespace WinCopies.GUI.IO
                         i++;
             }
 
-            protected override void UpdateValue<T>(ref T value, in T newValue, in string propertyName)
+            protected override bool UpdateValue<T>(ref T value, in T newValue, in string propertyName)
             {
 #if CS8
                 static
@@ -162,7 +162,7 @@ namespace WinCopies.GUI.IO
                         break;
                 }
 
-                base.UpdateValue(ref value, newValue, propertyName);
+                return base.UpdateValue(ref value, newValue, propertyName);
             }
 
             private void AddEvents(in ObservableCollection<TItems> items)

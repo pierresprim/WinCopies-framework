@@ -47,7 +47,10 @@ namespace WinCopies.GUI.Samples
 
             var menuItems = new TitleBarMenuItemQueue();
 
-            menuItems.Enqueue(_menuItem = new TitleBarMenuItem() { Header = "Menu 1", Command = new DelegateCommand(o => true, o => MessageBox.Show("You clicked on the menu item 1.")) });
+            menuItems.Enqueue(_menuItem = new TitleBarMenuItem() { Header = "Menu 1" });
+            
+            _menuItem.Click+=(object sender, EventArgs _e)=>  MessageBox.Show("You clicked on the menu item 1.");
+
             menuItems.Enqueue(new TitleBarMenuItem()
             {
                 Header = "Menu 2",

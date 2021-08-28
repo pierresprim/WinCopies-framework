@@ -41,14 +41,13 @@ namespace WinCopies.IO.Process
 #if !CS9
             EnumerableQueueCollection<T>
 #endif
-            (new QueueCollection<IEnumerableQueue<T>, T>(
-                new Enumerable<string>(
-                    () => enumerator
-                    ).Select(
-                        path => path.EndsWith(":\\") || path.EndsWith(":\\\\")
-                                ? converter(new PathTypes<IPathInfo>.RootPath(path, true))
-                                : converter(new PathTypes<IPathInfo>.PathInfo(System.IO.Path.GetFileName(path), sourcePath)))
-                    .ToEnumerableQueue()));
+            (new Enumerable<string>(
+                () => enumerator
+                ).Select(
+                    path => path.EndsWith(":\\") || path.EndsWith(":\\\\")
+                        ? converter(new PathTypes<IPathInfo>.RootPath(path, true))
+                        : converter(new PathTypes<IPathInfo>.PathInfo(System.IO.Path.GetFileName(path), sourcePath)))
+                    .ToEnumerableQueue());
 
         public static IRecursiveEnumerable<T> GetDefaultEnumerable(in T path, in RecursiveEnumerationOrder recursiveEnumerationOrder, in Func<PathTypes<IPathInfo>.PathInfo, T> func) => new RecursivelyEnumerablePath<T>(path, null, null
 #if CS8

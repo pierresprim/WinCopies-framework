@@ -41,9 +41,26 @@ namespace WinCopies.GUI.Samples
     /// </summary>
     public partial class ExplorerControlTest : Windows.Window
     {
+        private static Windows.Window _processWindow;
+
         public static IProcessPathCollectionFactory DefaultProcessPathCollectionFactory { get; } = new ProcessPathCollectionFactory();
 
         public static WinCopies.IO.ClientVersion ClientVersion { get; } = GetClientVersion();
+
+        public static Windows.Window ProcessWindow
+        {
+            get
+            {
+                if (_processWindow == null)
+                {
+                    _processWindow = new Windows.Window() { ContentTemplateSelector = new InterfaceDataTemplateSelector(), Content = new ProcessManager<IProcess>() { Processes = new ObservableCollection<IProcess>() } };
+
+                    _processWindow.Show();
+                }
+
+                return _processWindow;
+            }
+        }
 
         public static readonly DependencyProperty ItemsProperty = DependencyProperty.Register(nameof(Items), typeof(ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel>), typeof(ExplorerControlTest), new PropertyMetadata(null, (DependencyObject d, DependencyPropertyChangedEventArgs e) =>
         {
@@ -115,23 +132,6 @@ namespace WinCopies.GUI.Samples
             else
 
                 AddProcess(((IDirectProcessFactoryProcessInfo)processInfo).TryGetProcessParameters(GetEnumerable()));
-        }
-
-        private static Windows.Window _processWindow;
-
-        public static Windows.Window ProcessWindow
-        {
-            get
-            {
-                if (_processWindow == null)
-                {
-                    _processWindow = new Windows.Window() { ContentTemplateSelector = new InterfaceDataTemplateSelector(), Content = new ProcessManager<IProcess>() { Processes = new ObservableCollection<IProcess>() } };
-
-                    _processWindow.Show();
-                }
-
-                return _processWindow;
-            }
         }
 
         private void Command_CanExecute(object sender, CanExecuteRoutedEventArgs e)

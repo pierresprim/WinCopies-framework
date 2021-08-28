@@ -9,7 +9,6 @@
     <Import_RootNamespace>WinCopies.Util.Temp.Shared</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)EnumerableQueueCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Temp.cs" />
   </ItemGroup>
 </Project>

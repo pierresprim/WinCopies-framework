@@ -16,8 +16,7 @@
     xmlns:util="clr-namespace:WinCopies;assembly=WinCopies.Util.Desktop"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:utilCommands="clr-namespace:WinCopies.Util.Commands.Primitives;assembly=WinCopies.Util"
-    xmlns:i="clr-namespace:Microsoft.Xaml.Behaviors;assembly=Microsoft.Xaml.Behaviors"
-    xmlns:temp="clr-namespace:WinCopies.Temp;assembly=WinCopies.Util.Temp">
+    xmlns:i="clr-namespace:Microsoft.Xaml.Behaviors;assembly=Microsoft.Xaml.Behaviors">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/wincopies.gui;component/Themes/Generic.xaml" />
         <ResourceDictionary Source="pack://application:,,,/wincopies.gui.templates;component/Themes/Generic.xaml" />
@@ -158,7 +157,7 @@
                             </Style>
                         </controls:NavigationButton.GoForwardButtonStyle>
                     </controls:NavigationButton>
-                    <Button Content="{x:Static icons:Resources.arrow_up}" Command="{x:Static temp:Temp.BrowseToParent}" />
+                    <Button Content="{x:Static icons:Resources.arrow_up}" Command="{x:Static commands:NavigationCommands.BrowseToParent}" />
                 </StackPanel>
                 <dotNetFix:TextBox Grid.Column="1">
                     <TextBox.Style>

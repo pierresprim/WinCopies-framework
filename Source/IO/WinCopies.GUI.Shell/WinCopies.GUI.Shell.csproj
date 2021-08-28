@@ -8,19 +8,19 @@
     <UseWPF>true</UseWPF>
     <DocumentationFile>WinCopies.GUI.Shell.xml</DocumentationFile>
     <DefineConstants>WinCopies2;WinCopies3;ProcessesWork;$(DefineConstants)</DefineConstants>
-    <VersionPrefix>3.6</VersionPrefix>
-    <VersionSuffix>preview</VersionSuffix>
-    <AssemblyVersion>3.6</AssemblyVersion>
-    <FileVersion>3.6</FileVersion>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>WinCopies.GUI.Shell.snk</AssemblyOriginatorKeyFile>
+    <VersionPrefix>3.7</VersionPrefix>
+    <VersionSuffix>preview</VersionSuffix>
+    <AssemblyVersion>3.7</AssemblyVersion>
+    <FileVersion>3.7</FileVersion>
   </PropertyGroup>
 
   <Import Project="..\WinCopies.GUI.Shell.Shared\WinCopies.GUI.Shell.Shared.projitems" Label="Shared" />
 
   <ItemGroup>
-    <PackageReference Include="WinCopies.Util" Version="3.12-preview" />
-    <PackageReference Include="WinCopies.Util.Desktop" Version="3.12-preview" />
+    <PackageReference Include="WinCopies.Util" Version="3.13-preview" />
+    <PackageReference Include="WinCopies.Util.Desktop" Version="3.13-preview" />
 
     <PackageReference Include="Squid-Box.SevenZipSharp" Version="1.2.231" />
   </ItemGroup>

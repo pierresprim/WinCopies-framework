@@ -17,12 +17,11 @@
 
 using Microsoft.WindowsAPICodePack;
 using Microsoft.WindowsAPICodePack.Shell;
-using Microsoft.WindowsAPICodePack.Win32Native;
+using Microsoft.WindowsAPICodePack.Win32Native.Menus;
 using Microsoft.WindowsAPICodePack.Win32Native.Shell.DesktopWindowManager;
 
 using System;
 using System.Collections.Specialized;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Windows;
@@ -30,10 +29,8 @@ using System.Windows.Input;
 using System.Windows.Interop;
 
 using WinCopies.Collections;
-using WinCopies.Collections.DotNetFix.Generic;
-using WinCopies.Commands;
+using WinCopies.Desktop;
 using WinCopies.Linq;
-using WinCopies.Temp;
 using WinCopies.Util.Data;
 
 using static Microsoft.WindowsAPICodePack.Shell.DesktopWindowManager;
@@ -42,176 +39,11 @@ using static Microsoft.WindowsAPICodePack.Win32Native.Shell.DesktopWindowManager
 
 using static WinCopies.Delegates;
 using static WinCopies.Util.Desktop.UtilHelpers;
-using static WinCopies.ThrowHelper;
-using static WinCopies.Temp.Temp;
-using WinCopies.Desktop;
+using static Microsoft.WindowsAPICodePack.Win32Native.InteropTools;
+using WinCopies.Util;
 
 namespace WinCopies.GUI.Windows
 {
-    public enum XButton : sbyte
-    {
-        One = 1,
-
-        Two = 2
-    }
-
-    public enum XButtonClick : sbyte
-    {
-        Down = 1,
-
-        Up = 2,
-
-        DoubleClick = 3
-    }
-
-    public class TitleBarMenuItem : ViewModelBase, ICommandSource, DotNetFix.IDisposable
-    {
-        private ICommand _command;
-        private object _commandParameter;
-        private IInputElement _commandTarget;
-        private string _header;
-        private bool _isEnabled = true;
-
-        public uint Id { get; internal set; }
-
-        public TitleBarMenuItemQueue Collection { get; internal set; }
-
-        public string Header { get => _header; set => UpdateValue(ref _header, value, nameof(Header)); }
-
-        public bool IsEnabled { get => _isEnabled; set => UpdateValue(ref _isEnabled, value, nameof(IsEnabled)); }
-
-        public ICommand Command
-        {
-            get => _command;
-
-            set
-            {
-                ICommand oldValue = _command;
-
-#if WinCopies4
-                if (
-#endif
-                UpdateValue(ref _command, value, nameof(Command))
-#if WinCopies4
-                    )
-#else
-                    ;
-
-                if (oldValue != value)
-#endif
-                    OnCommandChanged(oldValue);
-            }
-        }
-
-        public object CommandParameter { get => _commandParameter; set => UpdateValue(ref _commandParameter, value, nameof(CommandParameter)); }
-
-        public IInputElement CommandTarget { get => _commandTarget; set => UpdateValue(ref _commandTarget, value, nameof(CommandTarget)); }
-
-        public bool IsDisposed => Command == null;
-
-        protected virtual void OnCommandChanged(ICommand oldValue)
-        {
-            void onCommandCanExecuteChanged(object sender, EventArgs e) => OnCommandCanExecuteChanged(e);
-
-            if (oldValue != null)
-
-                oldValue.CanExecuteChanged -= onCommandCanExecuteChanged;
-
-            if (_command != null)
-
-                _command.CanExecuteChanged += onCommandCanExecuteChanged;
-        }
-
-        protected virtual void OnCommandCanExecuteChanged(EventArgs e) => IsEnabled = _command.CanExecute(_commandParameter, _commandTarget);
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (IsDisposed)
-
-                return;
-
-            if (disposing)
-            {
-                if (Collection == null)
-
-                    Id = 0u;
-
-                _command = null;
-                _commandParameter = null;
-                _commandTarget = null;
-            }
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-
-            GC.SuppressFinalize(this);
-        }
-    }
-
-    public class TitleBarMenuItemQueue : Collections.DotNetFix.Generic.TEMP.EnumerableQueueCollection<TitleBarMenuItem>
-    {
-        public uint LastId { get; private set; }
-
-        protected override void EnqueueItem(TitleBarMenuItem item)
-        {
-            ThrowIfNull(item, nameof(item));
-
-            if (item.Collection == null)
-            {
-                item.Collection = this;
-                item.Id = ++LastId;
-
-                base.EnqueueItem(item);
-
-                LastId = item.Id;
-            }
-
-            else
-
-                throw new ArgumentException("The given item is already in a collection.");
-        }
-
-        private static void ResetItem(in TitleBarMenuItem item)
-        {
-            item.Collection = null;
-            item.Id = 0u;
-        }
-
-        protected override bool TryDequeueItem(
-#if CS8
-            [MaybeNullWhen(false)]
-#endif
-            out TitleBarMenuItem result)
-        {
-            if (base.TryDequeueItem(out result))
-            {
-                ResetItem(result);
-
-                return true;
-            }
-
-            return false;
-        }
-
-        protected override TitleBarMenuItem DequeueItem()
-        {
-            TitleBarMenuItem item = base.DequeueItem();
-
-            ResetItem(item);
-
-            return item;
-        }
-
-        protected override void ClearItems()
-        {
-            while (((IUIntCountable)InnerQueue).Count > 0)
-
-                _ = DequeueItem();
-        }
-    }
-
     public class Window : System.Windows.Window
     {
         private static DependencyProperty Register<T>(in string propertyName) => Register<T, Window>(propertyName);
@@ -344,7 +176,7 @@ namespace WinCopies.GUI.Windows
 
                 item.Id = id;
 
-                _ = AppendMenuW(menu, MenuFlags.String, id, item.Header ?? (item.Command is RoutedCommand command ? command.Name : null));
+                _ = AppendMenu(menu, MenuFlags.String, id, item.Header ?? (item.Command is RoutedCommand command ? command.Name : null));
 
                 item.PropertyChanged += onPropertyChanged;
             }
@@ -362,7 +194,7 @@ namespace WinCopies.GUI.Windows
             {
                 item.PropertyChanged -= onPropertyChanged;
 
-                _ = DeleteMenu(menu, (SystemMenuCommands)item.Id, MenuFlags.ByCommand);
+                _ = DeleteMenu(menu, (SystemMenuCommands)item.Id);
             }
         }
 
@@ -470,11 +302,11 @@ namespace WinCopies.GUI.Windows
 
                 var menuItems = (System.Collections.Generic.IEnumerable<TitleBarMenuItem>)TitleBarMenuItems;
 
-                foreach (var menuItem in menuItems)
+                foreach (TitleBarMenuItem menuItem in menuItems)
                 {
                     if (menuItem.Id == menuId && menuItem.IsEnabled)
                     {
-                        _ = menuItem.Command?.TryExecute(menuItem.CommandParameter, menuItem.CommandTarget);
+                        menuItem.OnClick();
 
                         break;
                     }
@@ -534,7 +366,7 @@ namespace WinCopies.GUI.Windows
 
         protected virtual IntPtr OnSourceHook(IntPtr hwnd, WindowMessage msg, IntPtr wParam, IntPtr lParam, out bool handled)
         {
-            if (((ushort)msg).BetweenA((ushort)WindowMessage.XBUTTONDOWN, (ushort)WindowMessage.XBUTTONDBLCLK, true, true))
+            if (((ushort)msg).Between((ushort)WindowMessage.XBUTTONDOWN, (ushort)WindowMessage.XBUTTONDBLCLK, true, true))
 
                 handled = OnXButtonClick((XButton)HIWORD(wParam), (XButtonClick)((ushort)msg - ((ushort)WindowMessage.XBUTTONDOWN - 1)));
 

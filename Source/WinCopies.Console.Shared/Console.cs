@@ -324,7 +324,7 @@ namespace WinCopies.Console
             WindowWidth = cursorPosition.Left;
 
             //DeleteMenu(GetSystemMenu(GetConsoleWindow(), false), SC_MINIMIZE, MF_BYCOMMAND);
-            Microsoft.WindowsAPICodePack.Win32Native.Console.Console.DeleteConsoleMenu(new KeyValuePair<SystemMenuCommands, MenuFlags>(SystemMenuCommands.Maximize, MenuFlags.ByCommand), new KeyValuePair<SystemMenuCommands, MenuFlags>(SystemMenuCommands.Size, MenuFlags.ByCommand));
+            Microsoft.WindowsAPICodePack.Win32Native.Console.Console.DeleteConsoleMenu(SystemMenuCommands.Maximize, SystemMenuCommands.Size);
 
             //Console.WriteLine("Yes, its fixed!");
             //Console.ReadLine();

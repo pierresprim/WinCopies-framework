@@ -12,17 +12,21 @@
     <DocumentationFile>WinCopies.GUI.ViewModels.xml</DocumentationFile>
     <SignAssembly>true</SignAssembly>
     <DefineConstants>WinCopies2;WinCopies3;$(DefineConstants)</DefineConstants>
-    <VersionPrefix>3.6</VersionPrefix>
-    <VersionSuffix>preview</VersionSuffix>
-    <AssemblyVersion>3.6</AssemblyVersion>
-    <FileVersion>3.6</FileVersion>
     <AssemblyOriginatorKeyFile>WinCopies.GUI.ViewModels.snk</AssemblyOriginatorKeyFile>
+    <VersionPrefix>3.7</VersionPrefix>
+    <VersionSuffix>preview</VersionSuffix>
+    <AssemblyVersion>3.7</AssemblyVersion>
+    <FileVersion>3.7</FileVersion>
   </PropertyGroup>
 
   <Import Project="..\WinCopies.GUI.ViewModels.Shared\WinCopies.GUI.ViewModels.Shared.projitems" Label="Shared" />
 
   <ItemGroup>
     <ProjectReference Include="..\WinCopies.GUI.Models\WinCopies.GUI.Models.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WinCopies.Util.Desktop" Version="3.13-preview" />
   </ItemGroup>
 
   <ItemGroup>

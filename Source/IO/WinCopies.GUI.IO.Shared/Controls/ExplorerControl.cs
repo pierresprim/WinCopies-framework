@@ -173,7 +173,7 @@ namespace WinCopies.GUI.IO.Controls
         {
             AddHandler(System.Windows.Controls.Primitives.Selector.SelectionChangedEvent, new SelectionChangedEventHandler(ListView_SelectionChanged));
 
-            _ = CommandBindings.Add(new CommandBinding(Temp.Temp.BrowseToParent, (object sender, ExecutedRoutedEventArgs e) => { BrowseToParent?.Execute(null); e.Handled = true; }, (object sender, CanExecuteRoutedEventArgs e) => { e.CanExecute = BrowseToParent?.CanExecute(null) == true; e.Handled = true; }));
+            _ = CommandBindings.Add(new CommandBinding(WinCopies.Commands.NavigationCommands.BrowseToParent, (object sender, ExecutedRoutedEventArgs e) => { BrowseToParent?.Execute(null); e.Handled = true; }, (object sender, CanExecuteRoutedEventArgs e) => { e.CanExecute = BrowseToParent?.CanExecute(null) == true; e.Handled = true; }));
         }
 
         protected virtual void OnGoToPageCanExecute(CanExecuteRoutedEventArgs e)
