@@ -176,7 +176,11 @@ namespace WinCopies.GUI.Windows
 
                 item.Id = id;
 
-                _ = AppendMenu(menu, MenuFlags.String, id, item.Header ?? (item.Command is RoutedCommand command ? command.Name : null));
+                _ = AppendMenu(menu, MenuFlags.String, id, item.Header ?? (item.Command is RoutedUICommand command ? command.Text : null));
+
+                if (!item.IsEnabled)
+
+                    _ = EnableMenuItemByCommand(menu, (SystemMenuCommands)id, MenuFlags.Disabled);
 
                 item.PropertyChanged += onPropertyChanged;
             }

@@ -6,6 +6,10 @@ The WinCopies® software framework
 CHANGELOG
 ---------
 
+### 3.8-preview
+
+- Bug fixed when adding a title bar menu item: the menu item remained enabled even if its IsEnabled property is set to false.
+
 ### 3.7-preview
 - Add:
 	- TabControl style
