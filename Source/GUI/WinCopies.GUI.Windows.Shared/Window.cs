@@ -22,25 +22,19 @@ using Microsoft.WindowsAPICodePack.Win32Native.Shell.DesktopWindowManager;
 
 using System;
 using System.Collections.Specialized;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
-
-using WinCopies.Collections;
-using WinCopies.Desktop;
 using WinCopies.Linq;
-using WinCopies.Util.Data;
 
 using static Microsoft.WindowsAPICodePack.Shell.DesktopWindowManager;
+using static Microsoft.WindowsAPICodePack.Win32Native.InteropTools;
 using static Microsoft.WindowsAPICodePack.Win32Native.Menus.Menus;
 using static Microsoft.WindowsAPICodePack.Win32Native.Shell.DesktopWindowManager.DesktopWindowManager;
 
 using static WinCopies.Delegates;
 using static WinCopies.Util.Desktop.UtilHelpers;
-using static Microsoft.WindowsAPICodePack.Win32Native.InteropTools;
-using WinCopies.Util;
 
 namespace WinCopies.GUI.Windows
 {
@@ -56,7 +50,7 @@ namespace WinCopies.GUI.Windows
 
         public static readonly DependencyProperty IsSourceInitializedProperty = IsSourceInitializedPropertyKey.DependencyProperty;
 
-        public bool IsSourceInitialized { get => (bool)GetValue(IsSourceInitializedProperty); }
+        public bool IsSourceInitialized => (bool)GetValue(IsSourceInitializedProperty);
 
         public static readonly DependencyProperty CloseButtonProperty = Register<bool>(nameof(CloseButton), new PropertyMetadata(true, (DependencyObject d, DependencyPropertyChangedEventArgs e) => _ = (bool)e.NewValue ? EnableCloseMenuItem((Window)d) : DisableCloseMenuItem((Window)d)));
 
