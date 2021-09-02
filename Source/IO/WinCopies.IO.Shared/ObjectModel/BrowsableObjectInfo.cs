@@ -18,14 +18,9 @@
 
 using System;
 using System.Collections;
-using System.Drawing;
 using System.Reflection;
-using System.Windows;
-using System.Windows.Interop;
-using System.Windows.Media.Imaging;
 
 using WinCopies.Collections.Generic;
-using WinCopies.GUI.Drawing;
 using WinCopies.IO.ObjectModel;
 using WinCopies.IO.Process;
 using WinCopies.IO.Process.ObjectModel;
@@ -79,8 +74,11 @@ namespace WinCopies.IO.ObjectModel
         #endregion
 
         private BrowsableObjectInfoCallbackQueue _callbackQueue;
+        private IBitmapSourcesLinker _bitmapSources;
 
         #region Properties
+        IBitmapSources IBrowsableObjectInfo.BitmapSources => BitmapSources;
+
         #region Static Properties
         public static ISelectorDictionary<ProcessFactorySelectorDictionaryParameters, IProcess> DefaultProcessSelectorDictionary { get; } = new DefaultNullableValueSelectorDictionary<ProcessFactorySelectorDictionaryParameters, IProcess>();
 
@@ -93,7 +91,7 @@ namespace WinCopies.IO.ObjectModel
         #endregion
 
         #region Protected Properties
-        protected abstract IBrowsableObjectInfoBitmapSources BitmapSourcesOverride { get; }
+        protected abstract IBitmapSourceProvider BitmapSourceProviderOverride { get; }
 
         protected abstract IBrowsabilityOptions BrowsabilityOverride { get; }
 
@@ -121,7 +119,9 @@ namespace WinCopies.IO.ObjectModel
         #endregion
 
         #region Public Properties
-        public IBrowsableObjectInfoBitmapSources BitmapSources => GetValueIfNotDisposed(() => BitmapSourcesOverride);
+        public IBitmapSourceProvider BitmapSourceProvider => GetValueIfNotDisposed(() => BitmapSourceProviderOverride);
+
+        public IBitmapSourcesLinker BitmapSources => GetValueIfNotDisposed(() => _bitmapSources);
 
         public IBrowsabilityOptions Browsability => GetValueIfNotDisposed(() => BrowsabilityOverride);
 
@@ -158,14 +158,17 @@ namespace WinCopies.IO.ObjectModel
         #endregion
         #endregion
 
-        #region Constructors
         // /// <param name="clientVersion">The <see cref="ClientVersion"/> that will be used to initialize new <see cref="PortableDeviceInfo"/>s and <see cref="PortableDeviceObjectInfo"/>s.</param>
         /// <summary>
         /// Initializes a new instance of the <see cref="BrowsableObjectInfo"/> class.
         /// </summary>
         /// <param name="path">The path of the new item.</param>
-        protected BrowsableObjectInfo(in string path, in ClientVersion clientVersion) : base(path) => ClientVersion = clientVersion;
-        #endregion
+        protected BrowsableObjectInfo(in string path, in ClientVersion clientVersion) : base(path)
+        {
+            ClientVersion = clientVersion;
+
+            _bitmapSources = new BitmapSourcesLinker(BitmapSourceProviderOverride);
+        }
 
         #region Methods
         #region Static Methods
@@ -274,24 +277,23 @@ namespace WinCopies.IO.ObjectModel
         /// </summary>
         /// <seealso cref="Dispose"/>
         /// <seealso cref="DisposeManaged"/>
-        protected virtual void DisposeUnmanaged()
-        {
-            //if (ItemsLoader != null)
+        protected virtual void DisposeUnmanaged() => _bitmapSources = null;
 
-            //{
+        //if (ItemsLoader != null)
 
-            //    if (ItemsLoader.IsBusy)
+        //{
 
-            //        ItemsLoader.Cancel();
+        //    if (ItemsLoader.IsBusy)
 
-            //    // ItemsLoader.Path = null;
+        //        ItemsLoader.Cancel();
 
-            //}
+        //    // ItemsLoader.Path = null;
 
-            //if (disposing)
+        //}
 
-            //    _parent = null;
-        }
+        //if (disposing)
+
+        //    _parent = null;
         #endregion
         #endregion
 

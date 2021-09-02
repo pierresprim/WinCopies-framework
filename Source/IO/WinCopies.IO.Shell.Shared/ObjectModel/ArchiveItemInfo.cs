@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-using Microsoft.WindowsAPICodePack.PortableDevices;
 using Microsoft.WindowsAPICodePack.Win32Native.Shell;
 
 using SevenZip;
@@ -31,6 +30,7 @@ using WinCopies.IO.Enumeration;
 using WinCopies.IO.Process;
 using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Selectors;
+using WinCopies.IO.Shell;
 using WinCopies.PropertySystem;
 
 using static WinCopies.
@@ -48,36 +48,36 @@ namespace WinCopies.IO.ObjectModel
     /// </summary>
     public abstract class ArchiveItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : ArchiveItemInfoProvider<TObjectProperties, ArchiveFileInfo?, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IArchiveItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IFileSystemObjectInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
     {
-        protected class BrowsableObjectInfoBitmapSources : BrowsableObjectInfoBitmapSources<IArchiveItemInfo>
+        protected class BrowsableObjectInfoBitmapSources : BitmapSources<IArchiveItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>>
         {
             /// <summary>
             /// Gets the small <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
             /// </summary>
-            protected override BitmapSource SmallBitmapSourceOverride => InnerObject.TryGetBitmapSource(SmallIconSize);
+            protected override BitmapSource SmallOverride => InnerObject.TryGetBitmapSource(SmallIconSize);
 
             /// <summary>
             /// Gets the medium <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
             /// </summary>
-            protected override BitmapSource MediumBitmapSourceOverride => InnerObject.TryGetBitmapSource(MediumIconSize);
+            protected override BitmapSource MediumOverride => InnerObject.TryGetBitmapSource(MediumIconSize);
 
             /// <summary>
             /// Gets the large <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
             /// </summary>
-            protected override BitmapSource LargeBitmapSourceOverride => InnerObject.TryGetBitmapSource(LargeIconSize);
+            protected override BitmapSource LargeOverride => InnerObject.TryGetBitmapSource(LargeIconSize);
 
             /// <summary>
             /// Gets the extra large <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
             /// </summary>
-            protected override BitmapSource ExtraLargeBitmapSourceOverride => InnerObject.TryGetBitmapSource(ExtraLargeIconSize);
+            protected override BitmapSource ExtraLargeOverride => InnerObject.TryGetBitmapSource(ExtraLargeIconSize);
 
-            public BrowsableObjectInfoBitmapSources(in IArchiveItemInfo archiveItemInfo) : base(archiveItemInfo) { /* Left empty. */ }
+            public BrowsableObjectInfoBitmapSources(in IArchiveItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> archiveItemInfo) : base(archiveItemInfo) { /* Left empty. */ }
         }
 
         #region Fields
         private ArchiveFileInfo? _innerObject;
         private IBrowsableObjectInfo _parent;
         private IBrowsabilityOptions _browsability;
-        private IBrowsableObjectInfoBitmapSources _bitmapSources;
+        private IBitmapSourceProvider _bitmapSourceProvider;
         #endregion
 
         #region Properties
@@ -87,48 +87,83 @@ namespace WinCopies.IO.ObjectModel
         /// </summary>
         public override IShellObjectInfoBase ArchiveShellObject { get; }
 
-        protected override IBrowsableObjectInfoBitmapSources BitmapSourcesOverride => _bitmapSources;
+        protected override IBitmapSourceProvider BitmapSourceProviderOverride => _bitmapSourceProvider
+#if CS8
+            ??=
+#else
+            ?? (_bitmapSourceProvider =
+#endif
+            new BitmapSourceProviderCommon2(this, new BrowsableObjectInfoBitmapSources(this), true)
+#if !CS8
+            )
+#endif
+            ;
 
         protected override IBrowsabilityOptions BrowsabilityOverride
-#if CS8
-                => _browsability ??= ObjectPropertiesGeneric.FileType switch
-                {
 #if CS9
-                    FileType.Folder or FileType.Drive => BrowsabilityOptions.BrowsableByDefault,// case FileType.Archive:
-#else
-                    FileType.Folder => BrowsabilityOptions.BrowsableByDefault,
-                    FileType.Drive => BrowsabilityOptions.BrowsableByDefault,
-#endif
-                    _ => BrowsabilityOptions.NotBrowsable
-                };
+            => _browsability ??=
 #else
         {
             get
             {
-                if (_browsability != null)
+                if (_browsability == null)
 
-                    return _browsability;
+                switch (
+#endif
 
-                switch (ObjectPropertiesGeneric.FileType)
+            ObjectPropertiesGeneric.FileType
+#if CS9
+                switch
+            {
+#else
+                )
+   
                 {
-                    case FileType.Folder:
-                    case FileType.Drive:
-                        // case FileType.Archive:
+                    case
+#endif
+                FileType.Folder
+#if CS9
+                    or
+#else
+                        :
 
-                        _browsability = BrowsabilityOptions.BrowsableByDefault;
+                    case
+#endif
+                    FileType.Drive
+#if CS9
+                    =>
+#else
+                        :
 
-                        break;
+                        _browsability =
+#endif
+                    BrowsabilityOptions.BrowsableByDefault
+#if CS9
+                ,
+#else
+                ;
 
-                    default:
+                break;
+#endif
+                // case FileType.Archive:
+#if CS9
+                _ =>
+#else
+                default:
 
-                        _browsability = BrowsabilityOptions.NotBrowsable;
+                    _browsability =
+#endif
+                BrowsabilityOptions.NotBrowsable
+#if !CS9
+                ;
 
-                        break;
-                }
-
+                break;
+#endif
+            };
+#if !CS9
                 return _browsability;
             }
-        }
+}
 #endif
 
         /// <summary>
@@ -223,7 +258,7 @@ namespace WinCopies.IO.ObjectModel
         {
             _parent = null;
             _browsability = null;
-            _bitmapSources = null;
+            _bitmapSourceProvider = null;
 
             base.DisposeUnmanaged();
         }

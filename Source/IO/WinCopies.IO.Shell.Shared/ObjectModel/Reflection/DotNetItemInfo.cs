@@ -26,20 +26,21 @@ using WinCopies.IO.Reflection.PropertySystem;
 using static WinCopies.UtilHelpers;
 using static WinCopies.ThrowHelper;
 using static WinCopies.IO.Shell.Resources.ExceptionMessages;
+using WinCopies.IO.Shell;
 
 namespace WinCopies.IO.ObjectModel.Reflection
 {
     public abstract class DotNetItemInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : BrowsableObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IDotNetItemInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IDotNetItemInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
     {
-        protected class BrowsableObjectInfoBitmapSources : BrowsableObjectInfoBitmapSources<DotNetItemInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>>
+        protected class BrowsableObjectInfoBitmapSources : BitmapSources<DotNetItemInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>>
         {
-            protected sealed override BitmapSource SmallBitmapSourceOverride => InnerObject.TryGetBitmapSource(SmallIconSize);
+            protected sealed override BitmapSource SmallOverride => InnerObject.TryGetBitmapSource(SmallIconSize);
 
-            protected sealed override BitmapSource MediumBitmapSourceOverride => InnerObject.TryGetBitmapSource(MediumIconSize);
+            protected sealed override BitmapSource MediumOverride => InnerObject.TryGetBitmapSource(MediumIconSize);
 
-            protected sealed override BitmapSource LargeBitmapSourceOverride => InnerObject.TryGetBitmapSource(LargeIconSize);
+            protected sealed override BitmapSource LargeOverride => InnerObject.TryGetBitmapSource(LargeIconSize);
 
-            protected sealed override BitmapSource ExtraLargeBitmapSourceOverride => InnerObject.TryGetBitmapSource(ExtraLargeIconSize);
+            protected sealed override BitmapSource ExtraLargeOverride => InnerObject.TryGetBitmapSource(ExtraLargeIconSize);
 
             public BrowsableObjectInfoBitmapSources(in DotNetItemInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> dotNetItemInfo) : base(dotNetItemInfo) { /* Left empty. */ }
         }
@@ -47,7 +48,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
         private static ArrayBuilder<IBrowsableObjectInfo> _defaultRootItems;
         private IBrowsableObjectInfo _parent;
         private IDotNetAssemblyInfo _parentAssembly;
-        private IBrowsableObjectInfoBitmapSources _bitmapSources;
+        private IBitmapSourceProvider _bitmapSourceProvider;
 
         #region Properties
         //public override Predicate<TPredicateTypeParameter> RootItemsPredicate => item => false;
@@ -80,13 +81,13 @@ namespace WinCopies.IO.ObjectModel.Reflection
 
         protected sealed override bool IsRecursivelyBrowsableOverride => IsBrowsable;
 
-        protected override IBrowsableObjectInfoBitmapSources BitmapSourcesOverride => _bitmapSources
+        protected override IBitmapSourceProvider BitmapSourceProviderOverride => _bitmapSourceProvider
 #if CS8
             ??=
 #else
-            ?? (_bitmapSources =
+            ?? (_bitmapSourceProvider =
 #endif
-            new BrowsableObjectInfoBitmapSources(this)
+            new BitmapSourceProviderCommon2(this, new BrowsableObjectInfoBitmapSources(this), true)
 #if !CS8
             )
 #endif
@@ -133,7 +134,8 @@ namespace WinCopies.IO.ObjectModel.Reflection
             _parent = null;
             _parentAssembly = null;
 
-            _bitmapSources = null;
+            _bitmapSourceProvider.Dispose();
+            _bitmapSourceProvider = null;
 
             base.DisposeUnmanaged();
         }

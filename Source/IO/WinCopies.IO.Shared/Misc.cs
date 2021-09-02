@@ -16,6 +16,7 @@
 * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Reflection;
@@ -478,68 +479,135 @@ namespace WinCopies.IO
         }
     }
 
+    public interface IBitmapSourceProvider : WinCopies.DotNetFix.IDisposable
+    {
+        IBitmapSources Default { get; }
+
+        IBitmapSources Sources { get; }
+    }
+
+    public abstract class BitmapSourceProviderAbstract : IBitmapSourceProvider
+    {
+        protected abstract IBitmapSources DefaultOverride { get; }
+
+        protected abstract IBitmapSources SourcesOverride { get; }
+
+        public IBitmapSources Default => GetOrThrowIfDisposed(this, DefaultOverride);
+
+        public IBitmapSources Sources => GetOrThrowIfDisposed(this, SourcesOverride);
+
+        protected abstract bool DisposeBitmapSources { get; }
+
+        public bool IsDisposed { get; private set; }
+
+        protected virtual void DisposeManaged() => IsDisposed = true;
+
+        protected virtual void DisposeUnmanaged()
+        {
+            if (DisposeBitmapSources)
+            {
+                DefaultOverride.Dispose();
+
+                SourcesOverride.Dispose();
+            }
+        }
+
+        public void Dispose()
+        {
+            if (IsDisposed)
+
+                return;
+
+            DisposeManaged();
+
+            DisposeUnmanaged();
+
+            GC.SuppressFinalize(this);
+        }
+
+        ~BitmapSourceProviderAbstract() => DisposeUnmanaged();
+    }
+
+    public class BitmapSourceProvider : BitmapSourceProviderAbstract
+    {
+        private IBitmapSources _defaultOverride;
+        private IBitmapSources _sourcesOverride;
+
+        protected override IBitmapSources DefaultOverride => _defaultOverride;
+
+        protected override IBitmapSources SourcesOverride => _sourcesOverride;
+
+        protected override bool DisposeBitmapSources { get; }
+
+        public BitmapSourceProvider(in IBitmapSources defaultBitmapSources, in IBitmapSources bitmapSources, in bool disposeBitmapSources)
+        {
+            _defaultOverride = defaultBitmapSources;
+
+            _sourcesOverride = bitmapSources;
+
+            DisposeBitmapSources = disposeBitmapSources;
+        }
+
+        protected override void DisposeManaged()
+        {
+            base.DisposeManaged();
+
+            _defaultOverride = null;
+            _sourcesOverride = null;
+        }
+    }
+
     /// <summary>
     /// Represents a <see cref="BitmapSource"/>s provider for a GUI.
     /// </summary>
-    public interface IBrowsableObjectInfoBitmapSources : DotNetFix.IDisposable
+    public interface IBitmapSources : DotNetFix.IDisposable
     {
         /// <summary>
         /// Gets the small <see cref="BitmapSource"/> of the object related to the current instance.
         /// </summary>
-        BitmapSource SmallBitmapSource { get; }
+        BitmapSource Small { get; }
 
         /// <summary>
         /// Gets the medium <see cref="BitmapSource"/> of the object related to the current instance.
         /// </summary>
-        BitmapSource MediumBitmapSource { get; }
+        BitmapSource Medium { get; }
 
         /// <summary>
         /// Gets the large <see cref="BitmapSource"/> of the object related to the current instance.
         /// </summary>
-        BitmapSource LargeBitmapSource { get; }
+        BitmapSource Large { get; }
 
         /// <summary>
         /// Gets the extra large <see cref="BitmapSource"/> of the object related to the current instance.
         /// </summary>
-        BitmapSource ExtraLargeBitmapSource { get; }
+        BitmapSource ExtraLarge { get; }
     }
 
-    public abstract class BrowsableObjectInfoBitmapSources<T> : IBrowsableObjectInfoBitmapSources
+    public abstract class BitmapSources : IBitmapSources
     {
-        private T _innerObject;
-
-        public T InnerObject => IsDisposed ? throw GetExceptionForDispose(false) : _innerObject;
-
         public bool IsDisposed { get; private set; }
 
-        protected abstract BitmapSource SmallBitmapSourceOverride { get; }
+        protected abstract BitmapSource SmallOverride { get; }
 
-        protected abstract BitmapSource MediumBitmapSourceOverride { get; }
+        protected abstract BitmapSource MediumOverride { get; }
 
-        protected abstract BitmapSource LargeBitmapSourceOverride { get; }
+        protected abstract BitmapSource LargeOverride { get; }
 
-        protected abstract BitmapSource ExtraLargeBitmapSourceOverride { get; }
+        protected abstract BitmapSource ExtraLargeOverride { get; }
 
 
 
-        public BitmapSource SmallBitmapSource => GetValueIfNotDisposed(() => SmallBitmapSourceOverride);
+        public BitmapSource Small => GetValueIfNotDisposed(() => SmallOverride);
 
-        public BitmapSource MediumBitmapSource => GetValueIfNotDisposed(() => MediumBitmapSourceOverride);
+        public BitmapSource Medium => GetValueIfNotDisposed(() => MediumOverride);
 
-        public BitmapSource LargeBitmapSource => GetValueIfNotDisposed(() => LargeBitmapSourceOverride);
+        public BitmapSource Large => GetValueIfNotDisposed(() => LargeOverride);
 
-        public BitmapSource ExtraLargeBitmapSource => GetValueIfNotDisposed(() => ExtraLargeBitmapSourceOverride);
-
-        public BrowsableObjectInfoBitmapSources(in T browsableObjectInfo) => _innerObject = browsableObjectInfo;
+        public BitmapSource ExtraLarge => GetValueIfNotDisposed(() => ExtraLargeOverride);
 
         protected TParam GetValueIfNotDisposed<TParam>(in Func<TParam> func) => IsDisposed ? throw GetExceptionForDispose(false) : func();
 
-        protected virtual void Dispose(bool disposing)
-        {
-            _innerObject = default;
-
-            IsDisposed = true;
-        }
+        protected virtual void Dispose(bool disposing) => IsDisposed = true;
 
         public void Dispose()
         {
@@ -552,18 +620,96 @@ namespace WinCopies.IO
             GC.SuppressFinalize(this);
         }
 
-        ~BrowsableObjectInfoBitmapSources() => Dispose(false);
+        ~BitmapSources() => Dispose(false);
     }
 
-    public class BrowsableObjectInfoBitmapBitmapSources : BrowsableObjectInfoBitmapSources<Bitmap>
+    public abstract class BitmapSources<T> : BitmapSources
     {
-        protected override BitmapSource SmallBitmapSourceOverride => InnerObject.ToImageSource();
+        private T _innerObject;
 
-        protected override BitmapSource MediumBitmapSourceOverride => InnerObject.ToImageSource();
+        public T InnerObject => IsDisposed ? throw GetExceptionForDispose(false) : _innerObject;
 
-        protected override BitmapSource LargeBitmapSourceOverride => InnerObject.ToImageSource();
+        public BitmapSources(in T browsableObjectInfo) => _innerObject = browsableObjectInfo;
 
-        protected override BitmapSource ExtraLargeBitmapSourceOverride => InnerObject.ToImageSource();
+        protected override void Dispose(bool disposing)
+        {
+            _innerObject = default;
+
+            base.Dispose(disposing);
+        }
+    }
+
+    public interface IBitmapSourcesLinker : IBitmapSources
+    {
+        void LoadSmall();
+
+        void LoadMedium();
+
+        void LoadLarge();
+
+        void LoadExtraLarge();
+
+        void Load();
+    }
+
+    public class BitmapSourcesLinker : BitmapSources<IBitmapSourceProvider>, IBitmapSourcesLinker, INotifyPropertyChanged
+    {
+        private BitmapSource _small;
+        private BitmapSource _medium;
+        private BitmapSource _large;
+        private BitmapSource _extraLarge;
+
+        protected override BitmapSource SmallOverride => _small;
+
+        protected override BitmapSource MediumOverride => _medium;
+
+        protected override BitmapSource LargeOverride => _large;
+
+        protected override BitmapSource ExtraLargeOverride => _extraLarge;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public BitmapSourcesLinker(in IBitmapSourceProvider bitmapSourceProvider) : base(bitmapSourceProvider)
+        {
+            _small = bitmapSourceProvider.Default.Small;
+            _medium = bitmapSourceProvider.Default.Medium;
+            _large = bitmapSourceProvider.Default.Large;
+            _extraLarge = bitmapSourceProvider.Default.ExtraLarge;
+        }
+
+        protected virtual void RaisePropertyChangedEvent(in PropertyChangedEventArgs e) => PropertyChanged?.Invoke(this, e);
+
+        protected virtual void RaisePropertyChangedEvent(in string propertyName) => RaisePropertyChangedEvent(new PropertyChangedEventArgs(propertyName));
+
+        protected virtual void UpdateValue<T>(ref T value, in T newValue, string propertyName) => UtilHelpers.UpdateValue(ref value, newValue, () => RaisePropertyChangedEvent(propertyName));
+
+        public void LoadSmall() => UpdateValue(ref _small, InnerObject.Sources.Small, nameof(Small));
+
+        public void LoadMedium() => UpdateValue(ref _medium, InnerObject.Sources.Medium, nameof(Medium));
+
+        public void LoadLarge() => UpdateValue(ref _large, InnerObject.Sources.Large, nameof(Large));
+
+        public void LoadExtraLarge() => UpdateValue(ref _extraLarge, InnerObject.Sources.ExtraLarge, nameof(ExtraLarge));
+
+        public virtual void Load()
+        {
+            System.Collections.Generic.IEnumerable<MethodInfo> methods = GetType().GetMethods().Where(m => m.Name.StartsWith(nameof(Load)) && m.GetParameters().Length == 0);
+
+            foreach (MethodInfo method in methods)
+
+                _ = method.Invoke(this, null);
+        }
+    }
+
+    public class BrowsableObjectInfoBitmapBitmapSources : BitmapSources<Bitmap>
+    {
+        protected override BitmapSource SmallOverride => InnerObject.ToImageSource();
+
+        protected override BitmapSource MediumOverride => InnerObject.ToImageSource();
+
+        protected override BitmapSource LargeOverride => InnerObject.ToImageSource();
+
+        protected override BitmapSource ExtraLargeOverride => InnerObject.ToImageSource();
 
         public BrowsableObjectInfoBitmapBitmapSources(in Bitmap bitmap) : base(bitmap) { /* Left empty. */ }
     }
@@ -581,13 +727,13 @@ namespace WinCopies.IO
     {
         private Collections.DotNetFix.Generic.LinkedList<Action<IBrowsableObjectInfo, BrowsableObjectInfoCallbackReason>> _list = new
 #if !CS9
-            Collections.DotNetFix.Generic.LinkedList<Action<IBrowsableObjectInfo, BrowsableObjectInfoCallbackReason>>
+            LinkedList<Action<IBrowsableObjectInfo, BrowsableObjectInfoCallbackReason>>
 #endif
             ();
 
         public BrowsableObjectInfoCallback Enqueue(in Action<IBrowsableObjectInfo, BrowsableObjectInfoCallbackReason> action)
         {
-            Collections.DotNetFix.Generic.LinkedList<Action<IBrowsableObjectInfo, BrowsableObjectInfoCallbackReason>>.LinkedListNode node = (Collections.DotNetFix.Generic.LinkedList<Action<IBrowsableObjectInfo, BrowsableObjectInfoCallbackReason>>.LinkedListNode)_list.AddLast(action);
+            Collections.DotNetFix.Generic.LinkedList<Action<IBrowsableObjectInfo, BrowsableObjectInfoCallbackReason>>.LinkedListNode node = _list.AddLast(action);
 
             return new BrowsableObjectInfoCallback(() => _list.Remove(node));
         }

@@ -16,7 +16,6 @@
  * along with the WinCopies Framework. If not, see <https://www.gnu.org/licenses/>. */
 
 using Microsoft.Win32;
-using Microsoft.WindowsAPICodePack.PortableDevices;
 using Microsoft.WindowsAPICodePack.Shell;
 
 using System;
@@ -32,6 +31,7 @@ using WinCopies.IO.Process;
 using WinCopies.IO.Process.ObjectModel;
 using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Selectors;
+using WinCopies.IO.Shell;
 using WinCopies.Linq;
 using WinCopies.PropertySystem;
 using WinCopies.Util;
@@ -47,15 +47,15 @@ namespace WinCopies.IO.ObjectModel
     /// </summary>
     public abstract class RegistryItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>/*<TItems, TFactory>*/ : BrowsableObjectInfo<TObjectProperties, RegistryKey, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>/*<TItems, TFactory>*/, IRegistryItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IRegistryItemInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo> // where TItems : BrowsableObjectInfo, IRegistryItemInfo where TFactory : IRegistryItemInfoFactory
     {
-        private class BrowsableObjectInfoBitmapSources : BrowsableObjectInfoBitmapSources<RegistryItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>>
+        private class BrowsableObjectInfoBitmapSources : BitmapSources<RegistryItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>>
         {
-            protected override BitmapSource SmallBitmapSourceOverride => InnerObject.TryGetBitmapSource(SmallIconSize);
+            protected override BitmapSource SmallOverride => InnerObject.TryGetBitmapSource(SmallIconSize);
 
-            protected override BitmapSource MediumBitmapSourceOverride => InnerObject.TryGetBitmapSource(MediumIconSize);
+            protected override BitmapSource MediumOverride => InnerObject.TryGetBitmapSource(MediumIconSize);
 
-            protected override BitmapSource LargeBitmapSourceOverride => InnerObject.TryGetBitmapSource(LargeIconSize);
+            protected override BitmapSource LargeOverride => InnerObject.TryGetBitmapSource(LargeIconSize);
 
-            protected override BitmapSource ExtraLargeBitmapSourceOverride => InnerObject.TryGetBitmapSource(ExtraLargeIconSize);
+            protected override BitmapSource ExtraLargeOverride => InnerObject.TryGetBitmapSource(ExtraLargeIconSize);
 
             public BrowsableObjectInfoBitmapSources(in RegistryItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> registryItemInfo) : base(registryItemInfo) { /* Left empty. */ }
         }
@@ -64,7 +64,7 @@ namespace WinCopies.IO.ObjectModel
         internal NullableReference<RegistryKey> _registryKey;
         private IBrowsableObjectInfo _parent;
         private IBrowsabilityOptions _browsability;
-        private IBrowsableObjectInfoBitmapSources _bitmapSources;
+        private IBitmapSourceProvider _bitmapSourceProvider;
         private string _itemTypeName;
         #endregion
 
@@ -121,13 +121,13 @@ namespace WinCopies.IO.ObjectModel
         /// </summary>
         public override string Name { get; }
 
-        protected override IBrowsableObjectInfoBitmapSources BitmapSourcesOverride => _bitmapSources
+        protected override IBitmapSourceProvider BitmapSourceProviderOverride => _bitmapSourceProvider
 #if CS8
             ??=
 #else
-            ?? (_bitmapSources =
+            ?? (_bitmapSourceProvider =
 #endif
-            new BrowsableObjectInfoBitmapSources(this)
+            new BitmapSourceProviderCommon2(this, new BrowsableObjectInfoBitmapSources(this), true)
 #if !CS8
             )
 #endif
@@ -142,35 +142,56 @@ namespace WinCopies.IO.ObjectModel
             {
                 if (_browsability == null)
                 {
-#if CS8
-                    _browsability = ObjectPropertiesGeneric.RegistryItemType switch
-                    {
 #if CS9
-                        RegistryItemType.Key or RegistryItemType.Root => BrowsabilityOptions.BrowsableByDefault,
+                    _browsability =
 #else
-                        RegistryItemType.Key => BrowsabilityOptions.BrowsableByDefault,
-                        RegistryItemType.Root => BrowsabilityOptions.BrowsableByDefault,
+                    switch (
 #endif
-                        _ => BrowsabilityOptions.NotBrowsable,
-                    };
+                        ObjectPropertiesGeneric.RegistryItemType
+#if CS9
+                        switch
 #else
-
-                    switch (ObjectPropertiesGeneric.RegistryItemType)
+                        )
+#endif
                     {
-                        case RegistryItemType.Root:
-                        case RegistryItemType.Key:
+#if !CS9
+                        case
+#endif
+                        RegistryItemType.Key
+#if CS9
+                        or
+#else
+                        :
 
-                            _browsability = BrowsabilityOptions.BrowsableByDefault;
+                        case
+#endif
+                            RegistryItemType.Root
+#if CS9
+                            =>
+#else
+                            :
 
-                            break;
+                            _browsability =
+#endif
+                            BrowsabilityOptions.BrowsableByDefault
+#if CS9
+                            ,
+
+                            _ =>
+#else
+                            ; break;
 
                         default:
 
-                            _browsability = BrowsabilityOptions.NotBrowsable;
+                            _browsability =
+#endif
+                            BrowsabilityOptions.NotBrowsable
+#if !CS9
+                                ;
 
                             break;
-                    }
 #endif
+                    };
                 }
 
                 return _browsability;
@@ -343,7 +364,7 @@ namespace WinCopies.IO.ObjectModel
 
                     return
 #endif
-                        Icons.Computer.TryGetComputerBitmapSource(size)
+                        Icons.Computer.Instance.TryGetBitmapSource(size)
 #if CS8
                     ,
 #else
@@ -359,18 +380,18 @@ namespace WinCopies.IO.ObjectModel
 
                     return
 #endif
-                        Icons.Folder.TryGetFolderBitmapSource(size)
+                        Icons.Folder.Instance.TryGetBitmapSource(size)
 #if CS8
                         ,
 
-                        _ =>
+                _ =>
 #else
                         ;
             }
 
             return
 #endif
-                    Icons.File.TryGetFileBitmapSource(size)
+                    Icons.File.Instance.TryGetBitmapSource(size)
 #if CS8
             }
 #endif
@@ -387,10 +408,10 @@ namespace WinCopies.IO.ObjectModel
         {
             CloseKey();
 
-            if (_bitmapSources != null)
+            if (_bitmapSourceProvider != null)
             {
-                _bitmapSources.Dispose();
-                _bitmapSources = null;
+                _bitmapSourceProvider.Dispose();
+                _bitmapSourceProvider = null;
             }
 
             base.DisposeUnmanaged();

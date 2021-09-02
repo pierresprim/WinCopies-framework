@@ -35,6 +35,8 @@ using WinCopies.IO.Shell;
 using WinCopies.Linq;
 using WinCopies.PropertySystem;
 
+using static System.Drawing.Imaging.PixelFormat;
+
 using static WinCopies.UtilHelpers;
 using static WinCopies.ThrowHelper;
 
@@ -43,24 +45,100 @@ namespace WinCopies.IO
     public static class IconImageInfoHelper
     {
         public static string GetFriendlyBitDepth(PixelFormat pixelFormat)
+#if CS9
+            =>
+#else
         {
-            switch (pixelFormat)
+            switch (
+#endif
+            pixelFormat
+#if CS9
+        switch
+#else
+            )
+#endif
             {
-                case PixelFormat.Format1bppIndexed:
-                    return "1-bit B/W";
-                case PixelFormat.Format24bppRgb:
-                    return "24-bit True Colors";
-                case PixelFormat.Format32bppArgb:
-                case PixelFormat.Format32bppRgb:
-                    return "32-bit Alpha Channel";
-                case PixelFormat.Format8bppIndexed:
-                    return "8-bit 256 Colors";
-                case PixelFormat.Format4bppIndexed:
-                    return "4-bit 16 Colors";
-            }
+#if !CS9
+                case
+#endif
+                Format1bppIndexed
+#if CS9
+                =>
+#else
+                : return
+#endif
+                "1-bit B/W"
+#if CS9
+                ,
+#else
+                ; case
+#endif
+                Format24bppRgb
+#if CS9
+                =>
+#else
+                : return
+#endif
+                "24-bit True Colors"
+#if CS9
+                ,
+#else
+                ; case
+#endif
+                Format32bppArgb
+#if CS9
+                or
+#else
+                : case
+#endif
+                Format32bppRgb
+#if CS9
+                =>
+#else
+                : return
+#endif
+                "32-bit Alpha Channel"
+#if CS9
+                ,
+#else
+                ; case
+#endif
+                Format8bppIndexed
+#if CS9
+                =>
+#else
+                : return
+#endif
+                "8-bit 256 Colors"
+#if CS9
+                ,
+#else
+                ; case
+#endif
+                Format4bppIndexed
+#if CS9
+                =>
+#else
+                : return
+#endif
+                "4-bit 16 Colors"
+#if CS9
+                ,
 
-            return "Unknown";
+                _ =>
+#else
+                ; default: return
+#endif
+                "Unknown"
+#if CS9
+                ,
+#else
+                ;
+#endif
+            };
+#if !CS9
         }
+#endif
     }
 
     namespace PropertySystem
@@ -112,22 +190,82 @@ namespace WinCopies.IO
             private IShellObjectInfo _shellObjectInfo;
 
             public static bool IsValidFormat(in string path)
+#if CS9
+                =>
+#else
             {
-                switch (System.IO.Path.GetExtension(path).ToLower())
+                switch (
+#endif
+                System.IO.Path.GetExtension(path).ToLower()
+#if CS9
+                    switch
+#else
+                    )
+#endif
                 {
-                    case ".ico":
-                    case ".icl":
-                    case ".dll":
-                    case ".exe":
-                    case ".ocx":
-                    case ".cpl":
-                    case ".src":
+#if !CS9
+                    case
+#endif
+                    ".ico"
+#if CS9
+                        or
+#else
+                        : case
+#endif
+                        ".icl"
+#if CS9
+                        or
+#else
+                        : case
+#endif
+                        ".dll"
+#if CS9
+                        or
+#else
+                        : case
+#endif
+                        ".exe"
+#if CS9
+                        or
+#else
+                        : case
+#endif
+                        ".ocx"
+#if CS9
+                        or
+#else
+                        : case
+#endif
+                        ".cpl"
+#if CS9
+                        or
+#else
+                        : case
+#endif
+                        ".src"
+#if CS9
+                    =>
+#else
+                    : return
+#endif
+                    true
+#if CS9
+                    ,
 
-                        return true;
-                }
-
-                return false;
+                    _ =>
+#else
+                    ; default: return
+#endif
+                    false
+#if CS9
+                    ,
+#else
+                    ;
+#endif
+                };
+#if !CS9
             }
+#endif
 
             protected IShellObjectInfo ShellObjectInfo => GetValueIfNotDisposed(_shellObjectInfo);
 
@@ -149,7 +287,7 @@ namespace WinCopies.IO
 
             protected override IBrowsableObjectInfo ParentOverride => _shellObjectInfo.Parent;
 
-            protected override IBrowsableObjectInfoBitmapSources BitmapSourcesOverride => _shellObjectInfo.BitmapSources;
+            protected override IBitmapSourceProvider BitmapSourceProviderOverride => _shellObjectInfo.BitmapSourceProvider;
 
             protected override string ItemTypeNameOverride => _shellObjectInfo.ItemTypeName;
 
@@ -239,17 +377,17 @@ namespace WinCopies.IO
         public class SingleIconInfo : BrowsableObjectInfo<object, SingleIcon, SingleIconInfoItemProvider, IEnumerableSelectorDictionary<SingleIconInfoItemProvider, IBrowsableObjectInfo>, SingleIconInfoItemProvider>, ISingleIconInfo
         {
             #region Classes
-            protected class BrowsableObjectInfoBitmapSources : BrowsableObjectInfoBitmapSources<SingleIcon>
+            protected class BrowsableObjectInfoBitmapSources : BitmapSources<SingleIcon>
             {
                 public static BitmapSource TryGetBitmapSource(in Icon icon, in ushort size) => Shell.ObjectModel.BrowsableObjectInfo.TryGetBitmapSource(Shell.ObjectModel.BrowsableObjectInfo.TryGetIcon(icon, size));
 
-                protected override BitmapSource SmallBitmapSourceOverride => TryGetBitmapSource(InnerObject.Icon, SmallIconSize);
+                protected override BitmapSource SmallOverride => TryGetBitmapSource(InnerObject.Icon, SmallIconSize);
 
-                protected override BitmapSource MediumBitmapSourceOverride => TryGetBitmapSource(InnerObject.Icon, MediumIconSize);
+                protected override BitmapSource MediumOverride => TryGetBitmapSource(InnerObject.Icon, MediumIconSize);
 
-                protected override BitmapSource LargeBitmapSourceOverride => TryGetBitmapSource(InnerObject.Icon, LargeIconSize);
+                protected override BitmapSource LargeOverride => TryGetBitmapSource(InnerObject.Icon, LargeIconSize);
 
-                protected override BitmapSource ExtraLargeBitmapSourceOverride => TryGetBitmapSource(InnerObject.Icon, ExtraLargeIconSize);
+                protected override BitmapSource ExtraLargeOverride => TryGetBitmapSource(InnerObject.Icon, ExtraLargeIconSize);
 
                 public BrowsableObjectInfoBitmapSources(in SingleIcon singleIcon) : base(singleIcon) { /* Left empty. */ }
             }
@@ -266,7 +404,7 @@ namespace WinCopies.IO
 
             private SingleIcon _singleIcon;
             private IBrowsableObjectInfo _parent;
-            private IBrowsableObjectInfoBitmapSources _bitmapSources;
+            private IBitmapSourceProvider _bitmapSourceProvider;
 
             protected override SingleIcon InnerObjectGenericOverride => _singleIcon;
 
@@ -294,13 +432,13 @@ namespace WinCopies.IO
 #endif
             ;
 
-            protected override IBrowsableObjectInfoBitmapSources BitmapSourcesOverride => _bitmapSources
+            protected override IBitmapSourceProvider BitmapSourceProviderOverride => _bitmapSourceProvider
 #if CS8
             ??=
 #else
-            ?? (_bitmapSources =
+            ?? (_bitmapSourceProvider =
 #endif
-            new BrowsableObjectInfoBitmapSources(InnerObjectGeneric)
+            new BitmapSourceProviderCommon2(this, new BrowsableObjectInfoBitmapSources(InnerObjectGeneric), true)
 #if !CS8
             )
 #endif
@@ -350,7 +488,7 @@ namespace WinCopies.IO
 
             protected override void DisposeManaged()
             {
-                _bitmapSources = null;
+                _bitmapSourceProvider = null;
 
                 base.DisposeManaged();
             }
@@ -364,7 +502,7 @@ namespace WinCopies.IO
         public class IconImageInfo : BrowsableObjectInfo<IIconImageInfoProperties, IconImage, IconImageInfoItemProvider, IEnumerableSelectorDictionary<IconImageInfoItemProvider, IBrowsableObjectInfo>, IconImageInfoItemProvider>, IIconImageInfo
         {
             private ISingleIconInfo _parent;
-            private IBrowsableObjectInfoBitmapSources _bitmapSources;
+            private IBitmapSourceProvider _bitmapSourceProvider;
             private IconImage _iconImage;
 
             protected override IProcessFactory ProcessFactoryOverride => null;
@@ -383,13 +521,13 @@ namespace WinCopies.IO
 
             protected override IBrowsableObjectInfo ParentOverride => _parent;
 
-            protected override IBrowsableObjectInfoBitmapSources BitmapSourcesOverride => _bitmapSources
+            protected override IBitmapSourceProvider BitmapSourceProviderOverride => _bitmapSourceProvider
 #if CS8
             ??=
 #else
-            ?? (_bitmapSources =
+            ?? (_bitmapSourceProvider =
 #endif
-            new BrowsableObjectInfoIconBitmapSources(InnerObjectGeneric.Icon)
+            new BitmapSourceProviderCommon2(this, new BrowsableObjectInfoIconBitmapSources(InnerObjectGeneric.Icon), true)
 #if !CS8
             )
 #endif
@@ -437,8 +575,8 @@ namespace WinCopies.IO
 
             protected override void DisposeUnmanaged()
             {
-                _bitmapSources.Dispose();
-                _bitmapSources = null;
+                _bitmapSourceProvider.Dispose();
+                _bitmapSourceProvider = null;
 
                 _parent = null;
 
@@ -455,7 +593,7 @@ namespace WinCopies.IO
         {
             private Bitmap _bitmap;
             private IBrowsableObjectInfo _parent;
-            private IBrowsableObjectInfoBitmapSources _bitmapSources;
+            private IBitmapSourceProvider _bitmapSourceProvider;
 
             public override string Name => LocalizedName;
 
@@ -475,17 +613,17 @@ namespace WinCopies.IO
 
             protected override bool IsRecursivelyBrowsableOverride => false;
 
-            protected override IBrowsableObjectInfoBitmapSources BitmapSourcesOverride => GetValueIfNotDisposed(_bitmapSources
+            protected override IBitmapSourceProvider BitmapSourceProviderOverride => _bitmapSourceProvider
 #if CS8
             ??=
 #else
-            ?? (_bitmapSources =
+            ?? (_bitmapSourceProvider =
 #endif
-            new BrowsableObjectInfoBitmapBitmapSources(InnerObjectGeneric)
+            new BitmapSourceProviderCommon2(this, new BrowsableObjectInfoBitmapBitmapSources(InnerObjectGeneric), true)
 #if !CS8
             )
 #endif
-            );
+            ;
 
             protected override string ItemTypeNameOverride => "Bitmap";
 
@@ -517,8 +655,8 @@ namespace WinCopies.IO
 
             protected override void DisposeUnmanaged()
             {
-                _bitmapSources.Dispose();
-                _bitmapSources = null;
+                _bitmapSourceProvider.Dispose();
+                _bitmapSourceProvider = null;
 
                 _parent = null;
 
@@ -550,7 +688,7 @@ namespace WinCopies.IO
         {
             private Icon _icon;
             private IBrowsableObjectInfo _parent;
-            private IBrowsableObjectInfoBitmapSources _bitmapSources;
+            private IBitmapSourceProvider _bitmapSourceProvider;
 
             public override string Name => LocalizedName;
 
@@ -570,17 +708,17 @@ namespace WinCopies.IO
 
             protected override bool IsRecursivelyBrowsableOverride => false;
 
-            protected override IBrowsableObjectInfoBitmapSources BitmapSourcesOverride => GetValueIfNotDisposed(_bitmapSources
+            protected override IBitmapSourceProvider BitmapSourceProviderOverride => _bitmapSourceProvider
 #if CS8
             ??=
 #else
-            ?? (_bitmapSources =
+            ?? (_bitmapSourceProvider =
 #endif
-            new BrowsableObjectInfoIconBitmapSources(InnerObjectGeneric)
+            new BitmapSourceProviderCommon2(this, new BrowsableObjectInfoIconBitmapSources(InnerObjectGeneric), true)
 #if !CS8
             )
 #endif
-            );
+            ;
 
             protected override string ItemTypeNameOverride => "Icon";
 
@@ -612,8 +750,8 @@ namespace WinCopies.IO
 
             protected override void DisposeUnmanaged()
             {
-                _bitmapSources.Dispose();
-                _bitmapSources = null;
+                _bitmapSourceProvider.Dispose();
+                _bitmapSourceProvider = null;
 
                 _parent = null;
 

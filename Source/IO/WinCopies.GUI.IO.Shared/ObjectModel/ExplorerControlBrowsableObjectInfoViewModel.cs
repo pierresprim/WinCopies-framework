@@ -26,6 +26,8 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+
+using WinCopies.Collections;
 using WinCopies.Collections.Generic;
 using WinCopies.Commands;
 using WinCopies.GUI.Controls;
@@ -81,6 +83,92 @@ namespace WinCopies.GUI.IO.ObjectModel
             ~ButtonModel() => Dispose();
         }
 
+        private class BackgroundWorker
+        {
+            private WinCopies.BackgroundWorker _backgroundWorker;
+            private IBrowsableObjectInfo _updateWith;
+            private IBrowsableObjectInfo _workOn;
+
+            public BackgroundWorker()
+            {
+                _backgroundWorker.WorkerSupportsCancellation = _backgroundWorker.WorkerReportsProgress = true;
+
+                _backgroundWorker.DoWork += (object sender, DoWorkEventArgs e) => OnDoWork();
+            }
+
+            public void OnDoWork()
+            {
+                System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> enumerable = _workOn.GetItems();
+                ulong? count;
+                ulong i;
+
+                void initCount()
+                {
+                    count = enumerable is ICollection collection ? (ulong
+#if !CS9
+                    ?
+#endif
+                    )collection.Count : enumerable is ICountable countable ? (ulong)countable.Count : enumerable is IUIntCountable uintCountable ? uintCountable.Count : enumerable is ILongCountable longCountable ? (ulong)longCountable.Count : enumerable is IULongCountable ulongCountable ? ulongCountable.Count :
+#if !CS9
+                    (ulong?)
+#endif
+                    null;
+
+                    i = 0ul;
+                }
+
+                initCount();
+
+                bool doWork()
+                {
+                    foreach (IBrowsableObjectInfo item in enumerable)
+
+                        if (_updateWith == _workOn)
+                        {
+                            try
+                            {
+                                if (item.BitmapSources is IBitmapSourcesLinker bitmapSourcesLinker)
+
+                                    bitmapSourcesLinker.Load();
+                            }
+
+                            catch { /* Left empty. */ }
+
+                            if (count.HasValue)
+
+                                _backgroundWorker.ReportProgress((int)((++i) / count.Value * 100));
+                        }
+
+                        else
+                        {
+                            enumerable = (_workOn = _updateWith).GetItems();
+
+                            initCount();
+
+                            _backgroundWorker.ReportProgress(0);
+
+                            return true;
+                        }
+
+                    return false;
+                }
+
+                while (doWork()) { /* Left empty. */ }
+            }
+
+            public void UpdatePath(in IBrowsableObjectInfo browsableObjectInfo)
+            {
+                _updateWith = browsableObjectInfo;
+
+                if (!_backgroundWorker.IsBusy)
+                {
+                    _workOn = _updateWith;
+
+                    _backgroundWorker.RunWorkerAsync();
+                }
+            }
+        }
+
         #region Fields
         private System.Collections.Generic.IReadOnlyList<ButtonModel> _commonCommands;
         private IBrowsableObjectInfoFactory _factory;
@@ -93,6 +181,7 @@ namespace WinCopies.GUI.IO.ObjectModel
         private IList _selectedItems;
         private string _text;
         private System.Collections.Generic.IEnumerable<IBrowsableObjectInfoViewModel> _treeViewItems;
+        private BackgroundWorker _backgroundWorker = new BackgroundWorker();
         #endregion
 
         #region Properties
@@ -212,27 +301,23 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         private void Path_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) => OnPathPropertyChanged(e);
 
-        protected void UpdateValueIfNotDisposed<T>(ref T value, in T newValue, in string propertyName)
-        {
-            if (IsDisposed)
-
-                throw GetExceptionForDispose(false);
-
-            base.UpdateValue(ref value, newValue, propertyName);
-        }
+        protected void UpdateValueIfNotDisposed<T>(ref T value, in T newValue, in string propertyName) => _ = IsDisposed ? throw GetExceptionForDispose(false) : base.UpdateValue(ref value, newValue, propertyName);
 
         protected T GetValueIfNotDisposed<T>(in T value) => IsDisposed ? throw GetExceptionForDispose(false) : value;
 
+        protected virtual void OnPathAdded()
+        {
+            _path.PropertyChanged += Path_PropertyChanged;
+
+            _backgroundWorker.UpdatePath(_path);
+        }
+
         protected virtual void OnPathRemoved(IBrowsableObjectInfoViewModel path) => path.PropertyChanged -= Path_PropertyChanged;
 
-        protected virtual void OnPathChanged(IBrowsableObjectInfoViewModel oldPath)
+        protected virtual void OnUpdateText() => Text = _path.Path;
+
+        protected virtual void OnUpdateCommands()
         {
-            OnPathRemoved(oldPath);
-
-            Path.PropertyChanged += Path_PropertyChanged;
-
-            Text = _path.Path;
-
             foreach (ButtonModel command in _commonCommands)
 
                 command.Update();
@@ -242,7 +327,10 @@ namespace WinCopies.GUI.IO.ObjectModel
                 , null, CustomProcesses
 #endif
                 );
+        }
 
+        protected virtual void OnUpdateHistory()
+        {
             if (_path.Path == History.Current.Path)
 
                 return;
@@ -281,6 +369,19 @@ namespace WinCopies.GUI.IO.ObjectModel
 
                 _historyObservable.NotifyOnPropertyChanged = true;
             }
+        }
+
+        protected virtual void OnPathChanged(IBrowsableObjectInfoViewModel oldPath)
+        {
+            OnPathRemoved(oldPath);
+
+            OnPathAdded();
+
+            OnUpdateText();
+
+            OnUpdateCommands();
+
+            OnUpdateHistory();
         }
 
         protected virtual void OnHistoryCurrentChanged(System.ComponentModel.PropertyChangedEventArgs e) => Path = new BrowsableObjectInfoViewModel(_historyObservable.Current) { SortComparison = Path.SortComparison, Factory = Path.Factory };

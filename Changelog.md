@@ -9,6 +9,13 @@ CHANGELOG
 ### 3.8-preview
 
 - Bug fixed when adding a title bar menu item: the menu item remained enabled even if its IsEnabled property is set to false.
+- Update IBrowsableObjectInfo bitmap source properties in order to add a linker to the default and actual bitmap sources so that the actual ones can loaded on background. All bitmap sources implementation has been updated consequently.
+- Icons:
+	- is in WinCopies.IO.Shell.
+	- TryGetFolderBitmapSource method has been replaced with an extension method.
+- Add:
+	- methods to ExplorerControlBrowsableObjectInfoViewModel.
+	- new types.
 
 ### 3.7-preview
 - Add:

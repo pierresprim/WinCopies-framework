@@ -15,6 +15,7 @@
 * You should have received a copy of the GNU General Public License
 * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+using System;
 using System.Windows.Media.Imaging;
 
 using static Microsoft.WindowsAPICodePack.NativeAPI.Consts.DllNames;
@@ -22,22 +23,43 @@ using static Microsoft.WindowsAPICodePack.NativeAPI.Consts.DllNames;
 using static WinCopies.IO.ObjectModel.BrowsableObjectInfo;
 using static WinCopies.IO.Shell.ObjectModel.BrowsableObjectInfo;
 
-namespace WinCopies.IO
+namespace WinCopies.IO.Shell
 {
     public static class Icons
     {
-        public static class Folder
+        public abstract class BitmapSources : IBitmapSources
         {
-            private static BitmapSource _folderSmall;
-            private static BitmapSource _folderMedium;
-            private static BitmapSource _folderLarge;
-            private static BitmapSource _folderExtraLarge;
+            private readonly Type _type;
 
-            public static BitmapSource FolderSmall => _folderSmall
+            public BitmapSource Small => GetBitmapSource(nameof(Small));
+
+            public BitmapSource Medium => GetBitmapSource(nameof(Medium));
+
+            public BitmapSource Large => GetBitmapSource(nameof(Large));
+
+            public BitmapSource ExtraLarge => GetBitmapSource(nameof(ExtraLarge));
+
+            bool DotNetFix.IDisposable.IsDisposed => false;
+
+            private protected BitmapSources() => _type = typeof(Icons).GetNestedType(GetType().Name + "Static");
+
+            private BitmapSource GetBitmapSource(in string name) => (BitmapSource)_type.GetProperty(name).GetValue(null);
+
+            void System.IDisposable.Dispose() { /* Left empty. */ }
+        }
+
+        public static class FolderStatic
+        {
+            private static BitmapSource _small;
+            private static BitmapSource _medium;
+            private static BitmapSource _large;
+            private static BitmapSource _extraLarge;
+
+            public static BitmapSource Small => _small
 #if CS8
                 ??=
 #else
-                ?? (_folderSmall =
+                ?? (_small =
 #endif
                 _TryGetFolderBitmapSource(SmallIconSize)
 #if !CS8
@@ -45,11 +67,11 @@ namespace WinCopies.IO
 #endif
                 ;
 
-            public static BitmapSource FolderMedium => _folderMedium
+            public static BitmapSource Medium => _medium
 #if CS8
                 ??=
 #else
-                ?? (_folderMedium =
+                ?? (_medium =
 #endif
                 _TryGetFolderBitmapSource(MediumIconSize)
 #if !CS8
@@ -57,11 +79,11 @@ namespace WinCopies.IO
 #endif
                 ;
 
-            public static BitmapSource FolderLarge => _folderLarge
+            public static BitmapSource Large => _large
 #if CS8
                 ??=
 #else
-                ?? (_folderLarge =
+                ?? (_large =
 #endif
                 _TryGetFolderBitmapSource(LargeIconSize)
 #if !CS8
@@ -69,11 +91,11 @@ namespace WinCopies.IO
 #endif
                 ;
 
-            public static BitmapSource FolderExtraLarge => _folderExtraLarge
+            public static BitmapSource ExtraLarge => _extraLarge
 #if CS8
                 ??=
 #else
-                ?? (_folderExtraLarge =
+                ?? (_extraLarge =
 #endif
                 _TryGetFolderBitmapSource(ExtraLargeIconSize)
 #if !CS8
@@ -82,44 +104,39 @@ namespace WinCopies.IO
                 ;
 
             private static BitmapSource _TryGetFolderBitmapSource(in int size) => TryGetBitmapSource(FolderIcon, Shell32, size);
-
-            public static BitmapSource TryGetFolderBitmapSource(in int size)
-            {
-                switch (size)
-                {
-                    case SmallIconSize:
-
-                        return FolderSmall;
-
-                    case MediumIconSize:
-
-                        return FolderMedium;
-
-                    case LargeIconSize:
-
-                        return FolderLarge;
-
-                    case ExtraLargeIconSize:
-
-                        return FolderExtraLarge;
-                }
-
-                return null;
-            }
         }
 
-        public static class File
+        public class Folder : BitmapSources
         {
-            private static BitmapSource _fileSmall;
-            private static BitmapSource _fileMedium;
-            private static BitmapSource _fileLarge;
-            private static BitmapSource _fileExtraLarge;
+            private static Folder _folder;
 
-            public static BitmapSource FileSmall => _fileSmall
+            public static Folder Instance => _folder
 #if CS8
                 ??=
 #else
-                ?? (_fileSmall =
+                ?? (_folder =
+#endif
+                new Folder()
+#if !CS8
+                )
+#endif
+                ;
+
+            private Folder() { /* Left empty. */ }
+        }
+
+        public static class FileStatic
+        {
+            private static BitmapSource _small;
+            private static BitmapSource _medium;
+            private static BitmapSource _large;
+            private static BitmapSource _extraLarge;
+
+            public static BitmapSource Small => _small
+#if CS8
+                ??=
+#else
+                ?? (_small =
 #endif
                 _TryGetFileBitmapSource(SmallIconSize)
 #if !CS8
@@ -127,11 +144,11 @@ namespace WinCopies.IO
 #endif
                 ;
 
-            public static BitmapSource FileMedium => _fileMedium
+            public static BitmapSource Medium => _medium
 #if CS8
                 ??=
 #else
-                ?? (_fileMedium =
+                ?? (_medium =
 #endif
                 _TryGetFileBitmapSource(MediumIconSize)
 #if !CS8
@@ -139,11 +156,11 @@ namespace WinCopies.IO
 #endif
                 ;
 
-            public static BitmapSource FileLarge => _fileLarge
+            public static BitmapSource Large => _large
 #if CS8
                 ??=
 #else
-                ?? (_fileLarge =
+                ?? (_large =
 #endif
                 _TryGetFileBitmapSource(LargeIconSize)
 #if !CS8
@@ -151,11 +168,11 @@ namespace WinCopies.IO
 #endif
                 ;
 
-            public static BitmapSource FileExtraLarge => _fileExtraLarge
+            public static BitmapSource ExtraLarge => _extraLarge
 #if CS8
                 ??=
 #else
-                ?? (_fileExtraLarge =
+                ?? (_extraLarge =
 #endif
                 _TryGetFileBitmapSource(ExtraLargeIconSize)
 #if !CS8
@@ -164,33 +181,28 @@ namespace WinCopies.IO
                 ;
 
             private static BitmapSource _TryGetFileBitmapSource(in int size) => TryGetBitmapSource(FileIcon, Shell32, size);
-
-            public static BitmapSource TryGetFileBitmapSource(in int size)
-            {
-                switch (size)
-                {
-                    case SmallIconSize:
-
-                        return FileSmall;
-
-                    case MediumIconSize:
-
-                        return FileMedium;
-
-                    case LargeIconSize:
-
-                        return FileLarge;
-
-                    case ExtraLargeIconSize:
-
-                        return FileExtraLarge;
-                }
-
-                return null;
-            }
         }
 
-        public static class Computer
+        public class File : BitmapSources
+        {
+            private static File _file;
+
+            public static File Instance => _file
+#if CS8
+                ??=
+#else
+                ?? (_file =
+#endif
+                new File()
+#if !CS8
+                )
+#endif
+                ;
+
+            private File() { /* Left empty. */ }
+        }
+
+        public static class ComputerStatic
         {
             private static BitmapSource _computerSmall;
             private static BitmapSource _computerMedium;
@@ -246,30 +258,25 @@ namespace WinCopies.IO
                 ;
 
             private static BitmapSource _TryGetComputerBitmapSource(in int size) => TryGetBitmapSource(ComputerIcon, Shell32, size);
+        }
 
-            public static BitmapSource TryGetComputerBitmapSource(in int size)
-            {
-                switch (size)
-                {
-                    case SmallIconSize:
+        public class Computer : BitmapSources
+        {
+            private static Computer _folder;
 
-                        return ComputerSmall;
+            public static Computer Instance => _folder
+#if CS8
+                ??=
+#else
+                ?? (_folder =
+#endif
+                new Computer()
+#if !CS8
+                )
+#endif
+                ;
 
-                    case MediumIconSize:
-
-                        return ComputerMedium;
-
-                    case LargeIconSize:
-
-                        return ComputerLarge;
-
-                    case ExtraLargeIconSize:
-
-                        return ComputerExtraLarge;
-                }
-
-                return null;
-            }
+            private Computer() { /* Left empty. */ }
         }
     }
 }

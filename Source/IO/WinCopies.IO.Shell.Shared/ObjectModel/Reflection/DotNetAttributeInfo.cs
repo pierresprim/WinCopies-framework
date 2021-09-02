@@ -26,6 +26,7 @@ using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Reflection;
 using WinCopies.IO.Reflection.PropertySystem;
 using WinCopies.PropertySystem;
+using WinCopies.IO.Shell;
 
 #if DEBUG
 using WinCopies.Diagnostics;
@@ -62,7 +63,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
         }
 #endif
 
-        protected sealed override BitmapSource TryGetBitmapSource(in int size) => Icons.File.TryGetFileBitmapSource(size);
+        protected sealed override BitmapSource TryGetBitmapSource(in int size) => Icons.File.Instance.TryGetBitmapSource(size);
 
         protected override void DisposeManaged()
         {

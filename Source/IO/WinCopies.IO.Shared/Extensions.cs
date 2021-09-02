@@ -16,12 +16,14 @@
 * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using System;
-
+using System.Windows.Media.Imaging;
 using WinCopies.Collections;
 using WinCopies.Collections.DotNetFix.Generic;
 using WinCopies.Collections.Generic;
 
 using static WinCopies.ThrowHelper;
+
+using static WinCopies.IO.ObjectModel.BrowsableObjectInfo;
 
 namespace WinCopies.IO
 {
@@ -58,6 +60,96 @@ namespace WinCopies.IO
 
     public static class Extensions
     {
+        public static BitmapSource TryGetBitmapSource(this IBitmapSources bitmapSources, in int size)
+#if CS8
+            =>
+#else
+        {
+            ThrowIfNull(
+#endif
+            bitmapSources
+#if CS8
+            == null ? throw GetArgumentNullException(
+#else
+            ,
+#endif
+                nameof(bitmapSources))
+#if CS8
+            : size
+#else
+            ;
+#endif
+            switch
+#if CS8
+            {
+#else
+                (size)
+                {
+                    case
+#endif
+                SmallIconSize
+#if CS8
+                =>
+#else
+                : return
+#endif
+                bitmapSources.Small
+#if CS8
+                ,
+#else
+                    ; case
+#endif
+                MediumIconSize
+#if CS8
+                =>
+#else
+                : return
+#endif
+               bitmapSources.Medium
+#if CS8
+                ,
+#else
+                    ; case
+#endif
+                LargeIconSize
+#if CS8
+                =>
+#else
+                : return
+#endif
+               bitmapSources.Large
+#if CS8
+                ,
+#else
+                    ; case
+#endif
+                ExtraLargeIconSize
+#if CS8
+                =>
+#else
+                : return
+#endif
+               bitmapSources.ExtraLarge
+#if CS8
+                ,
+
+                _ =>
+#else
+                    ; default:
+
+                        return
+#endif
+                null
+#if CS8
+            };
+#else
+                ;
+            }
+#endif
+#if !CS8
+        }
+#endif
+
         public static string GetPath(this IPathCommon path, in bool ignoreRoot)
         {
             ThrowIfNull(path, nameof(path));

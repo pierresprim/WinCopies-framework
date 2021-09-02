@@ -82,7 +82,9 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         public bool IsSpecialItem => ModelGeneric.IsSpecialItem;
 
-        public IBrowsableObjectInfoBitmapSources BitmapSources => ModelGeneric.BitmapSources;
+        public IBitmapSourceProvider BitmapSourceProvider => ModelGeneric.BitmapSourceProvider;
+
+        public IBitmapSources BitmapSources => ModelGeneric.BitmapSources;
 
         public object InnerObject => ModelGeneric.InnerObject;
 

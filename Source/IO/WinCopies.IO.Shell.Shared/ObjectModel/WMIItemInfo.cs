@@ -28,6 +28,7 @@ using WinCopies.IO.AbstractionInterop;
 using WinCopies.IO.Process;
 using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Selectors;
+using WinCopies.IO.Shell;
 using WinCopies.Linq;
 using WinCopies.PropertySystem;
 using WinCopies.Util;
@@ -56,27 +57,27 @@ namespace WinCopies.IO
     {
         public abstract class WMIItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : BrowsableObjectInfo<TObjectProperties, ManagementBaseObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IWMIItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IWMIItemInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
         {
-            protected class BrowsableObjectInfoBitmapSources : BrowsableObjectInfoBitmapSources<WMIItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>>
+            protected class BrowsableObjectInfoBitmapSources : BitmapSources<WMIItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>>
             {
                 /// <summary>
                 /// Gets the small <see cref="BitmapSource"/> of this <see cref="WMIItemInfo"/>.
                 /// </summary>
-                protected override BitmapSource SmallBitmapSourceOverride => InnerObject.TryGetBitmapSource(SmallIconSize);
+                protected override BitmapSource SmallOverride => InnerObject.TryGetBitmapSource(SmallIconSize);
 
                 /// <summary>
                 /// Gets the medium <see cref="BitmapSource"/> of this <see cref="WMIItemInfo"/>.
                 /// </summary>
-                protected override BitmapSource MediumBitmapSourceOverride => InnerObject.TryGetBitmapSource(MediumIconSize);
+                protected override BitmapSource MediumOverride => InnerObject.TryGetBitmapSource(MediumIconSize);
 
                 /// <summary>
                 /// Gets the large <see cref="BitmapSource"/> of this <see cref="WMIItemInfo"/>.
                 /// </summary>
-                protected override BitmapSource LargeBitmapSourceOverride => InnerObject.TryGetBitmapSource(LargeIconSize);
+                protected override BitmapSource LargeOverride => InnerObject.TryGetBitmapSource(LargeIconSize);
 
                 /// <summary>
                 /// Gets the extra large <see cref="BitmapSource"/> of this <see cref="WMIItemInfo"/>.
                 /// </summary>
-                protected override BitmapSource ExtraLargeBitmapSourceOverride => InnerObject.TryGetBitmapSource(ExtraLargeIconSize);
+                protected override BitmapSource ExtraLargeOverride => InnerObject.TryGetBitmapSource(ExtraLargeIconSize);
 
                 public BrowsableObjectInfoBitmapSources(in WMIItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> wmiItemInfo) : base(wmiItemInfo) { /* Left empty. */ }
             }
@@ -87,11 +88,21 @@ namespace WinCopies.IO
             private string _itemTypeName;
             private IBrowsabilityOptions _browsability;
             private string _description;
-            private IBrowsableObjectInfoBitmapSources _bitmapSources;
+            private IBitmapSourceProvider _bitmapSourceProvider;
             #endregion
 
             #region Properties
-            protected override IBrowsableObjectInfoBitmapSources BitmapSourcesOverride => _bitmapSources;
+            protected override IBitmapSourceProvider BitmapSourceProviderOverride => _bitmapSourceProvider
+#if CS8
+                ??=
+#else
+                ?? (_bitmapSourceProvider =
+#endif
+                new BitmapSourceProviderCommon2(this, new BrowsableObjectInfoBitmapSources(this), true)
+#if !CS8
+                )
+#endif
+                ;
 
             protected override IProcessFactory ProcessFactoryOverride => Process.ProcessFactory.DefaultProcessFactory;
 
@@ -105,30 +116,84 @@ namespace WinCopies.IO
                 {
                     if (string.IsNullOrEmpty(_itemTypeName))
 #if CS8
-                        _itemTypeName = ObjectPropertiesGeneric.ItemType switch
-                        {
-                            WMIItemType.Namespace => Shell.Properties.Resources.WMINamespace,
-                            WMIItemType.Class => Shell.Properties.Resources.WMIClass,
-                            WMIItemType.Instance => Shell.Properties.Resources.WMIInstance,
-                            _ => throw new InvalidOperationException("Invalid item type."),
-                        };
+                        _itemTypeName =
 #else
-
-                        switch (ObjectPropertiesGeneric.ItemType)
-                        {
-                            case WMIItemType.Namespace:
-                                _itemTypeName = Shell.Properties.Resources.WMINamespace;
-                                break;
-                            case WMIItemType.Class:
-                                _itemTypeName = Shell.Properties.Resources.WMIClass;
-                                break;
-                            case WMIItemType.Instance:
-                                _itemTypeName = Shell.Properties.Resources.WMIInstance;
-                                break;
-                            default:
-                                throw new InvalidOperationException($"Invalid item type.");
-                        }
+                        switch (
 #endif
+                            ObjectPropertiesGeneric.ItemType
+#if CS8
+                            switch
+#else
+                            )
+#endif
+                            {
+#if !CS8
+                                case
+#endif
+                                WMIItemType.Namespace
+#if CS8
+                                    =>
+#else
+                                    :
+
+                                _itemTypeName =
+#endif
+                                    Shell.Properties.Resources.WMINamespace
+#if CS8
+                                ,
+#else
+                                ;
+
+                                break;
+
+                                case
+#endif
+                                WMIItemType.Class
+#if CS8
+                                    =>
+#else
+                                    :
+
+                                _itemTypeName =
+#endif
+                                    Shell.Properties.Resources.WMIClass
+#if CS8
+                                ,
+#else
+                                ;
+
+                                break;
+
+                                case
+#endif
+                                WMIItemType.Instance
+#if CS8
+                                    =>
+#else
+                                    :
+
+                                _itemTypeName =
+#endif
+                                    Shell.Properties.Resources.WMIInstance
+#if CS8
+                                ,
+
+                                _ =>
+#else
+                                ;
+
+                                break;
+
+                                default:
+#endif
+                                throw new InvalidOperationException("Invalid item type.")
+#if CS8
+                                ,
+#else
+                                ;
+#endif
+                            };
+
                     return _itemTypeName;
                 }
             }
@@ -178,31 +243,53 @@ namespace WinCopies.IO
                 get
                 {
                     if (_browsability == null)
-                    {
-#if CS8
-                        _browsability = ObjectPropertiesGeneric.ItemType switch
-                        {
+
 #if CS9
-                            WMIItemType.Namespace or WMIItemType.Class => BrowsabilityOptions.BrowsableByDefault,
+                        _browsability =
 #else
-                            WMIItemType.Namespace => BrowsabilityOptions.BrowsableByDefault,
-                            WMIItemType.Class => BrowsabilityOptions.BrowsableByDefault,
+                        switch (
 #endif
-                            _ => BrowsabilityOptions.NotBrowsable
-                        };
+                            ObjectPropertiesGeneric.ItemType
+#if CS9
+                            switch
 #else
-                        switch (ObjectPropertiesGeneric.ItemType)
-                        {
-                            case WMIItemType.Namespace:
-                            case WMIItemType.Class:
-                                _browsability = BrowsabilityOptions.BrowsableByDefault;
-                                break;
-                            default:
-                                _browsability = BrowsabilityOptions.NotBrowsable;
-                                break;
-                        }
+                        )
 #endif
-                    }
+                            {
+#if !CS9
+                                case
+#endif
+                                WMIItemType.Namespace
+#if CS9
+                                or
+#else
+                                : case
+#endif
+                                WMIItemType.Class
+#if CS9
+                                =>
+#else
+                                :
+
+                                _browsability =
+#endif
+                                BrowsabilityOptions.BrowsableByDefault
+#if CS9
+                                ,
+
+                                _ =>
+#else
+                                ;
+
+                                break; default:
+
+                                    _browsability =
+#endif
+                                BrowsabilityOptions.NotBrowsable
+#if !CS9
+                                ; break;
+#endif
+                            };
 
                     return _browsability;
                 }
@@ -316,7 +403,27 @@ namespace WinCopies.IO
                 {
                     case WMIItemType.Namespace:
 
-                        path = Path.Substring(0, Path.LastIndexOf(WinCopies.IO.Path.PathSeparator)) + NamespacePath;
+                        path =
+#if CS8
+                            string.Concat(
+#endif
+                                Path.
+#if CS8
+                                AsSpan
+#else
+                                Substring
+#endif
+                                (0, Path.LastIndexOf(WinCopies.IO.Path.PathSeparator))
+#if CS8
+                                ,
+#else
+                                +
+#endif
+                                NamespacePath
+#if CS8
+                                )
+#endif
+                            ;
 
                         return path.EndsWith(RootNamespace, true, CultureInfo.InvariantCulture)
                             ? GetRootWMIItemInfo()
@@ -326,7 +433,28 @@ namespace WinCopies.IO
 
                         return Path.EndsWith("root:" + Name, true, CultureInfo.InvariantCulture)
                             ? GetRootWMIItemInfo()
-                            : GetWMIItemInfo(Path.Substring(0, Path.IndexOf(':')) + NamespacePath, WMIItemType.Namespace);
+                            : GetWMIItemInfo(
+#if CS8
+                                string.Concat(
+#endif
+                                    Path.
+#if CS8
+                                    AsSpan
+#else
+                                    Substring
+#endif
+                                    (0, Path.IndexOf(':'))
+#if CS8
+                                    ,
+#else
+                                    +
+#endif
+                                    NamespacePath
+#if CS8
+                                    )
+#endif
+                                , WMIItemType.Namespace)
+                            ;
 
                     case WMIItemType.Instance:
 
@@ -351,11 +479,8 @@ namespace WinCopies.IO
 
             protected override void DisposeUnmanaged()
             {
-                if (_bitmapSources != null)
-                {
-                    _bitmapSources.Dispose();
-                    _bitmapSources = null;
-                }
+                _bitmapSourceProvider.Dispose();
+                _bitmapSourceProvider = null;
 
                 base.DisposeUnmanaged();
             }

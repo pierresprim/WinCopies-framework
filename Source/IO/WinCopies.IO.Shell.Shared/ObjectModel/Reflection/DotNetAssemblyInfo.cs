@@ -99,7 +99,7 @@ namespace WinCopies.IO
 
             protected override Shell.PropertySystem.IFileSystemObjectInfoProperties ObjectPropertiesGenericOverride { get; }
 
-            protected override IBrowsableObjectInfoBitmapSources BitmapSourcesOverride => _shellObjectInfo.BitmapSources;
+            protected override IBitmapSourceProvider BitmapSourceProviderOverride => _shellObjectInfo.BitmapSourceProvider;
 
             protected override System.Collections.Generic.IEnumerable<IBrowsabilityPath> BrowsabilityPathsOverride => _shellObjectInfo.BrowsabilityPaths;
 

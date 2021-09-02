@@ -25,6 +25,7 @@ using WinCopies.IO.AbstractionInterop;
 using WinCopies.IO.Process;
 using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Selectors;
+using WinCopies.IO.Shell;
 using WinCopies.Linq;
 using WinCopies.PropertySystem;
 
@@ -36,15 +37,15 @@ namespace WinCopies.IO.ObjectModel
 {
     public abstract class PortableDeviceObjectInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : FileSystemObjectInfo<TObjectProperties, IPortableDeviceObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IPortableDeviceObjectInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IFileSystemObjectInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
     {
-        protected class BrowsableObjectInfoBitmapSources : BrowsableObjectInfoBitmapSources<IPortableDeviceObjectInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>>
+        protected class BrowsableObjectInfoBitmapSources : BitmapSources<IPortableDeviceObjectInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>>
         {
-            protected override BitmapSource SmallBitmapSourceOverride => InnerObject.TryGetBitmapSource(SmallIconSize);
+            protected override BitmapSource SmallOverride => InnerObject.TryGetBitmapSource(SmallIconSize);
 
-            protected override BitmapSource MediumBitmapSourceOverride => InnerObject.TryGetBitmapSource(MediumIconSize);
+            protected override BitmapSource MediumOverride => InnerObject.TryGetBitmapSource(MediumIconSize);
 
-            protected override BitmapSource LargeBitmapSourceOverride => InnerObject.TryGetBitmapSource(LargeIconSize);
+            protected override BitmapSource LargeOverride => InnerObject.TryGetBitmapSource(LargeIconSize);
 
-            protected override BitmapSource ExtraLargeBitmapSourceOverride => InnerObject.TryGetBitmapSource(ExtraLargeIconSize);
+            protected override BitmapSource ExtraLargeOverride => InnerObject.TryGetBitmapSource(ExtraLargeIconSize);
 
             public BrowsableObjectInfoBitmapSources(in IPortableDeviceObjectInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> portableDeviceInfo) : base(portableDeviceInfo) { /* Left empty. */ }
         }
@@ -56,19 +57,19 @@ namespace WinCopies.IO.ObjectModel
         private bool _isNameLoaded;
         private string _name;
         private bool? _isSpecialItem;
-        private IBrowsableObjectInfoBitmapSources _bitmapSources;
+        private IBitmapSourceProvider _bitmapSourceProvider;
         #endregion
 
         #region Properties
-        protected override System.Collections.Generic.IEnumerable<IProcessInfo> CustomProcessesOverride => PortableDeviceObjectInfo. DefaultCustomProcessesSelectorDictionary.Select(this);
+        protected override System.Collections.Generic.IEnumerable<IProcessInfo> CustomProcessesOverride => PortableDeviceObjectInfo.DefaultCustomProcessesSelectorDictionary.Select(this);
 
-        protected override IBrowsableObjectInfoBitmapSources BitmapSourcesOverride => _bitmapSources
+        protected override IBitmapSourceProvider BitmapSourceProviderOverride => _bitmapSourceProvider
 #if CS8
             ??=
 #else
-            ?? (_bitmapSources =
+            ?? (_bitmapSourceProvider =
 #endif
-            new BrowsableObjectInfoBitmapSources(this)
+            new BitmapSourceProviderCommon2(this, new BrowsableObjectInfoBitmapSources(this), true)
 #if !CS8
             )
 #endif
@@ -143,10 +144,10 @@ namespace WinCopies.IO.ObjectModel
         {
             _parent = null;
 
-            if (_bitmapSources != null)
+            if (_bitmapSourceProvider != null)
             {
-                _bitmapSources.Dispose();
-                _bitmapSources = null;
+                _bitmapSourceProvider.Dispose();
+                _bitmapSourceProvider = null;
             }
 
             base.DisposeUnmanaged();

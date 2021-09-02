@@ -57,7 +57,7 @@ namespace WinCopies.IO
             private ShellObject _shellObject;
             private IBrowsableObjectInfo _parent;
             private IBrowsabilityOptions _browsability;
-            private IBrowsableObjectInfoBitmapSources _bitmapSources;
+            private IBitmapSourceProvider _bitmapSourceProvider;
 
             #region Properties
             public System.IO.Stream ArchiveFileStream { get; private set; }
@@ -65,9 +65,14 @@ namespace WinCopies.IO
             /// <summary>
             /// The parent <see cref="IShellObjectInfoBase"/> of the current archive item. If the current <see cref="ShellObjectInfo"/> represents an archive file, this property returns the current <see cref="ShellObjectInfo"/>, or <see langword="null"/> otherwise.
             /// </summary>
-            public override IShellObjectInfoBase ArchiveShellObject => ObjectPropertiesGeneric.FileType == FileType.Archive ? this : null;
+            public override IShellObjectInfoBase ArchiveShellObject => ObjectPropertiesGeneric.FileType == Archive ? this : null;
 
-            public bool IsArchiveOpen => ArchiveFileStream is object;
+            public bool IsArchiveOpen => ArchiveFileStream is
+#if CS9
+                not null;
+#else
+                object;
+#endif
 
             #region Overrides
             /// <summary>
@@ -75,13 +80,13 @@ namespace WinCopies.IO
             /// </summary>
             protected sealed override ShellObject InnerObjectGenericOverride => _shellObject;
 
-            protected override IBrowsableObjectInfoBitmapSources BitmapSourcesOverride => _bitmapSources
+            protected override IBitmapSourceProvider BitmapSourceProviderOverride => _bitmapSourceProvider
 #if CS8
                 ??=
 #else
-                ?? (_bitmapSources =
+                ?? (_bitmapSourceProvider =
 #endif
-                new BrowsableObjectInfoBitmapSources(InnerObjectGeneric)
+                new Shell.BitmapSourceProvider(InnerObjectGeneric, true)
 #if !CS8
                 )
 #endif
@@ -185,22 +190,15 @@ namespace WinCopies.IO
 
             #region Methods
             #region Archive
-            public void OpenArchive(FileMode fileMode, FileAccess fileAccess, FileShare fileShare, int? bufferSize, FileOptions fileOptions)
-            {
-                if (ObjectPropertiesGeneric.FileType == FileType.Archive)
-
-                    ArchiveFileStream = ArchiveFileStream == null
+            public void OpenArchive(FileMode fileMode, FileAccess fileAccess, FileShare fileShare, int? bufferSize, FileOptions fileOptions) => ArchiveFileStream = ObjectPropertiesGeneric.FileType == Archive
+                    ? ArchiveFileStream == null
                         ? new FileStream(Path, fileMode, fileAccess, fileShare, bufferSize ?? 4096, fileOptions)
-                        : throw new InvalidOperationException("The archive is not open.");
-
-                else
-
-                    throw new InvalidOperationException("The current item is not an archive.");
-            }
+                        : throw new InvalidOperationException("The archive is not open.")
+                    : throw new InvalidOperationException("The current item is not an archive.");
 
             public void CloseArchive()
             {
-                if (ObjectPropertiesGeneric.FileType == FileType.Archive)
+                if (ObjectPropertiesGeneric.FileType == Archive)
                 {
                     if (ArchiveFileStream == null)
 
@@ -226,10 +224,10 @@ namespace WinCopies.IO
 
                     CloseArchive();
 
-                if (_bitmapSources != null)
+                if (_bitmapSourceProvider != null)
                 {
-                    _bitmapSources.Dispose();
-                    _bitmapSources = null;
+                    _bitmapSourceProvider.Dispose();
+                    _bitmapSourceProvider = null;
                 }
 
                 base.DisposeUnmanaged();

@@ -39,15 +39,15 @@ namespace WinCopies.IO.ObjectModel
 {
     public abstract class PortableDeviceInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : FileSystemObjectInfo<TObjectProperties, IPortableDevice, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IPortableDeviceInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IPortableDeviceInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
     {
-        protected class BrowsableObjectInfoBitmapSources : BrowsableObjectInfoBitmapSources<IPortableDeviceInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>>
+        protected class BrowsableObjectInfoBitmapSources : BitmapSources<IPortableDeviceInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>>
         {
-            protected override BitmapSource SmallBitmapSourceOverride => InnerObject.TryGetBitmapSource(SmallIconSize);
+            protected override BitmapSource SmallOverride => InnerObject.TryGetBitmapSource(SmallIconSize);
 
-            protected override BitmapSource MediumBitmapSourceOverride => InnerObject.TryGetBitmapSource(MediumIconSize);
+            protected override BitmapSource MediumOverride => InnerObject.TryGetBitmapSource(MediumIconSize);
 
-            protected override BitmapSource LargeBitmapSourceOverride => InnerObject.TryGetBitmapSource(LargeIconSize);
+            protected override BitmapSource LargeOverride => InnerObject.TryGetBitmapSource(LargeIconSize);
 
-            protected override BitmapSource ExtraLargeBitmapSourceOverride => InnerObject.TryGetBitmapSource(ExtraLargeIconSize);
+            protected override BitmapSource ExtraLargeOverride => InnerObject.TryGetBitmapSource(ExtraLargeIconSize);
 
             public BrowsableObjectInfoBitmapSources(in IPortableDeviceInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> portableDeviceInfo) : base(portableDeviceInfo) { /* Left empty. */ }
         }
@@ -55,16 +55,16 @@ namespace WinCopies.IO.ObjectModel
         private const int PortableDeviceIcon = 42;
         private const string PortableDeviceIconDllName = "imageres.dll";
         private IPortableDevice _portableDevice;
-        private IBrowsableObjectInfoBitmapSources _bitmapSources;
+        private IBitmapSourceProvider _bitmapSourceProvider;
 
         #region Properties
-        protected override IBrowsableObjectInfoBitmapSources BitmapSourcesOverride => _bitmapSources
+        protected override IBitmapSourceProvider BitmapSourceProviderOverride => _bitmapSourceProvider
 #if CS8
             ??=
 #else
-            ?? (_bitmapSources =
+            ?? (_bitmapSourceProvider =
 #endif
-            new BrowsableObjectInfoBitmapSources(this)
+            new BitmapSourceProviderCommon(false, new BrowsableObjectInfoBitmapSources(this), true)
 #if !CS8
             )
 #endif
@@ -113,10 +113,10 @@ namespace WinCopies.IO.ObjectModel
 
         protected override void DisposeUnmanaged()
         {
-            if (_bitmapSources != null)
+            if (_bitmapSourceProvider != null)
             {
-                _bitmapSources.Dispose();
-                _bitmapSources = null;
+                _bitmapSourceProvider.Dispose();
+                _bitmapSourceProvider = null;
             }
 
             base.DisposeUnmanaged();

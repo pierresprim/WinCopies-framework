@@ -29,15 +29,15 @@ using static WinCopies.IO.Shell.ObjectModel.BrowsableObjectInfo;
 
 namespace WinCopies.IO.Shell
 {
-    public class BrowsableObjectInfoIconBitmapSources : BrowsableObjectInfoBitmapSources<Icon>
+    public class BrowsableObjectInfoIconBitmapSources : BitmapSources<Icon>
     {
-        protected override BitmapSource SmallBitmapSourceOverride => TryGetBitmapSource(InnerObject);
+        protected override BitmapSource SmallOverride => TryGetBitmapSource(InnerObject);
 
-        protected override BitmapSource MediumBitmapSourceOverride => TryGetBitmapSource(InnerObject);
+        protected override BitmapSource MediumOverride => TryGetBitmapSource(InnerObject);
 
-        protected override BitmapSource LargeBitmapSourceOverride => TryGetBitmapSource(InnerObject);
+        protected override BitmapSource LargeOverride => TryGetBitmapSource(InnerObject);
 
-        protected override BitmapSource ExtraLargeBitmapSourceOverride => TryGetBitmapSource(InnerObject);
+        protected override BitmapSource ExtraLargeOverride => TryGetBitmapSource(InnerObject);
 
         public BrowsableObjectInfoIconBitmapSources(in Icon icon) : base(icon) { /* Left empty. */ }
     }

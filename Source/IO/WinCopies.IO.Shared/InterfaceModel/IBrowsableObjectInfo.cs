@@ -15,8 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-using Microsoft.WindowsAPICodePack.PortableDevices;
-
 using System;
 
 using WinCopies.Collections.Generic;
@@ -69,7 +67,9 @@ namespace WinCopies.IO
             /// </summary>
             IBrowsableObjectInfo Parent { get; }
 
-            IBrowsableObjectInfoBitmapSources BitmapSources { get; }
+            IBitmapSourceProvider BitmapSourceProvider { get; }
+
+            IBitmapSources BitmapSources { get; }
 
             string ItemTypeName { get; }
 
