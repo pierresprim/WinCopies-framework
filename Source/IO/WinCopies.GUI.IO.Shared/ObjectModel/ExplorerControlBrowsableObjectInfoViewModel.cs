@@ -131,11 +131,8 @@ namespace WinCopies.GUI.IO.ObjectModel
                             try
                             {
                                 if (item.BitmapSources is IBitmapSourcesLinker bitmapSourcesLinker)
-                                {
-                                    bitmapSourcesLinker.Load();
 
-                                    bitmapSourcesLinker.Freeze();
-                                }
+                                    bitmapSourcesLinker.Load();
                             }
 
                             catch { /* Left empty. */ }

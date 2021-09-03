@@ -662,8 +662,6 @@ namespace WinCopies.IO
         void OnExtraLargeLoaded();
 
         void OnBitmapSourcesLoaded();
-
-        void Freeze();
     }
 
     public class BitmapSourcesLinker : BitmapSources<IBitmapSourceProvider>, IBitmapSourcesLinker, INotifyPropertyChanged
@@ -687,20 +685,13 @@ namespace WinCopies.IO
 
         public BitmapSourcesLinker(in IBitmapSourceProvider bitmapSourceProvider) : base(bitmapSourceProvider)
         {
-            _small = bitmapSourceProvider.Default.Small;
-            _medium = bitmapSourceProvider.Default.Medium;
-            _large = bitmapSourceProvider.Default.Large;
-            _extraLarge = bitmapSourceProvider.Default.ExtraLarge;
+            UpdateBitmapSource(ref _small, bitmapSourceProvider.Default.Small);
+            UpdateBitmapSource(ref _medium, bitmapSourceProvider.Default.Medium);
+            UpdateBitmapSource(ref _large, bitmapSourceProvider.Default.Large);
+            UpdateBitmapSource(ref _extraLarge, bitmapSourceProvider.Default.ExtraLarge);
         }
 
-        public virtual void Freeze()
-        {
-            System.Collections.Generic.IEnumerable<PropertyInfo> enumerable = GetType().GetProperties(_flags).Where(p => p.PropertyType == typeof(BitmapSource));
-
-            foreach (PropertyInfo property in enumerable)
-
-                ((Freezable)property.GetValue(this)).Freeze();
-        }
+        protected void UpdateBitmapSource(ref BitmapSource value, in BitmapSource newValue) => (value = newValue).Freeze();
 
         protected virtual void RaisePropertyChangedEvent(in PropertyChangedEventArgs e) => PropertyChanged?.Invoke(this, e);
 
@@ -716,13 +707,13 @@ namespace WinCopies.IO
 
         public virtual void OnBitmapSourcesLoaded() => InvokeMethods(name => name != nameof(OnBitmapSourcesLoaded) && name.StartsWith("On") && name.EndsWith("Loaded"));
 
-        public void LoadSmall() => UpdateValue(ref _small, InnerObject.Sources.Small);
+        public void LoadSmall() => UpdateBitmapSource(ref _small, InnerObject.Sources.Small);
 
-        public void LoadMedium() => UpdateValue(ref _medium, InnerObject.Sources.Medium);
+        public void LoadMedium() => UpdateBitmapSource(ref _medium, InnerObject.Sources.Medium);
 
-        public void LoadLarge() => UpdateValue(ref _large, InnerObject.Sources.Large);
+        public void LoadLarge() => UpdateBitmapSource(ref _large, InnerObject.Sources.Large);
 
-        public void LoadExtraLarge() => UpdateValue(ref _extraLarge, InnerObject.Sources.ExtraLarge);
+        public void LoadExtraLarge() => UpdateBitmapSource(ref _extraLarge, InnerObject.Sources.ExtraLarge);
 
         public virtual void Load() => InvokeMethods(name => name.Length > nameof(Load).Length && name.StartsWith(nameof(Load)));
 
