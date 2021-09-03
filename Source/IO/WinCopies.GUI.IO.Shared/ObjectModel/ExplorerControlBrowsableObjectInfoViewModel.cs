@@ -26,6 +26,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 using WinCopies.Collections;
 using WinCopies.Collections.Generic;
@@ -85,7 +86,7 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         private class BackgroundWorker
         {
-            private WinCopies.BackgroundWorker _backgroundWorker;
+            private WinCopies.BackgroundWorker _backgroundWorker = new WinCopies.BackgroundWorker();
             private IBrowsableObjectInfo _updateWith;
             private IBrowsableObjectInfo _workOn;
 
@@ -94,9 +95,11 @@ namespace WinCopies.GUI.IO.ObjectModel
                 _backgroundWorker.WorkerSupportsCancellation = _backgroundWorker.WorkerReportsProgress = true;
 
                 _backgroundWorker.DoWork += (object sender, DoWorkEventArgs e) => OnDoWork();
+
+                _backgroundWorker.ProgressChanged += (object sender, ProgressChangedEventArgs e) => BackgroundWorker.OnProgressChanged((IBitmapSourcesLinker)e.UserState);
             }
 
-            public void OnDoWork()
+            private void OnDoWork()
             {
                 System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> enumerable = _workOn.GetItems();
                 ulong? count;
@@ -128,15 +131,16 @@ namespace WinCopies.GUI.IO.ObjectModel
                             try
                             {
                                 if (item.BitmapSources is IBitmapSourcesLinker bitmapSourcesLinker)
-
+                                {
                                     bitmapSourcesLinker.Load();
+
+                                    bitmapSourcesLinker.Freeze();
+                                }
                             }
 
                             catch { /* Left empty. */ }
 
-                            if (count.HasValue)
-
-                                _backgroundWorker.ReportProgress((int)((++i) / count.Value * 100));
+                            _backgroundWorker.ReportProgress(count.HasValue ? (int)((++i) / count.Value * 100) : 0, item.BitmapSources);
                         }
 
                         else
@@ -154,6 +158,15 @@ namespace WinCopies.GUI.IO.ObjectModel
                 }
 
                 while (doWork()) { /* Left empty. */ }
+            }
+
+            private static void OnProgressChanged(IBitmapSourcesLinker bitmapSourcesLinker)
+            {
+                if (bitmapSourcesLinker == null)
+
+                    return;
+
+                _ = Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(bitmapSourcesLinker.OnBitmapSourcesLoaded));
             }
 
             public void UpdatePath(in IBrowsableObjectInfo browsableObjectInfo)
@@ -181,7 +194,11 @@ namespace WinCopies.GUI.IO.ObjectModel
         private IList _selectedItems;
         private string _text;
         private System.Collections.Generic.IEnumerable<IBrowsableObjectInfoViewModel> _treeViewItems;
-        private BackgroundWorker _backgroundWorker = new BackgroundWorker();
+        private readonly BackgroundWorker _backgroundWorker = new
+#if !CS9
+            BackgroundWorker
+#endif
+            ();
         #endregion
 
         #region Properties
@@ -241,6 +258,8 @@ namespace WinCopies.GUI.IO.ObjectModel
             ThrowIfNull(converter, nameof(converter));
 
             _path = path;
+
+            LoadPath();
 
             GetBrowsableObjectInfoViewModelConverter = converter;
 
@@ -305,11 +324,13 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         protected T GetValueIfNotDisposed<T>(in T value) => IsDisposed ? throw GetExceptionForDispose(false) : value;
 
+        private void LoadPath() => _backgroundWorker.UpdatePath(_path);
+
         protected virtual void OnPathAdded()
         {
             _path.PropertyChanged += Path_PropertyChanged;
 
-            _backgroundWorker.UpdatePath(_path);
+            LoadPath();
         }
 
         protected virtual void OnPathRemoved(IBrowsableObjectInfoViewModel path) => path.PropertyChanged -= Path_PropertyChanged;

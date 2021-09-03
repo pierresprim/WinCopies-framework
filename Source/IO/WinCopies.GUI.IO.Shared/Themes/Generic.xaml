@@ -203,7 +203,7 @@
         <localControls:ExplorerControlTreeViewItemHeader>
             <localControls:ExplorerControlTreeViewItemHeader.Style>
                 <Style TargetType="{x:Type localControls:ExplorerControlTreeViewItemHeader}" >
-                    <Setter Property="Icon" Value="{Binding BitmapSources.SmallBitmapSource}" />
+                    <Setter Property="Icon" Value="{Binding BitmapSources.Small}" />
                     <Setter Property="ItemName" Value="{Binding LocalizedName}" />
                 </Style>
             </localControls:ExplorerControlTreeViewItemHeader.Style>
@@ -214,8 +214,8 @@
         <localControls:ExplorerControlListViewItemContent>
             <localControls:ExplorerControlListViewItemContent.Style>
                 <Style TargetType="{x:Type localControls:ExplorerControlListViewItemContent}" >
-                    <Setter Property="SmallIcon" Value="{Binding BitmapSources.SmallBitmapSource}" />
-                    <Setter Property="LargeIcon" Value="{Binding BitmapSources.LargeBitmapSource}" />
+                    <Setter Property="SmallIcon" Value="{Binding BitmapSources.Small}" />
+                    <Setter Property="LargeIcon" Value="{Binding BitmapSources.Large}" />
                     <Setter Property="ItemName" Value="{Binding LocalizedName}" />
                     <Setter Property="HasTransparency" Value="{Binding IsSpecialItem}" />
                     <Setter Property="IsCheckBoxVisible" Value="{Binding IsCheckBoxVisible, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type localControls:ExplorerControl}}}" />

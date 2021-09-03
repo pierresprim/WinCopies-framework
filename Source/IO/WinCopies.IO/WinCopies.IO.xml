@@ -316,27 +316,27 @@
             The item redirects to an other item, with this item browsable.
             </summary>
         </member>
-        <member name="T:WinCopies.IO.IBrowsableObjectInfoBitmapSources">
+        <member name="T:WinCopies.IO.IBitmapSources">
             <summary>
             Represents a <see cref="T:System.Windows.Media.Imaging.BitmapSource"/>s provider for a GUI.
             </summary>
         </member>
-        <member name="P:WinCopies.IO.IBrowsableObjectInfoBitmapSources.SmallBitmapSource">
+        <member name="P:WinCopies.IO.IBitmapSources.Small">
             <summary>
             Gets the small <see cref="T:System.Windows.Media.Imaging.BitmapSource"/> of the object related to the current instance.
             </summary>
         </member>
-        <member name="P:WinCopies.IO.IBrowsableObjectInfoBitmapSources.MediumBitmapSource">
+        <member name="P:WinCopies.IO.IBitmapSources.Medium">
             <summary>
             Gets the medium <see cref="T:System.Windows.Media.Imaging.BitmapSource"/> of the object related to the current instance.
             </summary>
         </member>
-        <member name="P:WinCopies.IO.IBrowsableObjectInfoBitmapSources.LargeBitmapSource">
+        <member name="P:WinCopies.IO.IBitmapSources.Large">
             <summary>
             Gets the large <see cref="T:System.Windows.Media.Imaging.BitmapSource"/> of the object related to the current instance.
             </summary>
         </member>
-        <member name="P:WinCopies.IO.IBrowsableObjectInfoBitmapSources.ExtraLargeBitmapSource">
+        <member name="P:WinCopies.IO.IBitmapSources.ExtraLarge">
             <summary>
             Gets the extra large <see cref="T:System.Windows.Media.Imaging.BitmapSource"/> of the object related to the current instance.
             </summary>

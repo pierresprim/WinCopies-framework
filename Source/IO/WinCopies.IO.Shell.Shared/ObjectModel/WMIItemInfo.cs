@@ -479,8 +479,11 @@ namespace WinCopies.IO
 
             protected override void DisposeUnmanaged()
             {
-                _bitmapSourceProvider.Dispose();
-                _bitmapSourceProvider = null;
+                if (_bitmapSourceProvider != null)
+                {
+                    _bitmapSourceProvider.Dispose();
+                    _bitmapSourceProvider = null;
+                }
 
                 base.DisposeUnmanaged();
             }

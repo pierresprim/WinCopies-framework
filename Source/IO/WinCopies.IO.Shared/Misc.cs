@@ -20,6 +20,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Reflection;
+using System.Windows;
 using System.Windows.Media.Imaging;
 
 using WinCopies.Collections.Generic;
@@ -29,6 +30,7 @@ using WinCopies.IO.ObjectModel;
 using WinCopies.IO.Process.ObjectModel;
 
 using static WinCopies.ThrowHelper;
+using static WinCopies.UtilHelpers;
 
 namespace WinCopies.IO
 {
@@ -506,9 +508,9 @@ namespace WinCopies.IO
         {
             if (DisposeBitmapSources)
             {
-                DefaultOverride.Dispose();
+                DefaultOverride?.Dispose();
 
-                SourcesOverride.Dispose();
+                SourcesOverride?.Dispose();
             }
         }
 
@@ -548,9 +550,9 @@ namespace WinCopies.IO
             DisposeBitmapSources = disposeBitmapSources;
         }
 
-        protected override void DisposeManaged()
+        protected override void DisposeUnmanaged()
         {
-            base.DisposeManaged();
+            base.DisposeUnmanaged();
 
             _defaultOverride = null;
             _sourcesOverride = null;
@@ -650,10 +652,24 @@ namespace WinCopies.IO
         void LoadExtraLarge();
 
         void Load();
+
+        void OnSmallLoaded();
+
+        void OnMediumLoaded();
+
+        void OnLargeLoaded();
+
+        void OnExtraLargeLoaded();
+
+        void OnBitmapSourcesLoaded();
+
+        void Freeze();
     }
 
     public class BitmapSourcesLinker : BitmapSources<IBitmapSourceProvider>, IBitmapSourcesLinker, INotifyPropertyChanged
     {
+        private const BindingFlags _flags = BindingFlags.Public | BindingFlags.Instance;
+
         private BitmapSource _small;
         private BitmapSource _medium;
         private BitmapSource _large;
@@ -677,23 +693,42 @@ namespace WinCopies.IO
             _extraLarge = bitmapSourceProvider.Default.ExtraLarge;
         }
 
+        public virtual void Freeze()
+        {
+            System.Collections.Generic.IEnumerable<PropertyInfo> enumerable = GetType().GetProperties(_flags).Where(p => p.PropertyType == typeof(BitmapSource));
+
+            foreach (PropertyInfo property in enumerable)
+
+                ((Freezable)property.GetValue(this)).Freeze();
+        }
+
         protected virtual void RaisePropertyChangedEvent(in PropertyChangedEventArgs e) => PropertyChanged?.Invoke(this, e);
 
         protected virtual void RaisePropertyChangedEvent(in string propertyName) => RaisePropertyChangedEvent(new PropertyChangedEventArgs(propertyName));
 
-        protected virtual void UpdateValue<T>(ref T value, in T newValue, string propertyName) => UtilHelpers.UpdateValue(ref value, newValue, () => RaisePropertyChangedEvent(propertyName));
+        public virtual void OnSmallLoaded() => RaisePropertyChangedEvent(nameof(Small));
 
-        public void LoadSmall() => UpdateValue(ref _small, InnerObject.Sources.Small, nameof(Small));
+        public virtual void OnMediumLoaded() => RaisePropertyChangedEvent(nameof(Medium));
 
-        public void LoadMedium() => UpdateValue(ref _medium, InnerObject.Sources.Medium, nameof(Medium));
+        public virtual void OnLargeLoaded() => RaisePropertyChangedEvent(nameof(Large));
 
-        public void LoadLarge() => UpdateValue(ref _large, InnerObject.Sources.Large, nameof(Large));
+        public virtual void OnExtraLargeLoaded() => RaisePropertyChangedEvent(nameof(ExtraLarge));
 
-        public void LoadExtraLarge() => UpdateValue(ref _extraLarge, InnerObject.Sources.ExtraLarge, nameof(ExtraLarge));
+        public virtual void OnBitmapSourcesLoaded() => InvokeMethods(name => name != nameof(OnBitmapSourcesLoaded) && name.StartsWith("On") && name.EndsWith("Loaded"));
 
-        public virtual void Load()
+        public void LoadSmall() => UpdateValue(ref _small, InnerObject.Sources.Small);
+
+        public void LoadMedium() => UpdateValue(ref _medium, InnerObject.Sources.Medium);
+
+        public void LoadLarge() => UpdateValue(ref _large, InnerObject.Sources.Large);
+
+        public void LoadExtraLarge() => UpdateValue(ref _extraLarge, InnerObject.Sources.ExtraLarge);
+
+        public virtual void Load() => InvokeMethods(name => name.Length > nameof(Load).Length && name.StartsWith(nameof(Load)));
+
+        private void InvokeMethods(Predicate<string> predicate)
         {
-            System.Collections.Generic.IEnumerable<MethodInfo> methods = GetType().GetMethods().Where(m => m.Name.StartsWith(nameof(Load)) && m.GetParameters().Length == 0);
+            System.Collections.Generic.IEnumerable<MethodInfo> methods = GetType().GetMethods(_flags).Where(m => predicate(m.Name) && m.GetParameters().Length == 0);
 
             foreach (MethodInfo method in methods)
 

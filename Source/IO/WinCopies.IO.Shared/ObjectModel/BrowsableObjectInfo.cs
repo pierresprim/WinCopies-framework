@@ -121,7 +121,17 @@ namespace WinCopies.IO.ObjectModel
         #region Public Properties
         public IBitmapSourceProvider BitmapSourceProvider => GetValueIfNotDisposed(() => BitmapSourceProviderOverride);
 
-        public IBitmapSourcesLinker BitmapSources => GetValueIfNotDisposed(() => _bitmapSources);
+        public IBitmapSourcesLinker BitmapSources => GetValueIfNotDisposed(() => _bitmapSources
+#if CS8
+            ??=
+#else
+            ?? (_bitmapSources =
+#endif
+            new BitmapSourcesLinker(BitmapSourceProviderOverride)
+#if !CS8
+            )
+#endif
+            );
 
         public IBrowsabilityOptions Browsability => GetValueIfNotDisposed(() => BrowsabilityOverride);
 
@@ -163,12 +173,7 @@ namespace WinCopies.IO.ObjectModel
         /// Initializes a new instance of the <see cref="BrowsableObjectInfo"/> class.
         /// </summary>
         /// <param name="path">The path of the new item.</param>
-        protected BrowsableObjectInfo(in string path, in ClientVersion clientVersion) : base(path)
-        {
-            ClientVersion = clientVersion;
-
-            _bitmapSources = new BitmapSourcesLinker(BitmapSourceProviderOverride);
-        }
+        protected BrowsableObjectInfo(in string path, in ClientVersion clientVersion) : base(path) => ClientVersion = clientVersion;
 
         #region Methods
         #region Static Methods

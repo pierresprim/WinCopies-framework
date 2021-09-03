@@ -8,7 +8,9 @@ CHANGELOG
 
 ### 3.8-preview
 
-- Bug fixed when adding a title bar menu item: the menu item remained enabled even if its IsEnabled property is set to false.
+- Bug fixed:
+	- when adding a title bar menu item: the menu item remained enabled even if its IsEnabled property is set to false.
+	- on disposing WMIItemInfo objects.
 - Update IBrowsableObjectInfo bitmap source properties in order to add a linker to the default and actual bitmap sources so that the actual ones can loaded on background. All bitmap sources implementation has been updated consequently.
 - Icons:
 	- is in WinCopies.IO.Shell.

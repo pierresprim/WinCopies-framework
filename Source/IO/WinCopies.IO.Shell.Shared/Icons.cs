@@ -209,7 +209,7 @@ namespace WinCopies.IO.Shell
             private static BitmapSource _computerLarge;
             private static BitmapSource _computerExtraLarge;
 
-            public static BitmapSource ComputerSmall => _computerSmall
+            public static BitmapSource Small => _computerSmall
 #if CS8
                 ??=
 #else
@@ -221,7 +221,7 @@ namespace WinCopies.IO.Shell
 #endif
                 ;
 
-            public static BitmapSource ComputerMedium => _computerMedium
+            public static BitmapSource Medium => _computerMedium
 #if CS8
                 ??=
 #else
@@ -233,7 +233,7 @@ namespace WinCopies.IO.Shell
 #endif
                 ;
 
-            public static BitmapSource ComputerLarge => _computerLarge
+            public static BitmapSource Large => _computerLarge
 #if CS8
                 ??=
 #else
@@ -245,7 +245,7 @@ namespace WinCopies.IO.Shell
 #endif
                 ;
 
-            public static BitmapSource ComputerExtraLarge => _computerExtraLarge
+            public static BitmapSource ExtraLarge => _computerExtraLarge
 #if CS8
                 ??=
 #else
@@ -262,13 +262,13 @@ namespace WinCopies.IO.Shell
 
         public class Computer : BitmapSources
         {
-            private static Computer _folder;
+            private static Computer _computer;
 
-            public static Computer Instance => _folder
+            public static Computer Instance => _computer
 #if CS8
                 ??=
 #else
-                ?? (_folder =
+                ?? (_computer =
 #endif
                 new Computer()
 #if !CS8
