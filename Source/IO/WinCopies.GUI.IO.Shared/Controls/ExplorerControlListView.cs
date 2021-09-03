@@ -15,8 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+using Microsoft.WindowsAPICodePack.Shell;
+using System.Collections.Specialized;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
+using WinCopies.Collections.Generic;
+using WinCopies.IO.ObjectModel;
 
 namespace WinCopies.GUI.IO.Controls
 {
@@ -43,10 +48,49 @@ namespace WinCopies.GUI.IO.Controls
 
     public class ExplorerControlListView : ListView
     {
+        private Point startPoint;
         //public static readonly DependencyProperty ViewStyleProperty = DependencyProperty.Register(nameof(ViewStyle), typeof(ViewStyle), typeof(ExplorerControlListView));
 
         //public ViewStyle ViewStyle { get => (ViewStyle)GetValue(ViewStyleProperty); set => SetValue(ViewStyleProperty, value); }
 
         protected override DependencyObject GetContainerForItemOverride() => new ExplorerControlListViewItem();
+
+        protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
+        {
+            base.OnMouseLeftButtonDown(e);
+
+            startPoint = e.GetPosition(null);
+        }
+
+        protected override void OnMouseMove(MouseEventArgs e)
+        {
+            base.OnMouseMove(e);
+
+            Point point = e.GetPosition(null);
+
+            Vector diff = startPoint - point;
+
+            if (IsMouseCaptured && e.LeftButton == MouseButtonState.Pressed && (System.Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance || System.Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance) && SelectedItems.Count > 0)
+            {
+                var arrayBuilder = new ArrayBuilder<string>();
+
+                foreach (var item in SelectedItems)
+                {
+                    if (((IBrowsableObjectInfo)item).InnerObject is ShellObject shellObject)
+
+                        _ = arrayBuilder.AddLast(shellObject.ParsingName);
+                }
+
+                var sc = new StringCollection();
+
+                sc.AddRange(arrayBuilder.ToArray());
+
+                DataObject data = new DataObject();
+
+                data.SetFileDropList(sc);
+
+                _ = DragDrop.DoDragDrop(this, data, DragDropEffects.Copy);
+            }
+        }
     }
 }

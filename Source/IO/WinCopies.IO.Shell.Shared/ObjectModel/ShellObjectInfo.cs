@@ -21,6 +21,7 @@ using Microsoft.WindowsAPICodePack.Shell;
 using System;
 using System.IO;
 using System.Linq;
+
 using WinCopies.IO.AbstractionInterop;
 using WinCopies.IO.Enumeration;
 using WinCopies.IO.Process;
