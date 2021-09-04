@@ -13,10 +13,10 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>WinCopies.GUI.snk</AssemblyOriginatorKeyFile>
     <DefineConstants>WinCopies2;WinCopies3;$(DefineConstants)</DefineConstants>
-    <VersionPrefix>3.7</VersionPrefix>
+    <VersionPrefix>3.8</VersionPrefix>
     <VersionSuffix>preview</VersionSuffix>
-    <AssemblyVersion>3.7</AssemblyVersion>
-    <FileVersion>3.7</FileVersion>
+    <AssemblyVersion>3.8</AssemblyVersion>
+    <FileVersion>3.8</FileVersion>
   </PropertyGroup>
 
   <Import Project="..\WinCopies.GUI.Shared\WinCopies.GUI.Shared.projitems" Label="Shared" />
