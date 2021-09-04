@@ -161,7 +161,7 @@ namespace WinCopies.IO
             /// Gets the name of this <see cref="ShellObjectInfo"/> depending of the associated <see cref="ShellObject"/> (see the <see cref="ShellObject"/> property for more details.
             /// </summary>
             public override string Name => _shellObject.Name;
-
+            
             protected override IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystemOverride => ShellObjectPropertySystemCollection._GetShellObjectPropertySystemCollection(this);
 
             protected override IBrowsableObjectInfo ParentOverride => _parent

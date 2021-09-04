@@ -125,13 +125,13 @@ namespace WinCopies.GUI.Samples
 
                     return;
 
-            if (processInfo is IRunnableProcessFactoryProcessInfo runnableProcessInfo)
+            if (processInfo is IRunnableProcessInfo runnableProcessInfo)
 
                 runnableProcessInfo.Run(GetEnumerable(), 10u);
 
             else
 
-                AddProcess(((IDirectProcessFactoryProcessInfo)processInfo).TryGetProcessParameters(GetEnumerable()));
+                AddProcess(((IDirectProcessInfo)processInfo).TryGetProcessParameters(GetEnumerable()));
         }
 
         private void Command_CanExecute(object sender, CanExecuteRoutedEventArgs e)

@@ -37,6 +37,10 @@ using System.Collections.ObjectModel;
 using System.Reflection;
 
 using WinCopies.Collections;
+using WinCopies.Linq;
+using Microsoft.WindowsAPICodePack.Shell;
+using WinCopies.IO.ObjectModel;
+using System.Collections.Specialized;
 
 #if !WinCopies3
 using WinCopies.Util;
@@ -154,6 +158,8 @@ namespace WinCopies.IO.Shell
 
             InArchiveFormats = new ReadOnlyDictionary<InArchiveFormat, string[]>(dic);
         }
+
+        public static StringCollection GetStringCollection(in System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths) => IO.Path. GetStringCollection(paths.WhereSelect(path => path.InnerObject is ShellObject, path => ((ShellObject)path.InnerObject).ParsingName));
 
         public static bool IsSupportedArchiveFormat(in string extension)
         {

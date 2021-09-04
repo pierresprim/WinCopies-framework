@@ -41,6 +41,11 @@ using System.Text;
 
 using WinCopies.Collections;
 using WinCopies.Linq;
+using System.IO;
+using System.Collections.Specialized;
+using WinCopies.Collections.Generic;
+using WinCopies.IO.ObjectModel;
+using Microsoft.WindowsAPICodePack.Shell;
 
 #if !WinCopies3
 using WinCopies.Util;
@@ -646,6 +651,21 @@ namespace WinCopies.IO
 
         //        }
 
+        public static StringCollection GetStringCollection(in System.Collections.Generic.IEnumerable<string> paths)
+        {
+            var arrayBuilder = new ArrayBuilder<string>();
+
+            foreach (var item in paths)
+
+                    _ = arrayBuilder.AddLast(item);
+
+            var sc = new StringCollection();
+
+            sc.AddRange(arrayBuilder.ToArray());
+
+            return sc;
+        }
+
         public static string GetRealPathFromEnvironmentVariables(in string path)
         {
             string[] subPaths = path.Split(WinCopies.IO.Path.PathSeparator);
@@ -698,6 +718,14 @@ namespace WinCopies.IO
         }
 
         public static bool Exists(in string path) => System.IO.File.Exists(path) || System.IO.Directory.Exists(path);
+
+        public static DirectoryInfo TryGetParent(in string path) => System.IO.Directory.Exists(path) ? System.IO.Directory.GetParent(path) : System.IO.File.Exists(path) ? new System.IO.FileInfo(path).Directory : null;
+
+        public static DirectoryInfo GetParent(in string path) => TryGetParent(path) ?? throw new System.IO.IOException("The given path was not found.");
+
+        public static string TryGetParent2(in string path) => TryGetParent(path)?.FullName;
+
+        public static string GetParent2(in string path) => GetParent(path).FullName;
 
         public static uint? PathFileNameContainsParenthesesNumber(string path) => FileNameContainsParenthesesNumber(IsFileSystemPath(path) ? System.IO.Path.GetFileNameWithoutExtension(path) : throw new ArgumentException($"{nameof(path)} is not a file system path."));
 

@@ -467,15 +467,17 @@ namespace WinCopies.IO.ObjectModel
 
             public IProcessCommands NewItemProcessCommands { get; }
 
-            IRunnableProcessFactoryProcessInfo IProcessFactory.Copy => Process.ProcessFactory.DefaultRunnableProcessFactoryProcessInfo;
+            IRunnableProcessInfo IProcessFactory.Copy => Process.ProcessFactory.DefaultRunnableProcessFactoryProcessInfo;
 
-            IRunnableProcessFactoryProcessInfo IProcessFactory.Cut => Process.ProcessFactory.DefaultRunnableProcessFactoryProcessInfo;
+            IRunnableProcessInfo IProcessFactory.Cut => Process.ProcessFactory.DefaultRunnableProcessFactoryProcessInfo;
 
-            IDirectProcessFactoryProcessInfo IProcessFactory.Recycling => Process.ProcessFactory.DefaultProcessInfo;
+            IDirectProcessInfo IProcessFactory.Recycling => Process.ProcessFactory.DefaultProcessInfo;
 
-            IDirectProcessFactoryProcessInfo IProcessFactory.Deletion => Process.ProcessFactory.DefaultProcessInfo;
+            IDirectProcessInfo IProcessFactory.Deletion => Process.ProcessFactory.DefaultProcessInfo;
 
-            IDirectProcessFactoryProcessInfo IProcessFactory.Clearing => Process.ProcessFactory.DefaultProcessInfo;
+            IDirectProcessInfo IProcessFactory.Clearing => Process.ProcessFactory.DefaultProcessInfo;
+
+            IDragDropProcessInfo IProcessFactory.DragDrop => Process.ProcessFactory.DefaultDragDropProcessInfo;
 
             public _ProcessFactory(in IRegistryItemInfo registryItemInfo) => NewItemProcessCommands = new _NewItemProcessCommands(registryItemInfo);
 

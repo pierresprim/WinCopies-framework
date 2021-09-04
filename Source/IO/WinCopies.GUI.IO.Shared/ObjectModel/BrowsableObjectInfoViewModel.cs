@@ -194,7 +194,7 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         public bool IsSelected { get => _isSelected; set { _isSelected = value; OnPropertyChanged(nameof(IsSelected)); } }
 
-        public WinCopies.IO.ClientVersion? ClientVersion => ModelGeneric.ClientVersion;
+        public ClientVersion? ClientVersion => ModelGeneric.ClientVersion;
 
         /// <summary>
         /// The model for this view model instance.
@@ -203,7 +203,7 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         public IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystem => ModelGeneric.ObjectPropertySystem;
 
-        WinCopies.IO.ClientVersion IBrowsableObjectInfo.ClientVersion => ModelGeneric.ClientVersion;
+        ClientVersion IBrowsableObjectInfo.ClientVersion => ModelGeneric.ClientVersion;
 
         public int SelectedIndex { get => _selectedIndex; set { _selectedIndex = value; OnPropertyChanged(nameof(SelectedIndex)); } }
 

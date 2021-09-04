@@ -50,20 +50,23 @@ namespace WinCopies.IO
         private ProcessFactoryTypes<IShellObjectInfoBase2>.Deletion _recycling;
         private ProcessFactoryTypes<IShellObjectInfoBase2>.Deletion _deletion;
         private ProcessFactoryTypes<IShellObjectInfoBase2>.Deletion _clearing;
+        private DragDropProcessFactory<IShellObjectInfo<IO.PropertySystem.IFileSystemObjectInfoProperties>> _dragDrop;
         private IProcessCommands _newItemProcessCommands;
-        private const string PreferredDropEffect = "Preferred DropEffect";
+        public const string PreferredDropEffect = "Preferred DropEffect";
         #endregion
 
         #region Properties
-        public IRunnableProcessFactoryProcessInfo Copy => _copy;
+        public IRunnableProcessInfo Copy => _copy;
 
-        public IRunnableProcessFactoryProcessInfo Cut => _cut;
+        public IRunnableProcessInfo Cut => _cut;
 
-        public IDirectProcessFactoryProcessInfo Recycling => _recycling;
+        public IDirectProcessInfo Recycling => _recycling;
 
-        public IDirectProcessFactoryProcessInfo Deletion => _deletion;
+        public IDirectProcessInfo Deletion => _deletion;
 
-        public IDirectProcessFactoryProcessInfo Clearing => _clearing;
+        public IDirectProcessInfo Clearing => _clearing;
+
+        public IDragDropProcessInfo DragDrop => _dragDrop;
 
         public bool IsDisposed => _path == null;
 
@@ -103,6 +106,12 @@ namespace WinCopies.IO
                 ProcessFactoryTypes<IShellObjectInfoBase2>.Deletion
 #endif
                 (path, RemoveOption.Clear);
+
+            _dragDrop = new
+#if !CS9
+                DragDropProcessFactory<IShellObjectInfo<IFileSystemObjectInfoProperties>>
+#endif
+                (path);
 
             _newItemProcessCommands = new _NewItemProcessCommands(path);
         }
@@ -230,6 +239,9 @@ namespace WinCopies.IO
 
             _clearing.Dispose();
             _clearing = null;
+
+            _dragDrop.Dispose();
+            _dragDrop = null;
 
             _newItemProcessCommands.Dispose();
             _newItemProcessCommands = null;

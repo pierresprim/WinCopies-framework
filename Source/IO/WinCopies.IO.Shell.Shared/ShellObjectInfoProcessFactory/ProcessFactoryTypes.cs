@@ -20,6 +20,7 @@ using Microsoft.WindowsAPICodePack.Win32Native;
 using Microsoft.WindowsAPICodePack.Win32Native.Shell;
 
 using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
@@ -27,9 +28,11 @@ using System.Runtime.InteropServices;
 using System.Windows;
 
 using WinCopies.Collections.Generic;
+using WinCopies.Extensions;
 using WinCopies.IO.ObjectModel;
 using WinCopies.IO.Process;
 using WinCopies.IO.Shell.Process;
+using WinCopies.IO.Shell.PropertySystem;
 using WinCopies.Linq;
 using WinCopies.Util;
 
@@ -42,6 +45,8 @@ namespace WinCopies.IO
 {
     public partial class ShellObjectInfoProcessFactory
     {
+        public static IProcessParameters GetCopyProcessParameters(in string sourcePath, in string destPath, in bool move, in System.Collections.Generic.IEnumerable<string> paths) => ShellObjectInfoProcessFactory.GetProcessParameters(Guids.Process.Shell.Copy, sourcePath, destPath, move, paths);
+
         public static class ProcessFactoryTypes<T> where T : IShellObjectInfoBase2
         {
             public class Copy : RunnableProcessFactoryProcessInfo<T>
@@ -107,7 +112,7 @@ namespace WinCopies.IO
 
                     return sourcePath == null
                         ? null
-                        : ShellObjectInfoProcessFactory.GetProcessParameters(Guids.Process.Shell.Copy, sourcePath, Path.Path, move, new Enumerable<string>(() => new Collections.StringEnumerator(sc, Collections.DotNetFix.EnumerationDirection.FIFO)));
+                        : GetCopyProcessParameters(sourcePath, Path.Path, move, new Enumerable<string>(() => new Collections.StringEnumerator(sc, Collections.DotNetFix.EnumerationDirection.FIFO)));
                 }
             }
 
@@ -205,6 +210,112 @@ namespace WinCopies.IO
                     return null;
                 }
             }
+        }
+
+        public class DragDropProcessFactory<T> : ProcessFactoryProcessInfoBase<T>, IDragDropProcessInfo where T : IShellObjectInfo<PropertySystem.IFileSystemObjectInfoProperties>
+        {
+            public DragDropProcessFactory(in T path) : base(path) { /* Left empty. */ }
+
+            protected virtual bool SupportsDragDrop(IBrowsableObjectInfo path) => path is IShellObjectInfo<IFileSystemObjectInfoProperties> _path && _path.InnerObject.IsFileSystemObject && _path.ObjectProperties.FileType != FileType.Drive;
+
+            public bool CanRun(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths)
+            {
+                foreach (IBrowsableObjectInfo path in paths)
+
+                    if (!SupportsDragDrop(path))
+
+                        return false;
+
+                return true;
+            }
+
+            protected virtual bool CanRunOverride(IDictionary<string, object> data, out DragDropEffects dragDropEffects, out string sourcePath, out string[] paths, out bool? sameRoot)
+            {
+                if (SupportsDragDrop(Path) && data.ContainsKey(DataFormats.FileDrop) && data.ContainsKey(PreferredDropEffect) && data[PreferredDropEffect] is DragDropEffects _dragDropEffects)
+
+                    if ((dragDropEffects = _dragDropEffects).HasFlag(DragDropEffects.Copy) || _dragDropEffects.HasFlag())
+                    {
+                        var _paths = (string[])data[DataFormats.FileDrop];
+
+                        string parent = null;
+
+                        Predicate<string> predicate = path =>
+                        {
+                            parent = WinCopies.IO.Path.GetParent2(path);
+
+                            predicate = _path => _path.Validate(parent, parent.EndsWith(WinCopies.IO.Path.PathSeparator
+#if !CS8
+                                .ToString()
+#endif
+                                ) ? 1 : 0, null, null, 1, "\\");
+
+                            return true;
+                        };
+
+                        paths = _paths;
+
+                        foreach (string path in _paths)
+
+                            if (!predicate(path))
+                            {
+                                sourcePath = parent;
+
+                                sameRoot = null;
+
+                                return false;
+                            }
+
+                        sourcePath = parent;
+
+                        return (sameRoot = System.IO.Path.GetPathRoot(parent) == System.IO.Path.GetPathRoot(Path.Path)) == true || _dragDropEffects.HasFlag(DragDropEffects.Copy);
+                    }
+
+                dragDropEffects = DragDropEffects.None;
+
+                sourcePath = null;
+
+                paths = null;
+
+                sameRoot = null;
+
+                return false;
+            }
+
+            public bool CanRun(IDictionary<string, object> data) => CanRunOverride(data, out _, out _, out _, out _);
+
+            public IDictionary<string, object> TryGetData(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths, out DragDropEffects dragDropEffects)
+            {
+                if (CanRun(paths))
+                {
+                    StringCollection sc = Shell.Path.GetStringCollection(paths);
+
+                    dragDropEffects = DragDropEffects.Copy | DragDropEffects.Move;
+
+                    return new Dictionary<string, object>(1) { { DataFormats.FileDrop, sc } };
+                }
+
+                dragDropEffects = DragDropEffects.None;
+
+                return null;
+            }
+
+            public IDictionary<string, object> GetData(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths, out DragDropEffects dragDropEffects) => TryGetData(paths, out dragDropEffects) ?? throw ProcessFactoryProcessInfo.GetParametersGenerationException();
+
+            public IProcessParameters TryGetProcessParameters(IDictionary<string, object> data)
+            {
+                if (CanRunOverride(data, out DragDropEffects dragDropEffects, out string sourcePath, out string[] paths, out bool? sameRoot))
+                {
+                    IProcessParameters getProcessParameters(in bool move) => GetCopyProcessParameters(sourcePath, Path.Path, move, paths);
+
+                    return sameRoot.Value ? getProcessParameters(dragDropEffects.HasFlag(DragDropEffects.Move)) : getProcessParameters(false);
+                }
+
+                return null;
+            }
+
+            public IProcessParameters GetProcessParameters(IDictionary<string, object> data) => TryGetProcessParameters(data) ?? throw ProcessFactoryProcessInfo.GetProcessParametersGenerationException();
+
+            new internal void Dispose() => base.Dispose();
         }
     }
 }

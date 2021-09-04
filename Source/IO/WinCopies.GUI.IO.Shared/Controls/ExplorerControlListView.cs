@@ -16,12 +16,18 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using Microsoft.WindowsAPICodePack.Shell;
+using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+
 using WinCopies.Collections.Generic;
+using WinCopies.GUI.IO.ObjectModel;
 using WinCopies.IO.ObjectModel;
+using WinCopies.IO.Process;
+using WinCopies.Linq;
 
 namespace WinCopies.GUI.IO.Controls
 {
@@ -46,12 +52,31 @@ namespace WinCopies.GUI.IO.Controls
 
     //    }
 
+    public class DroppedEventArgs : RoutedEventArgs
+    {
+        public IProcessParameters ProcessParameters { get; }
+
+        public DroppedEventArgs(in IProcessParameters processParameters) => ProcessParameters = processParameters;
+    }
+
     public class ExplorerControlListView : ListView
     {
-        private Point startPoint;
+        private Point _startPoint;
+
         //public static readonly DependencyProperty ViewStyleProperty = DependencyProperty.Register(nameof(ViewStyle), typeof(ViewStyle), typeof(ExplorerControlListView));
 
         //public ViewStyle ViewStyle { get => (ViewStyle)GetValue(ViewStyleProperty); set => SetValue(ViewStyleProperty, value); }
+
+        public static readonly RoutedEvent DroppedEvent = EventManager.RegisterRoutedEvent(nameof(Dropped), RoutingStrategy.Bubble, typeof(RoutedEventHandler<DroppedEventArgs>), typeof(ExplorerControlListView));
+
+        public event RoutedEventHandler<DroppedEventArgs> Dropped
+        {
+            add => AddHandler(DroppedEvent, value);
+
+            remove => RemoveHandler(DroppedEvent, value);
+        }
+
+        public ExplorerControlListView() => AllowDrop = true;
 
         protected override DependencyObject GetContainerForItemOverride() => new ExplorerControlListViewItem();
 
@@ -59,38 +84,93 @@ namespace WinCopies.GUI.IO.Controls
         {
             base.OnMouseLeftButtonDown(e);
 
-            startPoint = e.GetPosition(null);
+            _startPoint = e.GetPosition(null);
         }
+
+        public IDragDropProcessInfo GetDragDropProcessInfo() => ((IExplorerControlBrowsableObjectInfoViewModel)DataContext).Path.ProcessFactory.DragDrop;
+
+        protected virtual DataObject GetDragDropData()
+        {
+            DataObject data = new DataObject();
+
+            System.Collections.Generic.IDictionary<string, object> result = GetDragDropProcessInfo() .TryGetData(GetSelectedPaths(), out DragDropEffects dragDropEffects);
+
+            if (result.Count == 1 && result.ContainsKey(DataFormats.FileDrop))
+            {
+                object obj = result[DataFormats.FileDrop];
+
+                if (obj is StringCollection sc)
+                {
+                    data.SetFileDropList(sc);
+
+                    return data;
+                }
+
+                else if (obj is System.Collections.Generic.IEnumerable<string> paths)
+                {
+                    data.SetFileDropList(WinCopies.IO.Path.GetStringCollection(paths));
+
+                    return data;
+                }
+            }
+
+            foreach (var d in result)
+
+                data.SetData(d.Key, d.Value);
+
+            return data;
+        }
+
+        protected System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetSelectedPaths() => SelectedItems.To<IBrowsableObjectInfo>();
 
         protected override void OnMouseMove(MouseEventArgs e)
         {
             base.OnMouseMove(e);
 
-            Point point = e.GetPosition(null);
-
-            Vector diff = startPoint - point;
-
-            if (IsMouseCaptured && e.LeftButton == MouseButtonState.Pressed && (System.Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance || System.Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance) && SelectedItems.Count > 0)
+            if (GetDragDropProcessInfo().CanRun(GetSelectedPaths()))
             {
-                var arrayBuilder = new ArrayBuilder<string>();
+                Point point = e.GetPosition(null);
 
-                foreach (var item in SelectedItems)
-                {
-                    if (((IBrowsableObjectInfo)item).InnerObject is ShellObject shellObject)
+                Vector diff = _startPoint - point;
 
-                        _ = arrayBuilder.AddLast(shellObject.ParsingName);
-                }
+                if (IsMouseCaptured && e.LeftButton == MouseButtonState.Pressed && (System.Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance || System.Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance) && SelectedItems.Count > 0)
 
-                var sc = new StringCollection();
-
-                sc.AddRange(arrayBuilder.ToArray());
-
-                DataObject data = new DataObject();
-
-                data.SetFileDropList(sc);
-
-                _ = DragDrop.DoDragDrop(this, data, DragDropEffects.Copy);
+                    _ = DragDrop.DoDragDrop(this, GetDragDropData(), DragDropEffects.Copy | DragDropEffects.Move | DragDropEffects.Link);
             }
+        }
+
+        protected override void OnDragEnter(DragEventArgs e)
+        {
+            base.OnDragEnter(e);
+
+            if (!e.Data.GetDataPresent(DataFormats.FileDrop) || e.Source == this)
+
+                e.Effects = DragDropEffects.None;
+        }
+
+        protected override void OnDrop(DragEventArgs e)
+        {
+            base.OnDrop(e);
+
+            string[] formats = e.Data.GetFormats();
+
+            var data = new ArrayBuilder<string>();
+
+            foreach (string item in formats)
+
+                _ = data.AddLast(item);
+
+            var dic = new Dictionary<string, object>((int)data.Count);
+
+            foreach (string item in data)
+
+                dic.Add(item, e.Data.GetData(item));
+
+            var processParameters = GetDragDropProcessInfo().TryGetProcessParameters(dic);
+
+            if (processParameters != null)
+
+                RaiseEvent(new DroppedEventArgs(processParameters) { RoutedEvent = DroppedEvent });
         }
     }
 }
