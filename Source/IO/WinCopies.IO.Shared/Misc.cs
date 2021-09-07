@@ -180,33 +180,53 @@ namespace WinCopies.IO
         ~BrowsabilityPath() => Dispose();
     }
 
-    public interface IBrowsabilityPathStack<T> where T : IBrowsableObjectInfo
+    public interface IBrowsableObjectInfoStack<T>
     {
-        void Push(IBrowsabilityPath<T> browsabilityPath);
+        void Push(T obj);
     }
 
-    public sealed class BrowsabilityPathStack<T> : IBrowsabilityPathStack<T> where T : IBrowsableObjectInfo
+    public abstract class BrowsableObjectInfoStackBase<TItems, TStack> where TStack : IStack<TItems>
     {
-        private IEnumerableStack<IBrowsabilityPath<T>> _stack;
+        protected TStack Stack { get; set; } 
 
-        public BrowsabilityPathStack(in IEnumerableStack<IBrowsabilityPath<T>> stack) => _stack = stack;
+        protected BrowsableObjectInfoStackBase(in TStack stack) => Stack = stack;
+    }
+
+    public abstract class BrowsableObjectInfoStack<TItems, TStack> : BrowsableObjectInfoStackBase<TItems, TStack>, IBrowsableObjectInfoStack<TItems> where TStack : IStack<TItems>
+    {
+        protected BrowsableObjectInfoStack(in TStack stack) : base(stack) { }
+
+        public void Push(TItems obj) => Stack.Push(obj);
+    }
+
+    public abstract class BrowsableObjectInfoEnumerableStack<T> : BrowsableObjectInfoStack<T, IEnumerableStack<T>>
+    {
+        protected BrowsableObjectInfoEnumerableStack(in IEnumerableStack<T> stack) : base(stack) { }
+    }
+
+    public interface IBrowsabilityPathStack<T> : IBrowsableObjectInfoStack<IBrowsabilityPath<T>> where T : IBrowsableObjectInfo
+    {
+        // Left empty.
+    }
+
+    public sealed class BrowsabilityPathStack<T> : BrowsableObjectInfoEnumerableStack<IBrowsabilityPath<T>>, IBrowsabilityPathStack<T> where T : IBrowsableObjectInfo
+    {
+        public BrowsabilityPathStack(in IEnumerableStack<IBrowsabilityPath<T>> stack) : base(stack) { }
 
         public BrowsabilityPathStack() : this(new EnumerableStack<IBrowsabilityPath<T>>()) { /* Left empty. */ }
 
-        public System.Collections.Generic.IEnumerable<IBrowsabilityPath> GetBrowsabilityPaths(T browsableObjectInfo) => _stack.Select(item => new BrowsabilityPath<T>(item, browsableObjectInfo));
+        public System.Collections.Generic.IEnumerable<IBrowsabilityPath> GetBrowsabilityPaths(T browsableObjectInfo) => Stack.Select(item => new BrowsabilityPath<T>(item, browsableObjectInfo));
 
-        public void Push(IBrowsabilityPath<T> browsabilityPath) => _stack.Push(browsabilityPath);
-
-        public WriteOnlyBrowsabilityPathStack<T> AsWriteOnly() => new WriteOnlyBrowsabilityPathStack<T>(_stack);
+        public WriteOnlyBrowsabilityPathStack<T> AsWriteOnly() => new
+#if !CS9
+            WriteOnlyBrowsabilityPathStack<T>
+#endif
+            (Stack);
     }
 
-    public sealed class WriteOnlyBrowsabilityPathStack<T> : IBrowsabilityPathStack<T> where T : IBrowsableObjectInfo
+    public sealed class WriteOnlyBrowsabilityPathStack<T> : BrowsableObjectInfoStack<IBrowsabilityPath<T>, IEnumerableStack<IBrowsabilityPath<T>>>, IBrowsabilityPathStack<T> where T : IBrowsableObjectInfo
     {
-        private IEnumerableStack<IBrowsabilityPath<T>> _stack;
-
-        public WriteOnlyBrowsabilityPathStack(in IEnumerableStack<IBrowsabilityPath<T>> stack) => _stack = stack;
-
-        public void Push(IBrowsabilityPath<T> browsabilityPath) => _stack.Push(browsabilityPath);
+        public WriteOnlyBrowsabilityPathStack(in IEnumerableStack<IBrowsabilityPath<T>> stack) : base(stack) { }
     }
 
     public interface IBrowsabilityOptions

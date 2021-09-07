@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-using System;
 using System.Drawing;
 using System.Windows;
 using System.Windows.Interop;
@@ -23,7 +22,6 @@ using System.Windows.Media.Imaging;
 
 using WinCopies.GUI.Drawing;
 using WinCopies.IO.ObjectModel;
-using WinCopies.IO.ObjectModel.Reflection;
 
 using static WinCopies.IO.Shell.ObjectModel.BrowsableObjectInfo;
 
@@ -42,26 +40,23 @@ namespace WinCopies.IO.Shell
         public BrowsableObjectInfoIconBitmapSources(in Icon icon) : base(icon) { /* Left empty. */ }
     }
 
+    public class BrowsableObjectInfoPlugin : IO.BrowsableObjectInfoPlugin
+    {
+        public BrowsableObjectInfoPlugin()
+        {
+            RegisterBrowsabilityPathsStack.Push(ShellObjectInfo.RegisterDefaultBrowsabilityPaths);
+
+            RegisterProcessSelectorsStack.Push(ShellObjectInfo.RegisterDefaultProcessSelectors);
+
+            OnRegisterCompletedStack.Push(() => PlugInParameters = null);
+        }
+    }
+
     namespace ObjectModel
     {
         public static class BrowsableObjectInfo
         {
-            private static void EmptyVoid() { /* Left empty. */ }
-
-            public static Action RegisterDefaultBrowsabilityPaths { get; private set; } = () =>
-            {
-                ShellObjectInfo.BrowsabilityPathStack.Push(new MultiIconInfo.BrowsabilityPath());
-                ShellObjectInfo.BrowsabilityPathStack.Push(new DotNetAssemblyInfo.BrowsabilityPath());
-
-                RegisterDefaultBrowsabilityPaths = EmptyVoid;
-            };
-
-            public static Action RegisterDefaultProcessSelectors { get; private set; } = () =>
-            {
-                ShellObjectInfo.RegisterProcessSelectors();
-
-                RegisterDefaultProcessSelectors = EmptyVoid;
-            };
+            public static IBrowsableObjectInfoPlugin PlugInParameters { get; internal set; } = new BrowsableObjectInfoPlugin();
 
             public static Icon TryGetIcon(in Icon[] icons, in ushort size) => TryGetIcon(icons, new System.Drawing.Size(size, size));
 

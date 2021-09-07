@@ -24,8 +24,15 @@ using WinCopies.IO.Process;
 
 namespace WinCopies.GUI.Shell.ObjectModel
 {
-    public static class BrowsableObjectInfo
+    public class BrowsableObjectInfoPlugin : WinCopies.IO.Shell.BrowsableObjectInfoPlugin
     {
+        public BrowsableObjectInfoPlugin() => RegisterProcessSelectorsStack.Push(() =>
+          {
+              ShellObjectInfo.DefaultCustomProcessesSelectorDictionary.Push(item => item.InnerObject.IsFileSystemObject, item => new IProcessInfo[] { new ArchiveCompressionProcessInfo() });
+
+              WinCopies.IO.ObjectModel.BrowsableObjectInfo.DefaultProcessSelectorDictionary.Push(item => WinCopies.IO.ObjectModel.BrowsableObjectInfo.Predicate(item, typeof(WinCopies.IO.Guids.Process)), TryGetArchiveProcess);
+          });
+
         public static WinCopies.IO.Process.ObjectModel.IProcess TryGetArchiveProcess(ProcessFactorySelectorDictionaryParameters processParameters)
         {
             string guid = processParameters.ProcessParameters.Guid.ToString();
@@ -69,21 +76,10 @@ namespace WinCopies.GUI.Shell.ObjectModel
         }
 
         public static WinCopies.IO.Process.ObjectModel.IProcess GetArchiveProcess(ProcessFactorySelectorDictionaryParameters processParameters) => TryGetArchiveProcess(processParameters) ?? throw new InvalidOperationException("No process could be generated.");
+    }
 
-        public static void RegisterAllProcessSelectors()
-        {
-            WinCopies.IO.Shell.ObjectModel.BrowsableObjectInfo.RegisterDefaultProcessSelectors();
-
-            ShellObjectInfo.DefaultCustomProcessesSelectorDictionary.Push(item => item.InnerObject.IsFileSystemObject, item => new IProcessInfo[] { new ArchiveCompressionProcessInfo() });
-
-            WinCopies.IO.ObjectModel.BrowsableObjectInfo.DefaultProcessSelectorDictionary.Push(item => WinCopies.IO.ObjectModel.BrowsableObjectInfo.Predicate(item, typeof(WinCopies.IO.Guids.Process)), TryGetArchiveProcess);
-        }
-
-        public static void RegisterDefaultSelectors()
-        {
-            WinCopies.IO.Shell.ObjectModel.BrowsableObjectInfo.RegisterDefaultBrowsabilityPaths();
-
-            RegisterAllProcessSelectors();
-        }
+    public static class BrowsableObjectInfo
+    {
+        public static IBrowsableObjectInfoPlugin PluginParameters { get; } = new BrowsableObjectInfoPlugin();
     }
 }
