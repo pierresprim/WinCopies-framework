@@ -15,6 +15,8 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+using Microsoft.WindowsAPICodePack;
+using Microsoft.WindowsAPICodePack.COMNative.Shell;
 using Microsoft.WindowsAPICodePack.Shell;
 
 using System;
@@ -25,8 +27,10 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-
+using System.Windows.Interop;
+using WinCopies.Desktop;
 using WinCopies.GUI.IO;
+using WinCopies.GUI.IO.Controls;
 using WinCopies.GUI.IO.ObjectModel;
 using WinCopies.GUI.IO.Process;
 using WinCopies.GUI.Windows;
@@ -42,6 +46,8 @@ namespace WinCopies.GUI.Samples
     public partial class ExplorerControlTest : Windows.Window
     {
         private static Windows.Window _processWindow;
+        private System.Windows.Interop.HwndSourceHook _hook;
+
 
         public static IProcessPathCollectionFactory DefaultProcessPathCollectionFactory { get; } = new ProcessPathCollectionFactory();
 
@@ -77,7 +83,51 @@ namespace WinCopies.GUI.Samples
 
         public IExplorerControlBrowsableObjectInfoViewModel SelectedItem { get => (IExplorerControlBrowsableObjectInfoViewModel)GetValue(SelectedItemProperty); set => SetValue(SelectedItemProperty, value); }
 
-        static ExplorerControlTest() => Shell.ObjectModel.BrowsableObjectInfo.RegisterDefaultSelectors();
+        static ExplorerControlTest()
+        {
+            WinCopies.IO.IBrowsableObjectInfoPlugin pluginParameters = Shell.ObjectModel.BrowsableObjectInfo.GetPluginParameters();
+
+            pluginParameters.RegisterBrowsabilityPaths();
+            pluginParameters.RegisterItemSelectors();
+            pluginParameters.RegisterProcessSelectors();
+
+            EventManager.RegisterClassHandler(typeof(ExplorerControlTest), ExplorerControlListView.ContextMenuRequestedEvent, new RoutedEventHandler((object sender, RoutedEventArgs e) =>
+           {
+               var listView = (ListView)e.OriginalSource;
+
+               var window = listView.GetParent<ExplorerControlTest>(true);
+
+               var selectedItem = window.SelectedItem;
+
+               if (selectedItem.SelectedItems == null)
+
+                   return;
+
+               if (selectedItem.SelectedItems.Count != 1)
+
+                   return;
+
+               var _selectedItem = (ShellObject)((IBrowsableObjectInfoViewModel)selectedItem.SelectedItems[0]).InnerObject;
+
+               var folder = (ShellContainer)selectedItem.Path.InnerObject;
+
+               ShellContextMenu contextMenu;
+
+               contextMenu = new ShellContextMenu( (ShellContainer) ShellObjectFactory.Create(folder.ParsingName), new HookRegistration(hook =>
+                  {
+                      window._hook = (IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled) => hook((WindowMessage)msg, wParam, lParam, ref handled);
+
+                      HwndSource.FromHwnd(new WindowInteropHelper(window).Handle).AddHook(window._hook);
+                  }, hook => HwndSource.FromHwnd(new WindowInteropHelper(window).Handle).RemoveHook(window._hook)), ShellObjectFactory.Create(_selectedItem.ParsingName));
+
+               _ = contextMenu.Query(1u, uint.MaxValue, ContextMenuFlags.Explore | ContextMenuFlags.CanRename);
+
+               System.Windows.Point point = ((ExplorerControlListViewContextMenuRequestedEventArgs)e).MouseButtonEventArgs.GetPosition(null);
+               System.Drawing.Point _point = new System.Drawing.Point((int)point.X, (int)point.Y);
+
+               contextMenu.Show(new WindowInteropHelper(window).Handle, _point);
+           }));
+        }
 
         public ExplorerControlTest()
         {

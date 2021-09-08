@@ -24,6 +24,7 @@ using System.Linq;
 
 using WinCopies.IO.AbstractionInterop;
 using WinCopies.IO.Enumeration;
+using WinCopies.IO.ObjectModel.Reflection;
 using WinCopies.IO.Process;
 using WinCopies.IO.Process.ObjectModel;
 using WinCopies.IO.PropertySystem;
@@ -41,7 +42,6 @@ using static WinCopies.IO.Shell.Path;
 using static WinCopies.ThrowHelper;
 
 using SystemPath = System.IO.Path;
-using WinCopies.IO.ObjectModel.Reflection;
 
 #if !CS8
 using WinCopies.Collections;

@@ -40,6 +40,56 @@
               Looks up a localized string similar to An unknown error occurred..
             </summary>
         </member>
+        <member name="T:WinCopies.IO.IBitmapSources">
+            <summary>
+            Represents a <see cref="T:System.Windows.Media.Imaging.BitmapSource"/>s provider for a GUI.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.IBitmapSources.Small">
+            <summary>
+            Gets the small <see cref="T:System.Windows.Media.Imaging.BitmapSource"/> of the object related to the current instance.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.IBitmapSources.Medium">
+            <summary>
+            Gets the medium <see cref="T:System.Windows.Media.Imaging.BitmapSource"/> of the object related to the current instance.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.IBitmapSources.Large">
+            <summary>
+            Gets the large <see cref="T:System.Windows.Media.Imaging.BitmapSource"/> of the object related to the current instance.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.IBitmapSources.ExtraLarge">
+            <summary>
+            Gets the extra large <see cref="T:System.Windows.Media.Imaging.BitmapSource"/> of the object related to the current instance.
+            </summary>
+        </member>
+        <member name="T:WinCopies.IO.Browsability">
+            <summary>
+            Indicates the browsing ability for an <see cref="T:WinCopies.IO.ObjectModel.IBrowsableObjectInfo"/>.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.Browsability.NotBrowsable">
+            <summary>
+            The item is not browsable.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.Browsability.BrowsableByDefault">
+            <summary>
+            The item is browsable by default.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.Browsability.Browsable">
+            <summary>
+            The item is browsable but browsing should not be the default action to perform on this item.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.Browsability.RedirectsToBrowsableItem">
+            <summary>
+            The item redirects to an other item, with this item browsable.
+            </summary>
+        </member>
         <member name="T:WinCopies.IO.FileType">
             <summary>
             The file type of an I/O object.
@@ -289,56 +339,6 @@
         <member name="F:WinCopies.IO.FileSystemEntryEnumerationOrder.DirectoriesThenFiles">
             <summary>
             Enumerates directories then files.
-            </summary>
-        </member>
-        <member name="T:WinCopies.IO.Browsability">
-            <summary>
-            Indicates the browsing ability for an <see cref="T:WinCopies.IO.ObjectModel.IBrowsableObjectInfo"/>.
-            </summary>
-        </member>
-        <member name="F:WinCopies.IO.Browsability.NotBrowsable">
-            <summary>
-            The item is not browsable.
-            </summary>
-        </member>
-        <member name="F:WinCopies.IO.Browsability.BrowsableByDefault">
-            <summary>
-            The item is browsable by default.
-            </summary>
-        </member>
-        <member name="F:WinCopies.IO.Browsability.Browsable">
-            <summary>
-            The item is browsable but browsing should not be the default action to perform on this item.
-            </summary>
-        </member>
-        <member name="F:WinCopies.IO.Browsability.RedirectsToBrowsableItem">
-            <summary>
-            The item redirects to an other item, with this item browsable.
-            </summary>
-        </member>
-        <member name="T:WinCopies.IO.IBitmapSources">
-            <summary>
-            Represents a <see cref="T:System.Windows.Media.Imaging.BitmapSource"/>s provider for a GUI.
-            </summary>
-        </member>
-        <member name="P:WinCopies.IO.IBitmapSources.Small">
-            <summary>
-            Gets the small <see cref="T:System.Windows.Media.Imaging.BitmapSource"/> of the object related to the current instance.
-            </summary>
-        </member>
-        <member name="P:WinCopies.IO.IBitmapSources.Medium">
-            <summary>
-            Gets the medium <see cref="T:System.Windows.Media.Imaging.BitmapSource"/> of the object related to the current instance.
-            </summary>
-        </member>
-        <member name="P:WinCopies.IO.IBitmapSources.Large">
-            <summary>
-            Gets the large <see cref="T:System.Windows.Media.Imaging.BitmapSource"/> of the object related to the current instance.
-            </summary>
-        </member>
-        <member name="P:WinCopies.IO.IBitmapSources.ExtraLarge">
-            <summary>
-            Gets the extra large <see cref="T:System.Windows.Media.Imaging.BitmapSource"/> of the object related to the current instance.
             </summary>
         </member>
         <member name="T:WinCopies.IO.PropertySystem.ShellPropertyGroup">

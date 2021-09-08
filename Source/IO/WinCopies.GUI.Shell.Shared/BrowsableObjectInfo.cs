@@ -26,12 +26,15 @@ namespace WinCopies.GUI.Shell.ObjectModel
 {
     public class BrowsableObjectInfoPlugin : WinCopies.IO.Shell.BrowsableObjectInfoPlugin
     {
-        public BrowsableObjectInfoPlugin() => RegisterProcessSelectorsStack.Push(() =>
+        public BrowsableObjectInfoPlugin()
+        {
+            RegisterProcessSelectorsStack.Push(() =>
           {
               ShellObjectInfo.DefaultCustomProcessesSelectorDictionary.Push(item => item.InnerObject.IsFileSystemObject, item => new IProcessInfo[] { new ArchiveCompressionProcessInfo() });
 
               WinCopies.IO.ObjectModel.BrowsableObjectInfo.DefaultProcessSelectorDictionary.Push(item => WinCopies.IO.ObjectModel.BrowsableObjectInfo.Predicate(item, typeof(WinCopies.IO.Guids.Process)), TryGetArchiveProcess);
           });
+        }
 
         public static WinCopies.IO.Process.ObjectModel.IProcess TryGetArchiveProcess(ProcessFactorySelectorDictionaryParameters processParameters)
         {
@@ -80,6 +83,6 @@ namespace WinCopies.GUI.Shell.ObjectModel
 
     public static class BrowsableObjectInfo
     {
-        public static IBrowsableObjectInfoPlugin PluginParameters { get; } = new BrowsableObjectInfoPlugin();
+        public static IBrowsableObjectInfoPlugin GetPluginParameters()=>new BrowsableObjectInfoPlugin(); 
     }
 }

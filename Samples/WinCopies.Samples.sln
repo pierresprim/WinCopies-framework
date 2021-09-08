@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29920.165
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31612.314
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinCopies.GUI.Samples", "WinCopies.GUI.Samples\WinCopies.GUI.Samples.csproj", "{4FB1033C-A609-482F-8F9C-6D8FEA96424C}"
 EndProject
@@ -70,6 +70,8 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "WinCopies.IO.Shell.Shared",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3.x", "3.x", "{FA20DE14-94DB-485F-A451-65921C82E1A7}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "WinCopies.GUI.Samples.Shared", "WinCopies.GUI.Samples.Shared\WinCopies.GUI.Samples.Shared.shproj", "{692404EA-80C6-4D74-8455-4A9103D8E20E}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		..\Source\IO\WinCopies.IO.Shell.Shared\WinCopies.IO.Shell.Shared.projitems*{032f8e1c-0ad0-4909-a7ff-77288179c170}*SharedItemsImports = 5
@@ -89,6 +91,7 @@ Global
 		..\Source\GUI\WinCopies.GUI.ViewModels.Shared\WinCopies.GUI.ViewModels.Shared.projitems*{589fcd51-85a1-46ff-ab94-3cdd133f92de}*SharedItemsImports = 13
 		..\Source\IO\WinCopies.IO.Shell.Shared\WinCopies.IO.Shell.Shared.projitems*{5c6a8e8f-21ab-4c80-b898-5fb090cb72bd}*SharedItemsImports = 13
 		..\Source\IO\WinCopies.GUI.IO.Shared\WinCopies.GUI.IO.Shared.projitems*{690260b7-f85d-481e-9527-0a6034e39053}*SharedItemsImports = 13
+		WinCopies.GUI.Samples.Shared\WinCopies.GUI.Samples.Shared.projitems*{692404ea-80c6-4d74-8455-4a9103d8e20e}*SharedItemsImports = 13
 		..\Source\GUI\WinCopies.GUI.Drawing.Shared\WinCopies.GUI.Drawing.Shared.projitems*{6ff3e03e-1cae-428d-a922-6c1288db39e2}*SharedItemsImports = 5
 		..\Source\IO\WinCopies.IO.Shared\WinCopies.IO.Shared.projitems*{76656453-c025-42e6-86a0-dfbb520ed7d9}*SharedItemsImports = 13
 		..\Source\GUI\WinCopies.GUI.Controls.Shared\WinCopies.GUI.Controls.Shared.projitems*{8e59282e-c7fb-44dc-8617-a1b2a932c5a9}*SharedItemsImports = 13

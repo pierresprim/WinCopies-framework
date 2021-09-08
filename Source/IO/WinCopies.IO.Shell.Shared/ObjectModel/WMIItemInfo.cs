@@ -255,15 +255,16 @@ namespace WinCopies.IO
 #else
                         )
 #endif
-                            {
+                        {
 #if !CS9
-                                case
+                            case
 #endif
                                 WMIItemType.Namespace
 #if CS9
                                 or
 #else
-                                : case
+                                :
+                            case
 #endif
                                 WMIItemType.Class
 #if CS9
@@ -281,15 +282,17 @@ namespace WinCopies.IO
 #else
                                 ;
 
-                                break; default:
+                                break;
 
-                                    _browsability =
+                            default:
+
+                                _browsability =
 #endif
                                 BrowsabilityOptions.NotBrowsable
 #if !CS9
                                 ; break;
 #endif
-                            };
+                        };
 
                     return _browsability;
                 }

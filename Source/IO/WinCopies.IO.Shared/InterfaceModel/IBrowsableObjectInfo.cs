@@ -24,7 +24,6 @@ using WinCopies.PropertySystem;
 
 namespace WinCopies.IO
 {
-
     namespace ObjectModel
     {
         /// <summary>

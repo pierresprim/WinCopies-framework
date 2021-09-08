@@ -47,8 +47,6 @@ namespace WinCopies.IO.Shell
             RegisterBrowsabilityPathsStack.Push(ShellObjectInfo.RegisterDefaultBrowsabilityPaths);
 
             RegisterProcessSelectorsStack.Push(ShellObjectInfo.RegisterDefaultProcessSelectors);
-
-            OnRegisterCompletedStack.Push(() => PlugInParameters = null);
         }
     }
 
@@ -56,7 +54,7 @@ namespace WinCopies.IO.Shell
     {
         public static class BrowsableObjectInfo
         {
-            public static IBrowsableObjectInfoPlugin PlugInParameters { get; internal set; } = new BrowsableObjectInfoPlugin();
+            public static IBrowsableObjectInfoPlugin GetPlugInParameters() => new BrowsableObjectInfoPlugin();
 
             public static Icon TryGetIcon(in Icon[] icons, in ushort size) => TryGetIcon(icons, new System.Drawing.Size(size, size));
 

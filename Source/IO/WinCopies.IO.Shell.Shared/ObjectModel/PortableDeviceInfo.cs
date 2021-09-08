@@ -52,8 +52,6 @@ namespace WinCopies.IO.ObjectModel
             public BrowsableObjectInfoBitmapSources(in IPortableDeviceInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> portableDeviceInfo) : base(portableDeviceInfo) { /* Left empty. */ }
         }
 
-        private const int PortableDeviceIcon = 42;
-        private const string PortableDeviceIconDllName = "imageres.dll";
         private IPortableDevice _portableDevice;
         private IBitmapSourceProvider _bitmapSourceProvider;
 
@@ -92,24 +90,6 @@ namespace WinCopies.IO.ObjectModel
         #endregion Properties
 
         public PortableDeviceInfo(in IPortableDevice portableDevice, in ClientVersion clientVersion) : base((portableDevice ?? throw GetArgumentNullException(nameof(portableDevice))).DeviceFriendlyName, clientVersion) => _portableDevice = portableDevice;
-
-        private BitmapSource TryGetBitmapSource(in int size)
-        {
-            using
-#if NETFRAMEWORK
-            (
-#endif
-
-            Icon icon = Shell.ObjectModel.BrowsableObjectInfo.TryGetIcon(PortableDeviceIcon, PortableDeviceIconDllName, new System.Drawing.Size(size, size))
-
-#if NETFRAMEWORK
-            )
-#else
-                ;
-#endif
-
-            return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
-        }
 
         protected override void DisposeUnmanaged()
         {

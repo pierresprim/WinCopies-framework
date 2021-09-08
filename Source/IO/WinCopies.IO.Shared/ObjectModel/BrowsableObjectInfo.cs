@@ -29,7 +29,6 @@ using WinCopies.PropertySystem;
 
 using static WinCopies.ThrowHelper;
 using static WinCopies.Collections.Util;
-using WinCopies.Collections.DotNetFix.Generic;
 
 namespace WinCopies.IO
 {
@@ -51,74 +50,6 @@ namespace WinCopies.IO
             public const string ArchiveCompression = "02d03025-8cec-49b7-a639-46b9dcb2569b";
             public const string ArchiveExtraction = "96272e6c-be30-4db8-b48f-54b6fb425302";
         }
-    }
-
-    public interface IBrowsableObjectInfoPlugin
-    {
-        void RegisterBrowsabilityPaths();
-
-        void RegisterProcessSelectors();
-
-        void RegisterItemSelectors();
-
-        void OnRegistrationCompleted();
-    }
-
-    public class BrowsableObjectInfoPluginStack : BrowsableObjectInfoEnumerableStack<Action>
-    {
-        private Action _runActions = EmptyVoid;
-        private Action<Action> _pushAction;
-
-        public BrowsableObjectInfoPluginStack() : base(new EnumerableStack<Action>()) => InitializePushAction();
-
-        private void _Push(Action action) => Stack.Push(action);
-
-        private void InitializePushAction() => _pushAction = action =>
-        {
-            InitializeRunAction();
-
-            _Push(action);
-
-            _pushAction = _Push;
-        };
-
-        private void InitializeRunAction() => _runActions = () =>
-         {
-             foreach (Action action in Stack)
-
-                 action();
-
-             _runActions = EmptyVoid;
-
-             Stack.Clear();
-
-             InitializePushAction();
-         };
-
-        protected static void EmptyVoid() { /* Left empty. */ }
-
-        public void Push(Action obj) => _pushAction(obj);
-
-        protected internal void RunActions() => _runActions();
-    }
-
-    public class BrowsableObjectInfoPlugin : IBrowsableObjectInfoPlugin
-    {
-        public static BrowsableObjectInfoPluginStack RegisterBrowsabilityPathsStack { get; }
-
-        public static BrowsableObjectInfoPluginStack RegisterProcessSelectorsStack { get; }
-
-        public static BrowsableObjectInfoPluginStack RegisterItemSelectorsStack { get; }
-
-        public static BrowsableObjectInfoPluginStack OnRegisterCompletedStack { get; }
-
-        public void RegisterBrowsabilityPaths() => RegisterBrowsabilityPathsStack.RunActions();
-
-        public void RegisterProcessSelectors() => RegisterProcessSelectorsStack.RunActions();
-
-        public void RegisterItemSelectors() => RegisterItemSelectorsStack.RunActions();
-
-        public void OnRegistrationCompleted() => OnRegisterCompletedStack.RunActions();
     }
 
     namespace ObjectModel
