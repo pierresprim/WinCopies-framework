@@ -24,6 +24,7 @@ using System.Linq;
 
 using WinCopies.IO.AbstractionInterop;
 using WinCopies.IO.Enumeration;
+using WinCopies.IO.ObjectModel.Reflection;
 using WinCopies.IO.Process;
 using WinCopies.IO.Process.ObjectModel;
 using WinCopies.IO.PropertySystem;
@@ -161,7 +162,7 @@ namespace WinCopies.IO
             /// Gets the name of this <see cref="ShellObjectInfo"/> depending of the associated <see cref="ShellObject"/> (see the <see cref="ShellObject"/> property for more details.
             /// </summary>
             public override string Name => _shellObject.Name;
-            
+
             protected override IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystemOverride => ShellObjectPropertySystemCollection._GetShellObjectPropertySystemCollection(this);
 
             protected override IBrowsableObjectInfo ParentOverride => _parent
@@ -303,7 +304,15 @@ namespace WinCopies.IO
 
             public static IEnumerableSelectorDictionary<ShellObjectInfoItemProvider, IBrowsableObjectInfo> DefaultItemSelectorDictionary { get; } = new ShellObjectInfoSelectorDictionary();
 
-            public static Action RegisterProcessSelectors { get; private set; } = () =>
+            public static Action RegisterDefaultBrowsabilityPaths { get; private set; } = () =>
+              {
+                  BrowsabilityPathStack.Push(new MultiIconInfo.BrowsabilityPath());
+                  BrowsabilityPathStack.Push(new DotNetAssemblyInfo.BrowsabilityPath());
+
+                  RegisterDefaultBrowsabilityPaths = EmptyVoid;
+              };
+
+            public static Action RegisterDefaultProcessSelectors { get; private set; } = () =>
             {
                 DefaultProcessSelectorDictionary.Push(item => Predicate(item, typeof(Guids.Process.Shell))
                                     , TryGetProcess
@@ -311,7 +320,7 @@ namespace WinCopies.IO
                 // System.Reflection.Assembly.GetExecutingAssembly().DefinedTypes.FirstOrDefault(t => t.Namespace.StartsWith(typeof(Process.ObjectModel.IProcess).Namespace) && t.GetCustomAttribute<ProcessGuidAttribute>().Guid == guid);
                 );
 
-                RegisterProcessSelectors = EmptyVoid;
+                RegisterDefaultProcessSelectors = EmptyVoid;
             };
             #endregion Static Properties
 

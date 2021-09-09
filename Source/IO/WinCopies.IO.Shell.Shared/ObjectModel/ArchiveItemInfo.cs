@@ -108,18 +108,18 @@ namespace WinCopies.IO.ObjectModel
             {
                 if (_browsability == null)
 
-                switch (
+                    switch (
 #endif
 
-            ObjectPropertiesGeneric.FileType
+                ObjectPropertiesGeneric.FileType
 #if CS9
                 switch
             {
 #else
                 )
-   
-                {
-                    case
+
+                    {
+                        case
 #endif
                 FileType.Folder
 #if CS9
@@ -127,7 +127,7 @@ namespace WinCopies.IO.ObjectModel
 #else
                         :
 
-                    case
+                        case
 #endif
                     FileType.Drive
 #if CS9
@@ -135,7 +135,7 @@ namespace WinCopies.IO.ObjectModel
 #else
                         :
 
-                        _browsability =
+                            _browsability =
 #endif
                     BrowsabilityOptions.BrowsableByDefault
 #if CS9
@@ -143,27 +143,27 @@ namespace WinCopies.IO.ObjectModel
 #else
                 ;
 
-                break;
+                            break;
 #endif
-                // case FileType.Archive:
+                        // case FileType.Archive:
 #if CS9
                 _ =>
 #else
-                default:
+                        default:
 
-                    _browsability =
+                            _browsability =
 #endif
                 BrowsabilityOptions.NotBrowsable
 #if !CS9
                 ;
 
-                break;
+                            break;
 #endif
-            };
+                    };
 #if !CS9
                 return _browsability;
             }
-}
+        }
 #endif
 
         /// <summary>

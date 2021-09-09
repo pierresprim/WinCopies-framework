@@ -6,6 +6,13 @@ The WinCopies® software framework
 CHANGELOG
 ---------
 
+### 3.9.1-preview
+
+- Add:
+	- ContextMenuRequested routed event to ExplorerControlListView.
+	- drag and drop in ListView.
+- Update BrowsableObjectInfo related types in order to have more centralized plug-in handling.
+
 ### 3.8-preview
 
 - Bug fixed:

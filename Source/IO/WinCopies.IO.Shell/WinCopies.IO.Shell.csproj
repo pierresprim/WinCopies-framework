@@ -13,10 +13,10 @@
     <SignAssembly>true</SignAssembly>
     <DefineConstants>WinCopies2;WinCopies3;$(DefineConstants)</DefineConstants>
     <AssemblyOriginatorKeyFile>WinCopies.GUI.IO.snk</AssemblyOriginatorKeyFile>
-    <VersionPrefix>3.8</VersionPrefix>
+    <VersionPrefix>3.9.1</VersionPrefix>
     <VersionSuffix>preview</VersionSuffix>
-    <AssemblyVersion>3.8</AssemblyVersion>
-    <FileVersion>3.8</FileVersion>
+    <AssemblyVersion>3.9.1</AssemblyVersion>
+    <FileVersion>3.9.1</FileVersion>
   </PropertyGroup>
 
   <Import Project="..\WinCopies.IO.Shell.Shared\WinCopies.IO.Shell.Shared.projitems" Label="Shared" />
@@ -72,8 +72,9 @@
 
     <PackageReference Include="Squid-Box.SevenZipSharp" Version="1.2.231" />
 
-    <PackageReference Include="WinCopies.WindowsAPICodePack.Consts" Version="3.5-preview" />
-    <PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="3.5-preview" />
+    <PackageReference Include="WinCopies.WindowsAPICodePack.Consts" Version="3.6-preview" />
+    <PackageReference Include="WinCopies.WindowsAPICodePack.COMNative" Version="3.6.1-preview" />
+    <PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="3.6-preview" />
     <PackageReference Include="WinCopies.WindowsAPICodePack.PortableDevices" Version="3.4-preview" />
   </ItemGroup>
 

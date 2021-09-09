@@ -15,8 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-using Microsoft.WindowsAPICodePack.Shell;
-using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Windows;
@@ -59,6 +57,17 @@ namespace WinCopies.GUI.IO.Controls
         public DroppedEventArgs(in IProcessParameters processParameters) => ProcessParameters = processParameters;
     }
 
+    public class ExplorerControlListViewContextMenuRequestedEventArgs : RoutedEventArgs
+    {
+        public MouseButtonEventArgs MouseButtonEventArgs { get; }
+
+        public ExplorerControlListViewContextMenuRequestedEventArgs(in MouseButtonEventArgs mouseButtonEventArgs) : base(ExplorerControlListView.ContextMenuRequestedEvent) => MouseButtonEventArgs = mouseButtonEventArgs;
+
+        public ExplorerControlListViewContextMenuRequestedEventArgs(in MouseButtonEventArgs mouseButtonEventArgs, in RoutedEvent routedEvent) : base(routedEvent) => MouseButtonEventArgs = mouseButtonEventArgs;
+
+        public ExplorerControlListViewContextMenuRequestedEventArgs(in MouseButtonEventArgs mouseButtonEventArgs, in RoutedEvent routedEvent, in object source) : base(routedEvent, source) => MouseButtonEventArgs = mouseButtonEventArgs;
+    }
+
     public class ExplorerControlListView : ListView
     {
         private Point _startPoint;
@@ -76,6 +85,15 @@ namespace WinCopies.GUI.IO.Controls
             remove => RemoveHandler(DroppedEvent, value);
         }
 
+        public static readonly RoutedEvent ContextMenuRequestedEvent = EventManager.RegisterRoutedEvent(nameof(ContextMenuRequested), RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(ExplorerControlListView));
+
+        public event RoutedEventHandler<DroppedEventArgs> ContextMenuRequested
+        {
+            add => AddHandler(ContextMenuRequestedEvent, value);
+
+            remove => RemoveHandler(ContextMenuRequestedEvent, value);
+        }
+
         public ExplorerControlListView() => AllowDrop = true;
 
         protected override DependencyObject GetContainerForItemOverride() => new ExplorerControlListViewItem();
@@ -87,13 +105,20 @@ namespace WinCopies.GUI.IO.Controls
             _startPoint = e.GetPosition(null);
         }
 
+        protected override void OnMouseRightButtonUp(MouseButtonEventArgs e)
+        {
+            base.OnMouseRightButtonUp(e);
+
+            RaiseEvent(new ExplorerControlListViewContextMenuRequestedEventArgs(e) );
+        }
+
         public IDragDropProcessInfo GetDragDropProcessInfo() => ((IExplorerControlBrowsableObjectInfoViewModel)DataContext).Path.ProcessFactory.DragDrop;
 
         protected virtual DataObject GetDragDropData()
         {
             DataObject data = new DataObject();
 
-            System.Collections.Generic.IDictionary<string, object> result = GetDragDropProcessInfo() .TryGetData(GetSelectedPaths(), out DragDropEffects dragDropEffects);
+            System.Collections.Generic.IDictionary<string, object> result = GetDragDropProcessInfo().TryGetData(GetSelectedPaths(), out DragDropEffects dragDropEffects);
 
             if (result.Count == 1 && result.ContainsKey(DataFormats.FileDrop))
             {
@@ -127,13 +152,11 @@ namespace WinCopies.GUI.IO.Controls
         {
             base.OnMouseMove(e);
 
-            if (GetDragDropProcessInfo().CanRun(GetSelectedPaths()))
+            if (IsMouseCaptured && e.LeftButton == MouseButtonState.Pressed&& SelectedItems.Count > 0 &&GetDragDropProcessInfo().CanRun(GetSelectedPaths()))
             {
-                Point point = e.GetPosition(null);
+                Vector diff = _startPoint - e.GetPosition(null);
 
-                Vector diff = _startPoint - point;
-
-                if (IsMouseCaptured && e.LeftButton == MouseButtonState.Pressed && (System.Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance || System.Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance) && SelectedItems.Count > 0)
+                if (System.Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance || System.Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance)
 
                     _ = DragDrop.DoDragDrop(this, GetDragDropData(), DragDropEffects.Copy | DragDropEffects.Move | DragDropEffects.Link);
             }

@@ -9,7 +9,13 @@
     <Import_RootNamespace>WinCopies.IO.Shared</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)BitmapSources\BitmapSourceProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BitmapSources\BitmapSources.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BitmapSources\BitmapSourcesLinker.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Browsability.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectInfoItemProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectInfoPlugin.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectInfoStack.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Directory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EnumerablePath.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions.cs" />
@@ -27,7 +33,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)PathInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\BrowsableObjectInfoProcessFactoryDictionary.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\Errors.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\Factories.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\IProcessError.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\Misc.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ObjectModel\Interfaces.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ObjectModel\IProcess.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ObjectModel\Process.Partial\LinkedLists.cs" />

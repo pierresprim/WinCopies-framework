@@ -65,61 +65,71 @@ namespace WinCopies.IO
 #if CS9
                 =>
 #else
-                : return
+                :
+                    return
 #endif
                 "1-bit B/W"
 #if CS9
                 ,
 #else
-                ; case
+                ;
+                case
 #endif
                 Format24bppRgb
 #if CS9
                 =>
 #else
-                : return
+                :
+                    return
 #endif
                 "24-bit True Colors"
 #if CS9
                 ,
 #else
-                ; case
+                ;
+                case
 #endif
                 Format32bppArgb
 #if CS9
                 or
 #else
-                : case
+                :
+                case
 #endif
                 Format32bppRgb
 #if CS9
                 =>
 #else
-                : return
+                :
+                    return
 #endif
                 "32-bit Alpha Channel"
 #if CS9
                 ,
 #else
-                ; case
+                ;
+                case
 #endif
                 Format8bppIndexed
 #if CS9
                 =>
 #else
-                : return
+                :
+                    return
 #endif
                 "8-bit 256 Colors"
 #if CS9
                 ,
 #else
-                ; case
+                ;
+                case
 #endif
                 Format4bppIndexed
 #if CS9
                 =>
 #else
-                : return
+                :
+                    return
 #endif
                 "4-bit 16 Colors"
 #if CS9
@@ -127,7 +137,9 @@ namespace WinCopies.IO
 
                 _ =>
 #else
-                ; default: return
+                ;
+                default:
+                    return
 #endif
                 "Unknown"
 #if CS9
@@ -143,7 +155,7 @@ namespace WinCopies.IO
 
     namespace PropertySystem
     {
-        public interface IIconImageInfoProperties : WinCopies.DotNetFix.IDisposable
+        public interface IIconImageInfoProperties : DotNetFix.IDisposable
         {
             string FriendlyBitDepth { get; }
 
@@ -210,43 +222,50 @@ namespace WinCopies.IO
 #if CS9
                         or
 #else
-                        : case
+                        :
+                    case
 #endif
                         ".icl"
 #if CS9
                         or
 #else
-                        : case
+                        :
+                    case
 #endif
                         ".dll"
 #if CS9
                         or
 #else
-                        : case
+                        :
+                    case
 #endif
                         ".exe"
 #if CS9
                         or
 #else
-                        : case
+                        :
+                    case
 #endif
                         ".ocx"
 #if CS9
                         or
 #else
-                        : case
+                        :
+                    case
 #endif
                         ".cpl"
 #if CS9
                         or
 #else
-                        : case
+                        :
+                    case
 #endif
                         ".src"
 #if CS9
                     =>
 #else
-                    : return
+                    :
+                        return
 #endif
                     true
 #if CS9
@@ -254,7 +273,9 @@ namespace WinCopies.IO
 
                     _ =>
 #else
-                    ; default: return
+                    ;
+                    default:
+                        return
 #endif
                     false
 #if CS9

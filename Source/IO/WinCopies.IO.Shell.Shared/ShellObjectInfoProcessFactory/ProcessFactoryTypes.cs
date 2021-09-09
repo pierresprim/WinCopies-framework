@@ -216,7 +216,7 @@ namespace WinCopies.IO
         {
             public DragDropProcessFactory(in T path) : base(path) { /* Left empty. */ }
 
-            protected virtual bool SupportsDragDrop(IBrowsableObjectInfo path) => path is IShellObjectInfo<IFileSystemObjectInfoProperties> _path && _path.InnerObject.IsFileSystemObject && _path.ObjectProperties.FileType != FileType.Drive;
+            protected virtual bool SupportsDragDrop(IBrowsableObjectInfo path) => path.InnerObject is ShellObject shellObject && shellObject.IsFileSystemObject && path.ObjectProperties is IFileSystemObjectInfoProperties properties && properties.FileType != FileType.Drive;
 
             public bool CanRun(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths)
             {

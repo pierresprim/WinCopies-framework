@@ -19,6 +19,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)AbstractionInterop\PortableDeviceObjectInfoItemProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AbstractionInterop\WMIItemInfoItemProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AbstractionInterop\ShellObjectInfoItemProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BitmapSources.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FileSystemEntryEnumeratorProcessSimulation.cs" />
