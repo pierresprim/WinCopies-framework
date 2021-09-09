@@ -10,10 +10,10 @@
     <DefineConstants>WinCopies2;WinCopies3;ProcessesWork;$(DefineConstants)</DefineConstants>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>WinCopies.GUI.Shell.snk</AssemblyOriginatorKeyFile>
-    <VersionPrefix>3.8</VersionPrefix>
+    <VersionPrefix>3.9</VersionPrefix>
     <VersionSuffix>preview</VersionSuffix>
-    <AssemblyVersion>3.8</AssemblyVersion>
-    <FileVersion>3.8</FileVersion>
+    <AssemblyVersion>3.9</AssemblyVersion>
+    <FileVersion>3.9</FileVersion>
   </PropertyGroup>
 
   <Import Project="..\WinCopies.GUI.Shell.Shared\WinCopies.GUI.Shell.Shared.projitems" Label="Shared" />

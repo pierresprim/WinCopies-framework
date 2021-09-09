@@ -152,13 +152,11 @@ namespace WinCopies.GUI.IO.Controls
         {
             base.OnMouseMove(e);
 
-            if (GetDragDropProcessInfo().CanRun(GetSelectedPaths()))
+            if (IsMouseCaptured && e.LeftButton == MouseButtonState.Pressed&& SelectedItems.Count > 0 &&GetDragDropProcessInfo().CanRun(GetSelectedPaths()))
             {
-                Point point = e.GetPosition(null);
+                Vector diff = _startPoint - e.GetPosition(null);
 
-                Vector diff = _startPoint - point;
-
-                if (IsMouseCaptured && e.LeftButton == MouseButtonState.Pressed && (System.Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance || System.Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance) && SelectedItems.Count > 0)
+                if (System.Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance || System.Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance)
 
                     _ = DragDrop.DoDragDrop(this, GetDragDropData(), DragDropEffects.Copy | DragDropEffects.Move | DragDropEffects.Link);
             }
