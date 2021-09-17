@@ -15,7 +15,8 @@
     xmlns:commands="clr-namespace:WinCopies.Commands;assembly=WinCopies.Util.Desktop"
     xmlns:util="clr-namespace:WinCopies;assembly=WinCopies.Util.Desktop"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
-    xmlns:utilCommands="clr-namespace:WinCopies.Util.Commands.Primitives;assembly=WinCopies.Util">
+    xmlns:utilCommands="clr-namespace:WinCopies.Util.Commands.Primitives;assembly=WinCopies.Util"
+    xmlns:temp="clr-namespace:WinCopies.Temp;assembly=WinCopies.Util.Temp">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/wincopies.gui;component/Themes/Generic.xaml" />
         <ResourceDictionary Source="pack://application:,,,/wincopies.gui.templates;component/Themes/Generic.xaml" />
@@ -401,6 +402,42 @@
     <Style TargetType="{x:Type localControls:ExplorerControlListViewItemContent}">
         <Setter Property="Template" Value="{StaticResource ExplorerControlSizeThreeListViewItemContentTemplate}" />
     </Style>
+
+    <Style x:Key="WinCopies.IO.TabItemStyle" TargetType="{x:Type TabItem}">
+        <Setter Property="IsSelected" Value="{Binding IsSelected}" />
+        <Setter Property="Header" Value="{Binding}" />
+        <Setter Property="HeaderTemplate">
+            <Setter.Value>
+                <DataTemplate DataType="{x:Type localObjectModel:IExplorerControlBrowsableObjectInfoViewModel}">
+                    <DockPanel>
+                        <Image DockPanel.Dock="Left" Source="{Binding Path.BitmapSources.Medium}" Height="32" Width="32" />
+                        <controls:Label Content="{Binding Path.Name}" RecognizesAccessKey="False" VerticalContentAlignment="Center" />
+                        <Button DockPanel.Dock="Right" Content="X" Command="{x:Static commands:ApplicationCommands.CloseTab}" CommandParameter="{Binding}" Height="20" Width="20" />
+                    </DockPanel>
+                </DataTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="ContentTemplateSelector">
+            <Setter.Value>
+                <util:InterfaceDataTemplateSelector />
+            </Setter.Value>
+        </Setter>
+        <Setter Property="ContextMenu">
+            <Setter.Value>
+                <ContextMenu>
+                    <MenuItem Header="Close tab" Icon="{x:Static icons:Resources.tab_delete}" Command="{x:Static commands:ApplicationCommands.CloseTab}" />
+                    <MenuItem Header="Close other tabs" Command="{x:Static temp:Temp.CloseOtherTabs}" />
+                    <MenuItem Header="Close all tabs" Command="{x:Static commands:ApplicationCommands.CloseAllTabs}" />
+                    <MenuItem Header="Close tabs to the left" Command="{x:Static temp:Temp.CloseTabsToTheLeftOrRight}" CommandParameter="{x:Static temp:CloseTabsTo.Left}" />
+                    <MenuItem Header="Close tabs to the right" Command="{x:Static temp:Temp.CloseTabsToTheLeftOrRight}" CommandParameter="{x:Static temp:CloseTabsTo.Right}" />
+                </ContextMenu>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <DataTemplate DataType="{x:Type localObjectModel:IBrowsableObjectInfoCollectionViewModel}">
+        <TabControl Style="{StaticResource WinCopies.TabControlStyle}" ItemsSource="{Binding Paths}" SelectedItem="{Binding SelectedItem, Mode=OneWayToSource}" SelectedIndex="{Binding SelectedIndex, Mode=OneWayToSource}" ItemContainerStyle="{StaticResource WinCopies.IO.TabItemStyle}" />
+    </DataTemplate>
 
     <!--Processes-->
 

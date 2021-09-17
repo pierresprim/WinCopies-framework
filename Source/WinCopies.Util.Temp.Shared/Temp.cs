@@ -15,6 +15,49 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+#if DEBUG
+using System;
+using System.Windows.Input;
+
+namespace WinCopies.Temp
+{
+    public enum CloseTabsTo : sbyte
+    {
+        Left = 1,
+
+        Right = 2
+    }
+
+    public static class Temp
+    {
+        public static RoutedUICommand CloseOtherTabs { get; } = new
+#if !CS9
+            RoutedUICommand
+#endif
+            (/*Properties.Resources.*/"CloseOtherTabs", nameof(CloseOtherTabs), typeof(Temp), new InputGestureCollection() { new KeyGesture(Key.W, ModifierKeys.Control | ModifierKeys.Alt) });
+
+        public static RoutedUICommand CloseTabsToTheLeftOrRight { get; } = new
+#if !CS9
+            RoutedUICommand
+#endif
+            (/*Properties.Resources.*/"CloseTabsToTheLeftOrRight", nameof(CloseTabsToTheLeftOrRight), typeof(Temp));
+
+        public static void ForEach<T>(this System.Collections.Generic.IEnumerable<T> enumerable, in Action<T> action)
+        {
+            foreach (var item in enumerable)
+
+                action(item);
+        }
+
+        public static void ForEach<T>(this System.Collections.Generic.IEnumerable<T> enumerable, in ActionIn<T> action)
+        {
+            foreach (T item in enumerable)
+
+                action(item);
+        }
+    }
+}
+
 //using System;
 //using System.Collections.Generic;
 
@@ -30,7 +73,6 @@
 //    WinCopies.Util.Util;
 //#endif
 
-//#if DEBUG
 //namespace WinCopies.Temp
 //{
 //    public static class Delegates
@@ -328,10 +370,5 @@
 //#endif
 //            =>            Null<TIn, TOut>;
 //    }
-
-//    //    public static class Temp
-//    //    {
-
-//    //    }
 //}
-//#endif
+#endif

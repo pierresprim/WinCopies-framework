@@ -1,4 +1,4 @@
-﻿<!-- Copyright © Pierre Sprimont, 2020
+﻿<!--Copyright © Pierre Sprimont, 2020
 
 This file is part of the WinCopies Framework.
 
@@ -13,7 +13,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with the WinCopies Framework.  If not, see<https://www.gnu.org/licenses/>. -->
+along with the WinCopies Framework.  If not, see<https://www.gnu.org/licenses/>.-->
 
 <windows:Window x:Class="WinCopies.GUI.Samples.ExplorerControlTest"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -28,7 +28,7 @@ along with the WinCopies Framework.  If not, see<https://www.gnu.org/licenses/>.
         xmlns:windows="clr-namespace:WinCopies.GUI.Windows;assembly=WinCopies.GUI"
         mc:Ignorable="d"
         Title="ExplorerControlTest" Height="450" Width="800">
-    <Window.CommandBindings>
+    <!--<Window.CommandBindings>
         <CommandBinding Command="{x:Static commands:ApplicationCommands.NewTab}" CanExecute="Command_CanExecute" Executed="NewTab_Executed" />
         <CommandBinding Command="{x:Static commands:ApplicationCommands.CloseTab}" CanExecute="CloseTab_CanExecute" Executed="CloseTab_Executed" />
         <CommandBinding Command="{x:Static NavigationCommands.BrowseBack}" CanExecute="Window_PreviousCanExecute" Executed="Window_PreviousExecuted" />
@@ -91,5 +91,5 @@ along with the WinCopies Framework.  If not, see<https://www.gnu.org/licenses/>.
                 </Style>
             </TabControl.ItemContainerStyle>
         </TabControl>
-    </DockPanel>
+    </DockPanel>-->
 </windows:Window>

@@ -13,7 +13,10 @@
     <Compile Include="$(MSBuildThisFileDirectory)ArchiveCompressionProcessParametersControl.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectInfoFactory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectInfoViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectInfoWindow.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ExplorerControlBrowsableObjectInfoViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectInfoWindowMenuItem.cs" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="$(MSBuildThisFileDirectory)Themes\Generic.xaml">
