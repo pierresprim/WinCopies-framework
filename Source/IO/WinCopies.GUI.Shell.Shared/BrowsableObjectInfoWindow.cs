@@ -50,7 +50,11 @@ namespace WinCopies.GUI.Shell
     {
         private System.Windows.Interop.HwndSourceHook _hook;
 
-        private static RoutedUICommand GetRoutedCommand(in string text, in string name) => new RoutedUICommand(text, name, typeof(BrowsableObjectInfoWindow));
+        private static RoutedUICommand GetRoutedCommand(in string text, in string name) => new
+#if !CS9
+            RoutedUICommand
+#endif
+            (text, name, typeof(BrowsableObjectInfoWindow));
 
         public static RoutedCommand NewRegistryTab { get; } = GetRoutedCommand(Properties.Resources.NewRegistryTab, nameof(NewRegistryTab));
 
@@ -72,11 +76,7 @@ namespace WinCopies.GUI.Shell
 
                 IExplorerControlBrowsableObjectInfoViewModel selectedItem = ((BrowsableObjectInfoWindowViewModel)window.DataContext).Paths.SelectedItem;
 
-                if (selectedItem.SelectedItems == null)
-
-                    return;
-
-                if (selectedItem.SelectedItems.Count != 1)
+                if (selectedItem.SelectedItems == null || selectedItem.SelectedItems.Count != 1)
 
                     return;
 
@@ -96,7 +96,7 @@ namespace WinCopies.GUI.Shell
                     _ = contextMenu.Query(1u, uint.MaxValue, ContextMenuFlags.Explore | ContextMenuFlags.CanRename);
 
                     Point point = ((ExplorerControlListViewContextMenuRequestedEventArgs)e).MouseButtonEventArgs.GetPosition(null);
-                    System.Drawing.Point _point = new System.Drawing.Point((int)point.X, (int)point.Y);
+                    var _point = new System.Drawing.Point((int)point.X, (int)point.Y);
 
                     contextMenu.Show(new WindowInteropHelper(window).Handle, _point);
                 }
@@ -119,8 +119,6 @@ namespace WinCopies.GUI.Shell
 
             // InitializeComponent();
         }
-
-        public BrowsableObjectInfoWindow() : this(new BrowsableObjectInfoWindowViewModel()) { /* Left empty. */ }
 
         private void Command_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
@@ -197,7 +195,7 @@ namespace WinCopies.GUI.Shell
 
         private void SubmitABug_Executed(object sender, ExecutedRoutedEventArgs e) => RunCommand(OnSubmitABug, e);
 
-        private System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetEnumerable() => ((BrowsableObjectInfoWindowViewModel)DataContext).Paths.SelectedItem.Path.Items.WhereSelect(item => item.IsSelected, item => item.Model);
+        protected System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetEnumerable() => ((BrowsableObjectInfoWindowViewModel)DataContext).Paths.SelectedItem.Path.Items.WhereSelect(item => item.IsSelected, item => item.Model);
 
         private void CanRunCommand(in IProcessFactoryProcessInfo processFactory, in CanExecuteRoutedEventArgs e)
         {
@@ -220,7 +218,7 @@ namespace WinCopies.GUI.Shell
 
             CanRunCommand(GetProcessFactory().Copy, e);
 
-        private IProcessFactory GetProcessFactory() => ((BrowsableObjectInfoWindowViewModel)DataContext).Paths.SelectedItem.Path.ProcessFactory;
+        protected IProcessFactory GetProcessFactory() => ((BrowsableObjectInfoWindowViewModel)DataContext).Paths.SelectedItem.Path.ProcessFactory;
 
         private static void RunCommand(in Action action, in IRunnableProcessInfo processFactory)
         {

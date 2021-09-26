@@ -4,6 +4,8 @@ namespace WinCopies.GUI.Samples
 {
     public partial class ExplorerControlWindow : BrowsableObjectInfoWindow
     {
+        public ExplorerControlWindow() : base(new BrowsableObjectInfoWindowViewModel()) { /* Left empty. */ }
+
         protected override BrowsableObjectInfoWindow GetNewBrowsableObjectInfoWindow() => new ExplorerControlWindow();
 
         protected override void OnAboutWindowRequested() { }

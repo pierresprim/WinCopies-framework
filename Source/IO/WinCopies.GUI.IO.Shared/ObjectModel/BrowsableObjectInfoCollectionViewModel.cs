@@ -80,12 +80,7 @@ namespace WinCopies.GUI.IO.ObjectModel
             return false;
         }
 
-        protected virtual void OnPathAdded(IExplorerControlBrowsableObjectInfoViewModel path)
-        {
-            path.IsCheckBoxVisible = _checkBoxVisible;
-
-            // path.CustomProcessParametersGeneratedEventHandler += Item_CustomProcessParametersGeneratedEventHandler;
-        }
+        protected virtual void OnPathAdded(IExplorerControlBrowsableObjectInfoViewModel path) => path.IsCheckBoxVisible = _checkBoxVisible;
 
         protected virtual void OnPathCollectionChanged(NotifyCollectionChangedEventArgs e)
         {
@@ -94,12 +89,6 @@ namespace WinCopies.GUI.IO.ObjectModel
                 foreach (object item in e.NewItems)
 
                     OnPathAdded((IExplorerControlBrowsableObjectInfoViewModel)item);
-
-            //if (e.OldItems != null)
-
-            //    foreach (object _item in e.OldItems)
-
-            //        ((IExplorerControlBrowsableObjectInfoViewModel)_item).CustomProcessParametersGeneratedEventHandler -= Item_CustomProcessParametersGeneratedEventHandler;
         }
 
         private void Paths_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => OnPathCollectionChanged(e);
