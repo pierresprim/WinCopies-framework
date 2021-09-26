@@ -28,7 +28,7 @@ namespace WinCopies.IO.Selectors
     {
         public static IBrowsableObjectInfo Convert(PortableDeviceObjectInfoItemProvider item) => new PortableDeviceObjectInfo((item ?? throw GetArgumentNullException(nameof(item))).PortableDeviceObject, item.ParentPortableDevice, item.ClientVersion);
 
-        protected override Converter<PortableDeviceObjectInfoItemProvider, IBrowsableObjectInfo> DefaultSelectorOverride => Convert;
+        protected override Converter<PortableDeviceObjectInfoItemProvider, IBrowsableObjectInfo> DefaultActionOverride => Convert;
 
         public PortableDeviceInfoSelectorDictionary() { /* Left empty. */ }
     }
@@ -37,7 +37,7 @@ namespace WinCopies.IO.Selectors
     {
         public static IBrowsableObjectInfo Convert(PortableDeviceObjectInfoItemProvider item) => new PortableDeviceObjectInfo((item ?? throw GetArgumentNullException(nameof(item))).PortableDeviceObject, item.ParentPortableDeviceObject, item.ClientVersion);
 
-        protected override Converter<PortableDeviceObjectInfoItemProvider, IBrowsableObjectInfo> DefaultSelectorOverride => Convert;
+        protected override Converter<PortableDeviceObjectInfoItemProvider, IBrowsableObjectInfo> DefaultActionOverride => Convert;
 
         public PortableDeviceObjectInfoSelectorDictionary() { /* Left empty. */ }
     }

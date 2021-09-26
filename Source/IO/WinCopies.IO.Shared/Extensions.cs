@@ -17,12 +17,13 @@
 
 using System;
 using System.Windows.Media.Imaging;
+
 using WinCopies.Collections;
 using WinCopies.Collections.DotNetFix.Generic;
 using WinCopies.Collections.Generic;
+using WinCopies.IO.ObjectModel;
 
 using static WinCopies.ThrowHelper;
-
 using static WinCopies.IO.ObjectModel.BrowsableObjectInfo;
 
 namespace WinCopies.IO
@@ -60,6 +61,8 @@ namespace WinCopies.IO
 
     public static class Extensions
     {
+        public static BrowsableAs GetBrowsableAsValue(this IBrowsableObjectInfo browsableObjectInfo) => browsableObjectInfo.IsBrowsable() ? browsableObjectInfo.IsLocalRoot ? BrowsableAs.LocalRoot : BrowsableAs.Folder : BrowsableAs.File;
+
         public static BitmapSource TryGetBitmapSource(this IBitmapSources bitmapSources, in int size)
 #if CS8
             =>

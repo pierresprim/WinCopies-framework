@@ -19,7 +19,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 
-using WinCopies.Temp;
+using WinCopies.Util;
 using WinCopies.Util.Data;
 
 namespace WinCopies.GUI.IO.ObjectModel

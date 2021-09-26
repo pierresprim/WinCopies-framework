@@ -25,6 +25,8 @@ namespace WinCopies.IO
     {
         IBitmapSources Default { get; }
 
+        IBitmapSources Intermediate { get; }
+
         IBitmapSources Sources { get; }
     }
 
@@ -32,9 +34,13 @@ namespace WinCopies.IO
     {
         protected abstract IBitmapSources DefaultOverride { get; }
 
+        protected abstract IBitmapSources IntermediateOverride { get; }
+
         protected abstract IBitmapSources SourcesOverride { get; }
 
         public IBitmapSources Default => GetOrThrowIfDisposed(this, DefaultOverride);
+
+        public IBitmapSources Intermediate => GetOrThrowIfDisposed(this, IntermediateOverride);
 
         public IBitmapSources Sources => GetOrThrowIfDisposed(this, SourcesOverride);
 
@@ -49,6 +55,8 @@ namespace WinCopies.IO
             if (DisposeBitmapSources)
             {
                 DefaultOverride?.Dispose();
+
+                IntermediateOverride?.Dispose();
 
                 SourcesOverride?.Dispose();
             }
@@ -72,20 +80,25 @@ namespace WinCopies.IO
 
     public class BitmapSourceProvider : BitmapSourceProviderAbstract
     {
-        private IBitmapSources _defaultOverride;
-        private IBitmapSources _sourcesOverride;
+        private IBitmapSources _default;
+        private IBitmapSources _intermediate;
+        private IBitmapSources _sources;
 
-        protected override IBitmapSources DefaultOverride => _defaultOverride;
+        protected override IBitmapSources DefaultOverride => _default;
 
-        protected override IBitmapSources SourcesOverride => _sourcesOverride;
+        protected override IBitmapSources IntermediateOverride => _intermediate;
+
+        protected override IBitmapSources SourcesOverride => _sources;
 
         protected override bool DisposeBitmapSources { get; }
 
-        public BitmapSourceProvider(in IBitmapSources defaultBitmapSources, in IBitmapSources bitmapSources, in bool disposeBitmapSources)
+        public BitmapSourceProvider(in IBitmapSources @default, in IBitmapSources intermediate, in IBitmapSources sources, in bool disposeBitmapSources)
         {
-            _defaultOverride = defaultBitmapSources;
+            _default = @default;
 
-            _sourcesOverride = bitmapSources;
+            _intermediate = intermediate;
+
+            _sources = sources;
 
             DisposeBitmapSources = disposeBitmapSources;
         }
@@ -94,8 +107,9 @@ namespace WinCopies.IO
         {
             base.DisposeUnmanaged();
 
-            _defaultOverride = null;
-            _sourcesOverride = null;
+            _default = null;
+            _intermediate = null;
+            _sources = null;
         }
     }
 }

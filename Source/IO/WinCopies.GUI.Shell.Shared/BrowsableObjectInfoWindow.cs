@@ -30,7 +30,6 @@ using System.Windows.Interop;
 using WinCopies.Desktop;
 using WinCopies.GUI.IO.Controls;
 using WinCopies.GUI.IO.ObjectModel;
-using WinCopies.GUI.Shell;
 using WinCopies.GUI.Windows;
 using WinCopies.IO.ObjectModel;
 using WinCopies.IO.Process;
@@ -53,13 +52,13 @@ namespace WinCopies.GUI.Shell
 
         private static RoutedUICommand GetRoutedCommand(in string text, in string name) => new RoutedUICommand(text, name, typeof(BrowsableObjectInfoWindow));
 
-        public static RoutedCommand NewRegistryTab { get; } = GetRoutedCommand(Shell.Properties.Resources.NewRegistryTab, nameof(NewRegistryTab));
+        public static RoutedCommand NewRegistryTab { get; } = GetRoutedCommand(Properties.Resources.NewRegistryTab, nameof(NewRegistryTab));
 
-        public static RoutedCommand NewWMITab { get; } = GetRoutedCommand(Shell.Properties.Resources.NewWMITab, nameof(NewWMITab));
+        public static RoutedCommand NewWMITab { get; } = GetRoutedCommand(Properties.Resources.NewWMITab, nameof(NewWMITab));
 
-        public static RoutedCommand Quit { get; } = GetRoutedCommand(Shell.Properties.Resources.Quit, nameof(Quit));
+        public static RoutedCommand Quit { get; } = GetRoutedCommand(Properties.Resources.Quit, nameof(Quit));
 
-        public static RoutedCommand SubmitABug { get; } = GetRoutedCommand(Shell.Properties.Resources.SubmitABug, nameof(SubmitABug));
+        public static RoutedCommand SubmitABug { get; } = GetRoutedCommand(Properties.Resources.SubmitABug, nameof(SubmitABug));
 
         static BrowsableObjectInfoWindow()
         {
@@ -71,7 +70,7 @@ namespace WinCopies.GUI.Shell
 
                 var window = listView.GetParent<BrowsableObjectInfoWindow>(true);
 
-                var selectedItem = ((BrowsableObjectInfoWindowViewModel)window.DataContext).Paths.SelectedItem;
+                IExplorerControlBrowsableObjectInfoViewModel selectedItem = ((BrowsableObjectInfoWindowViewModel)window.DataContext).Paths.SelectedItem;
 
                 if (selectedItem.SelectedItems == null)
 
@@ -333,8 +332,6 @@ namespace WinCopies.GUI.Shell
             };
 #else
                 ;
-
-                break;
             }
 #endif
 
@@ -429,9 +426,9 @@ namespace WinCopies.GUI.Shell
 
             add(Commands.ApplicationCommands.NewWindow, NewWindow_Executed, Command_CanExecute);
             add(Commands.ApplicationCommands.CloseTab, CloseTab_Executed, CloseTab_CanExecute);
-            add(Temp.Temp.CloseOtherTabs, CloseOtherTabs_Executed, CloseTab_CanExecute);
+            add(Commands.ApplicationCommands.CloseOtherTabs, CloseOtherTabs_Executed, CloseTab_CanExecute);
             add(Commands.ApplicationCommands.CloseAllTabs, CloseAllTabs_Executed, CloseTab_CanExecute);
-            add(Temp.Temp.CloseTabsToTheLeftOrRight, CloseTabsTo_Executed, CloseTabsTo_CanExecute);
+            add(Commands.ApplicationCommands.CloseTabsToTheLeftOrRight, CloseTabsTo_Executed, CloseTabsTo_CanExecute);
 
             add(ApplicationCommands.Close, CloseWindow_Executed, Command_CanExecute);
 

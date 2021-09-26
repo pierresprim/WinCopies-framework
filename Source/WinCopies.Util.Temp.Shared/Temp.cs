@@ -16,8 +16,7 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 #if DEBUG
-using System;
-using System.Windows.Input;
+using Microsoft.WindowsAPICodePack.Win32Native.Shell;
 
 namespace WinCopies.Temp
 {
@@ -30,31 +29,13 @@ namespace WinCopies.Temp
 
     public static class Temp
     {
-        public static RoutedUICommand CloseOtherTabs { get; } = new
-#if !CS9
-            RoutedUICommand
-#endif
-            (/*Properties.Resources.*/"CloseOtherTabs", nameof(CloseOtherTabs), typeof(Temp), new InputGestureCollection() { new KeyGesture(Key.W, ModifierKeys.Control | ModifierKeys.Alt) });
-
-        public static RoutedUICommand CloseTabsToTheLeftOrRight { get; } = new
-#if !CS9
-            RoutedUICommand
-#endif
-            (/*Properties.Resources.*/"CloseTabsToTheLeftOrRight", nameof(CloseTabsToTheLeftOrRight), typeof(Temp));
-
-        public static void ForEach<T>(this System.Collections.Generic.IEnumerable<T> enumerable, in Action<T> action)
-        {
-            foreach (var item in enumerable)
-
-                action(item);
-        }
-
-        public static void ForEach<T>(this System.Collections.Generic.IEnumerable<T> enumerable, in ActionIn<T> action)
-        {
-            foreach (T item in enumerable)
-
-                action(item);
-        }
+        public static ShellImageListIconSize GetIconSizeFromSize(in System.Drawing.Size size) => size.Width <= 16
+                ? ShellImageListIconSize.Small
+                : size.Width <= 32
+                ? ShellImageListIconSize.Large
+                : size.Width <= 48
+                ? ShellImageListIconSize.ExtraLarge
+                : size.Width <= 256 ? ShellImageListIconSize.Jumbo : ShellImageListIconSize.Last;
     }
 }
 

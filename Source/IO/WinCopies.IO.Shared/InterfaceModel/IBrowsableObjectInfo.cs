@@ -39,6 +39,8 @@ namespace WinCopies.IO
 
             System.Collections.Generic.IEnumerable<IProcessInfo> CustomProcesses { get; }
 
+            bool IsLocalRoot { get; }
+
             /// <summary>
             /// Gets a value indicating whether this <see cref="IBrowsableObjectInfo"/> is recursively browsable.
             /// </summary>

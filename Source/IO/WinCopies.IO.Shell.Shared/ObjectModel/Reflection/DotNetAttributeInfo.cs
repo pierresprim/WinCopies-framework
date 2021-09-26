@@ -41,6 +41,8 @@ namespace WinCopies.IO.ObjectModel.Reflection
         private CustomAttributeData _data;
 
         #region Properties
+        protected override bool IsLocalRootOverride => false;
+
         protected sealed override CustomAttributeData InnerObjectGenericOverride => _data;
 
         protected override IProcessFactory ProcessFactoryOverride => Process.ProcessFactory.DefaultProcessFactory;

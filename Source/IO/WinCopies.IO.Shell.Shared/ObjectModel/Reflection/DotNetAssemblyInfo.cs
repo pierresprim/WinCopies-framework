@@ -87,6 +87,8 @@ namespace WinCopies.IO
 
             //public override Predicate<IBrowsableObjectInfo> RootItemsBrowsableObjectInfoPredicate => null;
 
+            protected override bool IsLocalRootOverride => false;
+
             protected IShellObjectInfo ShellObjectInfo => GetValueIfNotDisposed(_shellObjectInfo);
 
             protected override Assembly InnerObjectGenericOverride => _assembly;

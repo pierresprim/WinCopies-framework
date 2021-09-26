@@ -31,7 +31,7 @@ namespace WinCopies.IO.Selectors.Reflection
                     ? throw SelectorDictionary.GetInvalidItemException()
                     : new DotNetNamespaceInfo(item.NamespaceName, item.Parent));
 
-        protected override Converter<DotNetNamespaceInfoItemProvider, IBrowsableObjectInfo> DefaultSelectorOverride => Convert;
+        protected override Converter<DotNetNamespaceInfoItemProvider, IBrowsableObjectInfo> DefaultActionOverride => Convert;
 
         public DotNetNamespaceInfoSelectorDictionary() { /* Left empty. */ }
     }

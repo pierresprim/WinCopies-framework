@@ -36,7 +36,7 @@ namespace WinCopies.IO.Selectors.Reflection
             : item.CustomAttributeData == null ? throw SelectorDictionary.GetInvalidItemException()
             : (IBrowsableObjectInfo)new DotNetAttributeInfo(item.CustomAttributeData, item.Parent);
 
-        protected override Converter<DotNetMemberInfoItemProvider, IBrowsableObjectInfo> DefaultSelectorOverride => Convert;
+        protected override Converter<DotNetMemberInfoItemProvider, IBrowsableObjectInfo> DefaultActionOverride => Convert;
 
         public DotNetMemberInfoSelectorDictionary() { /* Left empty. */ }
     }

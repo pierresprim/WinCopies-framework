@@ -37,19 +37,6 @@ namespace WinCopies.IO.ObjectModel
 {
     public abstract class PortableDeviceObjectInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : FileSystemObjectInfo<TObjectProperties, IPortableDeviceObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IPortableDeviceObjectInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IFileSystemObjectInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
     {
-        protected class BrowsableObjectInfoBitmapSources : BitmapSources<IPortableDeviceObjectInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>>
-        {
-            protected override BitmapSource SmallOverride => InnerObject.TryGetBitmapSource(SmallIconSize);
-
-            protected override BitmapSource MediumOverride => InnerObject.TryGetBitmapSource(MediumIconSize);
-
-            protected override BitmapSource LargeOverride => InnerObject.TryGetBitmapSource(LargeIconSize);
-
-            protected override BitmapSource ExtraLargeOverride => InnerObject.TryGetBitmapSource(ExtraLargeIconSize);
-
-            public BrowsableObjectInfoBitmapSources(in IPortableDeviceObjectInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> portableDeviceInfo) : base(portableDeviceInfo) { /* Left empty. */ }
-        }
-
         #region Fields
         private IPortableDeviceObject _portableDeviceObject;
         private IBrowsableObjectInfo _parent;
@@ -57,23 +44,12 @@ namespace WinCopies.IO.ObjectModel
         private bool _isNameLoaded;
         private string _name;
         private bool? _isSpecialItem;
-        private IBitmapSourceProvider _bitmapSourceProvider;
         #endregion
 
         #region Properties
-        protected override System.Collections.Generic.IEnumerable<IProcessInfo> CustomProcessesOverride => PortableDeviceObjectInfo.DefaultCustomProcessesSelectorDictionary.Select(this);
+        protected override bool IsLocalRootOverride => false;
 
-        protected override IBitmapSourceProvider BitmapSourceProviderOverride => _bitmapSourceProvider
-#if CS8
-            ??=
-#else
-            ?? (_bitmapSourceProvider =
-#endif
-            new BitmapSourceProviderCommon2(this, new BrowsableObjectInfoBitmapSources(this), true)
-#if !CS8
-            )
-#endif
-            ;
+        protected override System.Collections.Generic.IEnumerable<IProcessInfo> CustomProcessesOverride => PortableDeviceObjectInfo.DefaultCustomProcessesSelectorDictionary.Select(this);
 
         protected override IProcessFactory ProcessFactoryOverride => Process.ProcessFactory.DefaultProcessFactory;
 
@@ -143,12 +119,6 @@ namespace WinCopies.IO.ObjectModel
         protected override void DisposeUnmanaged()
         {
             _parent = null;
-
-            if (_bitmapSourceProvider != null)
-            {
-                _bitmapSourceProvider.Dispose();
-                _bitmapSourceProvider = null;
-            }
 
             base.DisposeUnmanaged();
         }

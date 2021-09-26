@@ -22,11 +22,11 @@ using System.Windows.Media.Imaging;
 using WinCopies.Collections.Generic;
 using WinCopies.IO.Process;
 using WinCopies.IO.Reflection.PropertySystem;
+using WinCopies.IO.Shell;
 
 using static WinCopies.UtilHelpers;
 using static WinCopies.ThrowHelper;
 using static WinCopies.IO.Shell.Resources.ExceptionMessages;
-using WinCopies.IO.Shell;
 
 namespace WinCopies.IO.ObjectModel.Reflection
 {
@@ -47,7 +47,6 @@ namespace WinCopies.IO.ObjectModel.Reflection
 
         private static ArrayBuilder<IBrowsableObjectInfo> _defaultRootItems;
         private IBrowsableObjectInfo _parent;
-        private IDotNetAssemblyInfo _parentAssembly;
         private IBitmapSourceProvider _bitmapSourceProvider;
 
         #region Properties
@@ -77,7 +76,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
 
         protected sealed override IBrowsableObjectInfo ParentOverride => _parent;
 
-        public IDotNetAssemblyInfo ParentDotNetAssemblyInfo => _parentAssembly;
+        public IDotNetAssemblyInfo ParentDotNetAssemblyInfo { get; private set; }
 
         protected sealed override bool IsRecursivelyBrowsableOverride => IsBrowsable;
 
@@ -87,7 +86,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
 #else
             ?? (_bitmapSourceProvider =
 #endif
-            new BitmapSourceProviderCommon2(this, new BrowsableObjectInfoBitmapSources(this), true)
+            new Shell.BitmapSourceProvider(this, new BrowsableObjectInfoBitmapSources(this), true)
 #if !CS8
             )
 #endif
@@ -110,7 +109,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
 
             // todo: provide two constructors:
 
-            _parentAssembly = parent is IDotNetItemInfo dotNetItemInfo ? dotNetItemInfo.ParentDotNetAssemblyInfo ?? throw new ArgumentException(string.Format(PropertyCannotBeNullOnObject, nameof(IDotNetItemInfo.ParentDotNetAssemblyInfo), nameof(dotNetItemInfo))) : parent is IDotNetAssemblyInfo dotNetAssemblyInfo ? dotNetAssemblyInfo : throw new ArgumentException(ParentMustBeAnIDotNetAssemblyInfoOrAnIDotNetItemInfoBase, nameof(parent));
+            ParentDotNetAssemblyInfo = parent is IDotNetItemInfo dotNetItemInfo ? dotNetItemInfo.ParentDotNetAssemblyInfo ?? throw new ArgumentException(string.Format(PropertyCannotBeNullOnObject, nameof(IDotNetItemInfo.ParentDotNetAssemblyInfo), nameof(dotNetItemInfo))) : parent is IDotNetAssemblyInfo dotNetAssemblyInfo ? dotNetAssemblyInfo : throw new ArgumentException(ParentMustBeAnIDotNetAssemblyInfoOrAnIDotNetItemInfoBase, nameof(parent));
         }
 
         protected abstract BitmapSource TryGetBitmapSource(in int size);
@@ -132,7 +131,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
         protected override void DisposeUnmanaged()
         {
             _parent = null;
-            _parentAssembly = null;
+            ParentDotNetAssemblyInfo = null;
 
             _bitmapSourceProvider.Dispose();
             _bitmapSourceProvider = null;

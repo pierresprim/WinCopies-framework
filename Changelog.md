@@ -6,6 +6,21 @@ The WinCopies® software framework
 CHANGELOG
 ---------
 
+### 3.10-preview
+
+- Update ExplorerControlBrowsableObjectInfoViewModel to load bitmap sources of the current inner path and the new intermediate bitmap sources of the BitmapSourcesLinker class.
+- Update FileSystemObjectInfo default bitmap sources.
+- Add:
+	- intermediate bitmap sources in BitmapSourcesLinker
+	- new types.
+	- IBitmapSourceProvider.Intermediate property.
+	- BitmapSourceProviderAbstract.Intermediate(Override) properties.
+	- IBitmapSourcesLinker.LoadSteps
+	- protected methods to BitmapSourcesLinker.
+	- IBrowsableObjectInfo.IsLocalRoot property.
+	- BrowsableObjectInfo.IsLocalRoot(Override) properties.
+	- Extensions.GetBrowsableAsValue method.
+
 ### 3.9.1-preview
 
 - Add:

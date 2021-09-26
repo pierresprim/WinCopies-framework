@@ -108,7 +108,7 @@
                                 <local:BrowsableObjectInfoWindowMenuItem ResourceKey="NewWindow" Icon="{x:Static guiResources:Resources.application_add}" Command="{x:Static commands:ApplicationCommands.NewWindow}" />
                                 <local:BrowsableObjectInfoWindowMenuItem ResourceKey="CloseTab">
                                     <local:BrowsableObjectInfoWindowMenuItem ResourceKey="CloseTab" Icon="{x:Static guiResources:Resources.tab_delete}" Command="{x:Static commands:ApplicationCommands.CloseTab}" />
-                                    <local:BrowsableObjectInfoWindowMenuItem ResourceKey="CloseOtherTabs" Command="{x:Static temp:Temp.CloseOtherTabs}" />
+                                    <local:BrowsableObjectInfoWindowMenuItem ResourceKey="CloseOtherTabs" Command="{x:Static commands:ApplicationCommands.CloseOtherTabs}" />
                                     <local:BrowsableObjectInfoWindowMenuItem ResourceKey="CloseAllTabs" Command="{x:Static commands:ApplicationCommands.CloseAllTabs}" />
                                 </local:BrowsableObjectInfoWindowMenuItem>
                                 <local:BrowsableObjectInfoWindowMenuItem ResourceKey="CloseWindow" Command="{x:Static ApplicationCommands.Close}" />
@@ -122,8 +122,8 @@
                                 <local:BrowsableObjectInfoWindowMenuItem ResourceKey="EmptyRecycleBin" Icon="{x:Static guiResources:Resources.bin}" Command="{x:Static commands:ApplicationCommands.Empty}" />
                                 <local:BrowsableObjectInfoWindowMenuItem ResourceKey="Delete" Icon="{x:Static guiResources:Resources.delete}" Command="{x:Static commands:ApplicationCommands.DeletePermanently}" />
                             </local:BrowsableObjectInfoWindowMenuItem>
-                            <MenuItem Header="Open _with" ItemsSource="{Binding DataContext.SelectedItem.BrowsabilityPaths, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:BrowsableObjectInfoWindow}}}" ItemContainerStyle="{StaticResource MenuItemItemContainerStyle}" />
-                            <MenuItem Header="_Tools" ItemsSource="{Binding DataContext.SelectedItem.CustomProcesses, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:BrowsableObjectInfoWindow}}}" ItemContainerStyle="{StaticResource MenuItemItemContainerStyle}" />
+                            <MenuItem Header="Open _with" ItemsSource="{Binding DataContext.Paths.SelectedItem.BrowsabilityPaths, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:BrowsableObjectInfoWindow}}}" ItemContainerStyle="{StaticResource MenuItemItemContainerStyle}" />
+                            <MenuItem Header="_Tools" ItemsSource="{Binding DataContext.Paths.SelectedItem.CustomProcesses, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:BrowsableObjectInfoWindow}}}" ItemContainerStyle="{StaticResource MenuItemItemContainerStyle}" />
                             <local:BrowsableObjectInfoWindowMenuItem ResourceKey="Help">
                                 <local:BrowsableObjectInfoWindowMenuItem ResourceKey="About" Icon="{x:Static guiResources:Resources.help}" Command="{x:Static ApplicationCommands.Help}" />
                                 <local:BrowsableObjectInfoWindowMenuItem ResourceKey="SubmitABug" Icon="{x:Static guiResources:Resources.bug}" Command="{x:Static local:BrowsableObjectInfoWindow.SubmitABug}" />
@@ -144,6 +144,8 @@
             </Setter.Value>
         </Setter>
 
+        <Setter Property="Title" Value="{Binding Paths.SelectedItem.Path.Name}" />
+        <Setter Property="Icon" Value="{Binding Paths.SelectedItem.Path.BitmapSources.Small}" />
         <Setter Property="Content" Value="{Binding Paths}" />
     </Style>
 </ResourceDictionary>

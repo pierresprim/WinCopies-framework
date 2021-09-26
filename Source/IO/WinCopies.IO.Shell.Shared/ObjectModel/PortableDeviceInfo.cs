@@ -20,10 +20,6 @@ using Microsoft.WindowsAPICodePack.Shell;
 using Microsoft.WindowsAPICodePack.Win32Native;
 
 using System;
-using System.Drawing;
-using System.Windows;
-using System.Windows.Interop;
-using System.Windows.Media.Imaging;
 
 using WinCopies.IO.AbstractionInterop;
 using WinCopies.IO.Process;
@@ -39,30 +35,19 @@ namespace WinCopies.IO.ObjectModel
 {
     public abstract class PortableDeviceInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : FileSystemObjectInfo<TObjectProperties, IPortableDevice, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IPortableDeviceInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IPortableDeviceInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
     {
-        protected class BrowsableObjectInfoBitmapSources : BitmapSources<IPortableDeviceInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>>
-        {
-            protected override BitmapSource SmallOverride => InnerObject.TryGetBitmapSource(SmallIconSize);
-
-            protected override BitmapSource MediumOverride => InnerObject.TryGetBitmapSource(MediumIconSize);
-
-            protected override BitmapSource LargeOverride => InnerObject.TryGetBitmapSource(LargeIconSize);
-
-            protected override BitmapSource ExtraLargeOverride => InnerObject.TryGetBitmapSource(ExtraLargeIconSize);
-
-            public BrowsableObjectInfoBitmapSources(in IPortableDeviceInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> portableDeviceInfo) : base(portableDeviceInfo) { /* Left empty. */ }
-        }
-
         private IPortableDevice _portableDevice;
         private IBitmapSourceProvider _bitmapSourceProvider;
 
         #region Properties
+        protected override bool IsLocalRootOverride => false;
+
         protected override IBitmapSourceProvider BitmapSourceProviderOverride => _bitmapSourceProvider
 #if CS8
             ??=
 #else
             ?? (_bitmapSourceProvider =
 #endif
-            new BitmapSourceProviderCommon(false, new BrowsableObjectInfoBitmapSources(this), true)
+            FileSystemObjectInfo.GetDefaultBitmapSourcesProvider(this, new Shell.BitmapSources(new BitmapSourcesStruct(38, "imageres.dll")))
 #if !CS8
             )
 #endif

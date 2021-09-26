@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows;
-using WinCopies.GUI.IO;
-using WinCopies.GUI.Shell;
+﻿using WinCopies.GUI.Shell;
 
 namespace WinCopies.GUI.Samples
 {

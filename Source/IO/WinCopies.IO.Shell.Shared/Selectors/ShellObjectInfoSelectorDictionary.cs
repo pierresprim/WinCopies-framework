@@ -34,7 +34,7 @@ namespace WinCopies.IO.Selectors
             : (IBrowsableObjectInfo)(item.NonShellObjectRootItemType == NonShellObjectRootItemType.WMI ? new WMIItemInfo(null, item.ClientVersion.Value)
             : throw SelectorDictionary.GetInvalidItemException());
 
-        protected override Converter<ShellObjectInfoItemProvider, IBrowsableObjectInfo> DefaultSelectorOverride => Convert;
+        protected override Converter<ShellObjectInfoItemProvider, IBrowsableObjectInfo> DefaultActionOverride => Convert;
 
         public ShellObjectInfoSelectorDictionary() { /* Left empty. */ }
     }
@@ -43,7 +43,7 @@ namespace WinCopies.IO.Selectors
     {
         public static IBrowsableObjectInfo Convert(MultiIconInfoItemProvider multiIconInfoItemProvider) => new SingleIconInfo(multiIconInfoItemProvider.MultiIconInfo.Path, multiIconInfoItemProvider.MultiIconInfo.ClientVersion, multiIconInfoItemProvider.Icon);
 
-        protected override Converter<MultiIconInfoItemProvider, IBrowsableObjectInfo> DefaultSelectorOverride => Convert;
+        protected override Converter<MultiIconInfoItemProvider, IBrowsableObjectInfo> DefaultActionOverride => Convert;
 
         public MultiIconInfoSelectorDictionary() { /* Left empty. */ }
     }
@@ -52,7 +52,7 @@ namespace WinCopies.IO.Selectors
     {
         public static IBrowsableObjectInfo Convert(SingleIconInfoItemProvider icon) => new IconImageInfo(icon.Icon, icon.Parent);
 
-        protected override Converter<SingleIconInfoItemProvider, IBrowsableObjectInfo> DefaultSelectorOverride => Convert;
+        protected override Converter<SingleIconInfoItemProvider, IBrowsableObjectInfo> DefaultActionOverride => Convert;
 
         public SingleIconInfoSelectorDictionary() { /* Left empty. */ }
     }
@@ -68,7 +68,7 @@ namespace WinCopies.IO.Selectors
             return new BitmapInfo(icon.Parent, icon.Name, icon.Bitmap);
         }
 
-        protected override Converter<IconImageInfoItemProvider, IBrowsableObjectInfo> DefaultSelectorOverride => Convert;
+        protected override Converter<IconImageInfoItemProvider, IBrowsableObjectInfo> DefaultActionOverride => Convert;
 
         public IconImageInfoSelectorDictionary() { /* Left empty. */ }
     }

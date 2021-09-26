@@ -35,6 +35,8 @@ namespace WinCopies.IO.ObjectModel.Reflection
         private ParameterInfo _parameterInfo;
 
         #region Properties
+        protected override bool IsLocalRootOverride => false;
+
         protected override IProcessFactory ProcessFactoryOverride => Process.ProcessFactory.DefaultProcessFactory;
 
         protected override string ItemTypeNameOverride => Shell.Properties.Resources.DotNetParameter;

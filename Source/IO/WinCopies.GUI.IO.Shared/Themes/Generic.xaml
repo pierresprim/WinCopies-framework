@@ -426,10 +426,10 @@
             <Setter.Value>
                 <ContextMenu>
                     <MenuItem Header="Close tab" Icon="{x:Static icons:Resources.tab_delete}" Command="{x:Static commands:ApplicationCommands.CloseTab}" />
-                    <MenuItem Header="Close other tabs" Command="{x:Static temp:Temp.CloseOtherTabs}" />
+                    <MenuItem Header="Close other tabs" Command="{x:Static commands:ApplicationCommands.CloseOtherTabs}" />
                     <MenuItem Header="Close all tabs" Command="{x:Static commands:ApplicationCommands.CloseAllTabs}" />
-                    <MenuItem Header="Close tabs to the left" Command="{x:Static temp:Temp.CloseTabsToTheLeftOrRight}" CommandParameter="{x:Static temp:CloseTabsTo.Left}" />
-                    <MenuItem Header="Close tabs to the right" Command="{x:Static temp:Temp.CloseTabsToTheLeftOrRight}" CommandParameter="{x:Static temp:CloseTabsTo.Right}" />
+                    <MenuItem Header="Close tabs to the left" Command="{x:Static commands:ApplicationCommands.CloseTabsToTheLeftOrRight}" CommandParameter="{x:Static temp:CloseTabsTo.Left}" />
+                    <MenuItem Header="Close tabs to the right" Command="{x:Static commands:ApplicationCommands.CloseTabsToTheLeftOrRight}" CommandParameter="{x:Static temp:CloseTabsTo.Right}" />
                 </ContextMenu>
             </Setter.Value>
         </Setter>

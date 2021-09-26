@@ -90,6 +90,8 @@ namespace WinCopies.IO
             #endregion
 
             #region Protected Properties
+            protected abstract bool IsLocalRootOverride { get; }
+
             protected abstract IBitmapSourceProvider BitmapSourceProviderOverride { get; }
 
             protected abstract IBrowsabilityOptions BrowsabilityOverride { get; }
@@ -118,6 +120,8 @@ namespace WinCopies.IO
             #endregion
 
             #region Public Properties
+            public bool IsLocalRoot => GetValueIfNotDisposed(() => IsLocalRootOverride);
+
             public IBitmapSourceProvider BitmapSourceProvider => GetValueIfNotDisposed(() => BitmapSourceProviderOverride);
 
             public IBitmapSourcesLinker BitmapSources => GetValueIfNotDisposed(() => _bitmapSources

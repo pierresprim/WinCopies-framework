@@ -65,16 +65,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WinCopies.Util" Version="3.13-preview" />
+    <PackageReference Include="WinCopies.Util" Version="3.14-preview" />
     <PackageReference Include="WinCopies.Collections" Version="3.13-preview" />
-    <PackageReference Include="WinCopies.Util.Extensions" Version="3.13-preview" />
-    <PackageReference Include="WinCopies.Util.Desktop" Version="3.13-preview" />
+    <PackageReference Include="WinCopies.Util.Extensions" Version="3.14-preview" />
+    <PackageReference Include="WinCopies.Util.Desktop" Version="3.14-preview" />
 
     <PackageReference Include="Squid-Box.SevenZipSharp" Version="1.2.231" />
 
-    <PackageReference Include="WinCopies.WindowsAPICodePack.Consts" Version="3.6-preview" />
-    <PackageReference Include="WinCopies.WindowsAPICodePack.COMNative" Version="3.6.1-preview" />
-    <PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="3.6-preview" />
+    <PackageReference Include="WinCopies.WindowsAPICodePack.Consts" Version="3.7-preview" />
+    <PackageReference Include="WinCopies.WindowsAPICodePack.COMNative" Version="3.7.1-preview" />
+    <PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="3.7.1-preview" />
     <PackageReference Include="WinCopies.WindowsAPICodePack.PortableDevices" Version="3.4-preview" />
   </ItemGroup>
 

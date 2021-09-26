@@ -47,19 +47,6 @@ namespace WinCopies.IO.ObjectModel
     /// </summary>
     public abstract class RegistryItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>/*<TItems, TFactory>*/ : BrowsableObjectInfo<TObjectProperties, RegistryKey, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>/*<TItems, TFactory>*/, IRegistryItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IRegistryItemInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo> // where TItems : BrowsableObjectInfo, IRegistryItemInfo where TFactory : IRegistryItemInfoFactory
     {
-        private class BrowsableObjectInfoBitmapSources : BitmapSources<RegistryItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>>
-        {
-            protected override BitmapSource SmallOverride => InnerObject.TryGetBitmapSource(SmallIconSize);
-
-            protected override BitmapSource MediumOverride => InnerObject.TryGetBitmapSource(MediumIconSize);
-
-            protected override BitmapSource LargeOverride => InnerObject.TryGetBitmapSource(LargeIconSize);
-
-            protected override BitmapSource ExtraLargeOverride => InnerObject.TryGetBitmapSource(ExtraLargeIconSize);
-
-            public BrowsableObjectInfoBitmapSources(in RegistryItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> registryItemInfo) : base(registryItemInfo) { /* Left empty. */ }
-        }
-
         #region Fields
         internal NullableReference<RegistryKey> _registryKey;
         private IBrowsableObjectInfo _parent;
@@ -75,6 +62,8 @@ namespace WinCopies.IO.ObjectModel
         //public override bool NeedsObjectsOrValuesReconstruction => _registryKey is object; // If _registryKey is null, reconstructing registry does not make sense, so we return false.
 
         //public static DeepClone<RegistryKey> DefaultRegistryKeyDeepClone { get; } = registryKey => Registry.OpenRegistryKey(registryKey.Name);
+
+        protected override bool IsLocalRootOverride => ObjectPropertiesGenericOverride.RegistryItemType == RegistryItemType.Root;
 
         protected override bool IsSpecialItemOverride => false;
 
@@ -127,7 +116,7 @@ namespace WinCopies.IO.ObjectModel
 #else
             ?? (_bitmapSourceProvider =
 #endif
-            new BitmapSourceProviderCommon2(this, new BrowsableObjectInfoBitmapSources(this), true)
+            new Shell.BitmapSourceProvider(this)
 #if !CS8
             )
 #endif
@@ -338,67 +327,6 @@ namespace WinCopies.IO.ObjectModel
 
             base.DisposeManaged();
         }
-
-        private BitmapSource TryGetBitmapSource(in int size)
-#if CS8
-            =>
-#else
-        {
-            switch (
-#endif
-            ObjectPropertiesGeneric.RegistryItemType
-#if CS8
-            switch
-#else
-            )
-#endif
-            {
-#if !CS8
-                case
-#endif
-                RegistryItemType.Root
-#if CS8
-                    =>
-#else
-                    :
-
-                    return
-#endif
-                        Icons.Computer.Instance.TryGetBitmapSource(size)
-#if CS8
-                    ,
-#else
-                    ;
-
-                case
-#endif
-                RegistryItemType.Key
-#if CS8
-                =>
-#else
-                :
-
-                    return
-#endif
-                        Icons.Folder.Instance.TryGetBitmapSource(size)
-#if CS8
-                        ,
-
-                _ =>
-#else
-                        ;
-            }
-
-            return
-#endif
-                    Icons.File.Instance.TryGetBitmapSource(size)
-#if CS8
-            }
-#endif
-                    ;
-#if !CS8
-    }
-#endif
 
         public override IEqualityComparer<IBrowsableObjectInfoBase> GetDefaultEqualityComparer() => new RegistryItemInfoEqualityComparer<IBrowsableObjectInfoBase>();
 
