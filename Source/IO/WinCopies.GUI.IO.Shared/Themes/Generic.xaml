@@ -15,8 +15,7 @@
     xmlns:commands="clr-namespace:WinCopies.Commands;assembly=WinCopies.Util.Desktop"
     xmlns:util="clr-namespace:WinCopies;assembly=WinCopies.Util.Desktop"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
-    xmlns:utilCommands="clr-namespace:WinCopies.Util.Commands.Primitives;assembly=WinCopies.Util"
-    xmlns:temp="clr-namespace:WinCopies.Temp;assembly=WinCopies.Util.Temp">
+    xmlns:utilCommands="clr-namespace:WinCopies.Util.Commands.Primitives;assembly=WinCopies.Util">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/wincopies.gui;component/Themes/Generic.xaml" />
         <ResourceDictionary Source="pack://application:,,,/wincopies.gui.templates;component/Themes/Generic.xaml" />
@@ -428,8 +427,8 @@
                     <MenuItem Header="Close tab" Icon="{x:Static icons:Resources.tab_delete}" Command="{x:Static commands:ApplicationCommands.CloseTab}" />
                     <MenuItem Header="Close other tabs" Command="{x:Static commands:ApplicationCommands.CloseOtherTabs}" />
                     <MenuItem Header="Close all tabs" Command="{x:Static commands:ApplicationCommands.CloseAllTabs}" />
-                    <MenuItem Header="Close tabs to the left" Command="{x:Static commands:ApplicationCommands.CloseTabsToTheLeftOrRight}" CommandParameter="{x:Static temp:CloseTabsTo.Left}" />
-                    <MenuItem Header="Close tabs to the right" Command="{x:Static commands:ApplicationCommands.CloseTabsToTheLeftOrRight}" CommandParameter="{x:Static temp:CloseTabsTo.Right}" />
+                    <MenuItem Header="Close tabs to the left" Command="{x:Static commands:ApplicationCommands.CloseTabsToTheLeftOrRight}" CommandParameter="{x:Static localControls:CloseTabsTo.Left}" />
+                    <MenuItem Header="Close tabs to the right" Command="{x:Static commands:ApplicationCommands.CloseTabsToTheLeftOrRight}" CommandParameter="{x:Static localControls:CloseTabsTo.Right}" />
                 </ContextMenu>
             </Setter.Value>
         </Setter>

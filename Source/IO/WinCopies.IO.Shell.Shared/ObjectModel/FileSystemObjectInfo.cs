@@ -220,6 +220,14 @@ namespace WinCopies.IO
 
         public static class FileSystemObjectInfo
         {
+            public static ShellImageListIconSize GetIconSizeFromSize(in System.Drawing.Size size) => size.Width <= 16
+                    ? ShellImageListIconSize.Small
+                    : size.Width <= 32
+                    ? ShellImageListIconSize.Large
+                    : size.Width <= 48
+                    ? ShellImageListIconSize.ExtraLarge
+                    : size.Width <= 256 ? ShellImageListIconSize.Jumbo : ShellImageListIconSize.Last;
+
             public static BitmapSource TryGetDefaultBitmapSource<T>(in IFileSystemObjectInfo<T> fileSystemObjectInfo, in int size) where T : IFileSystemObjectInfoProperties => TryGetBitmapSource(System.IO.Path.GetExtension(fileSystemObjectInfo.Path), fileSystemObjectInfo.ObjectProperties.FileType, size);
 
             public static Shell.BitmapSourceProvider GetDefaultBitmapSourcesProvider<T>(in IFileSystemObjectInfo<T> fileSystemObjectInfo, in IBitmapSources bitmapSources = null) where T : IFileSystemObjectInfoProperties => new Shell.BitmapSourceProvider(fileSystemObjectInfo, new FileSystemObjectInfoBitmapSources<T>(fileSystemObjectInfo), bitmapSources, true);
@@ -254,7 +262,7 @@ namespace WinCopies.IO
 
                // if (System.IO.Path.HasExtension(Path))
 
-               fileType == FileType.Folder || fileType == FileType.KnownFolder ? TryGetIcon(3, size) : CoreErrorHelper.Succeeded(ImageList.Instance.TryExtractIcon(extension, Temp.Temp.GetIconSizeFromSize(size), out Icon icon)) ? icon  /*?.TryGetIcon(size, 32, true, true)*/ : TryGetIcon(0, size);// else// return TryGetIcon(FileType == FileType.Folder ? 3 : 0, "SHELL32.dll", size);
+               fileType == FileType.Folder || fileType == FileType.KnownFolder ? TryGetIcon(3, size) : CoreErrorHelper.Succeeded(ImageList.Instance.TryExtractIcon(extension, GetIconSizeFromSize(size), out Icon icon)) ? icon  /*?.TryGetIcon(size, 32, true, true)*/ : TryGetIcon(0, size);// else// return TryGetIcon(FileType == FileType.Folder ? 3 : 0, "SHELL32.dll", size);
 
             public static BitmapSource TryGetBitmapSource(in string extension, in FileType fileType, in int size)
             {

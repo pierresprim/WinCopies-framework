@@ -20,22 +20,9 @@ using Microsoft.WindowsAPICodePack.Win32Native.Shell;
 
 namespace WinCopies.Temp
 {
-    public enum CloseTabsTo : sbyte
-    {
-        Left = 1,
-
-        Right = 2
-    }
-
     public static class Temp
     {
-        public static ShellImageListIconSize GetIconSizeFromSize(in System.Drawing.Size size) => size.Width <= 16
-                ? ShellImageListIconSize.Small
-                : size.Width <= 32
-                ? ShellImageListIconSize.Large
-                : size.Width <= 48
-                ? ShellImageListIconSize.ExtraLarge
-                : size.Width <= 256 ? ShellImageListIconSize.Jumbo : ShellImageListIconSize.Last;
+        
     }
 }
 

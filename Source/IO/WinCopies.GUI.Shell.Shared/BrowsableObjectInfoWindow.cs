@@ -34,7 +34,6 @@ using WinCopies.GUI.Windows;
 using WinCopies.IO.ObjectModel;
 using WinCopies.IO.Process;
 using WinCopies.Linq;
-using WinCopies.Temp;
 
 using static System.Windows.Input.ApplicationCommands;
 
@@ -72,7 +71,7 @@ namespace WinCopies.GUI.Shell
             {
                 var listView = (ExplorerControlListView)e.OriginalSource;
 
-                var window = listView.GetParent<BrowsableObjectInfoWindow>(true);
+                BrowsableObjectInfoWindow window = listView.GetParent<BrowsableObjectInfoWindow>(true);
 
                 IExplorerControlBrowsableObjectInfoViewModel selectedItem = ((BrowsableObjectInfoWindowViewModel)window.DataContext).Paths.SelectedItem;
 
@@ -295,7 +294,8 @@ namespace WinCopies.GUI.Shell
 #if CS8
                 =>
 #else
-                : e.CanExecute =
+                :
+                    e.CanExecute =
 #endif
                 dataContext.Paths.SelectedIndex > 0
 #if CS8
@@ -303,7 +303,7 @@ namespace WinCopies.GUI.Shell
 #else
                 ;
 
-                break;
+                    break;
 
                 case
 #endif
@@ -311,7 +311,8 @@ namespace WinCopies.GUI.Shell
 #if CS8
                 =>
 #else
-                : e.CanExecute =
+                :
+                    e.CanExecute =
 #endif
                 dataContext.Paths.SelectedIndex < dataContext.Paths.Paths.Count - 1
 #if CS8
@@ -321,11 +322,11 @@ namespace WinCopies.GUI.Shell
 #else
                 ;
 
-                break;
+                    break;
 
                 default:
 #endif
-                throw GetInvalidParameterException()
+                    throw GetInvalidParameterException()
 #if CS8
             };
 #else
