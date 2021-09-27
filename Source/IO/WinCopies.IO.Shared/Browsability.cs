@@ -25,6 +25,15 @@ using static WinCopies.ThrowHelper;
 
 namespace WinCopies.IO
 {
+    public enum BrowsableAs
+    {
+        File = 0,
+
+        Folder = 1,
+
+        LocalRoot = 2
+    }
+
     /// <summary>
     /// Indicates the browsing ability for an <see cref="IBrowsableObjectInfo"/>.
     /// </summary>

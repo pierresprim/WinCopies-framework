@@ -21,7 +21,6 @@ using SevenZip;
 
 using System;
 using System.Linq;
-using System.Windows.Media.Imaging;
 
 using WinCopies.Collections.Generic;
 using WinCopies.Extensions;
@@ -30,7 +29,6 @@ using WinCopies.IO.Enumeration;
 using WinCopies.IO.Process;
 using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Selectors;
-using WinCopies.IO.Shell;
 using WinCopies.PropertySystem;
 
 using static WinCopies.
@@ -48,56 +46,20 @@ namespace WinCopies.IO.ObjectModel
     /// </summary>
     public abstract class ArchiveItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : ArchiveItemInfoProvider<TObjectProperties, ArchiveFileInfo?, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IArchiveItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IFileSystemObjectInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
     {
-        protected class BrowsableObjectInfoBitmapSources : BitmapSources<IArchiveItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>>
-        {
-            /// <summary>
-            /// Gets the small <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
-            /// </summary>
-            protected override BitmapSource SmallOverride => InnerObject.TryGetBitmapSource(SmallIconSize);
-
-            /// <summary>
-            /// Gets the medium <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
-            /// </summary>
-            protected override BitmapSource MediumOverride => InnerObject.TryGetBitmapSource(MediumIconSize);
-
-            /// <summary>
-            /// Gets the large <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
-            /// </summary>
-            protected override BitmapSource LargeOverride => InnerObject.TryGetBitmapSource(LargeIconSize);
-
-            /// <summary>
-            /// Gets the extra large <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
-            /// </summary>
-            protected override BitmapSource ExtraLargeOverride => InnerObject.TryGetBitmapSource(ExtraLargeIconSize);
-
-            public BrowsableObjectInfoBitmapSources(in IArchiveItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> archiveItemInfo) : base(archiveItemInfo) { /* Left empty. */ }
-        }
-
         #region Fields
         private ArchiveFileInfo? _innerObject;
         private IBrowsableObjectInfo _parent;
         private IBrowsabilityOptions _browsability;
-        private IBitmapSourceProvider _bitmapSourceProvider;
         #endregion
 
         #region Properties
         #region Overrides
+        protected override bool IsLocalRootOverride => false;
+
         /// <summary>
         /// The parent <see cref="IShellObjectInfoBase"/> of the current archive item.
         /// </summary>
         public override IShellObjectInfoBase ArchiveShellObject { get; }
-
-        protected override IBitmapSourceProvider BitmapSourceProviderOverride => _bitmapSourceProvider
-#if CS8
-            ??=
-#else
-            ?? (_bitmapSourceProvider =
-#endif
-            new BitmapSourceProviderCommon2(this, new BrowsableObjectInfoBitmapSources(this), true)
-#if !CS8
-            )
-#endif
-            ;
 
         protected override IBrowsabilityOptions BrowsabilityOverride
 #if CS9
@@ -258,7 +220,6 @@ namespace WinCopies.IO.ObjectModel
         {
             _parent = null;
             _browsability = null;
-            _bitmapSourceProvider = null;
 
             base.DisposeUnmanaged();
         }

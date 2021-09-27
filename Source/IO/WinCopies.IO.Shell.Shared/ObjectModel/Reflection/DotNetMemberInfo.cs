@@ -40,6 +40,8 @@ namespace WinCopies.IO.ObjectModel.Reflection
         private MemberInfo _memberInfo;
 
         #region Properties
+        protected override bool IsLocalRootOverride => false;
+
         protected sealed override MemberInfo InnerObjectGenericOverride => _memberInfo;
 
         protected override IProcessFactory ProcessFactoryOverride => Process.ProcessFactory.DefaultProcessFactory;

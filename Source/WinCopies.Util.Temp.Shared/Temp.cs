@@ -15,6 +15,17 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+#if DEBUG
+using Microsoft.WindowsAPICodePack.Win32Native.Shell;
+
+namespace WinCopies.Temp
+{
+    public static class Temp
+    {
+        
+    }
+}
+
 //using System;
 //using System.Collections.Generic;
 
@@ -30,7 +41,6 @@
 //    WinCopies.Util.Util;
 //#endif
 
-//#if DEBUG
 //namespace WinCopies.Temp
 //{
 //    public static class Delegates
@@ -328,10 +338,5 @@
 //#endif
 //            =>            Null<TIn, TOut>;
 //    }
-
-//    //    public static class Temp
-//    //    {
-
-//    //    }
 //}
-//#endif
+#endif

@@ -32,7 +32,7 @@ namespace WinCopies.IO.Selectors
                 ? throw SelectorDictionary.GetInvalidItemException()
                 : ArchiveItemInfo.From(item.ShellObjectInfo, item.ArchiveFilePath);
 
-        protected override Converter<ArchiveItemInfoItemProvider, IBrowsableObjectInfo> DefaultSelectorOverride => Convert;
+        protected override Converter<ArchiveItemInfoItemProvider, IBrowsableObjectInfo> DefaultActionOverride => Convert;
 
         public ArchiveItemInfoSelectorDictionary() { /* Left empty. */ }
     }

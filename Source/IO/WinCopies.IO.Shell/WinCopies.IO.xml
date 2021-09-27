@@ -396,26 +396,6 @@
             Represents an archive item.
             </summary>
         </member>
-        <member name="P:WinCopies.IO.ObjectModel.ArchiveItemInfo`4.BrowsableObjectInfoBitmapSources.SmallOverride">
-            <summary>
-            Gets the small <see cref="T:System.Windows.Media.Imaging.BitmapSource"/> of this <see cref="T:WinCopies.IO.ObjectModel.ArchiveItemInfo"/>.
-            </summary>
-        </member>
-        <member name="P:WinCopies.IO.ObjectModel.ArchiveItemInfo`4.BrowsableObjectInfoBitmapSources.MediumOverride">
-            <summary>
-            Gets the medium <see cref="T:System.Windows.Media.Imaging.BitmapSource"/> of this <see cref="T:WinCopies.IO.ObjectModel.ArchiveItemInfo"/>.
-            </summary>
-        </member>
-        <member name="P:WinCopies.IO.ObjectModel.ArchiveItemInfo`4.BrowsableObjectInfoBitmapSources.LargeOverride">
-            <summary>
-            Gets the large <see cref="T:System.Windows.Media.Imaging.BitmapSource"/> of this <see cref="T:WinCopies.IO.ObjectModel.ArchiveItemInfo"/>.
-            </summary>
-        </member>
-        <member name="P:WinCopies.IO.ObjectModel.ArchiveItemInfo`4.BrowsableObjectInfoBitmapSources.ExtraLargeOverride">
-            <summary>
-            Gets the extra large <see cref="T:System.Windows.Media.Imaging.BitmapSource"/> of this <see cref="T:WinCopies.IO.ObjectModel.ArchiveItemInfo"/>.
-            </summary>
-        </member>
         <member name="P:WinCopies.IO.ObjectModel.ArchiveItemInfo`4.ArchiveShellObject">
             <summary>
             The parent <see cref="T:WinCopies.IO.ObjectModel.IShellObjectInfoBase"/> of the current archive item.

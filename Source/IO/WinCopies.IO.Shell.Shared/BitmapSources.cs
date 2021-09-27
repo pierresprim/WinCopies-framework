@@ -3,10 +3,13 @@
 using System.Windows.Media.Imaging;
 
 using WinCopies.IO.ObjectModel;
+using WinCopies.IO.PropertySystem;
 
-namespace WinCopies.IO.Shell
+using static WinCopies.IO.ObjectModel.BrowsableObjectInfo;
+
+namespace WinCopies.IO
 {
-    public class BitmapSources : BitmapSources<ShellObject>
+    public class ShellObjectBitmapSources : BitmapSources<ShellObject>
     {
         protected override BitmapSource SmallOverride => InnerObject.Thumbnail.SmallBitmapSource;
 
@@ -16,38 +19,94 @@ namespace WinCopies.IO.Shell
 
         protected override BitmapSource ExtraLargeOverride => InnerObject.Thumbnail.ExtraLargeBitmapSource;
 
-        public BitmapSources(in ShellObject shellObject) : base(shellObject) { /* Left empty. */ }
+        public ShellObjectBitmapSources(in ShellObject shellObject) : base(shellObject) { /* Left empty. */ }
     }
 
-    public class BitmapSourceProviderCommon : IO.BitmapSourceProvider
+    public class FileSystemObjectInfoBitmapSources<T> : BitmapSources<IFileSystemObjectInfo<T>> where T : IFileSystemObjectInfoProperties
     {
-        public BitmapSourceProviderCommon(in bool folder, in IBitmapSources bitmapSources, in bool disposeBitmapSources) : base(
-            folder ?
-#if !CS9
-                (Icons.BitmapSources)
-#endif
-                Icons.Folder.Instance
-            :
-#if !CS9
-                (Icons.BitmapSources)
-#endif
-                Icons.File.Instance, bitmapSources, disposeBitmapSources)
-        { /* Left empty. */ }
+        protected BitmapSource TryGetBitmapSource(in int size) => FileSystemObjectInfo.TryGetDefaultBitmapSource(InnerObject, size);
+
+        protected override BitmapSource SmallOverride => TryGetBitmapSource(SmallIconSize);
+
+        protected override BitmapSource MediumOverride => TryGetBitmapSource(ExtraLargeIconSize);
+
+        protected override BitmapSource LargeOverride => TryGetBitmapSource(ExtraLargeIconSize);
+
+        protected override BitmapSource ExtraLargeOverride => TryGetBitmapSource(ExtraLargeIconSize);
+
+        public FileSystemObjectInfoBitmapSources(in IFileSystemObjectInfo<T> fileSystemObjectInfo) : base(fileSystemObjectInfo) { /* Left empty. */ }
     }
 
-    public class BitmapSourceProvider : BitmapSourceProviderCommon
+    namespace Shell
     {
-        public BitmapSourceProvider(in ShellObject shellObject, in bool disposeBitmapSources) : base(shellObject is ShellFolder, new BitmapSources(shellObject), disposeBitmapSources)
+        public struct BitmapSourcesStruct
         {
-            // Left empty.
+            public int IconIndex { get; }
+
+            public string DllName { get; }
+
+            public BitmapSourcesStruct(in int iconIndex, in string dllName)
+            {
+                IconIndex = iconIndex;
+
+                DllName = dllName;
+            }
         }
-    }
 
-    public class BitmapSourceProviderCommon2 : BitmapSourceProviderCommon
-    {
-        public BitmapSourceProviderCommon2(in IBrowsableObjectInfo browsableObjectInfo, in IBitmapSources bitmapSources, in bool disposeBitmapSources) : base(browsableObjectInfo.IsBrowsable(), bitmapSources, disposeBitmapSources)
+        public class BitmapSources : BitmapSources2<BitmapSourcesStruct>
         {
-            // Left empty.
+            public BitmapSources(in BitmapSourcesStruct parameters) : base(parameters) { /* Left empty. */ }
+
+            protected BitmapSource TryGetBitmapSource(in int size) => ObjectModel.BrowsableObjectInfo.TryGetBitmapSource(InnerObject.IconIndex, InnerObject.DllName, size);
+
+            protected override BitmapSource GetSmall() => TryGetBitmapSource(SmallIconSize);
+
+            protected override BitmapSource GetMedium() => TryGetBitmapSource(MediumIconSize);
+
+            protected override BitmapSource GetLarge() => TryGetBitmapSource(LargeIconSize);
+
+            protected override BitmapSource GetExtraLarge() => TryGetBitmapSource(ExtraLargeIconSize);
+        }
+
+        public class BitmapSourceProvider : IO.BitmapSourceProvider
+        {
+            private static IBitmapSources GetDefaultBitmapSources(in BrowsableAs browsableAs)
+            {
+                switch (browsableAs)
+                {
+                    case BrowsableAs.File:
+
+                        return Icons.File.Instance;
+
+                    case BrowsableAs.Folder:
+
+                        return Icons.Folder.Instance;
+
+                    case BrowsableAs.LocalRoot:
+
+                        return Icons.Computer.Instance;
+                }
+
+                throw new InvalidEnumArgumentException(nameof(BrowsableAs), browsableAs);
+            }
+
+            public BitmapSourceProvider(in BrowsableAs browsableAs, in IBitmapSources intermediate, in IBitmapSources sources, in bool disposeBitmapSources) : base(GetDefaultBitmapSources(browsableAs), intermediate, sources, disposeBitmapSources)
+            { /* Left empty. */ }
+
+            public BitmapSourceProvider(in IBrowsableObjectInfo browsableObjectInfo, in IBitmapSources intermediate, in IBitmapSources bitmapSources, in bool disposeBitmapSources) : this(browsableObjectInfo.GetBrowsableAsValue(), intermediate, bitmapSources, disposeBitmapSources)
+            {
+                // Left empty.
+            }
+
+            public BitmapSourceProvider(in IBrowsableObjectInfo browsableObjectInfo, in IBitmapSources bitmapSources, in bool disposeBitmapSources) : this(browsableObjectInfo.GetBrowsableAsValue(), null, bitmapSources, disposeBitmapSources)
+            {
+                // Left empty.
+            }
+
+            public BitmapSourceProvider(in IBrowsableObjectInfo browsableObjectInfo) : this(browsableObjectInfo, null, false)
+            {
+                // Left empty.
+            }
         }
     }
 }

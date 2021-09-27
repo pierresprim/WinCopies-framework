@@ -15,28 +15,29 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-using Microsoft.WindowsAPICodePack;
-using Microsoft.WindowsAPICodePack.COMNative.Shell;
-using Microsoft.WindowsAPICodePack.Shell;
+//using Microsoft.WindowsAPICodePack;
+//using Microsoft.WindowsAPICodePack.COMNative.Shell;
+//using Microsoft.WindowsAPICodePack.Shell;
 
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Reflection;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Interop;
-using WinCopies.Desktop;
-using WinCopies.GUI.IO;
-using WinCopies.GUI.IO.Controls;
-using WinCopies.GUI.IO.ObjectModel;
-using WinCopies.GUI.IO.Process;
-using WinCopies.GUI.Windows;
-using WinCopies.IO.ObjectModel;
-using WinCopies.IO.Process;
-using WinCopies.Linq;
+//using System;
+//using System.Collections.Generic;
+//using System.Collections.ObjectModel;
+//using System.ComponentModel;
+//using System.Reflection;
+//using System.Windows;
+//using System.Windows.Controls;
+//using System.Windows.Input;
+//using System.Windows.Interop;
+
+//using WinCopies.Desktop;
+//using WinCopies.GUI.IO;
+//using WinCopies.GUI.IO.Controls;
+//using WinCopies.GUI.IO.ObjectModel;
+//using WinCopies.GUI.IO.Process;
+//using WinCopies.GUI.Windows;
+//using WinCopies.IO.ObjectModel;
+//using WinCopies.IO.Process;
+//using WinCopies.Linq;
 
 namespace WinCopies.GUI.Samples
 {
@@ -45,340 +46,340 @@ namespace WinCopies.GUI.Samples
     /// </summary>
     public partial class ExplorerControlTest : Windows.Window
     {
-        private static Windows.Window _processWindow;
-        private System.Windows.Interop.HwndSourceHook _hook;
+        //        private static Windows.Window _processWindow;
+        //        private System.Windows.Interop.HwndSourceHook _hook;
 
 
-        public static IProcessPathCollectionFactory DefaultProcessPathCollectionFactory { get; } = new ProcessPathCollectionFactory();
+        //        public static IProcessPathCollectionFactory DefaultProcessPathCollectionFactory { get; } = new ProcessPathCollectionFactory();
 
-        public static WinCopies.IO.ClientVersion ClientVersion { get; } = GetClientVersion();
+        //        public static WinCopies.IO.ClientVersion ClientVersion { get; } = GetClientVersion();
 
-        public static Windows.Window ProcessWindow
-        {
-            get
-            {
-                if (_processWindow == null)
-                {
-                    _processWindow = new Windows.Window() { ContentTemplateSelector = new InterfaceDataTemplateSelector(), Content = new ProcessManager<IProcess>() { Processes = new ObservableCollection<IProcess>() } };
+        //        public static Windows.Window ProcessWindow
+        //        {
+        //            get
+        //            {
+        //                if (_processWindow == null)
+        //                {
+        //                    _processWindow = new Windows.Window() { ContentTemplateSelector = new InterfaceDataTemplateSelector(), Content = new ProcessManager<IProcess>() { Processes = new ObservableCollection<IProcess>() } };
 
-                    _processWindow.Show();
-                }
+        //                    _processWindow.Show();
+        //                }
 
-                return _processWindow;
-            }
-        }
+        //                return _processWindow;
+        //            }
+        //        }
 
-        public static readonly DependencyProperty ItemsProperty = DependencyProperty.Register(nameof(Items), typeof(ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel>), typeof(ExplorerControlTest), new PropertyMetadata(null, (DependencyObject d, DependencyPropertyChangedEventArgs e) =>
-        {
-            if (e.NewValue != null)
+        //        public static readonly DependencyProperty ItemsProperty = DependencyProperty.Register(nameof(Items), typeof(ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel>), typeof(ExplorerControlTest), new PropertyMetadata(null, (DependencyObject d, DependencyPropertyChangedEventArgs e) =>
+        //        {
+        //            if (e.NewValue != null)
 
-                foreach (IExplorerControlBrowsableObjectInfoViewModel item in (System.Collections.Generic.IEnumerable<IExplorerControlBrowsableObjectInfoViewModel>)e.NewValue)
+        //                foreach (IExplorerControlBrowsableObjectInfoViewModel item in (System.Collections.Generic.IEnumerable<IExplorerControlBrowsableObjectInfoViewModel>)e.NewValue)
 
-                    AddHandlers(item);
-        }));
+        //                    AddHandlers(item);
+        //        }));
 
-        public ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> Items { get => (ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel>)GetValue(ItemsProperty); set => SetValue(ItemsProperty, value); }
+        //        public ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> Items { get => (ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel>)GetValue(ItemsProperty); set => SetValue(ItemsProperty, value); }
 
-        public static readonly DependencyProperty SelectedItemProperty = DependencyProperty.Register(nameof(SelectedItem), typeof(IExplorerControlBrowsableObjectInfoViewModel), typeof(ExplorerControlTest));
+        //        public static readonly DependencyProperty SelectedItemProperty = DependencyProperty.Register(nameof(SelectedItem), typeof(IExplorerControlBrowsableObjectInfoViewModel), typeof(ExplorerControlTest));
 
-        public IExplorerControlBrowsableObjectInfoViewModel SelectedItem { get => (IExplorerControlBrowsableObjectInfoViewModel)GetValue(SelectedItemProperty); set => SetValue(SelectedItemProperty, value); }
+        //        public IExplorerControlBrowsableObjectInfoViewModel SelectedItem { get => (IExplorerControlBrowsableObjectInfoViewModel)GetValue(SelectedItemProperty); set => SetValue(SelectedItemProperty, value); }
 
-        static ExplorerControlTest()
-        {
-            WinCopies.IO.IBrowsableObjectInfoPlugin pluginParameters = Shell.ObjectModel.BrowsableObjectInfo.GetPluginParameters();
+        //        static ExplorerControlTest()
+        //        {
+        //            WinCopies.IO.IBrowsableObjectInfoPlugin pluginParameters = Shell.ObjectModel.BrowsableObjectInfo.GetPluginParameters();
 
-            pluginParameters.RegisterBrowsabilityPaths();
-            pluginParameters.RegisterItemSelectors();
-            pluginParameters.RegisterProcessSelectors();
+        //            pluginParameters.RegisterBrowsabilityPaths();
+        //            pluginParameters.RegisterItemSelectors();
+        //            pluginParameters.RegisterProcessSelectors();
 
-            EventManager.RegisterClassHandler(typeof(ExplorerControlTest), ExplorerControlListView.ContextMenuRequestedEvent, new RoutedEventHandler((object sender, RoutedEventArgs e) =>
-           {
-               var listView = (ListView)e.OriginalSource;
+        //            EventManager.RegisterClassHandler(typeof(ExplorerControlTest), ExplorerControlListView.ContextMenuRequestedEvent, new RoutedEventHandler((object sender, RoutedEventArgs e) =>
+        //           {
+        //               var listView = (ListView)e.OriginalSource;
 
-               var window = listView.GetParent<ExplorerControlTest>(true);
+        //               var window = listView.GetParent<ExplorerControlTest>(true);
 
-               var selectedItem = window.SelectedItem;
+        //               var selectedItem = window.SelectedItem;
 
-               if (selectedItem.SelectedItems == null)
+        //               if (selectedItem.SelectedItems == null)
 
-                   return;
+        //                   return;
 
-               if (selectedItem.SelectedItems.Count != 1)
+        //               if (selectedItem.SelectedItems.Count != 1)
 
-                   return;
+        //                   return;
 
-               var _selectedItem = (ShellObject)((IBrowsableObjectInfoViewModel)selectedItem.SelectedItems[0]).InnerObject;
+        //               var _selectedItem = (ShellObject)((IBrowsableObjectInfoViewModel)selectedItem.SelectedItems[0]).InnerObject;
 
-               var folder = (ShellContainer)selectedItem.Path.InnerObject;
+        //               var folder = (ShellContainer)selectedItem.Path.InnerObject;
 
-               ShellContextMenu contextMenu;
+        //               ShellContextMenu contextMenu;
 
-               contextMenu = new ShellContextMenu( (ShellContainer) ShellObjectFactory.Create(folder.ParsingName), new HookRegistration(hook =>
-                  {
-                      window._hook = (IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled) => hook((WindowMessage)msg, wParam, lParam, ref handled);
+        //               contextMenu = new ShellContextMenu( (ShellContainer) ShellObjectFactory.Create(folder.ParsingName), new HookRegistration(hook =>
+        //                  {
+        //                      window._hook = (IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled) => hook((WindowMessage)msg, wParam, lParam, ref handled);
 
-                      HwndSource.FromHwnd(new WindowInteropHelper(window).Handle).AddHook(window._hook);
-                  }, hook => HwndSource.FromHwnd(new WindowInteropHelper(window).Handle).RemoveHook(window._hook)), ShellObjectFactory.Create(_selectedItem.ParsingName));
+        //                      HwndSource.FromHwnd(new WindowInteropHelper(window).Handle).AddHook(window._hook);
+        //                  }, hook => HwndSource.FromHwnd(new WindowInteropHelper(window).Handle).RemoveHook(window._hook)), ShellObjectFactory.Create(_selectedItem.ParsingName));
 
-               _ = contextMenu.Query(1u, uint.MaxValue, ContextMenuFlags.Explore | ContextMenuFlags.CanRename);
+        //               _ = contextMenu.Query(1u, uint.MaxValue, ContextMenuFlags.Explore | ContextMenuFlags.CanRename);
 
-               System.Windows.Point point = ((ExplorerControlListViewContextMenuRequestedEventArgs)e).MouseButtonEventArgs.GetPosition(null);
-               System.Drawing.Point _point = new System.Drawing.Point((int)point.X, (int)point.Y);
+        //               System.Windows.Point point = ((ExplorerControlListViewContextMenuRequestedEventArgs)e).MouseButtonEventArgs.GetPosition(null);
+        //               System.Drawing.Point _point = new System.Drawing.Point((int)point.X, (int)point.Y);
 
-               contextMenu.Show(new WindowInteropHelper(window).Handle, _point);
-           }));
-        }
+        //               contextMenu.Show(new WindowInteropHelper(window).Handle, _point);
+        //           }));
+        //        }
 
-        public ExplorerControlTest()
-        {
-            InitializeComponent();
+        //        public ExplorerControlTest()
+        //        {
+        //            InitializeComponent();
 
-            DataContext = this;
+        //            DataContext = this;
 
-            void addCommandBinding(in ICommand command, Func<IProcessFactoryProcessInfo> getProcessInfo) => CommandBindings.Add(new CommandBinding(command, (object sender, ExecutedRoutedEventArgs e) => StartProcess(getProcessInfo()), (object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = getProcessInfo().CanRun(GetEnumerable())));
+        //            void addCommandBinding(in ICommand command, Func<IProcessFactoryProcessInfo> getProcessInfo) => CommandBindings.Add(new CommandBinding(command, (object sender, ExecutedRoutedEventArgs e) => StartProcess(getProcessInfo()), (object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = getProcessInfo().CanRun(GetEnumerable())));
 
-            IProcessFactory getProcessFactory() => SelectedItem.Path.ProcessFactory;
+        //            IProcessFactory getProcessFactory() => SelectedItem.Path.ProcessFactory;
 
-            addCommandBinding(ApplicationCommands.Copy, () => getProcessFactory().Copy);
+        //            addCommandBinding(ApplicationCommands.Copy, () => getProcessFactory().Copy);
 
-            addCommandBinding(ApplicationCommands.Cut, () => getProcessFactory().Cut);
+        //            addCommandBinding(ApplicationCommands.Cut, () => getProcessFactory().Cut);
 
-            _ = CommandBindings.Add(new CommandBinding(ApplicationCommands.Paste, (object sender, ExecutedRoutedEventArgs e) => AddProcess(getProcessFactory().Copy.TryGetProcessParameters(10u)), (object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = SelectedItem.Path.ProcessFactory.CanPaste(10u)));
+        //            _ = CommandBindings.Add(new CommandBinding(ApplicationCommands.Paste, (object sender, ExecutedRoutedEventArgs e) => AddProcess(getProcessFactory().Copy.TryGetProcessParameters(10u)), (object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = SelectedItem.Path.ProcessFactory.CanPaste(10u)));
 
-            addCommandBinding(ApplicationCommands.Delete, () => getProcessFactory().Recycling);
+        //            addCommandBinding(ApplicationCommands.Delete, () => getProcessFactory().Recycling);
 
-            addCommandBinding(Commands.ApplicationCommands.Empty, () => getProcessFactory().Clearing);
+        //            addCommandBinding(Commands.ApplicationCommands.Empty, () => getProcessFactory().Clearing);
 
-            addCommandBinding(Commands.ApplicationCommands.DeletePermanently, () => getProcessFactory().Deletion);
-        }
+        //            addCommandBinding(Commands.ApplicationCommands.DeletePermanently, () => getProcessFactory().Deletion);
+        //        }
 
-        protected override void OnSourceInitialized(EventArgs e)
-        {
-            base.OnSourceInitialized(e);
+        //        protected override void OnSourceInitialized(EventArgs e)
+        //        {
+        //            base.OnSourceInitialized(e);
 
-            var menuItems = new TitleBarMenuItemQueue();
+        //            var menuItems = new TitleBarMenuItemQueue();
 
-            menuItems.Enqueue(new TitleBarMenuItem() { Header = "New tab", Command = Commands.ApplicationCommands.NewTab });
+        //            menuItems.Enqueue(new TitleBarMenuItem() { Header = "New tab", Command = Commands.ApplicationCommands.NewTab });
 
-            menuItems.Enqueue(new TitleBarMenuItem() { Header = "Close tab", Command = Commands.ApplicationCommands.CloseTab, CommandParameter = SelectedItem });
+        //            menuItems.Enqueue(new TitleBarMenuItem() { Header = "Close tab", Command = Commands.ApplicationCommands.CloseTab, CommandParameter = SelectedItem });
 
-            TitleBarMenuItems = menuItems;
-        }
+        //            TitleBarMenuItems = menuItems;
+        //        }
 
-        private IEnumerable<IBrowsableObjectInfo> GetEnumerable() => SelectedItem.Path.Items.WhereSelect(item => item.IsSelected, item => item.Model);
+        //        private IEnumerable<IBrowsableObjectInfo> GetEnumerable() => SelectedItem.Path.Items.WhereSelect(item => item.IsSelected, item => item.Model);
 
-        protected void StartProcess(in IProcessFactoryProcessInfo processInfo)
-        {
-            if (processInfo.UserConfirmationRequired)
+        //        protected void StartProcess(in IProcessFactoryProcessInfo processInfo)
+        //        {
+        //            if (processInfo.UserConfirmationRequired)
 
-                if (MessageBox.Show(processInfo.GetUserConfirmationText(), Assembly.GetExecutingAssembly().GetName().Name, MessageBoxButton.YesNo, MessageBoxImage.Question, System.Windows.MessageBoxResult.No) == System.Windows.MessageBoxResult.No)
+        //                if (MessageBox.Show(processInfo.GetUserConfirmationText(), Assembly.GetExecutingAssembly().GetName().Name, MessageBoxButton.YesNo, MessageBoxImage.Question, System.Windows.MessageBoxResult.No) == System.Windows.MessageBoxResult.No)
 
-                    return;
+        //                    return;
 
-            if (processInfo is IRunnableProcessInfo runnableProcessInfo)
+        //            if (processInfo is IRunnableProcessInfo runnableProcessInfo)
 
-                runnableProcessInfo.Run(GetEnumerable(), 10u);
+        //                runnableProcessInfo.Run(GetEnumerable(), 10u);
 
-            else
+        //            else
 
-                AddProcess(((IDirectProcessInfo)processInfo).TryGetProcessParameters(GetEnumerable()));
-        }
+        //                AddProcess(((IDirectProcessInfo)processInfo).TryGetProcessParameters(GetEnumerable()));
+        //        }
 
-        private void Command_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = true;
+        //        private void Command_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        //        {
+        //            e.CanExecute = true;
 
-            e.Handled = true;
-        }
+        //            e.Handled = true;
+        //        }
 
-        private void AddNewTab(IExplorerControlBrowsableObjectInfoViewModel viewModel, ExecutedRoutedEventArgs e)
-        {
-            viewModel.IsSelected = true;
+        //        private void AddNewTab(IExplorerControlBrowsableObjectInfoViewModel viewModel, ExecutedRoutedEventArgs e)
+        //        {
+        //            viewModel.IsSelected = true;
 
-            Items.Add(viewModel);
+        //            Items.Add(viewModel);
 
-            e.Handled = true;
-        }
+        //            e.Handled = true;
+        //        }
 
-        public static IExplorerControlBrowsableObjectInfoViewModel GetDefaultExplorerControlBrowsableObjectInfoViewModel() => GetDefaultExplorerControlBrowsableObjectInfoViewModel(new ShellObjectInfo(KnownFolders.Desktop, ClientVersion));
+        //        public static IExplorerControlBrowsableObjectInfoViewModel GetDefaultExplorerControlBrowsableObjectInfoViewModel() => GetDefaultExplorerControlBrowsableObjectInfoViewModel(new ShellObjectInfo(KnownFolders.Desktop, ClientVersion));
 
-        public static IExplorerControlBrowsableObjectInfoViewModel GetDefaultExplorerControlBrowsableObjectInfoViewModel(in IBrowsableObjectInfo browsableObjectInfo)
-        {
-            IExplorerControlBrowsableObjectInfoViewModel viewModel = Shell.ObjectModel.ExplorerControlBrowsableObjectInfoViewModel.From(new BrowsableObjectInfoViewModel(browsableObjectInfo), path => ShellObjectInfo.From(ShellObjectFactory.Create(path), ClientVersion));
+        //        public static IExplorerControlBrowsableObjectInfoViewModel GetDefaultExplorerControlBrowsableObjectInfoViewModel(in IBrowsableObjectInfo browsableObjectInfo)
+        //        {
+        //            IExplorerControlBrowsableObjectInfoViewModel viewModel = Shell.ObjectModel.ExplorerControlBrowsableObjectInfoViewModel.From(new BrowsableObjectInfoViewModel(browsableObjectInfo), path => ShellObjectInfo.From(ShellObjectFactory.Create(path), ClientVersion));
 
-            return viewModel;
-        }
+        //            return viewModel;
+        //        }
 
-        private void NewTab_Executed(object sender, ExecutedRoutedEventArgs e) => AddNewTab(GetDefaultExplorerControlBrowsableObjectInfoViewModel(), e);
+        //        private void NewTab_Executed(object sender, ExecutedRoutedEventArgs e) => AddNewTab(GetDefaultExplorerControlBrowsableObjectInfoViewModel(), e);
 
-        private void CloseTab_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = Items.Count > 1;
+        //        private void CloseTab_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        //        {
+        //            e.CanExecute = Items.Count > 1;
 
-            e.Handled = true;
-        }
+        //            e.Handled = true;
+        //        }
 
-        private void CloseTab_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-            _ = Items.Remove((IExplorerControlBrowsableObjectInfoViewModel)(e.Parameter is Func func ? func() : e.Parameter));
+        //        private void CloseTab_Executed(object sender, ExecutedRoutedEventArgs e)
+        //        {
+        //            _ = Items.Remove((IExplorerControlBrowsableObjectInfoViewModel)(e.Parameter is Func func ? func() : e.Parameter));
 
-            e.Handled = true;
-        }
+        //            e.Handled = true;
+        //        }
 
-        private static void AddProcess(in IProcessParameters parameters)
-        {
-            IProcess result = new Process(BrowsableObjectInfo.DefaultProcessSelectorDictionary.Select(new ProcessFactorySelectorDictionaryParameters(parameters, DefaultProcessPathCollectionFactory)));
+        //        private static void AddProcess(in IProcessParameters parameters)
+        //        {
+        //            IProcess result = new Process(BrowsableObjectInfo.DefaultProcessSelectorDictionary.Select(new ProcessFactorySelectorDictionaryParameters(parameters, DefaultProcessPathCollectionFactory)));
 
-            ((ProcessManager<IProcess>)ProcessWindow.Content).Processes.Add(result);
+        //            ((ProcessManager<IProcess>)ProcessWindow.Content).Processes.Add(result);
 
-            result.RunWorkerAsync();
-        }
+        //            result.RunWorkerAsync();
+        //        }
 
-        private static WinCopies.IO.ClientVersion GetClientVersion()
-        {
-            Version version = Assembly.GetExecutingAssembly().GetName().Version;
+        //        private static WinCopies.IO.ClientVersion GetClientVersion()
+        //        {
+        //            Version version = Assembly.GetExecutingAssembly().GetName().Version;
 
-            return new WinCopies.IO.ClientVersion("WinCopies Framework Test App", (uint)version.Major, (uint)version.Minor, (uint)version.Revision);
-        }
+        //            return new WinCopies.IO.ClientVersion("WinCopies Framework Test App", (uint)version.Major, (uint)version.Minor, (uint)version.Revision);
+        //        }
 
-        public static ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> GetShellItems() => new
-#if !CS9
-            ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel>
-#endif
-            ()
-        { { GetExplorerControlBrowsableObjectInfoViewModel(GetBrowsableObjectInfoViewModel(ShellObjectInfo.From(ShellObjectFactory.Create("C:\\"), ClientVersion)), true, SelectionMode.Extended, true) } };
+        //        public static ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> GetShellItems() => new
+        //#if !CS9
+        //            ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel>
+        //#endif
+        //            ()
+        //        { { GetExplorerControlBrowsableObjectInfoViewModel(GetBrowsableObjectInfoViewModel(ShellObjectInfo.From(ShellObjectFactory.Create("C:\\"), ClientVersion)), true, SelectionMode.Extended, true) } };
 
-        private static IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo) => new BrowsableObjectInfoViewModel(browsableObjectInfo);
+        //        private static IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo) => new BrowsableObjectInfoViewModel(browsableObjectInfo);
 
-        public static IExplorerControlBrowsableObjectInfoViewModel GetExplorerControlBrowsableObjectInfoViewModel(in IBrowsableObjectInfoViewModel browsableObjectInfo, in bool isSelected, in SelectionMode selectionMode, in bool isCheckBoxVisible)
-        {
-            IExplorerControlBrowsableObjectInfoViewModel result = Shell.ObjectModel.ExplorerControlBrowsableObjectInfoViewModel.From(browsableObjectInfo, path => ShellObjectInfo.From(ShellObjectFactory.Create(path), ClientVersion));
+        //        public static IExplorerControlBrowsableObjectInfoViewModel GetExplorerControlBrowsableObjectInfoViewModel(in IBrowsableObjectInfoViewModel browsableObjectInfo, in bool isSelected, in SelectionMode selectionMode, in bool isCheckBoxVisible)
+        //        {
+        //            IExplorerControlBrowsableObjectInfoViewModel result = Shell.ObjectModel.ExplorerControlBrowsableObjectInfoViewModel.From(browsableObjectInfo, path => ShellObjectInfo.From(ShellObjectFactory.Create(path), ClientVersion));
 
-            result.IsSelected = isSelected;
-            result.SelectionMode = selectionMode;
-            result.IsCheckBoxVisible = isCheckBoxVisible;
+        //            result.IsSelected = isSelected;
+        //            result.SelectionMode = selectionMode;
+        //            result.IsCheckBoxVisible = isCheckBoxVisible;
 
-            return result;
-        }
+        //            return result;
+        //        }
 
-        public static ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> GetRegistryItems() => new
-#if !CS9
-            ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel>
-#endif
-            ()
-        { { GetExplorerControlBrowsableObjectInfoViewModel(new BrowsableObjectInfoViewModel(new RegistryItemInfo()), true, SelectionMode.Extended, true) } };
+        //        public static ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> GetRegistryItems() => new
+        //#if !CS9
+        //            ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel>
+        //#endif
+        //            ()
+        //        { { GetExplorerControlBrowsableObjectInfoViewModel(new BrowsableObjectInfoViewModel(new RegistryItemInfo()), true, SelectionMode.Extended, true) } };
 
-        public static ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> GetWMIItems() => new
-#if !CS9
-            ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel>
-#endif
-            ()
-        { { GetExplorerControlBrowsableObjectInfoViewModel(new BrowsableObjectInfoViewModel(new WMIItemInfo()), true, SelectionMode.Extended, true) } };
+        //        public static ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> GetWMIItems() => new
+        //#if !CS9
+        //            ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel>
+        //#endif
+        //            ()
+        //        { { GetExplorerControlBrowsableObjectInfoViewModel(new BrowsableObjectInfoViewModel(new WMIItemInfo()), true, SelectionMode.Extended, true) } };
 
-        private void RadioButton_Checked(object sender, RoutedEventArgs e)
-        {
-            string radioButton = (string)((RadioButton)e.Source).Content;
+        //        private void RadioButton_Checked(object sender, RoutedEventArgs e)
+        //        {
+        //            string radioButton = (string)((RadioButton)e.Source).Content;
 
-            switch (radioButton)
-            {
-                case "Shell":
+        //            switch (radioButton)
+        //            {
+        //                case "Shell":
 
-                    Items = GetShellItems();
+        //                    Items = GetShellItems();
 
-                    break;
+        //                    break;
 
-                case "Registry":
+        //                case "Registry":
 
-                    Items = GetRegistryItems();
+        //                    Items = GetRegistryItems();
 
-                    break;
+        //                    break;
 
-                case "WMI":
+        //                case "WMI":
 
-                    Items = GetWMIItems();
+        //                    Items = GetWMIItems();
 
-                    break;
-            }
+        //                    break;
+        //            }
 
-            Items.CollectionChanged += Items_CollectionChanged;
-        }
+        //            Items.CollectionChanged += Items_CollectionChanged;
+        //        }
 
-        private static void AddHandlers(in IExplorerControlBrowsableObjectInfoViewModel item) => item.CustomProcessParametersGeneratedEventHandler += ExplorerControlTest_CustomProcessParametersGeneratedEventHandler;
+        //        private static void AddHandlers(in IExplorerControlBrowsableObjectInfoViewModel item) => item.CustomProcessParametersGeneratedEventHandler += ExplorerControlTest_CustomProcessParametersGeneratedEventHandler;
 
-        private void Items_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            switch (e.Action)
-            {
-                case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
+        //        private void Items_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        //        {
+        //            switch (e.Action)
+        //            {
+        //                case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
 
-                    foreach (object _item in e.NewItems)
+        //                    foreach (object _item in e.NewItems)
 
-                        AddHandlers((IExplorerControlBrowsableObjectInfoViewModel)_item);
+        //                        AddHandlers((IExplorerControlBrowsableObjectInfoViewModel)_item);
 
-                    break;
+        //                    break;
 
-                case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
+        //                case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
 
-                    IExplorerControlBrowsableObjectInfoViewModel item;
+        //                    IExplorerControlBrowsableObjectInfoViewModel item;
 
-                    foreach (object _item in e.OldItems)
-                    {
-                        item = (IExplorerControlBrowsableObjectInfoViewModel)_item;
+        //                    foreach (object _item in e.OldItems)
+        //                    {
+        //                        item = (IExplorerControlBrowsableObjectInfoViewModel)_item;
 
-                        item.CustomProcessParametersGeneratedEventHandler -= ExplorerControlTest_CustomProcessParametersGeneratedEventHandler;
+        //                        item.CustomProcessParametersGeneratedEventHandler -= ExplorerControlTest_CustomProcessParametersGeneratedEventHandler;
 
-                        item.Dispose();
-                    }
+        //                        item.Dispose();
+        //                    }
 
-                    break;
-            }
-        }
+        //                    break;
+        //            }
+        //        }
 
-        private static void ExplorerControlTest_CustomProcessParametersGeneratedEventHandler(object sender, CustomProcessParametersGeneratedEventArgs e) => AddProcess(e.ProcessParameters);
+        //        private static void ExplorerControlTest_CustomProcessParametersGeneratedEventHandler(object sender, CustomProcessParametersGeneratedEventArgs e) => AddProcess(e.ProcessParameters);
 
-        protected override void OnClosing(CancelEventArgs e)
-        {
-            ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> items = Items;
+        //        protected override void OnClosing(CancelEventArgs e)
+        //        {
+        //            ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> items = Items;
 
-            items.CollectionChanged -= Items_CollectionChanged;
+        //            items.CollectionChanged -= Items_CollectionChanged;
 
-            Items = null;
+        //            Items = null;
 
-            items.Clear();
+        //            items.Clear();
 
-            base.OnClosing(e);
-        }
+        //            base.OnClosing(e);
+        //        }
 
-        private void Window_PreviousCanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = SelectedItem.History.CanMovePreviousFromCurrent;
+        //        private void Window_PreviousCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        //        {
+        //            e.CanExecute = SelectedItem.History.CanMovePreviousFromCurrent;
 
-            e.Handled = true;
-        }
+        //            e.Handled = true;
+        //        }
 
-        private void Window_NextCanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = SelectedItem.History.CanMoveNextFromCurrent;
+        //        private void Window_NextCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        //        {
+        //            e.CanExecute = SelectedItem.History.CanMoveNextFromCurrent;
 
-            e.Handled = true;
-        }
+        //            e.Handled = true;
+        //        }
 
-        private void Window_PreviousExecuted(object sender, ExecutedRoutedEventArgs e)
-        {
-            SelectedItem.History.CurrentIndex++;
+        //        private void Window_PreviousExecuted(object sender, ExecutedRoutedEventArgs e)
+        //        {
+        //            SelectedItem.History.CurrentIndex++;
 
-            CommandManager.InvalidateRequerySuggested();
+        //            CommandManager.InvalidateRequerySuggested();
 
-            e.Handled = true;
-        }
+        //            e.Handled = true;
+        //        }
 
-        private void Window_NextExecuted(object sender, ExecutedRoutedEventArgs e)
-        {
-            SelectedItem.History.CurrentIndex--;
+        //        private void Window_NextExecuted(object sender, ExecutedRoutedEventArgs e)
+        //        {
+        //            SelectedItem.History.CurrentIndex--;
 
-            CommandManager.InvalidateRequerySuggested();
+        //            CommandManager.InvalidateRequerySuggested();
 
-            e.Handled = true;
-        }
+        //            e.Handled = true;
+        //        }
     }
 }

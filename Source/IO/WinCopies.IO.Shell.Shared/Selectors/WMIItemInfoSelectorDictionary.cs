@@ -31,7 +31,7 @@ namespace WinCopies.IO.Selectors
             ? new WMIItemInfo(item.ItemType, item.ManagementObject, item.Options, item.ClientVersion)
             : new WMIItemInfo(item.Path, item.ItemType, item.ManagementObject, item.Options, item.ClientVersion);
 
-        protected override Converter<WMIItemInfoItemProvider, IBrowsableObjectInfo> DefaultSelectorOverride => Convert;
+        protected override Converter<WMIItemInfoItemProvider, IBrowsableObjectInfo> DefaultActionOverride => Convert;
 
         public WMIItemInfoSelectorDictionary() { /* Left empty. */ }
     }

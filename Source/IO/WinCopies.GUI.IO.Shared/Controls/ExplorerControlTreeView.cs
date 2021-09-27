@@ -20,6 +20,14 @@ using System.Windows.Controls;
 
 namespace WinCopies.GUI.IO.Controls
 {
+    // todo: should be in WinCopies.Util.Desktop
+    public enum CloseTabsTo : sbyte
+    {
+        Left = 1,
+
+        Right = 2
+    }
+
     public class ExplorerControlTreeView : TreeView
     {
         protected override DependencyObject GetContainerForItemOverride() => new ExplorerControlTreeViewItem();

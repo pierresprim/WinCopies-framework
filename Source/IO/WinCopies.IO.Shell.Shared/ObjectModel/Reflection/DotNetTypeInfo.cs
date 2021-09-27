@@ -38,6 +38,8 @@ namespace WinCopies.IO.ObjectModel.Reflection
         private TypeInfo _typeInfo;
 
         #region Properties
+        protected override bool IsLocalRootOverride => false;
+
         protected override IProcessFactory ProcessFactoryOverride => Process.ProcessFactory.DefaultProcessFactory;
 
         protected sealed override TypeInfo InnerObjectGenericOverride => _typeInfo;

@@ -107,6 +107,92 @@ namespace WinCopies.IO
         }
     }
 
+    public struct BitmapSources2Struct
+    {
+        public BitmapSource Small;
+        public BitmapSource Medium;
+        public BitmapSource Large;
+        public BitmapSource ExtraLarge;
+
+        public void Dispose()
+        {
+            Small = null;
+            Medium = null;
+            Large = null;
+            ExtraLarge = null;
+        }
+    }
+
+    public abstract class BitmapSources2<T> : BitmapSources<T>
+    {
+        private BitmapSources2Struct _bitmapSources;
+
+        protected sealed override BitmapSource SmallOverride => _bitmapSources.Small
+#if CS8
+            ??=
+#else
+            ?? (_bitmapSources.Small =
+#endif
+            GetSmall()
+#if !CS8
+            )
+#endif
+            ;
+
+        protected sealed override BitmapSource MediumOverride => _bitmapSources.Medium
+#if CS8
+            ??=
+#else
+            ?? (_bitmapSources.Medium =
+#endif
+         GetMedium()
+#if !CS8
+            )
+#endif
+            ;
+
+        protected sealed override BitmapSource LargeOverride => _bitmapSources.Large
+#if CS8
+            ??=
+#else
+            ?? (_bitmapSources.Large =
+#endif
+         GetLarge()
+#if !CS8
+            )
+#endif
+            ;
+
+        protected sealed override BitmapSource ExtraLargeOverride => _bitmapSources.ExtraLarge
+#if CS8
+            ??=
+#else
+            ?? (_bitmapSources.ExtraLarge =
+#endif
+         GetExtraLarge()
+#if !CS8
+            )
+#endif
+            ;
+
+        public BitmapSources2(in T browsableObjectInfo) : base(browsableObjectInfo) { /* Left empty. */ }
+
+        protected abstract BitmapSource GetSmall();
+
+        protected abstract BitmapSource GetMedium();
+
+        protected abstract BitmapSource GetLarge();
+
+        protected abstract BitmapSource GetExtraLarge();
+
+        protected override void Dispose(bool disposing)
+        {
+            _bitmapSources.Dispose();
+
+            base.Dispose(disposing);
+        }
+    }
+
     public class BrowsableObjectInfoBitmapBitmapSources : BitmapSources<Bitmap>
     {
         protected override BitmapSource SmallOverride => InnerObject.ToImageSource();

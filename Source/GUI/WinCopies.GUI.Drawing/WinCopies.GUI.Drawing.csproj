@@ -7,7 +7,7 @@
     <TargetFrameworks>netcoreapp3.0;netcoreapp3.1;net5.0-windows;net6.0-windows;net472;net48;netstandard2.0;netstandard2.1</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>WinCopies.GUI.Drawing.snk</AssemblyOriginatorKeyFile>
-    <DocumentationFile>D:\repositories\WinCopies-framework\Source\GUI\WinCopies.GUI.Drawing\WinCopies.GUI.Drawing.xml</DocumentationFile>
+    <DocumentationFile>WinCopies.GUI.Drawing.xml</DocumentationFile>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DefineConstants>WinCopies2;WinCopies3;$(DefineConstants)</DefineConstants>
     <VersionPrefix>3.6</VersionPrefix>

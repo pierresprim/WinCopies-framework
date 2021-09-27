@@ -15,17 +15,20 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+using Microsoft.WindowsAPICodePack.COMNative.Shell;
 using Microsoft.WindowsAPICodePack.Shell;
+using Microsoft.WindowsAPICodePack.Win32Native;
 using Microsoft.WindowsAPICodePack.Win32Native.Shell;
 
+using System;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 
 using WinCopies.Collections.Generic;
-using WinCopies.GUI.Drawing;
 using WinCopies.IO.PropertySystem;
 
 namespace WinCopies.IO
@@ -43,8 +46,22 @@ namespace WinCopies.IO
     {
         public abstract class FileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : BrowsableObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IFileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IFileSystemObjectInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
         {
+            private IBitmapSourceProvider _bitmapSourceProvider;
+
             #region Properties
             protected override bool IsRecursivelyBrowsableOverride => true;
+
+            protected override IBitmapSourceProvider BitmapSourceProviderOverride => _bitmapSourceProvider
+#if CS8
+            ??=
+#else
+            ?? (_bitmapSourceProvider =
+#endif
+            FileSystemObjectInfo.GetDefaultBitmapSourcesProvider(this)
+#if !CS8
+            )
+#endif
+            ;
 
             // public override Predicate<TPredicateTypeParameter> RootItemsPredicate => null;
 
@@ -65,7 +82,7 @@ namespace WinCopies.IO
             #region TryGetIcon/BitmapSource
             public Icon TryGetIcon(in int size) => FileSystemObjectInfo.TryGetIcon(System.IO.Path.GetExtension(Path), ObjectPropertiesGeneric.FileType, new System.Drawing.Size(size, size));
 
-            public BitmapSource TryGetBitmapSource(in int size) => FileSystemObjectInfo.TryGetBitmapSource(System.IO.Path.GetExtension(Path), ObjectPropertiesGeneric.FileType, size);
+            public BitmapSource TryGetBitmapSource(in int size) => FileSystemObjectInfo.TryGetDefaultBitmapSource(this, size);
             #endregion
             #endregion
 
@@ -107,6 +124,17 @@ namespace WinCopies.IO
             protected override ArrayBuilder<IBrowsableObjectInfo> GetRootItemsOverride() => FileSystemObjectInfo.GetRootItems();
 
             protected override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetSubRootItemsOverride() => GetItems().Where(item => item.Browsability?.Browsability == IO.Browsability.BrowsableByDefault);
+
+            protected override void DisposeUnmanaged()
+            {
+                if (_bitmapSourceProvider != null)
+                {
+                    _bitmapSourceProvider.Dispose();
+                    _bitmapSourceProvider = null;
+                }
+
+                base.DisposeUnmanaged();
+            }
             #endregion
             #endregion
 
@@ -161,8 +189,51 @@ namespace WinCopies.IO
             #endregion
         }
 
+        public class ImageList
+        {
+            private IImageList _imageList;
+            private static ImageList _instance;
+
+            public static ImageList Instance = _instance
+#if CS8
+                ??=
+#else
+                ?? (_instance =
+#endif
+                new ImageList()
+#if !CS8
+                )
+#endif
+                ;
+
+            private ImageList()
+            {
+                var guid = new Guid(Microsoft.WindowsAPICodePack.NativeAPI.Guids.Shell.IImageList);
+
+                _ = Microsoft.WindowsAPICodePack.Win32Native.Shell.Shell.SHGetImageList(ShellImageListIconSize.Jumbo, ref guid, out IntPtr ptr);
+
+                _imageList = (IImageList)Marshal.GetTypedObjectForIUnknown(ptr, typeof(IImageList));
+            }
+
+            public HResult TryExtractIcon(string extension, ShellImageListIconSize size, out Icon icon) => FileOperation.TryExtractIcon(extension, size, _imageList, out icon);
+        }
+
         public static class FileSystemObjectInfo
         {
+            public static ShellImageListIconSize GetIconSizeFromSize(in System.Drawing.Size size) => size.Width <= 16
+                    ? ShellImageListIconSize.Small
+                    : size.Width <= 32
+                    ? ShellImageListIconSize.Large
+                    : size.Width <= 48
+                    ? ShellImageListIconSize.ExtraLarge
+                    : size.Width <= 256 ? ShellImageListIconSize.Jumbo : ShellImageListIconSize.Last;
+
+            public static BitmapSource TryGetDefaultBitmapSource<T>(in IFileSystemObjectInfo<T> fileSystemObjectInfo, in int size) where T : IFileSystemObjectInfoProperties => TryGetBitmapSource(System.IO.Path.GetExtension(fileSystemObjectInfo.Path), fileSystemObjectInfo.ObjectProperties.FileType, size);
+
+            public static Shell.BitmapSourceProvider GetDefaultBitmapSourcesProvider<T>(in IFileSystemObjectInfo<T> fileSystemObjectInfo, in IBitmapSources bitmapSources = null) where T : IFileSystemObjectInfoProperties => new Shell.BitmapSourceProvider(fileSystemObjectInfo, new FileSystemObjectInfoBitmapSources<T>(fileSystemObjectInfo), bitmapSources, true);
+
+            public static Shell.BitmapSourceProvider GetDefaultBitmapSourcesProvider<T>(in IFileSystemObjectInfo<T> fileSystemObjectInfo, in IBitmapSources intermediate, in IBitmapSources bitmapSources = null) where T : IFileSystemObjectInfoProperties => new Shell.BitmapSourceProvider(fileSystemObjectInfo, intermediate, bitmapSources, true);
+
             public static ArrayBuilder<IBrowsableObjectInfo> GetRootItems()
             {
                 var arrayBuilder = new ArrayBuilder<IBrowsableObjectInfo>();
@@ -191,7 +262,7 @@ namespace WinCopies.IO
 
                // if (System.IO.Path.HasExtension(Path))
 
-               fileType == FileType.Folder ? TryGetIcon(3, size) : FileOperation.GetFileInfo(extension, FileAttributes.Normal, GetFileInfoOptions.Icon | GetFileInfoOptions.UseFileAttributes).Icon?.TryGetIcon(size, 32, true, true) ?? TryGetIcon(0, size);// else// return TryGetIcon(FileType == FileType.Folder ? 3 : 0, "SHELL32.dll", size);
+               fileType == FileType.Folder || fileType == FileType.KnownFolder ? TryGetIcon(3, size) : CoreErrorHelper.Succeeded(ImageList.Instance.TryExtractIcon(extension, GetIconSizeFromSize(size), out Icon icon)) ? icon  /*?.TryGetIcon(size, 32, true, true)*/ : TryGetIcon(0, size);// else// return TryGetIcon(FileType == FileType.Folder ? 3 : 0, "SHELL32.dll", size);
 
             public static BitmapSource TryGetBitmapSource(in string extension, in FileType fileType, in int size)
             {

@@ -15,6 +15,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)ExplorerControlTest.xaml.cs">
       <DependentUpon>ExplorerControlTest.xaml</DependentUpon>
     </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)ExplorerControlWindow.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>

@@ -86,7 +86,11 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         private class BackgroundWorker
         {
-            private WinCopies.BackgroundWorker _backgroundWorker = new WinCopies.BackgroundWorker();
+            private WinCopies.BackgroundWorker _backgroundWorker = new
+#if !CS9
+                WinCopies.BackgroundWorker
+#endif
+            ();
             private IBrowsableObjectInfo _updateWith;
             private IBrowsableObjectInfo _workOn;
 
@@ -96,7 +100,7 @@ namespace WinCopies.GUI.IO.ObjectModel
 
                 _backgroundWorker.DoWork += (object sender, DoWorkEventArgs e) => OnDoWork();
 
-                _backgroundWorker.ProgressChanged += (object sender, ProgressChangedEventArgs e) => BackgroundWorker.OnProgressChanged((IBitmapSourcesLinker)e.UserState);
+                _backgroundWorker.ProgressChanged += (object sender, ProgressChangedEventArgs e) => OnProgressChanged((IBitmapSourcesLinker)e.UserState);
             }
 
             private void OnDoWork()
@@ -124,34 +128,48 @@ namespace WinCopies.GUI.IO.ObjectModel
 
                 bool doWork()
                 {
-                    foreach (IBrowsableObjectInfo item in enumerable)
-
-                        if (_updateWith == _workOn)
+                    bool _doWork()
+                    {
+                        void load(in IBrowsableObjectInfo item)
                         {
-                            try
-                            {
-                                if (item.BitmapSources is IBitmapSourcesLinker bitmapSourcesLinker)
+                            if (item.BitmapSources is IBitmapSourcesLinker bitmapSourcesLinker)
 
-                                    bitmapSourcesLinker.Load();
+                                bitmapSourcesLinker.Load();
+                        }
+
+                        load(_workOn);
+
+                        foreach (IBrowsableObjectInfo item in enumerable)
+
+                            if (_updateWith == _workOn)
+                            {
+                                try
+                                {
+                                    load(item);
+                                }
+
+                                catch { /* Left empty. */ }
+
+                                _backgroundWorker.ReportProgress(count.HasValue ? (int)((++i) / count.Value * 100) : 0, item.BitmapSources);
                             }
 
-                            catch { /* Left empty. */ }
+                            else
+                            {
+                                enumerable = (_workOn = _updateWith).GetItems();
 
-                            _backgroundWorker.ReportProgress(count.HasValue ? (int)((++i) / count.Value * 100) : 0, item.BitmapSources);
-                        }
+                                initCount();
 
-                        else
-                        {
-                            enumerable = (_workOn = _updateWith).GetItems();
+                                _backgroundWorker.ReportProgress(0);
 
-                            initCount();
+                                return true;
+                            }
 
-                            _backgroundWorker.ReportProgress(0);
+                        return false;
+                    }
 
-                            return true;
-                        }
+                    while (_doWork()) { /* Left empty. */ }
 
-                    return false;
+                    return _doWork();
                 }
 
                 while (doWork()) { /* Left empty. */ }

@@ -21,6 +21,7 @@ using System.Windows.Input;
 
 using WinCopies.Commands;
 using WinCopies.GUI.Controls.Models;
+using WinCopies.GUI.IO;
 using WinCopies.GUI.Windows;
 
 namespace WinCopies.GUI.Samples
@@ -160,6 +161,6 @@ namespace WinCopies.GUI.Samples
 
         private void MenuItem_Click(object sender, RoutedEventArgs e) => new Window1().Show();
 
-        private void MenuItem_Click_1(object sender, RoutedEventArgs e) => new ExplorerControlTest().Show();
+        private void MenuItem_Click_1(object sender, RoutedEventArgs e) => new ExplorerControlWindow /*ExplorerControlTest*/().Show();
     }
 }

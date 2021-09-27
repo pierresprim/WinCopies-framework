@@ -92,13 +92,15 @@ namespace WinCopies.IO
             #endregion
 
             #region Properties
+            protected override bool IsLocalRootOverride => ObjectPropertiesGenericOverride.IsRootNode;
+
             protected override IBitmapSourceProvider BitmapSourceProviderOverride => _bitmapSourceProvider
 #if CS8
                 ??=
 #else
                 ?? (_bitmapSourceProvider =
 #endif
-                new BitmapSourceProviderCommon2(this, new BrowsableObjectInfoBitmapSources(this), true)
+                new Shell.BitmapSourceProvider(this, new BrowsableObjectInfoBitmapSources(this), true)
 #if !CS8
                 )
 #endif

@@ -77,6 +77,8 @@ namespace WinCopies.IO
 #endif
 
             #region Overrides
+            protected override bool IsLocalRootOverride => ObjectPropertiesGenericOverride.FileType == KnownFolder && InnerObjectGenericOverride.ParsingName == Computer.ParsingName;
+
             /// <summary>
             /// Gets a <see cref="ShellObject"/> that represents this <see cref="ShellObjectInfo"/>.
             /// </summary>
@@ -88,7 +90,7 @@ namespace WinCopies.IO
 #else
                 ?? (_bitmapSourceProvider =
 #endif
-                new Shell.BitmapSourceProvider(InnerObjectGeneric, true)
+               FileSystemObjectInfo.GetDefaultBitmapSourcesProvider(this, new ShellObjectBitmapSources(InnerObjectGenericOverride))
 #if !CS8
                 )
 #endif

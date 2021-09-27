@@ -40,7 +40,13 @@
     <Compile Include="$(MSBuildThisFileDirectory)Enumeration\ArchiveItemInfoEnumerator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enumeration\WMIItemInfoEnumerator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Misc.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\Icons.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\Icons\BitmapInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\Icons\IconImageInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\Icons\IconImageInfoHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\Icons\IconInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\Icons\MultiIconInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\Icons\PropertySystem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\Icons\SingleIconInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PathInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ObjectModel\ArchiveProcess.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ObjectModel\Compression.cs" />

@@ -45,7 +45,9 @@ namespace WinCopies.IO.Shell
 
             private BitmapSource GetBitmapSource(in string name) => (BitmapSource)_type.GetProperty(name).GetValue(null);
 
-            void System.IDisposable.Dispose() { /* Left empty. */ }
+            protected virtual void Dispose(in bool disposing) { /* Left empty. */ }
+
+            void System.IDisposable.Dispose() => Dispose(true);
         }
 
         public static class FolderStatic

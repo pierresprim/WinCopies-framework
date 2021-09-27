@@ -34,7 +34,7 @@ namespace WinCopies.IO.Selectors
                 ? new RegistryItemInfo(item.RegistryKey, item.ClientVersion)
                 : new RegistryItemInfo(item.RegistryKey, item.ValueName, item.ClientVersion);
 
-        protected override Converter<RegistryItemInfoItemProvider, IBrowsableObjectInfo> DefaultSelectorOverride => Convert;
+        protected override Converter<RegistryItemInfoItemProvider, IBrowsableObjectInfo> DefaultActionOverride => Convert;
 
         public RegistryItemInfoSelectorDictionary() { /* Left empty. */ }
     }

@@ -31,7 +31,7 @@ namespace WinCopies.IO.Selectors.Reflection
             : (IBrowsableObjectInfo)(item.TypeInfoItemProvider == null ? throw SelectorDictionary.GetInvalidItemException()
             : new DotNetTypeInfo(item.TypeInfoItemProvider.TypeInfo, item.TypeInfoItemProvider.ItemType, true, item.Parent));
 
-        protected override Converter<DotNetTypeInfoItemProvider, IBrowsableObjectInfo> DefaultSelectorOverride => Convert;
+        protected override Converter<DotNetTypeInfoItemProvider, IBrowsableObjectInfo> DefaultActionOverride => Convert;
 
         public DotNetTypeInfoSelectorDictionary() { /* Left empty. */ }
     }

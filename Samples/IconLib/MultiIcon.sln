@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31710.8
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MultiIcon", "MultiIcon\MultiIcon.csproj", "{F622DF93-3E98-4103-92ED-95D2972D9154}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinCopies.GUI.Drawing", "..\..\Source\GUI\WinCopies.GUI.Drawing\WinCopies.GUI.Drawing.csproj", "{6CA5164E-13D9-4755-BE22-D4B575C1CED2}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "WinCopies.GUI.Drawing.Shared", "..\..\Source\GUI\WinCopies.GUI.Drawing.Shared\WinCopies.GUI.Drawing.Shared.shproj", "{F96F9167-8D67-49F6-A4FB-CFFD49725150}"
+EndProject
+Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		..\..\Source\GUI\WinCopies.GUI.Drawing.Shared\WinCopies.GUI.Drawing.Shared.projitems*{6ca5164e-13d9-4755-be22-d4b575c1ced2}*SharedItemsImports = 5
+		..\..\Source\GUI\WinCopies.GUI.Drawing.Shared\WinCopies.GUI.Drawing.Shared.projitems*{f96f9167-8d67-49f6-a4fb-cffd49725150}*SharedItemsImports = 13
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F622DF93-3E98-4103-92ED-95D2972D9154}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F622DF93-3E98-4103-92ED-95D2972D9154}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F622DF93-3E98-4103-92ED-95D2972D9154}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F622DF93-3E98-4103-92ED-95D2972D9154}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6CA5164E-13D9-4755-BE22-D4B575C1CED2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6CA5164E-13D9-4755-BE22-D4B575C1CED2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6CA5164E-13D9-4755-BE22-D4B575C1CED2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6CA5164E-13D9-4755-BE22-D4B575C1CED2}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C430D0BB-37DB-4A5F-8419-939F2F4B4817}
+	EndGlobalSection
+EndGlobal
