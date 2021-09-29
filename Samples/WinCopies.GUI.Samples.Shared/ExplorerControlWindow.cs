@@ -23,15 +23,6 @@ namespace WinCopies.GUI.Samples
     {
         public ExplorerControlWindow() : base(GetDefaultDataContext()) { /* Left empty. */ }
 
-        public static BrowsableObjectInfoWindowViewModel GetDefaultDataContext()
-        {
-            var dataContext = new BrowsableObjectInfoWindowViewModel();
-
-            dataContext.Paths.IsCheckBoxVisible = true;
-
-            return dataContext;
-        }
-
         protected override BrowsableObjectInfoWindow GetNewBrowsableObjectInfoWindow() => new ExplorerControlWindow();
 
         protected override void OnAboutWindowRequested() { }

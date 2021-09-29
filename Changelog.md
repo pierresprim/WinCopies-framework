@@ -14,9 +14,10 @@ CHANGELOG
 	- new types.
 	- new properties and methods to IO.(I)BrowsableObjectInfo.
 	- null-check argument validation to IO.BrowsableObjectInfo.RegisterCallback.
+	- BrowsableObjectInfoWindow.GetDefaultDataContext method.
 - Re-design:
-	- BrowsableObjectInfoCallbackQueue
 	- BrowsableObjectInfoCallback
+	- BrowsableObjectInfoCallbackQueue
 - IO.(I)BrowsableObjectInfo.RegisterCallback(s)(Override) method definitions has been updated.
 - (I)BrowsableObjectInfoCollectionViewModel:
 	- the interface implements DotNetFix.IDisposable.
@@ -25,7 +26,7 @@ CHANGELOG
 		- BrowsableObjectInfoCollectionViewModel(Collection<IExplorerControlBrowsableObjectInfoViewModel> collection) constructor has been removed.
 		- all IExplorerControlBrowsableObjectInfoViewModel items are disposed on remove.
 		- new protected methods added.
-- BrowsableObjectInfoWindow: the IExplorerControlBrowsableObjectInfoViewModel collection of the BrowsableObjectInfoWindowViewModel view model is cleared on close.
+- BrowsableObjectInfoWindow: the IExplorerControlBrowsableObjectInfoViewModel collection of the BrowsableObjectInfoWindowViewModel view model is cleared on close and all items are disposed before the paths being cleared.
 - Bug fixes:
 	- (I)ExplorerControlBrowsableObjectInfoViewModel:
 		- the interface has new methods.
