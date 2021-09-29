@@ -21,6 +21,7 @@ using Microsoft.WindowsAPICodePack.Shell;
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Reflection;
 using System.Windows;
@@ -71,7 +72,7 @@ namespace WinCopies.GUI.Shell
             {
                 var listView = (ExplorerControlListView)e.OriginalSource;
 
-                BrowsableObjectInfoWindow window = listView.GetParent<BrowsableObjectInfoWindow>(true);
+                BrowsableObjectInfoWindow window = listView.GetParent<BrowsableObjectInfoWindow>(false);
 
                 IExplorerControlBrowsableObjectInfoViewModel selectedItem = ((BrowsableObjectInfoWindowViewModel)window.DataContext).Paths.SelectedItem;
 
@@ -106,8 +107,6 @@ namespace WinCopies.GUI.Shell
         {
             SetResourceReference(StyleProperty, typeof(BrowsableObjectInfoWindow));
 
-            // _ = Current._OpenWindows.AddFirst(this);
-
             DataContext = dataContext;
 
             if (dataContext.Paths.Paths.Count == 0)
@@ -115,8 +114,15 @@ namespace WinCopies.GUI.Shell
                 dataContext.Paths.Paths.Add(GetDefaultExplorerControlBrowsableObjectInfoViewModel());
 
             AddDefaultCommandBindings();
+        }
 
-            // InitializeComponent();
+        public static BrowsableObjectInfoWindowViewModel GetDefaultDataContext()
+        {
+            var dataContext = new BrowsableObjectInfoWindowViewModel();
+
+            dataContext.Paths.IsCheckBoxVisible = true;
+
+            return dataContext;
         }
 
         private void Command_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -128,7 +134,7 @@ namespace WinCopies.GUI.Shell
 
         private void CloseAllTabs_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            System.Collections.ObjectModel.ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> paths = ((BrowsableObjectInfoWindowViewModel)DataContext).Paths.Paths;
+            ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> paths = ((BrowsableObjectInfoWindowViewModel)DataContext).Paths.Paths;
 
             paths.Clear();
 
@@ -141,23 +147,27 @@ namespace WinCopies.GUI.Shell
             e.Handled = true;
         }
 
-        protected virtual bool OnCanCancelClose(System.Collections.ObjectModel.ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> paths) => /* !Current.IsClosing && */ paths.Count > 1 && MessageBox.Show(this, Shell.Properties.Resources.WindowClosingMessage, "WinCopies", YesNo, Question, No) != Yes;
+        protected virtual bool OnCanCancelClose(ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> paths) => /* !Current.IsClosing && */ paths.Count > 1 && MessageBox.Show(this, Properties.Resources.WindowClosingMessage, "WinCopies", YesNo, Question, No) != Yes;
 
         protected override void OnClosing(CancelEventArgs e)
         {
-            if (OnCanCancelClose(((BrowsableObjectInfoWindowViewModel)DataContext).Paths.Paths))
+            ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> paths = ((BrowsableObjectInfoWindowViewModel)DataContext).Paths.Paths;
+
+            if (OnCanCancelClose(paths))
 
                 e.Cancel = true;
 
+            else
+            {
+                foreach (IExplorerControlBrowsableObjectInfoViewModel path in paths)
+
+                    path.Dispose();
+
+                paths.Clear();
+            }
+
             base.OnClosing(e);
         }
-
-        //protected override void OnClosed(EventArgs e)
-        //{
-        //    base.OnClosed(e);
-
-        //    _ = Current._OpenWindows.Remove2(this);
-        //}
 
         private void CloseWindow_Executed(object sender, ExecutedRoutedEventArgs e)
         {
@@ -167,22 +177,6 @@ namespace WinCopies.GUI.Shell
         }
 
         protected abstract void OnQuit();
-
-        //{
-        //    ObservableLinkedCollection<System.Windows.Window> openWindows = Current._OpenWindows;
-
-        //    if (openWindows.Count == 1u || MessageBox.Show(this, Shell.Properties.Resources.ApplicationClosingMessage, "WinCopies", YesNo, Question, No) == Yes)
-        //    {
-        //        Current.IsClosing = true;
-
-        //        while (openWindows.Count > 0)
-        //        {
-        //            openWindows.First.Value.Close();
-
-        //            openWindows.RemoveFirst();
-        //        }
-        //    }
-        //}
 
         private void Quit_Executed(object sender, ExecutedRoutedEventArgs e) => RunCommand(OnQuit, e);
 

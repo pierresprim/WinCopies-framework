@@ -16,8 +16,6 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 #if DEBUG
-using Microsoft.WindowsAPICodePack.Win32Native.Shell;
-
 namespace WinCopies.Temp
 {
     public static class Temp

@@ -22,9 +22,11 @@ using System.Collections.Specialized;
 using WinCopies.Util;
 using WinCopies.Util.Data;
 
+using static WinCopies.ThrowHelper;
+
 namespace WinCopies.GUI.IO.ObjectModel
 {
-    public interface IBrowsableObjectInfoCollectionViewModel
+    public interface IBrowsableObjectInfoCollectionViewModel : DotNetFix.IDisposable
     {
         ICollection<IExplorerControlBrowsableObjectInfoViewModel> Paths { get; }
 
@@ -33,13 +35,16 @@ namespace WinCopies.GUI.IO.ObjectModel
         int SelectedIndex { get; set; }
     }
 
-    public class BrowsableObjectInfoCollectionViewModel : ViewModel<Collection<IExplorerControlBrowsableObjectInfoViewModel>>, IBrowsableObjectInfoCollectionViewModel
+    public class BrowsableObjectInfoCollectionViewModel : ViewModelBase, IBrowsableObjectInfoCollectionViewModel
     {
         private IExplorerControlBrowsableObjectInfoViewModel _selectedItem;
         private int _selectedIndex;
         private bool _checkBoxVisible;
+        private ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> _paths = new ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel>();
 
-        public ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> Paths { get; } = new ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel>();
+        public bool IsDisposed => _paths == null;
+
+        public ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> Paths => GetIfNotDisposed(_paths);
 
         public IExplorerControlBrowsableObjectInfoViewModel SelectedItem { get => _selectedItem; set => UpdateValue(ref _selectedItem, value, nameof(SelectedItem)); }
 
@@ -57,17 +62,14 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         ICollection<IExplorerControlBrowsableObjectInfoViewModel> IBrowsableObjectInfoCollectionViewModel.Paths => Paths;
 
-        public BrowsableObjectInfoCollectionViewModel(Collection<IExplorerControlBrowsableObjectInfoViewModel> collection) : base(collection)
-        {
-            if (collection is INotifyCollectionChanged _collection)
-
-                _collection.CollectionChanged += Paths_CollectionChanged;
-        }
-
-        public BrowsableObjectInfoCollectionViewModel() : this(new ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel>()) { /* Left empty. */ }
+        public BrowsableObjectInfoCollectionViewModel() => Paths.CollectionChanged += Paths_CollectionChanged;
 
         private bool UpdateValue<T>(ref T value, in T newValue, in string propertyName)
         {
+            if (IsDisposed)
+
+                throw GetExceptionForDispose(false);
+
             T oldValue = value;
 
             if (UtilHelpers.UpdateValue(ref value, newValue))
@@ -82,6 +84,8 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         protected virtual void OnPathAdded(IExplorerControlBrowsableObjectInfoViewModel path) => path.IsCheckBoxVisible = _checkBoxVisible;
 
+        protected virtual void OnPathRemoved(IExplorerControlBrowsableObjectInfoViewModel path) => path.Dispose();
+
         protected virtual void OnPathCollectionChanged(NotifyCollectionChangedEventArgs e)
         {
             if (e.NewItems != null)
@@ -89,10 +93,38 @@ namespace WinCopies.GUI.IO.ObjectModel
                 foreach (object item in e.NewItems)
 
                     OnPathAdded((IExplorerControlBrowsableObjectInfoViewModel)item);
+
+            if (e.OldItems != null)
+
+                foreach (object item in e.OldItems)
+
+                    OnPathRemoved((IExplorerControlBrowsableObjectInfoViewModel)item);
         }
 
         private void Paths_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => OnPathCollectionChanged(e);
 
         protected virtual void OnIsCheckBoxVisibleChanged() => Paths.ForEach((in IExplorerControlBrowsableObjectInfoViewModel path) => path.IsCheckBoxVisible = _checkBoxVisible);
+
+        protected T GetIfNotDisposed<T>(in T value) => GetOrThrowIfDisposed(this, value);
+
+        protected virtual void Dispose(in bool disposing)
+        {
+            _paths.CollectionChanged -= Paths_CollectionChanged;
+            _paths.Clear();
+            _paths = null;
+
+            if (disposing)
+            {
+                _selectedItem = null;
+
+                _selectedIndex = -1;
+
+                _checkBoxVisible = false;
+            }
+        }
+
+        public void Dispose() => Dispose(true);
+
+        ~BrowsableObjectInfoCollectionViewModel() => Dispose(false);
     }
 }

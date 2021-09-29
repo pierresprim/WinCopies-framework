@@ -52,6 +52,24 @@ namespace WinCopies.IO
         }
     }
 
+    public class BrowsableObjectInfoCallbackArgs
+    {
+        public string Path { get; }
+
+        public IBrowsableObjectInfo BrowsableObjectInfo { get; }
+
+        public BrowsableObjectInfoCallbackReason CallbackReason { get; }
+
+        public BrowsableObjectInfoCallbackArgs(in string path, in IBrowsableObjectInfo browsableObjectInfo, in BrowsableObjectInfoCallbackReason callbackReason)
+        {
+            Path = path;
+
+            BrowsableObjectInfo = browsableObjectInfo;
+
+            CallbackReason = callbackReason;
+        }
+    }
+
     namespace ObjectModel
     {
         /// <summary>
@@ -90,6 +108,8 @@ namespace WinCopies.IO
             #endregion
 
             #region Protected Properties
+            protected virtual bool IsMonitoringSupportedOverride { get; } = false;
+
             protected abstract bool IsLocalRootOverride { get; }
 
             protected abstract IBitmapSourceProvider BitmapSourceProviderOverride { get; }
@@ -120,6 +140,10 @@ namespace WinCopies.IO
             #endregion
 
             #region Public Properties
+            public bool IsMonitoring { get; private set; }
+
+            public bool IsMonitoringSupported => GetValueIfNotDisposed(() => IsMonitoringSupportedOverride);
+
             public bool IsLocalRoot => GetValueIfNotDisposed(() => IsLocalRootOverride);
 
             public IBitmapSourceProvider BitmapSourceProvider => GetValueIfNotDisposed(() => BitmapSourceProviderOverride);
@@ -197,13 +221,13 @@ namespace WinCopies.IO
             #endregion
 
             #region Protected Methods
-            protected virtual void RaiseCallbacksOverride(IBrowsableObjectInfo browsableObjectInfo, BrowsableObjectInfoCallbackReason callbackReason) => _callbackQueue?.RaiseCallbacks(browsableObjectInfo, callbackReason);
+            protected virtual void RaiseCallbacksOverride(BrowsableObjectInfoCallbackArgs a) => _callbackQueue?.RaiseCallbacks(a);
 
-            protected void RaiseCallbacks(in IBrowsableObjectInfo browsableObjectInfo, BrowsableObjectInfoCallbackReason callbackReason)
+            protected void RaiseCallbacks(in BrowsableObjectInfoCallbackArgs a)
             {
                 ThrowIfDisposed(this);
 
-                RaiseCallbacksOverride(browsableObjectInfo, callbackReason);
+                RaiseCallbacksOverride(a);
             }
 
             protected T GetValueIfNotDisposed<T>(in T value) => IsDisposed ? throw GetExceptionForDispose(false) : value;
@@ -219,12 +243,18 @@ namespace WinCopies.IO
             protected abstract ArrayBuilder<IBrowsableObjectInfo> GetRootItemsOverride();
 
             protected abstract System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetSubRootItemsOverride();
+
+            protected virtual void StartMonitoringOverride() => throw new NotSupportedException();
+
+            protected virtual void StopMonitoringOverride() => throw new NotSupportedException();
             #endregion
 
             #region Public Methods
-            public System.IDisposable RegisterCallback(Action<IBrowsableObjectInfo, BrowsableObjectInfoCallbackReason> action)
+            public IBrowsableObjectInfoCallback RegisterCallback(Action<BrowsableObjectInfoCallbackArgs> action)
             {
                 ThrowIfDisposed(this);
+
+                ThrowIfNull(action, nameof(action));
 
                 return (_callbackQueue
 #if CS8
@@ -237,6 +267,26 @@ namespace WinCopies.IO
                 )
 #endif
                 ).Enqueue(action);
+            }
+
+            public void StartMonitoring()
+            {
+                if (IsMonitoringSupported && !IsMonitoring)
+                {
+                    StartMonitoringOverride();
+
+                    IsMonitoring = true;
+                }
+            }
+
+            public void StopMonitoring()
+            {
+                if (GetValueIfNotDisposed(IsMonitoring))
+                {
+                    StopMonitoringOverride();
+
+                    IsMonitoring = false;
+                }
             }
 
             public ArrayBuilder<IBrowsableObjectInfo> GetRootItems() => GetValueIfNotDisposed(GetRootItemsOverride);
@@ -285,7 +335,14 @@ namespace WinCopies.IO
             /// </summary>
             /// <seealso cref="Dispose"/>
             /// <seealso cref="DisposeManaged"/>
-            protected virtual void DisposeUnmanaged() => _bitmapSources = null;
+            protected virtual void DisposeUnmanaged()
+            {
+                if (IsMonitoring)
+
+                    StopMonitoringOverride();
+
+                _bitmapSources = null;
+            }
 
             //if (ItemsLoader != null)
 
