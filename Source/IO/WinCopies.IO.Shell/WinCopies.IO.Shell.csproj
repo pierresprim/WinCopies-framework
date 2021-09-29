@@ -74,7 +74,7 @@
 
     <PackageReference Include="WinCopies.WindowsAPICodePack.Consts" Version="3.7-preview" />
     <PackageReference Include="WinCopies.WindowsAPICodePack.COMNative" Version="3.7.1-preview" />
-    <PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="3.7.1-preview" />
+    <PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="3.8.1-preview" />
     <PackageReference Include="WinCopies.WindowsAPICodePack.PortableDevices" Version="3.4-preview" />
   </ItemGroup>
 

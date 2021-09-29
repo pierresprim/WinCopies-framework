@@ -6,6 +6,36 @@ The WinCopies® software framework
 CHANGELOG
 ---------
 
+### 3.11-preview
+
+- Add:
+	- monitoring: the view model paths are updated when a path on disk is added, renamed or removed.
+	- methods to BrowsableObjectInfoViewModel in order to load and sort items.
+	- new types.
+	- new properties and methods to IO.(I)BrowsableObjectInfo.
+	- null-check argument validation to IO.BrowsableObjectInfo.RegisterCallback.
+- Re-design:
+	- BrowsableObjectInfoCallbackQueue
+	- BrowsableObjectInfoCallback
+- IO.(I)BrowsableObjectInfo.RegisterCallback(s)(Override) method definitions has been updated.
+- (I)BrowsableObjectInfoCollectionViewModel:
+	- the interface implements DotNetFix.IDisposable.
+	- class:
+		- inherits from ViewModelBase
+		- BrowsableObjectInfoCollectionViewModel(Collection<IExplorerControlBrowsableObjectInfoViewModel> collection) constructor has been removed.
+		- all IExplorerControlBrowsableObjectInfoViewModel items are disposed on remove.
+		- new protected methods added.
+- BrowsableObjectInfoWindow: the IExplorerControlBrowsableObjectInfoViewModel collection of the BrowsableObjectInfoWindowViewModel view model is cleared on close.
+- Bug fixes:
+	- (I)ExplorerControlBrowsableObjectInfoViewModel:
+		- the interface has new methods.
+		- class:
+			- the bitmap sources loader was not properly reinitialized between each loop.
+			- BrowseToParent command predicate threw an exception if the declaring object was disposed.
+			- when the path changed, it was loaded two times because of the history selected path change event handler.
+	- BrowsableObjectInfoWindow: an exception was thrown when attempting to get the Shell context menu for the selected item.
+	- ShellObjectInfo: when representing a ShellLink, threw an exception when browsability was requested if the path did not exist.
+
 ### 3.10-preview
 
 - Update ExplorerControlBrowsableObjectInfoViewModel to load bitmap sources of the current inner path and the new intermediate bitmap sources of the BitmapSourcesLinker class.

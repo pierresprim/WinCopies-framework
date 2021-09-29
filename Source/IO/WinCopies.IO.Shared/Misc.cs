@@ -94,24 +94,21 @@ namespace WinCopies.IO
 
     internal class BrowsableObjectInfoCallbackQueue : System.IDisposable
     {
-        private Collections.DotNetFix.Generic.LinkedList<Action<IBrowsableObjectInfo, BrowsableObjectInfoCallbackReason>> _list = new
+        private Collections.DotNetFix.Generic.LinkedList<Action<BrowsableObjectInfoCallbackArgs>> _list = new
 #if !CS9
-            Collections.DotNetFix.Generic.LinkedList<Action<IBrowsableObjectInfo, BrowsableObjectInfoCallbackReason>>
+            Collections.DotNetFix.Generic.LinkedList<Action<BrowsableObjectInfoCallbackArgs>>
 #endif
             ();
 
-        public BrowsableObjectInfoCallback Enqueue(in Action<IBrowsableObjectInfo, BrowsableObjectInfoCallbackReason> action)
+        public IBrowsableObjectInfoCallback Enqueue(in Action<BrowsableObjectInfoCallbackArgs> action) => new BrowsableObjectInfoCallback(this, _list.AddLast(action));
+
+        internal void Remove(in BrowsableObjectInfoCallback callback) => _list.Remove(callback.Node);
+
+        public void RaiseCallbacks(in BrowsableObjectInfoCallbackArgs a)
         {
-            Collections.DotNetFix.Generic.LinkedList<Action<IBrowsableObjectInfo, BrowsableObjectInfoCallbackReason>>.LinkedListNode node = _list.AddLast(action);
+            foreach (Action<BrowsableObjectInfoCallbackArgs> action in _list)
 
-            return new BrowsableObjectInfoCallback(() => _list.Remove(node));
-        }
-
-        public void RaiseCallbacks(IBrowsableObjectInfo browsableObjectInfo, BrowsableObjectInfoCallbackReason callbackReason)
-        {
-            foreach (Action<IBrowsableObjectInfo, BrowsableObjectInfoCallbackReason> action in _list)
-
-                action(browsableObjectInfo, callbackReason);
+                action(a);
         }
 
         public void Dispose()
@@ -122,21 +119,37 @@ namespace WinCopies.IO
         }
     }
 
-    internal class BrowsableObjectInfoCallback : DotNetFix.IDisposable
+    public interface IBrowsableObjectInfoCallback : DotNetFix.IDisposable
     {
-        private Action _action;
+        Action<BrowsableObjectInfoCallbackArgs> Action { get; }
+    }
 
-        public bool IsDisposed => _action == null;
+    internal class BrowsableObjectInfoCallback : IBrowsableObjectInfoCallback
+    {
+        private BrowsableObjectInfoCallbackQueue _callbackQueue;
 
-        public BrowsableObjectInfoCallback(in Action action) => _action = action;
+        internal Collections.DotNetFix.Generic.LinkedList<Action<BrowsableObjectInfoCallbackArgs>>.LinkedListNode Node { get; private set; }
+
+        public Action<BrowsableObjectInfoCallbackArgs> Action => IsDisposed ? throw ThrowHelper.GetExceptionForDispose(false) : Node.Value;
+
+        public bool IsDisposed => _callbackQueue == null;
+
+        public BrowsableObjectInfoCallback(in BrowsableObjectInfoCallbackQueue callbackQueue, Collections.DotNetFix.Generic.LinkedList<Action<BrowsableObjectInfoCallbackArgs>>.LinkedListNode node)
+        {
+            _callbackQueue = callbackQueue;
+
+            Node = node;
+        }
 
         public void Dispose()
         {
-            if (_action != null)
+            if (_callbackQueue != null)
             {
-                _action();
+                _callbackQueue.Remove(this);
 
-                _action = null;
+                _callbackQueue = null;
+
+                Node = null;
 
                 GC.SuppressFinalize(this);
             }

@@ -18,7 +18,6 @@
 using System;
 using System.Collections.ObjectModel;
 
-using WinCopies.GUI.Controls.Models;
 using WinCopies.IO.ObjectModel;
 
 namespace WinCopies.GUI.IO.ObjectModel
@@ -40,5 +39,9 @@ namespace WinCopies.GUI.IO.ObjectModel
         Comparison<IBrowsableObjectInfo> SortComparison { get; set; }
 
         IBrowsableObjectInfoFactory Factory { get; set; }
+
+        void LoadItems();
+
+        void UpdateItems();
     }
 }

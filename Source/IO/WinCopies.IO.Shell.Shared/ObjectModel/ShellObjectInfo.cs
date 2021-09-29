@@ -15,6 +15,8 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+#region Imports
+#region Namespaces
 using Microsoft.WindowsAPICodePack.COMNative.Shell;
 using Microsoft.WindowsAPICodePack.Shell;
 
@@ -22,8 +24,10 @@ using System;
 using System.IO;
 using System.Linq;
 
+#region WinCopies
 using WinCopies.IO.AbstractionInterop;
 using WinCopies.IO.Enumeration;
+using WinCopies.IO.ObjectModel;
 using WinCopies.IO.ObjectModel.Reflection;
 using WinCopies.IO.Process;
 using WinCopies.IO.Process.ObjectModel;
@@ -32,23 +36,131 @@ using WinCopies.IO.Selectors;
 using WinCopies.IO.Shell.Process;
 using WinCopies.Linq;
 using WinCopies.PropertySystem;
+#endregion
+#endregion
 
+#region Static Imports
 using static Microsoft.WindowsAPICodePack.Shell.KnownFolders;
 
-using static WinCopies.IO.ObjectModel.ShellObjectInfo;
-using static WinCopies.IO.Shell.Resources.ExceptionMessages;
+using static WinCopies.IO.BrowsableObjectInfoCallbackReason;
 using static WinCopies.IO.FileType;
+using static WinCopies.IO.ObjectModel.ShellObjectInfo;
 using static WinCopies.IO.Shell.Path;
+using static WinCopies.IO.Shell.Resources.ExceptionMessages;
 using static WinCopies.ThrowHelper;
+#endregion
 
 using SystemPath = System.IO.Path;
 
 #if !CS8
 using WinCopies.Collections;
 #endif
+#endregion
 
 namespace WinCopies.IO
 {
+    public struct ShellObjectInfoMonitoring<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IFileSystemObjectInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
+    {
+        public ShellObjectInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> ShellObjectInfo { get; }
+
+        public ShellObjectWatcher ShellObjectWatcher { get; private set; }
+
+        public ShellObjectInfoMonitoring(in ShellObjectInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> shellObjectInfo)
+        {
+            ShellObjectInfo = shellObjectInfo;
+
+            ShellObjectWatcher = null;
+        }
+
+        public void Start()
+        {
+            if (ShellObjectWatcher == null)
+            {
+                ShellObjectWatcher = new ShellObjectWatcher(ShellObjectInfo.InnerObjectGeneric, false);
+
+                if (ShellObjectInfo.InnerObjectGeneric.ParsingName == Computer.ParsingName)
+                {
+                    ShellObjectWatcher.DriveAdded += DirectoryCreated;
+                    ShellObjectWatcher.DriveRemoved += DirectoryDeleted;
+                }
+
+                else
+                {
+                    ShellObjectWatcher.DirectoryCreated += DirectoryCreated;
+                    ShellObjectWatcher.DirectoryRenamed += DirectoryRenamed;
+                    ShellObjectWatcher.DirectoryDeleted += DirectoryDeleted;
+
+                    ShellObjectWatcher.ItemCreated += ItemCreated;
+                    ShellObjectWatcher.ItemRenamed += ItemRenamed;
+                    ShellObjectWatcher.ItemDeleted += ItemDeleted;
+                }
+
+                ShellObjectWatcher.Start();
+            }
+        }
+
+        public void Stop()
+        {
+            if (ShellObjectWatcher == null)
+
+                return;
+
+            ShellObjectWatcher.Dispose();
+
+            if (ShellObjectInfo.InnerObjectGeneric.ParsingName == Computer.ParsingName)
+            {
+                ShellObjectWatcher.DriveAdded -= DirectoryCreated;
+                ShellObjectWatcher.DriveRemoved -= DirectoryDeleted;
+            }
+
+            else
+            {
+                ShellObjectWatcher.DirectoryCreated -= DirectoryCreated;
+                ShellObjectWatcher.DirectoryRenamed -= DirectoryRenamed;
+                ShellObjectWatcher.DirectoryDeleted -= DirectoryDeleted;
+
+                ShellObjectWatcher.ItemCreated -= ItemCreated;
+                ShellObjectWatcher.ItemRenamed -= ItemRenamed;
+                ShellObjectWatcher.ItemDeleted -= ItemDeleted;
+            }
+
+            ShellObjectWatcher = null;
+        }
+
+        private IBrowsableObjectInfo Create(in string path, in bool directory) => new ShellObjectInfo(path, directory ? Folder : FileType.File, ShellObjectFactory.Create(path), ShellObjectInfo.ClientVersion);
+
+        private void _RaiseCallback(in string path, in string newPath, in bool directory, in bool update)
+        {
+            try
+            {
+                IBrowsableObjectInfo obj = Create(newPath, directory);
+
+                ShellObjectInfo.RaiseCallbacks(new BrowsableObjectInfoCallbackArgs(path, obj, update ? Updated : Added));
+            }
+
+            catch
+            {
+                // Left empty.
+            }
+        }
+
+
+
+        private void DirectoryCreated(object sender, ShellObjectChangedEventArgs e) => _RaiseCallback(e.Path, e.Path, true, false);
+
+        private void DirectoryRenamed(object sender, ShellObjectRenamedEventArgs e) => _RaiseCallback(e.Path, e.NewPath, true, true);
+
+        private void DirectoryDeleted(object sender, ShellObjectChangedEventArgs e) => ShellObjectInfo.RaiseCallbacks(new BrowsableObjectInfoCallbackArgs(e.Path, null, Removed));
+
+
+
+        private void ItemCreated(object sender, ShellObjectChangedEventArgs e) => _RaiseCallback(e.Path, e.Path, false, false);
+
+        private void ItemRenamed(object sender, ShellObjectRenamedEventArgs e) => _RaiseCallback(e.Path, e.NewPath, false, true);
+
+        private void ItemDeleted(object sender, ShellObjectChangedEventArgs e) => ShellObjectInfo.RaiseCallbacks(new BrowsableObjectInfoCallbackArgs(e.Path, null, Removed));
+    }
+
     namespace ObjectModel
     {
         /// <summary>
@@ -56,10 +168,13 @@ namespace WinCopies.IO
         /// </summary>
         public abstract class ShellObjectInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : ArchiveItemInfoProvider<TObjectProperties, ShellObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IShellObjectInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IFileSystemObjectInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
         {
+            #region Fields
             private ShellObject _shellObject;
             private IBrowsableObjectInfo _parent;
             private IBrowsabilityOptions _browsability;
             private IBitmapSourceProvider _bitmapSourceProvider;
+            private ShellObjectInfoMonitoring<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>? _monitoring;
+            #endregion
 
             #region Properties
             public System.IO.Stream ArchiveFileStream { get; private set; }
@@ -77,6 +192,8 @@ namespace WinCopies.IO
 #endif
 
             #region Overrides
+            protected override bool IsMonitoringSupportedOverride => InnerObjectGenericOverride is ShellFileSystemFolder || InnerObjectGenericOverride is ShellFile || InnerObjectGenericOverride.ParsingName == Computer.ParsingName;
+
             protected override bool IsLocalRootOverride => ObjectPropertiesGenericOverride.FileType == KnownFolder && InnerObjectGenericOverride.ParsingName == Computer.ParsingName;
 
             /// <summary>
@@ -104,18 +221,25 @@ namespace WinCopies.IO
 
                         if (InnerObjectGeneric is ShellLink shellLink)
                         {
-                            ShellObjectInfo targetShellObjectInfo = From(shellLink.TargetShellObject, ClientVersion);
-
-                            if (targetShellObjectInfo.InnerObjectGeneric is ShellLink)
+                            if (IO.Path.Exists(shellLink.TargetLocation))
                             {
-                                targetShellObjectInfo.Dispose();
+                                ShellObjectInfo targetShellObjectInfo = From(shellLink.TargetShellObject, ClientVersion);
 
-                                _browsability = BrowsabilityOptions.NotBrowsable;
+                                if (targetShellObjectInfo.InnerObjectGeneric is ShellLink)
+                                {
+                                    targetShellObjectInfo.Dispose();
+
+                                    _browsability = BrowsabilityOptions.NotBrowsable;
+                                }
+
+                                else
+
+                                    _browsability = new ShellLinkBrowsabilityOptions(targetShellObjectInfo);
                             }
 
                             else
 
-                                _browsability = new ShellLinkBrowsabilityOptions(targetShellObjectInfo);
+                                _browsability = BrowsabilityOptions.NotBrowsable;
                         }
 
                         else
@@ -193,6 +317,7 @@ namespace WinCopies.IO
             protected ShellObjectInfo(in string path, in ShellObject shellObject, in ClientVersion clientVersion) : base(path, clientVersion) => _shellObject = shellObject;
 
             #region Methods
+            protected internal new void RaiseCallbacks(in BrowsableObjectInfoCallbackArgs a) => base.RaiseCallbacks(a);
             #region Archive
             public void OpenArchive(FileMode fileMode, FileAccess fileAccess, FileShare fileShare, int? bufferSize, FileOptions fileOptions) => ArchiveFileStream = ObjectPropertiesGeneric.FileType == Archive
                     ? ArchiveFileStream == null
@@ -220,6 +345,24 @@ namespace WinCopies.IO
             #endregion
 
             #region Overrides
+            protected override void StartMonitoringOverride()
+            {
+                var monitoring = new ShellObjectInfoMonitoring<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>(this);
+
+                monitoring.Start();
+
+                _monitoring = monitoring;
+            }
+
+            protected override void StopMonitoringOverride()
+            {
+                if (_monitoring.HasValue)
+                {
+                    _monitoring.Value.Stop();
+                    _monitoring = null;
+                }
+            }
+
             protected override void DisposeUnmanaged()
             {
                 _parent = null;

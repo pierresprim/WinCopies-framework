@@ -68,6 +68,10 @@ namespace WinCopies.GUI.IO.ObjectModel
         #region Properties
         //public static Predicate<IBrowsableObjectInfo> Predicate { get; } = browsableObjectInfo => browsableObjectInfo.IsBrowsable;
 
+        public bool IsMonitoringSupported => ModelGeneric.IsMonitoringSupported;
+
+        public bool IsMonitoring => ModelGeneric.IsMonitoring;
+
         public bool IsLocalRoot => ModelGeneric.IsLocalRoot;
 
         public IProcessFactory ProcessFactory => ModelGeneric.ProcessFactory;
@@ -113,49 +117,11 @@ namespace WinCopies.GUI.IO.ObjectModel
         {
             get
             {
-                if (_itemsLoaded)
+                if (!_itemsLoaded)
 
-                    return _items;
+                    LoadItems();
 
-                if (ModelGeneric.IsBrowsable())
-
-                    try
-                    {
-                        var __items = new ArrayBuilder<IBrowsableObjectInfoViewModel>((RootParentIsRootNode ? ModelGeneric.GetSubRootItems() : ModelGeneric.GetItems()).Select(
-
-                            _browsableObjectInfo => _factory == null ? new BrowsableObjectInfoViewModel(_browsableObjectInfo/*, _filter*/, RootParentIsRootNode) { SortComparison = SortComparison, Factory = Factory } : _factory.GetBrowsableObjectInfoViewModel(_browsableObjectInfo, this)));
-
-                        var itemsList = __items.ToList();
-
-                        __items.Clear();
-
-                        if (SortComparison == null)
-
-                            itemsList.Sort();
-
-                        else
-
-                            itemsList.Sort(SortComparison);
-
-                        return (_items = new ObservableCollection<IBrowsableObjectInfoViewModel>(itemsList));
-                    }
-
-                    catch
-#if DEBUG
-                    (Exception ex)
-#endif
-                    {
-#if DEBUG
-                        Debug.WriteLine(ex.Message);
-#endif
-                    }
-
-                    finally
-                    {
-                        _itemsLoaded = true;
-                    }
-
-                return null;
+                return _items;
             }
         }
 
@@ -225,7 +191,89 @@ namespace WinCopies.GUI.IO.ObjectModel
         #endregion
 
         #region Methods
-        public System.IDisposable RegisterCallback(Action<IBrowsableObjectInfo, BrowsableObjectInfoCallbackReason> callback) => ModelGeneric.RegisterCallback(callback);
+        public void Sort(in List<IBrowsableObjectInfoViewModel> list)
+        {
+            if (SortComparison == null)
+
+                list.Sort();
+
+            else
+
+                list.Sort(SortComparison);
+        }
+
+        public void LoadItems()
+        {
+            if (_itemsLoaded)
+
+                return;
+
+            if (ModelGeneric.IsBrowsable())
+            {
+                bool changed = false;
+
+                try
+                {
+                    var __items = new ArrayBuilder<IBrowsableObjectInfoViewModel>((RootParentIsRootNode ? ModelGeneric.GetSubRootItems() : ModelGeneric.GetItems()).Select(
+
+                        _browsableObjectInfo => _factory == null ? new BrowsableObjectInfoViewModel(_browsableObjectInfo/*, _filter*/, RootParentIsRootNode) { SortComparison = SortComparison, Factory = Factory } : _factory.GetBrowsableObjectInfoViewModel(_browsableObjectInfo, this)));
+
+                    List<IBrowsableObjectInfoViewModel> itemsList = __items.ToList();
+
+                    __items.Clear();
+
+                    Sort(itemsList);
+
+                    _items = new ObservableCollection<IBrowsableObjectInfoViewModel>(itemsList);
+
+                    changed = true;
+                }
+
+                catch
+#if DEBUG
+                    (Exception ex)
+#endif
+                {
+#if DEBUG
+                    Debug.WriteLine(ex.Message);
+#endif
+                }
+
+                finally
+                {
+                    _itemsLoaded = true;
+                }
+
+                if (changed)
+
+                    OnPropertyChanged(nameof(Items));
+            }
+        }
+
+        public void UpdateItems()
+        {
+            LoadItems();
+
+            var list = new List<IBrowsableObjectInfoViewModel>(Items.Count);
+
+            foreach (var item in Items)
+
+                list.Add(item);
+
+            Items.Clear();
+
+            Sort(list);
+
+            _items = new ObservableCollection<IBrowsableObjectInfoViewModel>(list);
+
+            OnPropertyChanged(nameof(Items));
+        }
+
+        public void StartMonitoring() => ModelGeneric.StartMonitoring();
+
+        public void StopMonitoring() => ModelGeneric.StopMonitoring();
+
+        public IBrowsableObjectInfoCallback RegisterCallback(Action<BrowsableObjectInfoCallbackArgs> callback) => ModelGeneric.RegisterCallback(callback);
 
         ArrayBuilder<IBrowsableObjectInfo> IBrowsableObjectInfo.GetRootItems() => ModelGeneric.GetRootItems();
 

@@ -46,6 +46,19 @@ using static WinCopies.ThrowHelper;
 
 namespace WinCopies.GUI.IO.ObjectModel
 {
+    public struct ExplorerControlBrowsableObjectInfoViewModelStruct
+    {
+        public IBrowsableObjectInfoViewModel Path;
+        public DotNetFix.IDisposable Callback;
+
+        public ExplorerControlBrowsableObjectInfoViewModelStruct(in IBrowsableObjectInfoViewModel path)
+        {
+            Path = path;
+
+            Callback = null;
+        }
+    }
+
     public abstract class ExplorerControlBrowsableObjectInfoViewModel : ViewModelBase, IExplorerControlBrowsableObjectInfoViewModel
     {
         //protected override void OnPropertyChanged(string propertyName, object oldValue, object newValue) => OnPropertyChanged(new WinCopies.Util.Data.PropertyChangedEventArgs(propertyName, oldValue, newValue));
@@ -164,6 +177,8 @@ namespace WinCopies.GUI.IO.ObjectModel
                                 return true;
                             }
 
+                        i = 0ul;
+
                         return false;
                     }
 
@@ -198,13 +213,13 @@ namespace WinCopies.GUI.IO.ObjectModel
         }
 
         #region Fields
+        private ExplorerControlBrowsableObjectInfoViewModelStruct _path;
         private System.Collections.Generic.IReadOnlyList<ButtonModel> _commonCommands;
         private IBrowsableObjectInfoFactory _factory;
         private HistoryObservableCollection<IBrowsableObjectInfo> _historyObservable;
         private bool _isCheckBoxVisible;
         private bool _isSelected;
         private const int _newItemCommandIndex = 0;
-        private IBrowsableObjectInfoViewModel _path;
         private SelectionMode _selectionMode = SelectionMode.Extended;
         private IList _selectedItems;
         private string _text;
@@ -245,7 +260,19 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         public HistoryObservableCollection<IBrowsableObjectInfo> History => GetValueIfNotDisposed(_historyObservable);
 
-        public bool IsCheckBoxVisible { get => _isCheckBoxVisible; set { if (value && _selectionMode == SelectionMode.Single) throw new ArgumentException("Cannot apply the true value for the IsCheckBoxVisible when SelectionMode is set to Single.", nameof(value)); UpdateValue(ref _isCheckBoxVisible, value, nameof(IsCheckBoxVisible)); } }
+        public bool IsCheckBoxVisible
+        {
+            get => _isCheckBoxVisible;
+
+            set
+            {
+                if (value && _selectionMode == SelectionMode.Single)
+
+                    throw new ArgumentException("Cannot apply the true value for the IsCheckBoxVisible when SelectionMode is set to Single.", nameof(value));
+
+                _ = UpdateValue(ref _isCheckBoxVisible, value, nameof(IsCheckBoxVisible));
+            }
+        }
 
         public bool IsDisposed { get; private set; }
 
@@ -255,7 +282,7 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         public IButtonModel NewItemCommand => GetValueIfNotDisposed(_commonCommands)[_newItemCommandIndex];
 
-        public IBrowsableObjectInfoViewModel Path { get => GetValueIfNotDisposed(_path); set { ThrowIfNull(value, nameof(value)); IBrowsableObjectInfoViewModel oldPath = _path; UpdateValueIfNotDisposed(ref _path, value, nameof(Path)); OnPathChanged(oldPath); } }
+        public IBrowsableObjectInfoViewModel Path { get => GetValueIfNotDisposed(_path).Path; set { ThrowIfNull(value, nameof(value)); IBrowsableObjectInfoViewModel oldPath = _path.Path; UpdateValueIfNotDisposed(ref _path.Path, value, nameof(Path)); OnPathChanged(oldPath); } }
 
         public IList SelectedItems { get => GetValueIfNotDisposed(_selectedItems); set => UpdateValueIfNotDisposed(ref _selectedItems, value, nameof(SelectedItems)); }
 
@@ -272,13 +299,11 @@ namespace WinCopies.GUI.IO.ObjectModel
         {
             ThrowIfNull(converter, nameof(converter));
 
-            _path = path;
-
-            LoadPath();
+            _path = new ExplorerControlBrowsableObjectInfoViewModelStruct(path);
 
             GetBrowsableObjectInfoViewModelConverter = converter;
 
-            BrowseToParent = new DelegateCommand(o => Path.Parent != null, o => Path = new BrowsableObjectInfoViewModel(Path.Parent));
+            BrowseToParent = new DelegateCommand(o => !IsDisposed && Path.Parent != null, o => Path = new BrowsableObjectInfoViewModel(Path.Parent));
 
             _commonCommands = new ButtonModel[] { new ButtonModel(() => Path.ProcessFactory.NewItemProcessCommands?.Name, Icons.Properties.Resources.folder_add)
             {
@@ -319,6 +344,8 @@ namespace WinCopies.GUI.IO.ObjectModel
             });
 
             _factory = factory;
+
+            OnPathAdded();
         }
 
         #region Methods
@@ -339,18 +366,82 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         protected T GetValueIfNotDisposed<T>(in T value) => IsDisposed ? throw GetExceptionForDispose(false) : value;
 
-        private void LoadPath() => _backgroundWorker.UpdatePath(_path);
+        private void LoadPath()
+        {
+            _path.Path.LoadItems();
+
+            _backgroundWorker.UpdatePath(_path.Path);
+        }
 
         protected virtual void OnPathAdded()
         {
-            _path.PropertyChanged += Path_PropertyChanged;
+            IBrowsableObjectInfoViewModel path = _path.Path;
+
+            path.PropertyChanged += Path_PropertyChanged;
+
+            _path.Callback = path.RegisterCallback(a =>
+          {
+              System.Collections.ObjectModel.ObservableCollection<IBrowsableObjectInfoViewModel> items = path.Items;
+
+              switch (a.CallbackReason)
+              {
+                  case BrowsableObjectInfoCallbackReason.Added:
+
+                      items.Add(new BrowsableObjectInfoViewModel(a.BrowsableObjectInfo));
+
+                      path.UpdateItems();
+
+                      break;
+
+                  case BrowsableObjectInfoCallbackReason.Updated:
+
+                      for (int i = 0; i < items.Count; i++)
+
+                          if (items[i].Path == a.Path)
+                          {
+                              items[i] = new BrowsableObjectInfoViewModel(a.BrowsableObjectInfo);
+
+                              break;
+                          }
+
+                      path.UpdateItems();
+
+                      break;
+
+                  case BrowsableObjectInfoCallbackReason.Removed:
+
+                      for (int i = 0; i < items.Count; i++)
+
+                          if (items[i].Path == a.Path)
+                          {
+                              items.RemoveAt(i);
+
+                              break;
+                          }
+
+                      break;
+              }
+          });
+
+            path.StartMonitoring();
 
             LoadPath();
         }
 
-        protected virtual void OnPathRemoved(IBrowsableObjectInfoViewModel path) => path.PropertyChanged -= Path_PropertyChanged;
+        protected virtual void OnPathRemoved(IBrowsableObjectInfoViewModel path)
+        {
+            path.StopMonitoring();
 
-        protected virtual void OnUpdateText() => Text = _path.Path;
+            if (_path.Callback != null)
+            {
+                _path.Callback.Dispose();
+                _path.Callback = null;
+            }
+
+            path.PropertyChanged -= Path_PropertyChanged;
+        }
+
+        protected virtual void OnUpdateText() => Text = _path.Path.Path;
 
         protected virtual void OnUpdateCommands()
         {
@@ -367,13 +458,13 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         protected virtual void OnUpdateHistory()
         {
-            if (_path.Path == History.Current.Path)
+            if (_path.Path.Path == History.Current.Path)
 
                 return;
 
             if (_historyObservable.Count == 1)
             {
-                _historyObservable.Insert(0, _path.Model);
+                _historyObservable.Insert(0, _path.Path.Model);
 
                 return;
             }
@@ -382,11 +473,11 @@ namespace WinCopies.GUI.IO.ObjectModel
             {
                 _historyObservable.NotifyOnPropertyChanged = false;
 
-                if (_historyObservable.CanMovePreviousFromCurrent && _path.Path == _historyObservable[_historyObservable.CurrentIndex + 1].Path)
+                if (_historyObservable.CanMovePreviousFromCurrent && _path.Path.Path == _historyObservable[_historyObservable.CurrentIndex + 1].Path)
 
                     _historyObservable.CurrentIndex++;
 
-                else if (_historyObservable.CanMoveNextFromCurrent && _path.Path == _historyObservable[_historyObservable.CurrentIndex - 1].Path)
+                else if (_historyObservable.CanMoveNextFromCurrent && _path.Path.Path == _historyObservable[_historyObservable.CurrentIndex - 1].Path)
 
                     _historyObservable.CurrentIndex--;
 
@@ -398,7 +489,7 @@ namespace WinCopies.GUI.IO.ObjectModel
 
                             _historyObservable.RemoveAt(0);
 
-                    _historyObservable.Insert(0, _path.Model);
+                    _historyObservable.Insert(0, _path.Path.Model);
 
                     _historyObservable.CurrentIndex = 0;
                 }
@@ -420,7 +511,12 @@ namespace WinCopies.GUI.IO.ObjectModel
             OnUpdateHistory();
         }
 
-        protected virtual void OnHistoryCurrentChanged(System.ComponentModel.PropertyChangedEventArgs e) => Path = new BrowsableObjectInfoViewModel(_historyObservable.Current) { SortComparison = Path.SortComparison, Factory = Path.Factory };
+        protected virtual void OnHistoryCurrentChanged(System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (Path.Path != _historyObservable.Current.Path)
+
+                Path = new BrowsableObjectInfoViewModel(_historyObservable.Current) { SortComparison = Path.SortComparison, Factory = Path.Factory };
+        }
 
         protected virtual bool OnGoCommandCanExecute() => true;
 
@@ -438,9 +534,9 @@ namespace WinCopies.GUI.IO.ObjectModel
 
             _treeViewItems = null;
 
-            OnPathRemoved(_path);
+            OnPathRemoved(_path.Path);
 
-            _path = null;
+            _path.Path = null;
 
             _historyObservable.NotifyOnPropertyChanged = false;
 

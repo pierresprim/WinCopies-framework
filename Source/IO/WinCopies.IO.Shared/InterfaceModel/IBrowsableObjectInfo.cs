@@ -31,6 +31,10 @@ namespace WinCopies.IO
         /// </summary>
         public interface IBrowsableObjectInfo : IBrowsableObjectInfoBase, IRecursiveEnumerable<IBrowsableObjectInfo>, DotNetFix.IDisposable
         {
+            bool IsMonitoringSupported  { get; }  
+
+            bool IsMonitoring { get; } 
+
             IBrowsabilityOptions Browsability { get; }
 
             System.Collections.Generic.IEnumerable<IBrowsabilityPath> BrowsabilityPaths { get; }
@@ -98,7 +102,11 @@ namespace WinCopies.IO
             ///// </summary>
             //IReadOnlyCollection<IBrowsableObjectInfo> Items { get; }
 
-            System.IDisposable RegisterCallback(Action<IBrowsableObjectInfo, BrowsableObjectInfoCallbackReason> callback);
+            IBrowsableObjectInfoCallback RegisterCallback(Action<BrowsableObjectInfoCallbackArgs > callback);
+
+            void StartMonitoring();
+
+            void StopMonitoring();
 
             System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems();
 
