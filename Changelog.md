@@ -71,6 +71,7 @@ CHANGELOG
 - Add:
 	- methods to ExplorerControlBrowsableObjectInfoViewModel.
 	- new types.
+	- support for drag and drop in ListView.
 
 ### 3.7-preview
 - Add:

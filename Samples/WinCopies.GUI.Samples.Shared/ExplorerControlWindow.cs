@@ -15,15 +15,66 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+using System.Collections.ObjectModel;
+using System.Reflection;
+using System.Windows;
+using WinCopies.GUI.IO.Process;
 using WinCopies.GUI.Shell;
+using WinCopies.IO.ObjectModel;
+using WinCopies.IO.Process;
 
 namespace WinCopies.GUI.Samples
 {
     public partial class ExplorerControlWindow : BrowsableObjectInfoWindow
     {
+        private static Windows.Window _processWindow;
+
+        public static Windows.Window ProcessWindow
+        {
+            get
+            {
+                if (_processWindow == null)
+                {
+                    _processWindow = new Windows.Window() { ContentTemplateSelector = new InterfaceDataTemplateSelector(), Content = new ProcessManager<IProcess>() { Processes = new ObservableCollection<IProcess>() } };
+
+                    _processWindow.Show();
+                }
+
+                return _processWindow;
+            }
+        }
+
+        public static IProcessPathCollectionFactory DefaultProcessPathCollectionFactory { get; } = new ProcessPathCollectionFactory();
+
         public ExplorerControlWindow() : base(GetDefaultDataContext()) { /* Left empty. */ }
 
         protected override BrowsableObjectInfoWindow GetNewBrowsableObjectInfoWindow() => new ExplorerControlWindow();
+
+        protected void StartProcess(in IProcessFactoryProcessInfo processInfo)
+        {
+            if (processInfo.UserConfirmationRequired)
+
+                if (MessageBox.Show(processInfo.GetUserConfirmationText(), Assembly.GetExecutingAssembly().GetName().Name, MessageBoxButton.YesNo, MessageBoxImage.Question, System.Windows.MessageBoxResult.No) == System.Windows.MessageBoxResult.No)
+
+                    return;
+
+            if (processInfo is IRunnableProcessInfo runnableProcessInfo)
+
+                runnableProcessInfo.Run(GetEnumerable(), 10u);
+
+            else
+
+                AddProcess(((IDirectProcessInfo)processInfo).TryGetProcessParameters(GetEnumerable()));
+        }
+
+        private static void AddProcess(in IProcessParameters parameters)
+        {
+            IProcess result = new Process(BrowsableObjectInfo.DefaultProcessSelectorDictionary.Select(new ProcessFactorySelectorDictionaryParameters(parameters, DefaultProcessPathCollectionFactory)));
+
+            ((ProcessManager<IProcess>)ProcessWindow.Content).Processes.Add(result);
+
+            result.RunWorkerAsync();
+        }
 
         protected override void OnAboutWindowRequested() { }
 
@@ -31,7 +82,7 @@ namespace WinCopies.GUI.Samples
 
         protected override void OnEmpty() { }
 
-        protected override void OnPaste() { }
+        protected override void OnPaste() => GetProcessFactory().Copy.TryGetProcessParameters(10u);
 
         protected override void OnQuit() { }
 

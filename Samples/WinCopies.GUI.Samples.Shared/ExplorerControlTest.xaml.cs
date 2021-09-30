@@ -46,28 +46,10 @@ namespace WinCopies.GUI.Samples
     /// </summary>
     public partial class ExplorerControlTest : Windows.Window
     {
-        //        private static Windows.Window _processWindow;
         //        private System.Windows.Interop.HwndSourceHook _hook;
 
 
-        //        public static IProcessPathCollectionFactory DefaultProcessPathCollectionFactory { get; } = new ProcessPathCollectionFactory();
-
         //        public static WinCopies.IO.ClientVersion ClientVersion { get; } = GetClientVersion();
-
-        //        public static Windows.Window ProcessWindow
-        //        {
-        //            get
-        //            {
-        //                if (_processWindow == null)
-        //                {
-        //                    _processWindow = new Windows.Window() { ContentTemplateSelector = new InterfaceDataTemplateSelector(), Content = new ProcessManager<IProcess>() { Processes = new ObservableCollection<IProcess>() } };
-
-        //                    _processWindow.Show();
-        //                }
-
-        //                return _processWindow;
-        //            }
-        //        }
 
         //        public static readonly DependencyProperty ItemsProperty = DependencyProperty.Register(nameof(Items), typeof(ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel>), typeof(ExplorerControlTest), new PropertyMetadata(null, (DependencyObject d, DependencyPropertyChangedEventArgs e) =>
         //        {
@@ -168,23 +150,6 @@ namespace WinCopies.GUI.Samples
 
         //        private IEnumerable<IBrowsableObjectInfo> GetEnumerable() => SelectedItem.Path.Items.WhereSelect(item => item.IsSelected, item => item.Model);
 
-        //        protected void StartProcess(in IProcessFactoryProcessInfo processInfo)
-        //        {
-        //            if (processInfo.UserConfirmationRequired)
-
-        //                if (MessageBox.Show(processInfo.GetUserConfirmationText(), Assembly.GetExecutingAssembly().GetName().Name, MessageBoxButton.YesNo, MessageBoxImage.Question, System.Windows.MessageBoxResult.No) == System.Windows.MessageBoxResult.No)
-
-        //                    return;
-
-        //            if (processInfo is IRunnableProcessInfo runnableProcessInfo)
-
-        //                runnableProcessInfo.Run(GetEnumerable(), 10u);
-
-        //            else
-
-        //                AddProcess(((IDirectProcessInfo)processInfo).TryGetProcessParameters(GetEnumerable()));
-        //        }
-
         //        private void Command_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         //        {
         //            e.CanExecute = true;
@@ -224,15 +189,6 @@ namespace WinCopies.GUI.Samples
         //            _ = Items.Remove((IExplorerControlBrowsableObjectInfoViewModel)(e.Parameter is Func func ? func() : e.Parameter));
 
         //            e.Handled = true;
-        //        }
-
-        //        private static void AddProcess(in IProcessParameters parameters)
-        //        {
-        //            IProcess result = new Process(BrowsableObjectInfo.DefaultProcessSelectorDictionary.Select(new ProcessFactorySelectorDictionaryParameters(parameters, DefaultProcessPathCollectionFactory)));
-
-        //            ((ProcessManager<IProcess>)ProcessWindow.Content).Processes.Add(result);
-
-        //            result.RunWorkerAsync();
         //        }
 
         //        private static WinCopies.IO.ClientVersion GetClientVersion()
