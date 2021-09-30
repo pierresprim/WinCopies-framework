@@ -237,6 +237,9 @@
   <data name="NewWMITabStatusBarLabel" xml:space="preserve">
     <value>Opens a new tab for WMI browsing.</value>
   </data>
+  <data name="OpenFile" xml:space="preserve">
+    <value>Open</value>
+  </data>
   <data name="Paste" xml:space="preserve">
     <value>Paste</value>
   </data>
@@ -257,6 +260,12 @@
   </data>
   <data name="RecycleStatusBarLabel" xml:space="preserve">
     <value>Moves the selected items to the Recycle Bin.</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="SelectFolder" xml:space="preserve">
+    <value>Select</value>
   </data>
   <data name="SubmitABug" xml:space="preserve">
     <value>Submit a _bug...</value>

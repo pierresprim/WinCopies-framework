@@ -87,9 +87,10 @@
             </Style>
             <!--End of Styles Section-->
             <Geometry x:Key="DownArrow">M 0,0 L 3.5,4 L 7,0 Z</Geometry>
+            <util:InterfaceDataTemplateSelector x:Key="InterfaceDataTemplateSelector" />
         </ResourceDictionary>
     </ResourceDictionary.MergedDictionaries>
-    
+
     <Style x:Key="WinCopies.TabControlStyle" TargetType="{x:Type TabControl}">
         <Setter Property="Padding" Value="2"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
@@ -530,11 +531,7 @@
 
     <Style BasedOn="{StaticResource {x:Type local:TextBox}}" TargetType="{x:Type local:ButtonTextBox}">
         <Setter Property="RightItems" Value="{Binding Buttons, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ButtonTextBox}}}" />
-        <Setter Property="RightItemsTemplateSelector">
-            <Setter.Value>
-                <util:InterfaceDataTemplateSelector />
-            </Setter.Value>
-        </Setter>
+        <Setter Property="RightItemsTemplateSelector" Value="{StaticResource InterfaceDataTemplateSelector}" />
     </Style>
 
     <Style BasedOn="{StaticResource {x:Type local:ButtonTextBox}}" TargetType="{x:Type local:PlaceholderTextBox}">
@@ -930,11 +927,7 @@
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
                                                 <!--<local:Label RecognizesAccessKey="False" Content="{Binding}" />-->
-                                                <ContentPresenter Content="{Binding Converter={StaticResource PropertyConverter}}">
-                                                    <ContentPresenter.ContentTemplateSelector>
-                                                        <util:InterfaceDataTemplateSelector />
-                                                    </ContentPresenter.ContentTemplateSelector>
-                                                </ContentPresenter>
+                                                <ContentPresenter Content="{Binding Converter={StaticResource PropertyConverter}}" ContentTemplateSelector="{StaticResource InterfaceDataTemplateSelector}" />
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                         <!--<DataGridTemplateColumn.CellEditingTemplate>

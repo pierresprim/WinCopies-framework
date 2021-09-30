@@ -12,7 +12,13 @@
     xmlns:temp="clr-namespace:WinCopies.Temp;assembly=WinCopies.Util.Temp"
     xmlns:sevenZip="clr-namespace:SevenZip;assembly=SevenZipSharp">
     <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/wincopies.gui.templates;component/Themes/Generic.xaml" />
         <ResourceDictionary Source="pack://application:,,,/wincopies.gui.io;component/Themes/Generic.xaml" />
+
+        <ResourceDictionary>
+            <!--Data converters-->
+            <local:FileSystemDialogBoxModeConverter x:Key="FileSystemDialogBoxModeConverter" />
+        </ResourceDictionary>
     </ResourceDictionary.MergedDictionaries>
 
     <ControlTemplate x:Key="ArchiveCompressionProcessParametersControlTemplate" TargetType="{x:Type localProcessControls:ArchiveCompressionProcessParametersControl}">
@@ -83,69 +89,94 @@
                                                                          IncludeEmptyDirectories="{Binding IncludeEmptyDirectories, Mode=TwoWay}" PreserveDirectoryRoot="{Binding PreserveDirectoryRoot, Mode=TwoWay}" />
     </DataTemplate>
 
+    <ControlTemplate x:Key="BrowsableObjectInfoWindowTemplate" TargetType="{x:Type local:BrowsableObjectInfoWindow}">
+        <ControlTemplate.Resources>
+            <Style x:Key="MenuItemItemContainerStyle" TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}">
+                <Setter Property="IsEnabled" Value="{Binding IsEnabled}" />
+                <Setter Property="Header" Value="{Binding Header}" />
+                <Setter Property="ItemsSource" Value="{Binding Items}" />
+                <Setter Property="Command" Value="{Binding Command}" />
+                <Setter Property="CommandParameter" Value="{Binding CommandParameter}" />
+                <Setter Property="CommandTarget" Value="{Binding CommandTarget}" />
+            </Style>
+        </ControlTemplate.Resources>
+        <DockPanel Background="{TemplateBinding Background}">
+            <Menu DataContext="{Binding Menu}" DockPanel.Dock="Top">
+                <local:BrowsableObjectInfoWindowMenuItem ResourceKey="File">
+                    <local:BrowsableObjectInfoWindowMenuItem ResourceKey="NewTab">
+                        <local:BrowsableObjectInfoWindowMenuItem ResourceKey="NewFileSystemTab" Icon="{x:Static guiResources:Resources.tab_add}" Command="{x:Static commands:ApplicationCommands.NewTab}" />
+                        <local:BrowsableObjectInfoWindowMenuItem ResourceKey="NewRegistryTab" Command="{x:Static local:BrowsableObjectInfoWindow.NewRegistryTab}" />
+                        <local:BrowsableObjectInfoWindowMenuItem ResourceKey="NewWMITab" Command="{x:Static local:BrowsableObjectInfoWindow.NewWMITab}" />
+                    </local:BrowsableObjectInfoWindowMenuItem>
+                    <local:BrowsableObjectInfoWindowMenuItem ResourceKey="NewWindow" Icon="{x:Static guiResources:Resources.application_add}" Command="{x:Static commands:ApplicationCommands.NewWindow}" />
+                    <local:BrowsableObjectInfoWindowMenuItem ResourceKey="CloseTab">
+                        <local:BrowsableObjectInfoWindowMenuItem ResourceKey="CloseTab" Icon="{x:Static guiResources:Resources.tab_delete}" Command="{x:Static commands:ApplicationCommands.CloseTab}" />
+                        <local:BrowsableObjectInfoWindowMenuItem ResourceKey="CloseOtherTabs" Command="{x:Static commands:ApplicationCommands.CloseOtherTabs}" />
+                        <local:BrowsableObjectInfoWindowMenuItem ResourceKey="CloseAllTabs" Command="{x:Static commands:ApplicationCommands.CloseAllTabs}" />
+                    </local:BrowsableObjectInfoWindowMenuItem>
+                    <local:BrowsableObjectInfoWindowMenuItem ResourceKey="CloseWindow" Command="{x:Static ApplicationCommands.Close}" />
+                    <local:BrowsableObjectInfoWindowMenuItem ResourceKey="Quit" Command="{x:Static local:BrowsableObjectInfoWindow.Quit}" />
+                </local:BrowsableObjectInfoWindowMenuItem>
+                <local:BrowsableObjectInfoWindowMenuItem ResourceKey="Edit">
+                    <local:BrowsableObjectInfoWindowMenuItem ResourceKey="Copy" Icon="{x:Static guiResources:Resources.page_copy}" Command="Copy" />
+                    <local:BrowsableObjectInfoWindowMenuItem ResourceKey="Cut" Icon="{x:Static guiResources:Resources.cut}" Command="Cut" />
+                    <local:BrowsableObjectInfoWindowMenuItem ResourceKey="Paste" Icon="{x:Static guiResources:Resources.page_paste}" Command="Paste" />
+                    <local:BrowsableObjectInfoWindowMenuItem ResourceKey="Recycle" Icon="{x:Static guiResources:Resources.bin_empty}" Command="Delete" />
+                    <local:BrowsableObjectInfoWindowMenuItem ResourceKey="EmptyRecycleBin" Icon="{x:Static guiResources:Resources.bin}" Command="{x:Static commands:ApplicationCommands.Empty}" />
+                    <local:BrowsableObjectInfoWindowMenuItem ResourceKey="Delete" Icon="{x:Static guiResources:Resources.delete}" Command="{x:Static commands:ApplicationCommands.DeletePermanently}" />
+                </local:BrowsableObjectInfoWindowMenuItem>
+                <MenuItem Header="Open _with" ItemsSource="{Binding DataContext.Paths.SelectedItem.BrowsabilityPaths, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:BrowsableObjectInfoWindow}}}" ItemContainerStyle="{StaticResource MenuItemItemContainerStyle}" />
+                <MenuItem Header="_Tools" ItemsSource="{Binding DataContext.Paths.SelectedItem.CustomProcesses, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:BrowsableObjectInfoWindow}}}" ItemContainerStyle="{StaticResource MenuItemItemContainerStyle}" />
+                <local:BrowsableObjectInfoWindowMenuItem ResourceKey="Help">
+                    <local:BrowsableObjectInfoWindowMenuItem ResourceKey="About" Icon="{x:Static guiResources:Resources.help}" Command="{x:Static ApplicationCommands.Help}" />
+                    <local:BrowsableObjectInfoWindowMenuItem ResourceKey="SubmitABug" Icon="{x:Static guiResources:Resources.bug}" Command="{x:Static local:BrowsableObjectInfoWindow.SubmitABug}" />
+                </local:BrowsableObjectInfoWindowMenuItem>
+            </Menu>
+
+            <StatusBar DockPanel.Dock="Bottom" VerticalAlignment="Bottom">
+                <Label Content="{Binding Menu.SelectedItem.StatusBarLabel}" />
+            </StatusBar>
+
+            <ContentControl Content="{Binding Content, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}">
+                <ContentControl.ContentTemplateSelector>
+                    <wincopies:InterfaceDataTemplateSelector />
+                </ContentControl.ContentTemplateSelector>
+            </ContentControl>
+        </DockPanel>
+    </ControlTemplate>
+
     <Style TargetType="{x:Type local:BrowsableObjectInfoWindow}" BasedOn="{StaticResource {x:Type gui:Window}}">
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate>
-                    <ControlTemplate.Resources>
-                        <Style x:Key="MenuItemItemContainerStyle" TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}">
-                            <Setter Property="IsEnabled" Value="{Binding IsEnabled}" />
-                            <Setter Property="Header" Value="{Binding Header}" />
-                            <Setter Property="ItemsSource" Value="{Binding Items}" />
-                            <Setter Property="Command" Value="{Binding Command}" />
-                            <Setter Property="CommandParameter" Value="{Binding CommandParameter}" />
-                            <Setter Property="CommandTarget" Value="{Binding CommandTarget}" />
-                        </Style>
-                    </ControlTemplate.Resources>
-                    <DockPanel Background="{TemplateBinding Background}">
-                        <Menu DataContext="{Binding Menu}" DockPanel.Dock="Top">
-                            <local:BrowsableObjectInfoWindowMenuItem ResourceKey="File">
-                                <local:BrowsableObjectInfoWindowMenuItem ResourceKey="NewTab">
-                                    <local:BrowsableObjectInfoWindowMenuItem ResourceKey="NewFileSystemTab" Icon="{x:Static guiResources:Resources.tab_add}" Command="{x:Static commands:ApplicationCommands.NewTab}" />
-                                    <local:BrowsableObjectInfoWindowMenuItem ResourceKey="NewRegistryTab" Command="{x:Static local:BrowsableObjectInfoWindow.NewRegistryTab}" />
-                                    <local:BrowsableObjectInfoWindowMenuItem ResourceKey="NewWMITab" Command="{x:Static local:BrowsableObjectInfoWindow.NewWMITab}" />
-                                </local:BrowsableObjectInfoWindowMenuItem>
-                                <local:BrowsableObjectInfoWindowMenuItem ResourceKey="NewWindow" Icon="{x:Static guiResources:Resources.application_add}" Command="{x:Static commands:ApplicationCommands.NewWindow}" />
-                                <local:BrowsableObjectInfoWindowMenuItem ResourceKey="CloseTab">
-                                    <local:BrowsableObjectInfoWindowMenuItem ResourceKey="CloseTab" Icon="{x:Static guiResources:Resources.tab_delete}" Command="{x:Static commands:ApplicationCommands.CloseTab}" />
-                                    <local:BrowsableObjectInfoWindowMenuItem ResourceKey="CloseOtherTabs" Command="{x:Static commands:ApplicationCommands.CloseOtherTabs}" />
-                                    <local:BrowsableObjectInfoWindowMenuItem ResourceKey="CloseAllTabs" Command="{x:Static commands:ApplicationCommands.CloseAllTabs}" />
-                                </local:BrowsableObjectInfoWindowMenuItem>
-                                <local:BrowsableObjectInfoWindowMenuItem ResourceKey="CloseWindow" Command="{x:Static ApplicationCommands.Close}" />
-                                <local:BrowsableObjectInfoWindowMenuItem ResourceKey="Quit" Command="{x:Static local:BrowsableObjectInfoWindow.Quit}" />
-                            </local:BrowsableObjectInfoWindowMenuItem>
-                            <local:BrowsableObjectInfoWindowMenuItem ResourceKey="Edit">
-                                <local:BrowsableObjectInfoWindowMenuItem ResourceKey="Copy" Icon="{x:Static guiResources:Resources.page_copy}" Command="Copy" />
-                                <local:BrowsableObjectInfoWindowMenuItem ResourceKey="Cut" Icon="{x:Static guiResources:Resources.cut}" Command="Cut" />
-                                <local:BrowsableObjectInfoWindowMenuItem ResourceKey="Paste" Icon="{x:Static guiResources:Resources.page_paste}" Command="Paste" />
-                                <local:BrowsableObjectInfoWindowMenuItem ResourceKey="Recycle" Icon="{x:Static guiResources:Resources.bin_empty}" Command="Delete" />
-                                <local:BrowsableObjectInfoWindowMenuItem ResourceKey="EmptyRecycleBin" Icon="{x:Static guiResources:Resources.bin}" Command="{x:Static commands:ApplicationCommands.Empty}" />
-                                <local:BrowsableObjectInfoWindowMenuItem ResourceKey="Delete" Icon="{x:Static guiResources:Resources.delete}" Command="{x:Static commands:ApplicationCommands.DeletePermanently}" />
-                            </local:BrowsableObjectInfoWindowMenuItem>
-                            <MenuItem Header="Open _with" ItemsSource="{Binding DataContext.Paths.SelectedItem.BrowsabilityPaths, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:BrowsableObjectInfoWindow}}}" ItemContainerStyle="{StaticResource MenuItemItemContainerStyle}" />
-                            <MenuItem Header="_Tools" ItemsSource="{Binding DataContext.Paths.SelectedItem.CustomProcesses, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:BrowsableObjectInfoWindow}}}" ItemContainerStyle="{StaticResource MenuItemItemContainerStyle}" />
-                            <local:BrowsableObjectInfoWindowMenuItem ResourceKey="Help">
-                                <local:BrowsableObjectInfoWindowMenuItem ResourceKey="About" Icon="{x:Static guiResources:Resources.help}" Command="{x:Static ApplicationCommands.Help}" />
-                                <local:BrowsableObjectInfoWindowMenuItem ResourceKey="SubmitABug" Icon="{x:Static guiResources:Resources.bug}" Command="{x:Static local:BrowsableObjectInfoWindow.SubmitABug}" />
-                            </local:BrowsableObjectInfoWindowMenuItem>
-                        </Menu>
-
-                        <StatusBar DockPanel.Dock="Bottom" VerticalAlignment="Bottom">
-                            <Label Content="{Binding Menu.SelectedItem.StatusBarLabel}" />
-                        </StatusBar>
-
-                        <ContentControl Content="{Binding Content, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}">
-                            <ContentControl.ContentTemplateSelector>
-                                <wincopies:InterfaceDataTemplateSelector />
-                            </ContentControl.ContentTemplateSelector>
-                        </ContentControl>
-                    </DockPanel>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-
+        <Setter Property="Template" Value="{StaticResource BrowsableObjectInfoWindowTemplate}" />
         <Setter Property="Title" Value="{Binding Paths.SelectedItem.Path.Name}" />
         <Setter Property="Icon" Value="{Binding Paths.SelectedItem.Path.BitmapSources.Small}" />
         <Setter Property="Content" Value="{Binding Paths}" />
     </Style>
+
+    <ControlTemplate x:Key="FileSystemDialogBoxContentTemplate" TargetType="{x:Type FileSystemDialogBoxContent}">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="auto" />
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition Height="auto" />
+            </Grid.RowDefinitions>
+
+            <ContentPresenter Grid.ColumnSpan="2" />
+
+            <TextBox Grid.Row="1" IsReadOnly="True" />
+            <Button Grid.Column="1" Grid.Row="1" Content="{TemplateBinding Mode, Converter={StaticResource FileSystemDialogBoxModeConverter}}" />
+        </Grid>
+    </ControlTemplate>
+
+    <Style TargetType="{x:Type local:FileSystemDialogBoxContent}">
+        <Setter Property="Template" Value="{StaticResource FileSystemDialogBoxContentTemplate}" />
+        <Setter Property="ContentTemplateSelector" Value="{StaticResource InterfaceDataTemplateSelector}" />
+    </Style>
+
+    <DataTemplate x:Key="FileSystemDialogBoxDataTemplate" DataType="{x:Type local:IFileSystemDialog}">
+        <local:FileSystemDialogBoxContent Filter="{Binding Filter}" Predicate="{Binding Predicate}" Path="{Binding Path}" SelectedItems="{Binding SelectedItems}" Mode="{Binding Mode}" />
+    </DataTemplate>
 </ResourceDictionary>

@@ -13,15 +13,22 @@
     <Compile Include="$(MSBuildThisFileDirectory)ArchiveCompressionProcessParametersControl.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectInfoFactory.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectInfoViewModel.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectInfoWindow.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ExplorerControlBrowsableObjectInfoViewModel.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectInfoWindowMenuItem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\FileSystemDialogBoxContent.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataConverters\FileSystemDialogBoxModeConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FileSystemDialog.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\BrowsableObjectInfoViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\FileSystemDialogBoxViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Windows\BrowsableObjectInfoWindow.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\ExplorerControlBrowsableObjectInfoViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\BrowsableObjectInfoWindowMenuItem.cs" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="$(MSBuildThisFileDirectory)Themes\Generic.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Windows\" />
   </ItemGroup>
 </Project>
