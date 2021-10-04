@@ -74,7 +74,7 @@ namespace WinCopies.GUI.Shell
 
                 BrowsableObjectInfoWindow window = listView.GetParent<BrowsableObjectInfoWindow>(false);
 
-                IExplorerControlBrowsableObjectInfoViewModel selectedItem = ((BrowsableObjectInfoWindowViewModel)window.DataContext).Paths.SelectedItem;
+                IExplorerControlViewModel selectedItem = ((BrowsableObjectInfoWindowViewModel)window.DataContext).Paths.SelectedItem;
 
                 if (selectedItem.SelectedItems == null || selectedItem.SelectedItems.Count != 1)
 
@@ -111,7 +111,7 @@ namespace WinCopies.GUI.Shell
 
             if (dataContext.Paths.Paths.Count == 0)
 
-                dataContext.Paths.Paths.Add(GetDefaultExplorerControlBrowsableObjectInfoViewModel());
+                dataContext.Paths.Paths.Add(GetDefaultExplorerControlViewModel());
 
             AddDefaultCommandBindings();
         }
@@ -134,11 +134,11 @@ namespace WinCopies.GUI.Shell
 
         private void CloseAllTabs_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> paths = ((BrowsableObjectInfoWindowViewModel)DataContext).Paths.Paths;
+            ObservableCollection<IExplorerControlViewModel> paths = ((BrowsableObjectInfoWindowViewModel)DataContext).Paths.Paths;
 
             paths.Clear();
 
-            IExplorerControlBrowsableObjectInfoViewModel explorerControlBrowsableObjectInfo = GetDefaultExplorerControlBrowsableObjectInfoViewModel();
+            IExplorerControlViewModel explorerControlBrowsableObjectInfo = GetDefaultExplorerControlViewModel();
 
             explorerControlBrowsableObjectInfo.IsSelected = true;
 
@@ -147,11 +147,11 @@ namespace WinCopies.GUI.Shell
             e.Handled = true;
         }
 
-        protected virtual bool OnCanCancelClose(ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> paths) => /* !Current.IsClosing && */ paths.Count > 1 && MessageBox.Show(this, Properties.Resources.WindowClosingMessage, "WinCopies", YesNo, Question, No) != Yes;
+        protected virtual bool OnCanCancelClose(ObservableCollection<IExplorerControlViewModel> paths) => /* !Current.IsClosing && */ paths.Count > 1 && MessageBox.Show(this, Properties.Resources.WindowClosingMessage, "WinCopies", YesNo, Question, No) != Yes;
 
         protected override void OnClosing(CancelEventArgs e)
         {
-            ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> paths = ((BrowsableObjectInfoWindowViewModel)DataContext).Paths.Paths;
+            ObservableCollection<IExplorerControlViewModel> paths = ((BrowsableObjectInfoWindowViewModel)DataContext).Paths.Paths;
 
             if (OnCanCancelClose(paths))
 
@@ -159,7 +159,7 @@ namespace WinCopies.GUI.Shell
 
             else
             {
-                foreach (IExplorerControlBrowsableObjectInfoViewModel path in paths)
+                foreach (IExplorerControlViewModel path in paths)
 
                     path.Dispose();
 
@@ -440,14 +440,14 @@ namespace WinCopies.GUI.Shell
             add(SubmitABug, SubmitABug_Executed, Command_CanExecute);
         }
 
-        private void AddNewDefaultTab(in IExplorerControlBrowsableObjectInfoViewModel viewModel)
+        private void AddNewDefaultTab(in IExplorerControlViewModel viewModel)
         {
             viewModel.IsSelected = true;
 
             ((BrowsableObjectInfoWindowViewModel)DataContext).Paths.Paths.Add(viewModel);
         }
 
-        private void AddNewTab(IExplorerControlBrowsableObjectInfoViewModel viewModel, ExecutedRoutedEventArgs e)
+        private void AddNewTab(IExplorerControlViewModel viewModel, ExecutedRoutedEventArgs e)
         {
             AddNewDefaultTab(viewModel);
 
@@ -497,11 +497,11 @@ namespace WinCopies.GUI.Shell
             return false;
         }
 
-        private void NewTab_Executed(object sender, ExecutedRoutedEventArgs e) => AddNewTab(GetDefaultExplorerControlBrowsableObjectInfoViewModel(), e);
+        private void NewTab_Executed(object sender, ExecutedRoutedEventArgs e) => AddNewTab(GetDefaultExplorerControlViewModel(), e);
 
-        private void NewRegistryTab_Executed(object sender, ExecutedRoutedEventArgs e) => AddNewTab(GetDefaultExplorerControlBrowsableObjectInfoViewModel(new RegistryItemInfo()), e);
+        private void NewRegistryTab_Executed(object sender, ExecutedRoutedEventArgs e) => AddNewTab(GetDefaultExplorerControlViewModel(new RegistryItemInfo()), e);
 
-        private void NewWMITab_Executed(object sender, ExecutedRoutedEventArgs e) => AddNewTab(GetDefaultExplorerControlBrowsableObjectInfoViewModel(new WMIItemInfo()), e);
+        private void NewWMITab_Executed(object sender, ExecutedRoutedEventArgs e) => AddNewTab(GetDefaultExplorerControlViewModel(new WMIItemInfo()), e);
 
         protected abstract BrowsableObjectInfoWindow GetNewBrowsableObjectInfoWindow();
 
@@ -521,7 +521,7 @@ namespace WinCopies.GUI.Shell
 
         private void CloseTab_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            _ = ((BrowsableObjectInfoWindowViewModel)DataContext).Paths.Paths.Remove((IExplorerControlBrowsableObjectInfoViewModel)(e.Parameter is Func func ? func() : e.Parameter));
+            _ = ((BrowsableObjectInfoWindowViewModel)DataContext).Paths.Paths.Remove((IExplorerControlViewModel)(e.Parameter is Func func ? func() : e.Parameter));
 
             e.Handled = true;
         }

@@ -42,7 +42,7 @@ namespace WinCopies.GUI.IO
             bool IsSelected { get; set; }
         }
 
-        public interface IExplorerControlBrowsableObjectInfoViewModel : IBrowsableObjectInfoViewModelCommon, DotNetFix.IDisposable
+        public interface IExplorerControlViewModel : IBrowsableObjectInfoViewModelCommon, DotNetFix.IDisposable
         {
             System.Collections.Generic.IEnumerable<IMenuItemModel<string>> BrowsabilityPaths { get; }
 
@@ -71,6 +71,10 @@ namespace WinCopies.GUI.IO
             System.Collections.Generic.IEnumerable<IBrowsableObjectInfoViewModel> TreeViewItems { get; set; }
 
             event System.EventHandler<CustomProcessParametersGeneratedEventArgs> CustomProcessParametersGeneratedEventHandler;
+
+            void StartMonitoring();
+
+            void StopMonitoring();
         }
     }
 }

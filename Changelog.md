@@ -6,6 +6,30 @@ The WinCopies® software framework
 CHANGELOG
 ---------
 
+### 3.12-preview
+
+- Update monitoring.
+- Add file system dialogs.
+- WinCopies.GUI.Shell.ObjectModel.ExplorerControlBrowsableObjectInfoViewModel:
+	- => ExplorerControlViewModel
+	- constructor is now protected.
+- WinCopies.GUI.IO.ObjectModel:
+	- IExplorerControlBrowsableObjectInfoViewModel:
+		- => IExplorerControlViewModel
+		- add Start/StopMonitoring() methods.
+	- ExplorerControlBrowsableObjectInfoViewModelStruct => ExplorerControlViewModelStruct
+	- ExplorerControlBrowsableObjectInfoViewModel:
+		- => ExplorerControlViewModel
+		- add:
+			- AutoStartMonitoring property.
+			- properties:
+				- OnRegisterCallback
+				- Start/StopMonitoring
+	- BrowsableObjectInfoViewModel:
+		- add Filter property and new methods
+		- an exception is thrown when attempting to update some properties when the object is disposed.
+- Add DialogWindowBase class. Some items of DialogWindow have been moved to this new class.
+
 ### 3.11-preview
 
 - Add:

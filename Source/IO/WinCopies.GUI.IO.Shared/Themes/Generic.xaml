@@ -119,7 +119,7 @@
 
     <ControlTemplate x:Key="ExplorerControlTemplate" TargetType="{x:Type localControls:ExplorerControl}">
         <!--<DataTemplate DataType="{x:Type local:BrowsableObjectInfo}">-->
-        <Grid>
+        <Grid Background="White">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="100" />
                 <ColumnDefinition />
@@ -307,11 +307,11 @@
         <Setter Property="ItemContainerStyle" Value="{StaticResource ExplorerControlListViewItemStyle}" />
     </Style>
 
-    <DataTemplate DataType="{x:Type localObjectModel:IExplorerControlBrowsableObjectInfoViewModel}">
+    <DataTemplate DataType="{x:Type localObjectModel:IExplorerControlViewModel}">
         <localControls:ExplorerControl x:Name="ExplorerControl" Path="{Binding Path.Path}" Text="{Binding Text, Mode=TwoWay}"
                                        TreeViewStyle="{StaticResource ExplorerControlTreeViewStyle}" ListViewStyle="{StaticResource ExplorerControlListViewStyle}"
                                        Commands="{Binding CommonCommands}"
-                                       History="{Binding History}" GoButtonCommand="{x:Static localObjectModel:ExplorerControlBrowsableObjectInfoViewModel.GoCommand}" GoButtonCommandParameter="{Binding}"
+                                       History="{Binding History}" GoButtonCommand="{x:Static localObjectModel:ExplorerControlViewModel.GoCommand}" GoButtonCommandParameter="{Binding}"
                                        IsCheckBoxVisible="{Binding IsCheckBoxVisible}"
                                        SelectedIndex="{Binding Path.SelectedIndex, Mode=TwoWay}" SelectedItem="{Binding Path.SelectedItem, Mode=TwoWay}"
                                        PropertyGridItem="{Binding Path}" PropertyGridDescription="{Binding Path.Items.Count, StringFormat={}{0} items}"
@@ -407,7 +407,7 @@
         <Setter Property="Header" Value="{Binding}" />
         <Setter Property="HeaderTemplate">
             <Setter.Value>
-                <DataTemplate DataType="{x:Type localObjectModel:IExplorerControlBrowsableObjectInfoViewModel}">
+                <DataTemplate DataType="{x:Type localObjectModel:IExplorerControlViewModel}">
                     <DockPanel>
                         <Image DockPanel.Dock="Left" Source="{Binding Path.BitmapSources.Medium}" Height="32" Width="32" />
                         <controls:Label Content="{Binding Path.Name}" RecognizesAccessKey="False" VerticalContentAlignment="Center" />

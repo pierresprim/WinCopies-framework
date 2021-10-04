@@ -17,6 +17,7 @@
 
 using Microsoft.WindowsAPICodePack.Shell;
 
+#region System
 using System;
 using System.Collections;
 using System.ComponentModel;
@@ -27,7 +28,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
+#endregion
 
+#region WinCopies
 using WinCopies.Collections;
 using WinCopies.Collections.Generic;
 using WinCopies.Commands;
@@ -40,18 +43,19 @@ using WinCopies.IO.ObjectModel;
 using WinCopies.IO.PropertySystem;
 using WinCopies.Linq;
 using WinCopies.Util.Data;
+#endregion
 
 using static WinCopies.GUI.IO.Properties.Resources;
 using static WinCopies.ThrowHelper;
 
 namespace WinCopies.GUI.IO.ObjectModel
 {
-    public struct ExplorerControlBrowsableObjectInfoViewModelStruct
+    public struct ExplorerControlViewModelStruct
     {
         public IBrowsableObjectInfoViewModel Path;
         public DotNetFix.IDisposable Callback;
 
-        public ExplorerControlBrowsableObjectInfoViewModelStruct(in IBrowsableObjectInfoViewModel path)
+        public ExplorerControlViewModelStruct(in IBrowsableObjectInfoViewModel path)
         {
             Path = path;
 
@@ -59,7 +63,7 @@ namespace WinCopies.GUI.IO.ObjectModel
         }
     }
 
-    public abstract class ExplorerControlBrowsableObjectInfoViewModel : ViewModelBase, IExplorerControlBrowsableObjectInfoViewModel
+    public abstract class ExplorerControlViewModel : ViewModelBase, IExplorerControlViewModel
     {
         //protected override void OnPropertyChanged(string propertyName, object oldValue, object newValue) => OnPropertyChanged(new WinCopies.Util.Data.PropertyChangedEventArgs(propertyName, oldValue, newValue));
 
@@ -213,7 +217,8 @@ namespace WinCopies.GUI.IO.ObjectModel
         }
 
         #region Fields
-        private ExplorerControlBrowsableObjectInfoViewModelStruct _path;
+        private ExplorerControlViewModelStruct _path;
+        private bool _autoStartMonitoring = true;
         private System.Collections.Generic.IReadOnlyList<ButtonModel> _commonCommands;
         private IBrowsableObjectInfoFactory _factory;
         private HistoryObservableCollection<IBrowsableObjectInfo> _historyObservable;
@@ -232,6 +237,8 @@ namespace WinCopies.GUI.IO.ObjectModel
         #endregion
 
         #region Properties
+        public bool AutoStartMonitoring { get => _autoStartMonitoring; set => UpdateValue(ref _autoStartMonitoring, value, nameof(AutoStartMonitoring)); }
+
         protected Converter<string, IBrowsableObjectInfo> GetBrowsableObjectInfoViewModelConverter { get; }
 
         public ICommand BrowseToParent { get; }
@@ -256,7 +263,7 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         public IBrowsableObjectInfoFactory Factory { get => GetValueIfNotDisposed(_factory); set => UpdateValueIfNotDisposed(ref _factory, value ?? throw GetArgumentNullException(nameof(value)), nameof(Factory)); }
 
-        public static DelegateCommand<ExplorerControlBrowsableObjectInfoViewModel> GoCommand { get; } = new DelegateCommand<ExplorerControlBrowsableObjectInfoViewModel>(browsableObjectInfo => browsableObjectInfo != null && browsableObjectInfo.OnGoCommandCanExecute(), browsableObjectInfo => browsableObjectInfo.OnGoCommandExecuted());
+        public static DelegateCommand<ExplorerControlViewModel> GoCommand { get; } = new DelegateCommand<ExplorerControlViewModel>(browsableObjectInfo => browsableObjectInfo != null && browsableObjectInfo.OnGoCommandCanExecute(), browsableObjectInfo => browsableObjectInfo.OnGoCommandExecuted());
 
         public HistoryObservableCollection<IBrowsableObjectInfo> History => GetValueIfNotDisposed(_historyObservable);
 
@@ -295,11 +302,11 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         public event System.EventHandler<CustomProcessParametersGeneratedEventArgs> CustomProcessParametersGeneratedEventHandler;
 
-        protected ExplorerControlBrowsableObjectInfoViewModel(in IBrowsableObjectInfoViewModel path, in System.Collections.Generic.IEnumerable<IBrowsableObjectInfoViewModel> treeViewItems, in IBrowsableObjectInfoFactory factory, in Converter<string, IBrowsableObjectInfo> converter)
+        protected ExplorerControlViewModel(in IBrowsableObjectInfoViewModel path, in System.Collections.Generic.IEnumerable<IBrowsableObjectInfoViewModel> treeViewItems, in IBrowsableObjectInfoFactory factory, in Converter<string, IBrowsableObjectInfo> converter)
         {
             ThrowIfNull(converter, nameof(converter));
 
-            _path = new ExplorerControlBrowsableObjectInfoViewModelStruct(path);
+            _path = new ExplorerControlViewModelStruct(path);
 
             GetBrowsableObjectInfoViewModelConverter = converter;
 
@@ -373,70 +380,90 @@ namespace WinCopies.GUI.IO.ObjectModel
             _backgroundWorker.UpdatePath(_path.Path);
         }
 
+        protected void OnRegisterCallback(BrowsableObjectInfoCallbackArgs parameters)
+        {
+            IBrowsableObjectInfoViewModel path = _path.Path;
+
+            System.Collections.ObjectModel.ObservableCollection<IBrowsableObjectInfoViewModel> items = path.Items;
+
+            switch (parameters.CallbackReason)
+            {
+                case BrowsableObjectInfoCallbackReason.Added:
+
+                    items.Add(new BrowsableObjectInfoViewModel(parameters.BrowsableObjectInfo));
+
+                    path.UpdateItems();
+
+                    break;
+
+                case BrowsableObjectInfoCallbackReason.Updated:
+
+                    for (int i = 0; i < items.Count; i++)
+
+                        if (items[i].Path == parameters.Path)
+                        {
+                            items[i] = new BrowsableObjectInfoViewModel(parameters.BrowsableObjectInfo);
+
+                            break;
+                        }
+
+                    path.UpdateItems();
+
+                    break;
+
+                case BrowsableObjectInfoCallbackReason.Removed:
+
+                    for (int i = 0; i < items.Count; i++)
+
+                        if (items[i].Path == parameters.Path)
+                        {
+                            items.RemoveAt(i);
+
+                            break;
+                        }
+
+                    break;
+            }
+        }
+
+        public void StartMonitoring()
+        {
+            IBrowsableObjectInfoViewModel path = _path.Path;
+
+            _path.Callback = path.RegisterCallback(OnRegisterCallback);
+
+            path.StartMonitoring();
+        }
+
         protected virtual void OnPathAdded()
         {
             IBrowsableObjectInfoViewModel path = _path.Path;
 
             path.PropertyChanged += Path_PropertyChanged;
 
-            _path.Callback = path.RegisterCallback(a =>
-          {
-              System.Collections.ObjectModel.ObservableCollection<IBrowsableObjectInfoViewModel> items = path.Items;
+            if (_autoStartMonitoring)
 
-              switch (a.CallbackReason)
-              {
-                  case BrowsableObjectInfoCallbackReason.Added:
-
-                      items.Add(new BrowsableObjectInfoViewModel(a.BrowsableObjectInfo));
-
-                      path.UpdateItems();
-
-                      break;
-
-                  case BrowsableObjectInfoCallbackReason.Updated:
-
-                      for (int i = 0; i < items.Count; i++)
-
-                          if (items[i].Path == a.Path)
-                          {
-                              items[i] = new BrowsableObjectInfoViewModel(a.BrowsableObjectInfo);
-
-                              break;
-                          }
-
-                      path.UpdateItems();
-
-                      break;
-
-                  case BrowsableObjectInfoCallbackReason.Removed:
-
-                      for (int i = 0; i < items.Count; i++)
-
-                          if (items[i].Path == a.Path)
-                          {
-                              items.RemoveAt(i);
-
-                              break;
-                          }
-
-                      break;
-              }
-          });
-
-            path.StartMonitoring();
+                StartMonitoring();
 
             LoadPath();
         }
 
-        protected virtual void OnPathRemoved(IBrowsableObjectInfoViewModel path)
+        public void StopMonitoring()
         {
-            path.StopMonitoring();
+            _path.Path.StopMonitoring();
 
             if (_path.Callback != null)
             {
                 _path.Callback.Dispose();
                 _path.Callback = null;
             }
+        }
+
+        protected virtual void OnPathRemoved(IBrowsableObjectInfoViewModel path)
+        {
+            if (_autoStartMonitoring)
+
+                StopMonitoring();
 
             path.PropertyChanged -= Path_PropertyChanged;
         }
@@ -572,7 +599,7 @@ namespace WinCopies.GUI.IO.ObjectModel
         }
         #endregion
 
-        ~ExplorerControlBrowsableObjectInfoViewModel() => Dispose(false);
+        ~ExplorerControlViewModel() => Dispose(false);
 
         //private ViewStyle _viewStyle = ViewStyle.SizeThree;
 

@@ -15,13 +15,17 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+#region System
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Windows.Data;
+#endregion
 
+#region WinCopies
 using WinCopies.Collections.Generic;
 using WinCopies.IO;
 using WinCopies.IO.ObjectModel;
@@ -29,6 +33,7 @@ using WinCopies.IO.Process;
 using WinCopies.IO.PropertySystem;
 using WinCopies.PropertySystem;
 using WinCopies.Util.Data;
+#endregion
 
 using static WinCopies.
 #if !WinCopies3
@@ -51,18 +56,17 @@ namespace WinCopies.GUI.IO.ObjectModel
     //    public IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo) => new BrowsableObjectInfoViewModel(browsableObjectInfo, Predicate) { Factory = this };
     //}
 
-    public class BrowsableObjectInfoViewModel : ViewModel<IBrowsableObjectInfo>, IBrowsableObjectInfoViewModel
+    public partial class BrowsableObjectInfoViewModel : ViewModel<IBrowsableObjectInfo>, IBrowsableObjectInfoViewModel
     {
+
         #region Private fields
-        // private Predicate<IBrowsableObjectInfo> _filter;
+        private Selection _selection = Selection.GetInstance();
+        private Browsability _browsability = new
+#if !CS9
+            Browsability
+#endif
+            ();
         private IBrowsableObjectInfoFactory _factory;
-        private ObservableCollection<IBrowsableObjectInfoViewModel> _items;
-        private bool _itemsLoaded;
-        private IBrowsableObjectInfoViewModel _parent;
-        private bool _parentLoaded;
-        private bool _isSelected;
-        private int _selectedIndex = -1;
-        private IBrowsableObjectInfo _selectedItem;
         #endregion
 
         #region Properties
@@ -82,9 +86,26 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         public static Comparison<IBrowsableObjectInfo> DefaultComparison { get; } = (left, right) => left.CompareTo(right);
 
-        //public Predicate<IBrowsableObjectInfo> Filter { get => _filter; set { _filter = value; OnPropertyChanged(nameof(Filter)); } }
+        public Predicate<IBrowsableObjectInfo> Filter
+        {
+            get => _filter;
 
-        public IBrowsableObjectInfoFactory Factory { get => _factory; set { _factory = value; OnPropertyChanged(nameof(_factory)); } }
+            set
+            {
+                if (UpdateValue(ref _filter, value))
+                {
+                    _filter = GetIfNotDisposed(value);
+
+                    if (_items != null)
+
+                        UpdatePredicate();
+
+                    OnPropertyChanged(nameof(Filter));
+                }
+            }
+        }
+
+        public IBrowsableObjectInfoFactory Factory { get => _factory; set { _factory = GetIfNotDisposed(value); OnPropertyChanged(nameof(Factory)); } }
 
         public bool IsSpecialItem => ModelGeneric.IsSpecialItem;
 
@@ -111,15 +132,13 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         public bool HasTransparency => ModelGeneric.IsSpecialItem;
 
-        public Comparison<IBrowsableObjectInfo> SortComparison { get; set; }
+        public Comparison<IBrowsableObjectInfo> SortComparison { get => _sortComparison; set => UpdateValue(ref _sortComparison, value, nameof(SortComparison)); }
 
         public ObservableCollection<IBrowsableObjectInfoViewModel> Items
         {
             get
             {
-                if (!_itemsLoaded)
-
-                    LoadItems();
+                LoadItems();
 
                 return _items;
             }
@@ -191,6 +210,34 @@ namespace WinCopies.GUI.IO.ObjectModel
         #endregion
 
         #region Methods
+        protected T GetIfNotDisposed<T>(in T value) => GetOrThrowIfDisposed(this, value);
+
+        protected bool UpdateValue<T>(ref T value, in T newValue) => UtilHelpers.UpdateValue(ref value, GetIfNotDisposed(newValue));
+
+        protected bool UpdateValue<T>(ref T value, in T newValue, in string propertyName)
+        {
+            bool result = UpdateValue(ref value, newValue);
+
+            OnPropertyChanged(propertyName);
+
+            return result;
+        }
+
+        private bool Predicate(object obj) => Filter((IBrowsableObjectInfo)obj);
+
+        private void UpdatePredicate()
+        {
+            System.ComponentModel.ICollectionView items = CollectionViewSource.GetDefaultView(_items);
+
+            if (_filter == null)
+
+                items.Filter = null;
+
+            else
+
+                items.Filter = Predicate;
+        }
+
         public void Sort(in List<IBrowsableObjectInfoViewModel> list)
         {
             if (SortComparison == null)
@@ -204,7 +251,7 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         public void LoadItems()
         {
-            if (_itemsLoaded)
+            if (GetIfNotDisposed(_itemsLoaded))
 
                 return;
 
@@ -245,8 +292,14 @@ namespace WinCopies.GUI.IO.ObjectModel
                 }
 
                 if (changed)
+                {
+                    if (_filter != null)
+                    {
+
+                    }
 
                     OnPropertyChanged(nameof(Items));
+                }
             }
         }
 
@@ -254,15 +307,17 @@ namespace WinCopies.GUI.IO.ObjectModel
         {
             LoadItems();
 
-            var list = new List<IBrowsableObjectInfoViewModel>(Items.Count);
+            var list = new List<IBrowsableObjectInfoViewModel>(_items.Count);
 
-            foreach (var item in Items)
+            foreach (var item in _items)
 
                 list.Add(item);
 
-            Items.Clear();
+            _items.Clear();
 
             Sort(list);
+
+            CollectionViewSource.GetDefaultView(_items)
 
             _items = new ObservableCollection<IBrowsableObjectInfoViewModel>(list);
 

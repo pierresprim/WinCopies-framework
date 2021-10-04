@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using WinCopies.GUI.IO.ObjectModel;
 using WinCopies.IO.ObjectModel;
 using WinCopies.Util.Data;
 
@@ -12,7 +13,7 @@ namespace WinCopies.GUI.Shell
 
         public Predicate<IBrowsableObjectInfo> Predicate { get => ModelGeneric.Predicate; set { ModelGeneric.Predicate = value; OnPropertyChanged(nameof(Predicate)); } }
 
-        public IBrowsableObjectInfo Path { get => ModelGeneric.Path; set { ModelGeneric.Path = value; OnPropertyChanged(nameof(Path)); } }
+        public IExplorerControlViewModel Path { get => ModelGeneric.Path; set { ModelGeneric.Path = value; OnPropertyChanged(nameof(Path)); } }
 
         public IReadOnlyList<IBrowsableObjectInfo> SelectedItems { get => ModelGeneric.SelectedItems; set { ModelGeneric.SelectedItems = value; OnPropertyChanged(nameof(SelectedItems)); } }
 

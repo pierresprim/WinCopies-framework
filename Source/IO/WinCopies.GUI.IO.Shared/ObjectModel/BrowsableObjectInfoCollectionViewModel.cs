@@ -28,25 +28,25 @@ namespace WinCopies.GUI.IO.ObjectModel
 {
     public interface IBrowsableObjectInfoCollectionViewModel : DotNetFix.IDisposable
     {
-        ICollection<IExplorerControlBrowsableObjectInfoViewModel> Paths { get; }
+        ICollection<IExplorerControlViewModel> Paths { get; }
 
-        IExplorerControlBrowsableObjectInfoViewModel SelectedItem { get; set; }
+        IExplorerControlViewModel SelectedItem { get; set; }
 
         int SelectedIndex { get; set; }
     }
 
     public class BrowsableObjectInfoCollectionViewModel : ViewModelBase, IBrowsableObjectInfoCollectionViewModel
     {
-        private IExplorerControlBrowsableObjectInfoViewModel _selectedItem;
+        private IExplorerControlViewModel _selectedItem;
         private int _selectedIndex;
         private bool _checkBoxVisible;
-        private ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> _paths = new ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel>();
+        private ObservableCollection<IExplorerControlViewModel> _paths = new ObservableCollection<IExplorerControlViewModel>();
 
         public bool IsDisposed => _paths == null;
 
-        public ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> Paths => GetIfNotDisposed(_paths);
+        public ObservableCollection<IExplorerControlViewModel> Paths => GetIfNotDisposed(_paths);
 
-        public IExplorerControlBrowsableObjectInfoViewModel SelectedItem { get => _selectedItem; set => UpdateValue(ref _selectedItem, value, nameof(SelectedItem)); }
+        public IExplorerControlViewModel SelectedItem { get => _selectedItem; set => UpdateValue(ref _selectedItem, value, nameof(SelectedItem)); }
 
         public int SelectedIndex { get => _selectedIndex; set => UpdateValue(ref _selectedIndex, value, nameof(SelectedIndex)); }
 
@@ -60,7 +60,7 @@ namespace WinCopies.GUI.IO.ObjectModel
             }
         }
 
-        ICollection<IExplorerControlBrowsableObjectInfoViewModel> IBrowsableObjectInfoCollectionViewModel.Paths => Paths;
+        ICollection<IExplorerControlViewModel> IBrowsableObjectInfoCollectionViewModel.Paths => Paths;
 
         public BrowsableObjectInfoCollectionViewModel() => Paths.CollectionChanged += Paths_CollectionChanged;
 
@@ -82,9 +82,9 @@ namespace WinCopies.GUI.IO.ObjectModel
             return false;
         }
 
-        protected virtual void OnPathAdded(IExplorerControlBrowsableObjectInfoViewModel path) => path.IsCheckBoxVisible = _checkBoxVisible;
+        protected virtual void OnPathAdded(IExplorerControlViewModel path) => path.IsCheckBoxVisible = _checkBoxVisible;
 
-        protected virtual void OnPathRemoved(IExplorerControlBrowsableObjectInfoViewModel path) => path.Dispose();
+        protected virtual void OnPathRemoved(IExplorerControlViewModel path) => path.Dispose();
 
         protected virtual void OnPathCollectionChanged(NotifyCollectionChangedEventArgs e)
         {
@@ -92,18 +92,18 @@ namespace WinCopies.GUI.IO.ObjectModel
 
                 foreach (object item in e.NewItems)
 
-                    OnPathAdded((IExplorerControlBrowsableObjectInfoViewModel)item);
+                    OnPathAdded((IExplorerControlViewModel)item);
 
             if (e.OldItems != null)
 
                 foreach (object item in e.OldItems)
 
-                    OnPathRemoved((IExplorerControlBrowsableObjectInfoViewModel)item);
+                    OnPathRemoved((IExplorerControlViewModel)item);
         }
 
         private void Paths_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => OnPathCollectionChanged(e);
 
-        protected virtual void OnIsCheckBoxVisibleChanged() => Paths.ForEach((in IExplorerControlBrowsableObjectInfoViewModel path) => path.IsCheckBoxVisible = _checkBoxVisible);
+        protected virtual void OnIsCheckBoxVisibleChanged() => Paths.ForEach((in IExplorerControlViewModel path) => path.IsCheckBoxVisible = _checkBoxVisible);
 
         protected T GetIfNotDisposed<T>(in T value) => GetOrThrowIfDisposed(this, value);
 

@@ -112,7 +112,7 @@ namespace WinCopies.GUI.IO.Controls
             RaiseEvent(new ExplorerControlListViewContextMenuRequestedEventArgs(e) );
         }
 
-        public IDragDropProcessInfo GetDragDropProcessInfo() => ((IExplorerControlBrowsableObjectInfoViewModel)DataContext).Path.ProcessFactory.DragDrop;
+        public IDragDropProcessInfo GetDragDropProcessInfo() => ((IExplorerControlViewModel)DataContext).Path.ProcessFactory.DragDrop;
 
         protected virtual DataObject GetDragDropData()
         {

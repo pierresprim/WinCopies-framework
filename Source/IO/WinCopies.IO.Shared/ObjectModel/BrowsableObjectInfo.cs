@@ -273,9 +273,9 @@ namespace WinCopies.IO
             {
                 if (IsMonitoringSupported && !IsMonitoring)
                 {
-                    StartMonitoringOverride();
-
                     IsMonitoring = true;
+
+                    StartMonitoringOverride();
                 }
             }
 

@@ -18,6 +18,7 @@
 using System.Collections.ObjectModel;
 using System.Reflection;
 using System.Windows;
+
 using WinCopies.GUI.IO.Process;
 using WinCopies.GUI.Shell;
 using WinCopies.IO.ObjectModel;

@@ -91,14 +91,14 @@ namespace WinCopies.GUI.Shell.ObjectModel
 
         public static IBrowsableObjectInfo GetBrowsableObjectInfo(string path) => ShellObjectInfo.From(ShellObjectFactory.Create(path));
 
-        public static IExplorerControlBrowsableObjectInfoViewModel GetDefaultExplorerControlBrowsableObjectInfoViewModel(in IBrowsableObjectInfo browsableObjectInfo)
+        public static IExplorerControlViewModel GetDefaultExplorerControlViewModel(in IBrowsableObjectInfo browsableObjectInfo)
         {
-            IExplorerControlBrowsableObjectInfoViewModel viewModel = ExplorerControlBrowsableObjectInfoViewModel.From(new BrowsableObjectInfoViewModel(browsableObjectInfo), GetBrowsableObjectInfo);
+            IExplorerControlViewModel viewModel = ExplorerControlViewModel.From(new BrowsableObjectInfoViewModel(browsableObjectInfo), GetBrowsableObjectInfo);
 
             return viewModel;
         }
 
-        public static IExplorerControlBrowsableObjectInfoViewModel GetDefaultExplorerControlBrowsableObjectInfoViewModel() => GetDefaultExplorerControlBrowsableObjectInfoViewModel(new ShellObjectInfo(KnownFolders.Desktop, ClientVersion));
+        public static IExplorerControlViewModel GetDefaultExplorerControlViewModel() => GetDefaultExplorerControlViewModel(new ShellObjectInfo(KnownFolders.Desktop, ClientVersion));
 
         public static IBrowsableObjectInfoPlugin GetPluginParameters() => new BrowsableObjectInfoPlugin();
     }

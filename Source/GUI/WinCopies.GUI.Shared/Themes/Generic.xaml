@@ -232,229 +232,227 @@
         </Style.Triggers>
     </Style>
 
+    <ControlTemplate x:Key="DialogWindowTemplate" TargetType="{x:Type windows:DialogWindow}">
+        <Grid Background="White">
+            <Grid.RowDefinitions >
+                <RowDefinition />
+                <RowDefinition Height="auto" />
+            </Grid.RowDefinitions>
+            <ContentControl Content="{TemplateBinding Content}" Style="{TemplateBinding ContentDecoratorStyle}" ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}" />
+            <StackPanel Grid.Row="1" Orientation="Horizontal" FlowDirection="{TemplateBinding FlowDirection}" HorizontalAlignment="{Binding FlowDirection, RelativeSource={RelativeSource Mode=TemplatedParent}, Converter={gui:FlowDirectionToHorizontalAlignment}}">
+                <Control Grid.Row="1" HorizontalAlignment="{Binding ButtonAlignment, RelativeSource={RelativeSource Mode=TemplatedParent}, Converter={StaticResource ButtonAlignmentToHorizontalAlignmentConverter}}" Focusable="False" >
+                    <Control.Style>
+                        <Style TargetType="{x:Type Control}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding DialogButton, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="{x:Static guiDialogs:DialogButton.OK}">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate>
+                                                <Button Command="{x:Static commands:DialogCommands.Ok}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.OK}}" />
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </DataTrigger>
+
+                                <DataTrigger Binding="{Binding DialogButton, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="{x:Static guiDialogs:DialogButton.OKCancel}">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate>
+                                                <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type windows:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal">
+                                                    <Button Command="{x:Static commands:DialogCommands.Ok}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.OK}}" />
+                                                    <Button Command="{x:Static commands:DialogCommands.Cancel}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Cancel}}" IsCancel="True" />
+                                                </StackPanel>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </DataTrigger>
+
+                                <DataTrigger Binding="{Binding DialogButton, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="{x:Static guiDialogs:DialogButton.AbortRetryIgnore}">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate>
+                                                <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type windows:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal" >
+                                                    <Button Command="{x:Static commands:DialogCommands.Abort}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Abort}}" />
+                                                    <Button Command="{x:Static commands:DialogCommands.Retry}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Retry}}" />
+                                                    <Button Command="{x:Static commands:DialogCommands.Ignore}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Ignore}}" IsCancel="True" />
+                                                </StackPanel>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </DataTrigger>
+
+                                <DataTrigger Binding="{Binding DialogButton, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="{x:Static guiDialogs:DialogButton.YesNoCancel}">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate>
+                                                <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type windows:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal" >
+                                                    <Button Command="{x:Static commands:DialogCommands.Yes}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Yes}}" IsEnabled="{Binding IsPredicateValid, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                                                    <Button Command="{x:Static commands:DialogCommands.No}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.No}}" />
+                                                    <Button Command="{x:Static commands:DialogCommands.Cancel}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Cancel}}" IsCancel="True" />
+                                                </StackPanel>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </DataTrigger>
+
+                                <DataTrigger Binding="{Binding DialogButton, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="{x:Static guiDialogs:DialogButton.YesNo}">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate>
+                                                <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type windows:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal" >
+                                                    <Button Command="{x:Static commands:DialogCommands.Yes}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Yes}}" IsEnabled="{Binding IsPredicateValid, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                                                    <Button Command="{x:Static commands:DialogCommands.No}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.No}}" />
+                                                </StackPanel>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </DataTrigger>
+
+                                <DataTrigger Binding="{Binding DialogButton, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="{x:Static guiDialogs:DialogButton.RetryCancel}">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate>
+                                                <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type windows:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal" >
+                                                    <Button Command="{x:Static commands:DialogCommands.Retry}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Retry}}" />
+                                                    <Button Command="{x:Static commands:DialogCommands.Cancel}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Cancel}}" IsCancel="True" />
+                                                </StackPanel>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </DataTrigger>
+
+                                <DataTrigger Binding="{Binding DialogButton, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="{x:Static guiDialogs:DialogButton.CancelTryContinue}">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate>
+                                                <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type windows:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal" >
+                                                    <Button Command="{x:Static commands:DialogCommands.Cancel}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Cancel}}" IsCancel="True" />
+                                                    <Button Command="{x:Static commands:DialogCommands.Retry}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Retry}}" />
+                                                    <Button Command="{x:Static commands:DialogCommands.Continue}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Continue}}" />
+                                                </StackPanel>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </DataTrigger>
+
+                                <DataTrigger Binding="{Binding DialogButton, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="{x:Static guiDialogs:DialogButton.ContinueIgnoreCancel}">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate>
+                                                <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type windows:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal" >
+                                                    <Button Command="{x:Static commands:DialogCommands.Continue}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Continue}}" />
+                                                    <Button Command="{x:Static commands:DialogCommands.Ignore}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Ignore}}" />
+                                                    <Button Command="{x:Static commands:DialogCommands.Cancel}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Cancel}}" IsCancel="True" />
+                                                </StackPanel>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </DataTrigger>
+
+                                <DataTrigger Binding="{Binding DialogButton, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="{x:Static guiDialogs:DialogButton.OKApplyCancel}">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate>
+                                                <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type windows:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal" >
+                                                    <Button Command="{x:Static commands:DialogCommands.Ok}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.OK}}" />
+                                                    <Button Command="{x:Static commands:DialogCommands.Apply}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Apply}}" />
+                                                    <Button Command="{x:Static commands:DialogCommands.Cancel}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Cancel}}" IsCancel="True" />
+                                                </StackPanel>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </DataTrigger>
+
+                                <DataTrigger Binding="{Binding DialogButton, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="{x:Static guiDialogs:DialogButton.RetryIgnoreCancel}">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate>
+                                                <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type windows:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal" >
+                                                    <Button Command="{x:Static commands:DialogCommands.Retry}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Retry}}" />
+                                                    <Button Command="{x:Static commands:DialogCommands.Ignore}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Ignore}}" />
+                                                    <Button Command="{x:Static commands:DialogCommands.Cancel}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Cancel}}" IsCancel="True" />
+                                                </StackPanel>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </DataTrigger>
+
+                                <DataTrigger Binding="{Binding DialogButton, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="{x:Static guiDialogs:DialogButton.IgnoreCancel}">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate>
+                                                <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type windows:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal" >
+                                                    <Button Command="{x:Static commands:DialogCommands.Ignore}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Ignore}}" />
+                                                    <Button Command="{x:Static commands:DialogCommands.Cancel}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Cancel}}" IsCancel="True" />
+                                                </StackPanel>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </DataTrigger>
+
+                                <DataTrigger Binding="{Binding DialogButton, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="{x:Static guiDialogs:DialogButton.YesToAllNoToAllCancel}">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate>
+                                                <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type windows:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal" >
+                                                    <Button Command="{x:Static commands:DialogCommands.YesToAll}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.YesToAll}}" />
+                                                    <Button Command="{x:Static commands:DialogCommands.NoToAll}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.NoToAll}}" />
+                                                    <Button Command="{x:Static commands:DialogCommands.Cancel}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Cancel}}" IsCancel="True" />
+                                                </StackPanel>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </DataTrigger>
+
+                                <DataTrigger Binding="{Binding DialogButton, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="{x:Static guiDialogs:DialogButton.YesToAllNoToAll}">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate>
+                                                <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type windows:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal" >
+                                                    <Button Command="{x:Static commands:DialogCommands.YesToAll}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.YesToAll}}" />
+                                                    <Button Command="{x:Static commands:DialogCommands.NoToAll}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.NoToAll}}" />
+                                                </StackPanel>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </DataTrigger>
+
+                                <DataTrigger Binding="{Binding CustomButtonsSource, RelativeSource={RelativeSource Mode=TemplatedParent}, Converter={converters:IsNullConverter}}" Value="false">
+                                    <DataTrigger.Setters>
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="{x:Type Control}" >
+                                                    <ItemsControl x:Name="PART_ItemsControl" ItemsSource="{Binding CustomButtonsSource, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}}" ItemTemplate="{Binding CustomButtonTemplate, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}}" ItemTemplateSelector="{Binding CustomButtonTemplateSelector, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}}">
+                                                        <ItemsControl.Resources>
+                                                            <ResourceDictionary>
+                                                                <ResourceDictionary.MergedDictionaries>
+                                                                    <ResourceDictionary Source="pack://application:,,,/wincopies.gui.templates;component/Themes/Generic.xaml" />
+                                                                </ResourceDictionary.MergedDictionaries>
+                                                            </ResourceDictionary>
+                                                        </ItemsControl.Resources>
+
+                                                        <ItemsControl.ItemsPanel>
+                                                            <ItemsPanelTemplate>
+                                                                <StackPanel Orientation="Horizontal" />
+                                                            </ItemsPanelTemplate>
+                                                        </ItemsControl.ItemsPanel>
+                                                    </ItemsControl>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </DataTrigger.Setters>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Control.Style>
+                </Control>
+                <Button Command="Help" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" Visibility="{Binding ShowHelpButtonAsCommandButton, RelativeSource={RelativeSource TemplatedParent}, Converter={converters:BooleanToVisibilityConverter}}" />
+            </StackPanel>
+        </Grid>
+    </ControlTemplate>
+
     <Style TargetType="{x:Type windows:DialogWindow}" BasedOn="{StaticResource {x:Type windows:Window}}">
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type windows:DialogWindow}">
-                    <Grid Background="White">
-                        <Grid.RowDefinitions >
-                            <RowDefinition />
-                            <RowDefinition Height="auto" />
-                        </Grid.RowDefinitions>
-                        <ContentControl Content="{TemplateBinding Content}" Style="{TemplateBinding ContentDecoratorStyle}" ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}" />
-                        <StackPanel Grid.Row="1" Orientation="Horizontal" FlowDirection="{TemplateBinding FlowDirection}" HorizontalAlignment="{Binding FlowDirection, RelativeSource={RelativeSource Mode=TemplatedParent}, Converter={gui:FlowDirectionToHorizontalAlignment}}">
-                            <Control Grid.Row="1" HorizontalAlignment="{Binding ButtonAlignment, RelativeSource={RelativeSource Mode=TemplatedParent}, Converter={StaticResource ButtonAlignmentToHorizontalAlignmentConverter}}" Focusable="False" >
-                                <Control.Style>
-                                    <Style TargetType="{x:Type Control}">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding DialogButton, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="{x:Static guiDialogs:DialogButton.OK}">
-                                                <Setter Property="Template">
-                                                    <Setter.Value>
-                                                        <ControlTemplate>
-                                                            <Button Command="{x:Static commands:DialogCommands.Ok}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.OK}}" />
-                                                        </ControlTemplate>
-                                                    </Setter.Value>
-                                                </Setter>
-                                            </DataTrigger>
-
-                                            <DataTrigger Binding="{Binding DialogButton, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="{x:Static guiDialogs:DialogButton.OKCancel}">
-                                                <Setter Property="Template">
-                                                    <Setter.Value>
-                                                        <ControlTemplate>
-                                                            <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type windows:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal">
-                                                                <Button Command="{x:Static commands:DialogCommands.Ok}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.OK}}" />
-                                                                <Button Command="{x:Static commands:DialogCommands.Cancel}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Cancel}}" IsCancel="True" />
-                                                            </StackPanel>
-                                                        </ControlTemplate>
-                                                    </Setter.Value>
-                                                </Setter>
-                                            </DataTrigger>
-
-                                            <DataTrigger Binding="{Binding DialogButton, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="{x:Static guiDialogs:DialogButton.AbortRetryIgnore}">
-                                                <Setter Property="Template">
-                                                    <Setter.Value>
-                                                        <ControlTemplate>
-                                                            <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type windows:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal" >
-                                                                <Button Command="{x:Static commands:DialogCommands.Abort}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Abort}}" />
-                                                                <Button Command="{x:Static commands:DialogCommands.Retry}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Retry}}" />
-                                                                <Button Command="{x:Static commands:DialogCommands.Ignore}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Ignore}}" IsCancel="True" />
-                                                            </StackPanel>
-                                                        </ControlTemplate>
-                                                    </Setter.Value>
-                                                </Setter>
-                                            </DataTrigger>
-
-                                            <DataTrigger Binding="{Binding DialogButton, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="{x:Static guiDialogs:DialogButton.YesNoCancel}">
-                                                <Setter Property="Template">
-                                                    <Setter.Value>
-                                                        <ControlTemplate>
-                                                            <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type windows:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal" >
-                                                                <Button Command="{x:Static commands:DialogCommands.Yes}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Yes}}" IsEnabled="{Binding IsPredicateValid, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
-                                                                <Button Command="{x:Static commands:DialogCommands.No}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.No}}" />
-                                                                <Button Command="{x:Static commands:DialogCommands.Cancel}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Cancel}}" IsCancel="True" />
-                                                            </StackPanel>
-                                                        </ControlTemplate>
-                                                    </Setter.Value>
-                                                </Setter>
-                                            </DataTrigger>
-
-                                            <DataTrigger Binding="{Binding DialogButton, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="{x:Static guiDialogs:DialogButton.YesNo}">
-                                                <Setter Property="Template">
-                                                    <Setter.Value>
-                                                        <ControlTemplate>
-                                                            <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type windows:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal" >
-                                                                <Button Command="{x:Static commands:DialogCommands.Yes}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Yes}}" IsEnabled="{Binding IsPredicateValid, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
-                                                                <Button Command="{x:Static commands:DialogCommands.No}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.No}}" />
-                                                            </StackPanel>
-                                                        </ControlTemplate>
-                                                    </Setter.Value>
-                                                </Setter>
-                                            </DataTrigger>
-
-                                            <DataTrigger Binding="{Binding DialogButton, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="{x:Static guiDialogs:DialogButton.RetryCancel}">
-                                                <Setter Property="Template">
-                                                    <Setter.Value>
-                                                        <ControlTemplate>
-                                                            <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type windows:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal" >
-                                                                <Button Command="{x:Static commands:DialogCommands.Retry}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Retry}}" />
-                                                                <Button Command="{x:Static commands:DialogCommands.Cancel}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Cancel}}" IsCancel="True" />
-                                                            </StackPanel>
-                                                        </ControlTemplate>
-                                                    </Setter.Value>
-                                                </Setter>
-                                            </DataTrigger>
-
-                                            <DataTrigger Binding="{Binding DialogButton, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="{x:Static guiDialogs:DialogButton.CancelTryContinue}">
-                                                <Setter Property="Template">
-                                                    <Setter.Value>
-                                                        <ControlTemplate>
-                                                            <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type windows:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal" >
-                                                                <Button Command="{x:Static commands:DialogCommands.Cancel}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Cancel}}" IsCancel="True" />
-                                                                <Button Command="{x:Static commands:DialogCommands.Retry}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Retry}}" />
-                                                                <Button Command="{x:Static commands:DialogCommands.Continue}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Continue}}" />
-                                                            </StackPanel>
-                                                        </ControlTemplate>
-                                                    </Setter.Value>
-                                                </Setter>
-                                            </DataTrigger>
-
-                                            <DataTrigger Binding="{Binding DialogButton, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="{x:Static guiDialogs:DialogButton.ContinueIgnoreCancel}">
-                                                <Setter Property="Template">
-                                                    <Setter.Value>
-                                                        <ControlTemplate>
-                                                            <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type windows:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal" >
-                                                                <Button Command="{x:Static commands:DialogCommands.Continue}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Continue}}" />
-                                                                <Button Command="{x:Static commands:DialogCommands.Ignore}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Ignore}}" />
-                                                                <Button Command="{x:Static commands:DialogCommands.Cancel}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Cancel}}" IsCancel="True" />
-                                                            </StackPanel>
-                                                        </ControlTemplate>
-                                                    </Setter.Value>
-                                                </Setter>
-                                            </DataTrigger>
-
-                                            <DataTrigger Binding="{Binding DialogButton, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="{x:Static guiDialogs:DialogButton.OKApplyCancel}">
-                                                <Setter Property="Template">
-                                                    <Setter.Value>
-                                                        <ControlTemplate>
-                                                            <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type windows:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal" >
-                                                                <Button Command="{x:Static commands:DialogCommands.Ok}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.OK}}" />
-                                                                <Button Command="{x:Static commands:DialogCommands.Apply}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Apply}}" />
-                                                                <Button Command="{x:Static commands:DialogCommands.Cancel}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Cancel}}" IsCancel="True" />
-                                                            </StackPanel>
-                                                        </ControlTemplate>
-                                                    </Setter.Value>
-                                                </Setter>
-                                            </DataTrigger>
-
-                                            <DataTrigger Binding="{Binding DialogButton, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="{x:Static guiDialogs:DialogButton.RetryIgnoreCancel}">
-                                                <Setter Property="Template">
-                                                    <Setter.Value>
-                                                        <ControlTemplate>
-                                                            <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type windows:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal" >
-                                                                <Button Command="{x:Static commands:DialogCommands.Retry}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Retry}}" />
-                                                                <Button Command="{x:Static commands:DialogCommands.Ignore}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Ignore}}" />
-                                                                <Button Command="{x:Static commands:DialogCommands.Cancel}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Cancel}}" IsCancel="True" />
-                                                            </StackPanel>
-                                                        </ControlTemplate>
-                                                    </Setter.Value>
-                                                </Setter>
-                                            </DataTrigger>
-
-                                            <DataTrigger Binding="{Binding DialogButton, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="{x:Static guiDialogs:DialogButton.IgnoreCancel}">
-                                                <Setter Property="Template">
-                                                    <Setter.Value>
-                                                        <ControlTemplate>
-                                                            <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type windows:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal" >
-                                                                <Button Command="{x:Static commands:DialogCommands.Ignore}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Ignore}}" />
-                                                                <Button Command="{x:Static commands:DialogCommands.Cancel}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Cancel}}" IsCancel="True" />
-                                                            </StackPanel>
-                                                        </ControlTemplate>
-                                                    </Setter.Value>
-                                                </Setter>
-                                            </DataTrigger>
-
-                                            <DataTrigger Binding="{Binding DialogButton, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="{x:Static guiDialogs:DialogButton.YesToAllNoToAllCancel}">
-                                                <Setter Property="Template">
-                                                    <Setter.Value>
-                                                        <ControlTemplate>
-                                                            <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type windows:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal" >
-                                                                <Button Command="{x:Static commands:DialogCommands.YesToAll}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.YesToAll}}" />
-                                                                <Button Command="{x:Static commands:DialogCommands.NoToAll}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.NoToAll}}" />
-                                                                <Button Command="{x:Static commands:DialogCommands.Cancel}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.Cancel}}" IsCancel="True" />
-                                                            </StackPanel>
-                                                        </ControlTemplate>
-                                                    </Setter.Value>
-                                                </Setter>
-                                            </DataTrigger>
-
-                                            <DataTrigger Binding="{Binding DialogButton, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="{x:Static guiDialogs:DialogButton.YesToAllNoToAll}">
-                                                <Setter Property="Template">
-                                                    <Setter.Value>
-                                                        <ControlTemplate>
-                                                            <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type windows:DialogWindow}, Mode=FindAncestor}}" Orientation="Horizontal" >
-                                                                <Button Command="{x:Static commands:DialogCommands.YesToAll}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.YesToAll}}" />
-                                                                <Button Command="{x:Static commands:DialogCommands.NoToAll}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.NoToAll}}" />
-                                                            </StackPanel>
-                                                        </ControlTemplate>
-                                                    </Setter.Value>
-                                                </Setter>
-                                            </DataTrigger>
-
-                                            <DataTrigger Binding="{Binding CustomButtonsSource, RelativeSource={RelativeSource Mode=TemplatedParent}, Converter={converters:IsNullConverter}}" Value="false">
-                                                <DataTrigger.Setters>
-                                                    <Setter Property="Template">
-                                                        <Setter.Value>
-                                                            <ControlTemplate TargetType="{x:Type Control}" >
-                                                                <ItemsControl x:Name="PART_ItemsControl" ItemsSource="{Binding CustomButtonsSource, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}}" ItemTemplate="{Binding CustomButtonTemplate, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}}" ItemTemplateSelector="{Binding CustomButtonTemplateSelector, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type windows:DialogWindow}}}">
-                                                                    <ItemsControl.Resources>
-                                                                        <ResourceDictionary>
-                                                                            <ResourceDictionary.MergedDictionaries>
-                                                                                <ResourceDictionary Source="pack://application:,,,/wincopies.gui.templates;component/Themes/Generic.xaml" />
-                                                                            </ResourceDictionary.MergedDictionaries>
-                                                                        </ResourceDictionary>
-                                                                    </ItemsControl.Resources>
-
-                                                                    <ItemsControl.ItemsPanel>
-                                                                        <ItemsPanelTemplate>
-                                                                            <StackPanel Orientation="Horizontal" />
-                                                                        </ItemsPanelTemplate>
-                                                                    </ItemsControl.ItemsPanel>
-                                                                </ItemsControl>
-                                                            </ControlTemplate>
-                                                        </Setter.Value>
-                                                    </Setter>
-                                                </DataTrigger.Setters>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Control.Style>
-                            </Control>
-                            <Button Command="Help" Content="{Binding Command.Text, RelativeSource={RelativeSource Self}}" Visibility="{Binding ShowHelpButtonAsCommandButton, RelativeSource={RelativeSource TemplatedParent}, Converter={converters:BooleanToVisibilityConverter}}" />
-                        </StackPanel>
-                    </Grid>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
+        <Setter Property="Template" Value="{StaticResource DialogWindowTemplate}" />
     </Style>
 
     <ControlTemplate x:Key="InputBoxTemplate.Horizontal" TargetType="{x:Type ContentControl}">

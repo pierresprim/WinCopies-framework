@@ -21,14 +21,12 @@
     <Compile Include="$(MSBuildThisFileDirectory)Windows\BrowsableObjectInfoWindow.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModels\ExplorerControlBrowsableObjectInfoViewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\BrowsableObjectInfoWindowMenuItem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Windows\FileSystemDialogBox.cs" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="$(MSBuildThisFileDirectory)Themes\Generic.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="$(MSBuildThisFileDirectory)Windows\" />
   </ItemGroup>
 </Project>

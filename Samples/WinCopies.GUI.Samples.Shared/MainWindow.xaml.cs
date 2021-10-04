@@ -162,5 +162,27 @@ namespace WinCopies.GUI.Samples
         private void MenuItem_Click(object sender, RoutedEventArgs e) => new Window1().Show();
 
         private void MenuItem_Click_1(object sender, RoutedEventArgs e) => new ExplorerControlWindow /*ExplorerControlTest*/().Show();
+
+        private void MenuItem_Click_2(object sender, RoutedEventArgs e)
+        {
+            var dialog = new Shell.FileSystemDialogBox(Shell.FileSystemDialogBoxMode.OpenFile, true) { };
+
+            bool? result = dialog.ShowDialog();
+
+            switch (dialog.MessageBoxResult)
+            {
+                case Windows.MessageBoxResult.OK:
+
+                    _ = MessageBox.Show($"You've selected: {dialog.Path.Path.Path}");
+
+                    break;
+
+                case Windows.MessageBoxResult.Cancel:
+
+                    _ = MessageBox.Show($"You've canceled the path selection.");
+
+                    break;
+            }
+        }
     }
 }

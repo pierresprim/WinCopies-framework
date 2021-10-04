@@ -39,6 +39,41 @@
             Gets or sets the placeholder for the text box. This is a dependency property.
             </summary>
         </member>
+        <member name="P:WinCopies.GUI.Windows.DialogWindowBase.MessageBoxResult">
+            <summary>
+            Gets the <see cref="T:WinCopies.GUI.Windows.MessageBoxResult"/>.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.DialogWindowBase.CommandProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Windows.DialogWindowBase.Command"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.DialogWindowBase.Command">
+            <summary>
+            Gets or sets the command that will be executed when the command source is invoked.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.DialogWindowBase.CommandParameterProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Windows.DialogWindowBase.CommandParameter"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.DialogWindowBase.CommandParameter">
+            <summary>
+            Gets or sets a value that represents a user defined data value that can be passed to the command when it is executed.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.DialogWindowBase.CommandTargetProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Windows.DialogWindowBase.CommandTarget"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.DialogWindowBase.CommandTarget">
+            <summary>
+            Gets or sets a value that represents the object that the command is being executed on.
+            </summary>
+        </member>
         <member name="T:WinCopies.GUI.Windows.DialogWindow">
             <summary>
             Represents a common dialog window for WPF.
@@ -51,7 +86,7 @@
         </member>
         <member name="P:WinCopies.GUI.Windows.DialogWindow.DialogButton">
             <summary>
-            Gets or sets the <see cref="T:WinCopies.GUI.Windows.DialogButton"/>. <see cref="P:WinCopies.GUI.Windows.DialogWindow.Command"/> will not be executed if this property is set to <see cref="F:WinCopies.GUI.Windows.DialogButton.OK"/>, or if the user clicks on one of the following buttons: Cancel, Ignore, Abort. This is a dependency property.
+            Gets or sets the <see cref="T:WinCopies.GUI.Windows.DialogButton"/>. <see cref="!:Command"/> will not be executed if this property is set to <see cref="F:WinCopies.GUI.Windows.DialogButton.OK"/>, or if the user clicks on one of the following buttons: Cancel, Ignore, Abort. This is a dependency property.
             </summary>
         </member>
         <member name="F:WinCopies.GUI.Windows.DialogWindow.ButtonAlignmentProperty">
@@ -87,41 +122,6 @@
         <member name="F:WinCopies.GUI.Windows.DialogWindow.ShowHelpButtonAsCommandButtonProperty">
             <summary>
             Identifies the <see cref="P:WinCopies.GUI.Windows.DialogWindow.ShowHelpButtonAsCommandButton"/> dependency property.
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Windows.DialogWindow.MessageBoxResult">
-            <summary>
-            Gets the <see cref="T:WinCopies.GUI.Windows.MessageBoxResult"/>.
-            </summary>
-        </member>
-        <member name="F:WinCopies.GUI.Windows.DialogWindow.CommandProperty">
-            <summary>
-            Identifies the <see cref="P:WinCopies.GUI.Windows.DialogWindow.Command"/> dependency property.
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Windows.DialogWindow.Command">
-            <summary>
-            Gets or sets the command that will be executed when the command source is invoked.
-            </summary>
-        </member>
-        <member name="F:WinCopies.GUI.Windows.DialogWindow.CommandParameterProperty">
-            <summary>
-            Identifies the <see cref="P:WinCopies.GUI.Windows.DialogWindow.CommandParameter"/> dependency property.
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Windows.DialogWindow.CommandParameter">
-            <summary>
-            Gets or sets a value that represents a user defined data value that can be passed to the command when it is executed.
-            </summary>
-        </member>
-        <member name="F:WinCopies.GUI.Windows.DialogWindow.CommandTargetProperty">
-            <summary>
-            Identifies the <see cref="P:WinCopies.GUI.Windows.DialogWindow.CommandTarget"/> dependency property.
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Windows.DialogWindow.CommandTarget">
-            <summary>
-            Gets or sets a value that represents the object that the command is being executed on.
             </summary>
         </member>
         <member name="F:WinCopies.GUI.Windows.Window.HelpButtonProperty">
