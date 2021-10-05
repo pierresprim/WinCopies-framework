@@ -58,12 +58,11 @@ namespace WinCopies.GUI.IO.ObjectModel
 
     public partial class BrowsableObjectInfoViewModel : ViewModel<IBrowsableObjectInfo>, IBrowsableObjectInfoViewModel
     {
-
         #region Private fields
         private Selection _selection = Selection.GetInstance();
-        private Browsability _browsability = new
+        private _Browsability _browsability = new
 #if !CS9
-            Browsability
+            _Browsability
 #endif
             ();
         private IBrowsableObjectInfoFactory _factory;
@@ -88,15 +87,20 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         public Predicate<IBrowsableObjectInfo> Filter
         {
-            get => _filter;
+            get => _browsability._items._itemManagement._filter;
 
             set
             {
-                if (UpdateValue(ref _filter, value))
-                {
-                    _filter = GetIfNotDisposed(value);
+                ThrowIfDisposed();
 
-                    if (_items != null)
+                ref _Browsability.Items items = ref _browsability._items;
+                ref Predicate<IBrowsableObjectInfo> filter = ref items._itemManagement._filter;
+
+                if (UpdateValue(ref filter, value))
+                {
+                    filter = GetIfNotDisposed(value);
+
+                    if (items._items != null)
 
                         UpdatePredicate();
 
@@ -105,7 +109,7 @@ namespace WinCopies.GUI.IO.ObjectModel
             }
         }
 
-        public IBrowsableObjectInfoFactory Factory { get => _factory; set { _factory = GetIfNotDisposed(value); OnPropertyChanged(nameof(Factory)); } }
+        public IBrowsableObjectInfoFactory Factory { get => _factory; set => UpdateValue2(ref _factory, value, nameof(Factory)); }
 
         public bool IsSpecialItem => ModelGeneric.IsSpecialItem;
 
@@ -132,7 +136,7 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         public bool HasTransparency => ModelGeneric.IsSpecialItem;
 
-        public Comparison<IBrowsableObjectInfo> SortComparison { get => _sortComparison; set => UpdateValue(ref _sortComparison, value, nameof(SortComparison)); }
+        public Comparison<IBrowsableObjectInfo> SortComparison { get => _browsability._items._itemManagement._sortComparison; set => UpdateValue2(ref _browsability._items._itemManagement._sortComparison, value, nameof(SortComparison)); }
 
         public ObservableCollection<IBrowsableObjectInfoViewModel> Items
         {
@@ -140,7 +144,7 @@ namespace WinCopies.GUI.IO.ObjectModel
             {
                 LoadItems();
 
-                return _items;
+                return _browsability._items._items;
             }
         }
 
@@ -150,7 +154,13 @@ namespace WinCopies.GUI.IO.ObjectModel
         {
             get
             {
-                if (_parentLoaded)
+                ThrowIfDisposed();
+
+                ref _Browsability.Parent parent = ref _browsability._parent;
+                ref bool parentLoaded = ref parent._parentLoaded;
+                ref IBrowsableObjectInfoViewModel _parent = ref parent._parent;
+
+                if (parentLoaded)
 
                     return _parent;
 
@@ -158,7 +168,7 @@ namespace WinCopies.GUI.IO.ObjectModel
 
                     _parent = new BrowsableObjectInfoViewModel(ModelGeneric.Parent) { SortComparison = SortComparison, Factory = Factory };
 
-                _parentLoaded = true;
+                parentLoaded = true;
 
                 return _parent;
             }
@@ -179,7 +189,7 @@ namespace WinCopies.GUI.IO.ObjectModel
         /// </summary>
         public string Name => ModelGeneric.Name;
 
-        public bool IsSelected { get => _isSelected; set { _isSelected = value; OnPropertyChanged(nameof(IsSelected)); } }
+        public bool IsSelected { get => _selection._isSelected; set => UpdateValue2(ref _selection._isSelected, value, nameof(IsSelected)); }
 
         public ClientVersion? ClientVersion => ModelGeneric.ClientVersion;
 
@@ -192,9 +202,9 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         ClientVersion IBrowsableObjectInfo.ClientVersion => ModelGeneric.ClientVersion;
 
-        public int SelectedIndex { get => _selectedIndex; set { _selectedIndex = value; OnPropertyChanged(nameof(SelectedIndex)); } }
+        public int SelectedIndex { get => _selection._selectedIndex; set => UpdateValue2(ref _selection._selectedIndex, value, nameof(SelectedIndex)); }
 
-        public IBrowsableObjectInfo SelectedItem { get => _selectedItem; set { _selectedItem = value; OnPropertyChanged(nameof(SelectedItem)); } }
+        public IBrowsableObjectInfo SelectedItem { get => _selection._selectedItem; set => UpdateValue2(ref _selection._selectedItem, value, nameof(SelectedItem)); }
 
         public System.Collections.Generic.IEnumerable<IBrowsabilityPath> BrowsabilityPaths => ModelGeneric.BrowsabilityPaths;
 
@@ -212,13 +222,17 @@ namespace WinCopies.GUI.IO.ObjectModel
         #region Methods
         protected T GetIfNotDisposed<T>(in T value) => GetOrThrowIfDisposed(this, value);
 
+        protected void ThrowIfDisposed() => ThrowHelper.ThrowIfDisposed(this);
+
         protected bool UpdateValue<T>(ref T value, in T newValue) => UtilHelpers.UpdateValue(ref value, GetIfNotDisposed(newValue));
 
-        protected bool UpdateValue<T>(ref T value, in T newValue, in string propertyName)
+        protected bool UpdateValue2<T>(ref T value, in T newValue, in string propertyName)
         {
             bool result = UpdateValue(ref value, newValue);
 
-            OnPropertyChanged(propertyName);
+            if (result)
+
+                OnPropertyChanged(propertyName);
 
             return result;
         }
@@ -227,15 +241,24 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         private void UpdatePredicate()
         {
-            System.ComponentModel.ICollectionView items = CollectionViewSource.GetDefaultView(_items);
+            ref _Browsability.Items _items = ref _browsability._items;
+            ref _Browsability.Items.ItemManagement itemManagement = ref _items._itemManagement;
+            ref System.ComponentModel.ICollectionView collectionView = ref itemManagement._collectionView;
 
-            if (_filter == null)
+            if (collectionView == null)
 
-                items.Filter = null;
+                collectionView = CollectionViewSource.GetDefaultView(_items._items);
+
+            if (itemManagement._filter == null)
+            {
+                collectionView.Filter = null;
+
+                collectionView = null;
+            }
 
             else
 
-                items.Filter = Predicate;
+                collectionView.Filter = Predicate;
         }
 
         public void Sort(in List<IBrowsableObjectInfoViewModel> list)
@@ -249,11 +272,19 @@ namespace WinCopies.GUI.IO.ObjectModel
                 list.Sort(SortComparison);
         }
 
-        public void LoadItems()
+        private ref _Browsability.Items LoadItems2()
         {
-            if (GetIfNotDisposed(_itemsLoaded))
+            ThrowIfDisposed();
 
-                return;
+            ref _Browsability.Items items = ref _browsability._items;
+            ref bool itemsLoaded = ref items._itemsLoaded;
+            ref ObservableCollection<IBrowsableObjectInfoViewModel> _items = ref items._items;
+            ref _Browsability.Items.ItemManagement itemManagement = ref items._itemManagement;
+            ref System.ComponentModel.ICollectionView collectionView = ref itemManagement._collectionView;
+
+            if (itemsLoaded)
+
+                return ref items;
 
             if (ModelGeneric.IsBrowsable())
             {
@@ -288,38 +319,61 @@ namespace WinCopies.GUI.IO.ObjectModel
 
                 finally
                 {
-                    _itemsLoaded = true;
+                    itemsLoaded = true;
                 }
 
                 if (changed)
                 {
-                    if (_filter != null)
-                    {
+                    ref Predicate<IBrowsableObjectInfo> filter = ref itemManagement._filter;
 
-                    }
+                    collectionView = CollectionViewSource.GetDefaultView(items._items);
+
+                    if (filter == null)
+
+                        collectionView.Filter = null;
+
+                    else
+
+                        collectionView.Filter = Predicate;
 
                     OnPropertyChanged(nameof(Items));
                 }
             }
+
+            return ref items;
         }
+
+        public void LoadItems() => LoadItems2();
 
         public void UpdateItems()
         {
-            LoadItems();
+            ref _Browsability.Items _items = ref LoadItems2();
+            ref ObservableCollection<IBrowsableObjectInfoViewModel> items = ref _items._items;
+            ref var collectionView = ref _items._itemManagement._collectionView;
 
-            var list = new List<IBrowsableObjectInfoViewModel>(_items.Count);
+            var list = new List<IBrowsableObjectInfoViewModel>(items.Count);
 
-            foreach (var item in _items)
+            foreach (var item in items)
 
                 list.Add(item);
 
-            _items.Clear();
+            items.Clear();
 
             Sort(list);
 
-            CollectionViewSource.GetDefaultView(_items)
+            collectionView.Filter = null;
 
-            _items = new ObservableCollection<IBrowsableObjectInfoViewModel>(list);
+            collectionView = CollectionViewSource.GetDefaultView(items);
+
+            if (Filter == null)
+
+                collectionView.Filter = null;
+
+            else
+
+                collectionView.Filter = Predicate;
+
+            items = new ObservableCollection<IBrowsableObjectInfoViewModel>(list);
 
             OnPropertyChanged(nameof(Items));
         }

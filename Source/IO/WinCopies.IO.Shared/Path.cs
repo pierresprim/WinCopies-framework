@@ -28,24 +28,18 @@
 //using IfCM = WinCopies.Util.Util.ComparisonMode;
 //using IfComp = WinCopies.Util.Util.Comparison;
 
-using Microsoft.Win32;
-
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Collections.Specialized;
 using System.Globalization;
+using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 
 using WinCopies.Collections;
-using WinCopies.Linq;
-using System.IO;
-using System.Collections.Specialized;
 using WinCopies.Collections.Generic;
-using WinCopies.IO.ObjectModel;
-using Microsoft.WindowsAPICodePack.Shell;
+using WinCopies.Linq;
 
 #if !WinCopies3
 using WinCopies.Util;
@@ -53,7 +47,6 @@ using WinCopies.Util;
 using static WinCopies.Util.Util;
 #else
 using static WinCopies.UtilHelpers;
-
 using static WinCopies.ThrowHelper;
 #endif
 
@@ -651,13 +644,15 @@ namespace WinCopies.IO
 
         //        }
 
+        public static bool Match(in string name, in string filter) => Regex.IsMatch(name, Temp.Regex.FromPathFilter(filter), RegexOptions.IgnoreCase);
+
         public static StringCollection GetStringCollection(in System.Collections.Generic.IEnumerable<string> paths)
         {
             var arrayBuilder = new ArrayBuilder<string>();
 
             foreach (var item in paths)
 
-                    _ = arrayBuilder.AddLast(item);
+                _ = arrayBuilder.AddLast(item);
 
             var sc = new StringCollection();
 

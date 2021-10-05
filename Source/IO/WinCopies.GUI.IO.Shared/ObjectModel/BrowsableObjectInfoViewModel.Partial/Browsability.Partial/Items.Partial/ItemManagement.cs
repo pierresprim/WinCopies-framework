@@ -5,7 +5,7 @@ namespace WinCopies.GUI.IO.ObjectModel
 {
     public partial class BrowsableObjectInfoViewModel
     {
-        private partial struct Browsability
+        private partial struct _Browsability
         {
             public partial struct Items
             {
@@ -13,6 +13,7 @@ namespace WinCopies.GUI.IO.ObjectModel
                 {
                     public Predicate<IBrowsableObjectInfo> _filter;
                     public Comparison<IBrowsableObjectInfo> _sortComparison;
+                    public System.ComponentModel.ICollectionView _collectionView;
                 }
             }
         }

@@ -25,6 +25,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)FileSystemEntryEnumeratorProcessSimulation.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enumeration\Reflection\DotNetEnumeration.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enumeration\RegistryItemInfoEnumeratorStruct.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Guids.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Icons.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\IArchiveItemInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\IArchiveItemInfoProvider.cs" />

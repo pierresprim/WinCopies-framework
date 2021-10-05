@@ -16,7 +16,6 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using System;
-using System.Collections.Generic;
 
 using static WinCopies.
 #if !WinCopies3

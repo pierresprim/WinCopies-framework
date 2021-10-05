@@ -16,11 +16,81 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 #if DEBUG
+using System;
+using System.Text;
+
 namespace WinCopies.Temp
 {
+    public static class Regex
+    {
+        public const string LikeSnippet = ".*?";
+
+        public static string FromPattern(in string filter, in char c, in string pattern) => filter == null
+                ? ""
+                : $"^{filter.Format(c, value => System.Text.RegularExpressions.Regex.Escape(value)).Replace(c.ToString(), pattern)}$";
+
+        public static string FromPathFilter(in string filter) => FromPattern(filter, Temp.PathFilterChar, LikeSnippet);
+
+        public static string FromLikeStatement(in string filter) => FromPattern(filter, Temp.LikeStatementChar, LikeSnippet);
+    }
+
     public static class Temp
     {
-        
+        public const char PathFilterChar = '*';
+        public const char LikeStatementChar = '%';
+
+        public static string Format(this string value, in char except, in Func<string, string> func)
+        {
+            string[] split = value.Split(except);
+
+            for (int i = 0; i < split.Length; i++)
+
+                split[i] = func(split[i]);
+
+            var result = new StringBuilder();
+
+            return result.AppendJoin(except, split).ToString();
+        }
+
+        public static T First<T>(this System.Collections.Generic.IReadOnlyList<T> list) => list[0];
+
+        public static T Last<T>(this System.Collections.Generic.IReadOnlyList<T> list) => list[list.Count - 1];
+
+#if !CS8
+        public static StringBuilder AppendJoin(this StringBuilder stringBuilder, in string s, in System.Collections.Generic.IEnumerable<string> values)
+        {
+            if (values is System.Collections.Generic.IReadOnlyList<string> collection)
+
+                return stringBuilder.AppendJoin(s, collection);
+
+            foreach (string value in values)
+
+                _ = stringBuilder.Append(value).Append(s);
+
+            _ = stringBuilder.Remove(stringBuilder.Length - s.Length, s.Length);
+
+            return stringBuilder;
+        }
+
+        public static StringBuilder AppendJoin(this StringBuilder stringBuilder, in char c, in System.Collections.Generic.IEnumerable<string> values) => stringBuilder.AppendJoin(c.ToString(), values);
+
+        public static StringBuilder AppendJoin(this StringBuilder stringBuilder, in char c, in System.Collections.Generic.IReadOnlyList<string> values) => stringBuilder.AppendJoin(c.ToString(), values);
+
+        public static StringBuilder AppendJoin(this StringBuilder stringBuilder, in string s, in System.Collections.Generic.IReadOnlyList<string> values)
+        {
+            for (int i = 0; i < values.Count - 1; i++)
+
+                _ = stringBuilder.Append(values[i]).Append(s);
+
+            _ = stringBuilder.Append(values.Last());
+
+            return stringBuilder;
+        }
+
+        public static StringBuilder AppendJoin(this StringBuilder stringBuilder, in char c, params string[] values) => stringBuilder.AppendJoin(c.ToString(), values);
+
+        public static StringBuilder AppendJoin(this StringBuilder stringBuilder, in string s, params string[] values) => stringBuilder.AppendJoin(s, (System.Collections.Generic.IReadOnlyList<string>)values);
+#endif
     }
 }
 

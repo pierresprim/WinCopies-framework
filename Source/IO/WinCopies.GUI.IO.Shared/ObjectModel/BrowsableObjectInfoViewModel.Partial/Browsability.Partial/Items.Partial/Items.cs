@@ -4,12 +4,13 @@ namespace WinCopies.GUI.IO.ObjectModel
 {
     public partial class BrowsableObjectInfoViewModel
     {
-        private partial struct Browsability
+        private partial struct _Browsability
         {
             public partial struct Items
             {
-                private ObservableCollection<IBrowsableObjectInfoViewModel> _items;
-                private bool _itemsLoaded;
+                public ObservableCollection<IBrowsableObjectInfoViewModel> _items;
+                public bool _itemsLoaded;
+                public ItemManagement _itemManagement;
             }
         }
     }

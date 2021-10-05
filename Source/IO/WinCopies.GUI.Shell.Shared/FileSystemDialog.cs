@@ -2,6 +2,7 @@
 
 using WinCopies.GUI.IO.ObjectModel;
 using WinCopies.IO.ObjectModel;
+using WinCopies.Util.Data;
 
 using static WinCopies.ThrowHelper;
 
@@ -9,7 +10,9 @@ namespace WinCopies.GUI.Shell
 {
     public interface IFileSystemDialog
     {
-        System.Collections.Generic.IEnumerable<string> Filter { get; set; }
+        System.Collections.Generic.IEnumerable<INamedObject<string>> Filters { get; set; }
+
+        INamedObject<string> SelectedFilter { get; set; }
 
         Predicate<IBrowsableObjectInfo> Predicate { get; set; }
 
@@ -24,7 +27,9 @@ namespace WinCopies.GUI.Shell
     {
         private IExplorerControlViewModel _path;
 
-        public System.Collections.Generic.IEnumerable<string> Filter { get; set; }
+        public System.Collections.Generic.IEnumerable<INamedObject<string>> Filters { get; set; }
+
+        public INamedObject<string> SelectedFilter { get; set; }
 
         public Predicate<IBrowsableObjectInfo> Predicate { get; set; }
 

@@ -27,8 +27,10 @@ CHANGELOG
 				- Start/StopMonitoring
 	- BrowsableObjectInfoViewModel:
 		- add Filter property and new methods
-		- an exception is thrown when attempting to update some properties when the object is disposed.
+		- an exception is thrown when attempting to get or set some properties when the object is disposed.
 - Add DialogWindowBase class. Some items of DialogWindow have been moved to this new class.
+- Move IO Guids to WinCopies.IO.Guids.Shell namespace (WinCopies.IO.Shell assembly).
+- Add WinCopies.IO.Path.Match method.
 
 ### 3.11-preview
 

@@ -2,7 +2,7 @@
 {
     public partial class BrowsableObjectInfoViewModel
     {
-        private partial struct Browsability
+        private partial struct _Browsability
         {
             public struct Parent
             {

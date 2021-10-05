@@ -167,7 +167,7 @@ namespace WinCopies.GUI.Samples
         {
             var dialog = new Shell.FileSystemDialogBox(Shell.FileSystemDialogBoxMode.OpenFile, true) { };
 
-            bool? result = dialog.ShowDialog();
+            _ = dialog.ShowDialog();
 
             switch (dialog.MessageBoxResult)
             {
