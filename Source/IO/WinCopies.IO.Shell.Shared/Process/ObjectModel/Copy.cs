@@ -119,7 +119,7 @@ namespace WinCopies.IO.Process
 
     namespace ObjectModel
     {
-        [ProcessGuid(Guids.Process.Shell.Copy)]
+        [ProcessGuid(Guids.Shell.Process.Shell.Copy)]
         public class Copy<T> : ProcessObjectModelTypes<IPathInfo, IPathInfo, T, ProcessError, CopyErrorAction, ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessDelegates<ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessEventDelegates>, ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessEventDelegates, IProcessProgressDelegateParameter>.DefaultProcesses<CopyOptions<IPathInfo>>.DefaultDestinationProcess2 where T : ProcessErrorTypes<IPathInfo, ProcessError, CopyErrorAction>.IProcessErrorFactories
         {
             #region Types
@@ -163,7 +163,7 @@ namespace WinCopies.IO.Process
             private Func<Shell.PathInfo, string, bool> _directoryDoWork;
 
             #region Properties
-            public override string Guid => Guids.Process.Shell.Copy;
+            public override string Guid => Guids.Shell.Process.Shell.Copy;
 
             public override string Name => Options.Move ? Shell.Properties.Resources.Move : Shell.Properties.Resources.Copy;
 

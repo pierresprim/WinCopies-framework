@@ -45,7 +45,7 @@ namespace WinCopies.IO
 {
     public partial class ShellObjectInfoProcessFactory
     {
-        public static IProcessParameters GetCopyProcessParameters(in string sourcePath, in string destPath, in bool move, in System.Collections.Generic.IEnumerable<string> paths) => ShellObjectInfoProcessFactory.GetProcessParameters(Guids.Process.Shell.Copy, sourcePath, destPath, move, paths);
+        public static IProcessParameters GetCopyProcessParameters(in string sourcePath, in string destPath, in bool move, in System.Collections.Generic.IEnumerable<string> paths) => GetProcessParameters(Guids.Shell.Process.Shell.Copy, sourcePath, destPath, move, paths);
 
         public static class ProcessFactoryTypes<T> where T : IShellObjectInfoBase2
         {
@@ -199,12 +199,12 @@ namespace WinCopies.IO
                                 return true;
                             };
 
-                            return new Enumerable<string>(() => enumerator).ForEachANDALSO(predicate) ? ShellObjectInfoProcessFactory.GetProcessParameters(Guids.Process.Shell.Deletion, sourcePath, RemoveOption, _paths) : null;
+                            return new Enumerable<string>(() => enumerator).ForEachANDALSO(predicate) ? ShellObjectInfoProcessFactory.GetProcessParameters(Guids.Shell.Process.Shell.Deletion, sourcePath, RemoveOption, _paths) : null;
                         }
 
                         else if (RemoveOption == RemoveOption.Clear)
 
-                            return ShellObjectInfoProcessFactory.GetProcessParameters(Guids.Process.Shell.Deletion, ShellObjectFactory.Create(RecycleBin.ParsingName).Properties.System.ItemName.Value, RemoveOption, new CustomEnumeratorEnumerable<string, EmptyEnumerator<string>>(new EmptyEnumerator<string>()));
+                            return ShellObjectInfoProcessFactory.GetProcessParameters(Guids.Shell.Process.Shell.Deletion, ShellObjectFactory.Create(RecycleBin.ParsingName).Properties.System.ItemName.Value, RemoveOption, new CustomEnumeratorEnumerable<string, EmptyEnumerator<string>>(new EmptyEnumerator<string>()));
                     }
 
                     return null;

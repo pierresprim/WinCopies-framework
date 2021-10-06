@@ -37,6 +37,7 @@ using WinCopies.Commands;
 using WinCopies.GUI.Controls;
 using WinCopies.GUI.Controls.Models;
 using WinCopies.GUI.Controls.ViewModels;
+using WinCopies.GUI.IO.ObjectModel;
 using WinCopies.GUI.Windows;
 using WinCopies.IO;
 using WinCopies.IO.ObjectModel;
@@ -48,7 +49,7 @@ using WinCopies.Util.Data;
 using static WinCopies.GUI.IO.Properties.Resources;
 using static WinCopies.ThrowHelper;
 
-namespace WinCopies.GUI.IO.ObjectModel
+namespace WinCopies.GUI.IO
 {
     public struct ExplorerControlViewModelStruct
     {
@@ -63,72 +64,74 @@ namespace WinCopies.GUI.IO.ObjectModel
         }
     }
 
-    public abstract class ExplorerControlViewModel : ViewModelBase, IExplorerControlViewModel
+    namespace ObjectModel
     {
-        //protected override void OnPropertyChanged(string propertyName, object oldValue, object newValue) => OnPropertyChanged(new WinCopies.Util.Data.PropertyChangedEventArgs(propertyName, oldValue, newValue));
-
-        [InterfaceDataTemplateSelector.Ignore]
-        private class ButtonModel : ExtendedButtonViewModel<IExtendedButtonModel<string, object>, string, object>, DotNetFix.IDisposable
+        public abstract class ExplorerControlViewModel : ViewModelBase, IExplorerControlViewModel
         {
-            private Func<string> _contentFunc;
+            //protected override void OnPropertyChanged(string propertyName, object oldValue, object newValue) => OnPropertyChanged(new WinCopies.Util.Data.PropertyChangedEventArgs(propertyName, oldValue, newValue));
 
-            public bool IsDisposed => _contentFunc == null;
-
-            public ButtonModel(in Func<string> contentFunc, in Bitmap icon) : base(new ExtendedButtonModel<string, object>())
+            [InterfaceDataTemplateSelector.Ignore]
+            private class ButtonModel : ExtendedButtonViewModel<IExtendedButtonModel<string, object>, string, object>, DotNetFix.IDisposable
             {
-                _contentFunc = contentFunc;
+                private Func<string> _contentFunc;
 
-                ModelGeneric.Content = GetContent();
+                public bool IsDisposed => _contentFunc == null;
 
-                ModelGeneric.ContentDecoration = icon;
+                public ButtonModel(in Func<string> contentFunc, in Bitmap icon) : base(new ExtendedButtonModel<string, object>())
+                {
+                    _contentFunc = contentFunc;
+
+                    ModelGeneric.Content = GetContent();
+
+                    ModelGeneric.ContentDecoration = icon;
+                }
+
+                private string GetContent() => _contentFunc() ?? "New item";
+
+                public void Update() => Content = GetContent();
+
+                public void Dispose()
+                {
+                    if (IsDisposed)
+
+                        return;
+
+                    Command = null;
+
+                    _contentFunc = null;
+                }
+
+                ~ButtonModel() => Dispose();
             }
 
-            private string GetContent() => _contentFunc() ?? "New item";
-
-            public void Update() => Content = GetContent();
-
-            public void Dispose()
+            private class BackgroundWorker
             {
-                if (IsDisposed)
-
-                    return;
-
-                Command = null;
-
-                _contentFunc = null;
-            }
-
-            ~ButtonModel() => Dispose();
-        }
-
-        private class BackgroundWorker
-        {
-            private WinCopies.BackgroundWorker _backgroundWorker = new
+                private WinCopies.BackgroundWorker _backgroundWorker = new
 #if !CS9
                 WinCopies.BackgroundWorker
 #endif
             ();
-            private IBrowsableObjectInfo _updateWith;
-            private IBrowsableObjectInfo _workOn;
+                private IBrowsableObjectInfo _updateWith;
+                private IBrowsableObjectInfo _workOn;
 
-            public BackgroundWorker()
-            {
-                _backgroundWorker.WorkerSupportsCancellation = _backgroundWorker.WorkerReportsProgress = true;
-
-                _backgroundWorker.DoWork += (object sender, DoWorkEventArgs e) => OnDoWork();
-
-                _backgroundWorker.ProgressChanged += (object sender, ProgressChangedEventArgs e) => OnProgressChanged((IBitmapSourcesLinker)e.UserState);
-            }
-
-            private void OnDoWork()
-            {
-                System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> enumerable = _workOn.GetItems();
-                ulong? count;
-                ulong i;
-
-                void initCount()
+                public BackgroundWorker()
                 {
-                    count = enumerable is ICollection collection ? (ulong
+                    _backgroundWorker.WorkerSupportsCancellation = _backgroundWorker.WorkerReportsProgress = true;
+
+                    _backgroundWorker.DoWork += (object sender, DoWorkEventArgs e) => OnDoWork();
+
+                    _backgroundWorker.ProgressChanged += (object sender, ProgressChangedEventArgs e) => OnProgressChanged((IBitmapSourcesLinker)e.UserState);
+                }
+
+                private void OnDoWork()
+                {
+                    System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> enumerable = _workOn.GetItems();
+                    ulong? count;
+                    ulong i;
+
+                    void initCount()
+                    {
+                        count = enumerable is ICollection collection ? (ulong
 #if !CS9
                     ?
 #endif
@@ -138,181 +141,218 @@ namespace WinCopies.GUI.IO.ObjectModel
 #endif
                     null;
 
-                    i = 0ul;
-                }
-
-                initCount();
-
-                bool doWork()
-                {
-                    bool _doWork()
-                    {
-                        void load(in IBrowsableObjectInfo item)
-                        {
-                            if (item.BitmapSources is IBitmapSourcesLinker bitmapSourcesLinker)
-
-                                bitmapSourcesLinker.Load();
-                        }
-
-                        load(_workOn);
-
-                        foreach (IBrowsableObjectInfo item in enumerable)
-
-                            if (_updateWith == _workOn)
-                            {
-                                try
-                                {
-                                    load(item);
-                                }
-
-                                catch { /* Left empty. */ }
-
-                                _backgroundWorker.ReportProgress(count.HasValue ? (int)((++i) / count.Value * 100) : 0, item.BitmapSources);
-                            }
-
-                            else
-                            {
-                                enumerable = (_workOn = _updateWith).GetItems();
-
-                                initCount();
-
-                                _backgroundWorker.ReportProgress(0);
-
-                                return true;
-                            }
-
                         i = 0ul;
-
-                        return false;
                     }
 
-                    while (_doWork()) { /* Left empty. */ }
+                    initCount();
 
-                    return _doWork();
+                    bool doWork()
+                    {
+                        bool _doWork()
+                        {
+                            void load(in IBrowsableObjectInfo item)
+                            {
+                                if (item.BitmapSources is IBitmapSourcesLinker bitmapSourcesLinker)
+
+                                    bitmapSourcesLinker.Load();
+                            }
+
+                            load(_workOn);
+
+                            foreach (IBrowsableObjectInfo item in enumerable)
+
+                                if (_updateWith == _workOn)
+                                {
+                                    try
+                                    {
+                                        load(item);
+                                    }
+
+                                    catch { /* Left empty. */ }
+
+                                    _backgroundWorker.ReportProgress(count.HasValue ? (int)((++i) / count.Value * 100) : 0, item.BitmapSources);
+                                }
+
+                                else
+                                {
+                                    enumerable = (_workOn = _updateWith).GetItems();
+
+                                    initCount();
+
+                                    _backgroundWorker.ReportProgress(0);
+
+                                    return true;
+                                }
+
+                            i = 0ul;
+
+                            return false;
+                        }
+
+                        while (_doWork()) { /* Left empty. */ }
+
+                        return _doWork();
+                    }
+
+                    while (doWork()) { /* Left empty. */ }
                 }
 
-                while (doWork()) { /* Left empty. */ }
-            }
-
-            private static void OnProgressChanged(IBitmapSourcesLinker bitmapSourcesLinker)
-            {
-                if (bitmapSourcesLinker == null)
-
-                    return;
-
-                _ = Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(bitmapSourcesLinker.OnBitmapSourcesLoaded));
-            }
-
-            public void UpdatePath(in IBrowsableObjectInfo browsableObjectInfo)
-            {
-                _updateWith = browsableObjectInfo;
-
-                if (!_backgroundWorker.IsBusy)
+                private static void OnProgressChanged(IBitmapSourcesLinker bitmapSourcesLinker)
                 {
-                    _workOn = _updateWith;
+                    if (bitmapSourcesLinker == null)
 
-                    _backgroundWorker.RunWorkerAsync();
+                        return;
+
+                    _ = Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(bitmapSourcesLinker.OnBitmapSourcesLoaded));
+                }
+
+                public void UpdatePath(in IBrowsableObjectInfo browsableObjectInfo)
+                {
+                    _updateWith = browsableObjectInfo;
+
+                    if (!_backgroundWorker.IsBusy)
+                    {
+                        _workOn = _updateWith;
+
+                        _backgroundWorker.RunWorkerAsync();
+                    }
                 }
             }
-        }
 
-        #region Fields
-        private ExplorerControlViewModelStruct _path;
-        private bool _autoStartMonitoring = true;
-        private System.Collections.Generic.IReadOnlyList<ButtonModel> _commonCommands;
-        private IBrowsableObjectInfoFactory _factory;
-        private HistoryObservableCollection<IBrowsableObjectInfo> _historyObservable;
-        private bool _isCheckBoxVisible;
-        private bool _isSelected;
-        private const int _newItemCommandIndex = 0;
-        private SelectionMode _selectionMode = SelectionMode.Extended;
-        private IList _selectedItems;
-        private string _text;
-        private System.Collections.Generic.IEnumerable<IBrowsableObjectInfoViewModel> _treeViewItems;
-        private readonly BackgroundWorker _backgroundWorker = new
+            #region Fields
+            private ExplorerControlViewModelStruct _path;
+            private bool _autoStartMonitoring = true;
+            private System.Collections.Generic.IReadOnlyList<ButtonModel> _commonCommands;
+            private IBrowsableObjectInfoFactory _factory;
+            private Predicate<IBrowsableObjectInfo> _oldPredicate;
+            private Predicate<IBrowsableObjectInfo> _predicate;
+            private HistoryObservableCollection<IBrowsableObjectInfo> _historyObservable;
+            private bool _isCheckBoxVisible;
+            private bool _isSelected;
+            private const int _newItemCommandIndex = 0;
+            private SelectionMode _selectionMode = SelectionMode.Extended;
+            private IList _selectedItems;
+            private string _text;
+            private System.Collections.Generic.IEnumerable<IBrowsableObjectInfoViewModel> _treeViewItems;
+            private readonly BackgroundWorker _backgroundWorker = new
 #if !CS9
             BackgroundWorker
 #endif
             ();
-        #endregion
+            #endregion
 
-        #region Properties
-        public bool AutoStartMonitoring { get => _autoStartMonitoring; set => UpdateValue(ref _autoStartMonitoring, value, nameof(AutoStartMonitoring)); }
+            #region Properties
+            public bool AutoStartMonitoring { get => GetValueIfNotDisposed(_autoStartMonitoring); set => UpdateValueIfNotDisposed(ref _autoStartMonitoring, value, nameof(AutoStartMonitoring)); }
 
-        protected Converter<string, IBrowsableObjectInfo> GetBrowsableObjectInfoViewModelConverter { get; }
+            protected Converter<string, IBrowsableObjectInfo> GetBrowsableObjectInfoViewModelConverter { get; }
 
-        public ICommand BrowseToParent { get; }
+            public ICommand BrowseToParent { get; }
 
-        public System.Collections.Generic.IEnumerable<IMenuItemModel<string>> BrowsabilityPaths => Path.SelectedItem?.BrowsabilityPaths?.Select(path => new MenuItemModel<string>(path.Name, new DelegateCommand(obj => path.IsValid(), obj => Path = new BrowsableObjectInfoViewModel(path.GetPath()) { SortComparison = Path.SortComparison, Factory = Path.Factory })));
+            public System.Collections.Generic.IEnumerable<IMenuItemModel<string>> BrowsabilityPaths => Path.SelectedItem?.BrowsabilityPaths?.Select(path => new MenuItemModel<string>(path.Name, new DelegateCommand(obj => path.IsValid(), obj => Path = new BrowsableObjectInfoViewModel(path.GetPath()) { SortComparison = Path.SortComparison, Factory = Path.Factory })));
 
-        public System.Collections.Generic.IEnumerable<IButtonModel> CommonCommands => GetValueIfNotDisposed(_commonCommands);
+            public System.Collections.Generic.IEnumerable<IButtonModel> CommonCommands => GetValueIfNotDisposed(_commonCommands);
 
-        public System.Collections.Generic.IEnumerable<IMenuItemModel<string, IMenuItemModel<string>, object>> CustomProcesses => Path.CustomProcesses?.GroupBy(item => item.GroupName, (groupName, processes) => new MenuItemModel<string, IMenuItemModel<string>, object>(null, null)
-        {
-            Header = groupName,
-
-            Items = processes.Select(process => new MenuItemModel<string>(process.Name, new DelegateCommand(obj => process.CanRun(obj, Path.Model, SelectedItems?.Select(_obj => ((IBrowsableObjectInfoViewModel)_obj).Model)), _obj =>
+            public System.Collections.Generic.IEnumerable<IMenuItemModel<string, IMenuItemModel<string>, object>> CustomProcesses => Path.CustomProcesses?.GroupBy(item => item.GroupName, (groupName, processes) => new MenuItemModel<string, IMenuItemModel<string>, object>(null, null)
             {
-                WinCopies.IO.Process.IProcessParameters processParameters = SelectedItems == null || SelectedItems.Count == 0 ? process.GetProcessParameters(_obj, Path.Model.Parent, Path.Model) : process.GetProcessParameters(_obj, Path.Model, SelectedItems.Select(path => ((IBrowsableObjectInfoViewModel)path).Model));
+                Header = groupName,
 
-                if (processParameters != null)
+                Items = processes.Select(process => new MenuItemModel<string>(process.Name, new DelegateCommand(obj => process.CanRun(obj, Path.Model, SelectedItems?.Select(_obj => ((IBrowsableObjectInfoViewModel)_obj).Model)), _obj =>
+                {
+                    WinCopies.IO.Process.IProcessParameters processParameters = SelectedItems == null || SelectedItems.Count == 0 ? process.GetProcessParameters(_obj, Path.Model.Parent, Path.Model) : process.GetProcessParameters(_obj, Path.Model, SelectedItems.Select(path => ((IBrowsableObjectInfoViewModel)path).Model));
 
-                    CustomProcessParametersGeneratedEventHandler?.Invoke(this, new CustomProcessParametersGeneratedEventArgs(processParameters));
-            })))
-        });
+                    if (processParameters != null)
 
-        public IBrowsableObjectInfoFactory Factory { get => GetValueIfNotDisposed(_factory); set => UpdateValueIfNotDisposed(ref _factory, value ?? throw GetArgumentNullException(nameof(value)), nameof(Factory)); }
+                        CustomProcessParametersGeneratedEventHandler?.Invoke(this, new CustomProcessParametersGeneratedEventArgs(processParameters));
+                })))
+            });
 
-        public static DelegateCommand<ExplorerControlViewModel> GoCommand { get; } = new DelegateCommand<ExplorerControlViewModel>(browsableObjectInfo => browsableObjectInfo != null && browsableObjectInfo.OnGoCommandCanExecute(), browsableObjectInfo => browsableObjectInfo.OnGoCommandExecuted());
+            public IBrowsableObjectInfoFactory Factory { get => GetValueIfNotDisposed(_factory); set => UpdateValueIfNotDisposed(ref _factory, value ?? throw GetArgumentNullException(nameof(value)), nameof(Factory)); }
 
-        public HistoryObservableCollection<IBrowsableObjectInfo> History => GetValueIfNotDisposed(_historyObservable);
-
-        public bool IsCheckBoxVisible
-        {
-            get => _isCheckBoxVisible;
-
-            set
+            public Predicate<IBrowsableObjectInfo> Filter
             {
-                if (value && _selectionMode == SelectionMode.Single)
+                get => GetValueIfNotDisposed(_predicate);
 
-                    throw new ArgumentException("Cannot apply the true value for the IsCheckBoxVisible when SelectionMode is set to Single.", nameof(value));
+                set
+                {
+                    ThrowIfDisposed();
 
-                _ = UpdateValue(ref _isCheckBoxVisible, value, nameof(IsCheckBoxVisible));
+                    if (UtilHelpers.UpdateValue(ref _predicate, value))
+                    {
+                        _path.Path.Filter = value;
+
+                        OnPropertyChanged(new System.ComponentModel.PropertyChangedEventArgs(nameof(Filter)));
+                    }
+                }
             }
-        }
 
-        public bool IsDisposed { get; private set; }
+            public static DelegateCommand<ExplorerControlViewModel> GoCommand { get; } = new DelegateCommand<ExplorerControlViewModel>(browsableObjectInfo => browsableObjectInfo != null && browsableObjectInfo.OnGoCommandCanExecute(), browsableObjectInfo => browsableObjectInfo.OnGoCommandExecuted());
 
-        public bool IsSelected { get => _isSelected; set => UpdateValue(ref _isSelected, value, nameof(IsSelected)); }
+            public HistoryObservableCollection<IBrowsableObjectInfo> History => GetValueIfNotDisposed(_historyObservable);
 
-        public DelegateCommand<IBrowsableObjectInfoViewModel> ItemClickCommand { get; }
+            public bool IsCheckBoxVisible
+            {
+                get => GetValueIfNotDisposed(_isCheckBoxVisible);
 
-        public IButtonModel NewItemCommand => GetValueIfNotDisposed(_commonCommands)[_newItemCommandIndex];
+                set
+                {
+                    ThrowIfDisposed();
 
-        public IBrowsableObjectInfoViewModel Path { get => GetValueIfNotDisposed(_path).Path; set { ThrowIfNull(value, nameof(value)); IBrowsableObjectInfoViewModel oldPath = _path.Path; UpdateValueIfNotDisposed(ref _path.Path, value, nameof(Path)); OnPathChanged(oldPath); } }
+                    if (value && _selectionMode == SelectionMode.Single)
 
-        public IList SelectedItems { get => GetValueIfNotDisposed(_selectedItems); set => UpdateValueIfNotDisposed(ref _selectedItems, value, nameof(SelectedItems)); }
+                        throw new ArgumentException("Cannot apply the true value for the IsCheckBoxVisible when SelectionMode is set to Single.", nameof(value));
 
-        public SelectionMode SelectionMode { get => _selectionMode; set { UpdateValue(ref _selectionMode, value, nameof(SelectionMode)); } }
+                    _ = UpdateValue(ref _isCheckBoxVisible, value, nameof(IsCheckBoxVisible));
+                }
+            }
 
-        public string Text { get => GetValueIfNotDisposed(_text); set => UpdateValueIfNotDisposed(ref _text, value, nameof(Text)); }
+            public bool IsDisposed { get; private set; }
 
-        public System.Collections.Generic.IEnumerable<IBrowsableObjectInfoViewModel> TreeViewItems { get => GetValueIfNotDisposed(_treeViewItems); set => UpdateValueIfNotDisposed(ref _treeViewItems, value, nameof(TreeViewItems)); }
-        #endregion
+            public bool IsSelected { get => GetValueIfNotDisposed(_isSelected); set => UpdateValueIfNotDisposed(ref _isSelected, value, nameof(IsSelected)); }
 
-        public event System.EventHandler<CustomProcessParametersGeneratedEventArgs> CustomProcessParametersGeneratedEventHandler;
+            public DelegateCommand<IBrowsableObjectInfoViewModel> ItemClickCommand { get; }
 
-        protected ExplorerControlViewModel(in IBrowsableObjectInfoViewModel path, in System.Collections.Generic.IEnumerable<IBrowsableObjectInfoViewModel> treeViewItems, in IBrowsableObjectInfoFactory factory, in Converter<string, IBrowsableObjectInfo> converter)
-        {
-            ThrowIfNull(converter, nameof(converter));
+            public IButtonModel NewItemCommand => GetValueIfNotDisposed(_commonCommands)[_newItemCommandIndex];
 
-            _path = new ExplorerControlViewModelStruct(path);
+            public IBrowsableObjectInfoViewModel Path
+            {
+                get => GetValueIfNotDisposed(_path).Path;
 
-            GetBrowsableObjectInfoViewModelConverter = converter;
+                set
+                {
+                    ThrowIfDisposed();
 
-            BrowseToParent = new DelegateCommand(o => !IsDisposed && Path.Parent != null, o => Path = new BrowsableObjectInfoViewModel(Path.Parent));
+                    ThrowIfNull(value, nameof(value));
 
-            _commonCommands = new ButtonModel[] { new ButtonModel(() => Path.ProcessFactory.NewItemProcessCommands?.Name, Icons.Properties.Resources.folder_add)
+                    IBrowsableObjectInfoViewModel oldPath = _path.Path;
+
+                    UpdateValueIfNotDisposed(ref _path.Path, value, nameof(Path));
+
+                    OnPathChanged(oldPath);
+                }
+            }
+
+            public IList SelectedItems { get => GetValueIfNotDisposed(_selectedItems); set => UpdateValueIfNotDisposed(ref _selectedItems, value, nameof(SelectedItems)); }
+
+            public SelectionMode SelectionMode { get => GetValueIfNotDisposed(_selectionMode); set => UpdateValueIfNotDisposed(ref _selectionMode, value, nameof(SelectionMode)); }
+
+            public string Text { get => GetValueIfNotDisposed(_text); set => UpdateValueIfNotDisposed(ref _text, value, nameof(Text)); }
+
+            public System.Collections.Generic.IEnumerable<IBrowsableObjectInfoViewModel> TreeViewItems { get => GetValueIfNotDisposed(_treeViewItems); set => UpdateValueIfNotDisposed(ref _treeViewItems, value, nameof(TreeViewItems)); }
+            #endregion
+
+            public event System.EventHandler<CustomProcessParametersGeneratedEventArgs> CustomProcessParametersGeneratedEventHandler;
+
+            protected ExplorerControlViewModel(in IBrowsableObjectInfoViewModel path, in System.Collections.Generic.IEnumerable<IBrowsableObjectInfoViewModel> treeViewItems, in IBrowsableObjectInfoFactory factory, in Converter<string, IBrowsableObjectInfo> converter)
+            {
+                ThrowIfNull(converter, nameof(converter));
+
+                _path = new ExplorerControlViewModelStruct(path);
+
+                GetBrowsableObjectInfoViewModelConverter = converter;
+
+                BrowseToParent = new DelegateCommand(o => !IsDisposed && Path.Parent != null, o => Path = new BrowsableObjectInfoViewModel(Path.Parent));
+
+                _commonCommands = new ButtonModel[] { new ButtonModel(() => Path.ProcessFactory.NewItemProcessCommands?.Name, Icons.Properties.Resources.folder_add)
             {
                 ToolTip = NewItemCommandToolTip,
 
@@ -326,283 +366,294 @@ namespace WinCopies.GUI.IO.ObjectModel
                 })
             }};
 
-            ((INotifyPropertyChanged)(_historyObservable = new HistoryObservableCollection<IBrowsableObjectInfo>())).PropertyChanged += (object sender, System.ComponentModel.PropertyChangedEventArgs e) =>
+                ((INotifyPropertyChanged)(_historyObservable = new HistoryObservableCollection<IBrowsableObjectInfo>())).PropertyChanged += (object sender, System.ComponentModel.PropertyChangedEventArgs e) =>
+                {
+                    if (e.PropertyName == nameof(ObservableLinkedCollectionEnumerable<IBrowsableObjectInfo>.Current))
+
+                        OnHistoryCurrentChanged(e);
+                };
+
+                path.PropertyChanged += Path_PropertyChanged;
+
+                _historyObservable.Add(path.Model);
+
+                _treeViewItems = treeViewItems;
+
+                ItemClickCommand = new DelegateCommand<IBrowsableObjectInfoViewModel>(browsableObjectInfo => true, browsableObjectInfo =>
+                {
+                    if (browsableObjectInfo.InnerObject is ShellObject && browsableObjectInfo.ObjectProperties is IFileSystemObjectInfoProperties properties && properties.FileType == FileType.File)
+
+                        _ = System.Diagnostics.Process.Start(new ProcessStartInfo(browsableObjectInfo.Path) { UseShellExecute = true });
+
+                    else
+
+                        Path = browsableObjectInfo.RootParentIsRootNode ? new BrowsableObjectInfoViewModel(browsableObjectInfo.Model) { SortComparison = browsableObjectInfo.SortComparison, Factory = browsableObjectInfo.Factory } : browsableObjectInfo;
+                });
+
+                _factory = factory;
+
+                OnPathAdded();
+            }
+
+            #region Methods
+            protected void ThrowIfDisposed() => ThrowHelper.ThrowIfDisposed(this);
+
+            protected virtual void OnPathPropertyChanged(System.ComponentModel.PropertyChangedEventArgs e)
             {
-                if (e.PropertyName == nameof(ObservableLinkedCollectionEnumerable<IBrowsableObjectInfo>.Current))
+                if (e.PropertyName == nameof(IBrowsableObjectInfoViewModel.SelectedItem))
 
-                    OnHistoryCurrentChanged(e);
-            };
-
-            path.PropertyChanged += Path_PropertyChanged;
-
-            _historyObservable.Add(path.Model);
-
-            _treeViewItems = treeViewItems;
-
-            ItemClickCommand = new DelegateCommand<IBrowsableObjectInfoViewModel>(browsableObjectInfo => true, browsableObjectInfo =>
-            {
-                if (browsableObjectInfo.InnerObject is ShellObject && browsableObjectInfo.ObjectProperties is IFileSystemObjectInfoProperties properties && properties.FileType == FileType.File)
-
-                    _ = System.Diagnostics.Process.Start(new ProcessStartInfo(browsableObjectInfo.Path) { UseShellExecute = true });
-
-                else
-
-                    Path = browsableObjectInfo.RootParentIsRootNode ? new BrowsableObjectInfoViewModel(browsableObjectInfo.Model) { SortComparison = browsableObjectInfo.SortComparison, Factory = browsableObjectInfo.Factory } : browsableObjectInfo;
-            });
-
-            _factory = factory;
-
-            OnPathAdded();
-        }
-
-        #region Methods
-        protected virtual void OnPathPropertyChanged(System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(IBrowsableObjectInfoViewModel.SelectedItem))
-
-                OnPropertyChanged(nameof(BrowsabilityPaths)
+                    OnPropertyChanged(nameof(BrowsabilityPaths)
 #if !WinCopies4
                     , null, BrowsabilityPaths
 #endif
                     );
-        }
-
-        private void Path_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) => OnPathPropertyChanged(e);
-
-        protected void UpdateValueIfNotDisposed<T>(ref T value, in T newValue, in string propertyName) => _ = IsDisposed ? throw GetExceptionForDispose(false) : base.UpdateValue(ref value, newValue, propertyName);
-
-        protected T GetValueIfNotDisposed<T>(in T value) => IsDisposed ? throw GetExceptionForDispose(false) : value;
-
-        private void LoadPath()
-        {
-            _path.Path.LoadItems();
-
-            _backgroundWorker.UpdatePath(_path.Path);
-        }
-
-        protected void OnRegisterCallback(BrowsableObjectInfoCallbackArgs parameters)
-        {
-            IBrowsableObjectInfoViewModel path = _path.Path;
-
-            System.Collections.ObjectModel.ObservableCollection<IBrowsableObjectInfoViewModel> items = path.Items;
-
-            switch (parameters.CallbackReason)
-            {
-                case BrowsableObjectInfoCallbackReason.Added:
-
-                    items.Add(new BrowsableObjectInfoViewModel(parameters.BrowsableObjectInfo));
-
-                    path.UpdateItems();
-
-                    break;
-
-                case BrowsableObjectInfoCallbackReason.Updated:
-
-                    for (int i = 0; i < items.Count; i++)
-
-                        if (items[i].Path == parameters.Path)
-                        {
-                            items[i] = new BrowsableObjectInfoViewModel(parameters.BrowsableObjectInfo);
-
-                            break;
-                        }
-
-                    path.UpdateItems();
-
-                    break;
-
-                case BrowsableObjectInfoCallbackReason.Removed:
-
-                    for (int i = 0; i < items.Count; i++)
-
-                        if (items[i].Path == parameters.Path)
-                        {
-                            items.RemoveAt(i);
-
-                            break;
-                        }
-
-                    break;
             }
-        }
 
-        public void StartMonitoring()
-        {
-            IBrowsableObjectInfoViewModel path = _path.Path;
+            private void Path_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) => OnPathPropertyChanged(e);
 
-            _path.Callback = path.RegisterCallback(OnRegisterCallback);
+            protected void UpdateValueIfNotDisposed<T>(ref T value, in T newValue, in string propertyName) => _ = IsDisposed ? throw GetExceptionForDispose(false) : base.UpdateValue(ref value, newValue, propertyName);
 
-            path.StartMonitoring();
-        }
+            protected T GetValueIfNotDisposed<T>(in T value) => IsDisposed ? throw GetExceptionForDispose(false) : value;
 
-        protected virtual void OnPathAdded()
-        {
-            IBrowsableObjectInfoViewModel path = _path.Path;
-
-            path.PropertyChanged += Path_PropertyChanged;
-
-            if (_autoStartMonitoring)
-
-                StartMonitoring();
-
-            LoadPath();
-        }
-
-        public void StopMonitoring()
-        {
-            _path.Path.StopMonitoring();
-
-            if (_path.Callback != null)
+            private void LoadPath()
             {
-                _path.Callback.Dispose();
-                _path.Callback = null;
+                _path.Path.LoadItems();
+
+                _backgroundWorker.UpdatePath(_path.Path);
             }
-        }
 
-        protected virtual void OnPathRemoved(IBrowsableObjectInfoViewModel path)
-        {
-            if (_autoStartMonitoring)
+            protected void OnRegisterCallback(BrowsableObjectInfoCallbackArgs parameters)
+            {
+                IBrowsableObjectInfoViewModel path = _path.Path;
 
-                StopMonitoring();
+                System.Collections.ObjectModel.ObservableCollection<IBrowsableObjectInfoViewModel> items = path.Items;
 
-            path.PropertyChanged -= Path_PropertyChanged;
-        }
+                switch (parameters.CallbackReason)
+                {
+                    case BrowsableObjectInfoCallbackReason.Added:
 
-        protected virtual void OnUpdateText() => Text = _path.Path.Path;
+                        items.Add(new BrowsableObjectInfoViewModel(parameters.BrowsableObjectInfo));
 
-        protected virtual void OnUpdateCommands()
-        {
-            foreach (ButtonModel command in _commonCommands)
+                        path.UpdateItems();
 
-                command.Update();
+                        break;
 
-            OnPropertyChanged(nameof(CustomProcesses)
+                    case BrowsableObjectInfoCallbackReason.Updated:
+
+                        for (int i = 0; i < items.Count; i++)
+
+                            if (items[i].Path == parameters.Path)
+                            {
+                                items[i] = new BrowsableObjectInfoViewModel(parameters.BrowsableObjectInfo);
+
+                                break;
+                            }
+
+                        path.UpdateItems();
+
+                        break;
+
+                    case BrowsableObjectInfoCallbackReason.Removed:
+
+                        for (int i = 0; i < items.Count; i++)
+
+                            if (items[i].Path == parameters.Path)
+                            {
+                                items.RemoveAt(i);
+
+                                break;
+                            }
+
+                        break;
+                }
+            }
+
+            public void StartMonitoring()
+            {
+                IBrowsableObjectInfoViewModel path = _path.Path;
+
+                _path.Callback = path.RegisterCallback(OnRegisterCallback);
+
+                path.StartMonitoring();
+            }
+
+            protected virtual void OnPathAdded()
+            {
+                IBrowsableObjectInfoViewModel path = _path.Path;
+
+                path.PropertyChanged += Path_PropertyChanged;
+
+                _oldPredicate = path.Filter;
+
+                path.Filter = _predicate;
+
+                if (_autoStartMonitoring)
+
+                    StartMonitoring();
+
+                LoadPath();
+            }
+
+            private void StopMonitoring(in IBrowsableObjectInfoViewModel path)
+            {
+                path.StopMonitoring();
+
+                if (_path.Callback != null)
+                {
+                    _path.Callback.Dispose();
+                    _path.Callback = null;
+                }
+            }
+
+            public void StopMonitoring() => StopMonitoring(_path.Path);
+
+            protected virtual void OnPathRemoved(IBrowsableObjectInfoViewModel path)
+            {
+                if (_autoStartMonitoring)
+
+                    StopMonitoring(path);
+
+                path.PropertyChanged -= Path_PropertyChanged;
+
+                path.Filter = _oldPredicate;
+            }
+
+            protected virtual void OnUpdateText() => Text = _path.Path.Path;
+
+            protected virtual void OnUpdateCommands()
+            {
+                foreach (ButtonModel command in _commonCommands)
+
+                    command.Update();
+
+                OnPropertyChanged(nameof(CustomProcesses)
 #if !WinCopies4
                 , null, CustomProcesses
 #endif
                 );
-        }
-
-        protected virtual void OnUpdateHistory()
-        {
-            if (_path.Path.Path == History.Current.Path)
-
-                return;
-
-            if (_historyObservable.Count == 1)
-            {
-                _historyObservable.Insert(0, _path.Path.Model);
-
-                return;
             }
 
-            else if (_historyObservable.Count >= 2)
+            protected virtual void OnUpdateHistory()
             {
-                _historyObservable.NotifyOnPropertyChanged = false;
+                if (_path.Path.Path == History.Current.Path)
 
-                if (_historyObservable.CanMovePreviousFromCurrent && _path.Path.Path == _historyObservable[_historyObservable.CurrentIndex + 1].Path)
+                    return;
 
-                    _historyObservable.CurrentIndex++;
-
-                else if (_historyObservable.CanMoveNextFromCurrent && _path.Path.Path == _historyObservable[_historyObservable.CurrentIndex - 1].Path)
-
-                    _historyObservable.CurrentIndex--;
-
-                else
+                if (_historyObservable.Count == 1)
                 {
-                    if (_historyObservable.CurrentIndex > 0)
-
-                        for (int i = 0; i < _historyObservable.CurrentIndex; i++)
-
-                            _historyObservable.RemoveAt(0);
-
                     _historyObservable.Insert(0, _path.Path.Model);
 
-                    _historyObservable.CurrentIndex = 0;
+                    return;
                 }
 
-                _historyObservable.NotifyOnPropertyChanged = true;
+                else if (_historyObservable.Count >= 2)
+                {
+                    _historyObservable.NotifyOnPropertyChanged = false;
+
+                    if (_historyObservable.CanMovePreviousFromCurrent && _path.Path.Path == _historyObservable[_historyObservable.CurrentIndex + 1].Path)
+
+                        _historyObservable.CurrentIndex++;
+
+                    else if (_historyObservable.CanMoveNextFromCurrent && _path.Path.Path == _historyObservable[_historyObservable.CurrentIndex - 1].Path)
+
+                        _historyObservable.CurrentIndex--;
+
+                    else
+                    {
+                        if (_historyObservable.CurrentIndex > 0)
+
+                            for (int i = 0; i < _historyObservable.CurrentIndex; i++)
+
+                                _historyObservable.RemoveAt(0);
+
+                        _historyObservable.Insert(0, _path.Path.Model);
+
+                        _historyObservable.CurrentIndex = 0;
+                    }
+
+                    _historyObservable.NotifyOnPropertyChanged = true;
+                }
             }
-        }
 
-        protected virtual void OnPathChanged(IBrowsableObjectInfoViewModel oldPath)
-        {
-            OnPathRemoved(oldPath);
-
-            OnPathAdded();
-
-            OnUpdateText();
-
-            OnUpdateCommands();
-
-            OnUpdateHistory();
-        }
-
-        protected virtual void OnHistoryCurrentChanged(System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            if (Path.Path != _historyObservable.Current.Path)
-
-                Path = new BrowsableObjectInfoViewModel(_historyObservable.Current) { SortComparison = Path.SortComparison, Factory = Path.Factory };
-        }
-
-        protected virtual bool OnGoCommandCanExecute() => true;
-
-        protected void OnGoCommandExecuted() => Path = _factory.GetBrowsableObjectInfoViewModel(GetBrowsableObjectInfoViewModelConverter(Text));
-
-        protected virtual void Dispose(bool disposing)
-        {
-            foreach (ButtonModel command in _commonCommands)
-
-                command.Dispose();
-
-            _commonCommands = null;
-
-            _text = null;
-
-            _treeViewItems = null;
-
-            OnPathRemoved(_path.Path);
-
-            _path.Path = null;
-
-            _historyObservable.NotifyOnPropertyChanged = false;
-
-            if (disposing)
-
-                _historyObservable.Clear();
-
-            _historyObservable = null;
-
-            _factory = null;
-
-            if (_selectedItems != null)
+            protected virtual void OnPathChanged(IBrowsableObjectInfoViewModel oldPath)
             {
+                OnPathRemoved(oldPath);
+
+                OnPathAdded();
+
+                OnUpdateText();
+
+                OnUpdateCommands();
+
+                OnUpdateHistory();
+            }
+
+            protected virtual void OnHistoryCurrentChanged(System.ComponentModel.PropertyChangedEventArgs e)
+            {
+                if (Path.Path != _historyObservable.Current.Path)
+
+                    Path = new BrowsableObjectInfoViewModel(_historyObservable.Current) { SortComparison = Path.SortComparison, Factory = Path.Factory };
+            }
+
+            protected virtual bool OnGoCommandCanExecute() => true;
+
+            protected void OnGoCommandExecuted() => Path = _factory.GetBrowsableObjectInfoViewModel(GetBrowsableObjectInfoViewModelConverter(Text));
+
+            protected virtual void Dispose(bool disposing)
+            {
+                foreach (ButtonModel command in _commonCommands)
+
+                    command.Dispose();
+
+                _commonCommands = null;
+
+                _text = null;
+
+                _treeViewItems = null;
+
+                OnPathRemoved(_path.Path);
+
+                _path.Path = null;
+
+                _historyObservable.NotifyOnPropertyChanged = false;
+
                 if (disposing)
 
-                    _selectedItems.Clear();
+                    _historyObservable.Clear();
 
-                _selectedItems = null;
+                _historyObservable = null;
+
+                _factory = null;
+
+                if (_selectedItems != null)
+                {
+                    if (disposing)
+
+                        _selectedItems.Clear();
+
+                    _selectedItems = null;
+                }
+
+                IsDisposed = true;
             }
 
-            IsDisposed = true;
+            public void Dispose()
+            {
+                if (IsDisposed)
+
+                    return;
+
+                Dispose(true);
+
+                GC.SuppressFinalize(this);
+            }
+            #endregion
+
+            ~ExplorerControlViewModel() => Dispose(false);
+
+            //private ViewStyle _viewStyle = ViewStyle.SizeThree;
+
+            //public ViewStyle ViewStyle { get => _viewStyle; set { _viewStyle = value; OnPropertyChanged(nameof(ViewStyle)); } }
         }
-
-        public void Dispose()
-        {
-            if (IsDisposed)
-
-                return;
-
-            Dispose(true);
-
-            GC.SuppressFinalize(this);
-        }
-        #endregion
-
-        ~ExplorerControlViewModel() => Dispose(false);
-
-        //private ViewStyle _viewStyle = ViewStyle.SizeThree;
-
-        //public ViewStyle ViewStyle { get => _viewStyle; set { _viewStyle = value; OnPropertyChanged(nameof(ViewStyle)); } }
     }
 }

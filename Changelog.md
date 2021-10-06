@@ -17,20 +17,20 @@ CHANGELOG
 	- IExplorerControlBrowsableObjectInfoViewModel:
 		- => IExplorerControlViewModel
 		- add Start/StopMonitoring() methods.
-	- ExplorerControlBrowsableObjectInfoViewModelStruct => ExplorerControlViewModelStruct
-	- ExplorerControlBrowsableObjectInfoViewModel:
+	- ExplorerControlBrowsableObjectInfoViewModelStruct:
+		- => ExplorerControlViewModelStruct
+		- is now in the WinCopies.GUI.IO namespace.
+	- ExplorerControlBrowsableObjectInfoViewModel
 		- => ExplorerControlViewModel
-		- add:
-			- AutoStartMonitoring property.
-			- properties:
-				- OnRegisterCallback
-				- Start/StopMonitoring
+		- some properties throw an exception when attempting to get or set value.
 	- BrowsableObjectInfoViewModel:
 		- add Filter property and new methods
 		- an exception is thrown when attempting to get or set some properties when the object is disposed.
+	- (I)(ExplorerControl)BrowsableObjectInfoViewModel: new properties and methods.
 - Add DialogWindowBase class. Some items of DialogWindow have been moved to this new class.
 - Move IO Guids to WinCopies.IO.Guids.Shell namespace (WinCopies.IO.Shell assembly).
 - Add WinCopies.IO.Path.Match method.
+- New extension methods.
 
 ### 3.11-preview
 

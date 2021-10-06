@@ -21,8 +21,9 @@ using System.Windows.Input;
 
 using WinCopies.Commands;
 using WinCopies.GUI.Controls.Models;
-using WinCopies.GUI.IO;
+using WinCopies.GUI.Shell;
 using WinCopies.GUI.Windows;
+using WinCopies.Util.Data;
 
 namespace WinCopies.GUI.Samples
 {
@@ -163,9 +164,16 @@ namespace WinCopies.GUI.Samples
 
         private void MenuItem_Click_1(object sender, RoutedEventArgs e) => new ExplorerControlWindow /*ExplorerControlTest*/().Show();
 
+        public class NamedObject : WinCopies.Util.Data.NamedObject<string>
+        {
+            public NamedObject(in string name, in string value) : base(name, value) { /* Left empty. */ }
+
+            public override string ToString() => Name;
+        }
+
         private void MenuItem_Click_2(object sender, RoutedEventArgs e)
         {
-            var dialog = new Shell.FileSystemDialogBox(Shell.FileSystemDialogBoxMode.OpenFile, true) { };
+            var dialog = new FileSystemDialogBox(new FileSystemDialog(FileSystemDialogBoxMode.OpenFile) { Filters = new INamedObject<string>[] { new NamedObject("Text file", "*.txt"), new NamedObject("CS file", "*.cs") } }, true);
 
             _ = dialog.ShowDialog();
 

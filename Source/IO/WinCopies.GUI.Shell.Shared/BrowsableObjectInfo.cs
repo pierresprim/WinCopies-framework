@@ -36,7 +36,7 @@ namespace WinCopies.GUI.Shell.ObjectModel
           {
               ShellObjectInfo.DefaultCustomProcessesSelectorDictionary.Push(item => item.InnerObject.IsFileSystemObject, item => new IProcessInfo[] { new ArchiveCompressionProcessInfo() });
 
-              WinCopies.IO.ObjectModel.BrowsableObjectInfo.DefaultProcessSelectorDictionary.Push(item => WinCopies.IO.ObjectModel.BrowsableObjectInfo.Predicate(item, typeof(WinCopies.IO.Guids.Process)), TryGetArchiveProcess);
+              WinCopies.IO.ObjectModel.BrowsableObjectInfo.DefaultProcessSelectorDictionary.Push(item => WinCopies.IO.ObjectModel.BrowsableObjectInfo.Predicate(item, typeof(WinCopies.IO.Guids.Shell.Process)), TryGetArchiveProcess);
           });
         }
 
@@ -50,7 +50,7 @@ namespace WinCopies.GUI.Shell.ObjectModel
             {
                 switch (guid)
                 {
-                    case WinCopies.IO.Guids.Process.ArchiveCompression:
+                    case WinCopies.IO.Guids.Shell.Process.Archive.Compression:
 
                         enumerator = processParameters.ProcessParameters.Parameters.GetEnumerator();
 

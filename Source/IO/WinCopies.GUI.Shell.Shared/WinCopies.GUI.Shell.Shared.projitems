@@ -15,6 +15,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectInfoFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\FileSystemDialogBoxContent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataConverters\FileSystemDialogBoxModeConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataConverters\FileSystemDialogBoxPredicateConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FileSystemDialog.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModels\BrowsableObjectInfoViewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModels\FileSystemDialogBoxViewModel.cs" />

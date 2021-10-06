@@ -459,7 +459,7 @@ namespace WinCopies.IO
 
             public static Action RegisterDefaultProcessSelectors { get; private set; } = () =>
             {
-                DefaultProcessSelectorDictionary.Push(item => Predicate(item, typeof(Guids.Process.Shell))
+                DefaultProcessSelectorDictionary.Push(item => Predicate(item, typeof(Guids.Shell.Process.Shell))
                                     , TryGetProcess
 
                 // System.Reflection.Assembly.GetExecutingAssembly().DefinedTypes.FirstOrDefault(t => t.Namespace.StartsWith(typeof(Process.ObjectModel.IProcess).Namespace) && t.GetCustomAttribute<ProcessGuidAttribute>().Guid == guid);
@@ -606,7 +606,7 @@ namespace WinCopies.IO
 
                     switch (guid)
                     {
-                        case Guids.Process.Shell.Copy:
+                        case Guids.Shell.Process.Shell.Copy:
 
                             PathTypes<IPathInfo>.PathInfoBase destinationPath;
 
@@ -654,7 +654,7 @@ namespace WinCopies.IO
 
                             return getCopyProcess();
 
-                        case Guids.Process.Shell.Deletion:
+                        case Guids.Shell.Process.Shell.Deletion:
 
                             sourcePath = getParameter();
 

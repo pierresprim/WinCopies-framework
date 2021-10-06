@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices;
+
 using WinCopies.Collections;
 using WinCopies.Collections.DotNetFix.Generic;
 using WinCopies.Collections.Generic;
@@ -40,7 +41,7 @@ using static WinCopies.ThrowHelper;
 
 namespace WinCopies.IO.Process.ObjectModel
 {
-    [ProcessGuid(Guids.Process.Shell.Deletion)]
+    [ProcessGuid(Guids.Shell.Process.Shell.Deletion)]
     public class Deletion<T> : ProcessObjectModelTypes<IPathInfo, IPathInfo, T, ProcessError, ErrorAction, ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessDelegates<ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessEventDelegates>, ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessEventDelegates, IProcessProgressDelegateParameter>.DefaultProcesses<DeletionOptions<IPathInfo>>.DefaultProcess2 where T : ProcessErrorTypes<IPathInfo, ProcessError, ErrorAction>.IProcessErrorFactories
     {
         private delegate bool Func(IPathInfo path, out IProcessError<ProcessError, ErrorAction> error, out bool isErrorGlobal);
@@ -49,7 +50,7 @@ namespace WinCopies.IO.Process.ObjectModel
         private Func _func;
 
         #region Properties
-        public override string Guid => Guids.Process.Shell.Deletion;
+        public override string Guid => Guids.Shell.Process.Shell.Deletion;
 
         public override string Name
         {

@@ -168,7 +168,7 @@
 
             <ContentControl Grid.ColumnSpan="3" ContentTemplateSelector="{StaticResource InterfaceDataTemplateSelector}" Content="{TemplateBinding Path}" />
 
-            <TextBox Grid.Row="1" IsReadOnly="True" IsReadOnlyCaretVisible="True" Text="{Binding Path.Path.Path, RelativeSource={RelativeSource TemplatedParent}}" />
+            <TextBox Grid.Row="1" IsReadOnly="True" IsReadOnlyCaretVisible="True" Text="{Binding Path.Path.Name, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}" />
             <ComboBox Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="1" ItemsSource="{TemplateBinding Filters}" SelectedItem="{Binding SelectedFilter, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" SelectedIndex="0" />
             <Button Grid.Column="1" Grid.Row="2" Content="{TemplateBinding Mode, Converter={StaticResource FileSystemDialogBoxModeConverter}}" Command="{x:Static ApplicationCommands.Close}" CommandParameter="{markup:TrueValue}" />
             <Button Grid.Column="2" Grid.Row="2" Content="Cancel" Command="{x:Static ApplicationCommands.Close}" CommandParameter="{markup:FalseValue}" />
@@ -177,10 +177,20 @@
 
     <Style TargetType="{x:Type local:FileSystemDialogBoxContent}">
         <Setter Property="Template" Value="{StaticResource FileSystemDialogBoxContentTemplate}" />
+        <Setter Property="SelectedPredicate">
+            <Setter.Value>
+                <MultiBinding Converter="{local:FileSystemDialogBoxPredicateConverter}">
+                    <Binding Path="Predicate" RelativeSource="{RelativeSource Mode=Self}" />
+                    <Binding Path="SelectedFilter" RelativeSource="{RelativeSource Mode=Self}" />
+                    <Binding Path="Mode" RelativeSource="{RelativeSource Mode=Self}" />
+                </MultiBinding>
+            </Setter.Value>
+        </Setter>
+        <!--<Setter Property="SelectedPredicate" Value="{Binding Path.Path.Filter, Mode=OneWayToSource, RelativeSource={RelativeSource Mode=Self}}" />-->
     </Style>
 
     <DataTemplate DataType="{x:Type local:IFileSystemDialog}">
-        <local:FileSystemDialogBoxContent Filters="{Binding Filters}" SelectedFilter="{Binding SelectedFilter}" Predicate="{Binding Predicate}" Path="{Binding Path}" SelectedItems="{Binding SelectedItems}" Mode="{Binding Mode}" />
+        <local:FileSystemDialogBoxContent Mode="{Binding Mode}" Filters="{Binding Filters}" SelectedFilter="{Binding SelectedFilter}" Predicate="{Binding Predicate}" Path="{Binding Path}" SelectedItems="{Binding SelectedItems}" />
     </DataTemplate>
 
     <Style TargetType="{x:Type local:FileSystemDialogBox}" BasedOn="{StaticResource {x:Type gui:Window}}">

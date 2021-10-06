@@ -24,6 +24,8 @@ namespace WinCopies.GUI.IO.ObjectModel
 {
     public interface IBrowsableObjectInfoViewModel : IBrowsableObjectInfo, IBrowsableObjectInfoViewModelCommon, IEquatable<IBrowsableObjectInfoViewModel>, IComparable<IBrowsableObjectInfoViewModel>
     {
+        Predicate<IBrowsableObjectInfo> Filter { get; set; }
+
         bool RootParentIsRootNode { get; }
 
         IBrowsableObjectInfo Model { get; }

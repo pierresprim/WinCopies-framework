@@ -54,6 +54,8 @@ namespace WinCopies.GUI.IO
 
             IBrowsableObjectInfoFactory Factory { get; set; }
 
+            Predicate<IBrowsableObjectInfo> Filter { get; set; }
+
             HistoryObservableCollection<IBrowsableObjectInfo> History { get; }
 
             bool IsCheckBoxVisible { get; set; }

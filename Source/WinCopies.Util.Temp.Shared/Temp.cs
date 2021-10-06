@@ -34,6 +34,8 @@ namespace WinCopies.Temp
         public static string FromLikeStatement(in string filter) => FromPattern(filter, Temp.LikeStatementChar, LikeSnippet);
     }
 
+    public delegate bool PredicateIn<T>(in T value);
+
     public static class Temp
     {
         public const char PathFilterChar = '*';

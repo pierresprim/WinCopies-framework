@@ -87,7 +87,7 @@ namespace WinCopies.GUI.IO.Process
 
                 values[i] = properties[i].GetValue(this).ToString();
 
-            return new ProcessParameters(WinCopies.IO.Guids.Process.ArchiveCompression, values.Surround(Enumerable.Repeat(sourcePath, 1), paths));
+            return new ProcessParameters(WinCopies.IO.Guids.Shell.Process.Archive.Compression, values.Surround(Enumerable.Repeat(sourcePath, 1), paths));
         }
 
         public static ArchiveCompressionParameters FromProcessParameters(in System.Collections.Generic.IEnumerator<string> enumerator)
