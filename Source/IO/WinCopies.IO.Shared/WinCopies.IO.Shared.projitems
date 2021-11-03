@@ -17,7 +17,10 @@
     <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectInfoPlugin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectInfoStack.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Directory.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)EnumerablePath.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Enumeration\EnumerablePath.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Enumeration\EnumerablePath.Static.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Enumeration\IEnumerablePath.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Enumeration\MovingRecursivelyEnumerablePath.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FileSystemObjectComparer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FileSystemObjectEqualityComparer.cs" />
@@ -30,6 +33,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\BrowsableObjectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\BrowsableObjectInfoBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Path.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Enumeration\RecursivelyEnumerablePath.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PathInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\BrowsableObjectInfoProcessFactoryDictionary.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\Errors.cs" />

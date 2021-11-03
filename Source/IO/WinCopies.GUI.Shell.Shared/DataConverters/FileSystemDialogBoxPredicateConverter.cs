@@ -9,6 +9,7 @@ using WinCopies.Util.Data;
 
 namespace WinCopies.GUI.Shell
 {
+    [MultiValueConversion(typeof(Predicate<IBrowsableObjectInfo>))]
     public class FileSystemDialogBoxPredicateConverter : AlwaysConvertibleOneWayMultiConverter<object, Predicate<IBrowsableObjectInfo>>
     {
         public override IReadOnlyConversionOptions ConvertOptions => ConverterHelper.ParameterCanBeNull;

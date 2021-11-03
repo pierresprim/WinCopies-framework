@@ -180,12 +180,6 @@
   <data name="DeleteStatusBarLabel" xml:space="preserve">
     <value>Deletes the selected items permanently.</value>
   </data>
-  <data name="DestinationPath" xml:space="preserve">
-    <value>Destination path:</value>
-  </data>
-  <data name="DirectoryStructure" xml:space="preserve">
-    <value>Directory structure</value>
-  </data>
   <data name="Edit" xml:space="preserve">
     <value>_Edit</value>
   </data>
@@ -195,6 +189,9 @@
   <data name="EmptyRecycleBinStatusBarLabel" xml:space="preserve">
     <value>Empties the Recycle Bin and delete all of its content from the disk.</value>
   </data>
+  <data name="Extraction" xml:space="preserve">
+    <value>Extraction</value>
+  </data>
   <data name="FastCompression" xml:space="preserve">
     <value>Fast compression</value>
   </data>
@@ -203,9 +200,6 @@
   </data>
   <data name="Help" xml:space="preserve">
     <value>_Help</value>
-  </data>
-  <data name="IncludeEmptyDirectories" xml:space="preserve">
-    <value>Include empty directories</value>
   </data>
   <data name="NewFileSystemTab" xml:space="preserve">
     <value>New file system tab</value>
@@ -240,14 +234,32 @@
   <data name="OpenFile" xml:space="preserve">
     <value>Open</value>
   </data>
+  <data name="OpenInNewTab" xml:space="preserve">
+    <value>Open in new tab</value>
+  </data>
+  <data name="OpenInNewTabStatusBarLabel" xml:space="preserve">
+    <value>Opens the selected item in a new tab.</value>
+  </data>
+  <data name="OpenInNewWindow" xml:space="preserve">
+    <value>Open in new window</value>
+  </data>
+  <data name="OpenInNewWindowStatusBarLabel" xml:space="preserve">
+    <value>Opens the selected item in a new window.</value>
+  </data>
+  <data name="OpenOrLaunch" xml:space="preserve">
+    <value>Open selected items</value>
+  </data>
+  <data name="OpenOrLaunchStatusBarLabel" xml:space="preserve">
+    <value>Opens the selected items.</value>
+  </data>
   <data name="Paste" xml:space="preserve">
     <value>Paste</value>
   </data>
   <data name="PasteStatusBarLabel" xml:space="preserve">
     <value>Pastes the Clipboard items in the selected folder.</value>
   </data>
-  <data name="PreserveDirectoryRoot" xml:space="preserve">
-    <value>Preserve directory root</value>
+  <data name="PreserveDirectoryStructure" xml:space="preserve">
+    <value>Preserve directory structure:</value>
   </data>
   <data name="Quit" xml:space="preserve">
     <value>_Quit</value>

@@ -17,66 +17,102 @@
 
 using Microsoft.WindowsAPICodePack.Shell;
 
+using SevenZip;
+
 using System;
 using System.Reflection;
 
+using WinCopies.Collections.DotNetFix.Generic;
 using WinCopies.GUI.IO.ObjectModel;
 using WinCopies.GUI.IO.Process;
 using WinCopies.IO;
 using WinCopies.IO.ObjectModel;
 using WinCopies.IO.Process;
 
+using static WinCopies.IO.Guids.Shell.Process.Archive;
+
 namespace WinCopies.GUI.Shell.ObjectModel
 {
+    public class ArchiveProcessInitializer<T> : ProcessInitialization<IPathInfo, ProcessError, ProcessTypes<IPathInfo, ProcessError, object>.ProcessErrorItem, object>.ProcessInitializer2<T> where T : IArchiveProcessParameters
+    {
+        public ArchiveProcessInitializer(in ProcessInitialization<IPathInfo, ProcessError, ProcessTypes<IPathInfo, ProcessError, object>.ProcessErrorItem, object>.ProcessInitializer processInitializer, in T extraParameters) : base(processInitializer, extraParameters) { /* Left empty. */ }
+
+        public override PathTypes<IPathInfo>.RootPath GetDestPath() => new PathTypes<WinCopies.IO.IPathInfo>.RootPath(ExtraParameters.DestinationPath, true);
+    }
+
+    public delegate WinCopies.IO.Process.ObjectModel.IProcess ProcessConverter<TInnerProcess, TFactory>(
+        in IEnumerableQueue<IPathInfo> initialPaths,
+        in IPathInfo sourcePath,
+        in IPathInfo destinationPath,
+        in ProcessTypes<IPathInfo>.IProcessQueue paths,
+        in WinCopies.IO.Process.IProcessLinkedList<IPathInfo, ProcessError, ProcessTypes<IPathInfo, ProcessError, object>.ProcessErrorItem, object> errorsQueue,
+        in ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessDelegates<ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessEventDelegates> progressDelegate,
+        in TInnerProcess innerProcess) where TFactory : ProcessErrorTypes<IPathInfo, ProcessError, object>.IProcessErrorFactories;
+
     public class BrowsableObjectInfoPlugin : WinCopies.IO.Shell.BrowsableObjectInfoPlugin
     {
         public BrowsableObjectInfoPlugin()
         {
             RegisterProcessSelectorsStack.Push(() =>
           {
-              ShellObjectInfo.DefaultCustomProcessesSelectorDictionary.Push(item => item.InnerObject.IsFileSystemObject, item => new IProcessInfo[] { new ArchiveCompressionProcessInfo() });
+              ShellObjectInfo.DefaultCustomProcessesSelectorDictionary.Push(item => item.InnerObject.IsFileSystemObject, item => new IProcessInfo[] { new ArchiveCompressionProcessInfo(), new ArchiveExtractionProcessInfo() });
 
-              WinCopies.IO.ObjectModel.BrowsableObjectInfo.DefaultProcessSelectorDictionary.Push(item => WinCopies.IO.ObjectModel.BrowsableObjectInfo.Predicate(item, typeof(WinCopies.IO.Guids.Shell.Process)), TryGetArchiveProcess);
+              WinCopies.IO.ObjectModel.BrowsableObjectInfo.DefaultProcessSelectorDictionary.Push(item => WinCopies.IO.ObjectModel.BrowsableObjectInfo.Predicate(item, typeof(WinCopies.IO.Guids.Shell.Process.Archive)), TryGetArchiveProcess);
           });
         }
 
+        public static WinCopies.IO.Process.ObjectModel.IProcess Get<TInnerProcess, TParameters>(in ArchiveProcessInitializer<TParameters> processInitializer, in ProcessConverter<TInnerProcess, ProcessErrorTypes<IPathInfo, ProcessError, object>.IProcessErrorFactories> func) where TParameters : IArchiveProcessParameters<TInnerProcess>
+        {
+            ProcessInitialization<WinCopies.IO.IPathInfo, ProcessError, ProcessTypes<WinCopies.IO.IPathInfo, ProcessError, object>.ProcessErrorItem, object>.ProcessInitializer _processInitializer = processInitializer.ProcessInitializer;
+
+            return func(_processInitializer.GetInitialPaths(), _processInitializer.SourcePath, processInitializer.GetDestPath(), _processInitializer.GetPathsQueue(), _processInitializer.GetErrorsQueue(), ProcessHelper<WinCopies.IO.IPathInfo>.GetDefaultProcessDelegates(), processInitializer.ExtraParameters.ToArchiveProcess());
+        }
+
+        public static WinCopies.IO.Process.ObjectModel.IProcess GetArchiveCompressionProcess(in IEnumerableQueue<IPathInfo> initialPaths, in IPathInfo sourcePath, in IPathInfo destinationPath, in ProcessTypes<IPathInfo>.IProcessQueue paths, in WinCopies.IO.Process.IProcessLinkedList<IPathInfo, ProcessError, ProcessTypes<IPathInfo, ProcessError, object>.ProcessErrorItem, object> errorsQueue, in ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessDelegates<ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessEventDelegates> progressDelegate, in SevenZipCompressor archiveCompressor) =>
+            new WinCopies.IO.Process.ObjectModel.Compression<ProcessErrorFactory<WinCopies.IO.IPathInfo, object>>(
+                            initialPaths,
+                            sourcePath,
+                            destinationPath,
+                            paths,
+                            errorsQueue,
+                            progressDelegate,
+                            new CompressionProcessErrorFactory(),
+                            archiveCompressor);
+
+        public static WinCopies.IO.Process.ObjectModel.IProcess GetArchiveExtractionProcess(in IEnumerableQueue<IPathInfo> initialPaths, in IPathInfo sourcePath, in IPathInfo destinationPath, in ProcessTypes<IPathInfo>.IProcessQueue paths, in WinCopies.IO.Process.IProcessLinkedList<IPathInfo, ProcessError, ProcessTypes<IPathInfo, ProcessError, object>.ProcessErrorItem, object> errorsQueue, in ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessDelegates<ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessEventDelegates> progressDelegate, in Converter<string, SevenZipExtractor> archiveExtractor) =>
+            new WinCopies.IO.Process.ObjectModel.Extraction<ProcessErrorFactory<WinCopies.IO.IPathInfo, object>>(
+                            initialPaths,
+                            sourcePath,
+                            destinationPath,
+                            paths,
+                            errorsQueue,
+                            progressDelegate,
+                            new CompressionProcessErrorFactory(),
+                            archiveExtractor);
+
         public static WinCopies.IO.Process.ObjectModel.IProcess TryGetArchiveProcess(ProcessFactorySelectorDictionaryParameters processParameters)
         {
-            string guid = processParameters.ProcessParameters.Guid.ToString();
+            ProcessInitialization<WinCopies.IO.IPathInfo, ProcessError, ProcessTypes<WinCopies.IO.IPathInfo, ProcessError, object>.ProcessErrorItem, object>.ProcessInitializer processInitializer = new ProcessInitialization<WinCopies.IO.IPathInfo, ProcessError, ProcessTypes<WinCopies.IO.IPathInfo, ProcessError, object>.ProcessErrorItem, object>.ProcessInitializer(processParameters);
 
-            System.Collections.Generic.IEnumerator<string> enumerator = null;
+            WinCopies.IO.Process.ObjectModel.IProcess get<TInnerProcess, TParameters>(in TParameters parameters, in ProcessConverter<TInnerProcess, ProcessErrorTypes<IPathInfo, ProcessError, object>.IProcessErrorFactories> func) where TParameters : IArchiveProcessParameters<TInnerProcess> => Get<TInnerProcess, TParameters>(new ArchiveProcessInitializer<TParameters>(processInitializer, parameters), func);
 
             try
             {
-                switch (guid)
+                switch (processInitializer.Guid)
                 {
-                    case WinCopies.IO.Guids.Shell.Process.Archive.Compression:
+                    case Extraction:
 
-                        enumerator = processParameters.ProcessParameters.Parameters.GetEnumerator();
+                        return get<Converter<string, SevenZipExtractor>, IArchiveExtractionParameters>(ArchiveExtractionParameters.FromProcessParameters(processInitializer.Enumerator), GetArchiveExtractionProcess);
 
-                        WinCopies.IO.IPathInfo sourcePath = enumerator.MoveNext() ? new PathTypes<WinCopies.IO.IPathInfo>.RootPath(enumerator.Current, true) : throw new InvalidOperationException(WinCopies.IO.Shell.Resources.ExceptionMessages.ProcessParametersCouldNotBeParsedCorrectly);
+                    case Compression:
 
-                        var parameters = ArchiveCompressionParameters.FromProcessParameters(enumerator);
-
-                        return new WinCopies.IO.Process.ObjectModel.Compression<ProcessErrorFactory<WinCopies.IO.IPathInfo, object>>(
-                            ProcessHelper<WinCopies.IO.IPathInfo>.GetInitialPaths(enumerator, sourcePath, path => path),
-                            sourcePath,
-                            new PathTypes<WinCopies.IO.IPathInfo>.RootPath(parameters.DestinationPath, true),
-                            processParameters.Factory.GetProcessCollection<WinCopies.IO.IPathInfo>(),
-                            processParameters.Factory.GetProcessLinkedList<
-                                WinCopies.IO.IPathInfo,
-                                ProcessError,
-                                ProcessTypes<WinCopies.IO.IPathInfo, ProcessError, object>.ProcessErrorItem,
-                                object>(),
-                            ProcessHelper<WinCopies.IO.IPathInfo>.GetDefaultProcessDelegates(),
-                            new CompressionProcessErrorFactory(),
-                            parameters.ToArchiveCompressor());
+                        return get<SevenZipCompressor, IArchiveCompressionParameters>(ArchiveCompressionParameters.FromProcessParameters(processInitializer.Enumerator), GetArchiveCompressionProcess);
                 }
             }
 
             finally
             {
-                enumerator?.Dispose();
+                processInitializer.Enumerator?.Dispose();
             }
 
             return null;
@@ -91,9 +127,11 @@ namespace WinCopies.GUI.Shell.ObjectModel
 
         public static IBrowsableObjectInfo GetBrowsableObjectInfo(string path) => ShellObjectInfo.From(ShellObjectFactory.Create(path));
 
-        public static IExplorerControlViewModel GetDefaultExplorerControlViewModel(in IBrowsableObjectInfo browsableObjectInfo)
+        public static IExplorerControlViewModel GetDefaultExplorerControlViewModel(in IBrowsableObjectInfo browsableObjectInfo) => GetDefaultExplorerControlViewModel(browsableObjectInfo is IBrowsableObjectInfoViewModel viewModel ? viewModel : new BrowsableObjectInfoViewModel(browsableObjectInfo));
+
+        public static IExplorerControlViewModel GetDefaultExplorerControlViewModel(in IBrowsableObjectInfoViewModel browsableObjectInfo)
         {
-            IExplorerControlViewModel viewModel = ExplorerControlViewModel.From(new BrowsableObjectInfoViewModel(browsableObjectInfo), GetBrowsableObjectInfo);
+            IExplorerControlViewModel viewModel = ExplorerControlViewModel.From(browsableObjectInfo, GetBrowsableObjectInfo);
 
             return viewModel;
         }

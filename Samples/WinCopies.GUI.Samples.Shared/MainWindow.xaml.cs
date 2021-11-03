@@ -21,6 +21,7 @@ using System.Windows.Input;
 
 using WinCopies.Commands;
 using WinCopies.GUI.Controls.Models;
+using WinCopies.GUI.IO.ObjectModel;
 using WinCopies.GUI.Shell;
 using WinCopies.GUI.Windows;
 using WinCopies.Util.Data;
@@ -164,7 +165,7 @@ namespace WinCopies.GUI.Samples
 
         private void MenuItem_Click_1(object sender, RoutedEventArgs e) => new ExplorerControlWindow /*ExplorerControlTest*/().Show();
 
-        public class NamedObject : WinCopies.Util.Data.NamedObject<string>
+        public class NamedObject : NamedObject<string>
         {
             public NamedObject(in string name, in string value) : base(name, value) { /* Left empty. */ }
 
@@ -173,24 +174,43 @@ namespace WinCopies.GUI.Samples
 
         private void MenuItem_Click_2(object sender, RoutedEventArgs e)
         {
-            var dialog = new FileSystemDialogBox(new FileSystemDialog(FileSystemDialogBoxMode.OpenFile) { Filters = new INamedObject<string>[] { new NamedObject("Text file", "*.txt"), new NamedObject("CS file", "*.cs") } }, true);
-
-            _ = dialog.ShowDialog();
-
-            switch (dialog.MessageBoxResult)
+            static void showDialog(in FileSystemDialogBoxMode mode, in INamedObject<string>[] filters)
             {
-                case Windows.MessageBoxResult.OK:
+                var dialog = new FileSystemDialogBox(new FileSystemDialog(mode), true);
 
-                    _ = MessageBox.Show($"You've selected: {dialog.Path.Path.Path}");
+                if (filters != null)
 
-                    break;
+                    dialog.Dialog.Filters = filters;
 
-                case Windows.MessageBoxResult.Cancel:
+                _ = dialog.ShowDialog();
 
-                    _ = MessageBox.Show($"You've canceled the path selection.");
+                IExplorerControlViewModel path = dialog.Dialog.Path;
 
-                    break;
+                switch (dialog.MessageBoxResult)
+                {
+                    case Windows.MessageBoxResult.OK:
+
+                        _ = MessageBox.Show($"You've selected: {path.Path.Path}");
+
+                        break;
+
+                    case Windows.MessageBoxResult.Cancel:
+
+                        _ = MessageBox.Show($"You've canceled the path selection.");
+
+                        break;
+                }
+
+                path.Dispose();
             }
+
+            showDialog(FileSystemDialogBoxMode.SelectFolder, null);
+
+            var filters = new INamedObject<string>[] { new NamedObject("Text file", "*.txt"), new NamedObject("CS file", "*.cs") };
+
+            showDialog(FileSystemDialogBoxMode.OpenFile, filters);
+
+            showDialog(FileSystemDialogBoxMode.OpenFile, filters);
         }
     }
 }

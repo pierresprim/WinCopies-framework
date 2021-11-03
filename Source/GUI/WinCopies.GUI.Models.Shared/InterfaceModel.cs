@@ -377,8 +377,25 @@ namespace WinCopies.GUI.Controls.Models
         // Left empty.
     }
 
-    public interface IMenuItemModel : IHeaderedItemsControlModel, ICommandSource
+    public interface IMenuItemModelBase
     {
+        bool IsSeparator { get; }
+    }
+
+    public interface ISeparator : IMenuItemModelBase
+    {
+#if CS8
+        bool IMenuItemModelBase.IsSeparator => true;
+#endif
+
+    }
+
+    public interface IMenuItemModel : IMenuItemModelBase, IHeaderedItemsControlModel, ICommandSource
+    {
+#if CS8
+        bool IMenuItemModelBase.IsSeparator => false;
+#endif
+
         new ICommand Command { get; set; }
 
         new object CommandParameter { get; set; }

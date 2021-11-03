@@ -52,7 +52,7 @@ namespace WinCopies.IO.Process
         Local = 2
     }
 
-    public interface IProcessInfo
+    public interface IProcessInfo : IProcessFactoryProcessInfoBase
     {
         string GroupName { get; }
 
@@ -65,17 +65,17 @@ namespace WinCopies.IO.Process
         IProcessParameters TryGetProcessParameters(object parameter, IBrowsableObjectInfo sourcePath, System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths);
     }
 
-    public interface IProcessCommands : DotNetFix.IDisposable
+    public interface IProcessCommand : DotNetFix.IDisposable
     {
         string Name { get; }
 
         string Caption { get; }
 
-        bool CanCreateNewItem();
+        bool CanExecute(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> items);
 
-        bool TryCreateNewItem(string name, out IProcessParameters result);
+        bool TryExecute(string name, System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> items, out IProcessParameters result);
 
-        IProcessParameters CreateNewItem(string name);
+        IProcessParameters Execute(string name, System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> items);
     }
 
     public interface IProcessInfoBase

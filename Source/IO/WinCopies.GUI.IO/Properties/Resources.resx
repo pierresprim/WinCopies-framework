@@ -117,29 +117,11 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ArchiveFormat" xml:space="preserve">
-    <value>Archive format:</value>
-  </data>
-  <data name="Compression" xml:space="preserve">
-    <value>Compression</value>
-  </data>
-  <data name="CompressionLevel" xml:space="preserve">
-    <value>Compression level:</value>
-  </data>
-  <data name="CompressionMethod" xml:space="preserve">
-    <value>Compression method:</value>
-  </data>
-  <data name="CompressionMode" xml:space="preserve">
-    <value>Compression mode:</value>
-  </data>
   <data name="DestinationPath" xml:space="preserve">
     <value>Destination path:</value>
   </data>
   <data name="DirectoryStructure" xml:space="preserve">
     <value>Directory structure</value>
-  </data>
-  <data name="FastCompression" xml:space="preserve">
-    <value>Fast compression</value>
   </data>
   <data name="IncludeEmptyDirectories" xml:space="preserve">
     <value>Include empty directories</value>
@@ -155,5 +137,8 @@
   </data>
   <data name="PreserveDirectoryRoot" xml:space="preserve">
     <value>Preserve directory root</value>
+  </data>
+  <data name="RenameItemCommandToolTip" xml:space="preserve">
+    <value>Opens a dialog for item renaming.</value>
   </data>
 </root>

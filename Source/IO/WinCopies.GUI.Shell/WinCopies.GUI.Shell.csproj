@@ -19,8 +19,8 @@
   <Import Project="..\WinCopies.GUI.Shell.Shared\WinCopies.GUI.Shell.Shared.projitems" Label="Shared" />
 
   <ItemGroup>
-    <PackageReference Include="WinCopies.Util" Version="3.14-preview" />
-    <PackageReference Include="WinCopies.Util.Desktop" Version="3.14-preview" />
+    <PackageReference Include="WinCopies.Util" Version="3.16-preview" />
+    <PackageReference Include="WinCopies.Util.Desktop" Version="3.16-preview" />
 
     <PackageReference Include="Squid-Box.SevenZipSharp" Version="1.2.231" />
   </ItemGroup>
@@ -29,6 +29,10 @@
     <ProjectReference Include="..\..\GUI\WinCopies.GUI.Templates\WinCopies.GUI.Templates.csproj" />
     <ProjectReference Include="..\WinCopies.GUI.IO\WinCopies.GUI.IO.csproj" />
     <ProjectReference Include="..\WinCopies.IO.Shell\WinCopies.IO.Shell.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(Configuration)'=='Debug'">
+    <ProjectReference Include="..\..\WinCopies.Util.Temp\WinCopies.Util.Temp.csproj" />
   </ItemGroup>
 
   <ItemGroup>

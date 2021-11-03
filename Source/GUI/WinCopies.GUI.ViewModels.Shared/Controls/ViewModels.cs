@@ -85,7 +85,7 @@ namespace WinCopies.GUI.Controls.ViewModels
     {
         public ICommand Command { get => ModelGeneric.Command; set => Update(nameof(Command), value, typeof(IButtonModel)); }
 
-        public object CommandParameter { get => ModelGeneric. CommandParameter; set => Update(nameof(CommandParameter), value, typeof(IButtonModel)); }
+        public object CommandParameter { get => ModelGeneric.CommandParameter; set => Update(nameof(CommandParameter), value, typeof(IButtonModel)); }
 
         public IInputElement CommandTarget { get => ModelGeneric.CommandTarget; set => Update(nameof(CommandTarget), value, typeof(IButtonModel)); }
 
@@ -99,7 +99,7 @@ namespace WinCopies.GUI.Controls.ViewModels
 
         ICommand ICommandSource.Command => Command;
 
-        public TCommandParameter CommandParameter { get => ModelGeneric. CommandParameter; set => Update(nameof(CommandParameter), value, typeof(IButtonModel)); }
+        public TCommandParameter CommandParameter { get => ModelGeneric.CommandParameter; set => Update(nameof(CommandParameter), value, typeof(IButtonModel)); }
 
         object IButtonModel.CommandParameter { get => ((IButtonModel)ModelGeneric).CommandParameter; set => ((IButtonModel)ModelGeneric).CommandParameter = value; }
 
@@ -234,6 +234,8 @@ namespace WinCopies.GUI.Controls.ViewModels
         public MenuItemViewModel(TModel model) : base(model) { /* Left empty. */ }
 
 #if !CS8
+        bool IMenuItemModelBase.IsSeparator => false;
+      
         object IHeaderedControlModel.Header { get => Header; set => Header = (THeader)value; }
 #endif
     }
@@ -256,6 +258,8 @@ namespace WinCopies.GUI.Controls.ViewModels
         public MenuItemViewModel(TModel model) : base(model) { /* Left empty. */ }
 
 #if !CS8
+        bool IMenuItemModelBase.IsSeparator => false;
+
         ICommand IMenuItemModel.Command { get => Command; set => Command = (ICommand<TCommandParameter>)value; }
 
         object IMenuItemModel.CommandParameter { get => CommandParameter; set => CommandParameter = (TCommandParameter)value; }

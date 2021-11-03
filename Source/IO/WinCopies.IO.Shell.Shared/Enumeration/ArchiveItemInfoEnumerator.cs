@@ -19,6 +19,7 @@ using SevenZip;
 
 using System;
 using System.Security;
+
 using WinCopies.Collections;
 using WinCopies.Collections.Generic;
 using WinCopies.IO.AbstractionInterop;
@@ -332,17 +333,11 @@ new WinCopies.Collections.Generic.Queue
             return false;
         }
 
-#if !WinCopies3
-        public void Reset()
-        {
-#else
-        protected override void ResetOverride()
-        {
-            base.ResetOverride();
-#endif
-            _index = -1;
+        protected override void ResetCurrent() => _current = null;
 
-            _current = null;
+        protected override void ResetOverride2()
+        {
+            _index = -1;
 
             _paths.Clear();
         }

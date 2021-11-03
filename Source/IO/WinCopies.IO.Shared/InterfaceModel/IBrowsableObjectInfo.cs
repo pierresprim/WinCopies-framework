@@ -21,6 +21,7 @@ using WinCopies.Collections.Generic;
 using WinCopies.IO.Process;
 using WinCopies.IO.PropertySystem;
 using WinCopies.PropertySystem;
+using WinCopies.Util.Commands.Primitives;
 
 namespace WinCopies.IO
 {
@@ -31,9 +32,9 @@ namespace WinCopies.IO
         /// </summary>
         public interface IBrowsableObjectInfo : IBrowsableObjectInfoBase, IRecursiveEnumerable<IBrowsableObjectInfo>, DotNetFix.IDisposable
         {
-            bool IsMonitoringSupported  { get; }  
+            bool IsMonitoringSupported { get; }
 
-            bool IsMonitoring { get; } 
+            bool IsMonitoring { get; }
 
             IBrowsabilityOptions Browsability { get; }
 
@@ -102,7 +103,7 @@ namespace WinCopies.IO
             ///// </summary>
             //IReadOnlyCollection<IBrowsableObjectInfo> Items { get; }
 
-            IBrowsableObjectInfoCallback RegisterCallback(Action<BrowsableObjectInfoCallbackArgs > callback);
+            IBrowsableObjectInfoCallback RegisterCallback(Action<BrowsableObjectInfoCallbackArgs> callback);
 
             void StartMonitoring();
 
@@ -113,6 +114,8 @@ namespace WinCopies.IO
             ArrayBuilder<IBrowsableObjectInfo> GetRootItems();
 
             System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetSubRootItems();
+
+            System.Collections.Generic.IEnumerable<ICommand> GetCommands(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> items);
 
             // IBrowsableObjectInfo GetBrowsableObjectInfo(IBrowsableObjectInfo browsableObjectInfo);
 

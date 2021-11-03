@@ -1,27 +1,27 @@
-﻿//* Copyright © Pierre Sprimont, 2021
-//*
-//* This file is part of the WinCopies Framework.
-//*
-//* The WinCopies Framework is free software: you can redistribute it and/or modify
-//* it under the terms of the GNU General Public License as published by
-//* the Free Software Foundation, either version 3 of the License, or
-//* (at your option) any later version.
-//*
-//* The WinCopies Framework is distributed in the hope that it will be useful,
-//* but WITHOUT ANY WARRANTY; without even the implied warranty of
-//* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//* GNU General Public License for more details.
-//*
-//* You should have received a copy of the GNU General Public License
-//* along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
+﻿/* Copyright © Pierre Sprimont, 2021
+ *
+ * This file is part of the WinCopies Framework.
+ *
+ * The WinCopies Framework is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * The WinCopies Framework is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using Microsoft.WindowsAPICodePack;
 using Microsoft.WindowsAPICodePack.COMNative.Shell;
 using Microsoft.WindowsAPICodePack.Shell;
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Reflection;
 using System.Windows;
@@ -32,6 +32,7 @@ using WinCopies.Desktop;
 using WinCopies.GUI.IO.Controls;
 using WinCopies.GUI.IO.ObjectModel;
 using WinCopies.GUI.Windows;
+using WinCopies.IO;
 using WinCopies.IO.ObjectModel;
 using WinCopies.IO.Process;
 using WinCopies.Linq;
@@ -42,6 +43,8 @@ using static System.Windows.MessageBoxButton;
 using static System.Windows.MessageBoxImage;
 using static System.Windows.MessageBoxResult;
 
+using static WinCopies.Commands.ApplicationCommands;
+using static WinCopies.Commands.Commands;
 using static WinCopies.GUI.Shell.ObjectModel.BrowsableObjectInfo;
 
 namespace WinCopies.GUI.Shell
@@ -103,8 +106,10 @@ namespace WinCopies.GUI.Shell
             }));
         }
 
-        public BrowsableObjectInfoWindow(in BrowsableObjectInfoWindowViewModel dataContext)
+        public BrowsableObjectInfoWindow(in IBrowsableObjectInfoWindowViewModel dataContext)
         {
+            ThrowHelper.ThrowIfNull(dataContext, nameof(dataContext));
+
             SetResourceReference(StyleProperty, typeof(BrowsableObjectInfoWindow));
 
             DataContext = dataContext;
@@ -116,7 +121,9 @@ namespace WinCopies.GUI.Shell
             AddDefaultCommandBindings();
         }
 
-        public static BrowsableObjectInfoWindowViewModel GetDefaultDataContext()
+        protected BrowsableObjectInfoWindow() : this(GetDefaultDataContext()) { /* Left empty. */ }
+
+        public static IBrowsableObjectInfoWindowViewModel GetDefaultDataContext()
         {
             var dataContext = new BrowsableObjectInfoWindowViewModel();
 
@@ -134,7 +141,7 @@ namespace WinCopies.GUI.Shell
 
         private void CloseAllTabs_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            ObservableCollection<IExplorerControlViewModel> paths = ((BrowsableObjectInfoWindowViewModel)DataContext).Paths.Paths;
+            IList<IExplorerControlViewModel> paths = ((BrowsableObjectInfoWindowViewModel)DataContext).Paths.Paths;
 
             paths.Clear();
 
@@ -147,11 +154,11 @@ namespace WinCopies.GUI.Shell
             e.Handled = true;
         }
 
-        protected virtual bool OnCanCancelClose(ObservableCollection<IExplorerControlViewModel> paths) => /* !Current.IsClosing && */ paths.Count > 1 && MessageBox.Show(this, Properties.Resources.WindowClosingMessage, "WinCopies", YesNo, Question, No) != Yes;
+        protected virtual bool OnCanCancelClose(IList<IExplorerControlViewModel> paths) => /* !Current.IsClosing && */ paths.Count > 1 && MessageBox.Show(this, Properties.Resources.WindowClosingMessage, "WinCopies", YesNo, Question, No) != Yes;
 
         protected override void OnClosing(CancelEventArgs e)
         {
-            ObservableCollection<IExplorerControlViewModel> paths = ((BrowsableObjectInfoWindowViewModel)DataContext).Paths.Paths;
+            IList<IExplorerControlViewModel> paths = ((BrowsableObjectInfoWindowViewModel)DataContext).Paths.Paths;
 
             if (OnCanCancelClose(paths))
 
@@ -176,15 +183,15 @@ namespace WinCopies.GUI.Shell
             e.Handled = true;
         }
 
-        protected abstract void OnQuit();
+        protected abstract void OnQuit(ExecutedRoutedEventArgs e);
 
         private void Quit_Executed(object sender, ExecutedRoutedEventArgs e) => RunCommand(OnQuit, e);
 
-        protected abstract void OnAboutWindowRequested(); // => _ = new About().ShowDialog();
+        protected abstract void OnAboutWindowRequested(ExecutedRoutedEventArgs e); // => _ = new About().ShowDialog();
 
         private void About_Executed(object sender, ExecutedRoutedEventArgs e) => RunCommand(OnAboutWindowRequested, e);
 
-        protected abstract void OnSubmitABug();
+        protected abstract void OnSubmitABug(ExecutedRoutedEventArgs e);
 
         private void SubmitABug_Executed(object sender, ExecutedRoutedEventArgs e) => RunCommand(OnSubmitABug, e);
 
@@ -193,13 +200,6 @@ namespace WinCopies.GUI.Shell
         private void CanRunCommand(in IProcessFactoryProcessInfo processFactory, in CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = processFactory.CanRun(GetEnumerable());
-
-            e.Handled = true;
-        }
-
-        private static void RunCommand(in Action action, in ExecutedRoutedEventArgs e)
-        {
-            action();
 
             e.Handled = true;
         }
@@ -213,20 +213,18 @@ namespace WinCopies.GUI.Shell
 
         protected IProcessFactory GetProcessFactory() => ((BrowsableObjectInfoWindowViewModel)DataContext).Paths.SelectedItem.Path.ProcessFactory;
 
-        private static void RunCommand(in Action action, in IRunnableProcessInfo processFactory)
-        {
-            if (processFactory.UserConfirmationRequired && MessageBox.Show(processFactory.GetUserConfirmationText(), Assembly.GetExecutingAssembly().GetName().Name, YesNo, Question, No) == No)
-
-                return;
-
-            action();
-        }
-
         private void RunProcess(in ExecutedRoutedEventArgs e, in FuncIn<IProcessFactory, IRunnableProcessInfo> func)
         {
             IRunnableProcessInfo processFactory = func(GetProcessFactory());
 
-            RunCommand(() => RunCommand(() => processFactory.Run(GetEnumerable(), 10u), processFactory), e);
+            RunCommand(_e =>
+            {
+                if (processFactory.UserConfirmationRequired && MessageBox.Show(processFactory.GetUserConfirmationText(), Assembly.GetExecutingAssembly().GetName().Name, YesNo, Question, No) == No)
+
+                    return;
+
+                processFactory.Run(GetEnumerable(), 10u);
+            }, e);
         }
 
         private void Copy_Executed(object sender, ExecutedRoutedEventArgs e) => RunProcess(e, (in IProcessFactory processFactory) => processFactory.Copy);
@@ -240,25 +238,25 @@ namespace WinCopies.GUI.Shell
             e.Handled = true;
         }
 
-        protected abstract void OnPaste(); // => StartInstance(GetProcessFactory().Copy.TryGetProcessParameters(10u));
+        protected abstract void OnPaste(ExecutedRoutedEventArgs e); // => StartInstance(GetProcessFactory().Copy.TryGetProcessParameters(10u));
 
         private void Paste_Executed(object sender, ExecutedRoutedEventArgs e) => RunCommand(OnPaste, e);
 
         private void Recycle_CanExecute(object sender, CanExecuteRoutedEventArgs e) => CanRunCommand(GetProcessFactory().Recycling, e);
 
-        protected abstract void OnRecycle(); // => StartInstance(GetProcessFactory().Recycling.TryGetProcessParameters(GetEnumerable()));
+        protected abstract void OnRecycle(ExecutedRoutedEventArgs e); // => StartInstance(GetProcessFactory().Recycling.TryGetProcessParameters(GetEnumerable()));
 
         private void Recycle_Executed(object sender, ExecutedRoutedEventArgs e) => RunCommand(OnRecycle, e);
 
         private void Empty_CanExecute(object sender, CanExecuteRoutedEventArgs e) => CanRunCommand(GetProcessFactory().Clearing, e);
 
-        protected abstract void OnEmpty(); // => StartInstance(GetProcessFactory().Clearing.TryGetProcessParameters(GetEnumerable()));
+        protected abstract void OnEmpty(ExecutedRoutedEventArgs e); // => StartInstance(GetProcessFactory().Clearing.TryGetProcessParameters(GetEnumerable()));
 
         private void Empty_Executed(object sender, ExecutedRoutedEventArgs e) => RunCommand(OnEmpty, e);
 
         private void Delete_CanExecute(object sender, CanExecuteRoutedEventArgs e) => CanRunCommand(GetProcessFactory().Deletion, e);
 
-        protected abstract void OnDelete(); // => StartInstance(GetProcessFactory().Deletion.TryGetProcessParameters(GetEnumerable()));
+        protected abstract void OnDelete(ExecutedRoutedEventArgs e); // => StartInstance(GetProcessFactory().Deletion.TryGetProcessParameters(GetEnumerable()));
 
         private void Delete_Executed(object sender, ExecutedRoutedEventArgs e) => RunCommand(OnDelete, e);
 
@@ -413,46 +411,177 @@ namespace WinCopies.GUI.Shell
             add(NavigationCommands.BrowseBack, Window_PreviousExecuted, Window_PreviousCanExecute);
             add(NavigationCommands.BrowseForward, Window_NextExecuted, Window_NextCanExecute);
 
-            add(Commands.ApplicationCommands.NewTab, NewTab_Executed, Command_CanExecute);
+            #region File
+            #region New
+            add(NewTab, NewTab_Executed, Command_CanExecute);
             add(NewRegistryTab, NewRegistryTab_Executed, Command_CanExecute);
             add(NewWMITab, NewWMITab_Executed, Command_CanExecute);
 
-            add(Commands.ApplicationCommands.NewWindow, NewWindow_Executed, Command_CanExecute);
-            add(Commands.ApplicationCommands.CloseTab, CloseTab_Executed, CloseTab_CanExecute);
-            add(Commands.ApplicationCommands.CloseOtherTabs, CloseOtherTabs_Executed, CloseTab_CanExecute);
-            add(Commands.ApplicationCommands.CloseAllTabs, CloseAllTabs_Executed, CloseTab_CanExecute);
-            add(Commands.ApplicationCommands.CloseTabsToTheLeftOrRight, CloseTabsTo_Executed, CloseTabsTo_CanExecute);
+            add(NewWindow, NewWindow_Executed, Command_CanExecute);
+            #endregion New
+
+            #region Open
+            add(OpenOrLaunch, Open_Executed, Open_CanExecute);
+            add(OpenInNewTab, OpenInNewTab_Executed, OpenInNewTabOrWindow_CanExecute);
+            add(OpenInNewWindow, OpenInNewWindow_Executed, OpenInNewTabOrWindow_CanExecute);
+            #endregion Open
+
+            #region Close
+            add(CloseTab, CloseTab_Executed, CloseTab_CanExecute);
+            add(CloseOtherTabs, CloseOtherTabs_Executed, CloseTab_CanExecute);
+            add(CloseAllTabs, CloseAllTabs_Executed, CloseTab_CanExecute);
+            add(CloseTabsToTheLeftOrRight, CloseTabsTo_Executed, CloseTabsTo_CanExecute);
 
             add(ApplicationCommands.Close, CloseWindow_Executed, Command_CanExecute);
+            #endregion Close
 
             add(Quit, Quit_Executed, Command_CanExecute);
+            #endregion File
 
+            #region Process
+            #region Copy
             add(Copy, Copy_Executed, Copy_CanExecute);
             add(Cut, Cut_Executed, Copy_CanExecute);
             add(Paste, Paste_Executed, Paste_CanExecute);
+            #endregion Copy
 
+            #region Deletion
             add(Delete, Recycle_Executed, Recycle_CanExecute);
-            add(Commands.ApplicationCommands.Empty, Empty_Executed, Empty_CanExecute);
-            add(Commands.ApplicationCommands.DeletePermanently, Delete_Executed, Delete_CanExecute);
+            add(Empty, Empty_Executed, Empty_CanExecute);
+            add(DeletePermanently, Delete_Executed, Delete_CanExecute);
+            #endregion Deletion
+            #endregion Process
 
+            #region Help
             add(Help, About_Executed, Command_CanExecute);
 
             add(SubmitABug, SubmitABug_Executed, Command_CanExecute);
+            #endregion Help
         }
 
-        private void AddNewDefaultTab(in IExplorerControlViewModel viewModel)
+        protected IExplorerControlViewModel GetCurrentExplorerControlViewModel() => ((BrowsableObjectInfoWindowViewModel)DataContext).Paths.SelectedItem;
+
+        protected System.Collections.IList GetSelectedItems() => GetCurrentExplorerControlViewModel().SelectedItems;
+
+        private void Open_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            viewModel.IsSelected = true;
+            IExplorerControlViewModel selectedItem = GetCurrentExplorerControlViewModel();
+
+            e.CanExecute = selectedItem.SelectedItems?.Count > 0 && selectedItem.SelectedItems[0] is IBrowsableObjectInfoViewModel browsableObjectInfo && selectedItem.ItemClickCommand.CanExecute(browsableObjectInfo);
+        }
+
+        private void Open_Executed(object sender, ExecutedRoutedEventArgs e) => TryExecuteRoutedCommand(() =>
+        {
+            IExplorerControlViewModel selectedItem = GetCurrentExplorerControlViewModel();
+            IList _selectedItems = selectedItem.SelectedItems;
+
+            if (_selectedItems?.Count > 0)
+            {
+                System.Collections.IList selectedItems = new ArrayList(_selectedItems.Count);
+
+                foreach (object item in _selectedItems)
+
+                    _ = selectedItems.Add(item);
+
+                Action<IBrowsableObjectInfoViewModel> action;
+
+                void _openItem(IBrowsableObjectInfoViewModel browsableObjectInfo)
+                {
+                    IBrowsableObjectInfoViewModel item = ExplorerControlViewModel.GetBrowsableObjectInfoOrLaunchItem(browsableObjectInfo);
+
+                    if (item != null)
+
+                        AddNewDefaultTab(GetDefaultExplorerControlViewModel(item), false);
+                }
+
+                void openItem(IBrowsableObjectInfoViewModel browsableObjectInfo)
+                {
+                    action = _openItem;
+
+                    if (selectedItem.ItemClickCommand == null)
+
+                        selectedItem.OnItemClick(browsableObjectInfo);
+
+                    else
+
+                        _ = selectedItem.ItemClickCommand.TryExecute(browsableObjectInfo);
+                }
+
+                action = openItem;
+
+                foreach (object item in selectedItems)
+
+                    if (item is IBrowsableObjectInfoViewModel _item)
+
+                        action(_item);
+            }
+        }, e);
+
+        public bool AreSelectedItemsBrowsableByDefault(out System.Collections.Generic.IEnumerable<IBrowsableObjectInfoViewModel> selectedItems)
+        {
+            System.Collections.IList _selectedItems = GetSelectedItems();
+
+            selectedItems = _selectedItems.As<IBrowsableObjectInfoViewModel>();
+
+            if (_selectedItems?.Count > 0)
+            {
+                foreach (IBrowsableObjectInfoViewModel item in selectedItems)
+
+                    if (item.Browsability.Browsability != Browsability.BrowsableByDefault)
+
+                        return false;
+
+                return true;
+            }
+
+            return false;
+        }
+
+        private void OpenInNewTabOrWindow_CanExecute(object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = AreSelectedItemsBrowsableByDefault(out _);
+
+        protected void OpenInNewTabOrWindow(in ActionIn<IBrowsableObjectInfoViewModel> action)
+        {
+            if (AreSelectedItemsBrowsableByDefault(out IEnumerable<IBrowsableObjectInfoViewModel> selectedItems))
+
+                foreach (IBrowsableObjectInfoViewModel item in selectedItems)
+
+                    action(item);
+        }
+
+        protected void OpenInNewTabOrWindow(ActionIn<IExplorerControlViewModel, bool> action) => OpenInNewTabOrWindow((in IBrowsableObjectInfoViewModel item) => action(GetDefaultExplorerControlViewModel(item), false));
+
+        private void OpenInNewTab_Executed(object sender, ExecutedRoutedEventArgs e) => TryExecuteRoutedCommand(() => OpenInNewTabOrWindow(AddNewDefaultTab), e);
+
+        private void OpenInNewWindow_Executed(object sender, ExecutedRoutedEventArgs e) => TryExecuteRoutedCommand(() =>
+        {
+            BrowsableObjectInfoCollectionViewModel items;
+
+            ActionIn<IExplorerControlViewModel> action = addItem;
+
+            void _addItem(in IExplorerControlViewModel item) => items.Paths.Add(item);
+
+            void addItem(in IExplorerControlViewModel item)
+            {
+                items = new BrowsableObjectInfoCollectionViewModel();
+
+                action = _addItem;
+
+                _addItem(item);
+
+                GetNewBrowsableObjectInfoWindow(new BrowsableObjectInfoWindowViewModel(items)).Show();
+            }
+
+            OpenInNewTabOrWindow((in IExplorerControlViewModel item, in bool selected) => action(item));
+        }, e);
+
+        private void AddNewDefaultTab(in IExplorerControlViewModel viewModel, in bool selected)
+        {
+            viewModel.IsSelected = selected;
 
             ((BrowsableObjectInfoWindowViewModel)DataContext).Paths.Paths.Add(viewModel);
         }
 
-        private void AddNewTab(IExplorerControlViewModel viewModel, ExecutedRoutedEventArgs e)
-        {
-            AddNewDefaultTab(viewModel);
-
-            e.Handled = true;
-        }
+        private void AddNewTab(IExplorerControlViewModel viewModel, ExecutedRoutedEventArgs e) => TryExecuteRoutedCommand(() => AddNewDefaultTab(viewModel, true), e);
 
         // todo: replace by the WinCopies.Util's same method.
 
@@ -504,13 +633,9 @@ namespace WinCopies.GUI.Shell
         private void NewWMITab_Executed(object sender, ExecutedRoutedEventArgs e) => AddNewTab(GetDefaultExplorerControlViewModel(new WMIItemInfo()), e);
 
         protected abstract BrowsableObjectInfoWindow GetNewBrowsableObjectInfoWindow();
+        protected abstract BrowsableObjectInfoWindow GetNewBrowsableObjectInfoWindow(in IBrowsableObjectInfoWindowViewModel dataContext);
 
-        private void NewWindow_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-            GetNewBrowsableObjectInfoWindow().Show();
-
-            e.Handled = true;
-        }
+        private void NewWindow_Executed(object sender, ExecutedRoutedEventArgs e) => TryExecuteRoutedCommand(() => GetNewBrowsableObjectInfoWindow().Show(), e);
 
         private void CloseTab_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
@@ -519,18 +644,17 @@ namespace WinCopies.GUI.Shell
             e.Handled = true;
         }
 
-        private void CloseTab_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-            _ = ((BrowsableObjectInfoWindowViewModel)DataContext).Paths.Paths.Remove((IExplorerControlViewModel)(e.Parameter is Func func ? func() : e.Parameter));
+        private void CloseTab_Executed(object sender, ExecutedRoutedEventArgs e) => TryExecuteRoutedCommand(() => ((BrowsableObjectInfoWindowViewModel)DataContext).Paths.Paths.Remove((IExplorerControlViewModel)(e.Parameter is Func func ? func() : e.Parameter)), e);
 
-            e.Handled = true;
-        }
+        private void CloseOtherTabs_Executed(object sender, ExecutedRoutedEventArgs e) => TryExecuteRoutedCommand(() => RemoveAll(((BrowsableObjectInfoWindowViewModel)DataContext).Paths.Paths, ((BrowsableObjectInfoWindowViewModel)DataContext).Paths.SelectedItem, false, false), e);
+    }
 
-        private void CloseOtherTabs_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-            _ = RemoveAll(((BrowsableObjectInfoWindowViewModel)DataContext).Paths.Paths, ((BrowsableObjectInfoWindowViewModel)DataContext).Paths.SelectedItem, false, false);
+    public abstract class BrowsableObjectInfoWindow2 : BrowsableObjectInfoWindow
+    {
+        protected BrowsableObjectInfoWindow2() : base() { /* Left empty. */ }
 
-            e.Handled = true;
-        }
+        protected BrowsableObjectInfoWindow2(in IBrowsableObjectInfoWindowViewModel dataContext) : base(dataContext) { /* Left empty. */ }
+
+        protected override BrowsableObjectInfoWindow GetNewBrowsableObjectInfoWindow() => GetNewBrowsableObjectInfoWindow(GetDefaultDataContext());
     }
 }

@@ -73,7 +73,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)Selectors\Reflection\DotNetNamespaceInfoSelectorDictionary.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Selectors\Reflection\DotNetMemberInfoSelectorDictionary.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Selectors\WMIItemInfoSelectorDictionary.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ShellObjectInfoProcessFactory\DragDropProcessFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ShellObjectInfoProcessFactory\ProcessFactoryTypes.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ShellObjectInfoProcessFactory\RenameItemProcessCommands.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ShellObjectInfoProcessFactory\ShellObjectInfoProcessFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ShellObjectInfoProcessFactory\NewItemProcessCommands.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)WMIItemInfoComparer.cs" />

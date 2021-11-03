@@ -22,7 +22,7 @@
 	<Import Project="..\WinCopies.GUI.Templates.Shared\WinCopies.GUI.Templates.Shared.projitems" Label="Shared" />
 
 	<ItemGroup>
-		<PackageReference Include="WinCopies.Util.Desktop" Version="3.14-preview" />
+		<PackageReference Include="WinCopies.Util.Desktop" Version="3.16-preview" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)'=='Debug'">

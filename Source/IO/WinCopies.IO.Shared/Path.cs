@@ -50,6 +50,8 @@ using static WinCopies.UtilHelpers;
 using static WinCopies.ThrowHelper;
 #endif
 
+using SysRegex = System.Text.RegularExpressions.Regex;
+
 namespace WinCopies.IO
 {
     public static class Path
@@ -644,7 +646,7 @@ namespace WinCopies.IO
 
         //        }
 
-        public static bool Match(in string name, in string filter) => Regex.IsMatch(name, Temp.Regex.FromPathFilter(filter), RegexOptions.IgnoreCase);
+        public static bool Match(in string name, in string filter) => SysRegex.IsMatch(name, Regex.FromPathFilter(filter), RegexOptions.IgnoreCase);
 
         public static StringCollection GetStringCollection(in System.Collections.Generic.IEnumerable<string> paths)
         {

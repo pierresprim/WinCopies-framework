@@ -351,7 +351,7 @@ namespace WinCopies.IO.ObjectModel
     {
         protected class _ProcessFactory : IProcessFactory
         {
-            protected class _NewItemProcessCommands : IProcessCommands
+            protected class _NewItemProcessCommands : IProcessCommand
             {
                 private IRegistryItemInfo _registryItemInfo;
 
@@ -363,9 +363,9 @@ namespace WinCopies.IO.ObjectModel
 
                 public _NewItemProcessCommands(in IRegistryItemInfo registryItemInfo) => _registryItemInfo = registryItemInfo;
 
-                public bool CanCreateNewItem() => _registryItemInfo.ObjectProperties.RegistryItemType == RegistryItemType.Key && !_registryItemInfo.InnerObject.Name.StartsWith(Microsoft.Win32.Registry.LocalMachine.Name);
+                public bool CanExecute(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> items) => _registryItemInfo.ObjectProperties.RegistryItemType == RegistryItemType.Key && !_registryItemInfo.InnerObject.Name.StartsWith(Microsoft.Win32.Registry.LocalMachine.Name);
 
-                public bool TryCreateNewItem(string parameter, out IProcessParameters result)
+                public bool TryExecute(string parameter, System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> items, out IProcessParameters result)
                 {
                     result = null;
 
@@ -382,7 +382,7 @@ namespace WinCopies.IO.ObjectModel
                     }
                 }
 
-                public IProcessParameters CreateNewItem(string parameter) => TryCreateNewItem(parameter, out IProcessParameters result)
+                public IProcessParameters Execute(string parameter, System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> items) => TryExecute(parameter, items, out IProcessParameters result)
                         ? result
                         : throw new InvalidOperationException(CouldNotCreateItem);
 
@@ -393,7 +393,9 @@ namespace WinCopies.IO.ObjectModel
 
             public bool IsDisposed { get; private set; }
 
-            public IProcessCommands NewItemProcessCommands { get; }
+            public IProcessCommand NewItemProcessCommand { get; }
+
+            public IProcessCommand RenameItemProcessCommand => null;
 
             IRunnableProcessInfo IProcessFactory.Copy => Process.ProcessFactory.DefaultRunnableProcessFactoryProcessInfo;
 
@@ -407,7 +409,7 @@ namespace WinCopies.IO.ObjectModel
 
             IDragDropProcessInfo IProcessFactory.DragDrop => Process.ProcessFactory.DefaultDragDropProcessInfo;
 
-            public _ProcessFactory(in IRegistryItemInfo registryItemInfo) => NewItemProcessCommands = new _NewItemProcessCommands(registryItemInfo);
+            public _ProcessFactory(in IRegistryItemInfo registryItemInfo) => NewItemProcessCommand = new _NewItemProcessCommands(registryItemInfo);
 
             IProcess IProcessFactory.GetProcess(ProcessFactorySelectorDictionaryParameters processParameters) => throw new NotSupportedException();
 

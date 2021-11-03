@@ -10,14 +10,17 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)ArchiveCompressionProcessInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\ArchiveExtractionProcessParametersControl.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ArchiveCompressionProcessParametersControl.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectInfoFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\FileSystemDialogBoxContent.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataConverters\BrowsabilityToOpenIconConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataConverters\FileSystemDialogBoxModeConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataConverters\FileSystemDialogBoxPredicateConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FileSystemDialog.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModels\BrowsableObjectInfoViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\BrowsableObjectInfoWindowMenuItemViewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModels\FileSystemDialogBoxViewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Windows\BrowsableObjectInfoWindow.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModels\ExplorerControlBrowsableObjectInfoViewModel.cs" />

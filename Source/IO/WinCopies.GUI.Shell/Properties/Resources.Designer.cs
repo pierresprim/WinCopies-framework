@@ -250,24 +250,6 @@ namespace WinCopies.GUI.Shell.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Destination path:.
-        /// </summary>
-        public static string DestinationPath {
-            get {
-                return ResourceManager.GetString("DestinationPath", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Directory structure.
-        /// </summary>
-        public static string DirectoryStructure {
-            get {
-                return ResourceManager.GetString("DirectoryStructure", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to _Edit.
         /// </summary>
         public static string Edit {
@@ -295,6 +277,15 @@ namespace WinCopies.GUI.Shell.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Extraction.
+        /// </summary>
+        public static string Extraction {
+            get {
+                return ResourceManager.GetString("Extraction", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Fast compression.
         /// </summary>
         public static string FastCompression {
@@ -318,15 +309,6 @@ namespace WinCopies.GUI.Shell.Properties {
         public static string Help {
             get {
                 return ResourceManager.GetString("Help", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Include empty directories.
-        /// </summary>
-        public static string IncludeEmptyDirectories {
-            get {
-                return ResourceManager.GetString("IncludeEmptyDirectories", resourceCulture);
             }
         }
         
@@ -430,6 +412,60 @@ namespace WinCopies.GUI.Shell.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Open in new tab.
+        /// </summary>
+        public static string OpenInNewTab {
+            get {
+                return ResourceManager.GetString("OpenInNewTab", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Opens the selected item in a new tab..
+        /// </summary>
+        public static string OpenInNewTabStatusBarLabel {
+            get {
+                return ResourceManager.GetString("OpenInNewTabStatusBarLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open in new window.
+        /// </summary>
+        public static string OpenInNewWindow {
+            get {
+                return ResourceManager.GetString("OpenInNewWindow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Opens the selected item in a new window..
+        /// </summary>
+        public static string OpenInNewWindowStatusBarLabel {
+            get {
+                return ResourceManager.GetString("OpenInNewWindowStatusBarLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open selected items.
+        /// </summary>
+        public static string OpenOrLaunch {
+            get {
+                return ResourceManager.GetString("OpenOrLaunch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Opens the selected items..
+        /// </summary>
+        public static string OpenOrLaunchStatusBarLabel {
+            get {
+                return ResourceManager.GetString("OpenOrLaunchStatusBarLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Paste.
         /// </summary>
         public static string Paste {
@@ -448,11 +484,11 @@ namespace WinCopies.GUI.Shell.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Preserve directory root.
+        ///   Looks up a localized string similar to Preserve directory structure:.
         /// </summary>
-        public static string PreserveDirectoryRoot {
+        public static string PreserveDirectoryStructure {
             get {
-                return ResourceManager.GetString("PreserveDirectoryRoot", resourceCulture);
+                return ResourceManager.GetString("PreserveDirectoryStructure", resourceCulture);
             }
         }
         

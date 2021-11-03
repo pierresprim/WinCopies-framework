@@ -79,7 +79,13 @@ namespace WinCopies.IO.Process
 
     namespace ObjectModel
     {
-        public static partial class ProcessObjectModelTypes<TItemsIn, TItemsOut, TFactory, TError, TAction, TProcessDelegates, TProcessEventDelegates, TProcessDelegateParam> where TItemsIn : IPathInfo where TItemsOut : IPathInfo where TFactory : ProcessErrorTypes<TItemsOut, TError, TAction>.IProcessErrorFactories where TProcessDelegates : ProcessDelegateTypes<TItemsOut, TProcessDelegateParam>.IProcessDelegates<TProcessEventDelegates> where TProcessEventDelegates : ProcessDelegateTypes<TItemsOut, TProcessDelegateParam>.IProcessEventDelegates where TProcessDelegateParam : IProcessProgressDelegateParameter
+        public static partial class ProcessObjectModelTypes<TItemsIn, TItemsOut, TFactory, TError, TAction, TProcessDelegates, TProcessEventDelegates, TProcessDelegateParam>
+            where TItemsIn : IPathInfo
+            where TItemsOut : IPathInfo
+            where TFactory : ProcessErrorTypes<TItemsOut, TError, TAction>.IProcessErrorFactories
+            where TProcessDelegates : ProcessDelegateTypes<TItemsOut, TProcessDelegateParam>.IProcessDelegates<TProcessEventDelegates>
+            where TProcessEventDelegates : ProcessDelegateTypes<TItemsOut, TProcessDelegateParam>.IProcessEventDelegates
+            where TProcessDelegateParam : IProcessProgressDelegateParameter
         {
             public abstract partial class Process : ProcessInterfaceModelTypes<TItemsIn, TItemsOut, TError, TAction>.IProcess<TProcessDelegateParam, TProcessEventDelegates>
             {
@@ -259,13 +265,17 @@ namespace WinCopies.IO.Process
 
                 protected abstract bool Check(out IProcessError<TError, TAction> error);
 
-                protected abstract void GetPathsLoadingErrorParameters(in TError error, in string message, in ErrorCode errorCode, out IProcessError<TError, TAction> _error, out bool clearOnError);
-
                 protected abstract bool OnPathLoaded(in TItemsOut path);
 
-                protected abstract System.Collections.Generic.IEnumerable<TItemsOut> GetEnumerable(in TItemsOut path);
+                protected virtual System.Collections.Generic.IEnumerable<TItemsOut> GetEnumerable(in TItemsOut path) => ProcessHelper<TItemsOut>.GetDefaultEnumerable(path, GetRecursiveEnumerationOrder(), Convert);
 
-                protected abstract TItemsOut Convert(TItemsIn path);
+                protected abstract void GetPathsLoadingErrorParameters(in TError error, in string message, in ErrorCode errorCode, out IProcessError<TError, TAction> _error, out bool clearOnError);
+
+                protected virtual TItemsOut ConvertGeneric(TItemsIn path) => ConvertCommon(path);
+
+                protected virtual TItemsOut Convert(PathTypes<IPathInfo>.PathInfo path) => ConvertCommon(path);
+
+                protected abstract TItemsOut ConvertCommon(IPathInfo path);
 
                 protected abstract RecursiveEnumerationOrder GetRecursiveEnumerationOrder();
 
@@ -275,7 +285,7 @@ namespace WinCopies.IO.Process
                 {
                     foreach (TItemsIn path in paths)
 
-                        if (!OnPathLoaded(Convert(path)))
+                        if (!OnPathLoaded(ConvertGeneric(path)))
                         {
                             SetCancelErrorParameters(out error, out clearOnError);
 
@@ -316,7 +326,7 @@ namespace WinCopies.IO.Process
 
                     foreach (TItemsIn path in paths)
                     {
-                        __path = Convert(path);
+                        __path = ConvertGeneric(path);
 
                         if (recursiveEnumerationOrder.HasFlag(RecursiveEnumerationOrder.ParentThenChildren))
 
@@ -761,6 +771,10 @@ namespace WinCopies.IO.Process
                     public TOptions Options { get; }
 
                     protected DefaultProcess2(in IEnumerableQueue<TItemsIn> initialPaths, in TItemsIn sourcePath, in ProcessTypes<TItemsOut>.IProcessQueue paths, in IProcessLinkedList<TItemsOut, TError, ProcessTypes<TItemsOut, TError, TAction>.ProcessErrorItem, TAction> errorsQueue, in TProcessDelegates processDelegates, in TFactory factory, in TOptions options) : base(initialPaths, sourcePath, paths, errorsQueue, processDelegates, factory) => (Options = options ?? throw GetArgumentNullException(nameof(options))).Process = this;
+
+                    protected override bool OnPathLoaded(in TItemsOut path) => ProcessHelper<TItemsOut>.ProcessHelper2<TError, TAction, TProcessDelegateParam, TProcessEventDelegates>.OnPathLoaded(path, Options, ProcessDelegates, null, AddPath);
+
+                    protected override void GetPathsLoadingErrorParameters(in TError error, in string message, in ErrorCode errorCode, out IProcessError<TError, TAction> _error, out bool clearOnError) => ProcessHelper.GetDefaultPathsLoadingErrorParameters(error, message, errorCode, Options, Factory, out _error, out clearOnError);
                 }
 
                 public abstract class DefaultDestinationProcess2 : DefaultDestinationProcess
@@ -768,6 +782,10 @@ namespace WinCopies.IO.Process
                     public TOptions Options { get; }
 
                     protected DefaultDestinationProcess2(in IEnumerableQueue<TItemsIn> initialPaths, in TItemsIn sourcePath, in TItemsIn destinationPath, in ProcessTypes<TItemsOut>.IProcessQueue paths, in IProcessLinkedList<TItemsOut, TError, ProcessTypes<TItemsOut, TError, TAction>.ProcessErrorItem, TAction> errorsQueue, in TProcessDelegates processDelegates, in TFactory factory, in TOptions options) : base(initialPaths, sourcePath, destinationPath, paths, errorsQueue, processDelegates, factory) => (Options = options ?? throw GetArgumentNullException(nameof(options))).Process = this;
+
+                    protected override bool OnPathLoaded(in TItemsOut path) => ProcessHelper<TItemsOut>.ProcessHelper2<TError, TAction, TProcessDelegateParam, TProcessEventDelegates>.OnPathLoaded(path, Options, ProcessDelegates, null, AddPath);
+
+                    protected override void GetPathsLoadingErrorParameters(in TError error, in string message, in ErrorCode errorCode, out IProcessError<TError, TAction> _error, out bool clearOnError) => ProcessHelper.GetDefaultPathsLoadingErrorParameters(error, message, errorCode, Options, Factory, out _error, out clearOnError);
                 }
             }
         }

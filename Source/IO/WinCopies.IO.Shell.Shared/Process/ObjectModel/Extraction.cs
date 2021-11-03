@@ -1,4 +1,4 @@
-﻿///*Copyright © Pierre Sprimont, 2021
+﻿/*Copyright © Pierre Sprimont, 2021
 // *
 // * This file is part of the WinCopies Framework.
 // *
@@ -14,6 +14,141 @@
 // *
 // * You should have received a copy of the GNU General Public License
 // * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
+
+using Microsoft.WindowsAPICodePack.Win32Native;
+
+using SevenZip;
+
+using System;
+using System.Collections.Generic;
+
+using WinCopies.Collections.DotNetFix.Generic;
+using WinCopies.Collections.Generic;
+using WinCopies.Util.Commands.Primitives;
+
+namespace WinCopies.IO.Process
+{
+    namespace ObjectModel
+    {
+        [ProcessGuid(Guids.Shell.Process.Archive.Extraction)]
+        public class Extraction<T> : // ArchiveProcess<WinCopies.IO.IPathInfo, ProcessQueueCollection, ReadOnlyProcessQueueCollection, ProcessErrorPathQueueCollection, ReadOnlyProcessErrorPathQueueCollection
+                                     // #if DEBUG
+                                     // , ProcessSimulationParameters
+                                     // #endif
+                                     // >
+           ArchiveProcess<T> where T : ProcessErrorTypes<IPathInfo, ProcessError, object>.IProcessErrorFactories
+        {
+            public override IReadOnlyDictionary<string, ICommand<IProcessErrorItem<IPathInfo, ProcessError, object>>> Actions => null;
+
+            protected Converter<string, SevenZipExtractor> ArchiveExtractorProvider { get; }
+
+            public override string Guid => Guids.Shell.Process.Archive.Extraction;
+
+            public override string Name => Shell.Properties.Resources.Extraction;
+
+            public Extraction(in IEnumerableQueue<IPathInfo> initialPaths, in IPathInfo sourcePath, in IPathInfo destinationPath, in ProcessTypes<IPathInfo>.IProcessQueue paths, in IProcessLinkedList<IPathInfo, ProcessError, ProcessTypes<IPathInfo, ProcessError, object>.ProcessErrorItem, object> errorsQueue, in ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessDelegates<ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessEventDelegates> progressDelegate, T factory, in Converter<string, SevenZipExtractor> archiveExtractorProvider) : base(initialPaths, sourcePath, destinationPath, paths, errorsQueue, progressDelegate, factory) => ArchiveExtractorProvider = archiveExtractorProvider;
+
+            protected override RecursiveEnumerationOrder GetRecursiveEnumerationOrder() => throw new NotSupportedException();
+
+            protected override bool OnPathLoaded(in IPathInfo path) => throw new NotSupportedException();
+
+            protected override void GetPathsLoadingErrorParameters(in ProcessError error, in string message, in ErrorCode errorCode, out IProcessError<ProcessError, object> _error, out bool clearOnError) => throw new NotSupportedException();
+
+            protected override bool LoadPathsOverride(out IProcessError<ProcessError, object> error, out bool clearOnError)
+            {
+                foreach (IPathInfo path in InitialPaths)
+
+                        AddPath(path);
+
+                error = Factory.GetNoErrorError();
+
+                clearOnError = false;
+
+                return true;
+            }
+
+            protected override bool Check(out IProcessError<ProcessError, object> error)
+            {
+                try
+                {
+                    if (System.IO.File.Exists(DestinationPath.Path) || System.IO.Directory.Exists(DestinationPath.Path))
+                    {
+                        error = new ProcessError<ProcessError, object>(ProcessError.FileSystemEntryAlreadyExists, "An item already exists with the same path.", ErrorCode.FileExists);
+
+                        return false;
+                    }
+                }
+
+                catch
+                {
+                    // Left empty.
+                }
+
+                error = Factory.GetNoErrorError();
+
+                return true;
+            }
+
+            protected override bool DoWork(IPathInfo path, out IProcessError<ProcessError, object> error, out bool isErrorGlobal)
+            {
+                isErrorGlobal = false;
+
+                SevenZipExtractor archiveExtractor = ArchiveExtractorProvider(path.Path);
+
+                archiveExtractor.FileExtractionStarted += FileExtractionStarted;
+
+                archiveExtractor.Extracting += Extracting;
+
+                archiveExtractor.FileExtractionFinished += FileExtractingFinished;
+
+                try
+                {
+                    archiveExtractor.ExtractArchive(DestinationPath.Path);
+
+                    error = Factory.GetNoErrorError();
+                }
+
+                catch (SevenZipException ex)
+                {
+                    error = Factory.GetError(ProcessError.UnknownError, ex.Message, (HResult)ex.HResult);
+                }
+
+                finally
+                {
+                    archiveExtractor.FileExtractionStarted -= FileExtractionStarted;
+
+                    archiveExtractor.Extracting -= Extracting;
+
+                    archiveExtractor.FileExtractionFinished -= FileExtractingFinished;
+                }
+
+                return CancellationPending ? (CancellationPending = false) : true;
+            }
+
+            protected override bool DoWork(IProcessErrorItem<IPathInfo, ProcessError, object> path, out IProcessError<ProcessError, object> error, out bool isErrorGlobal) => DoWork(path.Item, out error, out isErrorGlobal);
+
+            private void Extracting(object sender, ProgressEventArgs e) => CancellationPending = ProcessDelegates.CommonDelegate.RaiseEvent(new ProcessProgressDelegateParameter(e.PercentDone, null));
+
+            private void FileExtractionStarted(object sender, FileInfoEventArgs e)
+            {
+                if (OnFileProcessStarted(e.PercentDone))
+
+                    e.Cancel = true;
+            }
+
+            private void FileExtractingFinished(object sender, EventArgs e) => _ = OnFileProcessCompleted();
+
+            protected override void ResetStatus() { /* Left empty. */ }
+
+            protected override IPathInfo ConvertCommon(IPathInfo path) => path;
+
+            protected override Predicate<IPathInfo> GetAddAsDuplicatePredicate()
+            {
+                throw new NotImplementedException();
+            }
+        }
+    }
+}
 
 //using Microsoft.WindowsAPICodePack.Shell;
 

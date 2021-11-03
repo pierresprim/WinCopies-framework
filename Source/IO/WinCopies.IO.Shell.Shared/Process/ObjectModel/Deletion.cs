@@ -42,7 +42,26 @@ using static WinCopies.ThrowHelper;
 namespace WinCopies.IO.Process.ObjectModel
 {
     [ProcessGuid(Guids.Shell.Process.Shell.Deletion)]
-    public class Deletion<T> : ProcessObjectModelTypes<IPathInfo, IPathInfo, T, ProcessError, ErrorAction, ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessDelegates<ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessEventDelegates>, ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessEventDelegates, IProcessProgressDelegateParameter>.DefaultProcesses<DeletionOptions<IPathInfo>>.DefaultProcess2 where T : ProcessErrorTypes<IPathInfo, ProcessError, ErrorAction>.IProcessErrorFactories
+    public class Deletion<T> :
+        ProcessObjectModelTypes<
+            IPathInfo,
+            IPathInfo,
+            T,
+            ProcessError,
+            ErrorAction,
+            ProcessDelegateTypes<
+                IPathInfo,
+                IProcessProgressDelegateParameter>.IProcessDelegates<
+                    ProcessDelegateTypes<
+                        IPathInfo,
+                        IProcessProgressDelegateParameter>.IProcessEventDelegates>,
+            ProcessDelegateTypes<
+                IPathInfo,
+                IProcessProgressDelegateParameter>.IProcessEventDelegates,
+            IProcessProgressDelegateParameter>.DefaultProcesses<
+                DeletionOptions<
+                    IPathInfo>>.DefaultProcess2
+        where T : ProcessErrorTypes<IPathInfo, ProcessError, ErrorAction>.IProcessErrorFactories
     {
         private delegate bool Func(IPathInfo path, out IProcessError<ProcessError, ErrorAction> error, out bool isErrorGlobal);
 
@@ -78,8 +97,6 @@ namespace WinCopies.IO.Process.ObjectModel
         {
             // Left empty.
         }
-
-        protected override System.Collections.Generic.IEnumerable<IPathInfo> GetEnumerable(in IPathInfo path) => GetDefaultEnumerable(path, RecursiveEnumerationOrder.ChildrenThenParent);
 
         protected override RecursiveEnumerationOrder GetRecursiveEnumerationOrder() => RecursiveEnumerationOrder.ChildrenThenParent;
 
@@ -275,10 +292,6 @@ namespace WinCopies.IO.Process.ObjectModel
             return false;
         }
 
-        protected override void GetPathsLoadingErrorParameters(in ProcessError error, in string message, in ErrorCode errorCode, out IProcessError<ProcessError, ErrorAction> _error, out bool clearOnError) => GetDefaultPathsLoadingErrorParameters(error, message, errorCode, Options, Factory, out _error, out clearOnError);
-
-        protected override bool OnPathLoaded(in IPathInfo path) => ProcessHelper<IPathInfo>.ProcessHelper2<ProcessError, ErrorAction, IProcessProgressDelegateParameter, ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessEventDelegates>.OnPathLoaded(path, Options, ProcessDelegates, null, AddPath);
-
         protected override bool DoWork(IProcessErrorItem<IPathInfo, ProcessError, ErrorAction> path, out IProcessError<ProcessError, ErrorAction> error, out bool isErrorGlobal) => DoWork((IPathInfo)path, out error, out isErrorGlobal);
 
         protected override IProcessProgressDelegateParameter GetNotifyCompletionParameters() => GetDefaultNotifyCompletionParameters();
@@ -320,6 +333,6 @@ namespace WinCopies.IO.Process.ObjectModel
             _func = null;
         }
 
-        protected override IPathInfo Convert(IPathInfo path) => path;
+        protected override IPathInfo ConvertCommon(IPathInfo path) => path;
     }
 }

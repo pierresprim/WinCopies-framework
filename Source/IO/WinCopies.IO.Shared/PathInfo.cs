@@ -195,15 +195,17 @@ namespace WinCopies.IO
 
             public PathInfo(in string relativePath, in T parent) : this(relativePath, parent, GetIsDirectory(new PathInfoCommon(relativePath, parent).Path)) { /* Left empty. */ }
 
-            public PathInfo(in IPathCommon path, in bool isDirectory) : this((path ?? throw GetArgumentNullException(nameof(path))).RelativePath, path.Parent.GetPathOrThrowIfInvalid(nameof(path)), isDirectory)
+            public PathInfo(in IPathCommon path, in bool isDirectory) : this((path ?? throw GetArgumentNullException(nameof(path))).RelativePath, GetParentPathOrThrowIfInvalid(path), isDirectory)
             {
                 // Left empty.
             }
 
-            public PathInfo(in IPathCommon path) : this((path ?? throw GetArgumentNullException(nameof(path))).RelativePath, path.Parent.GetPathOrThrowIfInvalid(nameof(path)), GetIsDirectory(path.Path))
+            public PathInfo(in IPathCommon path) : this((path ?? throw GetArgumentNullException(nameof(path))).RelativePath, GetParentPathOrThrowIfInvalid(path), GetIsDirectory(path.Path))
             {
                 // Left empty.
             }
+
+            public static T GetParentPathOrThrowIfInvalid(in IPathCommon path) => path.Parent == null ? default : path.Parent.GetPathOrThrowIfInvalid(nameof(path));
 
             internal static bool GetIsDirectory(in string path)
             {

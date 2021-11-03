@@ -24,10 +24,19 @@ using static WinCopies.Util.Desktop.UtilHelpers;
 
 namespace WinCopies.GUI.IO.Controls.Process
 {
-    public class ArchiveCompressionProcessParametersControl : Control
+    public class ArchiveProcessParametersControl : Control
     {
+        public static readonly DependencyProperty DestinationPathProperty = Register<string, ArchiveProcessParametersControl>(nameof(DestinationPath));
+
+        public string DestinationPath { get => (string)GetValue(DestinationPathProperty); set => SetValue(DestinationPathProperty, value); }
+    }
+
+    public class ArchiveCompressionProcessParametersControl : ArchiveProcessParametersControl
+    {
+        private static DependencyProperty Register<T>(in string propertyName) => Register<T, ArchiveCompressionProcessParametersControl>(propertyName);
+
         private static DependencyProperty Register<T>(in string propertyName, in PropertyMetadata propertyMetadata) => Register<T, ArchiveCompressionProcessParametersControl>(propertyName, propertyMetadata);
-        
+
         public static readonly DependencyProperty ArchiveFormatProperty = Register<OutArchiveFormat>(nameof(ArchiveFormat), new PropertyMetadata(OutArchiveFormat.Zip));
 
         public OutArchiveFormat ArchiveFormat { get => (OutArchiveFormat)GetValue(ArchiveFormatProperty); set => SetValue(ArchiveFormatProperty, value); }
@@ -44,19 +53,15 @@ namespace WinCopies.GUI.IO.Controls.Process
 
         public CompressionMode CompressionMode { get => (CompressionMode)GetValue(CompressionModeProperty); set => SetValue(CompressionModeProperty, value); }
 
-        public static readonly DependencyProperty DestinationPathProperty = Register<string, ArchiveCompressionProcessParametersControl>(nameof(DestinationPath));
-
-        public string DestinationPath { get => (string)GetValue(DestinationPathProperty); set => SetValue(DestinationPathProperty, value); }
-
         public static readonly DependencyProperty FastCompressionProperty = Register<bool>(nameof(FastCompression), new PropertyMetadata(true));
 
         public bool FastCompression { get => (bool)GetValue(FastCompressionProperty); set => SetValue(FastCompressionProperty, value); }
 
-        public static readonly DependencyProperty IncludeEmptyDirectoriesProperty = Register<bool>(nameof(IncludeEmptyDirectories), new PropertyMetadata(false));
+        public static readonly DependencyProperty IncludeEmptyDirectoriesProperty = Register<bool>(nameof(IncludeEmptyDirectories));
 
         public bool IncludeEmptyDirectories { get => (bool)GetValue(IncludeEmptyDirectoriesProperty); set => SetValue(IncludeEmptyDirectoriesProperty, value); }
 
-        public static readonly DependencyProperty PreserveDirectoryRootProperty = Register<bool>(nameof(PreserveDirectoryRoot), new PropertyMetadata(false));
+        public static readonly DependencyProperty PreserveDirectoryRootProperty = Register<bool>(nameof(PreserveDirectoryRoot));
 
         public bool PreserveDirectoryRoot { get => (bool)GetValue(PreserveDirectoryRootProperty); set => SetValue(PreserveDirectoryRootProperty, value); }
 

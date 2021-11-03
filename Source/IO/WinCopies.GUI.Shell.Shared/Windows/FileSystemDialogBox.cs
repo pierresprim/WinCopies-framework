@@ -8,25 +8,19 @@ namespace WinCopies.GUI.Shell
     {
         protected override bool CanExecuteCommand => true;
 
-        public static readonly DependencyProperty PathProperty = DependencyProperty.Register(nameof(Path), typeof(IFileSystemDialog), typeof(FileSystemDialogBox), new PropertyMetadata(null, (DependencyObject d, DependencyPropertyChangedEventArgs e) =>
+        public static readonly DependencyProperty DialogProperty = DependencyProperty.Register(nameof(Dialog), typeof(IFileSystemDialog), typeof(FileSystemDialogBox), new PropertyMetadata(null, (DependencyObject d, DependencyPropertyChangedEventArgs e) =>
         {
             if (e.NewValue == null)
 
-                throw new InvalidOperationException($"Cannot set {nameof(Path)} to null.");
+                throw new InvalidOperationException($"Cannot set {nameof(Dialog)} to null.");
         }));
 
-        public IFileSystemDialog Path { get => (IFileSystemDialog)GetValue(PathProperty); set => SetValue(PathProperty, value); }
-
-        public static readonly DependencyProperty DisposePathOnCloseProperty = DependencyProperty.Register(nameof(DisposePathOnClose), typeof(bool), typeof(FileSystemDialogBox));
-
-        public bool DisposePathOnClose { get => (bool)GetValue(DisposePathOnCloseProperty); set => SetValue(DisposePathOnCloseProperty, value); }
+        public IFileSystemDialog Dialog { get => (IFileSystemDialog)GetValue(DialogProperty); set => SetValue(DialogProperty, value); }
 
         static FileSystemDialogBox() => DefaultStyleKeyProperty.OverrideMetadata(typeof(FileSystemDialogBox), new FrameworkPropertyMetadata(typeof(FileSystemDialogBox)));
 
-        private FileSystemDialogBox(in bool disposePathOnClose)
+        private FileSystemDialogBox()
         {
-            DisposePathOnClose = disposePathOnClose;
-
             _ = CommandBindings.Add(new CommandBinding(ApplicationCommands.Close, (object sender, ExecutedRoutedEventArgs e) =>
             {
                 if ((bool)e.Parameter)
@@ -35,25 +29,19 @@ namespace WinCopies.GUI.Shell
 
                 else
 
-                CloseWindowWithDialogResult(false, Windows.MessageBoxResult.Cancel);
+                    CloseWindowWithDialogResult(false, Windows.MessageBoxResult.Cancel);
             }, (object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = true));
         }
 
-        public FileSystemDialogBox(in FileSystemDialogBoxMode mode, in bool disposePathOnClose) : this(disposePathOnClose) => Path = new FileSystemDialogBoxViewModel(mode);
+        public FileSystemDialogBox(in FileSystemDialogBoxMode mode, in bool disposePathOnClose) : this() => Dialog = new FileSystemDialogBoxViewModel(mode);
 
-        public FileSystemDialogBox(in IFileSystemDialog path, in bool disposePathOnClose) : this(disposePathOnClose) => Path = path ?? throw ThrowHelper.GetArgumentNullException(nameof(path));
+        public FileSystemDialogBox(in IFileSystemDialog path, in bool disposePathOnClose) : this() => Dialog = path ?? throw ThrowHelper.GetArgumentNullException(nameof(path));
 
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e);
 
-            if (DisposePathOnClose)
-
-                Path?.Path?.Dispose();
-
-            else
-
-                Path?.Path?.StopMonitoring();
+            Dialog?.Path?.StopMonitoring();
         }
     }
 }

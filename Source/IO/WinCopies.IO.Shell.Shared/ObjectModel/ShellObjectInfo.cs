@@ -19,7 +19,6 @@
 #region Namespaces
 using Microsoft.WindowsAPICodePack.COMNative.Shell;
 using Microsoft.WindowsAPICodePack.Shell;
-
 using System;
 using System.IO;
 using System.Linq;
@@ -36,12 +35,12 @@ using WinCopies.IO.Selectors;
 using WinCopies.IO.Shell.Process;
 using WinCopies.Linq;
 using WinCopies.PropertySystem;
+using WinCopies.Util.Commands.Primitives;
 #endregion
 #endregion
 
 #region Static Imports
 using static Microsoft.WindowsAPICodePack.Shell.KnownFolders;
-
 using static WinCopies.IO.BrowsableObjectInfoCallbackReason;
 using static WinCopies.IO.FileType;
 using static WinCopies.IO.ObjectModel.ShellObjectInfo;
@@ -51,10 +50,6 @@ using static WinCopies.ThrowHelper;
 #endregion
 
 using SystemPath = System.IO.Path;
-
-#if !CS8
-using WinCopies.Collections;
-#endif
 #endregion
 
 namespace WinCopies.IO
@@ -318,6 +313,37 @@ namespace WinCopies.IO
 
             #region Methods
             protected internal new void RaiseCallbacks(in BrowsableObjectInfoCallbackArgs a) => base.RaiseCallbacks(a);
+
+            /// <summary>
+            /// Returns the parent of this <see cref="ShellObjectInfo"/>.
+            /// </summary>
+            /// <returns>The parent of this <see cref="ShellObjectInfo"/>.</returns>
+            private IBrowsableObjectInfo GetParent()
+            {
+                bool equalsFileType()
+                {
+                    switch (ObjectPropertiesGeneric.FileType)
+                    {
+                        case Folder:
+                        case Archive:
+
+                            return true;
+
+                        case KnownFolder:
+
+                            return _shellObject.IsFileSystemObject || ((ShellNonFileSystemFolder)_shellObject).ParsingName != Computer.ParsingName;
+                    }
+
+                    return false;
+                }
+
+                return equalsFileType()
+                    ? From(_shellObject.Parent, ClientVersion)
+                    : ObjectPropertiesGeneric.FileType == Drive
+                        ? new ShellObjectInfo(Computer.Path, KnownFolder, ShellObjectFactory.Create(Computer.ParsingName), ClientVersion)
+                        : null;
+            }
+
             #region Archive
             public void OpenArchive(FileMode fileMode, FileAccess fileAccess, FileShare fileShare, int? bufferSize, FileOptions fileOptions) => ArchiveFileStream = ObjectPropertiesGeneric.FileType == Archive
                     ? ArchiveFileStream == null
@@ -345,6 +371,58 @@ namespace WinCopies.IO
             #endregion
 
             #region Overrides
+            protected override System.Collections.Generic.IEnumerable<ICommand> GetCommandsOverride(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> items)
+            {
+                //if (InnerObject is ShellFolder shellFolder)
+                //{
+                //    IEnumerableQueue<ShellObject> shellObjects = new EnumerableQueue<ShellObject>();
+
+                //    foreach (IBrowsableObjectInfo _item in items)
+                //    {
+                //        if (_item.InnerObject is ShellObject shellObject)
+                //        {
+                //            if (((IUIntCountable)shellObjects).Count == 0u)
+
+                //                shellObjects.Enqueue(shellObject);
+
+                //            else
+                //            {
+                //                shellObjects.Clear();
+
+                //                return null;
+                //            }
+
+                //            if (!Equals(_item.Parent, this))
+
+                //                return null;
+                //        }
+
+                //        else
+
+                //            return null;
+                //    }
+
+                //    IntPtr menu = Menus.CreatePopupMenu();
+
+                //    Guid riid = new Guid(Microsoft.WindowsAPICodePack.NativeAPI.Guids.Shell.IContextMenu);
+                //    IntPtr ptr = shellFolder.GetUIObjectOf(IntPtr.Zero, ShellContainer.GetPIDLs(shellObjects), ref riid);
+                //    IContextMenu contextMenu = CoreHelpers.GetTypedObjectForIUnknown<IContextMenu>(in ptr);
+
+                //    HResult hresult = contextMenu.QueryContextMenu(menu, 0u, 1u, uint.MaxValue, ContextMenuFlags.Explore | ContextMenuFlags.CanRename);
+
+                //    IContextMenu3 contextMenu3;
+
+                //    contextMenu3.HandleMenuMsg2((uint)WindowMessage.MenuChar, wParam, IntPtr.Zero) == HResult.Ok)
+                //    {
+                //        handled = true;
+                //    }
+
+                //    var menuItem = Temp.NativeMenuItem<Command<uint>, System.Collections.Generic.IEnumerable<Command<uint>>>.Create(new Temp.NativeShellMenu(ptr));
+                //}
+
+                return null;
+            }
+
             protected override void StartMonitoringOverride()
             {
                 var monitoring = new ShellObjectInfoMonitoring<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>(this);
@@ -395,36 +473,6 @@ namespace WinCopies.IO
             /// <returns>The <see cref="LocalizedName"/> of this <see cref="ShellObjectInfo"/>.</returns>
             public override string ToString() => string.IsNullOrEmpty(Path) ? _shellObject.GetDisplayName(DisplayNameType.Default) : SystemPath.GetFileName(Path);
             #endregion
-
-            /// <summary>
-            /// Returns the parent of this <see cref="ShellObjectInfo"/>.
-            /// </summary>
-            /// <returns>The parent of this <see cref="ShellObjectInfo"/>.</returns>
-            private IBrowsableObjectInfo GetParent()
-            {
-                bool equalsFileType()
-                {
-                    switch (ObjectPropertiesGeneric.FileType)
-                    {
-                        case Folder:
-                        case Archive:
-
-                            return true;
-
-                        case KnownFolder:
-
-                            return _shellObject.IsFileSystemObject || ((ShellNonFileSystemFolder)_shellObject).ParsingName != Computer.ParsingName;
-                    }
-
-                    return false;
-                }
-
-                return equalsFileType()
-                    ? From(_shellObject.Parent, ClientVersion)
-                    : ObjectPropertiesGeneric.FileType == Drive
-                        ? new ShellObjectInfo(Computer.Path, KnownFolder, ShellObjectFactory.Create(Computer.ParsingName), ClientVersion)
-                        : null;
-            }
             #endregion
         }
 
@@ -459,8 +507,7 @@ namespace WinCopies.IO
 
             public static Action RegisterDefaultProcessSelectors { get; private set; } = () =>
             {
-                DefaultProcessSelectorDictionary.Push(item => Predicate(item, typeof(Guids.Shell.Process.Shell))
-                                    , TryGetProcess
+                DefaultProcessSelectorDictionary.Push(item => Predicate(item, typeof(Guids.Shell.Process.Shell)), TryGetProcess
 
                 // System.Reflection.Assembly.GetExecutingAssembly().DefinedTypes.FirstOrDefault(t => t.Namespace.StartsWith(typeof(Process.ObjectModel.IProcess).Namespace) && t.GetCustomAttribute<ProcessGuidAttribute>().Guid == guid);
                 );
@@ -486,7 +533,7 @@ namespace WinCopies.IO
                 _processFactory = new ShellObjectInfoProcessFactory(this);
             }
 
-            public ShellObjectInfo(in IKnownFolder knownFolder, in ClientVersion clientVersion) : this(string.IsNullOrEmpty(knownFolder.Path) ? knownFolder.ParsingName : knownFolder.Path, FileType.KnownFolder, ShellObjectFactory.Create(knownFolder.ParsingName), clientVersion)
+            public ShellObjectInfo(in IKnownFolder knownFolder, in ClientVersion clientVersion) : this(string.IsNullOrEmpty(knownFolder.Path) ? knownFolder.ParsingName : knownFolder.Path, KnownFolder, ShellObjectFactory.Create(knownFolder.ParsingName), clientVersion)
             {
                 // Left empty.
             }
@@ -537,6 +584,8 @@ namespace WinCopies.IO
 
             public static ShellObjectInitInfo GetInitInfo(in ShellObject shellObject)
             {
+                FileType getFileType(in string path, in FileType defaultFileType) => IsSupportedArchiveFormat(SystemPath.GetExtension(path)) ? Archive : defaultFileType;
+
                 switch (shellObject ?? throw GetArgumentNullException(nameof(shellObject)))
                 {
                     case ShellFolder _:
@@ -545,9 +594,9 @@ namespace WinCopies.IO
                         {
                             case ShellFileSystemFolder shellFileSystemFolder:
 
-                                (string path, FileType fileType) = shellFileSystemFolder is FileSystemKnownFolder ? (shellObject.ParsingName, KnownFolder) : (shellFileSystemFolder.Path, FileType.Folder);
+                                (string path, FileType fileType) = shellFileSystemFolder is FileSystemKnownFolder ? (shellObject.ParsingName, KnownFolder) : (shellFileSystemFolder.Path, Folder);
 
-                                return new ShellObjectInitInfo(path, System.IO.Directory.GetParent(path) is null ? Drive : fileType);
+                                return new ShellObjectInitInfo(path, System.IO.Directory.GetParent(path) is null ? Drive : getFileType(path, fileType));
 
                             case NonFileSystemKnownFolder nonFileSystemKnownFolder:
 
@@ -566,7 +615,7 @@ namespace WinCopies.IO
 
                     case ShellFile shellFile:
 
-                        return new ShellObjectInitInfo(shellFile.Path, IsSupportedArchiveFormat(SystemPath.GetExtension(shellFile.Path)) ? Archive : shellFile.IsLink ? Link : SystemPath.GetExtension(shellFile.Path) == ".library-ms" ? Library : FileType.File);
+                        return new ShellObjectInitInfo(shellFile.Path, shellFile.IsLink ? Link : SystemPath.GetExtension(shellFile.Path) == ".library-ms" ? Library : getFileType(shellFile.Path, FileType.File));
                 }
 
                 throw new ArgumentException(ShellObjectIsNotSupported);
@@ -586,7 +635,7 @@ namespace WinCopies.IO
 
                     PathTypes<IPathInfo>.RootPath getParameter() => enumerator.MoveNext()
                                         ? new PathTypes<IPathInfo>.RootPath(enumerator.Current, true)
-                                        : throw new InvalidOperationException(ProcessParametersCouldNotBeParsedCorrectly);
+                                        : throw new InvalidOperationException(Resources.ExceptionMessages.ProcessParametersCouldNotBeParsedCorrectly);
 
                     ProcessTypes<T>.IProcessQueue getProcessCollection<T>() where T : IPathInfo => processParameters.Factory.GetProcessCollection<T>();
 

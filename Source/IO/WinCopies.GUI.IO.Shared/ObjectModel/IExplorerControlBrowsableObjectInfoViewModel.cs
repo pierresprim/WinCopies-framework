@@ -21,18 +21,28 @@ using System.ComponentModel;
 using System.Windows.Controls;
 using System.Windows.Input;
 
+using WinCopies.Commands;
 using WinCopies.GUI.Controls;
 using WinCopies.GUI.Controls.Models;
 using WinCopies.IO.ObjectModel;
 using WinCopies.IO.Process;
 
+using static WinCopies.GUI.IO.ObjectModel.ExplorerControlViewModel.CommonCommandsUtilities;
+
 namespace WinCopies.GUI.IO
 {
     public class CustomProcessParametersGeneratedEventArgs : EventArgs
     {
+        public IProcessInfo Process { get; }
+
         public IProcessParameters ProcessParameters { get; }
 
-        public CustomProcessParametersGeneratedEventArgs(in IProcessParameters processParameters) => ProcessParameters = processParameters;
+        public CustomProcessParametersGeneratedEventArgs(in IProcessInfo process, in IProcessParameters processParameters)
+        {
+            Process = process;
+
+            ProcessParameters = processParameters;
+        }
     }
 
     namespace ObjectModel
@@ -60,7 +70,15 @@ namespace WinCopies.GUI.IO
 
             bool IsCheckBoxVisible { get; set; }
 
+            DelegateCommand<IBrowsableObjectInfoViewModel> ItemClickCommand { get; }
+
             IButtonModel NewItemCommand { get; }
+
+            IButtonModel RenameItemCommand { get; }
+
+            System.Collections.Generic.IEnumerable<IBrowsableObjectInfoViewModel> SelectedItems2 { get; }
+
+            System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> SelectedItemsInnerObjects { get; }
 
             IBrowsableObjectInfoViewModel Path { get; set; }
 
@@ -72,7 +90,13 @@ namespace WinCopies.GUI.IO
 
             System.Collections.Generic.IEnumerable<IBrowsableObjectInfoViewModel> TreeViewItems { get; set; }
 
-            event System.EventHandler<CustomProcessParametersGeneratedEventArgs> CustomProcessParametersGeneratedEventHandler;
+            event System.EventHandler<CustomProcessParametersGeneratedEventArgs> CustomProcessParametersGenerated;
+
+            void OnItemClick(IBrowsableObjectInfoViewModel browsableObjectInfo);
+
+            IButtonModel GetCommonCommand(CommonCommandsIndex index);
+
+            IProcessFactory GetProcessFactory();
 
             void StartMonitoring();
 

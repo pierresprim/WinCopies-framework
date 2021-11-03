@@ -32,6 +32,7 @@ using WinCopies.IO.ObjectModel;
 using WinCopies.IO.Process;
 using WinCopies.IO.PropertySystem;
 using WinCopies.PropertySystem;
+using WinCopies.Util.Commands.Primitives;
 using WinCopies.Util.Data;
 #endregion
 
@@ -220,6 +221,8 @@ namespace WinCopies.GUI.IO.ObjectModel
         #endregion
 
         #region Methods
+        public System.Collections.Generic.IEnumerable<ICommand> GetCommands(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> items) => ModelGeneric.GetCommands(items);
+
         protected T GetIfNotDisposed<T>(in T value) => GetOrThrowIfDisposed(this, value);
 
         protected void ThrowIfDisposed() => ThrowHelper.ThrowIfDisposed(this);

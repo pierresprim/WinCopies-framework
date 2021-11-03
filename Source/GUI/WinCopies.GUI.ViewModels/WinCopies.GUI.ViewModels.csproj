@@ -26,7 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WinCopies.Util.Desktop" Version="3.14-preview" />
+    <PackageReference Include="WinCopies.Util.Desktop" Version="3.16-preview" />
   </ItemGroup>
 
   <ItemGroup>

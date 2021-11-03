@@ -50,8 +50,9 @@ namespace WinCopies.IO
         private ProcessFactoryTypes<IShellObjectInfoBase2>.Deletion _recycling;
         private ProcessFactoryTypes<IShellObjectInfoBase2>.Deletion _deletion;
         private ProcessFactoryTypes<IShellObjectInfoBase2>.Deletion _clearing;
-        private DragDropProcessFactory<IShellObjectInfo<IO.PropertySystem.IFileSystemObjectInfoProperties>> _dragDrop;
-        private IProcessCommands _newItemProcessCommands;
+        private DragDropProcessFactory<IShellObjectInfo<IFileSystemObjectInfoProperties>> _dragDrop;
+        private IProcessCommand _newItemProcessCommands;
+        private IProcessCommand _renameItemProcessCommands;
         public const string PreferredDropEffect = "Preferred DropEffect";
         #endregion
 
@@ -68,9 +69,11 @@ namespace WinCopies.IO
 
         public IDragDropProcessInfo DragDrop => _dragDrop;
 
-        public bool IsDisposed => _path == null;
+        public IProcessCommand NewItemProcessCommand => IsDisposed ? throw GetExceptionForDispose(false) : _newItemProcessCommands;
 
-        public IProcessCommands NewItemProcessCommands => IsDisposed ? throw GetExceptionForDispose(false) : _newItemProcessCommands;
+        public IProcessCommand RenameItemProcessCommand => IsDisposed ? throw GetExceptionForDispose(false) : _renameItemProcessCommands;
+
+        public bool IsDisposed => _path == null;
         #endregion Properties
 
         public ShellObjectInfoProcessFactory(in IShellObjectInfo<IFileSystemObjectInfoProperties> path)
@@ -114,9 +117,12 @@ namespace WinCopies.IO
                 (path);
 
             _newItemProcessCommands = new _NewItemProcessCommands(path);
+            _renameItemProcessCommands= new _RenameItemProcessCommands(path);
         }
 
         #region Methods
+        public static IProcessParameters GetCopyProcessParameters(in string sourcePath, in string destPath, in bool move, in System.Collections.Generic.IEnumerable<string> paths) => GetProcessParameters(Guids.Shell.Process.Shell.Copy, sourcePath, destPath, move, paths);
+
         public static ProcessParameters GetProcessParameters(in string processGuid, in string sourcePath, in string destinationPath, in bool move, in System.Collections.Generic.IEnumerable<string> paths) => new ProcessParameters(processGuid, paths.PrependValues(sourcePath, destinationPath, move ? "1" : "0"));
 
         public static ProcessParameters GetProcessParameters(in string processGuid, in string sourcePath, in RemoveOption removeOption, in System.Collections.Generic.IEnumerable<string> paths) => new ProcessParameters(processGuid, paths.PrependValues(sourcePath, removeOption.GetNumValue().ToString()));

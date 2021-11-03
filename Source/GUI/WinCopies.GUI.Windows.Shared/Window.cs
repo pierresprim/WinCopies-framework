@@ -26,6 +26,7 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
+
 using WinCopies.Linq;
 
 using static Microsoft.WindowsAPICodePack.Shell.DesktopWindowManager;
@@ -170,11 +171,11 @@ namespace WinCopies.GUI.Windows
 
                 item.Id = id;
 
-                _ = AppendMenu(menu, MenuFlags.String, id, item.Header ?? (item.Command is RoutedUICommand command ? command.Text : null));
+                _ = AppendMenu(menu, Microsoft.WindowsAPICodePack.Win32Native.Menus.MenuFlags.String, id, item.Header ?? (item.Command is RoutedUICommand command ? command.Text : null));
 
                 if (!item.IsEnabled)
 
-                    _ = EnableMenuItemByCommand(menu, (SystemMenuCommands)id, MenuFlags.Disabled);
+                    _ = EnableMenuItemByCommand(menu, (SystemMenuCommands)id, Microsoft.WindowsAPICodePack.Win32Native.Menus.MenuFlags.Disabled);
 
                 item.PropertyChanged += onPropertyChanged;
             }
@@ -220,7 +221,7 @@ namespace WinCopies.GUI.Windows
             {
                 case nameof(TitleBarMenuItem.IsEnabled):
 
-                    _ = EnableMenuItemByCommand(GetSystemMenu(), (SystemMenuCommands)sender.Id, sender.IsEnabled ? MenuFlags.Enabled : MenuFlags.Disabled);
+                    _ = EnableMenuItemByCommand(GetSystemMenu(), (SystemMenuCommands)sender.Id, sender.IsEnabled ? Microsoft.WindowsAPICodePack.Win32Native.Menus.MenuFlags.Enabled : Microsoft.WindowsAPICodePack.Win32Native.Menus.MenuFlags.Disabled);
 
                     break;
 

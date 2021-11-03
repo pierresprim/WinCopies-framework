@@ -19,7 +19,7 @@ namespace WinCopies.GUI.IO.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
@@ -61,51 +61,6 @@ namespace WinCopies.GUI.IO.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Archive format:.
-        /// </summary>
-        public static string ArchiveFormat {
-            get {
-                return ResourceManager.GetString("ArchiveFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Compression.
-        /// </summary>
-        public static string Compression {
-            get {
-                return ResourceManager.GetString("Compression", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Compression level:.
-        /// </summary>
-        public static string CompressionLevel {
-            get {
-                return ResourceManager.GetString("CompressionLevel", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Compression method:.
-        /// </summary>
-        public static string CompressionMethod {
-            get {
-                return ResourceManager.GetString("CompressionMethod", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Compression mode:.
-        /// </summary>
-        public static string CompressionMode {
-            get {
-                return ResourceManager.GetString("CompressionMode", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Destination path:.
         /// </summary>
         public static string DestinationPath {
@@ -120,15 +75,6 @@ namespace WinCopies.GUI.IO.Properties {
         public static string DirectoryStructure {
             get {
                 return ResourceManager.GetString("DirectoryStructure", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Fast compression.
-        /// </summary>
-        public static string FastCompression {
-            get {
-                return ResourceManager.GetString("FastCompression", resourceCulture);
             }
         }
         
@@ -174,6 +120,15 @@ namespace WinCopies.GUI.IO.Properties {
         public static string PreserveDirectoryRoot {
             get {
                 return ResourceManager.GetString("PreserveDirectoryRoot", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Opens a dialog for item renaming..
+        /// </summary>
+        public static string RenameItemCommandToolTip {
+            get {
+                return ResourceManager.GetString("RenameItemCommandToolTip", resourceCulture);
             }
         }
     }

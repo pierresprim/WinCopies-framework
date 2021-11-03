@@ -236,11 +236,6 @@
               Looks up a localized string similar to The destination path is too long..
             </summary>
         </member>
-        <member name="P:WinCopies.IO.Shell.Resources.ExceptionMessages.ProcessParametersCouldNotBeParsedCorrectly">
-            <summary>
-              Looks up a localized string similar to The given parameters could not be parsed correctly..
-            </summary>
-        </member>
         <member name="P:WinCopies.IO.Shell.Resources.ExceptionMessages.PropertyCannotBeNullOnObject">
             <summary>
               Looks up a localized string similar to {0} cannot be null on {1}..
@@ -581,17 +576,17 @@
             Gets the name of this <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/> depending of the associated <see cref="T:Microsoft.WindowsAPICodePack.Shell.ShellObject"/> (see the <see cref="T:Microsoft.WindowsAPICodePack.Shell.ShellObject"/> property for more details.
             </summary>
         </member>
-        <member name="M:WinCopies.IO.ObjectModel.ShellObjectInfo`4.ToString">
-            <summary>
-            Gets a string representation of this <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/>.
-            </summary>
-            <returns>The <see cref="P:WinCopies.IO.ObjectModel.ShellObjectInfo`4.LocalizedName"/> of this <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/>.</returns>
-        </member>
         <member name="M:WinCopies.IO.ObjectModel.ShellObjectInfo`4.GetParent">
             <summary>
             Returns the parent of this <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/>.
             </summary>
             <returns>The parent of this <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/>.</returns>
+        </member>
+        <member name="M:WinCopies.IO.ObjectModel.ShellObjectInfo`4.ToString">
+            <summary>
+            Gets a string representation of this <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/>.
+            </summary>
+            <returns>The <see cref="P:WinCopies.IO.ObjectModel.ShellObjectInfo`4.LocalizedName"/> of this <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/>.</returns>
         </member>
         <member name="P:WinCopies.IO.ObjectModel.WMIItemInfo`4.BrowsableObjectInfoBitmapSources.SmallOverride">
             <summary>

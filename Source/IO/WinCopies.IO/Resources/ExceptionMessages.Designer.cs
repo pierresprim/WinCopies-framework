@@ -88,6 +88,15 @@ namespace WinCopies.IO.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The given parameters could not be parsed correctly..
+        /// </summary>
+        public static string ProcessParametersCouldNotBeParsedCorrectly {
+            get {
+                return ResourceManager.GetString("ProcessParametersCouldNotBeParsedCorrectly", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An unknown error occurred..
         /// </summary>
         public static string UnknownError {

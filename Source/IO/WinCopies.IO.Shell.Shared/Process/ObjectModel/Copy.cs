@@ -182,11 +182,13 @@ namespace WinCopies.IO.Process
             #region Methods
             private static Shell.PathInfo __Convert(IPathInfo path) => new Shell.PathInfo(path);
 
-            protected override IPathInfo Convert(IPathInfo path) => __Convert(path);
+            protected override IPathInfo ConvertGeneric(IPathInfo path) => __Convert(path);
 
             private static Shell.PathInfo _Convert(IPathInfo path) => Delegates.Convert<IPathInfo, Shell.PathInfo>(path);
 
             private static IPathInfo _ConvertBack(Shell.PathInfo path) => Delegates.ConvertBackIn<Shell.PathInfo, IPathInfo>(path);
+
+            protected override IPathInfo ConvertCommon(IPathInfo path) => path;
 
             protected override RecursiveEnumerationOrder GetRecursiveEnumerationOrder() => Options.Move ? RecursiveEnumerationOrder.Both : RecursiveEnumerationOrder.ParentThenChildren;
 
@@ -194,7 +196,7 @@ namespace WinCopies.IO.Process
 
             protected override bool OnPathLoaded(in IPathInfo path) => ProcessHelper<IPathInfo>.ProcessHelper2<ProcessError, CopyErrorAction, IProcessProgressDelegateParameter, ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessEventDelegates>.OnPathLoaded(path, Options, ProcessDelegates, null, AddPath);
 
-            protected override System.Collections.Generic.IEnumerable<IPathInfo> GetEnumerable(in IPathInfo path) => (Options.Move ? new MovingRecursivelyEnumerablePath<Shell.PathInfo>(_Convert(path), null, null
+            protected override System.Collections.Generic.IEnumerable<IPathInfo> GetEnumerable(in IPathInfo path) => (Options.Move ? new MoveRecursivelyEnumerablePath<Shell.PathInfo>(_Convert(path), null, null
 #if CS8
                 , null
 #endif

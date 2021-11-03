@@ -114,11 +114,11 @@ namespace WinCopies.IO.Process
 
                 ArchiveCompressor.CompressionMode = CompressionMode.Create;
 
-                ArchiveCompressor.FileCompressionStarted += ArchiveCompressor_FileCompressionStarted;
+                ArchiveCompressor.FileCompressionStarted += FileCompressionStarted;
 
-                ArchiveCompressor.Compressing += ArchiveCompressor_Compressing;
+                ArchiveCompressor.Compressing += Compressing;
 
-                ArchiveCompressor.FileCompressionFinished += ArchiveCompressor_FileCompressionFinished;
+                ArchiveCompressor.FileCompressionFinished += FileCompressionFinished;
 
                 error = Factory.GetNoErrorError();
 
@@ -129,19 +129,27 @@ namespace WinCopies.IO.Process
             {
                 isErrorGlobal = false;
 
-                if (path.IsDirectory)
+                try
+                {
+                    if (path is ArchiveCompressionPathInfo _path)
 
-                    ArchiveCompressor.CompressDirectory(path.Path, DestinationPath.Path);
+                        ArchiveCompressor.CompressFiles(DestinationPath.Path, _path.FileNames);
 
-                else if (path is ArchiveCompressionPathInfo _path)
+                    else if (path.IsDirectory)
 
-                    ArchiveCompressor.CompressFiles(DestinationPath.Path, _path.FileNames);
+                        ArchiveCompressor.CompressDirectory(path.Path, DestinationPath.Path);
 
-                else
+                    else
 
-                    ArchiveCompressor.CompressFiles(DestinationPath.Path, path.Path);
+                        ArchiveCompressor.CompressFiles(DestinationPath.Path, path.Path);
 
-                error = Factory.GetNoErrorError();
+                    error = Factory.GetNoErrorError();
+                }
+
+                catch (SevenZipException ex)
+                {
+                    error = Factory.GetError(ProcessError.UnknownError, ex.Message, (HResult)ex.HResult);
+                }
 
                 return CancellationPending ? (CancellationPending = false) : true;
             }
@@ -150,29 +158,29 @@ namespace WinCopies.IO.Process
 
             protected override bool OnRunWorkerCompleted(bool? result)
             {
-                ArchiveCompressor.FileCompressionStarted -= ArchiveCompressor_FileCompressionStarted;
+                ArchiveCompressor.FileCompressionStarted -= FileCompressionStarted;
 
-                ArchiveCompressor.Compressing -= ArchiveCompressor_Compressing;
+                ArchiveCompressor.Compressing -= Compressing;
 
-                ArchiveCompressor.FileCompressionFinished -= ArchiveCompressor_FileCompressionFinished;
+                ArchiveCompressor.FileCompressionFinished -= FileCompressionFinished;
 
                 return base.OnRunWorkerCompleted(result);
             }
 
-            private void ArchiveCompressor_Compressing(object sender, ProgressEventArgs e) => CancellationPending = ProcessDelegates.CommonDelegate.RaiseEvent(new ProcessProgressDelegateParameter(e.PercentDone, null));
+            private void Compressing(object sender, ProgressEventArgs e) => CancellationPending = ProcessDelegates.CommonDelegate.RaiseEvent(new ProcessProgressDelegateParameter(e.PercentDone, null));
 
-            private void ArchiveCompressor_FileCompressionStarted(object sender, FileNameEventArgs e)
+            private void FileCompressionStarted(object sender, FileNameEventArgs e)
             {
                 if (OnFileProcessStarted(e.PercentDone))
 
                     e.Cancel = true;
             }
 
-            private void ArchiveCompressor_FileCompressionFinished(object sender, System.EventArgs e) => _ = OnFileProcessCompleted();
+            private void FileCompressionFinished(object sender, EventArgs e) => _ = OnFileProcessCompleted();
 
             protected override void ResetStatus() { /* Left empty. */ }
 
-            protected override IPathInfo Convert(IPathInfo path) => path;
+            protected override IPathInfo ConvertCommon(IPathInfo path) => path;
         }
     }
 }

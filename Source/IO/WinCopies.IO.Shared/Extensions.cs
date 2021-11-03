@@ -191,14 +191,9 @@ namespace WinCopies.IO
                 throw new ArgumentException($"{argumentName} must have a non-null value.");
         }
 
-        public static NullableGeneric<T> GetOrThrowIfInvalidPath<T>(this NullableGeneric<T> path, in string argumentName) where T : IPathCommon
-        {
-            if ((path ?? throw GetArgumentNullException(argumentName)).Value == null)
-
-                throw new ArgumentException($"{argumentName} must have a non-null value.");
-
-            return path;
-        }
+        public static NullableGeneric<T> GetOrThrowIfInvalidPath<T>(this NullableGeneric<T> path, in string argumentName) where T : IPathCommon => (path ?? throw GetArgumentNullException(argumentName)).Value == null
+                ? throw new ArgumentException($"{argumentName} must have a non-null value.")
+                : path;
 
         public static T GetPathOrThrowIfInvalid<T>(this NullableGeneric<T> path, in string argumentName) where T : IPathCommon => path.GetOrThrowIfInvalidPath(argumentName).Value;
     }

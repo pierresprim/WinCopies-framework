@@ -18,6 +18,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Windows;
 
 using WinCopies.Util;
 using WinCopies.Util.Data;
@@ -28,11 +29,13 @@ namespace WinCopies.GUI.IO.ObjectModel
 {
     public interface IBrowsableObjectInfoCollectionViewModel : DotNetFix.IDisposable
     {
-        ICollection<IExplorerControlViewModel> Paths { get; }
+        IList<IExplorerControlViewModel> Paths { get; }
 
         IExplorerControlViewModel SelectedItem { get; set; }
 
         int SelectedIndex { get; set; }
+
+        bool IsCheckBoxVisible { get; set; }
     }
 
     public class BrowsableObjectInfoCollectionViewModel : ViewModelBase, IBrowsableObjectInfoCollectionViewModel
@@ -40,7 +43,11 @@ namespace WinCopies.GUI.IO.ObjectModel
         private IExplorerControlViewModel _selectedItem;
         private int _selectedIndex;
         private bool _checkBoxVisible;
-        private ObservableCollection<IExplorerControlViewModel> _paths = new ObservableCollection<IExplorerControlViewModel>();
+        private ObservableCollection<IExplorerControlViewModel> _paths = new
+#if !CS9
+            ObservableCollection<IExplorerControlViewModel>
+#endif
+            ();
 
         public bool IsDisposed => _paths == null;
 
@@ -60,7 +67,7 @@ namespace WinCopies.GUI.IO.ObjectModel
             }
         }
 
-        ICollection<IExplorerControlViewModel> IBrowsableObjectInfoCollectionViewModel.Paths => Paths;
+        IList<IExplorerControlViewModel> IBrowsableObjectInfoCollectionViewModel.Paths => Paths;
 
         public BrowsableObjectInfoCollectionViewModel() => Paths.CollectionChanged += Paths_CollectionChanged;
 
@@ -110,7 +117,9 @@ namespace WinCopies.GUI.IO.ObjectModel
         protected virtual void Dispose(in bool disposing)
         {
             _paths.CollectionChanged -= Paths_CollectionChanged;
-            _paths.Clear();
+
+            Application.Current.Dispatcher.Invoke(_paths.Clear, System.Windows.Threading.DispatcherPriority.Normal);
+
             _paths = null;
 
             if (disposing)

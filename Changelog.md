@@ -31,6 +31,39 @@ CHANGELOG
 - Move IO Guids to WinCopies.IO.Guids.Shell namespace (WinCopies.IO.Shell assembly).
 - Add WinCopies.IO.Path.Match method.
 - New extension methods.
+- Update (I)MenuItemModel interfaces and classes.
+- IBrowsableObjectInfoCollectionViewModel:
+	- Paths property type is now IList<IExplorerControlViewModel> instead of ICollection<IExplorerControlViewModel>.
+	- New property (IsCheckBoxVisible).
+- Bug fixes when:
+	- disposing BrowsableObjectInfoCollectionViewModel.
+	- cancelling generation of custom process parameters.
+	- ExplorerControlViewModel: selected items are cleared when disposing.
+- Bug fixed in:
+	- WinCopies.IO.PathTypes\<T>.PathInfo constructors: an ArgumentNullException was thrown when attempting to initialize a root path.
+	- Archive compression.
+- (I)ExplorerControlViewModel:
+	- CustomProcessParametersGeneratedEventHandler => CustomProcessParametersGenerated
+	- constructor: path cannot be null.
+	- new properties and methods.
+- CustomProcessParametersGeneratedEventArgs:
+	- add Process property and 'process' parameter to constructor.
+- Re-design WinCopies.GUI.Shell.BrowsableObjectInfo- view models, BrowsableObjectInfoWindow and types related to archive process.
+- MovingRecursivelyEnumerablePath => MoveRecursivelyEnumerablePath.
+- WinCopies.IO.ObjectModel.(I)BrowsableObjectInfo: add methods.
+- WinCopies.IO.Process:
+	- ObjectModel.ProcessObjectModelTypes<TItemsIn, TItemsOut, TFactory, TError, TAction, TProcessDelegates, TProcessEventDelegates, TProcessDelegateParam>:
+		- Process class:
+			- some previously abstract methods have now a default implementation.
+			- Convert methods changed.
+		- DefaultProcesses<TOptions>: DefaultProcess2 and DefaultDestinationProcess2 have a default implementation for some methods of the Process class.
+	- The content of the IProcessFactoryProcessInfo interface is now in the new IProcessFactoryProcessInfoBase interface.
+	- IProcessFactory: new property (RenameItemProcessCommand).
+	- IProcessInfo implements IProcessFactoryProcessInfoBase.
+	- IProcessCommands:
+		- => IProcessCommand
+		- all methods have been re-defined.
+- Update resources.
 
 ### 3.11-preview
 

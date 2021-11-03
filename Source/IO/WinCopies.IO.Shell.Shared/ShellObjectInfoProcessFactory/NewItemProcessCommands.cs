@@ -20,6 +20,7 @@ using System;
 using WinCopies.IO.ObjectModel;
 using WinCopies.IO.Process;
 using WinCopies.IO.PropertySystem;
+using WinCopies.Util.Shared.Delegates;
 
 using static WinCopies.IO.Shell.Resources.ExceptionMessages;
 using static WinCopies.IO.FileType;
@@ -28,7 +29,7 @@ namespace WinCopies.IO
 {
     public partial class ShellObjectInfoProcessFactory
     {
-        protected class _NewItemProcessCommands : IProcessCommands
+        protected class _NewItemProcessCommands : IProcessCommand
         {
             private IShellObjectInfo<IFileSystemObjectInfoProperties> _shellObjectInfo;
 
@@ -40,28 +41,30 @@ namespace WinCopies.IO
 
             public _NewItemProcessCommands(in IShellObjectInfo<IFileSystemObjectInfoProperties> shellObjectInfo) => _shellObjectInfo = shellObjectInfo;
 
-            public bool CanCreateNewItem()
-            {
-                switch (_shellObjectInfo.ObjectProperties.FileType)
-                {
-                    case Folder:
-                    case KnownFolder:
-                    case Drive:
+            private static bool RunCommand(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> items, in Func<bool> action) => ActionDelegates.RunFuncIfFALSE(() => Collections.Util.TryGetHasItems(items), action, false, out _);
 
-                        return _shellObjectInfo.InnerObject.IsFileSystemObject;
-                }
+            public bool CanExecute(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> items) => RunCommand(items, () =>
+             {
+                 switch (_shellObjectInfo.ObjectProperties.FileType)
+                 {
+                     case Folder:
+                     case KnownFolder:
+                     case Drive:
 
-                return false;
-            }
+                         return _shellObjectInfo.InnerObject.IsFileSystemObject;
+                 }
 
-            public bool TryCreateNewItem(string parameter, out IProcessParameters result)
+                 return false;
+             });
+
+            public bool TryExecute(string parameter, System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> items, out IProcessParameters result)
             {
                 result = null;
 
-                return Microsoft.WindowsAPICodePack.Win32Native.Shell.Shell.CreateDirectoryW($"{_shellObjectInfo.Path}\\{parameter}", IntPtr.Zero);
+                return RunCommand(items, () => Microsoft.WindowsAPICodePack.Win32Native.Shell.Shell.CreateDirectoryW($"{_shellObjectInfo.Path}\\{parameter}", IntPtr.Zero));
             }
 
-            public IProcessParameters CreateNewItem(string name) => TryCreateNewItem(name, out IProcessParameters result)
+            public IProcessParameters Execute(string name, System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> items) => TryExecute(name, items, out IProcessParameters result)
                     ? result
                     : throw new InvalidOperationException(CouldNotCreateItem);
 

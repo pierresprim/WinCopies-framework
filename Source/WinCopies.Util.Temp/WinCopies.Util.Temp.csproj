@@ -8,12 +8,14 @@
 		<DefineConstants>WinCopies3;$(DefineConstants)</DefineConstants>
 		<UseWPF>true</UseWPF>
 		<PackageIcon>WinCopies.png</PackageIcon>
-	  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="WinCopies.Util.Extensions" Version="3.14-preview" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="WinCopies.Util.Extensions" Version="3.14-preview" />
+
+		<PackageReference Include="WinCopies.WindowsAPICodePack.Win32Native" Version="3.8-preview" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<None Include="..\..\LICENSE.md">
@@ -21,8 +23,8 @@
 			<PackagePath></PackagePath>
 		</None>
 		<None Include="..\WinCopies.png">
-		  <Pack>True</Pack>
-		  <PackagePath></PackagePath>
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
 		</None>
 	</ItemGroup>
 

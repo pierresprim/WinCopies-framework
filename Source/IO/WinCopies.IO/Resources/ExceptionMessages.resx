@@ -126,6 +126,9 @@
   <data name="NoError" xml:space="preserve">
     <value>Process completed successfully.</value>
   </data>
+  <data name="ProcessParametersCouldNotBeParsedCorrectly" xml:space="preserve">
+    <value>The given parameters could not be parsed correctly.</value>
+  </data>
   <data name="UnknownError" xml:space="preserve">
     <value>An unknown error occurred.</value>
   </data>

@@ -22,6 +22,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
+
 using WinCopies.Commands;
 
 #if WinCopies3
@@ -1117,8 +1118,21 @@ namespace WinCopies.GUI.Controls.Models
         public GroupingRadioButtonModel(in TContent content, in BindingDirection bindingDirection) : base(content, bindingDirection) { /* Left empty. */ }
     }
 
-    public abstract class MenuItemModelBase<T> : ControlModel
+    public abstract class MenuItemModelRoot : ControlModel, IMenuItemModelBase
     {
+        public abstract bool IsSeparator { get; }
+    }
+
+    [TypeForDataTemplate(typeof(ISeparator))]
+    public sealed class Separator : MenuItemModelRoot
+    {
+        public sealed override bool IsSeparator => true;
+    }
+
+    public abstract class MenuItemModelBase<T> : MenuItemModelRoot
+    {
+        public sealed override bool IsSeparator => false;
+
         public T Header { get; set; }
 
         protected MenuItemModelBase() { /* Left empty. */ }

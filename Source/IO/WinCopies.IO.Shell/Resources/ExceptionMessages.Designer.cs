@@ -232,15 +232,6 @@ namespace WinCopies.IO.Shell.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The given parameters could not be parsed correctly..
-        /// </summary>
-        public static string ProcessParametersCouldNotBeParsedCorrectly {
-            get {
-                return ResourceManager.GetString("ProcessParametersCouldNotBeParsedCorrectly", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to {0} cannot be null on {1}..
         /// </summary>
         public static string PropertyCannotBeNullOnObject {

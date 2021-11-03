@@ -26,6 +26,7 @@ using WinCopies.IO.Process;
 using WinCopies.IO.Process.ObjectModel;
 using WinCopies.IO.PropertySystem;
 using WinCopies.PropertySystem;
+using WinCopies.Util.Commands.Primitives;
 
 using static WinCopies.ThrowHelper;
 using static WinCopies.Collections.Util;
@@ -232,9 +233,13 @@ namespace WinCopies.IO
             protected virtual void StartMonitoringOverride() => throw new NotSupportedException();
 
             protected virtual void StopMonitoringOverride() => throw new NotSupportedException();
+
+            protected virtual System.Collections.Generic.IEnumerable<ICommand> GetCommandsOverride(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> items) => null;
             #endregion
 
             #region Public Methods
+            public System.Collections.Generic.IEnumerable<ICommand> GetCommands(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> items) => GetValueIfNotDisposed(() => GetCommandsOverride(items));
+
             public IBrowsableObjectInfoCallback RegisterCallback(Action<BrowsableObjectInfoCallbackArgs> action)
             {
                 ThrowIfDisposed(this);

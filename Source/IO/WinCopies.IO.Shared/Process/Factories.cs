@@ -27,11 +27,16 @@ using static WinCopies.ThrowHelper;
 
 namespace WinCopies.IO.Process
 {
-    public interface IProcessFactoryProcessInfo : IProcessInfoBase
+    public interface IProcessFactoryProcessInfoBase
     {
         bool UserConfirmationRequired { get; }
 
         string GetUserConfirmationText();
+    }
+
+    public interface IProcessFactoryProcessInfo : IProcessFactoryProcessInfoBase, IProcessInfoBase
+    {
+        // Left empty.
     }
 
     public interface IDirectProcessInfo : IProcessFactoryProcessInfo
@@ -122,7 +127,9 @@ namespace WinCopies.IO.Process
 
     public interface IProcessFactory : DotNetFix.IDisposable
     {
-        IProcessCommands NewItemProcessCommands { get; }
+        IProcessCommand NewItemProcessCommand { get; }
+
+        IProcessCommand RenameItemProcessCommand { get; }
 
         IRunnableProcessInfo Copy { get; }
 
@@ -160,9 +167,9 @@ namespace WinCopies.IO.Process
 
             internal class DefaultProcessInfo : DefaultProcessInfoBase, IProcessFactoryProcessInfo
             {
-                bool IProcessFactoryProcessInfo.UserConfirmationRequired => false;
+                bool IProcessFactoryProcessInfoBase.UserConfirmationRequired => false;
 
-                string IProcessFactoryProcessInfo.GetUserConfirmationText() => null;
+                string IProcessFactoryProcessInfoBase.GetUserConfirmationText() => null;
             }
 
             internal class DefaultDirectProcessInfo : DefaultProcessInfo, IDirectProcessInfo
@@ -203,7 +210,9 @@ namespace WinCopies.IO.Process
 
             bool DotNetFix.IDisposable.IsDisposed => false;
 
-            IProcessCommands IProcessFactory.NewItemProcessCommands => null;
+            IProcessCommand IProcessFactory.NewItemProcessCommand => null;
+
+            IProcessCommand IProcessFactory.RenameItemProcessCommand => null;
 
             IRunnableProcessInfo IProcessFactory.Copy => ProcessFactory.DefaultRunnableProcessFactoryProcessInfo;
 
@@ -215,7 +224,7 @@ namespace WinCopies.IO.Process
 
             IDirectProcessInfo IProcessFactory.Clearing => ProcessFactory.DefaultProcessInfo;
 
-            IDragDropProcessInfo IProcessFactory.DragDrop => ProcessFactory.DefaultDragDropProcessInfo;
+            IDragDropProcessInfo IProcessFactory.DragDrop => DefaultDragDropProcessInfo;
 
             bool IProcessFactory.CanPaste(uint count) => false;
 

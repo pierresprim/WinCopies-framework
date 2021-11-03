@@ -35,6 +35,11 @@
               Looks up a localized string similar to Process completed successfully..
             </summary>
         </member>
+        <member name="P:WinCopies.IO.Resources.ExceptionMessages.ProcessParametersCouldNotBeParsedCorrectly">
+            <summary>
+              Looks up a localized string similar to The given parameters could not be parsed correctly..
+            </summary>
+        </member>
         <member name="P:WinCopies.IO.Resources.ExceptionMessages.UnknownError">
             <summary>
               Looks up a localized string similar to An unknown error occurred..

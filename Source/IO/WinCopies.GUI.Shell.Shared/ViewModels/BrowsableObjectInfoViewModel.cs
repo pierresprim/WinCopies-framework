@@ -15,8 +15,6 @@
 //* You should have received a copy of the GNU General Public License
 //* along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-using System.Linq;
-
 using WinCopies.GUI.IO.ObjectModel;
 using WinCopies.GUI.IO.Process;
 using WinCopies.IO.Process;
@@ -24,78 +22,46 @@ using WinCopies.Util.Data;
 
 namespace WinCopies.GUI.Shell
 {
-    public class BrowsableObjectInfoWindowMenuViewModel : ViewModelBase
+    public interface IBrowsableObjectInfoWindowMenuViewModel
     {
-        private BrowsableObjectInfoWindowMenuItemViewModel _selectedItem;
-
-        public BrowsableObjectInfoWindowMenuItemViewModel SelectedItem { get => _selectedItem; internal set => UpdateValue(ref _selectedItem, value.IsSelected ? value : null, nameof(SelectedItem)); }
+        IBrowsableObjectInfoWindowMenuItemViewModel SelectedItem { get; }
     }
 
-    public class BrowsableObjectInfoWindowMenuItemViewModel : ViewModelBase
+    public class BrowsableObjectInfoWindowMenuViewModel : ViewModelBase, IBrowsableObjectInfoWindowMenuViewModel
     {
-        private readonly BrowsableObjectInfoWindowMenuViewModel _parentMenu;
+        private IBrowsableObjectInfoWindowMenuItemViewModel _selectedItem;
 
-        public string ResourceId { get; set; }
-
-        public BrowsableObjectInfoWindowMenuItemViewModel ParentMenuItem { get; }
-
-        private bool _isSelected;
-
-        public bool IsSelected
-        {
-            get => _isSelected; set
-            {
-                _isSelected = value;
-
-                _parentMenu.SelectedItem = this; OnPropertyChanged(nameof(IsSelected)
-#if !WinCopies4
-                    , null, IsSelected
-#endif
-                    );
-            }
-        }
-
-        private string _statusBarLabel;
-
-        public string StatusBarLabel => _statusBarLabel
-#if CS8
-            ??=
-#else
-            ?? (_statusBarLabel =
-#endif
-            (string)typeof(Properties.Resources).GetProperties().FirstOrDefault(p => p.Name == $"{ResourceId}StatusBarLabel")?.GetValue(null)
-#if !CS8
-            )
-#endif
-            ;
-
-        public BrowsableObjectInfoWindowMenuItemViewModel(in BrowsableObjectInfoWindowMenuViewModel parentMenu/*, in string header, in string resourceId, in RoutedCommand command, Func commandParameter, ImageSource iconImageSource*/) /*: this(parentMenu._Items, header, resourceId, command, commandParameter, iconImageSource)*/ => _parentMenu = parentMenu;
-
-        public BrowsableObjectInfoWindowMenuItemViewModel(in BrowsableObjectInfoWindowMenuItemViewModel parentMenuItem/*, in string header, in string resourceId, in RoutedCommand command, Func commandParameter, ImageSource iconImageSource*/) //: this(parentMenuItem._Items, header, resourceId, command, commandParameter, iconImageSource)
-        {
-            _parentMenu = parentMenuItem._parentMenu;
-
-            ParentMenuItem = parentMenuItem;
-        }
+        public IBrowsableObjectInfoWindowMenuItemViewModel SelectedItem { get => _selectedItem; internal set => UpdateValue(ref _selectedItem, value.IsSelected ? value : null, nameof(SelectedItem)); }
     }
 
-    public class BrowsableObjectInfoWindowViewModel : ViewModelBase
+    public interface IBrowsableObjectInfoWindowViewModel
+    {
+        IBrowsableObjectInfoCollectionViewModel Paths { get; }
+
+        IBrowsableObjectInfoWindowMenuViewModel Menu { get; }
+    }
+
+    public class BrowsableObjectInfoWindowViewModel : ViewModelBase, IBrowsableObjectInfoWindowViewModel
     {
         public static IProcessPathCollectionFactory DefaultProcessPathCollectionFactory { get; } = new ProcessPathCollectionFactory();
 
-        public BrowsableObjectInfoCollectionViewModel Paths { get; }
+        public IBrowsableObjectInfoCollectionViewModel Paths { get; }
 
-        public BrowsableObjectInfoWindowMenuViewModel Menu { get; }
+        public IBrowsableObjectInfoWindowMenuViewModel Menu { get; }
 
-        public BrowsableObjectInfoWindowViewModel(in BrowsableObjectInfoCollectionViewModel paths)
+        public BrowsableObjectInfoWindowViewModel(in IBrowsableObjectInfoCollectionViewModel paths, in IBrowsableObjectInfoWindowMenuViewModel menu)
         {
             Paths = paths;
 
-            Menu = new BrowsableObjectInfoWindowMenuViewModel();
+            Menu = menu;
 
             // MainWindowModel.Init(Paths);
         }
 
-        public BrowsableObjectInfoWindowViewModel() : this(new BrowsableObjectInfoCollectionViewModel()) { /* Left empty. */ }
+        public BrowsableObjectInfoWindowViewModel() : this(new BrowsableObjectInfoCollectionViewModel(), new BrowsableObjectInfoWindowMenuViewModel()) { /* Left empty. */ }
+
+        public BrowsableObjectInfoWindowViewModel(in IBrowsableObjectInfoCollectionViewModel paths) : this(paths, new BrowsableObjectInfoWindowMenuViewModel()) { /* Left empty. */ }
+
+        public BrowsableObjectInfoWindowViewModel(in IBrowsableObjectInfoWindowMenuViewModel menu) : this(new BrowsableObjectInfoCollectionViewModel(), menu) { /* Left empty. */ }
     }
 }
