@@ -521,7 +521,7 @@
                                         </Grid.RowDefinitions>
 
                                         <Label Content="{StaticResource SourcePath}" />
-                                        <Label Grid.Column="1" Content="{Binding SourcePath, Mode=OneTime, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type localProcessControls:ProcessControl}}}" />
+                                        <Label Grid.Column="1" Content="{Binding SourcePath, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type localProcessControls:ProcessControl}}}" />
 
                                         <Label Grid.Row="1" Content="{StaticResource Status}" />
                                         <Label Grid.Column="1" Grid.Row="1" Content="{Binding Status, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type localProcessControls:ProcessControl}}}" />
@@ -625,7 +625,7 @@
                     <ListView.View>
                         <GridView>
                             <GridViewColumn Header="Type" DisplayMemberBinding="{Binding Name}" />
-                            <GridViewColumn Header="Source Path" DisplayMemberBinding="{Binding SourcePath, Converter={localProcess:PathCommonToStringConverter}}" />
+                            <GridViewColumn Header="Source Path" DisplayMemberBinding="{Binding SourcePath.Path}" />
                             <GridViewColumn Header="Status" DisplayMemberBinding="{Binding Status, Converter={data:ToStringConverter}}" />
                             <GridViewColumn Header="Progress">
                                 <GridViewColumn.CellTemplate>

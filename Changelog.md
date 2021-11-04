@@ -6,6 +6,12 @@ The WinCopies® software framework
 CHANGELOG
 ---------
 
+### 3.12.1-preview
+
+- Add constructor to ProcessWindow with a custom ObservableCollection\<IProcess>.
+- Bug fixed in process template: the SourcePath property data binding mode was set to OneTime.
+- Remove PathCommonToStringConverter.
+
 ### 3.12-preview
 
 - Update monitoring.

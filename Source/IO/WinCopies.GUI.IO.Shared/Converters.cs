@@ -20,20 +20,11 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
-using WinCopies.IO;
 using WinCopies.IO.Process;
 using WinCopies.Util.Data;
 
 namespace WinCopies.GUI.IO.Process
 {
-    [ValueConversion(typeof(IPathCommon), typeof(string))]
-    public class PathCommonToStringConverter : AlwaysConvertibleOneWayConverter<IPathCommon, object, string>
-    {
-        public override IReadOnlyConversionOptions ConvertOptions => ConverterHelper.ParameterCanBeNull;
-
-        protected override string Convert(IPathCommon value, object parameter, CultureInfo culture) => value.Path;
-    }
-
     [ValueConversion(typeof(ProcessTypes<IProcessErrorItem>.IProcessQueue), typeof(bool))]
     public class ErrorPathsToBooleanConverter : AlwaysConvertibleOneWayConverter<ProcessTypes<IProcessErrorItem>.IProcessQueue, object, bool>
     {

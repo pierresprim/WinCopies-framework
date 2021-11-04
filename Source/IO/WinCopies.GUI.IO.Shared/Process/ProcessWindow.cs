@@ -49,29 +49,18 @@ namespace WinCopies.GUI.IO.Process
         private NotificationIcon _icon;
         private MenuItem _showWindowMenuItem;
 
-        protected ProcessWindow()
+        protected ProcessWindow(in ObservableCollection<IProcess> processes)
         {
-            var processes = new ObservableCollection<IProcess>();
-
-            processes.CollectionChanged += Processes_CollectionChanged;
+            (processes ?? throw ThrowHelper.GetArgumentNullException(nameof(processes))).CollectionChanged += Processes_CollectionChanged;
 
             CommandBindings.Add(NotificationIconCommands.ShowWindow, ChangeWindowVisibilityState);
-
-            //addCommandBinding(_close, () =>
-            //{
-            //    App.Current.IsClosing = true;
-
-            //    Close();
-            //});
 
             ContentTemplateSelector = new InterfaceDataTemplateSelector();
 
             Content = new ProcessManager<IProcess>() { Processes = processes };
-
-            //_ = App.Current._OpenWindows.AddLast(this);
-
-            //_Processes.Init(processes);
         }
+
+        protected ProcessWindow() : this(new ObservableCollection<IProcess>()) { /* Left empty. */ }
 
         protected abstract NotificationIconData GetNotificationIconData();
 
@@ -167,17 +156,11 @@ namespace WinCopies.GUI.IO.Process
                     ((IProcess)process).RunWorkerAsync();
         }
 
-        protected virtual void OnClosingCancelled()
-        {
-            // App.Current.IsClosing = false;
-        }
+        protected virtual void OnClosingCancelled() { /* Left empty. */ }
 
-        protected abstract bool ValidateClosing(); // => App.Current.IsClosing;
+        protected abstract bool ValidateClosing();
 
-        protected virtual void OnClosingValidated()
-        {
-            // _ = App.Current._OpenWindows.Remove(this);
-        }
+        protected virtual void OnClosingValidated() {/* Left empty. */ }
 
         protected override void OnClosing(CancelEventArgs e)
         {
