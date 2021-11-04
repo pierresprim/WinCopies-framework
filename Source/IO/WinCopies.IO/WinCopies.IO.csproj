@@ -1,86 +1,86 @@
 <Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
-  <PropertyGroup>
-    <PackageId>WinCopies.IO</PackageId>
-    <AssemblyName>WinCopies.IO</AssemblyName>
-    <RootNamespace>WinCopies.IO</RootNamespace>
-    <TargetFrameworks>netcoreapp3.0;netcoreapp3.1;net5.0-windows;net6.0-windows;net472;net48</TargetFrameworks>
-    <UseWPF>true</UseWPF>
-    <Description>WinCopies framework's assembly for basic I/O operations</Description>
-    <Copyright>Copyright © 2021 Pierre Sprimont</Copyright>
-    <PackageTags>WinCopies, IO</PackageTags>
-    <DocumentationFile>WinCopies.IO.xml</DocumentationFile>
-    <SignAssembly>true</SignAssembly>
-    <DefineConstants>WinCopies2;WinCopies3;$(DefineConstants)</DefineConstants>
-    <AssemblyOriginatorKeyFile>WinCopies.IO.snk</AssemblyOriginatorKeyFile>
-    <VersionPrefix>3.11</VersionPrefix>
-    <VersionSuffix>preview</VersionSuffix>
-    <AssemblyVersion>3.11</AssemblyVersion>
-    <FileVersion>3.11</FileVersion>
-  </PropertyGroup>
+	<PropertyGroup>
+		<PackageId>WinCopies.IO</PackageId>
+		<AssemblyName>WinCopies.IO</AssemblyName>
+		<RootNamespace>WinCopies.IO</RootNamespace>
+		<TargetFrameworks>netcoreapp3.0;netcoreapp3.1;net5.0-windows;net6.0-windows;net472;net48</TargetFrameworks>
+		<UseWPF>true</UseWPF>
+		<Description>WinCopies framework's assembly for basic I/O operations</Description>
+		<Copyright>Copyright © 2021 Pierre Sprimont</Copyright>
+		<PackageTags>WinCopies, IO</PackageTags>
+		<DocumentationFile>WinCopies.IO.xml</DocumentationFile>
+		<SignAssembly>true</SignAssembly>
+		<DefineConstants>WinCopies2;WinCopies3;$(DefineConstants)</DefineConstants>
+		<AssemblyOriginatorKeyFile>WinCopies.IO.snk</AssemblyOriginatorKeyFile>
+		<VersionPrefix>3.12</VersionPrefix>
+		<VersionSuffix>preview</VersionSuffix>
+		<AssemblyVersion>3.12</AssemblyVersion>
+		<FileVersion>3.12</FileVersion>
+	</PropertyGroup>
 
-  <Import Project="..\WinCopies.IO.Shared\WinCopies.IO.Shared.projitems" Label="Shared" />
+	<Import Project="..\WinCopies.IO.Shared\WinCopies.IO.Shared.projitems" Label="Shared" />
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\GUI\WinCopies.GUI.Drawing\WinCopies.GUI.Drawing.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\GUI\WinCopies.GUI.Drawing\WinCopies.GUI.Drawing.csproj" />
+	</ItemGroup>
 
-  <ItemGroup Condition="'$(Configuration)'=='Debug'">
-    <ProjectReference Include="..\..\WinCopies.Util.Temp\WinCopies.Util.Temp.csproj" />
-  </ItemGroup>
+	<ItemGroup Condition="'$(Configuration)'=='Debug'">
+		<ProjectReference Include="..\..\WinCopies.Util.Temp\WinCopies.Util.Temp.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="WinCopies.Util" Version="3.16-preview" />
-    <PackageReference Include="WinCopies.Collections" Version="3.16-preview" />
-    <PackageReference Include="WinCopies.Util.Extensions" Version="3.14-preview" />
-    <PackageReference Include="WinCopies.Util.Desktop" Version="3.16-preview" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="WinCopies.Util" Version="3.16-preview" />
+		<PackageReference Include="WinCopies.Collections" Version="3.16-preview" />
+		<PackageReference Include="WinCopies.Util.Extensions" Version="3.14-preview" />
+		<PackageReference Include="WinCopies.Util.Desktop" Version="3.16-preview" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Compile Update="Properties\Resources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Update="Resources\ExceptionMessages.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>ExceptionMessages.resx</DependentUpon>
-    </Compile>
-    <Compile Update="Resources\PropertyDescriptions.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>PropertyDescriptions.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Update="Properties\Resources.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Resources.resx</DependentUpon>
+		</Compile>
+		<Compile Update="Resources\ExceptionMessages.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>ExceptionMessages.resx</DependentUpon>
+		</Compile>
+		<Compile Update="Resources\PropertyDescriptions.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>PropertyDescriptions.resx</DependentUpon>
+		</Compile>
+	</ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Update="Properties\Resources.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\ExceptionMessages.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>ExceptionMessages.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\PropertyDescriptions.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>PropertyDescriptions.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Update="Properties\Resources.resx">
+			<Generator>PublicResXFileCodeGenerator</Generator>
+			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\ExceptionMessages.resx">
+			<Generator>PublicResXFileCodeGenerator</Generator>
+			<LastGenOutput>ExceptionMessages.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\PropertyDescriptions.resx">
+			<Generator>PublicResXFileCodeGenerator</Generator>
+			<LastGenOutput>PropertyDescriptions.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Include="..\..\WinCopies.png">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
-  </ItemGroup>
+	<ItemGroup>
+		<None Include="..\..\WinCopies.png">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Include="..\..\..\LICENSE.md">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
-  </ItemGroup>
+	<ItemGroup>
+		<None Include="..\..\..\LICENSE.md">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+	</ItemGroup>
 
 </Project>

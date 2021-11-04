@@ -4,7 +4,6 @@ using System.Globalization;
 using WinCopies.GUI.IO.ObjectModel;
 using WinCopies.IO.ObjectModel;
 using WinCopies.IO.Shell;
-using WinCopies.Temp;
 using WinCopies.Util.Data;
 
 namespace WinCopies.GUI.Shell

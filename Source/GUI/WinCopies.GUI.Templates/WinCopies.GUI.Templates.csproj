@@ -13,10 +13,10 @@
 		<SignAssembly>true</SignAssembly>
 		<AssemblyOriginatorKeyFile>WinCopies.GUI.Templates.snk</AssemblyOriginatorKeyFile>
 		<DefineConstants>WinCopies2;WinCopies3;$(DefineConstants)</DefineConstants>
-    <VersionPrefix>3.7</VersionPrefix>
-    <VersionSuffix>preview</VersionSuffix>
-    <AssemblyVersion>3.7</AssemblyVersion>
-    <FileVersion>3.7</FileVersion>
+		<VersionPrefix>3.12</VersionPrefix>
+		<VersionSuffix>preview</VersionSuffix>
+		<AssemblyVersion>3.12</AssemblyVersion>
+		<FileVersion>3.12</FileVersion>
 	</PropertyGroup>
 
 	<Import Project="..\WinCopies.GUI.Templates.Shared\WinCopies.GUI.Templates.Shared.projitems" Label="Shared" />
@@ -35,14 +35,14 @@
 			<PackagePath></PackagePath>
 		</None>
 		<None Include="..\..\WinCopies.png">
-		  <Pack>True</Pack>
-		  <PackagePath></PackagePath>
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
 		</None>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\WinCopies.GUI.Models\WinCopies.GUI.Models.csproj" />
-	  <ProjectReference Include="..\WinCopies.GUI.ViewModels\WinCopies.GUI.ViewModels.csproj" />
+		<ProjectReference Include="..\WinCopies.GUI.Models\WinCopies.GUI.Models.csproj" />
+		<ProjectReference Include="..\WinCopies.GUI.ViewModels\WinCopies.GUI.ViewModels.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
