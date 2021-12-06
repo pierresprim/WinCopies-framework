@@ -42,9 +42,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)Controls\ExplorerControlTreeViewItem.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\ExplorerControlTreeViewItemHeader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\BrowsableObjectInfoFactory.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\ExplorerControlBrowsableObjectInfoViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\ExplorerControlViewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\IBrowsableObjectInfoViewModel.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\IExplorerControlBrowsableObjectInfoViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\IExplorerControlViewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\Collections\PathCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PathInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ObjectModel\DuplicateFinding.cs" />
