@@ -22,14 +22,17 @@ using System.IO;
 using WinCopies.IO.AbstractionInterop;
 using WinCopies.IO.Enumeration;
 using WinCopies.IO.PropertySystem;
+using WinCopies.Temp;
 
 namespace WinCopies.IO.ObjectModel
 {
     public interface IShellObjectInfoBase : IArchiveItemInfoProvider
     {
-        System.IO.Stream ArchiveFileStream { get; }
+        bool IsArchiveOpen { get; }
 
         void OpenArchive(FileMode fileMode, FileAccess fileAccess, FileShare fileShare, int? bufferSize, FileOptions fileOptions);
+
+        StreamInfo GetArchiveFileStream();
 
         void CloseArchive();
     }

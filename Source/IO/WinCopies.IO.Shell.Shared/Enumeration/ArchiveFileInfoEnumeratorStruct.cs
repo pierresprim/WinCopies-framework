@@ -27,43 +27,63 @@ using static WinCopies.
 
 namespace WinCopies.IO.Enumeration
 {
+    public struct ArchiveFileInfoEnumeratorStruct3
+    {
+        /// <summary>
+        /// Gets the <see cref="SevenZip.ArchiveFileInfo"/> that represents the cyrrent archive item. This property is set only when <see cref="Path"/> is <see langword="null"/>.
+        /// </summary>
+        public ArchiveFileInfo ArchiveFileInfo { get; }
+
+        public string ArchiveFileName { get; }
+
+        public ArchiveFileInfoEnumeratorStruct3(in ArchiveFileInfo archiveFileInfo, in string archiveFileName)
+        {
+            ArchiveFileInfo = archiveFileInfo;
+
+            ArchiveFileName = archiveFileName;
+        }
+    }
+
+    public struct ArchiveFileInfoEnumeratorStruct2
+    {
+        ///// <summary>
+        ///// Gets the relative path of the current archive item. This property is set only when <see cref="ArchiveFileInfo"/> is <see langword="null"/>. This property can be <see langword="null"/> if the relative path of the current item is the archive root path.
+        ///// </summary>
+        public string RelativePath { get; }
+
+        public string Name { get; }
+
+        public string Path => Name == null ? null : RelativePath == null ? Name : $"{RelativePath}{WinCopies.IO.Path.PathSeparator}{Name}";
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ArchiveFileInfoEnumeratorStruct"/> struct with a given path.
+        /// </summary>
+        /// <param name="relativePath">The relative path of the archive item.</param>
+        public ArchiveFileInfoEnumeratorStruct2(in string relativePath, in string name)
+        {
+            RelativePath = relativePath.Length > 0 ? relativePath : null;
+
+            Name = name ?? throw GetArgumentNullException(nameof(relativePath));
+        }
+    }
+
     /// <summary>
     /// Represents an archive item. This struct is used in enumeration methods.
     /// </summary>
     public class ArchiveFileInfoEnumeratorStruct
     {
-        /// <summary>
-        /// Gets the path of the current archive item. This property is set only when <see cref="ArchiveFileInfo"/> is <see langword="null"/>.
-        /// </summary>
-        public string Path { get; }
+        public ArchiveFileInfoEnumeratorStruct3? ArchiveFileInfo { get; }
 
-        /// <summary>
-        /// Gets the <see cref="SevenZip.ArchiveFileInfo"/> that represents the cyrrent archive item. This property is set only when <see cref="Path"/> is <see langword="null"/>.
-        /// </summary>
-        public ArchiveFileInfo? ArchiveFileInfo { get; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ArchiveFileInfoEnumeratorStruct"/> struct with the given path.
-        /// </summary>
-        /// <param name="path">The path of the archive item.</param>
-        public ArchiveFileInfoEnumeratorStruct(string path)
-        {
-            Path = path ?? throw GetArgumentNullException(nameof(path));
-
-            ArchiveFileInfo = null;
-        }
+        public ArchiveFileInfoEnumeratorStruct2? RelativePath { get; }
 
         ///// <summary>
         ///// Initializes a new instance of the <see cref="ArchiveFileInfoEnumeratorStruct"/> struct with the given <see cref="SevenZip.ArchiveFileInfo"/>.
         ///// </summary>
         ///// <param name="path">The <see cref="SevenZip.ArchiveFileInfo"/> that represents the archive item.</param>
-        public ArchiveFileInfoEnumeratorStruct(ArchiveFileInfo archiveFileInfo)
-        {
-            Path = null;
+        public ArchiveFileInfoEnumeratorStruct(in ArchiveFileInfoEnumeratorStruct3 archiveFileInfo) => ArchiveFileInfo = archiveFileInfo;
 
-            ArchiveFileInfo = archiveFileInfo;
-        }
+        public ArchiveFileInfoEnumeratorStruct(in ArchiveFileInfoEnumeratorStruct2 relativePath) => RelativePath = relativePath;
 
-        public string GetArchiveRelativePath() => Path ?? ArchiveFileInfo.Value.FileName;
+        public string GetFileName() => RelativePath.HasValue ? RelativePath.Value.Name : ArchiveFileInfo.Value.ArchiveFileName;
     }
 }

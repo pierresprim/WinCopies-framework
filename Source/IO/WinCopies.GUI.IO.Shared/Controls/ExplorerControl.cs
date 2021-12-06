@@ -20,6 +20,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
+using WinCopies.Desktop;
 using WinCopies.GUI.Controls;
 using WinCopies.GUI.Controls.Models;
 using WinCopies.IO.ObjectModel;
@@ -28,8 +29,6 @@ using WinCopies.Util.Data;
 using static System.Windows.RoutingStrategy;
 
 using static WinCopies.Util.Desktop.UtilHelpers;
-
-using ListView = System.Windows.Controls.ListView;
 
 namespace WinCopies.GUI.IO.Controls
 {
@@ -185,14 +184,14 @@ namespace WinCopies.GUI.IO.Controls
 
         protected virtual void OnListViewSelectionChanged(SelectionChangedEventArgs e)
         {
-            if (e.Source is ListView listView)
+            if (SelectedItems == null && e.Source is ExplorerControlListView listView && listView.GetParent<ExplorerControl>(false) == this)
             {
-                e.RoutedEvent = SelectionChangedEvent;
-                e.Source = this;
+                //e.RoutedEvent = SelectionChangedEvent;
+                //e.Source = this;
 
                 SelectedItems = listView.SelectedItems;
 
-                RaiseEvent(e);
+                //RaiseEvent(e);
             }
         }
 

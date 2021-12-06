@@ -43,7 +43,8 @@ IEnumerator
         DotNetFix.IDisposable
     {
         #region Private fields
-        private int _index = -1;
+        private const int DefaultIndex = 0;
+        private int _index = DefaultIndex;
         private IArchiveItemInfoProvider _archiveItemInfoProvider;
         private SevenZipExtractor _archiveExtractor;
         private
@@ -91,7 +92,11 @@ new WinCopies.Collections.Generic.Queue
 
             _archiveItemInfoProvider = archiveItemInfoProvider;
 
-            _archiveExtractor = new SevenZipExtractor(archiveItemInfoProvider.ArchiveShellObject.ArchiveFileStream);
+            if (archiveItemInfoProvider.ArchiveShellObject != null && !archiveItemInfoProvider.ArchiveShellObject.IsArchiveOpen)
+
+                archiveItemInfoProvider.ArchiveShellObject.OpenArchive(System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.Read, 4096, System.IO.FileOptions.None);
+
+            _archiveExtractor = new SevenZipExtractor(archiveItemInfoProvider.ArchiveShellObject.GetArchiveFileStream());
 
             if (func == null)
 
@@ -110,7 +115,6 @@ new WinCopies.Collections.Generic.Queue
             ()
         {
             #region Old
-
             // if (FileTypes == FileTypes.None) return;
 
             //else if (FileTypes.HasFlag(GetAllEnumFlags<FileTypes>()) && FileTypes.HasMultipleFlags())
@@ -162,7 +166,6 @@ new WinCopies.Collections.Generic.Queue
             //        #endif
 
             // ShellObjectInfo archiveShellObject = Path is ShellObjectInfo ? (ShellObjectInfo)Path : ((ArchiveItemInfo)Path).ArchiveShellObject;
-
             #endregion
 
             if (!_archiveItemInfoProvider.IsBrowsable())
@@ -207,12 +210,17 @@ new WinCopies.Collections.Generic.Queue
 
                 string fileName;
 
-                string relativePath = _archiveItemInfoProvider.Path
+                string relativePath = _archiveItemInfoProvider.Path.Length > _archiveItemInfoProvider.ArchiveShellObject.Path.Length && _archiveItemInfoProvider.Path.StartsWith(_archiveItemInfoProvider.ArchiveShellObject.Path) ? _archiveItemInfoProvider.Path
 #if CS8
-                    [(_archiveItemInfoProvider.ArchiveShellObject.Path.Length + 1)..];
+                    [(
 #else
-                    .Substring(_archiveItemInfoProvider.ArchiveShellObject.Path.Length + 1);
+                    .Substring(
 #endif
+                _archiveItemInfoProvider.ArchiveShellObject.Path.Length + 1)
+#if CS8
+                ..]
+#endif
+                : string.Empty;
 
                 // PathInfo path;
 
@@ -226,32 +234,35 @@ new WinCopies.Collections.Generic.Queue
 
                 Action addValue;
 
-                bool addPath(in ArchiveFileInfoEnumeratorStruct archiveFileInfoEnumeratorStruct, in int _i)
+                bool addPath(in ArchiveFileInfoEnumeratorStruct archiveFileInfoEnumeratorStruct)
                 {
                     if (Func is object && !Func(archiveFileInfoEnumeratorStruct))
 
                         return false;
 
-                    foreach (string path in _paths)
+                    if (!archiveFileInfoEnumeratorStruct.ArchiveFileInfo.HasValue || archiveFileInfoEnumeratorStruct.ArchiveFileInfo.Value.ArchiveFileInfo.IsDirectory)
+                    {
+                        foreach (string path in _paths)
 
-                        if (path == fileName)
+                            if (path == fileName)
 
-                            return false;
+                                return false;
+
+                        _paths.Enqueue(archiveFileInfoEnumeratorStruct.GetFileName());
+                    }
 
                     addValue();
 
-                    _index = _i;
-
-                    _paths.Enqueue(archiveFileInfoEnumeratorStruct.GetArchiveRelativePath());
+                    _index++;
 
                     return true;
                 }
 
                 ArchiveFileInfo archiveFileInfo;
 
-                for (int i = _index; i < _archiveExtractor.ArchiveFileData.Count; i++)
+                for (; _index < _archiveExtractor.ArchiveFileData.Count; _index++)
                 {
-                    archiveFileInfo = _archiveExtractor.ArchiveFileData[i];
+                    archiveFileInfo = _archiveExtractor.ArchiveFileData[_index];
 
                     // _path = archiveFileInfo.FileName.Replace('/', IO.Path.PathSeparator);
 
@@ -291,21 +302,23 @@ new WinCopies.Collections.Generic.Queue
 
                         ArchiveFileInfoEnumeratorStruct archiveFileInfoEnumeratorStruct;
 
-                        if (fileName.ToUpperInvariant() == archiveFileInfo.FileName.ToUpperInvariant())
-                        {
-                            archiveFileInfoEnumeratorStruct = new ArchiveFileInfoEnumeratorStruct(archiveFileInfo);
+                        var _fileName = new ArchiveFileInfoEnumeratorStruct2(relativePath, fileName);
 
-                            addValue = () => AddArchiveFileInfo(archiveFileInfoEnumeratorStruct.ArchiveFileInfo.Value);
+                        if (_fileName.Path.ToUpperInvariant() == archiveFileInfo.FileName.ToUpperInvariant())
+                        {
+                            archiveFileInfoEnumeratorStruct = new ArchiveFileInfoEnumeratorStruct(new ArchiveFileInfoEnumeratorStruct3(archiveFileInfo, fileName));
+
+                            addValue = () => AddArchiveFileInfo(archiveFileInfoEnumeratorStruct.ArchiveFileInfo.Value.ArchiveFileInfo);
                         }
 
                         else
                         {
-                            archiveFileInfoEnumeratorStruct = new ArchiveFileInfoEnumeratorStruct(fileName);
+                            archiveFileInfoEnumeratorStruct = new ArchiveFileInfoEnumeratorStruct(_fileName);
 
-                            addValue = () => AddPath(archiveFileInfoEnumeratorStruct.Path);
+                            addValue = () => AddPath(archiveFileInfoEnumeratorStruct.RelativePath.Value.Path);
                         }
 
-                        if (addPath(archiveFileInfoEnumeratorStruct, i))
+                        if (addPath(archiveFileInfoEnumeratorStruct))
                             //{
                             //if (archiveFileInfo.IsDirectory)
 
@@ -328,7 +341,10 @@ new WinCopies.Collections.Generic.Queue
                 //#endif
             }
 
-            catch (Exception ex) when (ex.Is(false, typeof(IOException), typeof(SecurityException), typeof(UnauthorizedAccessException), typeof(SevenZipException))) { }
+            catch (Exception ex) when (ex.Is(false, typeof(IOException), typeof(SecurityException), typeof(UnauthorizedAccessException), typeof(SevenZipException)))
+            {
+                _index++;
+            }
 
             return false;
         }
@@ -337,7 +353,7 @@ new WinCopies.Collections.Generic.Queue
 
         protected override void ResetOverride2()
         {
-            _index = -1;
+            _index = DefaultIndex;
 
             _paths.Clear();
         }
@@ -364,7 +380,6 @@ new WinCopies.Collections.Generic.Queue
 
             _func = null;
         }
-
         #endregion
 
         //private void Load()

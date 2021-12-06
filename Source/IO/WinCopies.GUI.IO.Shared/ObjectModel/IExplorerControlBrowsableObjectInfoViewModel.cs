@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -76,13 +77,11 @@ namespace WinCopies.GUI.IO
 
             IButtonModel RenameItemCommand { get; }
 
-            System.Collections.Generic.IEnumerable<IBrowsableObjectInfoViewModel> SelectedItems2 { get; }
-
-            System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> SelectedItemsInnerObjects { get; }
-
             IBrowsableObjectInfoViewModel Path { get; set; }
 
-            IList SelectedItems { get; set; }
+            ReadOnlyObservableCollection<IBrowsableObjectInfoViewModel> SelectedItems { get; }
+
+            System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> SelectedItemsInnerObjects { get; }
 
             SelectionMode SelectionMode { get; set; }
 

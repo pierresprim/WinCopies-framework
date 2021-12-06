@@ -97,11 +97,29 @@ namespace WinCopies.GUI.IO.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The item could not be renamed..
+        /// </summary>
+        public static string ItemCouldNotBeRenamed {
+            get {
+                return ResourceManager.GetString("ItemCouldNotBeRenamed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Item creation error.
         /// </summary>
         public static string ItemCreationError {
             get {
                 return ResourceManager.GetString("ItemCreationError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Item rename error.
+        /// </summary>
+        public static string ItemRenameError {
+            get {
+                return ResourceManager.GetString("ItemRenameError", resourceCulture);
             }
         }
         

@@ -49,22 +49,18 @@ namespace WinCopies.IO
 
                    return false;
 
-               byte i = 0;
-
-               IBrowsableObjectInfo _item = null;
-
                foreach (IBrowsableObjectInfo item in items)
                {
-                   _item = item;
+                   if (_obj == null)
 
-                   if (++i == 2)
+                       _obj = item;
+
+                   else
 
                        return false;
                }
 
-               _obj = _item;
-
-               return i == 1;
+               return true;
            }, action, false, out _);
 
             public bool CanExecute(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> items) => RunCommand(items, obj =>
@@ -76,6 +72,8 @@ namespace WinCopies.IO
                         case FileType.File:
                         case Folder:
                         case KnownFolder:
+                        case Archive:
+                        case Link:
                         case Drive:
 
                             return shellObjectInfo.InnerObject.IsFileSystemObject;

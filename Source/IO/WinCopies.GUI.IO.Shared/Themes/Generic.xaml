@@ -287,7 +287,7 @@
 
     <Style x:Key="ExplorerControlListViewItemStyle" TargetType="{x:Type localControls:ExplorerControlListViewItem}" BasedOn="{StaticResource {x:Type ListBoxItem}}">
         <Setter Property="ContentTemplate" Value="{StaticResource ListViewItemContentDataTemplate}" />
-        <Setter Property="IsSelected" Value="{Binding IsSelected}" />
+        <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
         <Setter Property="Command" Value="{Binding DataContext.ItemClickCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type localControls:ExplorerControl}}}" />
         <Setter Property="CommandParameter" Value="{Binding}" />
     </Style>
@@ -316,19 +316,20 @@
                                        SelectedIndex="{Binding Path.SelectedIndex, Mode=TwoWay}" SelectedItem="{Binding Path.SelectedItem, Mode=TwoWay}"
                                        PropertyGridItem="{Binding Path}" PropertyGridDescription="{Binding Path.Items.Count, StringFormat={}{0} items}"
                                        BrowseToParent="{Binding BrowseToParent}">
-            <data:PushBindingManager.PushBindings>
+            <!--<data:PushBindingManager.PushBindings>
                 <data:PushBinding TargetProperty="SelectedItems" Path="SelectedItems" />
-            </data:PushBindingManager.PushBindings>
+            </data:PushBindingManager.PushBindings>-->
         </localControls:ExplorerControl>
         <DataTemplate.Triggers>
-            <MultiDataTrigger>
+            <!--<MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
                     <Condition Binding="{Binding SelectedItems.Count}" Value="1" />
                     <Condition Binding="{Binding Path.SelectedItem, Converter={StaticResource IsNullConverter}}" Value="{markup:FalseValue}" />
-                </MultiDataTrigger.Conditions>
+            </MultiDataTrigger.Conditions>-->
+            <DataTrigger Binding="{Binding SelectedItems.Count}" Value="1">
                 <Setter Property="PropertyGridItem" TargetName="ExplorerControl" Value="{Binding Path.SelectedItem}" />
                 <Setter Property="PropertyGridDescription" TargetName="ExplorerControl" Value="{Binding Path.Items.Count, StringFormat={}{0} items; 1 item selected}" />
-            </MultiDataTrigger>
+            </DataTrigger>
             <DataTrigger Binding="{Binding SelectedItems.Count, Converter={StaticResource IntComparisonConverter}, ConverterParameter={data:IntComparsionConverterParameter Parameter=1, ExpectedComparisonResult=Greater}}" Value="{markup:TrueValue}">
                 <Setter Property="PropertyGridItem" TargetName="ExplorerControl" Value="{x:Null}" />
                 <Setter Property="PropertyGridDescription" TargetName="ExplorerControl">

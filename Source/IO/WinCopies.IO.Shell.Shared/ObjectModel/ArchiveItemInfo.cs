@@ -199,7 +199,7 @@ namespace WinCopies.IO.ObjectModel
 
                 ArchiveFileInfo? archiveFileInfo = null;
 
-                using (var extractor = new SevenZipExtractor(ArchiveShellObject.ArchiveFileStream))
+                using (var extractor = new SevenZipExtractor(ArchiveShellObject.GetArchiveFileStream()))
 
                     archiveFileInfo = extractor.ArchiveFileData.FirstOrDefault(item => string.Compare(item.FileName, path, StringComparison.OrdinalIgnoreCase) == 0);
 

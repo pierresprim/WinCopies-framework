@@ -31,6 +31,7 @@ using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Selectors;
 using WinCopies.Linq;
 using WinCopies.PropertySystem;
+using WinCopies.Temp;
 
 namespace WinCopies.IO.ObjectModel
 {
@@ -174,13 +175,13 @@ namespace WinCopies.IO.ObjectModel
 
         public override string Name => ShellObjectInfo.Name;
 
-        System.IO.Stream IShellObjectInfoBase.ArchiveFileStream => null;
-
         IShellObjectInfoBase IArchiveItemInfoProvider.ArchiveShellObject => this;
 
         ShellObject IEncapsulatorBrowsableObjectInfo<ShellObject>.InnerObject => ShellObjectInfo.InnerObject;
 
         protected override System.Collections.Generic.IEnumerable<IProcessInfo> CustomProcessesOverride => null;
+
+        bool IShellObjectInfoBase.IsArchiveOpen => false;
 
         protected internal MultiIconInfo(in IShellObjectInfo shellObjectInfo) : base(shellObjectInfo.InnerObject.ParsingName, shellObjectInfo.ClientVersion)
         {
@@ -200,6 +201,8 @@ namespace WinCopies.IO.ObjectModel
             : throw new ArgumentException("The given ShellObject must be a ShellFile.", nameof(shellObjectInfo))).Path)
             ? shellObjectInfo
             : throw new ArgumentException("The file format of the given ShellObject is not supported."));
+
+        StreamInfo IShellObjectInfoBase.GetArchiveFileStream() => null;
 
         protected override IEnumerableSelectorDictionary<MultiIconInfoItemProvider, IBrowsableObjectInfo> GetSelectorDictionaryOverride() => DefaultItemSelectorDictionary;
 

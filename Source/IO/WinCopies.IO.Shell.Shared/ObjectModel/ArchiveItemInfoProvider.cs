@@ -29,8 +29,6 @@ namespace WinCopies.IO.ObjectModel
         /// </summary>
         public abstract IShellObjectInfoBase ArchiveShellObject { get; }
 
-        IShellObjectInfoBase IArchiveItemInfoProvider.ArchiveShellObject => ArchiveShellObject;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ArchiveItemInfoProvider{TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/> class.
         /// </summary>

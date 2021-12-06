@@ -12,8 +12,7 @@
     xmlns:gui="clr-namespace:WinCopies.GUI.Windows;assembly=WinCopies.GUI"
     xmlns:guiResources="clr-namespace:WinCopies.GUI.Icons.Properties;assembly=WinCopies.GUI.Icons"
     xmlns:commands="clr-namespace:WinCopies.Commands;assembly=WinCopies.Util.Desktop"
-    xmlns:sevenZip="clr-namespace:SevenZip;assembly=SevenZipSharp"
-    xmlns:temp="clr-namespace:WinCopies.Temp;assembly=WinCopies.Util.Temp">
+    xmlns:sevenZip="clr-namespace:SevenZip;assembly=SevenZipSharp">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/wincopies.gui.templates;component/Themes/Generic.xaml" />
         <ResourceDictionary Source="pack://application:,,,/wincopies.gui.io;component/Themes/Generic.xaml" />

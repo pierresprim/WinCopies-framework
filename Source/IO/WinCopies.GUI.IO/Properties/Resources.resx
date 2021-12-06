@@ -129,8 +129,14 @@
   <data name="ItemCouldNotBeCreated" xml:space="preserve">
     <value>The item could not be created.</value>
   </data>
+  <data name="ItemCouldNotBeRenamed" xml:space="preserve">
+    <value>The item could not be renamed.</value>
+  </data>
   <data name="ItemCreationError" xml:space="preserve">
     <value>Item creation error</value>
+  </data>
+  <data name="ItemRenameError" xml:space="preserve">
+    <value>Item rename error</value>
   </data>
   <data name="NewItemCommandToolTip" xml:space="preserve">
     <value>Opens a dialog for item creation.</value>

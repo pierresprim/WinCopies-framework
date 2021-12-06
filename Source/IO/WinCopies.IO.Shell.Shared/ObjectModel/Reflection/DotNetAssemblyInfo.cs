@@ -34,6 +34,7 @@ using WinCopies.IO.Process;
 using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Reflection;
 using WinCopies.PropertySystem;
+using WinCopies.Temp;
 using WinCopies.Util;
 
 using static WinCopies.IO.DotNetAssemblyInfoHandledExtensions;
@@ -121,13 +122,13 @@ namespace WinCopies.IO
 
             protected override IBrowsableObjectInfo ParentOverride => _shellObjectInfo.Parent;
 
-            System.IO.Stream IShellObjectInfoBase.ArchiveFileStream => ShellObjectInfo.ArchiveFileStream;
-
             IShellObjectInfoBase IArchiveItemInfoProvider.ArchiveShellObject => ShellObjectInfo.ArchiveShellObject;
 
             IFileSystemObjectInfoProperties IBrowsableObjectInfo<IFileSystemObjectInfoProperties>.ObjectProperties => ShellObjectInfo.ObjectProperties;
 
             ShellObject IEncapsulatorBrowsableObjectInfo<ShellObject>.InnerObject => ShellObjectInfo.InnerObject;
+
+            bool IShellObjectInfoBase.IsArchiveOpen => false;
             #endregion Properties
 
             protected DotNetAssemblyInfo(in IShellObjectInfo shellObjectInfo, in ClientVersion clientVersion) : base(shellObjectInfo.Path, clientVersion) => ObjectPropertiesGenericOverride = new FileShellObjectInfoProperties<IShellObjectInfoBase2>(this, FileType.File);
@@ -139,6 +140,8 @@ namespace WinCopies.IO
 
                 return initInfo.FileType == FileType.File ? initInfo.Path.EndsWithOR(Exe, Dll) ? new DotNetAssemblyInfo(new ShellObjectInfo(initInfo.Path, initInfo.FileType, shellObject, clientVersion), clientVersion) : throw new ArgumentException($"{nameof(shellObject)} must be an exe (.exe) or a dll (.dll).") : throw new ArgumentException(GivenShellObjectIsNotAFile, nameof(shellObject));
             }
+
+            StreamInfo IShellObjectInfoBase.GetArchiveFileStream() => ShellObjectInfo.GetArchiveFileStream();
 
             protected override ArrayBuilder<IBrowsableObjectInfo> GetRootItemsOverride()
             {

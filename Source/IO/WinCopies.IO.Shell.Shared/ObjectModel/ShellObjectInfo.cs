@@ -35,6 +35,7 @@ using WinCopies.IO.Selectors;
 using WinCopies.IO.Shell.Process;
 using WinCopies.Linq;
 using WinCopies.PropertySystem;
+using WinCopies.Temp;
 using WinCopies.Util.Commands.Primitives;
 #endregion
 #endregion
@@ -163,28 +164,66 @@ namespace WinCopies.IO
         /// </summary>
         public abstract class ShellObjectInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : ArchiveItemInfoProvider<TObjectProperties, ShellObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IShellObjectInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IFileSystemObjectInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
         {
+            private struct GetStreamStruct : DotNetFix.IDisposable
+            {
+                private Func<StreamInfo> _getStreamDelegate;
+                private StreamInfo _archiveFileStream;
+
+                public StreamInfo ArchiveFileStream => _archiveFileStream.IsDisposed ? (_archiveFileStream = _getStreamDelegate()) : _archiveFileStream;
+
+                public bool IsDisposed
+                {
+                    get
+                    {
+                        if (_getStreamDelegate == null)
+
+                            return true;
+
+                        else if (_archiveFileStream.IsDisposed)
+                        {
+                            _archiveFileStream = null;
+                            _getStreamDelegate = null;
+
+                            return true;
+                        }
+
+                        return false;
+                    }
+                }
+
+                public GetStreamStruct(Func<FileStream> func) => _archiveFileStream = (_getStreamDelegate = () => new StreamInfo(func()))();
+
+                public void Dispose()
+                {
+                    if (!IsDisposed)
+                    {
+                        if (!_archiveFileStream.IsDisposed)
+
+                            _archiveFileStream.Dispose();
+
+                        _archiveFileStream = null;
+
+                        _getStreamDelegate = null;
+                    }
+                }
+            }
+
             #region Fields
             private ShellObject _shellObject;
             private IBrowsableObjectInfo _parent;
             private IBrowsabilityOptions _browsability;
             private IBitmapSourceProvider _bitmapSourceProvider;
             private ShellObjectInfoMonitoring<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>? _monitoring;
+            private GetStreamStruct? _getStreamStruct;
             #endregion
 
             #region Properties
-            public System.IO.Stream ArchiveFileStream { get; private set; }
-
             /// <summary>
             /// The parent <see cref="IShellObjectInfoBase"/> of the current archive item. If the current <see cref="ShellObjectInfo"/> represents an archive file, this property returns the current <see cref="ShellObjectInfo"/>, or <see langword="null"/> otherwise.
             /// </summary>
             public override IShellObjectInfoBase ArchiveShellObject => ObjectPropertiesGeneric.FileType == Archive ? this : null;
 
-            public bool IsArchiveOpen => ArchiveFileStream is
-#if CS9
-                not null;
-#else
-                object;
-#endif
+            public bool IsArchiveOpen => _getStreamStruct.HasValue;
 
             #region Overrides
             protected override bool IsMonitoringSupportedOverride => InnerObjectGenericOverride is ShellFileSystemFolder || InnerObjectGenericOverride is ShellFile || InnerObjectGenericOverride.ParsingName == Computer.ParsingName;
@@ -345,28 +384,60 @@ namespace WinCopies.IO
             }
 
             #region Archive
-            public void OpenArchive(FileMode fileMode, FileAccess fileAccess, FileShare fileShare, int? bufferSize, FileOptions fileOptions) => ArchiveFileStream = ObjectPropertiesGeneric.FileType == Archive
-                    ? ArchiveFileStream == null
-                        ? new FileStream(Path, fileMode, fileAccess, fileShare, bufferSize ?? 4096, fileOptions)
-                        : throw new InvalidOperationException("The archive is not open.")
-                    : throw new InvalidOperationException("The current item is not an archive.");
+            public StreamInfo GetArchiveFileStream()
+            {
+                ThrowArchiveOpenStatusException(true);
+
+                return _getStreamStruct?.ArchiveFileStream;
+            }
+
+            protected void ThrowItemIsNotAnArchiveException() => throw new InvalidOperationException("The current item is not an archive.");
+
+            protected void ThrowArchiveOpenStatusException(in bool mustBeOpen)
+            {
+                string msg = null;
+
+                if (mustBeOpen)
+                {
+                    if (!IsArchiveOpen)
+
+                        msg = "closed";
+                }
+
+                else if (IsArchiveOpen)
+
+                    msg = "already open";
+
+                if (msg != null)
+
+                    throw new InvalidOperationException($"The archive is {msg}.");
+            }
+
+            public void OpenArchive(FileMode fileMode, FileAccess fileAccess, FileShare fileShare, int? bufferSize, FileOptions fileOptions)
+            {
+                if (ObjectPropertiesGeneric.FileType == Archive)
+                {
+                    ThrowArchiveOpenStatusException(false);
+
+                    var getStreamStruct = new GetStreamStruct(() => new FileStream(Path, fileMode, fileAccess, fileShare, bufferSize ?? 4096, fileOptions));
+
+                    _getStreamStruct = getStreamStruct; // The field has to remain uninitialized if the struct constructor fails to initialize the stream.
+                }
+
+                else ThrowItemIsNotAnArchiveException();
+            }
 
             public void CloseArchive()
             {
                 if (ObjectPropertiesGeneric.FileType == Archive)
                 {
-                    if (ArchiveFileStream == null)
+                    ThrowArchiveOpenStatusException(false);
 
-                        return;
-
-                    ArchiveFileStream.Dispose();
-
-                    ArchiveFileStream = null;
+                    _getStreamStruct.Value.Dispose();
+                    _getStreamStruct = null;
                 }
 
-                else
-
-                    throw new InvalidOperationException("The current item is not an archive.");
+                else ThrowItemIsNotAnArchiveException();
             }
             #endregion
 

@@ -20,6 +20,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows.Data;
@@ -32,6 +33,7 @@ using WinCopies.IO.ObjectModel;
 using WinCopies.IO.Process;
 using WinCopies.IO.PropertySystem;
 using WinCopies.PropertySystem;
+using WinCopies.Temp;
 using WinCopies.Util.Commands.Primitives;
 using WinCopies.Util.Data;
 #endregion
@@ -50,6 +52,8 @@ using IEnumerable = System.Collections.IEnumerable;
 using System.Diagnostics.CodeAnalysis;
 #endif
 
+using static WinCopies.Temp.Temp;
+
 namespace WinCopies.GUI.IO.ObjectModel
 {
     //public class TreeViewItemBrowsableObjectInfoViewModelFactory : IBrowsableObjectInfoViewModelFactory
@@ -57,6 +61,7 @@ namespace WinCopies.GUI.IO.ObjectModel
     //    public IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo) => new BrowsableObjectInfoViewModel(browsableObjectInfo, Predicate) { Factory = this };
     //}
 
+    [DebuggerDisplay("{Name}")]
     public partial class BrowsableObjectInfoViewModel : ViewModel<IBrowsableObjectInfo>, IBrowsableObjectInfoViewModel
     {
         #region Private fields
@@ -190,7 +195,17 @@ namespace WinCopies.GUI.IO.ObjectModel
         /// </summary>
         public string Name => ModelGeneric.Name;
 
-        public bool IsSelected { get => _selection._isSelected; set => UpdateValue2(ref _selection._isSelected, value, nameof(IsSelected)); }
+        public bool IsSelected
+        {
+            get => _selection._isSelected;
+
+            set
+            {
+                if (UpdateValue2(ref _selection._isSelected, value, nameof(IsSelected)))
+
+                    SelectionChanged?.Invoke(this, EventArgs.Empty);
+            }
+        }
 
         public ClientVersion? ClientVersion => ModelGeneric.ClientVersion;
 
@@ -211,6 +226,10 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         public System.Collections.Generic.IEnumerable<IProcessInfo> CustomProcesses => ModelGeneric.CustomProcesses;
         #endregion
+
+        public event EventHandler<IBrowsableObjectInfoViewModel> SelectionChanged;
+
+        public event ItemsChangedEventHandler<IBrowsableObjectInfoViewModel> SelectedItemsChanged;
 
         #region Constructors
         internal BrowsableObjectInfoViewModel(in IBrowsableObjectInfo browsableObjectInfo, in bool rootParentIsRootNode) : base(browsableObjectInfo ?? throw GetArgumentNullException(nameof(browsableObjectInfo))) => RootParentIsRootNode = rootParentIsRootNode;
@@ -293,6 +312,8 @@ namespace WinCopies.GUI.IO.ObjectModel
             {
                 bool changed = false;
 
+                ObservableCollection<IBrowsableObjectInfoViewModel> oldItems = null;
+
                 try
                 {
                     var __items = new ArrayBuilder<IBrowsableObjectInfoViewModel>((RootParentIsRootNode ? ModelGeneric.GetSubRootItems() : ModelGeneric.GetItems()).Select(
@@ -304,6 +325,8 @@ namespace WinCopies.GUI.IO.ObjectModel
                     __items.Clear();
 
                     Sort(itemsList);
+
+                    oldItems = _items;
 
                     _items = new ObservableCollection<IBrowsableObjectInfoViewModel>(itemsList);
 
@@ -327,6 +350,41 @@ namespace WinCopies.GUI.IO.ObjectModel
 
                 if (changed)
                 {
+                    var newSelectedItems = new ArrayBuilder<IBrowsableObjectInfoViewModel>();
+
+                    foreach (var item in _items)
+
+                        if (item.IsSelected)
+
+                            _ = newSelectedItems.AddLast(item);
+
+                    foreach (var item in _items)
+
+                        item.SelectionChanged += Item_SelectionChanged;
+
+                    _items.CollectionChanged += Items_CollectionChanged;
+
+                    if (oldItems != null)
+                    {
+                        oldItems.CollectionChanged -= Items_CollectionChanged;
+
+                        foreach (var item in oldItems)
+
+                            item.SelectionChanged -= Item_SelectionChanged;
+
+                        var oldSelectedItems = new ArrayBuilder<IBrowsableObjectInfoViewModel>();
+
+                        foreach (var item in oldItems)
+
+                            if (!_items.Contains(item))
+
+                                _ = oldSelectedItems.AddLast(item);
+
+                        if (oldSelectedItems.Count > 0)
+
+                            RaiseSelectedItemsChanged(oldSelectedItems.ToList(), null);
+                    }
+
                     ref Predicate<IBrowsableObjectInfo> filter = ref itemManagement._filter;
 
                     collectionView = CollectionViewSource.GetDefaultView(items._items);
@@ -340,11 +398,71 @@ namespace WinCopies.GUI.IO.ObjectModel
                         collectionView.Filter = Predicate;
 
                     OnPropertyChanged(nameof(Items));
+
+                    if (newSelectedItems.Count > 0)
+
+                        RaiseSelectedItemsChanged(null, newSelectedItems.ToList());
                 }
             }
 
             return ref items;
         }
+
+        protected virtual void RaiseSelectedItemsChanged(ItemsChangedEventArgs<IBrowsableObjectInfoViewModel> e) => SelectedItemsChanged?.Invoke(this, e);
+
+        protected virtual void RaiseSelectedItemsChanged(System.Collections.Generic.IEnumerable<IBrowsableObjectInfoViewModel> oldItems, System.Collections.Generic.IEnumerable<IBrowsableObjectInfoViewModel> newItems) => RaiseSelectedItemsChanged(new ItemsChangedEventArgs<IBrowsableObjectInfoViewModel>(oldItems, newItems));
+
+        protected virtual void OnItemSelectionChanged(IBrowsableObjectInfoViewModel item)
+        {
+            var list = new List<IBrowsableObjectInfoViewModel>(1) { item };
+
+            if (item.IsSelected)
+
+                RaiseSelectedItemsChanged(null, list);
+
+            else
+
+                RaiseSelectedItemsChanged(list, null);
+        }
+
+        private void Item_SelectionChanged(IBrowsableObjectInfoViewModel sender, EventArgs e) => OnItemSelectionChanged(sender);
+
+        protected virtual void OnItemCollectionChanged(NotifyCollectionChangedEventArgs e)
+        {
+            var oldSelectedItems = new ArrayBuilder<IBrowsableObjectInfoViewModel>();
+            var newSelectedItems = new ArrayBuilder<IBrowsableObjectInfoViewModel>();
+
+#if CS8
+            static
+#endif
+                void runAction(in System.Collections.IEnumerable enumerable, in Action<IBrowsableObjectInfoViewModel> action) => RunActionIfNotNull(enumerable, action);
+
+            IList<IBrowsableObjectInfoViewModel> getList(in ArrayBuilder<IBrowsableObjectInfoViewModel> arrayBuilder) => arrayBuilder.Count > 0 ? arrayBuilder.ToList() : null;
+
+            runAction(e.OldItems, item =>
+            {
+                if (item.IsSelected)
+
+                    _ = oldSelectedItems.AddLast(item);
+
+                item.SelectionChanged -= Item_SelectionChanged;
+            });
+
+            runAction(e.NewItems, item =>
+            {
+                if (item.IsSelected)
+
+                    _ = newSelectedItems.AddLast(item);
+
+                item.SelectionChanged += Item_SelectionChanged;
+            });
+
+            if (oldSelectedItems.Count > 0 || newSelectedItems.Count > 0)
+
+                RaiseSelectedItemsChanged(getList(oldSelectedItems), getList(newSelectedItems));
+        }
+
+        private void Items_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => OnItemCollectionChanged(e);
 
         public void LoadItems() => LoadItems2();
 

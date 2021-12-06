@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections;
+using System.Diagnostics;
 using System.Reflection;
 
 using WinCopies.Collections.Generic;
@@ -61,6 +62,7 @@ namespace WinCopies.IO
         /// <summary>
         /// The base class for all IO browsable objects of the WinCopies framework.
         /// </summary>
+        [DebuggerDisplay("{Name}")]
         public abstract class BrowsableObjectInfo : BrowsableObjectInfoBase, IBrowsableObjectInfo
         {
             protected static void EmptyVoid() { /* Left empty. */ }

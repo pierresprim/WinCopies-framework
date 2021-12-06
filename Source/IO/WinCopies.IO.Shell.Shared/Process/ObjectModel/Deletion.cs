@@ -146,22 +146,15 @@ namespace WinCopies.IO.Process.ObjectModel
                 return false;
             }
 
-            if (!check(_fileOperation.TryDeleteItem(ShellObjectFactory.Create(path.Path), provider: null), out error))
+            if (check(_fileOperation.TryDeleteItem(ShellObjectFactory.Create(path.Path.Replace("\\\\", "\\")), provider: null), out error) && check(_fileOperation.TryPerformOperations(), out error))
 
-                return true;
+                if (_fileOperation.GetAnyOperationsAborted())
 
-            if (!check(_fileOperation.TryPerformOperations(), out error))
+                    setCancelledError(HResult.Canceled, out error);
 
-                return true;
+                else
 
-            if (_fileOperation.GetAnyOperationsAborted())
-            {
-                setCancelledError(HResult.Canceled, out error);
-
-                return true;
-            }
-
-            error = Factory.GetNoErrorError();
+                    error = Factory.GetNoErrorError();
 
             return true;
         }

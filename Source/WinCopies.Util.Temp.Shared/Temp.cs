@@ -16,6 +16,12 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 #if DEBUG
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using WinCopies.Linq;
+
 namespace WinCopies.Temp
 {
     //public interface IMinimalLinkedList<T> : System.Collections.Generic.IEnumerable<T>
@@ -78,192 +84,290 @@ namespace WinCopies.Temp
     //    public static explicit operator byte(BoolArray b) => b._b;
     //}
 
-    public static class Temp
+    public interface IItemsChangedEventArgs
     {
+        IEnumerable OldItems { get; }
 
+        IEnumerable NewItems { get; }
     }
 
-//    public class NativeShellMenu : IRecursiveEnumerable<NativeShellMenu>
-//    {
-//        public const RecursiveEnumerationOrder EnumerationOrder = RecursiveEnumerationOrder.ParentThenChildren;
+    public abstract class ItemsChangedAbstractEventArgs<T>
+    {
+        public T OldItems { get; }
 
-//        public IntPtr Menu { get; }
+        public T NewItems { get; }
 
-//        public uint Id { get; private set; }
+        public ItemsChangedAbstractEventArgs(in T oldItems, in T newItems)
+        {
+            OldItems = oldItems;
 
-//        public int Position { get; private set; }
+            NewItems = newItems;
+        }
+    }
 
-//        public int Count { get; }
+    public class ItemsChangedEventArgs : ItemsChangedAbstractEventArgs<IEnumerable>, IItemsChangedEventArgs
+    {
+        public ItemsChangedEventArgs(in IEnumerable oldItems, in IEnumerable newItems) : base(oldItems, newItems) { /* Left empty. */ }
+    }
 
-//        public NativeShellMenu Value => this;
+    public class ItemsChangedEventArgs<T> : ItemsChangedAbstractEventArgs<IEnumerable<T>>, IItemsChangedEventArgs
+    {
+        IEnumerable IItemsChangedEventArgs.OldItems => OldItems;
 
-//        public NativeShellMenu(in IntPtr menu) => Count = Menus.GetMenuItemCount(Menu);
+        IEnumerable IItemsChangedEventArgs.NewItems => NewItems;
 
-//        public RecursiveEnumerator<NativeShellMenu> GetEnumerator() => new RecursiveEnumerator<NativeShellMenu>(this, EnumerationOrder);
+        public ItemsChangedEventArgs(in IEnumerable<T> oldItems, in IEnumerable<T> newItems) : base(oldItems, newItems) { /* Left empty. */ }
+    }
 
-//        System.Collections.Generic.IEnumerator<NativeShellMenu> System.Collections.Generic.IEnumerable<NativeShellMenu>.GetEnumerator() => GetEnumerator();
+    public delegate void ItemsChangedEventHandler(object sender, ItemsChangedEventArgs e);
 
-//        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    public delegate void ItemsChangedEventHandler<T>(object sender, ItemsChangedEventArgs<T> e);
 
-//        public System.Collections.Generic.IEnumerator<IRecursiveEnumerable<NativeShellMenu>> GetRecursiveEnumerator() => new Enumerator(this);
+    public class StreamInfo : System.IO.Stream, DotNetFix.IDisposable
+    {
+        protected System.IO.Stream Stream { get; }
 
-//        public sealed class Enumerator : Enumerator<IRecursiveEnumerable<NativeShellMenu>>
-//        {
-//            private NativeShellMenu _menu;
-//            private NativeShellMenu _current;
+        public override bool CanRead => Stream.CanRead;
 
-//            public int CurrentIndex { get; private set; } = -1;
+        public override bool CanSeek => Stream.CanSeek;
 
-//            public override bool? IsResetSupported => true;
+        public override bool CanWrite => Stream.CanWrite;
 
-//            protected override IRecursiveEnumerable<NativeShellMenu> CurrentOverride => _current;
+        public override long Length => Stream.Length;
 
-//            public Enumerator(in NativeShellMenu menu) => _menu = menu;
+        public override long Position { get => Stream.Position; set => Stream.Position = value; }
 
-//            protected override bool MoveNextOverride()
-//            {
-//                if (++CurrentIndex == _menu.Count)
+        public bool IsDisposed { get; private set; }
 
-//                    return false;
+        public StreamInfo(in System.IO.Stream stream) => Stream = stream ?? throw ThrowHelper.GetArgumentNullException(nameof(stream));
 
-//                _current = new NativeShellMenu(Menus.GetSubMenu(_menu.Menu, CurrentIndex))
-//                {
-//                    Id = (uint)Menus.GetMenuItemID(_menu.Menu, CurrentIndex),
+        public override void Flush() => Stream.Flush();
 
-//                    Position = CurrentIndex
-//                };
+        public override int Read(byte[] buffer, int offset, int count) => Stream.Read(buffer, offset, count);
 
-//                return true;
-//            }
+        public override long Seek(long offset, SeekOrigin origin) => Stream.Seek(offset, origin);
 
-//            protected override void ResetCurrent()
-//            {
-//                base.ResetCurrent();
+        public override void SetLength(long value) => Stream.SetLength(value);
 
-//                CurrentIndex = -1;
+        public override void Write(byte[] buffer, int offset, int count) => Stream.Write(buffer, offset, count);
 
-//                _current = null;
-//            }
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
 
-//            protected override void DisposeManaged()
-//            {
-//                _menu = null;
+            IsDisposed = true;
+        }
+    }
 
-//                base.DisposeManaged();
-//            }
-//        }
-//    }
+    public static class Temp
+    {
+        private static void _RunAction<T>(in System.Collections.Generic.IEnumerable<T> enumerable, in Action<T> action)
+        {
+            foreach (var item in enumerable)
 
-//    public interface ISeparator
-//    {
+                action(item);
+        }
 
-//    }
+        public static void RunActionIfNotNull<T>(in System.Collections.Generic.IEnumerable<T> enumerable, in Action<T> action)
+        {
+            if (enumerable == null)
 
-//    public class Separator : ISeparator
-//    {
+                return;
 
-//    }
+            _RunAction(enumerable, action);
+        }
 
-//    public class NativeMenuItem<TItems, TItemCollection> : Command<uint> where TItemCollection : System.Collections.Generic.IEnumerable<TItems>
-//    {
-//        public struct NativeMenuItemConverters
-//        {
-//            public Converter<System.Collections.Generic.IEnumerable<TItems>, TItemCollection> ItemCollectionConverter { get; }
+        public static void RunActionIfNotNull<T>(in System.Collections.IEnumerable enumerable, in Action<T> action)
+        {
+            if (enumerable == null)
 
-//            public Converter<ISeparator, TItems> SeparatorConverter { get; }
+                return;
 
-//            public Converter<NativeMenuItem<TItems, TItemCollection>, TItems> ItemConverter { get; }
+            _RunAction(enumerable.To<T>(), action);
+        }
+    }
 
-//            public NativeMenuItemConverters(in Converter<System.Collections.Generic.IEnumerable<TItems>, TItemCollection> itemCollectionConverter, in Converter<ISeparator, TItems> separatorConverter, in Converter<NativeMenuItem<TItems, TItemCollection>, TItems> itemConverter)
-//            {
-//                ItemCollectionConverter = itemCollectionConverter;
+    //    public class NativeShellMenu : IRecursiveEnumerable<NativeShellMenu>
+    //    {
+    //        public const RecursiveEnumerationOrder EnumerationOrder = RecursiveEnumerationOrder.ParentThenChildren;
 
-//                SeparatorConverter = separatorConverter;
+    //        public IntPtr Menu { get; }
 
-//                ItemConverter = itemConverter;
-//            }
-//        }
+    //        public uint Id { get; private set; }
 
-//        public NativeMenuItemConverters _converters;
-//        public NativeShellMenu _shellMenu;
-//        private System.Collections.Generic.IEnumerable<TItems> _items;
+    //        public int Position { get; private set; }
 
-//        public ICommand<uint> Command { get; }
+    //        public int Count { get; }
 
-//        public uint CommandParameter { get; }
+    //        public NativeShellMenu Value => this;
 
-//        public System.Collections.Generic.IEnumerable<TItems> Items => _items
-//#if CS8
-//            ??=
-//#else
-//            ?? (_items =     
-//#endif
-//            GetItemCollection()
-//#if !CS8
-//            )
-//#endif
-//            ;
+    //        public NativeShellMenu(in IntPtr menu) => Count = Menus.GetMenuItemCount(Menu);
 
-//        protected NativeMenuItem(in NativeShellMenu shellMenu, in string header, in ICommand<uint> command, in uint commandParameter, in NativeMenuItemConverters converters) : base(header, null)
-//        {
-//            Command = command;
+    //        public RecursiveEnumerator<NativeShellMenu> GetEnumerator() => new RecursiveEnumerator<NativeShellMenu>(this, EnumerationOrder);
 
-//            CommandParameter = commandParameter;
+    //        System.Collections.Generic.IEnumerator<NativeShellMenu> System.Collections.Generic.IEnumerable<NativeShellMenu>.GetEnumerator() => GetEnumerator();
 
-//            _converters = converters;
+    //        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-//            _shellMenu = shellMenu;
-//        }
+    //        public System.Collections.Generic.IEnumerator<IRecursiveEnumerable<NativeShellMenu>> GetRecursiveEnumerator() => new Enumerator(this);
 
-//        public static TItems Create(in NativeShellMenu menu, in ICommand<uint> command, in NativeMenuItemConverters converters)
-//        {
-//            ThrowIfNull(menu, nameof(menu));
-//            ThrowIfNull(command, nameof(command));
+    //        public sealed class Enumerator : Enumerator<IRecursiveEnumerable<NativeShellMenu>>
+    //        {
+    //            private NativeShellMenu _menu;
+    //            private NativeShellMenu _current;
 
-//            if (If(Or, Logical, Equal, null, converters.ItemConverter, converters.SeparatorConverter, converters.ItemCollectionConverter))
+    //            public int CurrentIndex { get; private set; } = -1;
 
-//                throw new ArgumentException("One or more of the given converters is null.");
+    //            public override bool? IsResetSupported => true;
 
-//            var data = new MenuItemInfo() { cbSize = (uint)Marshal.SizeOf<MenuItemInfo>(), fMask = MenuItemInfoFlags.State | MenuItemInfoFlags.String | MenuItemInfoFlags.FType };
+    //            protected override IRecursiveEnumerable<NativeShellMenu> CurrentOverride => _current;
 
-//            GetMenuItemInfo(menu, ref data);
+    //            public Enumerator(in NativeShellMenu menu) => _menu = menu;
 
-//            MenuFlags menuFlags = (MenuFlags)data.fType;
+    //            protected override bool MoveNextOverride()
+    //            {
+    //                if (++CurrentIndex == _menu.Count)
 
-//            return menuFlags.HasFlag(MenuFlags.Separator)
-//                ? converters.SeparatorConverter(new Separator())
-//                : converters.ItemConverter(new NativeMenuItem<TItems, TItemCollection>(menu, data.dwTypeData, command, menu.Id, converters));
-//        }
+    //                    return false;
 
-//        public static void GetMenuItemInfo(in NativeShellMenu shellMenu, ref MenuItemInfo data)
-//        {
-//            if (!Menus.GetMenuItemInfoW(shellMenu.Menu, (uint)shellMenu.Position, true, ref data))
+    //                _current = new NativeShellMenu(Menus.GetSubMenu(_menu.Menu, CurrentIndex))
+    //                {
+    //                    Id = (uint)Menus.GetMenuItemID(_menu.Menu, CurrentIndex),
 
-//                Marshal.ThrowExceptionForHR(Marshal.GetHRForLastWin32Error());
-//        }
+    //                    Position = CurrentIndex
+    //                };
 
-//        public void GetMenuItemInfo(ref MenuItemInfo data) => GetMenuItemInfo(_shellMenu, ref data);
+    //                return true;
+    //            }
 
-//        protected TItemCollection GetItemCollection()
-//        {
-//            TItemCollection result = _converters.ItemCollectionConverter(new Enumerable<TItems>(() => _shellMenu.GetRecursiveEnumerator().SelectConverter(_menu => Create((NativeShellMenu)_menu, Command, _converters))));
+    //            protected override void ResetCurrent()
+    //            {
+    //                base.ResetCurrent();
 
-//            _converters = default;
+    //                CurrentIndex = -1;
 
-//            return result;
-//        }
+    //                _current = null;
+    //            }
 
-//        public override bool CanExecute(uint value)
-//        {
-//            var data = new MenuItemInfo() { cbSize = (uint)Marshal.SizeOf<MenuItemInfo>(), fMask = MenuItemInfoFlags.State };
+    //            protected override void DisposeManaged()
+    //            {
+    //                _menu = null;
 
-//            GetMenuItemInfo(ref data);
+    //                base.DisposeManaged();
+    //            }
+    //        }
+    //    }
 
-//            return ((MenuStates)data.fState).HasFlag(MenuStates.Enabled);
-//        }
+    //    public interface ISeparator
+    //    {
 
-//        public override void Execute(uint value) => Command?.Execute(CommandParameter);
-//    }
+    //    }
+
+    //    public class Separator : ISeparator
+    //    {
+
+    //    }
+
+    //    public class NativeMenuItem<TItems, TItemCollection> : Command<uint> where TItemCollection : System.Collections.Generic.IEnumerable<TItems>
+    //    {
+    //        public struct NativeMenuItemConverters
+    //        {
+    //            public Converter<System.Collections.Generic.IEnumerable<TItems>, TItemCollection> ItemCollectionConverter { get; }
+
+    //            public Converter<ISeparator, TItems> SeparatorConverter { get; }
+
+    //            public Converter<NativeMenuItem<TItems, TItemCollection>, TItems> ItemConverter { get; }
+
+    //            public NativeMenuItemConverters(in Converter<System.Collections.Generic.IEnumerable<TItems>, TItemCollection> itemCollectionConverter, in Converter<ISeparator, TItems> separatorConverter, in Converter<NativeMenuItem<TItems, TItemCollection>, TItems> itemConverter)
+    //            {
+    //                ItemCollectionConverter = itemCollectionConverter;
+
+    //                SeparatorConverter = separatorConverter;
+
+    //                ItemConverter = itemConverter;
+    //            }
+    //        }
+
+    //        public NativeMenuItemConverters _converters;
+    //        public NativeShellMenu _shellMenu;
+    //        private System.Collections.Generic.IEnumerable<TItems> _items;
+
+    //        public ICommand<uint> Command { get; }
+
+    //        public uint CommandParameter { get; }
+
+    //        public System.Collections.Generic.IEnumerable<TItems> Items => _items
+    //#if CS8
+    //            ??=
+    //#else
+    //            ?? (_items =     
+    //#endif
+    //            GetItemCollection()
+    //#if !CS8
+    //            )
+    //#endif
+    //            ;
+
+    //        protected NativeMenuItem(in NativeShellMenu shellMenu, in string header, in ICommand<uint> command, in uint commandParameter, in NativeMenuItemConverters converters) : base(header, null)
+    //        {
+    //            Command = command;
+
+    //            CommandParameter = commandParameter;
+
+    //            _converters = converters;
+
+    //            _shellMenu = shellMenu;
+    //        }
+
+    //        public static TItems Create(in NativeShellMenu menu, in ICommand<uint> command, in NativeMenuItemConverters converters)
+    //        {
+    //            ThrowIfNull(menu, nameof(menu));
+    //            ThrowIfNull(command, nameof(command));
+
+    //            if (If(Or, Logical, Equal, null, converters.ItemConverter, converters.SeparatorConverter, converters.ItemCollectionConverter))
+
+    //                throw new ArgumentException("One or more of the given converters is null.");
+
+    //            var data = new MenuItemInfo() { cbSize = (uint)Marshal.SizeOf<MenuItemInfo>(), fMask = MenuItemInfoFlags.State | MenuItemInfoFlags.String | MenuItemInfoFlags.FType };
+
+    //            GetMenuItemInfo(menu, ref data);
+
+    //            MenuFlags menuFlags = (MenuFlags)data.fType;
+
+    //            return menuFlags.HasFlag(MenuFlags.Separator)
+    //                ? converters.SeparatorConverter(new Separator())
+    //                : converters.ItemConverter(new NativeMenuItem<TItems, TItemCollection>(menu, data.dwTypeData, command, menu.Id, converters));
+    //        }
+
+    //        public static void GetMenuItemInfo(in NativeShellMenu shellMenu, ref MenuItemInfo data)
+    //        {
+    //            if (!Menus.GetMenuItemInfoW(shellMenu.Menu, (uint)shellMenu.Position, true, ref data))
+
+    //                Marshal.ThrowExceptionForHR(Marshal.GetHRForLastWin32Error());
+    //        }
+
+    //        public void GetMenuItemInfo(ref MenuItemInfo data) => GetMenuItemInfo(_shellMenu, ref data);
+
+    //        protected TItemCollection GetItemCollection()
+    //        {
+    //            TItemCollection result = _converters.ItemCollectionConverter(new Enumerable<TItems>(() => _shellMenu.GetRecursiveEnumerator().SelectConverter(_menu => Create((NativeShellMenu)_menu, Command, _converters))));
+
+    //            _converters = default;
+
+    //            return result;
+    //        }
+
+    //        public override bool CanExecute(uint value)
+    //        {
+    //            var data = new MenuItemInfo() { cbSize = (uint)Marshal.SizeOf<MenuItemInfo>(), fMask = MenuItemInfoFlags.State };
+
+    //            GetMenuItemInfo(ref data);
+
+    //            return ((MenuStates)data.fState).HasFlag(MenuStates.Enabled);
+    //        }
+
+    //        public override void Execute(uint value) => Command?.Execute(CommandParameter);
+    //    }
 }
 
 //using System;

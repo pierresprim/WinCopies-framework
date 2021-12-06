@@ -6,6 +6,25 @@ The WinCopies® software framework
 CHANGELOG
 ---------
 
+### 3.13-preview
+
+- Bug fixes and misc improvements.
+- IShellObjectInfoBase:
+	- add IsArchiveOpen property.
+	- replace ArchiveFileStream property with GetArchiveFileStream() method. The return type now is StreamInfo.
+- IExplorerControlViewModel:
+	- SelectedItems has new return type.
+	- SelectedItems2 has been removed.
+- ExplorerControlViewModel:
+	- New method: OnPathSelectedItemsChanged.
+	- OnTryExecuteCommand and OnPathAdded has new parameters.
+	- Selected items are cleared when disposing.
+- IBrowsableObjectInfoViewModel has new events.
+- BrowsableObjectInfoViewModel has new methods and events.
+- Redesign ArchiveFileInfoEnumeratorStruct.
+- Add new types.
+- Disable support for .Net Core 3.0.
+
 ### 3.12.1-preview
 
 - Add constructor to ProcessWindow with a custom ObservableCollection\<IProcess>.
