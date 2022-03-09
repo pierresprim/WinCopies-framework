@@ -10,18 +10,50 @@ namespace WinCopies.EntityFramework
 {
     public static partial class EntityCollection
     {
-        public static TResult? Add<TParameter, TResult>(Func<string, object?, TParameter> parameterFunc, Func<IEntityCollectionUpdater<TParameter, TResult>> updaterProvider, IEntity entity, out uint tables, out ulong rows, IReadOnlyDictionary<string, object>? extraColumns = null)
+        public static TResult
+#if CS9
+            ?
+#endif
+            Add<TParameter, TResult>(Func<string, object
+#if CS8
+            ?
+#endif
+            , TParameter> parameterFunc, Func<IEntityCollectionUpdater<TParameter, TResult>> updaterProvider, IEntity entity, out uint tables, out ulong rows, IReadOnlyDictionary<string, object>? extraColumns = null)
         {
             uint _tables = 0;
             ulong _rows = 0;
 
-            IEntity? tmp = null;
-            EntityAttribute? attribute;
+            IEntity
+#if CS9
+            ?
+#endif
+            tmp = null;
+            EntityAttribute
+#if CS8
+            ?
+#endif
+            attribute;
             Type? t = null;
-            IEntityCollectionUpdater<TParameter, TResult>? updater = null;
-            TResult? result = default;
-            object? value = null;
-            PropertyInfo? idProperty = null;
+            IEntityCollectionUpdater<TParameter, TResult>
+#if CS8
+            ?
+#endif
+            updater = null;
+            TResult
+#if CS9
+            ?
+#endif
+            result = default;
+            object
+#if CS8
+            ?
+#endif
+            value = null;
+            PropertyInfo
+#if CS8
+            ?
+#endif
+            idProperty = null;
             object? id = null;
             OneToManyForeignKeyAttribute oneToManyForeignKeyAttribute;
             ActionIn<KeyValuePair<PropertyInfo, EntityPropertyAttribute>, IEntity>? action = null;
