@@ -27,6 +27,8 @@ using WinCopies.Linq;
 
 using static WinCopies.ThrowHelper;
 using static WinCopies.Temp.ForLoop;
+using System.Reflection;
+using System.Globalization;
 
 namespace WinCopies.Temp
 {
@@ -145,7 +147,7 @@ namespace WinCopies.Temp
 
         public bool IsDisposed { get; private set; }
 
-        public StreamInfo(in System.IO.Stream stream) => Stream = stream ?? throw ThrowHelper.GetArgumentNullException(nameof(stream));
+        public StreamInfo(in System.IO.Stream stream) => Stream = stream ?? throw GetArgumentNullException(nameof(stream));
 
         public override void Flush() => Stream.Flush();
 
@@ -292,6 +294,223 @@ namespace WinCopies.Temp
 
     public static class Extensions
     {
+        public static ConstructorInfo? TryGetConstructor(this Type t, params Type[] types) => t.GetConstructor(types);
+
+        public static ConstructorInfo AssertGetConstructor(this Type t, params Type[] types) => t.TryGetConstructor(types) ?? throw new InvalidOperationException("There is no such constructor for this type.");
+
+        public static System.Collections.Generic.IEnumerable<T> AsReadOnlyEnumerable<T>(this System.Collections.Generic.IEnumerable<T> enumerable)
+        {
+            foreach (T? item in enumerable)
+
+                yield return item;
+        }
+
+        public static System.Collections.Generic.IEnumerable<U> As<T, U>(this System.Collections.Generic.IEnumerable<T> enumerable) where T : U
+        {
+            foreach (T? item in enumerable)
+
+                yield return item;
+        }
+
+        public static bool Any(this IEnumerable enumerable, Func<object, bool> func)
+        {
+            ThrowIfNull(enumerable, nameof(enumerable));
+            ThrowIfNull(func, nameof(func));
+
+            foreach (object value in enumerable)
+
+                if (func(value))
+
+                    return true;
+
+            return false;
+        }
+
+        public static bool AnyPredicate(this IEnumerable enumerable, Predicate func)
+        {
+            ThrowIfNull(enumerable, nameof(enumerable));
+            ThrowIfNull(func, nameof(func));
+
+            foreach (object value in enumerable)
+
+                if (func(value))
+
+                    return true;
+
+            return false;
+        }
+
+        public static bool Any<T>(this IEnumerable enumerable) => enumerable.Any(item => item is T);
+
+        public static bool AllPredicate<T>(this System.Collections.Generic.IEnumerable<T> source, Predicate<T> predicate)
+        {
+            foreach (T item in source)
+
+                if (!predicate(item))
+
+                    return false;
+
+            return true;
+        }
+
+        public static bool AnyPredicate<T>(this System.Collections.Generic.IEnumerable<T> source, Predicate<T> predicate)
+        {
+            foreach (T item in source)
+
+                if (predicate(item))
+
+                    return true;
+
+            return false;
+        }
+
+
+        /*private static System.Collections.Generic.IEnumerable<PropertyInfo> _GetAllProperties(this Type t, Predicate<Type?> predicate, bool include)
+        {
+            Type? type = t;
+
+            System.Collections.Generic.IEnumerable<PropertyInfo> loop() => type.GetProperties();
+
+            do
+            {
+                foreach (PropertyInfo p in loop())
+
+                    yield return p;
+
+                type = type.BaseType;
+            }
+            while (type != null && predicate(type));
+
+            if (include && type != null)
+
+                foreach (PropertyInfo p in loop())
+
+                    yield return p;
+        }
+
+        public static System.Collections.Generic.IEnumerable<PropertyInfo> GetAllProperties(this Type t, Predicate<Type?> predicate, bool include = true) => (t ?? throw GetArgumentNullException(nameof(t))).GetAllProperties(predicate ?? throw GetArgumentNullException(nameof(predicate)), include);
+
+        private static System.Collections.Generic.IEnumerable<PropertyInfo> __GetAllProperties(this Type t, Type u, bool include) => t._GetAllProperties(t => t != u, include);
+
+        internal static System.Collections.Generic.IEnumerable<PropertyInfo> _GetAllProperties(this Type t, in Type u, in bool include) => t == u ? include ? t.GetProperties() : Enumerable.Empty<PropertyInfo>() : t.__GetAllProperties(u, include);
+
+        internal static System.Collections.Generic.IEnumerable<PropertyInfo> GetAllProperties(this Type t, in Type u, in string tName, in string uName, in bool include = true) => (t ?? throw GetArgumentNullException(nameof(t))).IsAssignableTo(u ?? throw GetArgumentNullException(nameof(u))) ? t._GetAllProperties(u, include) : throw new ArgumentException($"{tName} must inherit from {uName}.");
+
+        public static System.Collections.Generic.IEnumerable<PropertyInfo> GetAllProperties(this Type t, in Type u, in bool include = true) => t.GetAllProperties(u, nameof(t), nameof(u), include);
+
+        public static System.Collections.Generic.IEnumerable<PropertyInfo> GetAllProperties<U>(this Type t, in bool include = true) => t.GetAllProperties(typeof(U), nameof(t), nameof(U), include);*/
+
+        public static T? FirstOrNull<T>(this System.Collections.Generic.IEnumerable<T> enumerable) where T : struct
+        {
+            foreach (T item in enumerable)
+
+                return item;
+
+            return null;
+        }
+
+        public static T? FirstOrNull<T>(this System.Collections.Generic.IEnumerable<T> enumerable, Func<T, bool> predicate) where T : struct
+        {
+            ThrowIfNull(predicate, nameof(predicate));
+
+            foreach (T item in enumerable)
+
+                if (predicate(item))
+
+                    return item;
+
+            return null;
+        }
+
+        public static T? FirstOrNullPredicate<T>(this System.Collections.Generic.IEnumerable<T> enumerable, Predicate<T> predicate) where T : struct
+        {
+            ThrowIfNull(predicate, nameof(predicate));
+
+            foreach (T item in enumerable)
+
+                if (predicate(item))
+
+                    return item;
+
+            return null;
+        }
+
+        public static TResult? FirstOrNull<TItems, TResult>(this System.Collections.Generic.IEnumerable<TItems> enumerable) where TResult : struct
+        {
+            foreach (TItems item in enumerable)
+
+                if (item is TResult result)
+
+                    return result;
+
+            return null;
+        }
+
+        public static string Surround(this string? value, in char left, in char right) => Surround(value, left.ToString(), right.ToString());
+        public static string Surround(this string? value, in char decorator) => Surround(value, decorator.ToString());
+        public static string Surround(this string? value, in string? left, in string? right) => $"{left}{value}{right}";
+        public static string Surround(this string? value, in string? decorator) => Surround(value, decorator, decorator);
+
+        private static string? FirstCharTo(this string? value, Converter<char, char> charConverter, Converter<string, string> stringConverter) => value == null ? null : value.Length > 1 ? charConverter(value[0]) + value[1..] : stringConverter(value);
+        public static string? FirstCharToLower(this string? value) => value.FirstCharTo(c => char.ToLower(c), s => s.ToLower());
+        public static string? FirstCharToLowerInvariant(this string? value) => value.FirstCharTo(c => char.ToLowerInvariant(c), s => s.ToLowerInvariant());
+        public static string? FirstCharToLower(this string? value, CultureInfo culture) => value.FirstCharTo(c => char.ToLower(c, culture), s => s.ToLower(culture));
+
+        public static string? FirstCharToUpper(this string? value) => value.FirstCharTo(c => char.ToLower(c), s => s.ToUpper());
+        public static string? FirstCharToUpperInvariant(this string? value) => value.FirstCharTo(c => char.ToUpperInvariant(c), s => s.ToUpperInvariant());
+        public static string? FirstCharToUpper(this string? value, CultureInfo culture) => value.FirstCharTo(c => char.ToUpper(c, culture), s => s.ToUpper(culture));
+
+        private static string FirstCharOfEachWordToUpper(this string s, in Converter<char, char> converter, params char[] separators)
+        {
+            string[] text = s.Split(separators);
+
+            char[] c = new char[s.Length];
+
+            int _j;
+
+            string _text;
+
+            for (int i = 0, j = 0; i < text.Length; i++)
+            {
+                _text = text[i];
+
+                c[j] = converter(_text[0]);
+
+                for (j++, _j = 1; _j < _text.Length; j++, _j++)
+
+                    c[j] = _text[_j];
+            }
+
+            return new string(c);
+        }
+        public static string FirstCharOfEachWordToUpper(this string s, params char[] separators) => s.FirstCharOfEachWordToUpper(c => char.ToUpper(c), separators);
+        public static string FirstCharOfEachWordToUpperInvariant(this string s, params char[] separators) => s.FirstCharOfEachWordToUpper(c => char.ToUpperInvariant(c), separators);
+        public static string FirstCharOfEachWordToUpper(this string s, CultureInfo culture, params char[] separators) => s.FirstCharOfEachWordToUpper(c => char.ToUpper(c, culture), separators);
+
+        public static string Reverse(this string s)
+        {
+            char[] c = new char[s.Length];
+
+            for (int i = 0; i < s.Length; i++)
+
+                c[i] = s[s.Length - i - 1];
+
+            return new string(c);
+        }
+
+        public static System.Collections.Generic.IEnumerable<TOut> ForEach<TIn, TOut>(this System.Collections.Generic.IEnumerable<TIn> enumerable, Func<TIn, System.Collections.Generic.IEnumerable<TOut>> func)
+        {
+            foreach (TIn? item in enumerable)
+
+                foreach (TOut? _item in func(item))
+
+                    yield return _item;
+        }
+
+        public static bool IsAssignableFrom<T>(this Type t) => t.IsAssignableFrom(typeof(T));
+
+        public static bool IsAssignableTo<T>(this Type t) => t.IsAssignableTo(typeof(T));
+
         public static T GetChild<T>(this DependencyObject parent, in bool lookForDirectChildOnly, out bool isDirectChild) where T : Visual
         {
             T child = default;

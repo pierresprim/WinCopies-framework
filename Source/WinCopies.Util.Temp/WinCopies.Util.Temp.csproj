@@ -9,6 +9,7 @@
 		<UseWPF>true</UseWPF>
 		<PackageIcon>WinCopies.png</PackageIcon>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<Nullable>enable</Nullable>
 	</PropertyGroup>
 
 	<ItemGroup>

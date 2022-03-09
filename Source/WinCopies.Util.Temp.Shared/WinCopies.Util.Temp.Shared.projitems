@@ -9,6 +9,14 @@
     <Import_RootNamespace>WinCopies.Util.Temp.Shared</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)EntityFramework\Entity.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EntityFramework\EntityCollection.Partial\Engine\Add.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EntityFramework\EntityCollection.Partial\Engine\GetItems.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EntityFramework\EntityCollection.Partial\Engine\Remove.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EntityFramework\EntityCollection.Partial\Helper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EntityFramework\EntityCollectionUpdater.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Temp.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Temp2.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TO_BE_DELETED.cs" />
   </ItemGroup>
 </Project>

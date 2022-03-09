@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	  <TargetFrameworks>netcoreapp3.1;net5.0-windows;net6.0-windows;net472;net48</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <Import Project="..\Reflection\WinCopies.Reflection.DotNetParser.Shared\WinCopies.Reflection.DotNetParser.Shared.projitems" Label="Shared" />
+
+</Project>
