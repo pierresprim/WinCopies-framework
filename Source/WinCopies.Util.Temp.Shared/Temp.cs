@@ -18,9 +18,15 @@
 #if DEBUG
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.IO;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
+
 using WinCopies.Linq;
+
+using static WinCopies.ThrowHelper;
+using static WinCopies.Temp.ForLoop;
 
 namespace WinCopies.Temp
 {
@@ -110,13 +116,13 @@ namespace WinCopies.Temp
         public ItemsChangedEventArgs(in IEnumerable oldItems, in IEnumerable newItems) : base(oldItems, newItems) { /* Left empty. */ }
     }
 
-    public class ItemsChangedEventArgs<T> : ItemsChangedAbstractEventArgs<IEnumerable<T>>, IItemsChangedEventArgs
+    public class ItemsChangedEventArgs<T> : ItemsChangedAbstractEventArgs<System.Collections.Generic.IEnumerable<T>>, IItemsChangedEventArgs
     {
         IEnumerable IItemsChangedEventArgs.OldItems => OldItems;
 
         IEnumerable IItemsChangedEventArgs.NewItems => NewItems;
 
-        public ItemsChangedEventArgs(in IEnumerable<T> oldItems, in IEnumerable<T> newItems) : base(oldItems, newItems) { /* Left empty. */ }
+        public ItemsChangedEventArgs(in System.Collections.Generic.IEnumerable<T> oldItems, in System.Collections.Generic.IEnumerable<T> newItems) : base(oldItems, newItems) { /* Left empty. */ }
     }
 
     public delegate void ItemsChangedEventHandler(object sender, ItemsChangedEventArgs e);
@@ -159,8 +165,340 @@ namespace WinCopies.Temp
         }
     }
 
+    public class BooleanEventArgs : EventArgs
+    {
+        public bool Value { get; }
+
+        public BooleanEventArgs(in bool value) => Value = value;
+    }
+
+    public interface IForLoopAction : DotNetFix.IDisposable
+    {
+        void Loop(int index, int count, Func<int, bool> action);
+    }
+
+    public interface IForLoopFunc<T> : DotNetFix.IDisposable
+    {
+        T Loop(int index, int count, FuncOut<int, T, bool> func, out bool ok);
+    }
+
+    internal class _ForLoop : DotNetFix.IDisposable
+    {
+        protected class PredicateClass
+        {
+            private readonly FuncIn<int, bool> _defaultPredicate;
+
+            public bool Continue { get; set; } = true;
+
+            public FuncIn<int, bool> Predicate { get; private set; }
+
+            public PredicateClass(FuncIn<int, bool> defaultPredicate)
+            {
+                _defaultPredicate = defaultPredicate;
+
+                Predicate = (in int i) =>
+                {
+                    Predicate = (in int _i) => Continue && _defaultPredicate(_i);
+
+                    return _defaultPredicate(i);
+                };
+            }
+        }
+
+        protected FuncIn<int, int, bool> Predicate { get; private set; }
+
+        protected ActionRef<int> Updater { get; private set; }
+
+        public bool IsDisposed => Updater == null;
+
+        public _ForLoop(in FuncIn<int, int, bool> predicate, in ActionRef<int> updater)
+        {
+            Predicate = predicate;
+            Updater = updater;
+        }
+
+        protected PredicateClass GetPredicate(int count) => new
+#if !CS9
+            PredicateClass
+#endif
+            ((in int index) => Predicate(index, count));
+
+        public void Dispose() => Updater = null;
+    }
+
+    internal class ForLoopAction : _ForLoop, IForLoopAction
+    {
+        public ForLoopAction(in FuncIn<int, int, bool> predicate, in ActionRef<int> updater) : base(predicate, updater) { /* Left empty. */ }
+
+        public void Loop(int index, int count, Func<int, bool> action)
+        {
+            ThrowIfNull(action, nameof(action));
+            ThrowIfDisposed(this);
+
+            PredicateClass predicate = GetPredicate(count);
+
+            for (; predicate.Predicate(index); Updater(ref index))
+
+                predicate.Continue = action(index);
+        }
+    }
+
+    internal class ForLoopFunc<T> : _ForLoop, IForLoopFunc<T>
+    {
+        public ForLoopFunc(in FuncIn<int, int, bool> predicate, in ActionRef<int> updater) : base(predicate, updater) { /* Left empty. */ }
+
+        public T Loop(int index, int count, FuncOut<int, T, bool> func, out bool ok)
+        {
+            ThrowIfNull(func, nameof(func));
+            ThrowIfDisposed(this);
+
+            PredicateClass predicate = GetPredicate(count);
+            T item = default;
+
+            for (; predicate.Predicate(index); Updater(ref index))
+
+                predicate.Continue = func(index, out item);
+
+            // We can't just return item because it would be possible that func did set item to a value different from the default one and returned true at the end.
+
+            return (ok = !predicate.Continue) ? item : default;
+        }
+    }
+
+    public static class ForLoop
+    {
+        private static void LoopAction(in int index, in int count, in Func<int, bool> action, in Func<IForLoopAction> forLoopFunc) => forLoopFunc().Loop(index, count, action);
+
+        public static IForLoopAction GetForLoopActionASC() => new ForLoopAction((in int _index, in int _count) => _index < _count, (ref int _index) => _index++);
+
+        public static void LoopActionASC(in int index, in int count, in Func<int, bool> action) => LoopAction(index, count, action, GetForLoopActionASC);
+
+        public static IForLoopAction GetForLoopActionDESC() => new ForLoopAction((in int _index, in int _count) => _index >= _count, (ref int _index) => _index--);
+
+        public static void LoopActionDESC(in int index, in int count, in Func<int, bool> action) => LoopAction(index, count, action, GetForLoopActionDESC);
+
+
+
+        private static T LoopFunc<T>(in int index, in int count, out bool ok, in FuncOut<int, T, bool> func, in Func<IForLoopFunc<T>> forLoopFunc) => forLoopFunc().Loop(index, count, func, out ok);
+
+        public static IForLoopFunc<T> GetForLoopFuncASC<T>() => new ForLoopFunc<T>((in int _index, in int _count) => _index < _count, (ref int _index) => _index++);
+
+        public static T LoopFuncASC<T>(in int index, in int count, out bool ok, in FuncOut<int, T, bool> func) => LoopFunc(index, count, out ok, func, GetForLoopFuncASC<T>);
+
+        public static IForLoopFunc<T> GetForLoopFuncDESC<T>() => new ForLoopFunc<T>((in int _index, in int _count) => _index >= _count, (ref int _index) => _index--);
+
+        public static T LoopFuncDESC<T>(in int index, in int count, out bool ok, in FuncOut<int, T, bool> func) => LoopFunc(index, count, out ok, func, GetForLoopFuncDESC<T>);
+    }
+
+    public static class Extensions
+    {
+        public static T GetChild<T>(this DependencyObject parent, in bool lookForDirectChildOnly, out bool isDirectChild) where T : Visual
+        {
+            T child = default;
+            int count = VisualTreeHelper.GetChildrenCount(parent);
+
+            for (int i = 0; i < count; i++)
+            {
+                var visual = (Visual)VisualTreeHelper.GetChild(parent, i);
+                child = visual as T;
+
+                if (child == null)
+                {
+                    if (!lookForDirectChildOnly && child == null)
+
+                        child = GetChild<T>(visual, false, out _);
+                }
+
+                else
+                {
+                    isDirectChild = true;
+
+                    return child;
+                }
+            }
+
+            isDirectChild = false;
+
+            return child;
+        }
+
+        public static Panel GetItemsPanel(this DependencyObject itemsControl)
+        {
+            ItemsPresenter itemsPresenter = itemsControl.GetChild<ItemsPresenter>(false, out _);
+
+            return itemsPresenter == null ? null : VisualTreeHelper.GetChild(itemsPresenter, 0) as Panel;
+        }
+
+        public static bool HasHorizontalOrientation(this Panel panel) => panel.HasLogicalOrientationPublic && panel.LogicalOrientationPublic == Orientation.Horizontal;
+
+        public static bool HasVerticalOrientation(this Panel panel) => panel.HasLogicalOrientationPublic && panel.LogicalOrientationPublic == Orientation.Vertical;
+
+        private struct TryGetFirstParams
+        {
+            public int Index { get; }
+
+            public int Count { get; }
+
+            public TryGetFirstParams(in int index, in int count)
+            {
+                Index = index;
+                Count = count;
+            }
+        }
+
+        private static bool TryGet<T>(in IList itemCollection, in int i, ref bool checkContent, out T item) where T : Visual
+        {
+#if CS8
+            static
+#endif
+                bool onItemFound(in T __item, out T ___item)
+            {
+                ___item = __item;
+
+                return false;
+            }
+
+            object obj = itemCollection[i];
+
+            if (obj is T _item)
+
+                return onItemFound(_item, out item);
+
+            else if (checkContent && obj is ContentPresenter contentPresenter)
+            {
+                _item = contentPresenter.GetChild<T>(true, out _);
+
+                if (_item != null)
+                {
+                    checkContent = true;
+
+                    return onItemFound(_item, out item);
+                }
+            }
+
+            item = default;
+
+            return true;
+        }
+
+        private delegate T LoopFunc<T>(in int index, in int count, out bool ok, in FuncOut<int, T, bool> func);
+
+        private static T TryGetFirst<T>(IList itemCollection, in TryGetFirstParams initParams, in TryGetFirstParams? rollBackParams, out bool rollBack, ref bool checkContent, LoopFunc<T> loopFunc, out bool found) where T : Visual
+        {
+            T loop(in TryGetFirstParams @params, ref bool _checkContent, out bool _found)
+            {
+                bool __checkContent = _checkContent;
+
+                T result = loopFunc(@params.Index, @params.Count, out _found, (int i, out T _item) => TryGet(itemCollection, i, ref __checkContent, out _item));
+
+                _checkContent = __checkContent;
+
+                return result;
+            }
+
+            T item = loop(initParams, ref checkContent, out found);
+
+            rollBack = false;
+
+            if (!found && rollBackParams.HasValue)
+            {
+                item = loop(rollBackParams.Value, ref checkContent, out found);
+
+                rollBack = true;
+            }
+
+            return item;
+        }
+
+        private struct TGFParams
+        {
+            public FuncIn<int, TryGetFirstParams> GetInitParams { get; }
+
+            public FuncIn<int, TryGetFirstParams> GetRollBackParams { get; }
+
+            public TGFParams(in int index, in FuncIn<int, int, TryGetFirstParams> getInitParams, in FuncIn<int, int, TryGetFirstParams> getRollBackParams)
+            {
+                GetInitParams = GetTGFParamsFunc(index, getInitParams);
+                GetRollBackParams = GetTGFParamsFunc(index, getRollBackParams);
+            }
+
+            private static FuncIn<int, TryGetFirstParams> GetTGFParamsFunc(int index, FuncIn<int, int, TryGetFirstParams> func) => (in int count) => func(index, count);
+        }
+
+        private static TOut TryGetFirst<TIn, TOut>(in TIn itemsControl, in FuncIn<TIn, IList> func, in TGFParams @params, ref bool rollBack, ref bool checkContent, in LoopFunc<TOut> loopFunc, out bool found) where TOut : Visual
+        {
+            if (itemsControl == null)
+
+                throw GetArgumentNullException(nameof(itemsControl));
+
+            IList itemCollection = func(itemsControl);
+
+            int count = itemCollection.Count;
+
+            TryGetFirstParams? _params;
+
+            if (rollBack)
+
+                _params = @params.GetRollBackParams(count);
+
+            else
+
+                _params = null;
+
+            return TryGetFirst(itemCollection, @params.GetInitParams(count), _params, out rollBack, ref checkContent, loopFunc, out found);
+        }
+
+        private static TGFParams GetTGFParams(in int index, in FuncIn<int, int, TryGetFirstParams> funcInitParams, in FuncIn<int, int, TryGetFirstParams> funcRollBackParams) => new
+#if !CS9
+            TGFParams
+#endif
+            (index, funcInitParams, funcRollBackParams);
+
+        private static TGFParams GetTGFAParams(in int index) => GetTGFParams(index, (in int _index, in int count) => new
+#if !CS9
+            TryGetFirstParams
+#endif
+            (_index + 1, count), (in int _index, in int _count) => new
+#if !CS9
+            TryGetFirstParams
+#endif
+            (0, _index));
+
+        private static TGFParams GetTGFBParams(in int index) => GetTGFParams(index, (in int _index, in int count) => new
+#if !CS9
+            TryGetFirstParams
+#endif
+            (_index - 1, 0), (in int _index, in int _count) => new
+#if !CS9
+            TryGetFirstParams
+#endif
+            (_count - 1, _index + 1));
+
+        private static T TryGetFirst<T>(in ItemsControl itemsControl, int index, in FuncIn<int, TGFParams> func, ref bool rollBack, ref bool checkContent, in LoopFunc<T> loopFunc, out bool found) where T : Visual => TryGetFirst(itemsControl, (in ItemsControl _itemsControl) => _itemsControl.Items, func(index), ref rollBack, ref checkContent, loopFunc, out found);
+
+        public static T TryGetFirstAfter<T>(this ItemsControl itemsControl, int index, ref bool rollBack, ref bool checkContent, out bool found) where T : Visual => TryGetFirst<T>(itemsControl, index, GetTGFAParams, ref rollBack, ref checkContent, LoopFuncASC, out found);
+
+        public static T TryGetFirstBefore<T>(this ItemsControl itemsControl, int index, ref bool rollBack, ref bool checkContent, out bool found) where T : Visual => TryGetFirst<T>(itemsControl, index, GetTGFBParams, ref rollBack, ref checkContent, LoopFuncDESC, out found);
+
+        private static T TryGetFirst<T>(in Panel itemsControl, int index, in FuncIn<int, TGFParams> func, ref bool rollBack, ref bool checkContent, in LoopFunc<T> loopFunc, out bool found) where T : Visual => TryGetFirst(itemsControl, (in Panel _itemsControl) => _itemsControl.Children, func(index), ref rollBack, ref checkContent, loopFunc, out found);
+
+        public static T TryGetFirstAfter<T>(this Panel itemsControl, int index, ref bool rollBack, ref bool checkContent, out bool found) where T : Visual => TryGetFirst<T>(itemsControl, index, GetTGFAParams, ref rollBack, ref checkContent, LoopFuncASC, out found);
+
+        public static T TryGetFirstBefore<T>(this Panel itemsControl, int index, ref bool rollBack, ref bool checkContent, out bool found) where T : Visual => TryGetFirst<T>(itemsControl, index, GetTGFBParams, ref rollBack, ref checkContent, LoopFuncDESC, out found);
+    }
+
     public static class Temp
     {
+        public static RoutedEventArgs<BooleanEventArgs> GetRoutedBooleanEventArgs(in RoutedEvent @event, in bool value) => new
+#if !CS9
+            RoutedEventArgs<BooleanEventArgs>
+#endif
+            (@event, new BooleanEventArgs(value));
+
+        public static void RegisterClassHandler<T>(RoutedEvent routedEvent, Delegate handler) => EventManager.RegisterClassHandler(typeof(T), routedEvent, handler);
+
+        public static void RegisterClassHandler<T>(RoutedEvent routedEvent, Delegate handler, bool handledEventsToo) => EventManager.RegisterClassHandler(typeof(T), routedEvent, handler, handledEventsToo);
+
         private static void _RunAction<T>(in System.Collections.Generic.IEnumerable<T> enumerable, in Action<T> action)
         {
             foreach (var item in enumerable)

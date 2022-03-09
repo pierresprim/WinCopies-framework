@@ -16,6 +16,7 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using System;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
 
@@ -212,5 +213,7 @@ namespace WinCopies.GUI.Samples
 
             showDialog(FileSystemDialogBoxMode.OpenFile, filters);
         }
+
+        private void MenuItem_Click_3(object sender, RoutedEventArgs e) => new NavigationMenuWindow().ShowDialog();
     }
 }

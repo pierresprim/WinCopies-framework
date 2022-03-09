@@ -317,16 +317,16 @@
             Gets a value that indicates whether files are automatically renamed when they conflict with existing paths.
             </summary>
         </member>
+        <member name="P:WinCopies.IO.Enumeration.ArchiveFileInfoEnumeratorStruct3.ArchiveFileInfo">
+            <summary>
+            Gets the <see cref="T:SevenZip.ArchiveFileInfo"/> that represents the cyrrent archive item. This property is set only when <see cref="T:WinCopies.IO.Path"/> is <see langword="null"/>.
+            </summary>
+        </member>
         <member name="M:WinCopies.IO.Enumeration.ArchiveFileInfoEnumeratorStruct2.#ctor(System.String@,System.String@)">
             <summary>
             Initializes a new instance of the <see cref="T:WinCopies.IO.Enumeration.ArchiveFileInfoEnumeratorStruct"/> struct with a given path.
             </summary>
             <param name="relativePath">The relative path of the archive item.</param>
-        </member>
-        <member name="P:WinCopies.IO.Enumeration.ArchiveFileInfoEnumeratorStruct3.ArchiveFileInfo">
-            <summary>
-            Gets the <see cref="T:SevenZip.ArchiveFileInfo"/> that represents the cyrrent archive item. This property is set only when <see cref="T:WinCopies.IO.Path"/> is <see langword="null"/>.
-            </summary>
         </member>
         <member name="T:WinCopies.IO.Enumeration.ArchiveFileInfoEnumeratorStruct">
             <summary>

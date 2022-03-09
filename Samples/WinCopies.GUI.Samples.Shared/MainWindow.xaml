@@ -37,6 +37,7 @@ along with the WinCopies Framework.  If not, see<https://www.gnu.org/licenses/>.
                 <MenuItem Header="LabelTest" Click="MenuItem_Click" />
                 <MenuItem Header="ExplorerControlTest" Click="MenuItem_Click_1" />
                 <MenuItem Header="Explorer dialog" Click="MenuItem_Click_2" />
+                <MenuItem Header="Menu" Click="MenuItem_Click_3" />
             </MenuItem>
         </Menu>
     </Grid>

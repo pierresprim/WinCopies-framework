@@ -23,6 +23,7 @@ CHANGELOG
 - BrowsableObjectInfoViewModel has new methods and events.
 - Redesign ArchiveFileInfoEnumeratorStruct.
 - Add new types.
+- Add Preview/TripleClick routed events to WinCopies.GUI.Controls.DotNetFix.TextBox
 - Disable support for .Net Core 3.0.
 
 ### 3.12.1-preview

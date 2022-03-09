@@ -64,7 +64,7 @@ namespace WinCopies.GUI.Controls
             return new string(c);
         }
 
-        public static string _Reverse(this string s)
+        public static string Reverse(this string s)
         {
             char[] c = new char[s.Length];
 
@@ -81,6 +81,16 @@ namespace WinCopies.GUI.Controls
     {
         public class TextBox : System.Windows.Controls.TextBox
         {
+            private static RoutedEvent Register<T>(in string eventName, in RoutingStrategy routingStrategy) => Util.Desktop.UtilHelpers.RegisterRoutedEvent<RoutedEventHandler, TextBox>(eventName, routingStrategy);
+
+            public static readonly RoutedEvent TripleClickEvent = Register<RoutedEventHandler>(nameof(TripleClick), RoutingStrategy.Bubble);
+
+            public event RoutedEventHandler TripleClick { add => AddHandler(TripleClickEvent, value); remove => RemoveHandler(TripleClickEvent, value); }
+
+            public static readonly RoutedEvent PreviewTripleClickEvent = Register<RoutedEventHandler>(nameof(PreviewTripleClick), RoutingStrategy.Tunnel);
+
+            public event RoutedEventHandler PreviewTripleClick { add => AddHandler(PreviewTripleClickEvent, value); remove => RemoveHandler(PreviewTripleClickEvent, value); }
+
             static TextBox() => DefaultStyleKeyProperty.OverrideMetadata(typeof(TextBox), new FrameworkPropertyMetadata(typeof(TextBox)));
 
             public TextBox() => RegisterCommandBindings();
@@ -195,13 +205,42 @@ namespace WinCopies.GUI.Controls
 
             protected virtual void OnFirstCharOfEachWordUpperCommandExecuted(ExecutedRoutedEventArgs e) => UpdateText((in string s) => s.FirstCharOfEachWordToUpper(' '), e);
 
-            protected virtual void OnReverseExecuted(ExecutedRoutedEventArgs e) => UpdateText((in string s) => s._Reverse(), e);
+            protected virtual void OnReverseExecuted(ExecutedRoutedEventArgs e) => UpdateText((in string s) => s.Reverse(), e);
 
             protected virtual void OnCaseCommandCanExecute(CanExecuteRoutedEventArgs e)
             {
                 e.CanExecute = !UtilHelpers.IsNullEmptyOrWhiteSpace(Text);
 
                 e.Handled = true;
+            }
+
+            protected virtual void OnTripleClick(MouseButtonEventArgs e) { /* Left empty. */ }
+
+            protected virtual void OnPreviewTripleClick(MouseButtonEventArgs e)
+            {
+                SelectAll();
+
+                e.RoutedEvent = PreviewTripleClickEvent;
+
+                RaiseEvent(e);
+            }
+
+            protected override void OnMouseDown(MouseButtonEventArgs e)
+            {
+                base.OnMouseDown(e);
+
+                if (e.ClickCount == 3)
+
+                    OnTripleClick(e);
+            }
+
+            protected override void OnPreviewMouseDown(MouseButtonEventArgs e)
+            {
+                base.OnPreviewMouseDown(e);
+
+                if (e.ClickCount == 3)
+
+                    OnPreviewTripleClick(e);
             }
         }
     }

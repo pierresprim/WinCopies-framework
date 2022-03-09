@@ -140,7 +140,7 @@ namespace WinCopies.IO.Enumeration
 
                 ////#endif
 
-                return !(portableDevice.Properties.TryGetValue(Microsoft.WindowsAPICodePack.PortableDevices.PropertySystem.Properties.Device.Type, out Property value) && (DeviceTypeValues)value.GetValue(out Type _) == DeviceTypeValues.Generic) && func(new ShellObjectInfoEnumeratorStruct(portableDevice));
+                return /*!(portableDevice.Properties.TryGetValue(Microsoft.WindowsAPICodePack.PortableDevices.PropertySystem.Properties.Device.Type, out Property value) && (DeviceTypeValues)value.GetValue(out Type _) == DeviceTypeValues.Generic) &&*/ func(new ShellObjectInfoEnumeratorStruct(portableDevice));
             }
 
             //throw new InvalidOperationException("The current portable device is not open.");
