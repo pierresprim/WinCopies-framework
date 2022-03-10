@@ -1,4 +1,7 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 using WinCopies.Linq;
 using WinCopies.Temp;
@@ -13,22 +16,38 @@ namespace WinCopies.EntityFramework
             ulong rows = 0;
 
             Type t = entity.GetType();
-            EntityAttribute? attribute = t.GetCustomAttributes<EntityAttribute>(true).FirstOrDefault();
+            EntityAttribute
+#if CS8
+            ?
+#endif
+            attribute = t.GetCustomAttributes<EntityAttribute>(true).FirstOrDefault();
 
             if (attribute != null)
             {
                 bool defaultPredicate(in PropertyInfo property, in Predicate predicate) => property.GetCustomAttributes(true).AnyPredicate(predicate);
 
-                IEnumerable<PropertyInfo> getProperties(in FuncIn<Type, IEnumerable<PropertyInfo>> func, in Predicate<PropertyInfo> predicate) => func(t).WherePredicate(predicate);
+                IEnumerable<PropertyInfo> getProperties(in FuncIn<Type, IEnumerable<PropertyInfo>> _func, in Predicate<PropertyInfo> predicate) => _func(t).WherePredicate(predicate);
 
-                IEntity? tmp;
-                object? collection;
+                IEntity
+#if CS8
+            ?
+#endif
+            tmp;
+                object
+#if CS8
+            ?
+#endif
+            collection;
 
-                foreach (PropertyInfo property in getProperties(GetDBProperties, property => property.PropertyType.IsAssignableTo<IDBEntityItemCollection>() && defaultPredicate(property, attribute => attribute is OneToManyForeignKeyAttribute oneToManyForeignKeyAttribute)))
+                foreach (PropertyInfo property in getProperties(GetDBProperties, property => property.PropertyType.IsAssignableTo<IDBEntityItemCollection>() && defaultPredicate(property, _attribute => _attribute is OneToManyForeignKeyAttribute oneToManyForeignKeyAttribute)))
 
                     if ((collection = property.GetValue(entity)) != null)
 
-                        foreach (IEntity? item in ((IDBEntityItemCollection)collection).AsEnumerable())
+                        foreach (IEntity
+#if CS8
+            ?
+#endif
+            item in ((IDBEntityItemCollection)collection).AsEnumerable())
 
                             _ = item.Remove(out _);
 
@@ -36,9 +55,25 @@ namespace WinCopies.EntityFramework
                 {
                     tables++;
 
-                    foreach (PropertyInfo property in getProperties(GetEntityProperties, property => defaultPredicate(property, attribute => attribute is not OneToManyForeignKeyAttribute && attribute is ForeignKeyAttribute foreignKeyAttribute && foreignKeyAttribute.RemoveAlso)))
+                    foreach (PropertyInfo property in getProperties(GetEntityProperties, property => defaultPredicate(property, _attribute =>
+#if !CS9
+                    !(
+#endif
+                        _attribute is
+#if CS9
+                        not
+#endif
+                        OneToManyForeignKeyAttribute
+#if !CS9
+                    )
+#endif
+                    && _attribute is ForeignKeyAttribute foreignKeyAttribute && foreignKeyAttribute.RemoveAlso)))
 
-                        if ((tmp = (IEntity?)property.GetValue(entity)) != null)
+                        if ((tmp = (IEntity
+#if CS8
+            ?
+#endif
+            )property.GetValue(entity)) != null)
                         {
                             rows += tmp.Remove(out uint _tables);
 

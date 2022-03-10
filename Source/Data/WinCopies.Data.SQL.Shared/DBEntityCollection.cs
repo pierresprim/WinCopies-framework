@@ -1,26 +1,42 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
+using WinCopies.Collections;
 using WinCopies.EntityFramework;
 using WinCopies.Linq;
 using WinCopies.Temp;
 
-using static WinCopies.EntityFramework.EntityCollection;
-using static WinCopies.Temp.Util;
+using static WinCopies.ThrowHelper;
+using static WinCopies.Data.SQL.SQLHelper;
 
 namespace WinCopies.Data.SQL
 {
-    public struct IntPopable : IPopable<string, object?>
+    public struct IntPopable : IPopable<string, object
+#if CS8
+            ?
+#endif
+            >
     {
         private readonly ISQLGetter _getter;
 
-        public int CurrentIndex { get; private set; } = 0;
+        public int CurrentIndex { get; private set; }
 
-        public IntPopable(in ISQLGetter getter) => _getter = getter;
+        public IntPopable(in ISQLGetter getter)
+        {
+            _getter = getter;
+
+            CurrentIndex = 0;
+        }
 
         public object Pop(string key) => _getter[CurrentIndex++];
     }
 
-    public struct StringPopable : IPopable<string, object?>
+    public struct StringPopable : IPopable<string, object
+#if CS8
+            ?
+#endif
+            >
     {
         private readonly ISQLGetter _getter;
 
@@ -29,110 +45,162 @@ namespace WinCopies.Data.SQL
         public object Pop(string key) => _getter[key];
     }
 
-    public abstract class EntityCollectionLoadingFactory<T, U> : IEntityCollectionLoadingFactory<T, U, ICondition>
-    {
-        private ISelect? _select;
-        private IConditionGroup? _conditionGroup;
-
-        protected Func<ISQLGetter, IPopable<string, object?>> ParseIntIndexableDelegate { get; private set; }
-
-        protected ISQLConnection Connection { get; private set; }
-
-        protected ISelect Select => _select ?? throw new InvalidOperationException("No select statement has been initialized.");
-
-        public IConditionGroup ConditionGroup => _conditionGroup ?? throw new InvalidOperationException("No condition group has been initialized.");
-
-        public uint ColumnsCount { get; private set; }
-
-        public EntityCollectionLoadingFactory(in ISQLConnection connection, in IConditionGroup? conditionGroup)
-        {
-            Connection = (connection ?? throw ThrowHelper.GetArgumentNullException(nameof(connection))).GetConnection();
-
-            if (Connection.IsClosed)
-
-                throw new Exception();
-
-            _conditionGroup = conditionGroup;
-
-            ResetDelegate();
-        }
-
-        public void ResetDelegate() => ParseIntIndexableDelegate = getter => ColumnsCount > int.MaxValue
-            ? throw new InvalidOperationException("Too much columns.")
-            : (ParseIntIndexableDelegate = getter => new IntPopable(getter))(getter);
-
-        public void Reset()
-        {
-            ColumnsCount = 0;
-
-            _select = null;
-            _conditionGroup = null;
-
-            ResetDelegate();
-        }
-
-        public ICondition GetCondition(string column, string param, object? value) => Connection.GetCondition(column, param, value);
-
-        public abstract T GetItem(U collection);
-
-        public IEnumerable GetOnlyFirstItems(string column)
-        {
-            ISelect? select = Select;
-
-            foreach (IPopable<string, object?>? item in select.GetPopables())
-
-                yield return item.Pop(column);
-        }
-
-        public void InitConditionGroup(bool multiple)
-        {
-            _conditionGroup = new ConditionGroup(multiple ? Connection.GetOperator(ConditionGroupOperator.And) : null);
-
-            if (_select != null)
-
-                _select.ConditionGroup = _conditionGroup;
-        }
-
-        public void InitSelector(string table, IEnumerable<string> columns)
-        {
-            _select = (Connection = Connection.GetConnection()).GetSelect(GetArray(table), columns.Select(column => Connection.GetColumn(column)));
-
-            if (_conditionGroup != null)
-
-                _select.ConditionGroup = _conditionGroup;
-        }
-
-        public void SetConditions(params ICondition[] conditions) => ConditionGroup.Conditions = SQLHelper.GetEnumerable(conditions);
-
-        public IEnumerable<IPopable<string, object?>> GetItems() => Select.GetItems(ParseIntIndexableDelegate, DBEntityCollection.GetStringPopable);
-
-        public void OnColumnsLoaded(uint columnsCount) => ColumnsCount = columnsCount;
-
-        public IEnumerator<IPopable<string, object?>> GetEnumerator() => GetItems().GetEnumerator();
-
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-        public object GetCollectionConstructorParameter() => Connection;
-    }
-
-    public class EntityCollectionNewItemLoadingFactory<T, U> : EntityCollectionLoadingFactory<T, U> where T : IEntity
-    {
-        public EntityCollectionNewItemLoadingFactory(in ISQLConnection connection, in IConditionGroup? conditionGroup) : base(connection, conditionGroup) { /* Left empty. */ }
-
-        public override T GetItem(U collection) => GetDBEntity<T, U>(collection);
-    }
-
-    public class EntityCollectionItemRefreshingFactory<T, U> : EntityCollectionLoadingFactory<T, U>
-    {
-        private readonly T _item;
-
-        public EntityCollectionItemRefreshingFactory(in ISQLConnection connection, in T item, in IConditionGroup? conditionGroup) : base(connection, conditionGroup) => _item = item;
-
-        public override T GetItem(U collection) => _item;
-    }
-
     public static class DBEntityCollection
     {
+#if !CS8
+        public static bool HasConditions(this IConditionGroup conditionGroup)
+        {
+            bool checkCount(in IUIntCountable collection) => collection != null && collection.Count > 0;
+
+            return checkCount((conditionGroup ?? throw GetArgumentNullException(nameof(conditionGroup))).Conditions) || checkCount(conditionGroup.ConditionGroups) || checkCount(conditionGroup.Selects);
+        }
+#endif
+
+        public static IEnumerable<IParameter> GetParameters(this IConditionGroup conditionGroup)
+        {
+            if ((conditionGroup ?? throw GetArgumentNullException(nameof(ConditionGroup))).Conditions != null)
+            {
+                IEnumerable<IParameter> enumerate()
+                {
+                    IParameter
+#if CS8
+            ?
+#endif
+            parameter;
+
+                    foreach (ICondition
+#if CS8
+            ?
+#endif
+            condition in conditionGroup.Conditions)
+                    {
+                        if ((parameter = condition?.InnerCondition.Parameter) == null)
+
+                            continue;
+
+                        yield return parameter;
+                    }
+                }
+
+                foreach (IParameter parameter in enumerate())
+
+                    yield return parameter;
+            }
+
+            if (conditionGroup.ConditionGroups != null)
+            {
+                IEnumerable<IParameter> parameters;
+
+                foreach (IConditionGroup
+#if CS8
+            ?
+#endif
+            _conditionGroup in conditionGroup.ConditionGroups)
+                {
+                    if (_conditionGroup == null)
+
+                        continue;
+
+                    parameters = _conditionGroup.GetParameters();
+
+                    foreach (IParameter parameter in parameters)
+
+                        yield return parameter;
+                }
+            }
+
+            if (conditionGroup.Selects != null)
+            {
+                IConditionGroup
+#if CS8
+            ?
+#endif
+            _conditionGroup;
+
+                foreach (KeyValuePair<SQLColumn, ISelect> select in conditionGroup.Selects)
+                {
+                    _conditionGroup = select.Value.ConditionGroup;
+
+                    if (_conditionGroup == null)
+
+                        continue;
+
+                    foreach (IParameter parameter in _conditionGroup)
+
+                        yield return parameter;
+                }
+            }
+        }
+
+        public static ISelect GetSelect(this ISQLConnection connection, in IEnumerable<string> defaultTables, in IEnumerable<SQLColumn> defaultColumns, string
+#if CS8
+            ?
+#endif
+            @operator = null, IEnumerable<ICondition>
+#if CS8
+            ?
+#endif
+            conditions = null, IEnumerable<IConditionGroup>
+#if CS8
+            ?
+#endif
+            conditionGroups = null, IEnumerable<KeyValuePair<SQLColumn, ISelect>>
+#if CS8
+            ?
+#endif
+            selects = null)
+        {
+            ThrowIfNull(connection, nameof(connection));
+
+            ISelect select = connection.GetSelect(new SQLItemCollection<string>(defaultTables), new SQLItemCollection<SQLColumn>(defaultColumns));
+
+            IConditionGroup initConditionGroup() => select.ConditionGroup = new ConditionGroup(@operator);
+
+            void initConditionGroup2(Action<IConditionGroup> action) => action(select.ConditionGroup ?? initConditionGroup());
+
+            if (conditions != null)
+
+                initConditionGroup().Conditions = GetEnumerable(conditions);
+
+            if (conditionGroups != null)
+
+                initConditionGroup2(conditionGroup => conditionGroup.ConditionGroups = GetEnumerable(conditionGroups));
+
+            if (selects != null)
+
+                initConditionGroup2(conditionGroup => conditionGroup.Selects = GetEnumerable(selects));
+
+            return select;
+        }
+
+        public static ISQLTableRequest2 GetDelete(this ISQLConnection connection, in IEnumerable<string> defaultTables, in string
+#if CS8
+            ?
+#endif
+            @operator = null, in IEnumerable<ICondition>
+#if CS8
+            ?
+#endif
+            conditions = null)
+        {
+            ThrowIfNull(connection, nameof(connection));
+
+            ISQLTableRequest2
+#if CS8
+            ?
+#endif
+            delete = connection.GetDelete(new SQLItemCollection<string>(defaultTables));
+
+            if (conditions != null)
+
+                delete.ConditionGroup = new ConditionGroup(@operator)
+                {
+                    Conditions = GetEnumerable(conditions)
+                };
+
+            return delete;
+        }
+
         public static T Parse<T>(in ISQLGetter getter, in Func<ISQLGetter, T> intAction, in Func<ISQLGetter, T> stringAction) => getter.IsIntIndexable
                 ? intAction(getter)
                 : getter.IsStringIndexable
@@ -146,34 +214,78 @@ namespace WinCopies.Data.SQL
                 yield return Parse(getter, intAction, stringAction);
         }
 
-        public static IEnumerable<IPopable<string, object?>> GetPopablesI(this ISelect select, Func<ISQLGetter, IPopable<string, object?>> intAction) => select.GetItems(intAction, GetStringPopable);
+        public static IEnumerable<IPopable<string, object
+#if CS8
+            ?
+#endif
+            >> GetPopablesI(this ISelect select, Func<ISQLGetter, IPopable<string, object
+#if CS8
+            ?
+#endif
+            >> intAction) => select.GetItems(intAction, GetStringPopable);
 
-        public static IEnumerable<IPopable<string, object?>> GetPopablesS(this ISelect select, Func<ISQLGetter, IPopable<string, object?>> stringAction) => select.GetItems(GetIntPopable, stringAction);
+        public static IEnumerable<IPopable<string, object
+#if CS8
+            ?
+#endif
+            >> GetPopablesS(this ISelect select, Func<ISQLGetter, IPopable<string, object
+#if CS8
+            ?
+#endif
+            >> stringAction) => select.GetItems(GetIntPopable, stringAction);
 
-        public static IEnumerable<IPopable<string, object?>> GetPopables(this ISelect select) => select.GetItems(GetIntPopable, GetStringPopable);
+        public static IEnumerable<IPopable<string, object
+#if CS8
+            ?
+#endif
+            >> GetPopables(this ISelect select) => select.GetItems(GetIntPopable, GetStringPopable);
 
-        public static IPopable<string, object?> GetIntPopable(ISQLGetter getter) => new IntPopable(getter);
+        public static IPopable<string, object
+#if CS8
+            ?
+#endif
+            > GetIntPopable(ISQLGetter getter) => new IntPopable(getter);
 
-        public static IPopable<string, object?> GetStringPopable(ISQLGetter getter) => new StringPopable(getter);
+        public static IPopable<string, object
+#if CS8
+            ?
+#endif
+            > GetStringPopable(ISQLGetter getter) => new StringPopable(getter);
 
         public static long? Add(in ISQLConnection connection, Func<IEntityCollectionUpdater<IParameter, long?>> func, IEntity entity, out uint tables, out ulong rows) => EntityCollection.Add(connection.GetParameter, func, entity, out tables, out rows);
 
-        public static IEnumerable<T> GetItems<T, U>(in U collection, in EntityCollectionLoadingFactory<T, U> loadingFactory, in Type? itemsType = null) where T : IEntity => EntityCollection.GetItems(collection, loadingFactory, itemsType);
+        public static IEnumerable<T> GetItems<T, U>(in U collection, in EntityCollectionLoadingFactory<T, U> loadingFactory, in Type
+#if CS8
+            ?
+#endif
+            itemsType = null) where T : IEntity => EntityCollection.GetItems(collection, loadingFactory, itemsType);
 
         public static bool RefreshItem<T, U>(in DBEntityCollection<U> collection, in ISQLConnection connection, in T item, in IConditionGroup conditionGroup) where T : IEntity where U : IEntity => GetItems(collection, new EntityCollectionItemRefreshingFactory<T, DBEntityCollection<U>>(connection.GetConnection(), item, conditionGroup), item.GetType()).FirstOrDefault() != null;
     }
 
     public class DBEntityCollection<T> : EntityCollection<T, DBEntityCollection<T>> where T : IEntity
     {
-        private ISQLConnection? _connection;
+        private ISQLConnection
+#if CS8
+            ?
+#endif
+            _connection;
 
-        protected internal ISQLConnection? Connection => IsDisposed ? throw ThrowHelper.GetExceptionForDispose(false) : _connection;
+        protected internal ISQLConnection
+#if CS8
+            ?
+#endif
+            Connection => IsDisposed ? throw ThrowHelper.GetExceptionForDispose(false) : _connection;
 
         public override bool IsDisposed => _connection == null;
 
         public DBEntityCollection(ISQLConnection connection) => _connection = connection;
 
-        public override long? Add(T entity, out uint tables, out ulong rows, IReadOnlyDictionary<string, object>? extraColumns = null) => IsDisposed ? throw ThrowHelper.GetExceptionForDispose(false) : EntityCollection.Add(_connection.GetParameter, () => new DBEntityCollectionAdder(_connection), entity, out tables, out rows, extraColumns);
+        public override long? Add(T entity, out uint tables, out ulong rows, IReadOnlyDictionary<string, object>
+#if CS8
+            ?
+#endif
+            extraColumns = null) => IsDisposed ? throw ThrowHelper.GetExceptionForDispose(false) : EntityCollection.Add(_connection.GetParameter, () => new DBEntityCollectionAdder(_connection), entity, out tables, out rows, extraColumns);
 
         public override IEnumerable<T> GetItems() => IsDisposed ? throw ThrowHelper.GetExceptionForDispose(false) : DBEntityCollection.GetItems(this, new EntityCollectionNewItemLoadingFactory<T, DBEntityCollection<T>>(_connection, null));
 

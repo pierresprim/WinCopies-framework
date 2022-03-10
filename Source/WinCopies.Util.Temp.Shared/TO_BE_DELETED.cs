@@ -1,4 +1,6 @@
-﻿using WinCopies.Collections.DotNetFix.Generic;
+﻿using System;
+using System.Collections;
+using WinCopies.Collections.DotNetFix.Generic;
 using WinCopies.Collections.Generic;
 using WinCopies.Temp;
 
@@ -30,7 +32,11 @@ namespace WinCopies.TO_BE_DELETED
 
         protected ArrayBuilder<LinkedListNode> AddRange(System.Collections.Generic.IEnumerable<T> values, FuncIn<T, LinkedListNode> action)
         {
-            ArrayBuilder<LinkedListNode> builder = new();
+            ArrayBuilder<LinkedListNode> builder = new
+#if !CS9
+                ArrayBuilder<LinkedListNode>
+#endif
+                ();
 
             foreach (T item in values)
 
@@ -93,5 +99,11 @@ namespace WinCopies.TO_BE_DELETED
         public LinkedListTEMP(in ILinkedList<T> list) => List = list;
 
         public IUIntCountableEnumerator<T> GetEnumerator() => List.GetEnumerator();
+
+#if !CS8
+        System.Collections.Generic.IEnumerator<T> System.Collections.Generic.IEnumerable<T>.GetEnumerator() => GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+#endif
     }
 }

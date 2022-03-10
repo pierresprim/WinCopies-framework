@@ -18,7 +18,11 @@ namespace WinCopies.EntityFramework
 #if CS8
             ?
 #endif
-            , TParameter> parameterFunc, Func<IEntityCollectionUpdater<TParameter, TResult>> updaterProvider, IEntity entity, out uint tables, out ulong rows, IReadOnlyDictionary<string, object>? extraColumns = null)
+            , TParameter> parameterFunc, Func<IEntityCollectionUpdater<TParameter, TResult>> updaterProvider, IEntity entity, out uint tables, out ulong rows, IReadOnlyDictionary<string, object>
+#if CS8
+            ?
+#endif
+            extraColumns = null)
         {
             uint _tables = 0;
             ulong _rows = 0;
@@ -33,7 +37,11 @@ namespace WinCopies.EntityFramework
             ?
 #endif
             attribute;
-            Type? t = null;
+            Type
+#if CS8
+            ?
+#endif
+            t = null;
             IEntityCollectionUpdater<TParameter, TResult>
 #if CS8
             ?
@@ -54,23 +62,47 @@ namespace WinCopies.EntityFramework
             ?
 #endif
             idProperty = null;
-            object? id = null;
+            object
+#if CS8
+                ?
+#endif
+                id = null;
             OneToManyForeignKeyAttribute oneToManyForeignKeyAttribute;
-            ActionIn<KeyValuePair<PropertyInfo, EntityPropertyAttribute>, IEntity>? action = null;
+            ActionIn<KeyValuePair<PropertyInfo, EntityPropertyAttribute>, IEntity>
+#if CS8
+            ?
+#endif
+            action = null;
             IDictionary<string, IEnumerable<IEntity>> _extraColumns;
             ActionIn<string> oneToManyForeignKeysUpdater = null;
             Func<ActionIn<string>> oneToManyForeignKeysUpdaterUpdater;
-            IEnumerable<IEntity>? entities = null;
-            KeyValuePair<string?, PropertyInfo>? idPropertyInfo;
-            object? _result;
+            IEnumerable<IEntity>
+#if CS8
+                ?
+#endif
+                entities = null;
+            KeyValuePair<string
+#if CS8
+                ?
+#endif
+                , PropertyInfo>? idPropertyInfo;
+            object
+#if CS8
+                ?
+#endif
+                _result;
             uint __rows;
             ActionIn<string> _enumerate;
 
-            void addValue(in string column, in bool isId) => updater.AddValue(column, parameterFunc(column.FirstCharToLower(), value is IEntity ? GetIdProperties(value.GetType()).FirstOrDefaultValue(out KeyValuePair<string?, PropertyInfo> idProperty) ? idProperty.Value.GetValue(value) : throw new InvalidOperationException($"{value.GetType()} does not have any ID property.") : value), isId);
+            void addValue(in string column, in bool isId) => updater.AddValue(column, parameterFunc(column.FirstCharToLower(), value is IEntity ? GetIdProperties(value.GetType()).FirstOrDefaultValue(out KeyValuePair<string
+#if CS8
+            ?
+#endif
+            , PropertyInfo> _idProperty) ? _idProperty.Value.GetValue(value) : throw new InvalidOperationException($"{value.GetType()} does not have any ID property.") : value), isId);
 
-            void _action(in KeyValuePair<PropertyInfo, EntityPropertyAttribute> property, in IEntity entity)
+            void _action(in KeyValuePair<PropertyInfo, EntityPropertyAttribute> property, in IEntity _entity)
             {
-                value = property.Key.GetValue(entity);
+                value = property.Key.GetValue(_entity);
 
                 if ((oneToManyForeignKeyAttribute = property.Key.GetCustomAttributes(true).FirstOrDefault<OneToManyForeignKeyAttribute>()) == null)
 
@@ -98,7 +130,7 @@ namespace WinCopies.EntityFramework
                 {
                     idProperty = idPropertyInfo.Value.Value;
 
-                    updater.Delete(getTable(), idPropertyInfo.Value.Key ?? idProperty.Name, foreignKeyIdColumn, _result, id => !entities.Any(entity => Equals(id, idProperty.GetValue(entity))));
+                    updater.Delete(getTable(), idPropertyInfo.Value.Key ?? idProperty.Name, foreignKeyIdColumn, _result, _id => !entities.Any(_entity => Equals(_id, idProperty.GetValue(_entity))));
                 }
 
                 (oneToManyForeignKeysUpdater = addOrUpdate)(foreignKeyIdColumn);
@@ -106,7 +138,7 @@ namespace WinCopies.EntityFramework
 
             bool enumerate(in string key)
             {
-                bool result = true;
+                bool __result = true;
 
                 foreach (IEntity __entity in entities)
                 {
@@ -114,23 +146,31 @@ namespace WinCopies.EntityFramework
 
                     oneToManyForeignKeysUpdater(key);
 
-                    result = false;
+                    __result = false;
                 }
 
-                return result;
+                return __result;
             }
 
             void add(in IEntity _entity, in ActionIn<IEntity> addValues)
             {
-                IEntity? tmp;
+                IEntity
+#if CS8
+                ?
+#endif
+                _tmp;
 
                 _result = null;
 
                 foreach (PropertyInfo property in GetEntityProperties(_entity.GetType()))
 
-                    if ((tmp = (IEntity?)property.GetValue(_entity)) != null)
+                    if ((_tmp = (IEntity
+#if CS8
+                ?
+#endif
+                )property.GetValue(_entity)) != null)
 
-                        add(tmp, _addValues);
+                        add(_tmp, _addValues);
 
                 if ((attribute = (t = _entity.GetType()).GetCustomAttributes<EntityAttribute>(true).FirstOrDefault()) != null)
                 {
@@ -138,7 +178,7 @@ namespace WinCopies.EntityFramework
 
                     _extraColumns = new Dictionary<string, IEnumerable<IEntity>>();
 
-                    action = (in KeyValuePair<PropertyInfo, EntityPropertyAttribute> property, in IEntity _entity) =>
+                    action = (in KeyValuePair<PropertyInfo, EntityPropertyAttribute> property, in IEntity __entity) =>
                     {
                         if (property.Value.IsId /*&& property.Key.PropertyType.IsAssignableFrom<TResult>()*/)
                         {
@@ -147,7 +187,7 @@ namespace WinCopies.EntityFramework
                             action = _action;
                         }
 
-                        _action(property, _entity);
+                        _action(property, __entity);
                     };
 
                     addValues(_entity);

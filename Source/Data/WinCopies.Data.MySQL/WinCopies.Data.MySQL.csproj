@@ -2,14 +2,21 @@
 
   <PropertyGroup>
 		<TargetFrameworks>netcoreapp3.1;net5.0-windows;net6.0-windows;net472;net48</TargetFrameworks>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="$(DefineConstants.Contains('CS8'))">
+	  <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <Import Project="..\WinCopies.Data.MySQL.Shared\WinCopies.Data.MySQL.Shared.projitems" Label="Shared" />
 
+	<ItemGroup>
+		<PackageReference Include="MySql.Data" Version="8.0.28" />
+	</ItemGroup>
+
   <ItemGroup>
-    <ProjectReference Include="..\WinCopies.Util.Temp\WinCopies.Util.Temp.csproj" />
+    <ProjectReference Include="..\WinCopies.Data.SQL\WinCopies.Data.SQL.csproj" />
+    <ProjectReference Include="..\..\WinCopies.Util.Temp\WinCopies.Util.Temp.csproj" />
   </ItemGroup>
 
 </Project>

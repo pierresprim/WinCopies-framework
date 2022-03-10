@@ -1,5 +1,6 @@
-﻿using MySql.Data.MySqlClient;
+﻿using System;
 using System.Data.Common;
+
 using WinCopies.Data.SQL;
 
 using static WinCopies.ThrowHelper;
@@ -8,7 +9,11 @@ namespace WinCopies.Data.MySQL
 {
     public class MySQLGetter : ISQLGetter
     {
-        private DbDataReader? _reader;
+        private DbDataReader
+#if CS8
+            ?
+#endif
+            _reader;
 
         public bool IsDisposed => _reader == null;
 

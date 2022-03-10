@@ -294,20 +294,32 @@ namespace WinCopies.Temp
 
     public static class Extensions
     {
-        public static ConstructorInfo? TryGetConstructor(this Type t, params Type[] types) => t.GetConstructor(types);
+        public static ConstructorInfo
+#if CS8
+                ?
+#endif
+                TryGetConstructor(this Type t, params Type[] types) => t.GetConstructor(types);
 
         public static ConstructorInfo AssertGetConstructor(this Type t, params Type[] types) => t.TryGetConstructor(types) ?? throw new InvalidOperationException("There is no such constructor for this type.");
 
         public static System.Collections.Generic.IEnumerable<T> AsReadOnlyEnumerable<T>(this System.Collections.Generic.IEnumerable<T> enumerable)
         {
-            foreach (T? item in enumerable)
+            foreach (T
+#if CS9
+                ?
+#endif
+                item in enumerable)
 
                 yield return item;
         }
 
         public static System.Collections.Generic.IEnumerable<U> As<T, U>(this System.Collections.Generic.IEnumerable<T> enumerable) where T : U
         {
-            foreach (T? item in enumerable)
+            foreach (T
+#if CS9
+                ?
+#endif
+                item in enumerable)
 
                 yield return item;
         }
@@ -446,19 +458,109 @@ namespace WinCopies.Temp
             return null;
         }
 
-        public static string Surround(this string? value, in char left, in char right) => Surround(value, left.ToString(), right.ToString());
-        public static string Surround(this string? value, in char decorator) => Surround(value, decorator.ToString());
-        public static string Surround(this string? value, in string? left, in string? right) => $"{left}{value}{right}";
-        public static string Surround(this string? value, in string? decorator) => Surround(value, decorator, decorator);
+        public static string Surround(this string
+#if CS8
+                ?
+#endif
+                value, in char left, in char right) => Surround(value, left.ToString(), right.ToString());
+        public static string Surround(this string
+#if CS8
+                ?
+#endif
+                value, in char decorator) => Surround(value, decorator.ToString());
+        public static string Surround(this string
+#if CS8
+                ?
+#endif
+                value, in string
+#if CS8
+                ?
+#endif
+                left, in string
+#if CS8
+                ?
+#endif
+                right) => $"{left}{value}{right}";
+        public static string Surround(this string
+#if CS8
+                ?
+#endif
+                value, in string
+#if CS8
+                ?
+#endif
+                decorator) => Surround(value, decorator, decorator);
 
-        private static string? FirstCharTo(this string? value, Converter<char, char> charConverter, Converter<string, string> stringConverter) => value == null ? null : value.Length > 1 ? charConverter(value[0]) + value[1..] : stringConverter(value);
-        public static string? FirstCharToLower(this string? value) => value.FirstCharTo(c => char.ToLower(c), s => s.ToLower());
-        public static string? FirstCharToLowerInvariant(this string? value) => value.FirstCharTo(c => char.ToLowerInvariant(c), s => s.ToLowerInvariant());
-        public static string? FirstCharToLower(this string? value, CultureInfo culture) => value.FirstCharTo(c => char.ToLower(c, culture), s => s.ToLower(culture));
+        private static string
+#if CS8
+                ?
+#endif
+                FirstCharTo(this string
+#if CS8
+                ?
+#endif
+                value, Converter<char, char> charConverter, Converter<string, string> stringConverter) => value == null ? null : value.Length > 1 ? charConverter(value[0]) + value
+#if CS8
+            [1..]
+#else
+            .Substring(1)
+#endif
+            : stringConverter(value);
+        public static string
+#if CS8
+                ?
+#endif
+                FirstCharToLower(this string
+#if CS8
+                ?
+#endif
+                value) => value.FirstCharTo(c => char.ToLower(c), s => s.ToLower());
+        public static string
+#if CS8
+                ?
+#endif
+                FirstCharToLowerInvariant(this string
+#if CS8
+                ?
+#endif
+                value) => value.FirstCharTo(c => char.ToLowerInvariant(c), s => s.ToLowerInvariant());
+        public static string
+#if CS8
+                ?
+#endif
+                FirstCharToLower(this string
+#if CS8
+                ?
+#endif
+                value, CultureInfo culture) => value.FirstCharTo(c => char.ToLower(c, culture), s => s.ToLower(culture));
 
-        public static string? FirstCharToUpper(this string? value) => value.FirstCharTo(c => char.ToLower(c), s => s.ToUpper());
-        public static string? FirstCharToUpperInvariant(this string? value) => value.FirstCharTo(c => char.ToUpperInvariant(c), s => s.ToUpperInvariant());
-        public static string? FirstCharToUpper(this string? value, CultureInfo culture) => value.FirstCharTo(c => char.ToUpper(c, culture), s => s.ToUpper(culture));
+        public static string
+#if CS8
+                ?
+#endif
+                FirstCharToUpper(this string
+#if CS8
+                ?
+#endif
+                value) => value.FirstCharTo(c => char.ToLower(c), s => s.ToUpper());
+        public static string
+#if CS8
+                ?
+#endif
+                FirstCharToUpperInvariant(this string
+#if CS8
+                ?
+#endif
+                value) => value.FirstCharTo(c => char.ToUpperInvariant(c), s => s.ToUpperInvariant());
+        public static string
+#if CS8
+                ?
+#endif
+                FirstCharToUpper(this string
+#if CS8
+                ?
+#endif
+                value, CultureInfo culture) => value.FirstCharTo(c => char.ToUpper(c, culture), s => s.ToUpper(culture));
 
         private static string FirstCharOfEachWordToUpper(this string s, in Converter<char, char> converter, params char[] separators)
         {
@@ -498,16 +600,41 @@ namespace WinCopies.Temp
             return new string(c);
         }
 
+#if !CS8
+        public static int LastIndexOf(this string s, in char c)
+        {
+            for (int i = 0; i < s.Length; i++)
+
+                if (s[i] == c)
+
+                    return i;
+
+            return -1;
+        }
+#endif
+
         public static System.Collections.Generic.IEnumerable<TOut> ForEach<TIn, TOut>(this System.Collections.Generic.IEnumerable<TIn> enumerable, Func<TIn, System.Collections.Generic.IEnumerable<TOut>> func)
         {
-            foreach (TIn? item in enumerable)
+            foreach (TIn
+#if CS9
+                ?
+#endif
+                item in enumerable)
 
-                foreach (TOut? _item in func(item))
+                foreach (TOut
+#if CS9
+                ?
+#endif
+                _item in func(item))
 
                     yield return _item;
         }
 
         public static bool IsAssignableFrom<T>(this Type t) => t.IsAssignableFrom(typeof(T));
+
+#if !CS9
+        public static bool IsAssignableTo(this Type t, in Type type) => type.IsAssignableFrom(t);
+#endif
 
         public static bool IsAssignableTo<T>(this Type t) => t.IsAssignableTo(typeof(T));
 
@@ -570,7 +697,7 @@ namespace WinCopies.Temp
 #if CS8
             static
 #endif
-                bool onItemFound(in T __item, out T ___item)
+            bool onItemFound(in T __item, out T ___item)
             {
                 ___item = __item;
 

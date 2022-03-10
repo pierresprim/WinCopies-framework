@@ -1,9 +1,12 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Text;
 
 using WinCopies.Data.SQL;
 using WinCopies.EntityFramework;
-using WinCopies.Linq;
 using WinCopies.Reflection.DotNetParser;
 using WinCopies.Temp;
 
@@ -65,15 +68,27 @@ namespace WinCopies.Reflection.DotNetDocBuilder
         [EntityProperty(IsPseudoId = true)]
         public string Name { get => TryRefreshAndGet(ref _name); set => _name = value; }
 
-        [EntityProperty($"{nameof(Namespace)}Id", IsPseudoId = true)]
+        [EntityProperty(
+#if CS10
+            $"{nameof(Namespace)}Id"
+#else
+            "NamespaceId"
+#endif
+            , IsPseudoId = true)]
         [ForeignKey]
         public Namespace Namespace { get => TryRefreshAndGet(ref _namespace); set => _namespace = value; }
 
-        [EntityProperty($"{nameof(TypeType)}Id")]
+        [EntityProperty(
+#if CS10
+            $"{nameof(TypeType)}Id"
+#else
+            "TypeTypeId"
+#endif
+            )]
         [ForeignKey]
         public TypeType TypeType { get => TryRefreshAndGet(ref _typeType); set => _typeType = value; }
 
-        [EntityProperty($"{nameof(AccessModifier)}")]
+        [EntityProperty(nameof(AccessModifier))]
         [ForeignKey]
         public AccessModifier AccessModifier { get => TryRefreshAndGet(ref _accessModifier); set => _accessModifier = value; }
 
@@ -97,7 +112,13 @@ namespace WinCopies.Reflection.DotNetDocBuilder
     {
         private Type _type;
 
-        [EntityProperty($"{nameof(Type)}Id")]
+        [EntityProperty(
+#if CS10
+            $"{nameof(Type)}Id"
+#else
+            "TypeId"
+#endif
+            )]
         [ForeignKey(RemoveAlso = true)]
         public Type Type { get => TryRefreshAndGet(ref _type); set => _type = value; }
 
@@ -111,7 +132,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
     {
         private UnderlyingType _underlyingType;
 
-        [EntityProperty($"{nameof(UnderlyingType)}")]
+        [EntityProperty(nameof(UnderlyingType))]
         [ForeignKey]
         public UnderlyingType UnderlyingType { get => TryRefreshAndGet(ref _underlyingType); set => _underlyingType = value; }
 
@@ -148,7 +169,11 @@ namespace WinCopies.Reflection.DotNetDocBuilder
         }
 
         #region Methods
-        protected void WriteLine(in string? msg, in bool? increment, in ConsoleColor? color = null)
+        protected void WriteLine(in string
+#if CS8
+            ?
+#endif
+            msg, in bool? increment, in ConsoleColor? color = null)
         {
             if (color.HasValue)
 
@@ -175,20 +200,49 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
         public IEnumerable<DotNetNamespace> GetAllNamespacesInPackages()
         {
-            foreach (DotNetPackage? package in Packages)
+            foreach (DotNetPackage
+#if CS8
+                ?
+#endif
+                package in Packages)
 
-                foreach (DotNetNamespace? @namespace in GetNamespaces(package))
+                foreach (DotNetNamespace
+#if CS8
+                ?
+#endif
+                @namespace in GetNamespaces(package))
 
                     yield return @namespace;
         }
 
         public void DeleteTypesBase<T>(string wholeNamespace) where T : TypeBase<T>
         {
-            void writeLine(in string? value = null) => WriteLine($"Deleting all {nameof(T)}s from {wholeNamespace}{value}", value == null);
+            void writeLine(in string
+#if CS8
+                ?
+#endif
+                value = null) => WriteLine($"Deleting all {nameof(T)}s from {wholeNamespace}{value}", value == null);
 
             writeLine();
 
-            using DBEntityCollection<T> types = new(GetConnection());
+            using
+#if !CS9
+#if !CS8
+                (
+#endif
+                var types = new
+#endif
+                DBEntityCollection<T>
+#if CS9
+                types = new
+#endif
+                (GetConnection())
+#if CS8
+                ;
+#else
+                )
+            {
+#endif
 
             ulong rows = 0;
 
@@ -213,13 +267,20 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
                     throw new InvalidOperationException($"Could not remove {wholeNamespace}.{type}.");
             }
+#if !CS8
+            }
+#endif
 
             writeLine(" completed");
         }
 
         public void DeleteTypes(string wholeNamespace)
         {
-            void writeLine(in string? value = null) => WriteLine($"Deleting all types from {wholeNamespace}{value}.", value == null);
+            void writeLine(in string
+#if CS8
+            ?
+#endif
+            value = null) => WriteLine($"Deleting all types from {wholeNamespace}{value}.", value == null);
 
             writeLine();
 
@@ -228,9 +289,27 @@ namespace WinCopies.Reflection.DotNetDocBuilder
             writeLine(" completed");
         }
 
+        protected static string GetNamespacePath(in string namespacePath) => namespacePath
+#if CS8
+                [..
+#else
+                .Substring(0,
+#endif
+                namespacePath.IndexOf('.')
+#if CS8
+                ]
+#else
+                )
+#endif
+                ;
+
         public IEnumerable<DotNetEnum> GetAllEnumsInPackages()
         {
-            foreach (DotNetEnum? @enum in GetAllNamespacesInPackages().ForEach(@namespace => @namespace.GetEnums()))
+            foreach (DotNetEnum
+#if CS8
+                ?
+#endif
+                @enum in GetAllNamespacesInPackages().ForEach(@namespace => @namespace.GetEnums()))
 
                 yield return @enum;
         }
@@ -244,7 +323,11 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
             _ = Directory.CreateDirectory(path = GetWholePath(namespacePath = Path.Combine(@enum.Type.Namespace, @enum.Type.Name)));
 
-            FileStream? writer = File.Create(path = Path.Combine(path, GetFileName(null)));
+            FileStream
+#if CS8
+                ?
+#endif
+                writer = File.Create(path = Path.Combine(path, GetFileName(null)));
 
             namespacePath = namespacePath.Replace('\\', '.');
 
@@ -259,7 +342,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
             File.WriteAllText(path, File.ReadAllText(path).Replace("{PackageId}", PackageInfo.FrameworkId.ToString())
                 .Replace("{ItemId}", id.ToString())
                 .Replace("{ItemName}", @enum.Type.Name)
-                .Replace("{DocURL}", $"2 => '<a href=\"/doc/{PackageInfo.URL}/{namespacePath[..namespacePath.IndexOf('.')]}/index.php\">{getDocHeader()}</a>', {GetNamespaceURLArray(namespacePath, out _)}")
+                .Replace("{DocURL}", $"2 => '<a href=\"/doc/{PackageInfo.URL}/{GetNamespacePath(namespacePath)}/index.php\">{getDocHeader()}</a>', {GetNamespaceURLArray(namespacePath, out _)}")
                 .Replace("{PackageUrl}", PackageInfo.URL));
         }
 
@@ -273,58 +356,61 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
             ulong rows = 0;
 
-            //while (true)
+            using
+#if !CS9
+#if !CS8
+                (
+#endif
+                var enums = new
+#endif
+                DBEntityCollection<Enum>
+#if CS9
+                enums = new
+#endif
+                (GetConnection())
+#if CS8
+                ;
+#else
+                )
+            {
+#endif
 
-            //    try
-            //    {
-                    var c = GetConnection();
+            foreach (Enum
+#if CS8
+                ?
+#endif
+                @enum in enums)
 
-                    if (c.IsClosed)
+                if (GetWholeNamespace(@enum.Type.Namespace.Id) == wholeNamespace)
+                {
+                    WriteLine($"{++i}: Searching {@enum} in all packages.", true, ConsoleColor.DarkYellow);
 
-                        throw new Exception();
+                    if (GetAllEnumsInPackages().Any(_enum => _enum.Type.Namespace == wholeNamespace))
 
-                    using DBEntityCollection<Enum> enums = new(c);
+                        WriteLine($"{@enum} found. Not removed from DB.", null, ConsoleColor.DarkGreen);
 
-                    foreach (Enum? @enum in enums)
+                    else
+                    {
+                        WriteLine($"{@enum} not found in any package. Deleting.", true, ConsoleColor.DarkRed);
 
-                        if (GetWholeNamespace(@enum.Type.Namespace.Id) == wholeNamespace)
+                        rows = @enum.Remove(out uint tables);
+
+                        if (rows > 0)
                         {
-                            WriteLine($"{++i}: Searching {@enum} in all packages.", true, ConsoleColor.DarkYellow);
+                            WriteLine($"Removed {rows} {nameof(rows)} in {tables} {nameof(tables)}.", null);
 
-                            if (GetAllEnumsInPackages().Any(_enum => _enum.Type.Namespace == wholeNamespace))
+                            Directory.Delete(Path.Combine(GetWholePath(wholeNamespace), @enum.Type.Name), true);
 
-                                WriteLine($"{@enum} found. Not removed from DB.", null, ConsoleColor.DarkGreen);
-
-                            else
-                            {
-                                WriteLine($"{@enum} not found in any package. Deleting.", true, ConsoleColor.DarkRed);
-
-                                rows = @enum.Remove(out uint tables);
-
-                                if (rows > 0)
-                                {
-                                    WriteLine($"Removed {rows} {nameof(rows)} in {tables} {nameof(tables)}.", null);
-
-                                    Directory.Delete(Path.Combine(GetWholePath(wholeNamespace), @enum.Type.Name), true);
-
-                                    WriteLine($"{@enum} successfully deleted.", false);
-                                }
-
-                                else
-
-                                    throw new InvalidOperationException($"Could not remove {wholeNamespace}.{@enum}.");
-                            }
-
-                            WriteLine($"Processing {wholeNamespace} completed.", false);
+                            WriteLine($"{@enum} successfully deleted.", false);
                         }
 
-                //    break;
-                //}
+                        else
 
-                //catch (Exception ex)
-                //{
+                            throw new InvalidOperationException($"Could not remove {wholeNamespace}.{@enum}.");
+                    }
 
-                //}
+                    WriteLine($"Processing {wholeNamespace} completed.", false);
+                }
 
             WriteLine("Parsing DB completed.", false);
 
@@ -332,13 +418,31 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
             i = 0;
 
-            DBEntityCollection<UnderlyingType> utColl = new(Connection);
-            DBEntityCollection<Type> tColl = new(Connection);
-            DBEntityCollection<Namespace> nColl = new(Connection);
-            DBEntityCollection<TypeType> ttColl = new(Connection);
-            DBEntityCollection<AccessModifier> amColl = new(Connection);
-
-            DBEntityCollection<Enum> _enums;
+            DBEntityCollection<UnderlyingType> utColl = new
+#if !CS9
+                DBEntityCollection<UnderlyingType>
+#endif
+                (Connection);
+            DBEntityCollection<Type> tColl = new
+#if !CS9
+                DBEntityCollection<Type>
+#endif
+                (Connection);
+            DBEntityCollection<Namespace> nColl = new
+#if !CS9
+                DBEntityCollection<Namespace>
+#endif
+                (Connection);
+            DBEntityCollection<TypeType> ttColl = new
+#if !CS9
+                DBEntityCollection<TypeType>
+#endif
+                (Connection);
+            DBEntityCollection<AccessModifier> amColl = new
+#if !CS9
+                DBEntityCollection<AccessModifier>
+#endif
+                (Connection);
 
             foreach (DotNetEnum @enum in GetAllEnumsInPackages().Where(_enum => _enum.Type.Namespace == wholeNamespace))
             {
@@ -348,47 +452,29 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
                 bool process()
                 {
-                    while (true)
+                    foreach (Enum _enum in enums)
+                    {
+                        wn = GetWholeNamespace(_enum.Type.Namespace.Id);
 
-                        try
+                        Debug.WriteLine(wn);
+
+                        if (wn == @enum.Type.Namespace && _enum.Type.Name == @enum.Type.Name)
                         {
-                            var c = GetConnection();
+                            WriteLine("Exists. Updating.", true, ConsoleColor.DarkGreen);
 
-                            if (c.IsClosed)
+                            _enum.UnderlyingType = new UnderlyingType(utColl) { Name = @enum.UnderlyingType.ToCSName() };
 
-                                throw new Exception();
+                            _enum.UnderlyingType.MarkForRefresh();
 
-                             _enums = new(c);
+                            _ = _enum.UnderlyingType.TryRefreshId(true);
 
-                            foreach (Enum _enum in _enums)
-                            {
-                                wn = GetWholeNamespace(_enum.Type.Namespace.Id);
+                            WriteLine($"Updated {_enum.Update(out uint tables)} rows in {tables} {nameof(tables)}. Id: {_enum.Id}.", false);
 
-                                Debug.WriteLine(wn);
-
-                                if (wn == @enum.Type.Namespace && _enum.Type.Name == @enum.Type.Name)
-                                {
-                                    WriteLine("Exists. Updating.", true, ConsoleColor.DarkGreen);
-
-                                    _enum.UnderlyingType = new UnderlyingType(utColl) { Name = @enum.UnderlyingType.ToCSName() };
-
-                                    _enum.UnderlyingType.MarkForRefresh();
-
-                                    _ = _enum.UnderlyingType.TryRefreshId(true);
-
-                                    WriteLine($"Updated {_enum.Update(out uint tables)} rows in {tables} {nameof(tables)}. Id: {_enum.Id}.", false);
-
-                                    return false;
-                                }
-                            }
-
-                            return true;
+                            return false;
                         }
+                    }
 
-                        catch
-                        {
-
-                        }
+                    return true;
                 }
 
                 if (process())
@@ -402,7 +488,11 @@ namespace WinCopies.Reflection.DotNetDocBuilder
                         return entity;
                     }
 
-                    Enum _enum = new(_enums)
+                    Enum _enum = new
+#if !CS9
+                        Enum
+#endif
+                        (enums)
                     {
                         UnderlyingType = getEntity(new UnderlyingType(utColl)
                         {
@@ -441,7 +531,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
                     _ = _enum.TryRefreshId(false);
 
-                    id = _enums.Add(_enum, out uint tables, out rows);
+                    id = enums.Add(_enum, out uint tables, out rows);
 
                     _enum.Dispose();
 
@@ -463,6 +553,9 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
                 WriteLine($"Processed {@enum.Type.Name}.", false);
             }
+#if !CS8
+            }
+#endif
 
             WriteLine("Updating namespaces completed.", false);
         }
@@ -476,7 +569,21 @@ namespace WinCopies.Reflection.DotNetDocBuilder
         {
             WriteLine("Updating namespaces", true);
 
-            using DBEntityCollection<Namespace> namespaces = new(GetConnection());
+            using
+#if !CS8
+                (
+#endif
+                DBEntityCollection<Namespace> namespaces = new
+#if !CS9
+                DBEntityCollection<Namespace>
+#endif
+                (GetConnection())
+#if CS8
+                ;
+#else
+                )
+            {
+#endif
 
             string wholeNamespace;
 
@@ -486,7 +593,11 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
             ulong rows = 0;
 
-            foreach (Namespace? @namespace in namespaces)
+            foreach (Namespace
+#if CS8
+                ?
+#endif
+                @namespace in namespaces)
             {
                 wholeNamespace = GetWholeNamespace(@namespace.Id);
 
@@ -529,7 +640,11 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
             i = 0;
 
-            foreach (DotNetNamespace? @namespace in GetAllNamespacesInPackages())
+            foreach (DotNetNamespace
+#if CS8
+                ?
+#endif
+                @namespace in GetAllNamespacesInPackages())
             {
                 WriteLine($"{++i}: Processing {@namespace.Path}.", true, ConsoleColor.DarkYellow);
 
@@ -555,7 +670,11 @@ namespace WinCopies.Reflection.DotNetDocBuilder
                 {
                     WriteLine("Does not exist. Adding.", true, ConsoleColor.DarkRed);
 
-                    Namespace _namespace = new(namespaces)
+                    Namespace _namespace = new
+#if !CS9
+                        Namespace
+#endif
+                        (namespaces)
                     {
                         Name = @namespace.Name,
 
@@ -586,35 +705,50 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
                 WriteLine($"Processed {@namespace.Path}.", false);
             }
+#if !CS8
+            }
+#endif
 
             WriteLine("Updating namespaces completed.", false);
         }
 
         public int? GetNamespaceId(string @namespace)
         {
-            ISQLConnection? connection = GetConnection();
+            ISQLConnection
+#if CS8
+                ?
+#endif
+                connection = GetConnection();
 
             string[] namespaces = @namespace.Split('.');
 
             int paramId = 0;
             string getParamName() => $"name{paramId++}";
 
-            SQLColumn[]? idColumn = GetArray(connection.GetColumn(ID));
+            SQLColumn[]
+#if CS8
+                ?
+#endif
+                idColumn = GetArray(connection.GetColumn(ID));
 
             ISelect getSelect(in ActionIn<IConditionGroup> action)
             {
-                ISelect select = connection.GetSelect(GetArray(DOC_NAMESPACE), idColumn);
+                ISelect _select = connection.GetSelect(GetArray(DOC_NAMESPACE), idColumn);
 
                 IConditionGroup conditionGroup = new ConditionGroup("AND");
 
-                select.ConditionGroup = conditionGroup;
+                _select.ConditionGroup = conditionGroup;
 
                 action(conditionGroup);
 
-                return select;
+                return _select;
             }
 
-            ICondition? getNameCondition(in string @namespace) => connection.GetCondition(NAME, getParamName(), @namespace);
+            ICondition
+#if CS8
+                ?
+#endif
+                getNameCondition(in string _namespace) => connection.GetCondition(NAME, getParamName(), _namespace);
 
             ISelect select = getSelect((in IConditionGroup conditionGroup) => conditionGroup.Conditions = GetEnumerable(connection.GetNullityCondition(PARENT_ID), getNameCondition(namespaces[0])));
 
@@ -627,7 +761,11 @@ namespace WinCopies.Reflection.DotNetDocBuilder
                     conditionGroup.Selects = GetEnumerable(new KeyValuePair<SQLColumn, ISelect>(connection.GetColumn(PARENT_ID), select));
                 });
 
-            foreach (ISQLGetter? value in select.ExecuteQuery())
+            foreach (ISQLGetter
+#if CS8
+                ?
+#endif
+                value in select.ExecuteQuery())
 
                 return (int)value[0];
 
@@ -652,24 +790,49 @@ namespace WinCopies.Reflection.DotNetDocBuilder
                 return false;
             }
 
-            using ISQLConnection? connection = GetConnection();
+            using
+#if !CS8
+                (
+#endif
+                ISQLConnection
+#if CS8
+                ?
+#endif
+                connection = GetConnection()
+#if CS8
+                ;
+#else
+                )
+#endif
 
             do
             {
-                IEnumerable<ISQLGetter>? result = connection.GetSelect(GetArray(DOC_NAMESPACE), GetArray(connection.GetColumn(NAME), connection.GetColumn(PARENT_ID)), conditions: GetArray(connection.GetCondition(ID, nameof(id), id))).ExecuteQuery();
+                IEnumerable<ISQLGetter>
+#if CS8
+                ?
+#endif
+                result = connection.GetSelect(GetArray(DOC_NAMESPACE), GetArray(connection.GetColumn(NAME), connection.GetColumn(PARENT_ID)), conditions: GetArray(connection.GetCondition(ID, nameof(id), id))).ExecuteQuery();
 
                 foreach (ISQLGetter item in result)
                 {
-                    namespaces.Prepend((first = new KeyValuePair<string, int?>((string)item[NAME], item[PARENT_ID] is int _id ? _id : null)).Value.Key);
+                    namespaces.Prepend((first = new KeyValuePair<string, int?>((string)item[NAME], item[PARENT_ID] is int _id ?
+#if !CS9
+                        (int?)
+#endif
+                        _id : null)).Value.Key);
 
                     break;
                 }
             }
             while (whileCondition());
 
-            connection.Close();
-
-            return string.Join('.', namespaces);
+            return string.Join(
+#if CS8
+                '.'
+#else
+                "."
+#endif
+                , namespaces);
         }
 
         public string GetWholePath(string wholeNamespace) => Path.Combine(RootPath, wholeNamespace.Replace('.', TO_BE_DELETED.Path.PathSeparator));
@@ -681,7 +844,11 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
             _ = Directory.CreateDirectory(path = GetWholePath(namespacePath = @namespace.Path));
 
-            FileStream? writer = File.Create(path = Path.Combine(path, GetFileName(null)));
+            FileStream
+#if CS8
+                ?
+#endif
+                writer = File.Create(path = Path.Combine(path, GetFileName(null)));
 
             byte[] data = GetNamespaceData();
 
@@ -694,7 +861,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
             File.WriteAllText(path, File.ReadAllText(path).Replace("{PackageId}", PackageInfo.FrameworkId.ToString())
                 .Replace("{ItemId}", id.ToString())
                 .Replace("{ItemName}", @namespace.Name)
-                .Replace("{DocURL}", namespacePath.Contains('.') ? $"2 => '<a href=\"/doc/{PackageInfo.URL}/{namespacePath[..namespacePath.IndexOf('.')]}/index.php\">{getDocHeader()}</a>', {GetNamespaceURLArray(namespacePath, out _)}" : $"2 => '{getDocHeader()}'")
+                .Replace("{DocURL}", namespacePath.Contains('.') ? $"2 => '<a href=\"/doc/{PackageInfo.URL}/{GetNamespacePath(namespacePath)}/index.php\">{getDocHeader()}</a>', {GetNamespaceURLArray(namespacePath, out _)}" : $"2 => '{getDocHeader()}'")
                 .Replace("{PackageUrl}", PackageInfo.URL));
         }
 
@@ -704,8 +871,16 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
             int length = namespaces.Length - 1;
 
-            StringBuilder sb = new();
-            StringBuilder aux = new();
+            StringBuilder sb = new
+#if !CS9
+                StringBuilder
+#endif
+                ();
+            StringBuilder aux = new
+#if !CS9
+                StringBuilder
+#endif
+                ();
 
             int i = 0;
 

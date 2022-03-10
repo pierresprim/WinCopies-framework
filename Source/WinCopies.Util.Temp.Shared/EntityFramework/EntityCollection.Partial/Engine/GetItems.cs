@@ -1,4 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 using WinCopies.Collections.Generic;
@@ -24,7 +27,11 @@ namespace WinCopies.EntityFramework
 
                 itemsType = typeof(TItem);
 
-            ArrayBuilder<KeyValuePair<PropertyInfo, string>> columns = new();
+            ArrayBuilder<KeyValuePair<PropertyInfo, string>> columns = new
+#if !CS9
+                ArrayBuilder<KeyValuePair<PropertyInfo, string>>
+#endif
+                ();
 
             foreach (KeyValuePair<PropertyInfo, EntityPropertyAttribute> property in GetDBPropertyInfo(itemsType))
 
@@ -36,17 +43,49 @@ namespace WinCopies.EntityFramework
              * Variables
             */
 
-            TItem? obj = default;
-            IEntity? tmp;
-            object? _tmp;
-            ForeignKeyAttribute? attribute;
+            TItem
+#if CS9
+            ?
+#endif
+            obj = default;
+            IEntity
+#if CS8
+            ?
+#endif
+            tmp;
+            object
+#if CS8
+            ?
+#endif
+            _tmp;
+            ForeignKeyAttribute
+#if CS8
+            ?
+#endif
+            attribute;
             PropertyInfo column;
-            PropertyInfo? idProperty;
-            KeyValuePair<string?, PropertyInfo>? foreignKeyIdProperty;
+            PropertyInfo
+#if CS8
+            ?
+#endif
+            idProperty;
+            KeyValuePair<string
+#if CS8
+            ?
+#endif
+            , PropertyInfo>? foreignKeyIdProperty;
             PropertyInfo _foreignKeyIdProperty;
             Type adderType;
-            KeyValuePair<string?, PropertyInfo>? adderTypeIdProperty;
-            object? value = null;
+            KeyValuePair<string
+#if CS8
+            ?
+#endif
+            , PropertyInfo>? adderTypeIdProperty;
+            object
+#if CS8
+            ?
+#endif
+            value = null;
 
             /*
              * Methods
@@ -58,7 +97,11 @@ namespace WinCopies.EntityFramework
 
             IDBEntityItemCollection getValidatedDBEntityCollection() => getValidatedDBEntityObject<IDBEntityItemCollection>(column.PropertyType, obj, false);
 
-            TCondition getCondition(in string columnName, in string paramName, in object? value) => loadingFactory.GetCondition(columnName, paramName, value);
+            TCondition getCondition(in string columnName, in string paramName, in object
+#if CS8
+            ?
+#endif
+            _value) => loadingFactory.GetCondition(columnName, paramName, _value);
 
             TCondition getForeignKeyCondition(in OneToManyForeignKeyAttribute _attribute) => getCondition(_attribute.ForeignKeyIdColumn, "foreignKeyId", idProperty.GetValue(obj));
 
@@ -68,9 +111,13 @@ namespace WinCopies.EntityFramework
 
             // TODO: Is*Indexable properties should also be accessible via the enumerable returned by ExecuteQuery().
 
-            loadingFactory.InitSelector(itemsType.GetCustomAttributes<EntityAttribute>(true).First().Table ?? itemsType.Name, columns.AsEnumerable<KeyValuePair<PropertyInfo, string>>().WhereSelect(column => !column.Key.GetCustomAttributes(true).Any<OneToManyForeignKeyAttribute>(), column => column.Value));
+            loadingFactory.InitSelector(itemsType.GetCustomAttributes<EntityAttribute>(true).First().Table ?? itemsType.Name, columns.AsEnumerable<KeyValuePair<PropertyInfo, string>>().WhereSelect(_column => !_column.Key.GetCustomAttributes(true).Any<OneToManyForeignKeyAttribute>(), _column => _column.Value));
 
-            foreach (IPopable<string, object?> items in loadingFactory)
+            foreach (IPopable<string, object
+#if CS8
+            ?
+#endif
+            > items in loadingFactory)
             {
                 obj = loadingFactory.GetItem(collection);
 
@@ -102,7 +149,11 @@ namespace WinCopies.EntityFramework
                                         {
                                             loadingFactory.SetConditions(getForeignKeyCondition(_attribute), getCondition(_attribute.IdColumn, "id", idProperty.GetValue(entity)));
 
-                                            foreach (IEnumerable? value in loadingFactory)
+                                            foreach (IEnumerable
+#if CS8
+                                                ?
+#endif
+                                                _value in loadingFactory)
 
                                                 return false;
 

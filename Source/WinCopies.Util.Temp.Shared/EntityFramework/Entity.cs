@@ -14,14 +14,24 @@ namespace WinCopies.EntityFramework
 {
     public interface IEntityCollection : IAsEnumerable<IEntity>, DotNetFix.IDisposable
     {
-        long? Add(IEntity entity, out uint tables, out ulong rows, IReadOnlyDictionary<string, object>? extraColumns);
+        long? Add(IEntity entity, out uint tables, out ulong rows, IReadOnlyDictionary<string, object>
+#if CS8
+                ?
+#endif
+                extraColumns);
     }
 
     public interface IEntityCollection<T> : IEntityCollection, IMultiTypeEnumerable<T, IEntity> where T : IEntity
     {
-        long? Add(T entity, out uint tables, out ulong rows, IReadOnlyDictionary<string, object>? extraColumns);
+        long? Add(T entity, out uint tables, out ulong rows, IReadOnlyDictionary<string, object>
+#if CS8
+                ?
+#endif
+                extraColumns);
 
+#if CS8
         long? IEntityCollection.Add(IEntity entity, out uint tables, out ulong rows, IReadOnlyDictionary<string, object>? extraColumns) => Add(entity is T _entity ? _entity : throw new InvalidArgumentException(nameof(entity)), out tables, out rows, extraColumns);
+#endif
     }
 
     public abstract class EntityCollection<TItems, TCollection> : IEntityCollection<TItems> where TItems : IEntity where TCollection : IEntityCollection<TItems>
@@ -30,7 +40,19 @@ namespace WinCopies.EntityFramework
 
         public EntityCollection() => _ = EntityCollection.ValidateConstructor<TItems, TCollection>();
 
-        public abstract long? Add(TItems entity, out uint tables, out ulong rows, IReadOnlyDictionary<string, object>? extraColumns = null);
+#if !CS8
+        IEnumerable<IEntity> IAsEnumerable<IEntity>.AsEnumerable() => this.As<TItems, IEntity>();
+#endif
+
+        public abstract long? Add(TItems entity, out uint tables, out ulong rows, IReadOnlyDictionary<string, object>
+#if CS8
+                ?
+#endif
+                extraColumns = null);
+
+#if !CS8
+        long? IEntityCollection.Add(IEntity entity, out uint tables, out ulong rows, IReadOnlyDictionary<string, object> extraColumns) => Add(entity is TItems _entity ? _entity : throw new InvalidArgumentException(nameof(entity)), out tables, out rows, extraColumns);
+#endif
 
         public abstract System.Collections.Generic.IEnumerable<TItems> GetItems();
 
@@ -51,9 +73,17 @@ namespace WinCopies.EntityFramework
 
     public interface IEntityIdRefresher : DotNetFix.IDisposable
     {
-        void Add(string column, string paramName, object? value);
+        void Add(string column, string paramName, object
+#if CS8
+                ?
+#endif
+                value);
 
-        bool TryGetId(string table, string idColumn, out object? id);
+        bool TryGetId(string table, string idColumn, out object
+#if CS8
+                ?
+#endif
+                id);
     }
 
     public interface IEntity : System.IDisposable
@@ -62,11 +92,19 @@ namespace WinCopies.EntityFramework
 
         bool TryRefreshId(IEntityIdRefresher refresher, PropertyInfo idProperty, System.Collections.Generic.IEnumerable<string> properties);
 
-        bool TryRefreshId(IEntityIdRefresher refresher, PropertyInfo idProperty, params string[] properties) => TryRefreshId(refresher, idProperty, properties.AsEnumerable());
+        bool TryRefreshId(IEntityIdRefresher refresher, PropertyInfo idProperty, params string[] properties)
+#if CS8
+            => TryRefreshId(refresher, idProperty, properties.AsEnumerable())
+#endif
+            ;
 
         bool TryRefreshId(IEntityIdRefresher refresher, string idProperty, System.Collections.Generic.IEnumerable<string> properties);
 
-        bool TryRefreshId(IEntityIdRefresher refresher, string idProperty, params string[] properties) => TryRefreshId(refresher, idProperty, properties.AsEnumerable());
+        bool TryRefreshId(IEntityIdRefresher refresher, string idProperty, params string[] properties)
+#if CS8
+            => TryRefreshId(refresher, idProperty, properties.AsEnumerable())
+#endif
+            ;
 
         bool TryRefreshId(IEntityIdRefresher refresher, bool thisType);
 
@@ -74,7 +112,11 @@ namespace WinCopies.EntityFramework
 
         bool Refresh();
 
-        void AddOrUpdate(IReadOnlyDictionary<string, object>? extraColumns);
+        void AddOrUpdate(IReadOnlyDictionary<string, object>
+#if CS8
+                ?
+#endif
+                extraColumns);
 
         ulong Update(out uint tables);
 
@@ -104,24 +146,50 @@ namespace WinCopies.EntityFramework
 
         void Clear();
 
+#if CS8
         void IDBEntityItemCollection.Add(IEntity item) => Add(item is T _item ? _item : throw GetInvalidTypeArgumentException(nameof(item)));
 
         bool IDBEntityItemCollection.Remove(IEntity item) => item is T _item && Remove(_item);
+#endif
     }
 
     public class DBEntityItemCollection<TItems, TParent> : IDBEntityItemCollection<TItems> where TItems : IEntity
     {
-        private readonly Collections.DotNetFix.Generic.LinkedList<TItems> _items = new();
+        private readonly Collections.DotNetFix.Generic.LinkedList<TItems> _items = new
+#if !CS9
+            Collections.DotNetFix.Generic.LinkedList<TItems>
+#endif
+            ();
 
         protected ILinkedList<TItems> Items => _items;
 
         protected TParent Parent { get; }
 
-        public DBEntityItemCollection(TParent parent) => Parent = parent ?? throw GetArgumentNullException(nameof(parent));
+        public DBEntityItemCollection(TParent parent) => Parent = parent
+#if CS8
+            ??
+#else
+            == null ?
+#endif
+            throw GetArgumentNullException(nameof(parent))
+#if !CS8
+            : parent
+#endif
+            ;
+
+#if !CS8
+        IEnumerable<IEntity> IAsEnumerable<IEntity>.AsEnumerable() => this.As<TItems, IEntity>();
+#endif
 
         public void Add(TItems item) => _items.AddLast(item);
 
         public bool Remove(TItems item) => _items.Remove2(item) != null;
+
+#if !CS8
+        void IDBEntityItemCollection.Add(IEntity item) => Add(item is TItems _item ? _item : throw GetInvalidTypeArgumentException(nameof(item)));
+
+        bool IDBEntityItemCollection.Remove(IEntity item) => item is TItems _item && Remove(_item);
+#endif
 
         public void Clear() => _items.Clear();
 
@@ -133,9 +201,18 @@ namespace WinCopies.EntityFramework
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
     public class EntityAttribute : Attribute
     {
-        public string? Table { get; }
+        public string
+#if CS8
+                ?
+#endif
+                Table
+        { get; }
 
-        public EntityAttribute(string? table = null) => Table = table;
+        public EntityAttribute(string
+#if CS8
+                ?
+#endif
+                table = null) => Table = table;
     }
 
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
@@ -145,9 +222,18 @@ namespace WinCopies.EntityFramework
 
         public bool IsPseudoId { get; set; }
 
-        public string? Column { get; }
+        public string
+#if CS8
+                ?
+#endif
+                Column
+        { get; }
 
-        public EntityPropertyAttribute(string? column = null) => Column = column;
+        public EntityPropertyAttribute(string
+#if CS8
+                ?
+#endif
+                column = null) => Column = column;
     }
 
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
@@ -202,6 +288,12 @@ namespace WinCopies.EntityFramework
 
         protected Entity(in IEntityCollection collection) => Collection = collection;
 
+#if !CS8
+        public bool TryRefreshId(IEntityIdRefresher refresher, PropertyInfo idProperty, params string[] properties) => TryRefreshId(refresher, idProperty, properties.AsEnumerable());
+
+        public bool TryRefreshId(IEntityIdRefresher refresher, string idProperty, params string[] properties) => TryRefreshId(refresher, idProperty, properties.AsEnumerable());
+#endif
+
         protected bool TryRefreshId(in IEntityIdRefresher refresher, in PropertyInfo idProperty, in System.Collections.Generic.IEnumerable<KeyValuePair<PropertyInfo, EntityPropertyAttribute>> properties)
         {
             if (!RefreshNeeded)
@@ -224,9 +316,17 @@ namespace WinCopies.EntityFramework
 
             string column;
             PropertyInfo _propertyInfo;
-            object? value;
-            PropertyInfo? foreignKeyProperty;
-            
+            object
+#if CS8
+                ?
+#endif
+                value;
+            PropertyInfo
+#if CS8
+                ?
+#endif
+                foreignKeyProperty;
+
             foreach (KeyValuePair<PropertyInfo, EntityPropertyAttribute> property in properties)
             {
                 _propertyInfo = property.Key;
@@ -234,7 +334,11 @@ namespace WinCopies.EntityFramework
                 refresher.Add(column = property.Value.Column ?? _propertyInfo.Name, column.FirstCharToLower(), (value = _propertyInfo.GetValue(this)) is IEntity && !(_propertyInfo.GetCustomAttributes<ForeignKeyAttribute>().FirstOrDefault() == null || (foreignKeyProperty = EntityCollection.GetEntityProperties(value.GetType()).FirstOrDefault()) == null) ? foreignKeyProperty.GetValue(value) : value);
             }
 
-            if (refresher.TryGetId(table, idColumn, out object? id))
+            if (refresher.TryGetId(table, idColumn, out object
+#if CS8
+                ?
+#endif
+                id))
 
                 idProperty.SetValue(this, Convert.ChangeType(id, idProperty.PropertyType));
 
@@ -260,8 +364,6 @@ namespace WinCopies.EntityFramework
             return TryRefreshId(refresher, (EntityCollection.GetIdProperties(t).FirstOrNull(property => property.Value.Name == idProperty) ?? throw new ArgumentException($"{nameof(idProperty)} is not found among the DB properties of {nameof(t.Name)}.")).Value, properties);
         }
 
-        public bool TryRefreshId(IEntityIdRefresher refresher, string idProperty, params string[] properties) => TryRefreshId(refresher, idProperty, properties.AsEnumerable());
-
         public bool TryRefreshId(IEntityIdRefresher refresher, bool thisType)
         {
             if (!RefreshNeeded)
@@ -272,9 +374,17 @@ namespace WinCopies.EntityFramework
 
             Type t = GetType();
 
-            foreach (PropertyInfo? property in EntityCollection.GetEntityProperties(t))
+            foreach (PropertyInfo
+#if CS8
+                ?
+#endif
+                property in EntityCollection.GetEntityProperties(t))
 
-                _ = ((IEntity?)property.GetValue(this))?.TryRefreshId(true);
+                _ = ((IEntity
+#if CS8
+                ?
+#endif
+                )property.GetValue(this))?.TryRefreshId(true);
 
             return thisType && TryRefreshId(refresher, (EntityCollection.GetIdProperties(t).FirstOrNull() ?? throw new InvalidOperationException($"{t.Namespace}.{t.Name} does not have any id property.")).Value, EntityCollection.GetDBPropertyInfo(t).Where(property => property.Value.IsPseudoId));
         }
@@ -287,9 +397,22 @@ namespace WinCopies.EntityFramework
 
                 return false;
 
-            using IEntityIdRefresher? refresher = GetRefresher();
+            using
+#if !CS8
+                (
+#endif
+                IEntityIdRefresher
+#if CS8
+                ?
+#endif
+                refresher = GetRefresher()
+#if CS8
+                ;
+#else
+                )
+#endif
 
-            return TryRefreshId(refresher, thisType);
+                return TryRefreshId(refresher, thisType);
         }
 
         protected T RefreshAndAccess<T>(Func<T> func)
@@ -327,7 +450,11 @@ namespace WinCopies.EntityFramework
         {
             bool result;
 
-            using (EntityParser entityParser = new(this))
+            using (EntityParser entityParser = new
+#if !CS9
+                EntityParser
+#endif
+                (this))
 
                 result = RefreshOverride();
 
@@ -336,7 +463,11 @@ namespace WinCopies.EntityFramework
             return result;
         }
 
-        public void AddOrUpdate(IReadOnlyDictionary<string, object>? extraColumns = null)
+        public void AddOrUpdate(IReadOnlyDictionary<string, object>
+#if CS8
+                ?
+#endif
+                extraColumns = null)
         {
             if (Collection.Add(this, out _, out _, extraColumns) == null)
 

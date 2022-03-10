@@ -1,6 +1,9 @@
 ﻿using MySql.Data.MySqlClient;
 
+using System;
 using System.Text;
+using System.Threading.Tasks;
+using System.Linq;
 
 using WinCopies.Collections.Generic;
 using WinCopies.Data.SQL;
@@ -17,7 +20,11 @@ namespace WinCopies.Data.MySQL
 
         protected override string GetSQL()
         {
-            StringBuilder sb = new();
+            StringBuilder sb = new
+#if !CS9
+                StringBuilder
+#endif
+                ();
 
             _ = sb.Append($"SELECT {Columns} FROM {Tables.ToString(tableName => tableName.Surround('`'))}");
 
@@ -27,7 +34,11 @@ namespace WinCopies.Data.MySQL
             {
                 OrderByColumns orderBy = OrderBy.Value;
 
-                SQLItemCollection<SQLColumn>? columns = orderBy.Columns;
+                SQLItemCollection<SQLColumn>
+#if CS8
+            ?
+#endif
+            columns = orderBy.Columns;
 
                 if (columns != null)
 
@@ -37,7 +48,11 @@ namespace WinCopies.Data.MySQL
             return sb.ToString();
         }
 
-        protected override Action<MySqlCommand, IConditionGroup?> GetPrepareCommandAction() => PrepareCommand;
+        protected override Action<MySqlCommand, IConditionGroup
+#if CS8
+            ?
+#endif
+            > GetPrepareCommandAction() => PrepareCommand;
 
         public override System.Collections.Generic.IEnumerable<ISQLGetter> ExecuteQuery()
         {
@@ -48,7 +63,11 @@ namespace WinCopies.Data.MySQL
 
         public override async Task<System.Collections.Generic.IEnumerable<ISQLGetter>> ExecuteQueryAsync()
         {
-            MySQLEnumerator? result = await MySQLEnumerator.GetEnumerableAsync(GetCommand(), Connection);
+            MySQLEnumerator
+#if CS8
+            ?
+#endif
+            result = await MySQLEnumerator.GetEnumerableAsync(GetCommand(), Connection);
 
             return new Enumerable<ISQLGetter>(() => result);
         }
@@ -60,7 +79,11 @@ namespace WinCopies.Data.MySQL
 
         protected override string GetSQL() => SQLHelper.GetSQL($"DELETE FROM {Tables.ToString(Temp.Delegates.GetSurrounder<string>("`"))}", ConditionGroup);
 
-        protected override Action<MySqlCommand, IConditionGroup?> GetPrepareCommandAction() => PrepareCommand;
+        protected override Action<MySqlCommand, IConditionGroup
+#if CS8
+            ?
+#endif
+            > GetPrepareCommandAction() => PrepareCommand;
 
         public uint ExecuteNonQuery(out long? lastInsertedId) => SQLHelper.ExecuteNonQuery(() =>
         {
@@ -75,12 +98,22 @@ namespace WinCopies.Data.MySQL
 
         public async Task<SQLAsyncNonQueryRequestResult> ExecuteNonQueryAsync()
         {
-            MySqlCommand? command = GetCommand();
+            MySqlCommand command = GetCommand();
 
             uint result = (uint)await command.ExecuteNonQueryAsync();
 
-            return new SQLAsyncNonQueryRequestResult(result, result > 0 ? command.LastInsertedId : null);
+            return new SQLAsyncNonQueryRequestResult(result, result > 0 ?
+#if !CS9
+                (long?)
+#endif
+                command.LastInsertedId : null);
         }
+
+#if !CS8
+        public uint ExecuteNonQuery() => ExecuteNonQuery(out _);
+
+        public async Task<uint> ExecuteNonQueryAsync2() => (await ExecuteNonQueryAsync()).Rows;
+#endif
     }
 
     public class Insert : Insert<MySQLConnection, MySqlCommand>
@@ -89,11 +122,18 @@ namespace WinCopies.Data.MySQL
 
         protected override string GetSQL()
         {
-            StringBuilder sb = new();
+            StringBuilder sb = new
+#if !CS9
+                StringBuilder
+#endif
+                ();
 
             _ = sb.Append($"INSERT INTO `{TableName}` ");
 
-            static string getString(object obj) => $"({obj})";
+#if CS8
+            static
+#endif
+            string getString(object obj) => $"({obj})";
 
             if (Columns != null)
 
@@ -103,7 +143,7 @@ namespace WinCopies.Data.MySQL
 
             ActionIn<SQLItemCollection<IParameter>> append = (in SQLItemCollection<IParameter> values) =>
             {
-                append = (in SQLItemCollection<IParameter> values) => sb.Append($",\n{getString(values)}");
+                append = (in SQLItemCollection<IParameter> _values) => sb.Append($",\n{getString(_values)}");
 
                 _ = sb.Append(getString(values));
             };
@@ -117,14 +157,18 @@ namespace WinCopies.Data.MySQL
 
         protected override Action<MySqlCommand> GetPrepareCommandAction() => command =>
           {
-              foreach (SQLItemCollection<IParameter>? paramCollection in Values)
+              foreach (SQLItemCollection<IParameter>
+#if CS8
+            ?
+#endif
+            paramCollection in Values)
 
                   PrepareCommand(command, paramCollection);
           };
 
         public override uint ExecuteNonQuery(out long? lastInsertedId) => ExecuteNonQuery(ExecuteNonQuery2, command => command.LastInsertedId, out lastInsertedId);
 
-        public override async Task<SQLAsyncNonQueryRequestResult> ExecuteNonQueryAsync() => new SQLAsyncNonQueryRequestResult(await ExecuteNonQuery(ExecuteNonQueryAsync2, out long? lastInsertedId), lastInsertedId);
+        public override async Task<SQLAsyncNonQueryRequestResult> ExecuteNonQueryAsync() => new SQLAsyncNonQueryRequestResult(await ExecuteNonQuery(MySQLConnection.ExecuteNonQueryAsync2, out long? lastInsertedId), lastInsertedId);
     }
 
     public class Update : Update<MySQLConnection, MySqlCommand>
@@ -133,7 +177,11 @@ namespace WinCopies.Data.MySQL
 
         protected override string GetSQL() => SQLHelper.GetSQL($"UPDATE `{TableName}` SET {Columns.ToString(value => value.ToString("`"))}", ConditionGroup);
 
-        protected override Action<MySqlCommand, IConditionGroup?> GetPrepareCommandAction() => (command, conditionGroup) =>
+        protected override Action<MySqlCommand, IConditionGroup
+#if CS8
+            ?
+#endif
+            > GetPrepareCommandAction() => (command, conditionGroup) =>
          {
              PrepareCommand(command, Columns.Select(condition => condition.InnerCondition.Parameter));
 
@@ -142,6 +190,6 @@ namespace WinCopies.Data.MySQL
 
         public override uint ExecuteNonQuery(out long? lastInsertedId) => ExecuteNonQuery(ExecuteNonQuery2, out lastInsertedId);
 
-        public override async Task<SQLAsyncNonQueryRequestResult> ExecuteNonQueryAsync() => new SQLAsyncNonQueryRequestResult(await ExecuteNonQuery(ExecuteNonQueryAsync2, out long? lastInsertedId), lastInsertedId);
+        public override async Task<SQLAsyncNonQueryRequestResult> ExecuteNonQueryAsync() => new SQLAsyncNonQueryRequestResult(await ExecuteNonQuery(MySQLConnection.ExecuteNonQueryAsync2, out long? lastInsertedId), lastInsertedId);
     }
 }

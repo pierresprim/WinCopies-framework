@@ -1,4 +1,5 @@
-﻿using WinCopies.Reflection.DotNetParser;
+﻿using System.Collections.Generic;
+using WinCopies.Reflection.DotNetParser;
 
 namespace WinCopies.Reflection.DotNetDocBuilder
 {
@@ -21,13 +22,13 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
         string GetWholePath(string wholeNamespace);
 
-        void CreateNamespaceFile( DotNetNamespace @namespace,  int id);
+        void CreateNamespaceFile(DotNetNamespace @namespace, int id);
 
         string GetNamespaceURLArray(string @namespace, out int index);
 
         IEnumerable<DotNetNamespace> GetNamespaces(IEnumerable<DotNetNamespace> parent);
 
-         IEnumerable<DotNetNamespace> GetAllNamespacesInPackages();
+        IEnumerable<DotNetNamespace> GetAllNamespacesInPackages();
 
         /*int? AddEnum(DotNetEnum @enum);
 

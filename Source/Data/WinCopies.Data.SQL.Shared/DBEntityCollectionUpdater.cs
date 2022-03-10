@@ -1,4 +1,7 @@
-﻿using WinCopies.EntityFramework;
+﻿using System;
+using System.Collections.Generic;
+
+using WinCopies.EntityFramework;
 
 using static WinCopies.Temp.Util;
 
@@ -33,11 +36,19 @@ namespace WinCopies.Data.SQL
 
         public DBEntityCollectionUpdaterBase(in ISQLConnection connection) => Connection = (connection ?? throw ThrowHelper.GetArgumentNullException(nameof(connection))).GetConnection() ?? throw new InvalidOperationException("Could not retrieve a connection.");
 
-        public abstract ISQLRequest? GetRequest(string table);
+        public abstract ISQLRequest
+#if CS8
+            ?
+#endif
+            GetRequest(string table);
 
         public sealed override uint ExecuteRequest(string table, out long? lastInsertedId)
         {
-            ISQLRequest? request = GetRequest(table);
+            ISQLRequest
+#if CS8
+            ?
+#endif
+            request = GetRequest(table);
 
             if (request == null)
             {
@@ -58,7 +69,11 @@ namespace WinCopies.Data.SQL
             return connection.GetDelete(GetArray(table), conditions: GetDefaultDeleteCondition(connection, foreignKeyIdColumn, foreignKeyId)).ExecuteNonQuery();
         }
 
-        protected override IEnumerable<Temp.IPopable<string, object?>> GetValues(string table, string idColumn, string foreignKeyIdColumn, object foreignKeyId)
+        protected override IEnumerable<Temp.IPopable<string, object
+#if CS8
+            ?
+#endif
+            >> GetValues(string table, string idColumn, string foreignKeyIdColumn, object foreignKeyId)
         {
             ISQLConnection connection = Connection.GetConnection();
 
@@ -70,11 +85,23 @@ namespace WinCopies.Data.SQL
 
     public class DBEntityCollectionAdder : DBEntityCollectionUpdaterBase
     {
-        private readonly new TO_BE_DELETED.LinkedList<ICondition> _idColumns = new();
+        private readonly TO_BE_DELETED.LinkedList<ICondition> _idColumns = new
+#if !CS9
+            TO_BE_DELETED.LinkedList<ICondition>
+#endif
+            ();
 
-        protected SQLItemCollection<StringSQLColumn> Columns { get; } = new();
+        protected SQLItemCollection<StringSQLColumn> Columns { get; } = new
+#if !CS9
+            SQLItemCollection<StringSQLColumn>
+#endif
+            ();
 
-        protected SQLItemCollection<IParameter> Values { get; } = new();
+        protected SQLItemCollection<IParameter> Values { get; } = new
+#if !CS9
+            SQLItemCollection<IParameter>
+#endif
+            ();
 
         protected TO_BE_DELETED.LinkedListTEMP<ICondition> IdColumns { get; }
 
@@ -94,11 +121,23 @@ namespace WinCopies.Data.SQL
             Values.Items.Append(parameter);
         }
 
-        public override ISQLRequest? GetRequest(string table)
+        public override ISQLRequest
+#if CS8
+            ?
+#endif
+            GetRequest(string table)
         {
-            ISQLConnection? connection = Connection.GetConnection();
+            ISQLConnection
+#if CS8
+            ?
+#endif
+            connection = Connection.GetConnection();
 
-            foreach (ISQLGetter? getter in connection.GetSelect(SQLHelper.GetEnumerable(table), SQLHelper.GetEnumerable(connection.GetColumn(_idColumns.FirstValue.InnerCondition.Column.Value)), connection.GetOperator(ConditionGroupOperator.And), IdColumns).ExecuteQuery())
+            foreach (ISQLGetter
+#if CS8
+            ?
+#endif
+            getter in connection.GetSelect(SQLHelper.GetEnumerable(table), SQLHelper.GetEnumerable(connection.GetColumn(_idColumns.FirstValue.InnerCondition.Column.Value)), connection.GetOperator(ConditionGroupOperator.And), IdColumns).ExecuteQuery())
 
                 return null;
 
@@ -108,9 +147,17 @@ namespace WinCopies.Data.SQL
 
     public class DBEntityCollectionUpdater : DBEntityCollectionUpdaterBase
     {
-        protected SQLItemCollection<ICondition> Values { get; } = new();
+        protected SQLItemCollection<ICondition> Values { get; } = new
+#if !CS9
+            SQLItemCollection<ICondition>
+#endif
+            ();
 
-        protected TO_BE_DELETED.LinkedListTEMP<ICondition> IdColumns { get; } = new(new TO_BE_DELETED.LinkedList<ICondition>());
+        protected TO_BE_DELETED.LinkedListTEMP<ICondition> IdColumns { get; } = new
+#if !CS9
+            TO_BE_DELETED.LinkedListTEMP<ICondition>
+#endif
+            (new TO_BE_DELETED.LinkedList<ICondition>());
 
         public DBEntityCollectionUpdater(in ISQLConnection connection) : base(connection) { /* Left empty. */ }
 

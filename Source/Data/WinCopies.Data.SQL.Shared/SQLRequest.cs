@@ -1,4 +1,9 @@
-﻿using WinCopies.Temp;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+using WinCopies.Temp;
 
 using static WinCopies.ThrowHelper;
 
@@ -24,14 +29,30 @@ namespace WinCopies.Data.SQL
 
         Task<SQLAsyncNonQueryRequestResult> ExecuteNonQueryAsync();
 
-        uint ExecuteNonQuery() => ExecuteNonQuery(out _);
+        uint ExecuteNonQuery()
+#if CS8
+            => ExecuteNonQuery(out _)
+#endif
+            ;
 
-        async Task<uint> ExecuteNonQueryAsync2() => (await ExecuteNonQueryAsync()).Rows;
+#if CS8
+        async
+#endif
+        Task<uint> ExecuteNonQueryAsync2()
+#if CS8
+            => (await ExecuteNonQueryAsync()).Rows
+#endif
+            ;
     }
 
     public interface ISQLColumnRequest
     {
-        IEnumerable<SQLColumn>? Columns { get; }
+        IEnumerable<SQLColumn>
+#if CS8
+            ?
+#endif
+            Columns
+        { get; }
     }
 
     public interface ISQLColumn
@@ -41,16 +62,33 @@ namespace WinCopies.Data.SQL
 
     public interface ISQLColumnRequest<T> : ISQLColumnRequest where T : ISQLColumn
     {
-        new IExtensibleEnumerable<T>? Columns { get; }
+        new IExtensibleEnumerable<T>
+#if CS8
+            ?
+#endif
+            Columns
+        { get; }
 
+#if CS8
         IEnumerable<SQLColumn>? ISQLColumnRequest.Columns => Columns?.Select(column => column.ToSQLColumn());
+#endif
     }
 
     public interface ISQLTableRequest
     {
-        IExtensibleEnumerable<string>? Tables { get; }
+        IExtensibleEnumerable<string>
+#if CS8
+            ?
+#endif
+            Tables
+        { get; }
 
-        IConditionGroup? ConditionGroup { get; set; }
+        IConditionGroup
+#if CS8
+            ?
+#endif
+            ConditionGroup
+        { get; set; }
     }
 
     public interface ISQLTableRequest2 : ISQLTableRequest, ISQLRequest
@@ -78,6 +116,10 @@ namespace WinCopies.Data.SQL
         public abstract uint ExecuteNonQuery(out long? lastInsertedId);
 
         public abstract Task<SQLAsyncNonQueryRequestResult> ExecuteNonQueryAsync();
+
+        public uint ExecuteNonQuery() => ExecuteNonQuery(out _);
+
+        public async Task<uint> ExecuteNonQueryAsync2() => (await ExecuteNonQueryAsync()).Rows;
     }
 
     public abstract class SQLRequest2<TConnection, TCommand> : NonQueryRequest<TConnection, TCommand>, ISQLRequest3 where TConnection : IConnection<TCommand>
@@ -88,11 +130,23 @@ namespace WinCopies.Data.SQL
 
         protected SQLRequest2(in TConnection connection, in string tableName) : base(connection) => TableName = tableName;
 
-        protected T ExecuteNonQuery<T>(in Func<TCommand, T> action, in Converter<TCommand, long?>? converter, out long? lastInsertedId)
+        protected T ExecuteNonQuery<T>(in Func<TCommand, T> action, in Converter<TCommand, long?>
+#if CS8
+            ?
+#endif
+            converter, out long? lastInsertedId)
         {
-            TCommand? command = GetCommand();
+            TCommand
+#if CS9
+            ?
+#endif
+            command = GetCommand();
 
-            T? result = action(command);
+            T
+#if CS9
+            ?
+#endif
+            result = action(command);
 
             lastInsertedId = converter == null ? null : converter(command);
 
@@ -110,11 +164,20 @@ namespace WinCopies.Data.SQL
 
         IExtensibleEnumerable<string> ISQLTableRequest.Tables => Tables;
 
-        public IConditionGroup? ConditionGroup { get; set; }
+        public IConditionGroup
+#if CS8
+            ?
+#endif
+            ConditionGroup
+        { get; set; }
 
         protected SQLTableRequest(in TConnection connection, in SQLItemCollection<string> tables) : base(connection) => Tables = tables;
 
-        protected abstract Action<TCommand, IConditionGroup?> GetPrepareCommandAction();
+        protected abstract Action<TCommand, IConditionGroup
+#if CS8
+            ?
+#endif
+            > GetPrepareCommandAction();
 
         protected override TCommand GetCommand()
         {

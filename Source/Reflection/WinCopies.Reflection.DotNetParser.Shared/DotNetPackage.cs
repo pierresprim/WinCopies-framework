@@ -1,4 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 using WinCopies.Collections.Generic;
@@ -17,7 +20,11 @@ namespace WinCopies.Reflection.DotNetParser
 
         public DotNetType(in Type type) => Type = type ?? throw GetArgumentNullException(nameof(type));
 
-        public int CompareTo(DotNetType? other) => other == null ? 1 : Type.Name.CompareTo(other.Type.Name);
+        public int CompareTo(DotNetType
+#if CS8
+            ?
+#endif
+            other) => other == null ? 1 : Type.Name.CompareTo(other.Type.Name);
 
         public override string ToString() => $"{Type.Namespace}.{Type.Name}";
     }
@@ -43,7 +50,11 @@ namespace WinCopies.Reflection.DotNetParser
 
     public static class DotNetHelper
     {
-        public static string? GetCSAccessModifier(Type type) => type.IsPublic
+        public static string
+#if CS8
+            ?
+#endif
+            GetCSAccessModifier(Type type) => type.IsPublic
                 ? "public"
                 : type.IsNestedFamily
                 ? type.IsNestedFamANDAssem ? "private protected" : type.IsNestedFamORAssem ? "protected internal" : "protected"
@@ -51,7 +62,11 @@ namespace WinCopies.Reflection.DotNetParser
 
         public static string GetCSAccessModifier<T>() => GetCSAccessModifier(typeof(T));
 
-        public static System.Collections.Generic.IEnumerable<Type?> GetDefinedTypes(this Assembly assembly)
+        public static System.Collections.Generic.IEnumerable<Type
+#if CS8
+            ?
+#endif
+            > GetDefinedTypes(this Assembly assembly)
         {
             try
             {
@@ -64,7 +79,11 @@ namespace WinCopies.Reflection.DotNetParser
             }
         }
 
-        public static ArgumentException GetTypeIsNotEnumException(in string paramName) => new($"The current type does not represent an {nameof(Enum)} type.", paramName);
+        public static ArgumentException GetTypeIsNotEnumException(in string paramName) => new
+#if !CS9
+            ArgumentException
+#endif
+            ($"The current type does not represent an {nameof(Enum)} type.", paramName);
 
         public static EUT ToDotNetEnumUnderlyingType(this Type type)
         {
@@ -72,7 +91,14 @@ namespace WinCopies.Reflection.DotNetParser
             {
                 Type t = type.GetEnumUnderlyingType();
 
-                static KeyValuePair<Type, EUT> getType<T>(in EUT enumType) => new(typeof(T), enumType);
+#if CS8
+                static
+#endif
+                KeyValuePair<Type, EUT> getType<T>(in EUT enumType) => new
+#if !CS9
+                    KeyValuePair<Type, EUT>
+#endif
+                    (typeof(T), enumType);
 
                 KeyValuePair<Type, EUT>[] types = GetArray(getType<int>(EUT.Int32), getType<uint>(EUT.UInt32), getType<short>(EUT.Int16), getType<ushort>(EUT.UInt16), getType<long>(EUT.Int64), getType<ulong>(EUT.UInt64), getType<byte>(EUT.Byte), getType<sbyte>(EUT.SByte));
 
@@ -86,18 +112,147 @@ namespace WinCopies.Reflection.DotNetParser
             throw GetTypeIsNotEnumException(nameof(type));
         }
 
-        public static string ToCSName(this EUT value) => value switch
+        public static string ToCSName(this EUT value)
+#if CS8
+            =>
+#else
         {
-            EUT.Int32 => "int",
-            EUT.UInt32 => "uint",
-            EUT.Int16 => "short",
-            EUT.UInt16 => "ushort",
-            EUT.Int64 => "long",
-            EUT.UInt64 => "ulong",
-            EUT.Byte => "byte",
-            EUT.SByte => "sbyte",
-            _ => throw new ArgumentOutOfRangeException(nameof(value)),
-        };
+#endif
+#if !CS8
+            switch (
+#endif
+                value
+#if CS8
+                switch
+#else
+                )
+#endif
+            {
+#if !CS8
+                case
+#endif
+                    EUT.Int32
+#if CS8
+                    =>
+#else
+                    :
+                    return
+#endif
+                    "int"
+#if CS8
+                    ,
+#else
+                    ;
+                case
+#endif
+                    EUT.UInt32
+#if CS8
+                    =>
+#else
+                    :
+                    return
+#endif
+                    "uint"
+#if CS8
+                    ,
+#else
+                    ;
+                case
+#endif
+                    EUT.Int16
+#if CS8
+                    =>
+#else
+                    :
+                    return
+#endif
+                    "short"
+#if CS8
+                    ,
+#else
+                    ;
+                case
+#endif
+                    EUT.UInt16
+#if CS8
+                    =>
+#else
+                    :
+                    return
+#endif
+                    "ushort"
+#if CS8
+                    ,
+#else
+                    ;
+                case
+#endif
+                    EUT.Int64
+#if CS8
+                    =>
+#else
+                    :
+                    return
+#endif
+                    "long"
+#if CS8
+                    ,
+#else
+                    ;
+                case
+#endif
+                    EUT.UInt64
+#if CS8
+                    =>
+#else
+                    :
+                    return
+#endif
+                    "ulong"
+#if CS8
+                    ,
+#else
+                    ;
+                case
+#endif
+                    EUT.Byte
+#if CS8
+                    =>
+#else
+                    :
+                    return
+#endif
+                    "byte"
+#if CS8
+                    ,
+#else
+                    ;
+                case
+#endif
+                    EUT.SByte
+#if CS8
+                    =>
+#else
+                    :
+                    return
+#endif
+                    "sbyte"
+#if CS8
+                    ,
+                    _ =>
+#else
+                    ;
+                default:
+#endif
+                    throw new ArgumentOutOfRangeException(nameof(value))
+#if CS8
+        }
+        ;
+#else
+            ;
+            }
+        }
+#endif
     }
 
     public struct DotNetEnumValue
@@ -136,17 +291,29 @@ namespace WinCopies.Reflection.DotNetParser
             {
                 if (InnerEnumerator.MoveNext())
                 {
-                    FieldInfo? current = InnerEnumerator.Current;
+                    FieldInfo
+#if CS8
+            ?
+#endif
+            current = InnerEnumerator.Current;
 
                     if (current != null)
                     {
-                        object? value = current.GetRawConstantValue();
+                        object
+#if CS8
+            ?
+#endif
+            value = current.GetRawConstantValue();
 
                         if (value != null)
                         {
                             value = Convert.ChangeType(value, UnderlyingType);
 
-                            DotNetEnumValue getCurrent(in long? value, in ulong? uValue) => new(current.Name, value, uValue);
+                            DotNetEnumValue getCurrent(in long? _value, in ulong? uValue) => new
+#if !CS9
+                                DotNetEnumValue
+#endif
+                                (current.Name, _value, uValue);
 
                             if (value != null)
                             {
@@ -182,7 +349,12 @@ namespace WinCopies.Reflection.DotNetParser
     {
         public DotNetPackage DotNetPackage { get; }
 
-        public DotNetNamespace? Parent { get; }
+        public DotNetNamespace
+#if CS8
+            ?
+#endif
+            Parent
+        { get; }
 
         public string Name { get; }
 
@@ -190,9 +362,13 @@ namespace WinCopies.Reflection.DotNetParser
         {
             get
             {
-                LinkedList<string> stringBuilder = new();
+                Collections.DotNetFix.Generic.ILinkedList<string> stringBuilder = new Collections.DotNetFix.Generic.LinkedList<string>();
 
-                DotNetNamespace? parent = Parent;
+                DotNetNamespace
+#if CS8
+            ?
+#endif
+            parent = Parent;
 
                 _ = stringBuilder.AddFirst(Name);
 
@@ -203,11 +379,21 @@ namespace WinCopies.Reflection.DotNetParser
                     parent = parent.Parent;
                 }
 
-                return string.Join('.', stringBuilder);
+                return string.Join(
+#if CS8
+                    '.'
+#else
+                    "."
+#endif
+                    , stringBuilder);
             }
         }
 
-        public DotNetNamespace(in DotNetPackage dotNetPackage, in DotNetNamespace? parent, in string name)
+        public DotNetNamespace(in DotNetPackage dotNetPackage, in DotNetNamespace
+#if CS8
+            ?
+#endif
+            parent, in string name)
         {
             DotNetPackage = dotNetPackage ?? throw GetArgumentNullException(nameof(dotNetPackage));
 
@@ -218,7 +404,27 @@ namespace WinCopies.Reflection.DotNetParser
             Name = name;
         }
 
-        public System.Collections.Generic.IEnumerable<DotNetNamespace> GetSubnamespaces() => new Enumerable<string>(() => new NamespaceEnumerator(DotNetPackage.Assembly, type => type.IsPublic, null)).Where(@namespace => @namespace.Length > Path.Length + 1 && @namespace.StartsWith(Path + '.') && !@namespace[(Path.Length + 1)..].Contains('.')).Select(@namespace => new DotNetNamespace(DotNetPackage, this, @namespace[(@namespace.LastIndexOf('.') + 1)..]));
+        public System.Collections.Generic.IEnumerable<DotNetNamespace> GetSubnamespaces() => new Enumerable<string>(() => new NamespaceEnumerator(DotNetPackage.Assembly, type => type.IsPublic, null)).WhereSelect(@namespace => @namespace.Length > Path.Length + 1 && @namespace.StartsWith(Path + '.') && !@namespace
+#if CS8
+        [
+#else
+        .Substring
+#endif
+        (Path.Length + 1)
+#if CS8
+        ..]
+#endif
+        .Contains('.'), @namespace => new DotNetNamespace(DotNetPackage, this, @namespace
+#if CS8
+            [
+#else
+            .Substring
+#endif
+            (@namespace.LastIndexOf('.') + 1)
+#if CS8
+            ..]
+#endif
+            ));
 
         public System.Collections.Generic.IEnumerable<T> GetTypes<T>(Predicate<Type> predicate, in Func<Type, T> func) => func == null ? throw GetArgumentNullException(nameof(func)) : DotNetPackage.Assembly.GetDefinedTypes().WhereSelect(type => type != null && type.IsPublic && !type.IsNested && predicate(type) && type.Namespace == Path, func);
 
@@ -231,7 +437,11 @@ namespace WinCopies.Reflection.DotNetParser
             // TODO
         }
 
-        public int CompareTo(DotNetNamespace? other) => other == null ? 1 : Path.CompareTo(other.Path);
+        public int CompareTo(DotNetNamespace
+#if CS8
+            ?
+#endif
+            other) => other == null ? 1 : Path.CompareTo(other.Path);
 
         public override string ToString() => Path;
     }
@@ -240,13 +450,22 @@ namespace WinCopies.Reflection.DotNetParser
     {
         public string Path { get; }
 
-        public Assembly? Assembly { get; private set; }
+        public Assembly
+#if CS8
+            ?
+#endif
+            Assembly
+        { get; private set; }
 
         public bool IsOpen => Assembly != null;
 
         public DotNetPackage(in string path) => Path = path ?? throw GetArgumentNullException(nameof(path));
 
-        private static InvalidOperationException GetPackageOpenStatusException(in string msg) => new($"The package is {msg} open.");
+        private static InvalidOperationException GetPackageOpenStatusException(in string msg) => new
+#if !CS9
+            InvalidOperationException
+#endif
+            ($"The package is {msg} open.");
 
         public void Open() => Assembly = Assembly == null ? Assembly.LoadFrom(Path) : throw GetPackageOpenStatusException("already");
 

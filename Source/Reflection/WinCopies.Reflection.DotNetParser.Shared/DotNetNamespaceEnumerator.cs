@@ -1,12 +1,19 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Linq;
+using System.Reflection;
 using System.Text;
+
 using WinCopies;
 using WinCopies.Collections.DotNetFix.Generic;
 using WinCopies.Collections.Generic;
 
 namespace WinCopies.Reflection.DotNetParser
 {
-    public class NamespaceEnumerator : Enumerator<Type?, string>
+    public class NamespaceEnumerator : Enumerator<Type
+#if CS8
+            ?
+#endif
+            , string>
     {
         private IQueue<string> _namespaces;
         private string _current;
@@ -20,7 +27,15 @@ namespace WinCopies.Reflection.DotNetParser
 
         protected override string CurrentOverride => _current;
 
-        public NamespaceEnumerator(in Assembly assembly, Predicate<Type>? prePredicate, in Predicate<Type>? postPredicate) : base(assembly.GetDefinedTypes())
+        public NamespaceEnumerator(in Assembly assembly, Predicate<Type>
+#if CS8
+            ?
+#endif
+            prePredicate, in Predicate<Type>
+#if CS8
+            ?
+#endif
+            postPredicate) : base(assembly.GetDefinedTypes())
         {
             _moveNext = prePredicate == null ? MoveNextOverride2 : Temp.Bool.PrependPredicateIn(prePredicate, MoveNextOverride2);
 
@@ -29,7 +44,11 @@ namespace WinCopies.Reflection.DotNetParser
             ResetMoveNext();
         }
 
-        protected virtual void OnTypeValidated(in string? current)
+        protected virtual void OnTypeValidated(in string
+#if CS8
+            ?
+#endif
+            current)
         {
             if (current != null)
 
@@ -62,7 +81,11 @@ namespace WinCopies.Reflection.DotNetParser
 
         protected void ResetMoveNext() => _moveNextGlobal = () =>
             {
-                Type? current;
+                Type
+#if CS8
+            ?
+#endif
+            current;
 
                 while (InnerEnumerator.MoveNext() && (current = InnerEnumerator.Current) != null)
 
@@ -70,11 +93,15 @@ namespace WinCopies.Reflection.DotNetParser
                     {
                         if (current.Namespace.Contains('.'))
                         {
-                            _namespaces = new WinCopies.Collections.DotNetFix.Generic.Queue<string>();
+                            _namespaces = new Collections.DotNetFix.Generic.Queue<string>();
 
                             string[] namespaces = current.Namespace.Split('.');
 
-                            StringBuilder sb = new();
+                            StringBuilder sb = new
+#if !CS9
+                            StringBuilder
+#endif
+                            ();
 
                             _ = sb.Append(namespaces[0]);
 

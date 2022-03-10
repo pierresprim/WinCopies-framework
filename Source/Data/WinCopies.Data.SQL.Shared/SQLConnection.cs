@@ -1,15 +1,40 @@
-﻿using WinCopies.EntityFramework;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+
+using WinCopies.EntityFramework;
 using WinCopies.Temp;
 
 namespace WinCopies.Data.SQL
 {
     public struct SelectParameters<T> : ISelectParameters<T> where T : ISQLColumn
     {
-        public IExtensibleEnumerable<string>? Tables { get; set; }
+        public IExtensibleEnumerable<string>
+#if CS8
+            ?
+#endif
+            Tables
+        { get; set; }
 
-        public IExtensibleEnumerable<T>? Columns { get; set; }
+        public IExtensibleEnumerable<T>
+#if CS8
+            ?
+#endif
+            Columns
+        { get; set; }
 
-        public IConditionGroup? ConditionGroup { get; set; }
+        public IConditionGroup
+#if CS8
+            ?
+#endif
+            ConditionGroup
+        { get; set; }
+
+#if !CS8
+        IEnumerable<SQLColumn> ISQLColumnRequest.Columns => Columns?.Select(column => column.ToSQLColumn());
+#endif
     }
 
     public abstract class SQLConnection : ISQLConnection
@@ -26,7 +51,12 @@ namespace WinCopies.Data.SQL
 
         public abstract string ColumnDecorator { get; }
 
-        public string? DBName { get; private set; }
+        public string
+#if CS8
+            ?
+#endif
+            DBName
+        { get; private set; }
 
         public SQLConnection() { /* Left empty. */ }
 
@@ -38,7 +68,11 @@ namespace WinCopies.Data.SQL
 
                 throw new InvalidOperationException("No DB open.");
 
-            ISQLConnection? connection = Clone(autoDispose);
+            ISQLConnection
+#if CS8
+            ?
+#endif
+            connection = Clone(autoDispose);
 
             connection.Open();
 
@@ -47,7 +81,13 @@ namespace WinCopies.Data.SQL
             return connection;
         }
 
-        public abstract void Open();
+#if !CS8
+        public ISelect GetSelect(IEnumerable<string> defaultTables, IEnumerable<SQLColumn> defaultColumns, string @operator = null, IEnumerable<ICondition> conditions = null, IEnumerable<IConditionGroup> conditionGroups = null, IEnumerable<KeyValuePair<SQLColumn, ISelect>> selects = null) => DBEntityCollection.GetSelect(this, defaultTables, defaultColumns, @operator, conditions, conditionGroups, selects);
+
+        public ISQLTableRequest2 GetDelete(IEnumerable<string> defaultTables, string @operator = null, IEnumerable<ICondition> conditions = null) => DBEntityCollection.GetDelete(this, defaultTables, @operator, conditions);
+#endif
+
+        public abstract bool Open();
 
         public abstract Task OpenAsync();
 
@@ -69,29 +109,53 @@ namespace WinCopies.Data.SQL
             return 0;
         }
 
-        public SQLColumn GetColumn(string columnName) => new(columnName, ColumnDecorator);
+        public SQLColumn GetColumn(string columnName) => new
+#if !CS9
+            SQLColumn
+#endif
+            (columnName, ColumnDecorator);
 
         public abstract ISelect GetSelect(SQLItemCollection<string> defaultTables, SQLItemCollection<SQLColumn> defaultColumns);
 
         public abstract ISelect GetCountSelect(string tableName, IConditionGroup conditionGroup);
 
-        public abstract IInsert GetInsert(string tableName, SQLItemCollection<StringSQLColumn>? columns, SQLItemCollection<SQLItemCollection<IParameter>> values);
+        public abstract IInsert GetInsert(string tableName, SQLItemCollection<StringSQLColumn>
+#if CS8
+            ?
+#endif
+            columns, SQLItemCollection<SQLItemCollection<IParameter>> values);
 
         public abstract ISQLTableRequest2 GetDelete(SQLItemCollection<string> defaultTables);
 
         public abstract IUpdate GetUpdate(string tableName, SQLItemCollection<ICondition> columns);
 
-        public abstract ICondition GetCondition<T>(string columnName, string paramName, T value, string? tableName = null, string @operator = "=");
+        public abstract ICondition GetCondition<T>(string columnName, string paramName, T value, string
+#if CS8
+            ?
+#endif
+            tableName = null, string @operator = "=");
 
-        public abstract ICondition GetNullityCondition(string columnName, string? tableName = null, string @operator = "IS");
+        public abstract ICondition GetNullityCondition(string columnName, string
+#if CS8
+            ?
+#endif
+            tableName = null, string @operator = "IS");
 
         public abstract IParameter<T> GetParameter<T>(string name, T value);
 
         public IEntityCollection<T> GetEntities<T>() where T : IEntity => new DBEntityCollection<T>(this);
 
-        public abstract string? GetOperator(ConditionGroupOperator @operator);
+        public abstract string
+#if CS8
+            ?
+#endif
+            GetOperator(ConditionGroupOperator @operator);
 
         public abstract ISQLConnection Clone(bool autoDispose = true);
+
+#if !CS8
+        object ICloneable.Clone() => Clone();
+#endif
 
         public abstract void Close();
 

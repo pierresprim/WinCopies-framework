@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Text;
 
 using WinCopies.Temp;
@@ -9,15 +11,42 @@ namespace WinCopies.Data.SQL
 {
     public struct SQLColumn : ISQLColumn
     {
-        public string? TableName { get; set; }
+        public string
+#if CS8
+            ?
+#endif
+            TableName
+        { get; set; }
 
         public string ColumnName { get; set; }
 
-        public string? Alias { get; set; }
+        public string
+#if CS8
+            ?
+#endif
+            Alias
+        { get; set; }
 
-        public string? Decorator { get; set; }
+        public string
+#if CS8
+            ?
+#endif
+            Decorator
+        { get; set; }
 
-        public SQLColumn(in string? tableName, in string columnName, in string? alias, in string? decorator = null)
+        public SQLColumn(in string
+#if CS8
+            ?
+#endif
+            tableName, in string columnName, in string
+#if CS8
+            ?
+#endif
+            alias, in string
+#if CS8
+            ?
+#endif
+            decorator = null)
         {
             TableName = tableName;
 
@@ -28,13 +57,21 @@ namespace WinCopies.Data.SQL
             Decorator = decorator;
         }
 
-        public SQLColumn(in string column, in string? decorator = null) : this(null, column, null, decorator) { /* Left empty. */ }
+        public SQLColumn(in string column, in string
+#if CS8
+            ?
+#endif
+            decorator = null) : this(null, column, null, decorator) { /* Left empty. */ }
 
         public string GetDecoratedValue(in string value) => Decorator == null ? value : value.Surround(Decorator);
 
         public override string ToString()
         {
-            StringBuilder sb = new();
+            StringBuilder sb = new
+#if !CS9
+                StringBuilder
+#endif
+                ();
 
             if (TableName != null)
 
@@ -58,9 +95,13 @@ namespace WinCopies.Data.SQL
 
         public IExtensibleEnumerable<T> Items { get => _items; set => _items = value ?? throw GetArgumentNullException(nameof(value)); }
 
+#if CS8
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+#endif
         public SQLItemCollection(in IExtensibleEnumerable<T> items) => Items = items; // The null-check is performed by the Items property.
+#if CS8
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+#endif
 
         public SQLItemCollection(in IEnumerable<T> items) : this(new TO_BE_DELETED.LinkedList<T>(items)) { /* Left empty. */ }
 
@@ -70,13 +111,17 @@ namespace WinCopies.Data.SQL
 
         IEnumerator IEnumerable.GetEnumerator() => Items.GetEnumerator();
 
-        public string ToString(Converter<T, string?> converter)
+        public string ToString(Converter<T, string
+#if CS8
+            ?
+#endif
+            > converter)
         {
             var sb = new StringBuilder();
 
             ActionIn<T> action = (in T value) =>
             {
-                action = (in T value) => sb.Append($", {converter(value)}");
+                action = (in T _value) => sb.Append($", {converter(_value)}");
 
                 _ = sb.Append(converter(value));
             };

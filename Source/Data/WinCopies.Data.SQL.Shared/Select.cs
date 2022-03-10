@@ -1,4 +1,7 @@
-﻿using WinCopies.Temp;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using WinCopies.Temp;
 
 using static WinCopies.ThrowHelper;
 
@@ -6,7 +9,12 @@ namespace WinCopies.Data.SQL
 {
     public interface ISelectParameters : ISQLTableRequest
     {
-        IConditionGroup? ConditionGroup { get; set; }
+        IConditionGroup
+#if CS8
+            ?
+#endif
+            ConditionGroup
+        { get; set; }
     }
 
     public enum OrderBy
@@ -58,6 +66,10 @@ namespace WinCopies.Data.SQL
         IExtensibleEnumerable<T> ISQLColumnRequest<T>.Columns => Columns;
 
         public OrderByColumns? OrderBy { get; set; }
+
+#if !CS8
+        IEnumerable<SQLColumn> ISQLColumnRequest.Columns => Columns?.Select(column => column.ToSQLColumn());
+#endif
 
         protected Select(in TConnection connection, in SQLItemCollection<string> tables, in SQLItemCollection<T> defaultColumns) : base(connection, tables) => Columns = defaultColumns;
 

@@ -1,7 +1,8 @@
 ﻿using MySql.Data.MySqlClient;
 
+using System;
 using System.Data.Common;
-
+using System.Threading.Tasks;
 using WinCopies.Collections.Generic;
 using WinCopies.Data.SQL;
 
@@ -32,20 +33,46 @@ namespace WinCopies.Data.MySQL
         //    }
         //}
 
-        private DbDataReader? _reader;
-        private MySQLGetter? _current;
-        private Action? _moveNextAction;
-        private Func<bool>? _moveNext;
+        private DbDataReader
+#if CS8
+            ?
+#endif
+            _reader;
+        private MySQLGetter
+#if CS8
+            ?
+#endif
+            _current;
+        private Action
+#if CS8
+            ?
+#endif
+            _moveNextAction;
+        private Func<bool>
+#if CS8
+            ?
+#endif
+            _moveNext;
         //ulong i = 0;
         MySQLConnection _connection;
         MySqlCommand _command;
         bool _dispose;
 
-        protected override MySQLGetter CurrentOverride => _current;
+        protected override
+#if CS9
+            MySQLGetter
+#else
+            ISQLGetter
+#endif
+            CurrentOverride => _current;
 
         public override bool? IsResetSupported => false;
 
-        private MySQLEnumerator(in MySqlCommand command, in DbDataReader? reader, MySQLConnection connection /*Func<MySqlConnection> func*/  )
+        private MySQLEnumerator(in MySqlCommand command, in DbDataReader
+#if CS8
+            ?
+#endif
+            reader, MySQLConnection connection /*Func<MySqlConnection> func*/  )
         {
             _connection = connection;
 
@@ -102,7 +129,17 @@ namespace WinCopies.Data.MySQL
 
         public MySQLEnumerator(in MySqlCommand command, in MySQLConnection connection) : this(command ?? throw GetArgumentNullException(nameof(command)), command.ExecuteReader(), connection) { /* Left empty. */ }
 
-        public static async Task<MySQLEnumerator> GetEnumerableAsync(MySqlCommand command, MySQLConnection connection) => new(command ?? throw GetArgumentNullException(nameof(command)), await command.ExecuteReaderAsync(), connection);
+        public static async Task<MySQLEnumerator> GetEnumerableAsync(MySqlCommand command, MySQLConnection connection) => new MySQLEnumerator(command
+#if CS8
+            ??
+#else
+            == null ?
+#endif
+            throw GetArgumentNullException(nameof(command))
+#if !CS8
+            : command
+#endif
+            , await command.ExecuteReaderAsync(), connection);
 
         protected void ResetConnection()
         {

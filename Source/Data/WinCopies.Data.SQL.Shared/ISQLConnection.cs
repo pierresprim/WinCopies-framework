@@ -1,4 +1,9 @@
-﻿using WinCopies.EntityFramework;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+
+using WinCopies.EntityFramework;
 
 using static WinCopies.Data.SQL.SQLHelper;
 
@@ -35,52 +40,63 @@ namespace WinCopies.Data.SQL
 
         SQLColumn GetColumn(string columnName);
 
-        ICondition GetCondition<T>(string columnName, string paramName, T value, string? tableName = null, string @operator = "=");
+        ICondition GetCondition<T>(string columnName, string paramName, T value, string
+#if CS8
+            ?
+#endif
+            tableName = null, string @operator = "=");
 
-        ICondition GetNullityCondition(string columnName, string? tableName = null, string @operator = "IS");
+        ICondition GetNullityCondition(string columnName, string
+#if CS8
+            ?
+#endif
+            tableName = null, string @operator = "IS");
 
         ISelect GetSelect(SQLItemCollection<string> defaultTables, SQLItemCollection<SQLColumn> defaultColumns);
 
-        ISelect GetSelect(IEnumerable<string> defaultTables, IEnumerable<SQLColumn> defaultColumns, string? @operator = null, IEnumerable<ICondition>? conditions = null, IEnumerable<IConditionGroup>? conditionGroups = null, IEnumerable<KeyValuePair<SQLColumn, ISelect>>? selects = null)
-        {
-            ISelect select = GetSelect(new SQLItemCollection<string>(defaultTables), new SQLItemCollection<SQLColumn>(defaultColumns));
+        ISelect GetSelect(IEnumerable<string> defaultTables, IEnumerable<SQLColumn> defaultColumns, string
+#if CS8
+            ?
+#endif
+            @operator = null, IEnumerable<ICondition>
+#if CS8
+            ?
+#endif
+            conditions = null, IEnumerable<IConditionGroup>
+#if CS8
+            ?
+#endif
+            conditionGroups = null, IEnumerable<KeyValuePair<SQLColumn, ISelect>>
+#if CS8
+            ?
+#endif
+            selects = null)
+#if CS8
+            => DBEntityCollection.GetSelect(this, defaultTables, defaultColumns, @operator, conditions, conditionGroups, selects)
+#endif
+            ;
 
-            IConditionGroup initConditionGroup() => select.ConditionGroup = new ConditionGroup(@operator);
-
-            void initConditionGroup2(Action<IConditionGroup> action) => action(select.ConditionGroup ?? initConditionGroup());
-
-            if (conditions != null)
-
-                initConditionGroup().Conditions = GetEnumerable(conditions);
-
-            if (conditionGroups != null)
-
-                initConditionGroup2(conditionGroup => conditionGroup.ConditionGroups = GetEnumerable(conditionGroups));
-
-            if (selects != null)
-
-                initConditionGroup2(conditionGroup => conditionGroup.Selects = GetEnumerable(selects));
-
-            return select;
-        }
-
-        ISQLTableRequest2 GetDelete(IEnumerable<string> defaultTables, string? @operator = null, IEnumerable<ICondition>? conditions = null)
-        {
-            ISQLTableRequest2? delete = GetDelete(new SQLItemCollection<string>(defaultTables));
-
-            if (conditions != null)
-
-                delete.ConditionGroup = new ConditionGroup(@operator)
-                {
-                    Conditions = GetEnumerable(conditions)
-                };
-
-            return delete;
-        }
+        ISQLTableRequest2 GetDelete(IEnumerable<string> defaultTables, string
+#if CS8
+            ?
+#endif
+            @operator = null, IEnumerable<ICondition>
+#if CS8
+            ?
+#endif
+            conditions = null)
+#if CS8
+            => DBEntityCollection.GetDelete(this, defaultTables, @operator, conditions)
+#endif
+            ;
 
         ISelect GetCountSelect(string tableName, IConditionGroup conditionGroup);
 
-        IInsert GetInsert(string tableName, SQLItemCollection<StringSQLColumn>? columns, SQLItemCollection<SQLItemCollection<IParameter>> values);
+        IInsert GetInsert(string tableName, SQLItemCollection<StringSQLColumn>
+#if CS8
+            ?
+#endif
+            columns, SQLItemCollection<SQLItemCollection<IParameter>> values);
 
         ISQLTableRequest2 GetDelete(SQLItemCollection<string> defaultTables);
 
@@ -90,12 +106,18 @@ namespace WinCopies.Data.SQL
 
         IEntityCollection<T> GetEntities<T>() where T : IEntity;
 
-        string? GetOperator(ConditionGroupOperator @operator);
+        string
+#if CS8
+            ?
+#endif
+            GetOperator(ConditionGroupOperator @operator);
 
         void Close();
 
         ISQLConnection Clone(bool autoDispose = true);
 
+#if CS8
         object ICloneable.Clone() => Clone();
+#endif
     }
 }

@@ -38,7 +38,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework.TrimEnd(`0123456789-windows`))' == 'net6.'">
-    <DefineConstants>CS4;CS5;CS6;CS7;CS8;CS9;NET5;NET6;$(DefineConstants)</DefineConstants>
+    <DefineConstants>CS4;CS5;CS6;CS7;CS8;CS9;CS10;NET5;NET6;$(DefineConstants)</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework.TrimEnd(`0123456789-windows`))' == 'net5.'">

@@ -9,6 +9,9 @@
 		<UseWPF>true</UseWPF>
 		<PackageIcon>WinCopies.png</PackageIcon>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="$(DefineConstants.Contains('CS8'))">
 		<Nullable>enable</Nullable>
 	</PropertyGroup>
 

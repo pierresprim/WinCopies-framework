@@ -1,4 +1,6 @@
-﻿using WinCopies.Temp;
+﻿using System.Collections.Generic;
+
+using WinCopies.Temp;
 
 namespace WinCopies.EntityFramework
 {
@@ -10,7 +12,7 @@ namespace WinCopies.EntityFramework
 
         uint Delete(string table, string foreignKeyIdColumn, object foreignKeyId);
 
-        void Delete(string table, string idColumn, string foreignKeyIdColumn, object foreignKeyId, Predicate<object> predicate);
+        void Delete(string table, string idColumn, string foreignKeyIdColumn, object foreignKeyId, Predicate predicate);
     }
 
     public interface IEntityCollectionDeleter : System.IDisposable
@@ -20,23 +22,44 @@ namespace WinCopies.EntityFramework
 
     public abstract class EntityCollectionUpdater<TParameter, TResult> : IEntityCollectionUpdater<TParameter, TResult>
     {
-        protected abstract IEnumerable<IPopable<string, object?>> GetValues(string table, string idColumn, string foreignKeyIdColumn, object foreignKeyId);
+        protected abstract IEnumerable<IPopable<string, object
+#if CS8
+            ?
+#endif
+            >> GetValues(string table, string idColumn, string foreignKeyIdColumn, object foreignKeyId);
         protected abstract IEntityCollectionDeleter GetDeleter();
 
-        public void Delete(string table, string idColumn, string foreignKeyIdColumn, object foreignKeyId, Predicate<object> predicate)
+        public void Delete(string table, string idColumn, string foreignKeyIdColumn, object foreignKeyId, Predicate predicate)
         {
-            using IEntityCollectionDeleter deleter = GetDeleter();
-
-            void tryDelete(in object id)
+            using
+#if !CS8
+                (
+#endif
+                IEntityCollectionDeleter deleter = GetDeleter()
+#if CS8
+                ;
+#else
+                )
             {
-                if (id != null && predicate(id))
+#endif
 
-                    _ = deleter.Delete(table, idColumn, id);
+                void tryDelete(in object id)
+                {
+                    if (id != null && predicate(id))
+
+                        _ = deleter.Delete(table, idColumn, id);
+                }
+
+                foreach (IPopable<string, object
+#if CS8
+            ?
+#endif
+            > popable in GetValues(table, idColumn, foreignKeyIdColumn, foreignKeyId))
+
+                    tryDelete(idColumn);
+#if !CS8
             }
-
-            foreach (IPopable<string, object?> popable in GetValues(table, idColumn, foreignKeyIdColumn, foreignKeyId))
-
-                tryDelete(idColumn);
+#endif
         }
 
         public abstract void AddValue(string column, TParameter parameter, bool isId);

@@ -12,6 +12,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)DBEntity.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DBEntityCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DBEntityCollectionUpdater.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Factories.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ISQLConnection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Misc.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Select.cs" />

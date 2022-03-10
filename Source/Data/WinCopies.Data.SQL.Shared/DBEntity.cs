@@ -1,6 +1,7 @@
-﻿using WinCopies.Collections.DotNetFix.Generic;
+﻿using System;
+using System.Linq;
+using WinCopies.Collections.DotNetFix.Generic;
 using WinCopies.EntityFramework;
-
 using WinCopies.Temp;
 
 using static WinCopies.Data.SQL.DBEntityCollection;
@@ -11,7 +12,11 @@ namespace WinCopies.Data.SQL
 {
     public class EntityIdRefresher : IEntityIdRefresher
     {
-        private ISQLConnection? _connection;
+        private ISQLConnection
+#if CS8
+            ?
+#endif
+            _connection;
 
         protected ISQLConnection Connection => IsDisposed ? throw GetExceptionForDispose(false) : _connection;
 
@@ -23,18 +28,34 @@ namespace WinCopies.Data.SQL
 
         protected void ThrowIfDisposed() => ThrowHelper.ThrowIfDisposed(this);
 
-        public void Add(string column, string paramName, object? value)
+        public void Add(string column, string paramName, object
+#if CS8
+            ?
+#endif
+            value)
         {
             ThrowIfDisposed();
 
             Columns.Enqueue(value == null ? Connection.GetNullityCondition(column) : Connection.GetCondition(column, paramName, value));
         }
 
-        public bool TryGetId(string table, string idColumn, out object? id)
+        public bool TryGetId(string table, string idColumn, out object
+#if CS8
+            ?
+#endif
+            id)
         {
             ThrowIfDisposed();
 
-            foreach (IPopable<string, object?>? popable in Connection.GetSelect(GetArray(table), GetArray(Connection.GetColumn(idColumn)), @operator: Connection.GetOperator(ConditionGroupOperator.And), conditions: Columns).GetPopables())
+            foreach (IPopable<string, object
+#if CS8
+            ?
+#endif
+            >
+#if CS8
+            ?
+#endif
+            popable in Connection.GetSelect(GetArray(table), GetArray(Connection.GetColumn(idColumn)), @operator: Connection.GetOperator(ConditionGroupOperator.And), conditions: Columns).GetPopables())
             {
                 id = popable?.Pop(idColumn);
 
