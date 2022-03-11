@@ -41,7 +41,9 @@ namespace WinCopies.Data.SQL
 
         public uint ColumnsCount { get; private set; }
 
-        public EntityCollectionLoadingFactory(in ISQLConnection connection, in IConditionGroup
+        public OrderByColumns? OrderBy { get; }
+
+        public EntityCollectionLoadingFactory(in ISQLConnection connection, in OrderByColumns? orderBy, in IConditionGroup
 #if CS8
             ?
 #endif
@@ -49,9 +51,7 @@ namespace WinCopies.Data.SQL
         {
             Connection = (connection ?? throw ThrowHelper.GetArgumentNullException(nameof(connection))).GetConnection();
 
-            if (Connection.IsClosed)
-
-                throw new Exception();
+            OrderBy = orderBy;
 
             _conditionGroup = conditionGroup;
 
@@ -114,6 +114,8 @@ namespace WinCopies.Data.SQL
         {
             _select = (Connection = Connection.GetConnection()).GetSelect(GetArray(table), columns.Select(column => Connection.GetColumn(column)));
 
+            _select.OrderBy = OrderBy;
+
             if (_conditionGroup != null)
 
                 _select.ConditionGroup = _conditionGroup;
@@ -142,11 +144,11 @@ namespace WinCopies.Data.SQL
 
     public class EntityCollectionNewItemLoadingFactory<T, U> : EntityCollectionLoadingFactory<T, U> where T : IEntity
     {
-        public EntityCollectionNewItemLoadingFactory(in ISQLConnection connection, in IConditionGroup
+        public EntityCollectionNewItemLoadingFactory(in ISQLConnection connection, in OrderByColumns? orderBy, in IConditionGroup
 #if CS8
             ?
 #endif
-            conditionGroup) : base(connection, conditionGroup) { /* Left empty. */ }
+            conditionGroup) : base(connection, orderBy, conditionGroup) { /* Left empty. */ }
 
         public override T GetItem(U collection) => GetDBEntity<T, U>(collection);
     }
@@ -159,7 +161,7 @@ namespace WinCopies.Data.SQL
 #if CS8
             ?
 #endif
-            conditionGroup) : base(connection, conditionGroup) => _item = item;
+            conditionGroup) : base(connection, null, conditionGroup) => _item = item;
 
         public override T GetItem(U collection) => _item;
     }

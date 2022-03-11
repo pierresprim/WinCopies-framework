@@ -420,6 +420,11 @@ namespace WinCopies.Temp
 
     public static class ThrowHelper
     {
+        public static T GetOrThrowIfInvalidType<T>(in object
+#if CS8
+            ?
+#endif
+            obj, in string argumentName) => obj is T _obj ? _obj : throw new TypeArgumentException<T>(obj?.GetType(), argumentName);
 
         public static void ThrowIfNull(object
 #if CS8

@@ -292,8 +292,23 @@ namespace WinCopies.Temp
         public static T LoopFuncDESC<T>(in int index, in int count, out bool ok, in FuncOut<int, T, bool> func) => LoopFunc(index, count, out ok, func, GetForLoopFuncDESC<T>);
     }
 
+    public class TypeArgumentException<TExpected> : ArgumentException
+    {
+        private const string MESSAGE = " an instance of or an instance of a type that inherits or implement ";
+
+        public TypeArgumentException(in Type
+#if CS8
+            ?
+#endif
+            type, in string argumentName) : base($"{argumentName} should be{MESSAGE}{GetTypeFullName(typeof(TExpected))}. {argumentName} was{(type == null ? "null" : MESSAGE + GetTypeFullName(type))}.") { /* Left empty. */ }
+
+        private static string GetTypeFullName(in Type t) => t.FullName ?? t.Name;
+    }
+
     public static class Extensions
     {
+        public static U AsOfType<T, U>(this T obj) where T : U => obj;
+
         public static ConstructorInfo
 #if CS8
                 ?

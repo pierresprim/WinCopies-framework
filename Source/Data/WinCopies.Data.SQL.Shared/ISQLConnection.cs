@@ -5,7 +5,9 @@ using System.Threading.Tasks;
 
 using WinCopies.EntityFramework;
 
-using static WinCopies.Data.SQL.SQLHelper;
+#if CS8
+using System.Linq;
+#endif
 
 namespace WinCopies.Data.SQL
 {
@@ -51,6 +53,18 @@ namespace WinCopies.Data.SQL
             ?
 #endif
             tableName = null, string @operator = "IS");
+
+        IOrderByColumns GetOrderByColumns(IEnumerable<string> columns, OrderBy orderBy)
+#if CS8
+            => new OrderByColumns(columns.Select(column => GetColumn(column)), orderBy)
+#endif
+            ;
+
+        IOrderByColumns GetOrderByColumns(OrderBy orderBy, params string[] columns)
+#if CS8
+            => GetOrderByColumns(columns.AsEnumerable(), orderBy)
+#endif
+            ;
 
         ISelect GetSelect(SQLItemCollection<string> defaultTables, SQLItemCollection<SQLColumn> defaultColumns);
 

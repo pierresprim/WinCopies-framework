@@ -29,6 +29,8 @@ namespace WinCopies.EntityFramework
 #endif
                 extraColumns);
 
+        System.Collections.Generic.IEnumerable<T> GetItems(IOrderByColumns orderBy);
+
 #if CS8
         long? IEntityCollection.Add(IEntity entity, out uint tables, out ulong rows, IReadOnlyDictionary<string, object>? extraColumns) => Add(entity is T _entity ? _entity : throw new InvalidArgumentException(nameof(entity)), out tables, out rows, extraColumns);
 #endif
@@ -54,7 +56,11 @@ namespace WinCopies.EntityFramework
         long? IEntityCollection.Add(IEntity entity, out uint tables, out ulong rows, IReadOnlyDictionary<string, object> extraColumns) => Add(entity is TItems _entity ? _entity : throw new InvalidArgumentException(nameof(entity)), out tables, out rows, extraColumns);
 #endif
 
-        public abstract System.Collections.Generic.IEnumerable<TItems> GetItems();
+        public abstract System.Collections.Generic.IEnumerable<TItems> GetItems(IOrderByColumns
+#if CS8
+            ?
+#endif
+            orderBy = null);
 
         public System.Collections.Generic.IEnumerator<TItems> GetEnumerator() => GetItems().GetEnumerator();
 
@@ -412,7 +418,7 @@ namespace WinCopies.EntityFramework
                 )
 #endif
 
-                return TryRefreshId(refresher, thisType);
+            return TryRefreshId(refresher, thisType);
         }
 
         protected T RefreshAndAccess<T>(Func<T> func)
@@ -531,5 +537,19 @@ namespace WinCopies.EntityFramework
         public int Id { get; set; }
 
         protected DefaultEntity(IEntityCollection collection) : base(collection) { /* Left empty. */ }
+    }
+
+    public enum OrderBy
+    {
+        Asc = 0,
+
+        Desc = 1
+    }
+
+    public interface IOrderByColumns
+    {
+        System.Collections.Generic.IEnumerable<string> Columns { get; }
+
+        OrderBy OrderBy { get; }
     }
 }

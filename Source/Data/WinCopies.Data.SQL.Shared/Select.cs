@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WinCopies.EntityFramework;
 using WinCopies.Temp;
 
 using static WinCopies.ThrowHelper;
@@ -17,18 +18,13 @@ namespace WinCopies.Data.SQL
         { get; set; }
     }
 
-    public enum OrderBy
-    {
-        Asc = 0,
-
-        Desc = 1
-    }
-
-    public struct OrderByColumns
+    public struct OrderByColumns : IOrderByColumns
     {
         public SQLItemCollection<SQLColumn> Columns { get; }
 
         public OrderBy OrderBy { get; }
+
+        IEnumerable<string> IOrderByColumns.Columns => Columns.Select(column => column.ToString());
 
         public OrderByColumns(in SQLItemCollection<SQLColumn> columns, in OrderBy orderBy)
         {
@@ -36,6 +32,10 @@ namespace WinCopies.Data.SQL
 
             OrderBy = orderBy;
         }
+
+        public OrderByColumns(in IEnumerable<SQLColumn> columns, in OrderBy orderBy) : this(columns is SQLItemCollection<SQLColumn> _columns ? _columns : new SQLItemCollection<SQLColumn>(columns), orderBy) { /* Left empty. */ }
+
+        public OrderByColumns(in OrderBy orderBy, params SQLColumn[] columns) : this(columns.AsEnumerable(), orderBy) { /* Left empty. */ }
     }
 
     public interface ISelect : ISelectParameters, ISQLColumnRequest

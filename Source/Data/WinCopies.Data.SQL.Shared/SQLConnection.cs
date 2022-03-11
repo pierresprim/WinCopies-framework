@@ -82,6 +82,10 @@ namespace WinCopies.Data.SQL
         }
 
 #if !CS8
+        public IOrderByColumns GetOrderByColumns(IEnumerable<string> columns, OrderBy orderBy) => new OrderByColumns(columns.Select(column => GetColumn(column)), orderBy);
+
+        public IOrderByColumns GetOrderByColumns(OrderBy orderBy, params string[] columns) => GetOrderByColumns(columns.AsEnumerable(), orderBy);
+
         public ISelect GetSelect(IEnumerable<string> defaultTables, IEnumerable<SQLColumn> defaultColumns, string @operator = null, IEnumerable<ICondition> conditions = null, IEnumerable<IConditionGroup> conditionGroups = null, IEnumerable<KeyValuePair<SQLColumn, ISelect>> selects = null) => DBEntityCollection.GetSelect(this, defaultTables, defaultColumns, @operator, conditions, conditionGroups, selects);
 
         public ISQLTableRequest2 GetDelete(IEnumerable<string> defaultTables, string @operator = null, IEnumerable<ICondition> conditions = null) => DBEntityCollection.GetDelete(this, defaultTables, @operator, conditions);

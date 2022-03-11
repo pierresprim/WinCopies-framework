@@ -197,7 +197,7 @@ namespace WinCopies.Data.MySQL
                     ;
                 case
 #endif
-                    ConditionGroupOperator.Or
+                ConditionGroupOperator.Or
 #if CS8
                     =>
 #else
@@ -206,7 +206,8 @@ namespace WinCopies.Data.MySQL
 #endif
                     "OR"
 #if CS8
-                    , _ =>
+                    ,
+                _ =>
 #else
                     ;
             }
@@ -217,7 +218,7 @@ namespace WinCopies.Data.MySQL
 #if !CS8
                 ;
 #endif
-        }
+            }
 #if CS8
         ;
 #endif

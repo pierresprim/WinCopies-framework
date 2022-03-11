@@ -275,7 +275,7 @@ namespace WinCopies.Data.SQL
 #if CS8
             ?
 #endif
-            Connection => IsDisposed ? throw ThrowHelper.GetExceptionForDispose(false) : _connection;
+            Connection => IsDisposed ? throw GetExceptionForDispose(false) : _connection;
 
         public override bool IsDisposed => _connection == null;
 
@@ -285,9 +285,13 @@ namespace WinCopies.Data.SQL
 #if CS8
             ?
 #endif
-            extraColumns = null) => IsDisposed ? throw ThrowHelper.GetExceptionForDispose(false) : EntityCollection.Add(_connection.GetParameter, () => new DBEntityCollectionAdder(_connection), entity, out tables, out rows, extraColumns);
+            extraColumns = null) => IsDisposed ? throw GetExceptionForDispose(false) : EntityCollection.Add(_connection.GetParameter, () => new DBEntityCollectionAdder(_connection), entity, out tables, out rows, extraColumns);
 
-        public override IEnumerable<T> GetItems() => IsDisposed ? throw ThrowHelper.GetExceptionForDispose(false) : DBEntityCollection.GetItems(this, new EntityCollectionNewItemLoadingFactory<T, DBEntityCollection<T>>(_connection, null));
+        public override IEnumerable<T> GetItems(IOrderByColumns
+#if CS8
+            ?
+#endif
+            orderBy = null) => IsDisposed ? throw GetExceptionForDispose(false) : DBEntityCollection.GetItems(this, new EntityCollectionNewItemLoadingFactory<T, DBEntityCollection<T>>(_connection, Temp.ThrowHelper.GetOrThrowIfInvalidType<OrderByColumns>(orderBy, nameof(orderBy)), null));
 
         public IEnumerator<T> GetEnumerator() => GetItems().GetEnumerator();
 
@@ -296,7 +300,6 @@ namespace WinCopies.Data.SQL
             if (!IsDisposed)
             {
                 _connection.Dispose();
-
                 _connection = null;
             }
 

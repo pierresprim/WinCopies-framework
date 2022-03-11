@@ -179,19 +179,18 @@ namespace WinCopies.Data.MySQL
 
             if (_reader != null)
             {
+                _reader.Close();
+                _reader.Dispose();
+                _reader = null;
+
+                _command.Dispose();
+                _command = null;
+
                 if (_dispose)
 
                     _connection.Dispose();
 
                 _connection = null;
-
-                _command.Dispose();
-
-                _command = null;
-
-                _reader.Close();
-                _reader.Dispose();
-                _reader = null;
             }
         }
 

@@ -42,7 +42,7 @@ namespace WinCopies.Data.MySQL
 
                 if (columns != null)
 
-                    _ = sb.Append($" ORDER BY {columns} {(orderBy.OrderBy == SQL.OrderBy.Asc ? "ASC" : "DESC")}");
+                    _ = sb.Append($" ORDER BY {columns} {(orderBy.OrderBy == EntityFramework.OrderBy.Asc ? "ASC" : "DESC")}");
             }
 
             return sb.ToString();

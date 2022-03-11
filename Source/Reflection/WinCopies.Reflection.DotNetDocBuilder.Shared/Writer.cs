@@ -217,11 +217,13 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
         public void DeleteTypesBase<T>(string wholeNamespace) where T : TypeBase<T>
         {
+            string typeTypeName = typeof(T).Name;
+
             void writeLine(in string
 #if CS8
                 ?
 #endif
-                value = null) => WriteLine($"Deleting all {nameof(T)}s from {wholeNamespace}{value}", value == null);
+                value = null) => WriteLine($"Deleting all {typeTypeName}s from {wholeNamespace}{value}", value == null);
 
             writeLine();
 
@@ -573,11 +575,22 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 #if !CS8
                 (
 #endif
+                ISQLConnection connection = GetConnection()
+#if CS8
+                ;
+#else
+                )
+#endif
+
+            using
+#if !CS8
+                (
+#endif
                 DBEntityCollection<Namespace> namespaces = new
 #if !CS9
                 DBEntityCollection<Namespace>
 #endif
-                (GetConnection())
+                (connection)
 #if CS8
                 ;
 #else
@@ -597,7 +610,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 #if CS8
                 ?
 #endif
-                @namespace in namespaces)
+                @namespace in namespaces.GetItems(connection.GetOrderByColumns(OrderBy.Desc, nameof(Namespace.Id))))
             {
                 wholeNamespace = GetWholeNamespace(@namespace.Id);
 
