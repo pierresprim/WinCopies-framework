@@ -19,16 +19,6 @@
 		<FileVersion>3.12</FileVersion>
 	</PropertyGroup>
 
-	<Import Project="..\WinCopies.IO.Shared\WinCopies.IO.Shared.projitems" Label="Shared" />
-
-	<ItemGroup>
-		<ProjectReference Include="..\..\GUI\WinCopies.GUI.Drawing\WinCopies.GUI.Drawing.csproj" />
-	</ItemGroup>
-
-	<ItemGroup Condition="'$(Configuration)'=='Debug'">
-		<ProjectReference Include="..\..\WinCopies.Util.Temp\WinCopies.Util.Temp.csproj" />
-	</ItemGroup>
-
 	<ItemGroup>
 		<PackageReference Include="WinCopies.Util" Version="3.16-preview" />
 		<PackageReference Include="WinCopies.Collections" Version="3.16-preview" />
@@ -81,6 +71,10 @@
 			<Pack>True</Pack>
 			<PackagePath></PackagePath>
 		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\..\GUI\3.x\WinCopies.GUI.Drawing\WinCopies.GUI.Drawing.csproj" />
 	</ItemGroup>
 
 </Project>

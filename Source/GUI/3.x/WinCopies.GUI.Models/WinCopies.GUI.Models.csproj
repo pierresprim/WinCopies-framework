@@ -1,31 +1,26 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<PackageId>WinCopies.GUI.ViewModels</PackageId>
-		<AssemblyName>WinCopies.GUI.ViewModels</AssemblyName>
-		<RootNamespace>WinCopies.GUI.ViewModels</RootNamespace>
+		<PackageId>WinCopies.GUI.Models</PackageId>
+		<AssemblyName>WinCopies.GUI.Models</AssemblyName>
+		<RootNamespace>WinCopies.GUI.Models</RootNamespace>
+		<Description>Models for the WinCopies framework.</Description>
 		<TargetFrameworks>netcoreapp3.1;net5.0-windows;net6.0-windows;net472;net48</TargetFrameworks>
 		<UseWPF>true</UseWPF>
-		<Description>View models for the WinCopies framework.</Description>
 		<Copyright>Copyright © 2021 Pierre Sprimont</Copyright>
-		<PackageTags>WinCopies, GUI, WPF, ViewModels</PackageTags>
-		<DocumentationFile>WinCopies.GUI.ViewModels.xml</DocumentationFile>
+		<PackageTags>WinCopies, GUI, WPF, Models</PackageTags>
+		<DocumentationFile>WinCopies.GUI.Models.xml</DocumentationFile>
 		<SignAssembly>true</SignAssembly>
+		<AssemblyOriginatorKeyFile>WinCopies.GUI.Models.snk</AssemblyOriginatorKeyFile>
 		<DefineConstants>WinCopies2;WinCopies3;$(DefineConstants)</DefineConstants>
-		<AssemblyOriginatorKeyFile>WinCopies.GUI.ViewModels.snk</AssemblyOriginatorKeyFile>
 		<VersionPrefix>3.12</VersionPrefix>
 		<VersionSuffix>preview</VersionSuffix>
 		<AssemblyVersion>3.12</AssemblyVersion>
 		<FileVersion>3.12</FileVersion>
 	</PropertyGroup>
 
-	<Import Project="..\WinCopies.GUI.ViewModels.Shared\WinCopies.GUI.ViewModels.Shared.projitems" Label="Shared" />
-
 	<ItemGroup>
-		<ProjectReference Include="..\WinCopies.GUI.Models\WinCopies.GUI.Models.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
+		<PackageReference Include="WinCopies.Util" Version="3.16-preview" />
 		<PackageReference Include="WinCopies.Util.Desktop" Version="3.16-preview" />
 	</ItemGroup>
 
@@ -39,5 +34,7 @@
 			<PackagePath></PackagePath>
 		</None>
 	</ItemGroup>
+
+	<Import Project="..\..\Shared\WinCopies.GUI.Models.Shared\WinCopies.GUI.Models.Shared.projitems" Label="Shared" />
 
 </Project>

@@ -19,14 +19,8 @@
 		<FileVersion>3.12</FileVersion>
 	</PropertyGroup>
 
-	<Import Project="..\WinCopies.GUI.Templates.Shared\WinCopies.GUI.Templates.Shared.projitems" Label="Shared" />
-
 	<ItemGroup>
 		<PackageReference Include="WinCopies.Util.Desktop" Version="3.16-preview" />
-	</ItemGroup>
-
-	<ItemGroup Condition="'$(Configuration)'=='Debug'">
-		<ProjectReference Include="..\..\WinCopies.Util.Temp\WinCopies.Util.Temp.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -41,8 +35,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\WinCopies.GUI.Models\WinCopies.GUI.Models.csproj" />
-		<ProjectReference Include="..\WinCopies.GUI.ViewModels\WinCopies.GUI.ViewModels.csproj" />
+	  <ProjectReference Include="..\WinCopies.GUI.Models\WinCopies.GUI.Models.csproj" />
+	  <ProjectReference Include="..\WinCopies.GUI.ViewModels\WinCopies.GUI.ViewModels.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -50,5 +44,7 @@
 			<SubType>Designer</SubType>
 		</Page>
 	</ItemGroup>
+
+	<Import Project="..\..\Shared\WinCopies.GUI.Templates.Shared\WinCopies.GUI.Templates.Shared.projitems" Label="Shared" />
 
 </Project>

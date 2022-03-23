@@ -15,8 +15,6 @@
     <FileVersion>3.6</FileVersion>
   </PropertyGroup>
 
-  <Import Project="..\WinCopies.GUI.Drawing.Shared\WinCopies.GUI.Drawing.Shared.projitems" Label="Shared" />
-
   <ItemGroup>
     <PackageReference Include="WinCopies.Util" Version="3.12-preview" />
     <PackageReference Include="WinCopies.Collections" Version="3.12-preview" />
@@ -76,5 +74,7 @@
       <DependentUpon>ExceptionMessages.resx</DependentUpon>
     </Compile>
   </ItemGroup>
+
+  <Import Project="..\..\Shared\WinCopies.GUI.Drawing.Shared\WinCopies.GUI.Drawing.Shared.projitems" Label="Shared" />
 
 </Project>

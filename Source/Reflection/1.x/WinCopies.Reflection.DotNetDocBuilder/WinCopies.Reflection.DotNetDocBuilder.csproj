@@ -8,12 +8,11 @@
 		<Nullable>enable</Nullable>
 	</PropertyGroup>
 
-  <Import Project="..\WinCopies.Reflection.DotNetDocBuilder.Shared\WinCopies.Reflection.DotNetDocBuilder.Shared.projitems" Label="Shared" />
-
   <ItemGroup>
-    <ProjectReference Include="..\..\Data\WinCopies.Data.SQL\WinCopies.Data.SQL.csproj" />
-    <ProjectReference Include="..\..\WinCopies.Util.Temp\WinCopies.Util.Temp.csproj" />
+    <ProjectReference Include="..\..\..\Data\1.x\WinCopies.Data.SQL\WinCopies.Data.SQL.csproj" />
     <ProjectReference Include="..\WinCopies.Reflection.DotNetParser\WinCopies.Reflection.DotNetParser.csproj" />
   </ItemGroup>
+
+  <Import Project="..\..\Shared\WinCopies.Reflection.DotNetDocBuilder.Shared\WinCopies.Reflection.DotNetDocBuilder.Shared.projitems" Label="Shared" />
 
 </Project>

@@ -19,15 +19,9 @@
 		<FileVersion>3.12</FileVersion>
 	</PropertyGroup>
 
-	<Import Project="..\WinCopies.IO.Shell.Shared\WinCopies.IO.Shell.Shared.projitems" Label="Shared" />
-
 	<ItemGroup>
-		<ProjectReference Include="..\..\GUI\WinCopies.GUI.Drawing\WinCopies.GUI.Drawing.csproj" />
+		<ProjectReference Include="..\..\..\GUI\3.x\WinCopies.GUI.Drawing\WinCopies.GUI.Drawing.csproj" />
 		<ProjectReference Include="..\WinCopies.IO\WinCopies.IO.csproj" />
-	</ItemGroup>
-
-	<ItemGroup Condition="'$(Configuration)'=='Debug'">
-		<ProjectReference Include="..\..\WinCopies.Util.Temp\WinCopies.Util.Temp.csproj" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(TargetFramework.TrimEnd(`-windows`))'=='net6.0'">
@@ -131,5 +125,7 @@
 			<PackagePath></PackagePath>
 		</None>
 	</ItemGroup>
+
+	<Import Project="..\..\Shared\WinCopies.IO.Shell.Shared\WinCopies.IO.Shell.Shared.projitems" Label="Shared" />
 
 </Project>

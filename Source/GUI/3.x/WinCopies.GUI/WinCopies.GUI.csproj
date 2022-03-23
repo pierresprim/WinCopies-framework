@@ -19,10 +19,6 @@
 		<FileVersion>3.12</FileVersion>
 	</PropertyGroup>
 
-	<Import Project="..\WinCopies.GUI.Shared\WinCopies.GUI.Shared.projitems" Label="Shared" />
-	<Import Project="..\WinCopies.GUI.Windows.Shared\WinCopies.GUI.Windows.Shared.projitems" Label="Shared" />
-	<Import Project="..\WinCopies.GUI.Controls.Shared\WinCopies.GUI.Controls.Shared.projitems" Label="Shared" />
-
 	<ItemGroup>
 		<PackageReference Include="WinCopies.Util" Version="3.16-preview" />
 		<PackageReference Include="WinCopies.Collections" Version="3.16-preview" />
@@ -44,14 +40,10 @@
 		</None>
 	</ItemGroup>
 
-	<ItemGroup Condition="'$(Configuration)'=='Debug'">
-		<ProjectReference Include="..\..\WinCopies.Util.Temp\WinCopies.Util.Temp.csproj" />
-	</ItemGroup>
-
 	<ItemGroup>
-		<ProjectReference Include="..\WinCopies.GUI.Icons\WinCopies.GUI.Icons.csproj" />
-		<ProjectReference Include="..\WinCopies.GUI.Models\WinCopies.GUI.Models.csproj" />
-		<ProjectReference Include="..\WinCopies.GUI.ViewModels\WinCopies.GUI.ViewModels.csproj" />
+	  <ProjectReference Include="..\WinCopies.GUI.Icons\WinCopies.GUI.Icons.csproj" />
+	  <ProjectReference Include="..\WinCopies.GUI.Models\WinCopies.GUI.Models.csproj" />
+	  <ProjectReference Include="..\WinCopies.GUI.ViewModels\WinCopies.GUI.ViewModels.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -60,5 +52,7 @@
 			<SubType>Designer</SubType>
 		</Page>
 	</ItemGroup>
+
+	<Import Project="..\..\Shared\WinCopies.GUI.Shared\WinCopies.GUI.Shared.projitems" Label="Shared" />
 
 </Project>
