@@ -365,38 +365,94 @@ namespace WinCopies.GUI.Windows
 
         protected virtual IntPtr OnSourceHook(IntPtr hwnd, WindowMessage msg, IntPtr wParam, IntPtr lParam, out bool handled)
         {
-            if (((ushort)msg).Between((ushort)WindowMessage.XBUTTONDOWN, (ushort)WindowMessage.XBUTTONDBLCLK, true, true))
+#if CS8
+            handled =
+#else
+            if (
+#endif
+                ((ushort)msg).Between((ushort)WindowMessage.XBUTTONDOWN, (ushort)WindowMessage.XBUTTONDBLCLK, true, true)
+#if CS8
+                ?
+#else
+                )
 
-                handled = OnXButtonClick((XButton)HIWORD(wParam), (XButtonClick)((ushort)msg - ((ushort)WindowMessage.XBUTTONDOWN - 1)));
+                handled =
+#endif
+                OnXButtonClick((XButton)HIWORD(wParam), (XButtonClick)((ushort)msg - ((ushort)WindowMessage.XBUTTONDOWN - 1)))
+#if CS8
+                :
+#else
+                ;
 
             else
 
-                switch (msg)
+                switch (
+#endif
+                msg
+#if CS8
+                switch
+#else
+                )
+#endif
                 {
-                    case WindowMessage.SystemCommand:
+#if !CS8
+                    case
+#endif
+                    WindowMessage.SystemCommand
+#if CS8
+                        =>
+#else
+                        :
 
-                        handled = OnSystemCommandMessage(wParam);
+                        handled =
+#endif
+                        OnSystemCommandMessage(wParam)
+#if CS8
+                        ,
+#else
+                        ; break;
+                    case
+#endif
+                    WindowMessage.ShowWindow
+#if CS8
+                        =>
+#else
+                        :
 
-                        break;
+                        handled =
+#endif
+                        OnShowWindowMessage()
+#if CS8
+                        ,
+#else
+                        ; break;
+                    case
+#endif
+                    WindowMessage.Close
+#if CS8
+                        =>
+#else
+                        :
 
-                    case WindowMessage.ShowWindow:
-
-                        handled = OnShowWindowMessage();
-
-                        break;
-
-                    case WindowMessage.Close:
-
-                        handled = !CloseButton;
-
-                        break;
-
+                        handled =
+#endif
+                        !CloseButton
+#if CS8
+                        ,
+                    _ =>
+#else
+                        ; break;
                     default:
 
-                        handled = false;
-
-                        break;
+                        handled =
+#endif
+                    false
+#if CS8
+                };
+#else
+                    ; break;
                 }
+#endif
 
             return IntPtr.Zero;
         }

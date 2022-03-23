@@ -127,7 +127,27 @@ namespace WinCopies.EntityFramework
                     {
                         void popValue() => value = items.Pop(_column.Value);
 
-                        void setValue() => column.SetValue(obj, value is DBNull ? null : value);
+                        void setValue() =>
+                        /*{
+                            object getNewEntity()
+                            {
+                                object e = getValidatedDBEntity(column.PropertyType);
+
+                                KeyValuePair<string
+#if CS8
+                                    ?
+#endif
+                                    , PropertyInfo>? p = GetIdProperties(column.PropertyType).FirstOrNull();
+
+                                if (p.HasValue)
+
+                                    p.Value.Value.SetValue(e, value);
+
+                                return e;
+                            }*/
+
+                            column.SetValue(obj, (value == null || value == DBNull.Value) ? null : value);
+                        //}
 
                         if ((attribute = (column = _column.Key).GetCustomAttributes<ForeignKeyAttribute>().FirstOrDefault()) != null)
 
@@ -197,13 +217,20 @@ namespace WinCopies.EntityFramework
                             {
                                 popValue();
 
-                                tmp = (_tmp = column.GetValue(obj)) == null
-                                    ? getValidatedDBEntity(column.PropertyType)
-                                    : (IEntity)_tmp;
+                                if (value == null || value == DBNull.Value)
 
-                                idProperty.SetValue(tmp, value);
+                                    tmp = null;
 
-                                tmp.MarkForRefresh();
+                                else
+                                {
+                                    tmp = (_tmp = column.GetValue(obj)) == null
+                                        ? getValidatedDBEntity(column.PropertyType)
+                                        : (IEntity)_tmp;
+
+                                    idProperty.SetValue(tmp, value);
+
+                                    tmp.MarkForRefresh();
+                                }
 
                                 value = tmp;
 

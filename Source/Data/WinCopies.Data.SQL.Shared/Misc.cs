@@ -118,12 +118,16 @@ namespace WinCopies.Data.SQL
 
     public interface IInsert : ISQLRequest3, ISQLColumnRequest<StringSQLColumn>
     {
+        bool Ignore { get; set; }
+
         IExtensibleEnumerable<IEnumerable<IParameter>> Values { get; }
     }
 
     public abstract class Insert<TConnection, TCommand> : SQLRequest2<TConnection, TCommand>, IInsert where TConnection : IConnection<TCommand>
     {
         private SQLItemCollection<SQLItemCollection<IParameter>> _values;
+
+        public bool Ignore { get; set; }
 
         public SQLItemCollection<StringSQLColumn> Columns { get; set; }
 

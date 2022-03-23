@@ -312,7 +312,7 @@ namespace WinCopies.Temp
 #endif
                 FirstBool
 #if CS9
-                : 
+                :
 #else
                 ;
 
@@ -373,7 +373,7 @@ namespace WinCopies.Temp
 #endif
         FirstBoolIn
 #if CS9
-        
+
             :
 #else
             ;
@@ -420,6 +420,30 @@ namespace WinCopies.Temp
 
     public static class ThrowHelper
     {
+        public static T
+#if CS9
+            ?
+#endif
+             GetOrThrowIfInvalidType<T>(in object
+#if CS8
+            ?
+#endif
+            obj, in string argumentName, in bool nullAllowed) where T : class => obj is T _obj ? _obj : (obj == null && nullAllowed) ?
+#if !CS9
+            (T)
+#endif
+            null : throw new TypeArgumentException<T>(obj?.GetType(), argumentName);
+
+        public static T? GetValueOrThrowIfInvalidType<T>(in object
+#if CS8
+            ?
+#endif
+            obj, in string argumentName, in bool nullAllowed) where T : struct => obj is T _obj ? _obj : (obj == null && nullAllowed) ?
+#if !CS9
+            (T?)
+#endif
+            null : throw new TypeArgumentException<T>(obj?.GetType(), argumentName);
+
         public static T GetOrThrowIfInvalidType<T>(in object
 #if CS8
             ?
@@ -458,6 +482,8 @@ namespace WinCopies.Temp
 
     public static class Util
     {
+        public static System.Collections.Generic.IEnumerable<T> Enumerate<T>(params System.Collections.Generic.IEnumerable<T>[] enumerables) => enumerables.Join(false);
+
         public static ConstructorInfo
 #if CS8
                 ?

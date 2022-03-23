@@ -83,7 +83,7 @@ namespace WinCopies.GUI.Shell
 
                     return;
 
-                if (((IBrowsableObjectInfoViewModel)selectedItem.SelectedItems[0]).InnerObject is ShellObject shellObject)
+                if ((selectedItem.SelectedItems[0]).InnerObject is ShellObject shellObject)
                 {
                     var folder = (ShellContainer)selectedItem.Path.InnerObject;
 

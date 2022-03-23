@@ -3,12 +3,16 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 using WinCopies.Data.SQL;
 using WinCopies.EntityFramework;
+using WinCopies.Linq;
 using WinCopies.Reflection.DotNetParser;
 using WinCopies.Temp;
+
+using static System.Reflection.GenericParameterAttributes;
 
 using static WinCopies.Data.SQL.SQLHelper;
 using static WinCopies.Reflection.DotNetDocBuilder.WriterConsts;
@@ -64,6 +68,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
         private Namespace _namespace;
         private TypeType _typeType;
         private AccessModifier _accessModifier;
+        private byte? _genericTypeCount;
 
         [EntityProperty(IsPseudoId = true)]
         public string Name { get => TryRefreshAndGet(ref _name); set => _name = value; }
@@ -91,6 +96,9 @@ namespace WinCopies.Reflection.DotNetDocBuilder
         [EntityProperty(nameof(AccessModifier))]
         [ForeignKey]
         public AccessModifier AccessModifier { get => TryRefreshAndGet(ref _accessModifier); set => _accessModifier = value; }
+
+        [EntityProperty(nameof(GenericTypeCount), IsPseudoId = true)]
+        public byte? GenericTypeCount { get => TryRefreshAndGet(ref _genericTypeCount); set => _genericTypeCount = value; }
 
         public Type(DBEntityCollection<Type> collection) : base(collection) { /* Left empty. */ }
 
@@ -132,11 +140,59 @@ namespace WinCopies.Reflection.DotNetDocBuilder
     {
         private UnderlyingType _underlyingType;
 
-        [EntityProperty(nameof(UnderlyingType))]
+        [EntityProperty]
         [ForeignKey]
         public UnderlyingType UnderlyingType { get => TryRefreshAndGet(ref _underlyingType); set => _underlyingType = value; }
 
         public Enum(DBEntityCollection<Enum> collection) : base(collection) { /* Left empty. */ }
+    }
+
+    [Entity("interfaceinterfaceimplementations")]
+    public class InterfaceImplementation : DefaultDBEntity<InterfaceImplementation>
+    {
+        private Type _interface;
+        private Type _implementedInterface;
+
+        [EntityProperty]
+        [ForeignKey]
+        public Type Interface { get => TryRefreshAndGet(ref _interface); set => _interface = value; }
+
+        [EntityProperty]
+        [ForeignKey]
+        public Type ImplementedInterface { get => TryRefreshAndGet(ref _implementedInterface); set => _implementedInterface = value; }
+
+        public InterfaceImplementation(DBEntityCollection<InterfaceImplementation> collection) : base(collection) { /* Left empty. */ }
+    }
+
+    [Entity("docgenerictypemodifier")]
+    public class GenericTypeModifier : DefaultDBEntity<GenericTypeModifier>
+    {
+        private string _name;
+
+        public string Name { get => TryRefreshAndGet(ref _name); set => _name = value; }
+
+        public GenericTypeModifier(DBEntityCollection<GenericTypeModifier> collection) : base(collection) { /* Left empty. */ }
+    }
+
+    [Entity("docgenerictype")]
+    public class GenericType : DefaultDBEntity<GenericType>
+    {
+        private string _name;
+        private Type _type;
+        private GenericTypeModifier _modifier;
+
+        [EntityProperty]
+        public string Name { get => TryRefreshAndGet(ref _name); set => _name = value; }
+
+        [EntityProperty("doctype")]
+        [ForeignKey]
+        public Type Type { get => TryRefreshAndGet(ref _type); set => _type = value; }
+
+        [EntityProperty]
+        [ForeignKey]
+        public GenericTypeModifier Modifier { get => TryRefreshAndGet(ref _modifier); set => _modifier = value; }
+
+        public GenericType(DBEntityCollection<GenericType> collection) : base(collection) { /* Left empty. */ }
     }
 
     public abstract class Writer : IWriter
@@ -146,7 +202,9 @@ namespace WinCopies.Reflection.DotNetDocBuilder
         #region Properties
         protected ISQLConnection Connection { get; }
 
-        protected IEnumerable<DotNetPackage> Packages { get; }
+        public IEnumerable<DotNetPackage> Packages { get; }
+
+        public IEnumerable<string> ValidPackages { get; }
 
         public string DBName { get; }
 
@@ -155,7 +213,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
         public string RootPath { get; }
         #endregion Properties
 
-        public Writer(in ISQLConnection connection, in string dbName, in string rootPath, in IEnumerable<DotNetPackage> packages, in PackageInfo packageInfo)
+        public Writer(in ISQLConnection connection, in string dbName, in string rootPath, in IEnumerable<DotNetPackage> packages, in IEnumerable<string> validPackages, in PackageInfo packageInfo)
         {
             Connection = connection;
 
@@ -164,6 +222,8 @@ namespace WinCopies.Reflection.DotNetDocBuilder
             RootPath = rootPath;
 
             Packages = packages;
+
+            ValidPackages = validPackages;
 
             PackageInfo = packageInfo;
         }
@@ -305,35 +365,86 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 #endif
                 ;
 
-        public IEnumerable<DotNetEnum> GetAllEnumsInPackages()
+        public IEnumerable<T> GetAllItemsInPackages<T>(Converter<DotNetNamespace, IEnumerable<T>> converter) where T : DotNetType
         {
-            foreach (DotNetEnum
+            foreach (T
 #if CS8
                 ?
 #endif
-                @enum in GetAllNamespacesInPackages().ForEach(@namespace => @namespace.GetEnums()))
+                item in GetAllNamespacesInPackages().ForEachConverter(converter))
 
-                yield return @enum;
+                yield return item;
+        }
+
+        public IEnumerable<DotNetEnum> GetAllEnumsInPackages() => GetAllItemsInPackages(@namespace => @namespace.GetEnums());
+
+        public IEnumerable<DotNetInterface> GetAllInterfacesInPackages()
+        {
+            WriteLine("Enqueueing interfaces...", true);
+
+            Collections.DotNetFix.Generic.IEnumerableQueue<DotNetInterface> dotNetInterfaces = new Collections.DotNetFix.Generic.EnumerableQueue<DotNetInterface>();
+
+            bool predicate(DotNetInterface @interface) => !dotNetInterfaces.Any(__i => __i.Type.Namespace == @interface.Type.Namespace && __i.Type.Name == @interface.Type.Name) && ValidPackages.Contains(@interface.Type.Assembly.GetName().Name);
+
+            IEnumerable<DotNetInterface> getBaseInterfaces(DotNetInterface __i)
+            {
+                foreach (DotNetInterface ___i in __i.GetBaseInterfaces().Where(predicate))
+                {
+                    foreach (DotNetInterface ____i in getBaseInterfaces(___i))
+
+                        yield return ____i;
+
+                    yield return ___i;
+                }
+
+                yield return __i;
+            }
+
+            IEnumerable<DotNetInterface> getInterfaces() => GetAllItemsInPackages(@namespace => @namespace.GetInterfaces()).Where(predicate);
+
+            uint index = 0;
+
+            foreach (DotNetInterface i in getInterfaces())
+
+                foreach (DotNetInterface _i in getBaseInterfaces(i))
+                {
+                    DotNetInterface get() => getInterfaces().First(___i => !(___i.Type.GenericTypeArguments?.Length > 0) && ___i.Type.Namespace == _i.Type.Namespace && ___i.Type.Name == _i.Type.Name);
+
+                    dotNetInterfaces.Enqueue(_i.Type.GenericTypeArguments?.Length > 0 ? get() : _i);
+
+                    WriteLine($"{++index}: Enqueued {i.Type}", null);
+                }
+
+            WriteLine("Enqueued interfaces.", false);
+
+            return dotNetInterfaces;
         }
 
         protected abstract byte[] GetEnumData();
 
-        public void CreateEnumFile(DotNetEnum @enum, int id)
+        protected abstract byte[] GetInterfaceData();
+
+        protected void CreateTypeFile(in DotNetType type, in int id, in Func<byte[]> typeDataFunc)
         {
             string path;
             string namespacePath;
+            System.Type t;
 
-            _ = Directory.CreateDirectory(path = GetWholePath(namespacePath = Path.Combine(@enum.Type.Namespace, @enum.Type.Name)));
+            _ = Directory.CreateDirectory(path = GetWholePath(namespacePath = Path.Combine((t = type.Type).Namespace, t.GetRealName())));
 
             FileStream
 #if CS8
                 ?
 #endif
-                writer = File.Create(path = Path.Combine(path, GetFileName(null)));
+                writer = File.Create(path = Path.Combine(path, GetFileName(t.ContainsGenericParameters ? (ushort
+#if !CS9
+                ?
+#endif
+                )t.GetGenericArguments().Length : null)));
 
             namespacePath = namespacePath.Replace('\\', '.');
 
-            byte[] data = GetEnumData();
+            byte[] data = typeDataFunc();
 
             writer.Write(data, 0, data.Length);
 
@@ -343,16 +454,41 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
             File.WriteAllText(path, File.ReadAllText(path).Replace("{PackageId}", PackageInfo.FrameworkId.ToString())
                 .Replace("{ItemId}", id.ToString())
-                .Replace("{ItemName}", @enum.Type.Name)
+                .Replace("{ItemName}", t.Name)
                 .Replace("{DocURL}", $"2 => '<a href=\"/doc/{PackageInfo.URL}/{GetNamespacePath(namespacePath)}/index.php\">{getDocHeader()}</a>', {GetNamespaceURLArray(namespacePath, out _)}")
                 .Replace("{PackageUrl}", PackageInfo.URL));
         }
 
-        public void UpdateEnums(string wholeNamespace, DotNetNamespace @namespace)
-        {
-            WriteLine("Updating enums", true);
+        public void CreateEnumFile(DotNetEnum @enum, int id) => CreateTypeFile(@enum, id, GetEnumData);
 
-            WriteLine("Parsing DB.", true);
+        public void CreateInterfaceFile(DotNetInterface @interface, int id) => CreateTypeFile(@interface, id, GetInterfaceData);
+
+        protected static T GetEntity<T>(in T entity) where T : IEntity
+        {
+            entity.MarkForRefresh();
+
+            return entity;
+        }
+
+        public static bool CheckTypeEquality(in string wn, in Type _type, in DotNetType item, in bool checkGenericity) => wn == item.Type.Namespace && _type.Name == item.Name && (!checkGenericity || (_type.GenericTypeCount.HasValue
+                            ? item.Type.ContainsGenericParameters && _type.GenericTypeCount.Value == item.Type.GetGenericArguments().Length
+                            : !item.Type.ContainsGenericParameters));
+
+        protected void UpdateItems<T, U>(in string name, in DotNetNamespace @namespace, bool checkGenericity, Predicate<T> itemPredicate, Action<T, U>
+#if CS8
+            ?
+#endif
+            onAdded, Action<T>
+#if CS8
+            ?
+#endif
+            onDeleting, Converter<T, Type> converter, in Func<IEnumerable<U>> func, in Func<U, DBEntityCollection<T>, Type, T> getItem, Action<U, T> update, Action<U, int> createFile) where T : IDefaultEntity where U : DotNetType
+        {
+            WriteLine($"Updating {name}s", true);
+
+            WriteLine("Parsing DB", true);
+
+            string wholeNamespace = @namespace.Path;
 
             uint i = 0;
 
@@ -363,11 +499,11 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 #if !CS8
                 (
 #endif
-                var enums = new
+                var items = new
 #endif
-                DBEntityCollection<Enum>
+                DBEntityCollection<T>
 #if CS9
-                enums = new
+                items = new
 #endif
                 (GetConnection())
 #if CS8
@@ -377,38 +513,74 @@ namespace WinCopies.Reflection.DotNetDocBuilder
             {
 #endif
 
-            foreach (Enum
-#if CS8
-                ?
+            bool checkAll(in Type _type, in DotNetType item) => CheckTypeEquality(wholeNamespace, _type, item, checkGenericity);
+
+            Type type;
+            uint tables = 0;
+
+            void updateRows(in T item) => rows = item.Remove(out tables);
+
+#if !CS9
+            var gtColl = new
 #endif
-                @enum in enums)
+            DBEntityCollection<GenericType>
+#if CS9
+                gtColl = new
+#endif
+                (Connection);
 
-                if (GetWholeNamespace(@enum.Type.Namespace.Id) == wholeNamespace)
+            ActionIn<T> delete = onDeleting == null ?
+#if !CS9
+                (ActionIn<T>)
+#endif
+                updateRows : (in T item) =>
+                 {
+                     onDeleting(item);
+
+                     T _item = item;
+                     Type t;
+
+                     string logMessage = $" generic type parameters for {(t = converter(item)).Namespace}.{t.Name}.";
+
+                     WriteLine("Removing" + logMessage, true);
+
+                     foreach (GenericType genericType in gtColl.Where(gt => gt.Type.Id == _item.Id))
+
+                         WriteLine($"Removed generic type parameter '{genericType.Name}'. Rows: {genericType.Remove(out tables)}. Tables: {tables}.", null);
+
+                     WriteLine("Removed" + logMessage, false);
+
+                     updateRows(item);
+                 };
+
+            foreach (T item in items.WherePredicate(itemPredicate))
+
+                if (GetWholeNamespace((type = converter(item)).Namespace.Id) == wholeNamespace)
                 {
-                    WriteLine($"{++i}: Searching {@enum} in all packages.", true, ConsoleColor.DarkYellow);
+                    WriteLine($"{++i}: Searching {item} in all packages.", true, ConsoleColor.DarkYellow);
 
-                    if (GetAllEnumsInPackages().Any(_enum => _enum.Type.Namespace == wholeNamespace))
+                    if (func().Any(_item => checkAll(type, _item)))
 
-                        WriteLine($"{@enum} found. Not removed from DB.", null, ConsoleColor.DarkGreen);
+                        WriteLine($"{item} found. Not removed from DB.", null, ConsoleColor.DarkGreen);
 
                     else
                     {
-                        WriteLine($"{@enum} not found in any package. Deleting.", true, ConsoleColor.DarkRed);
+                        WriteLine($"{item} not found in any package. Deleting.", true, ConsoleColor.DarkRed);
 
-                        rows = @enum.Remove(out uint tables);
+                        delete(item);
 
                         if (rows > 0)
                         {
                             WriteLine($"Removed {rows} {nameof(rows)} in {tables} {nameof(tables)}.", null);
 
-                            Directory.Delete(Path.Combine(GetWholePath(wholeNamespace), @enum.Type.Name), true);
+                            Directory.Delete(Path.Combine(GetWholePath(wholeNamespace), type.Name), true);
 
-                            WriteLine($"{@enum} successfully deleted.", false);
+                            WriteLine($"{item} successfully deleted.", false);
                         }
 
                         else
 
-                            throw new InvalidOperationException($"Could not remove {wholeNamespace}.{@enum}.");
+                            throw new InvalidOperationException($"Could not remove {wholeNamespace}.{item}.");
                     }
 
                     WriteLine($"Processing {wholeNamespace} completed.", false);
@@ -420,61 +592,172 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
             i = 0;
 
-            DBEntityCollection<UnderlyingType> utColl = new
 #if !CS9
-                DBEntityCollection<UnderlyingType>
+            var gtmColl = new
+#endif
+            DBEntityCollection<GenericTypeModifier>
+#if CS9
+                gtmColl = new
 #endif
                 (Connection);
-            DBEntityCollection<Type> tColl = new
 #if !CS9
-                DBEntityCollection<Type>
+            var tColl = new
+#endif
+            DBEntityCollection<Type>
+#if CS9
+                tColl = new
 #endif
                 (Connection);
-            DBEntityCollection<Namespace> nColl = new
 #if !CS9
-                DBEntityCollection<Namespace>
+            var nColl = new
+#endif
+            DBEntityCollection<Namespace>
+#if CS9
+                 nColl = new
 #endif
                 (Connection);
-            DBEntityCollection<TypeType> ttColl = new
 #if !CS9
-                DBEntityCollection<TypeType>
+            var ttColl = new
+#endif
+            DBEntityCollection<TypeType>
+#if CS9
+                ttColl = new
 #endif
                 (Connection);
-            DBEntityCollection<AccessModifier> amColl = new
 #if !CS9
-                DBEntityCollection<AccessModifier>
+            var amColl = new
+#endif
+            DBEntityCollection<AccessModifier>
+#if CS9
+                amColl = new
 #endif
                 (Connection);
 
-            foreach (DotNetEnum @enum in GetAllEnumsInPackages().Where(_enum => _enum.Type.Namespace == wholeNamespace))
+            void tryRefreshAccessModifierId() => type.AccessModifier.TryRefreshId(true);
+
+            void setModifier(in GenericType _gt, in string _name)
             {
-                WriteLine($"{++i}: Processing {@enum}.", true, ConsoleColor.DarkYellow);
+                _gt.Modifier = new GenericTypeModifier(gtmColl) { Name = _name };
 
-                string wn;
+                WriteLine($"Variance: {_name}.", null);
+            }
+
+            bool hasFlag(in System.Type _gt, in GenericParameterAttributes gpa) => _gt.GenericParameterAttributes.HasFlag(gpa);
+
+            void _setModifier(in System.Type _gt, in GenericType __gt)
+            {
+                if (hasFlag(_gt, Contravariant))
+
+                    setModifier(__gt, "in");
+
+                else if (hasFlag(_gt, Covariant))
+
+                    setModifier(__gt, "out");
+
+                else
+
+                    WriteLine($"No variance.", null);
+            }
+
+            ActionIn<T, U> _onAdded = onAdded == null ?
+#if !CS9
+                (ActionIn<T, U>)(
+#endif
+                (in T _item, in U _i) => _item.Dispose()
+#if !CS9
+            )
+#endif
+                : (in T _item, in U _i) =>
+            {
+                onAdded(_item, _i);
+
+                System.Type _type = _i.Type;
+
+                void writeLine(in string
+#if CS8
+                    ?
+#endif
+                    param1 = null, in string
+#if CS8
+                    ?
+#endif
+                    param2 = null) => WriteLine($"{_type.Namespace}.{_type.Name} is {param1}generic.{param2}", null);
+
+                if (_i.Type.ContainsGenericParameters)
+                {
+                    writeLine(param2: " Adding.");
+
+                    GenericType _gt;
+
+                    foreach (System.Type gt in _i.Type.GetGenericArguments())
+                    {
+                        WriteLine($"Adding {gt.Name}.", true);
+
+                        _gt = new GenericType(gtColl) { Type = converter(_item), Name = gt.Name };
+
+                        _setModifier(gt, _gt);
+
+                        WriteLine($"Added {_gt.Name}. Id: {gtColl.Add(_gt, out tables, out rows)}. Rows: {rows}. Tables: {tables}.", false);
+                    }
+                }
+
+                else
+
+                    writeLine("not ");
+
+                _item.Dispose();
+            };
+
+            Collections.DotNetFix.Generic.IEnumerableQueue<System.Type> browsed = new Collections.DotNetFix.Generic.EnumerableQueue<System.Type>();
+
+            foreach (U item in func().Where(_item => _item.Type.Namespace == wholeNamespace))
+            {
+                if (browsed.Contains(item.Type))
+
+                    continue;
+
+                WriteLine($"{++i}: Processing {item}.", true, ConsoleColor.DarkYellow);
+
+                browsed.Enqueue(item.Type);
 
                 bool process()
                 {
-                    foreach (Enum _enum in enums)
-                    {
-                        wn = GetWholeNamespace(_enum.Type.Namespace.Id);
+                    foreach (T _item in items.WherePredicate(itemPredicate))
 
-                        Debug.WriteLine(wn);
-
-                        if (wn == @enum.Type.Namespace && _enum.Type.Name == @enum.Type.Name)
+                        if (GetWholeNamespace((type = converter(_item)).Namespace.Id) == item.Type.Namespace && checkAll(type, item))
                         {
                             WriteLine("Exists. Updating.", true, ConsoleColor.DarkGreen);
 
-                            _enum.UnderlyingType = new UnderlyingType(utColl) { Name = @enum.UnderlyingType.ToCSName() };
+                            update(item, _item);
 
-                            _enum.UnderlyingType.MarkForRefresh();
+                            type.AccessModifier = GetEntity(new AccessModifier(amColl) { Name = item.Type.IsPublic ? "public" : "protected" });
 
-                            _ = _enum.UnderlyingType.TryRefreshId(true);
+                            tryRefreshAccessModifierId();
 
-                            WriteLine($"Updated {_enum.Update(out uint tables)} rows in {tables} {nameof(tables)}. Id: {_enum.Id}.", false);
+                            if (item.Type.ContainsGenericParameters)
+                            {
+                                WriteLine($"Updating generic type parameters for {type.Namespace.Name}.{type.Name}.", true);
+
+                                foreach (GenericType gt in gtColl.GetItems(Connection.GetOrderByColumns(OrderBy.Asc, nameof(GenericType.Id))).Where(_gt => _gt.Type.Id == _item.Id))
+
+                                    foreach (System.Type t in item.Type.GetGenericArguments())
+                                    {
+                                        WriteLine($"Updating generic type parameter {t.Name}.", true);
+
+                                        gt.Name = t.Name;
+
+                                        _setModifier(t, gt);
+
+                                        WriteLine($"Updated {gt.Update(out tables)} rows in {tables} {nameof(tables)}.", false);
+                                    }
+
+                                WriteLine($"Updated generic type parameters for {type.Namespace.Name}.{type.Name}.", false);
+                            }
+
+                            WriteLine($"Updated {_item.Update(out uint _tables)} rows in {_tables} {nameof(tables)}. Id: {_item.Id}.", false);
 
                             return false;
                         }
-                    }
 
                     return true;
                 }
@@ -483,88 +766,300 @@ namespace WinCopies.Reflection.DotNetDocBuilder
                 {
                     WriteLine("Does not exist. Adding.", true, ConsoleColor.DarkRed);
 
-                    T getEntity<T>(in T entity) where T : IEntity
+                    T _item = getItem(item, items, new Type(tColl)
                     {
-                        entity.MarkForRefresh();
+                        Name = item.Name,
 
-                        return entity;
-                    }
+                        AccessModifier = GetEntity(new AccessModifier(amColl) { Name = item.Type.IsPublic ? "public" : "protected" }),
 
-                    Enum _enum = new
-#if !CS9
-                        Enum
-#endif
-                        (enums)
-                    {
-                        UnderlyingType = getEntity(new UnderlyingType(utColl)
+                        Namespace = GetEntity(new Namespace(nColl)
                         {
-                            Name = @enum.UnderlyingType.ToCSName()
+                            Name = @namespace.Name,
+
+                            ParentId = @namespace.Parent == null ? null : GetNamespaceId(@namespace.Parent.Path),
+
+                            FrameworkId = PackageInfo.FrameworkId
                         }),
 
-                        Type = new Type(tColl)
+                        TypeType = GetEntity(new TypeType(ttColl)
                         {
-                            Name = @enum.Type.Name,
+                            Name = name
+                        })
+                    });
 
-                            AccessModifier = getEntity(new AccessModifier(amColl) { Name = "public" }),
+                    void _process()
+                    {
+                        tryRefreshAccessModifierId();
 
-                            Namespace = getEntity(new Namespace(nColl)
-                            {
-                                Name = @namespace.Name,
+                        _ = type.Namespace.TryRefreshId(true);
 
-                                ParentId = @namespace.Parent == null ? null : GetNamespaceId(@namespace.Parent.Path),
+                        _ = type.TypeType.TryRefreshId(true);
+                    }
 
-                                FrameworkId = PackageInfo.FrameworkId
-                            }),
+                    if (Equals(type = converter(_item), _item))
 
-                            TypeType = getEntity(new TypeType(ttColl)
-                            {
-                                Name = nameof(Enum)
-                            })
-                        }
-                    };
+                        _process();
 
-                    _enum.MarkForRefresh();
+                    else
+                    {
+                        _item.MarkForRefresh();
 
-                    _ = _enum.Type.AccessModifier.TryRefreshId(true);
+                        _process();
 
-                    _ = _enum.Type.Namespace.TryRefreshId(true);
+                        _ = _item.TryRefreshId(false);
+                    }
 
-                    _ = _enum.Type.TypeType.TryRefreshId(true);
-
-                    _ = _enum.TryRefreshId(false);
-
-                    id = enums.Add(_enum, out uint tables, out rows);
-
-                    _enum.Dispose();
+                    id = items.Add(_item, out tables, out rows);
 
                     if (id.HasValue)
                     {
                         WriteLine($"Added {rows} {nameof(rows)} in {tables} {nameof(tables)}. Id: {id.Value}", null);
 
-                        WriteLine($"Creating file for {@enum.Type.Name}.", null);
+                        _onAdded(_item, item);
 
-                        CreateEnumFile(@enum, (int)id.Value);
+                        WriteLine($"Creating file for {item.Type.Name}.", null);
 
-                        WriteLine($"File created for {@enum.Type.Name}.", false);
+                        createFile(item, (int)id.Value);
+
+                        WriteLine($"File created for {item.Type.Name}.", false);
                     }
 
                     else
+                    {
+                        _item.Dispose();
 
-                        throw new InvalidOperationException($"Failed to add {@enum.Type.Name}.");
+                        throw new InvalidOperationException($"Failed to add {item.Type.Name}.");
+                    }
                 }
 
-                WriteLine($"Processed {@enum.Type.Name}.", false);
+                WriteLine($"Processed {item.Type.Name}.", false);
             }
 #if !CS8
             }
 #endif
 
-            WriteLine("Updating namespaces completed.", false);
+            WriteLine($"Updating {name}s completed.", false);
         }
 
-        public void UpdateTypes(string wholeNamespace, DotNetNamespace @namespace)
+        public void UpdateEnums(DotNetNamespace @namespace)
         {
-            UpdateEnums(wholeNamespace, @namespace);
+#if CS8
+            static
+#endif
+                string getUnderlyingTypeCSName(in DotNetEnum @enum) => @enum.UnderlyingType.ToCSName();
+#if !CS9
+            var utColl = new
+#endif
+            DBEntityCollection<UnderlyingType>
+#if CS9
+                utColl = new
+#endif
+                (Connection);
+
+            UnderlyingType getUnderlyingType(DotNetEnum @enum) => new
+#if !CS9
+                UnderlyingType
+#endif
+                (utColl)
+            { Name = getUnderlyingTypeCSName(@enum) };
+
+            UpdateItems<Enum, DotNetEnum>("Enum", @namespace, false, @enum => true, null, null, item => item.Type, GetAllEnumsInPackages, (@enum, enums, type) => new
+#if !CS9
+                        Enum
+#endif
+                        (enums)
+            {
+                UnderlyingType = GetEntity(getUnderlyingType(@enum)),
+
+                Type = type
+            }, (@enum, _enum) =>
+            {
+                _enum.UnderlyingType = getUnderlyingType(@enum);
+
+                _enum.UnderlyingType.MarkForRefresh();
+
+                _ = _enum.UnderlyingType.TryRefreshId(true);
+            }, CreateEnumFile);
+        }
+
+        public void UpdateInterfaces(DotNetNamespace @namespace)
+        {
+#if CS8
+            static
+#endif
+                void setGenericTypeCount(in DotNetInterface @interface, in Type type) => type.GenericTypeCount = @interface.Type.ContainsGenericParameters ? (byte
+#if !CS9
+                    ?
+#endif
+                )@interface.Type.GetGenericArguments().Length : null;
+
+            DBEntityCollection<InterfaceImplementation> interfaceImplementations = new
+#if !CS9
+                DBEntityCollection<InterfaceImplementation>
+#endif
+                (GetConnection());
+
+            DBEntityCollection<Type> types = new
+#if !CS9
+                DBEntityCollection<Type>
+#endif
+                (GetConnection());
+
+            DBEntityCollection<Namespace> namespaces = new
+#if !CS9
+                DBEntityCollection<Namespace>
+#endif
+                (GetConnection());
+
+            Collections.DotNetFix.Generic.IEnumerableQueue<System.Type> interfaces = new Collections.DotNetFix.Generic.EnumerableQueue<System.Type>();
+            System.Type[] _interfaces;
+            Type
+#if CS8
+                ?
+#endif
+                t;
+            long id;
+
+            void getInterfaces(in System.Type type)
+            {
+                foreach (System.Type i in type.GetInterfaces())
+
+                    getInterfaces(i);
+
+                if (!interfaces.Contains(type))
+
+                    interfaces.Enqueue(type);
+            }
+
+            void updateInterfaces(in DotNetType _t)
+            {
+                foreach (System.Type i in (_interfaces = _t.Type.GetInterfaces()))
+
+                    foreach (System.Type _i in i.GetInterfaces())
+
+                        getInterfaces(_i);
+            }
+
+            string wholeNamespace = @namespace.Path;
+
+            bool checkAll(string wn, in Type _type, in DotNetType item) => CheckTypeEquality(wn, _type, item, true);
+
+            bool checkInterface(System.Type _i) => ValidPackages.Contains(_i.Assembly.GetName().Name) && !interfaces.Contains(_i);
+
+            bool checkInterfaceImplementation(in InterfaceImplementation _i, in System.Type i) => checkAll(GetWholeNamespace(_i.ImplementedInterface.Namespace.Id), _i.ImplementedInterface, new DotNetType(i));
+
+            void addEntityAssociations(Type type, DotNetInterface @interface, in bool check)
+            {
+                WriteLine($"Adding entity-associations for {@interface}", true);
+
+                updateInterfaces(@interface);
+
+                void add(in System.Type i)
+                {
+                    (t = new Type(types)
+                    {
+                        Namespace = new Namespace(namespaces) { Id = GetNamespaceId(i.Namespace).Value },
+                        Name = i.GetRealName(),
+                        GenericTypeCount = i.ContainsGenericParameters ? (byte
+#if !CS9
+                        ?
+#endif
+                        )i.GetGenericArguments().Length : null
+                    }).MarkForRefresh();
+
+                    //t.Namespace.Refresh();
+
+                    t.TryRefreshId(true);
+
+                    id = interfaceImplementations.Add(new InterfaceImplementation(interfaceImplementations) { Interface = type, ImplementedInterface = t }, out uint tables, out ulong rows).Value;
+
+                    WriteLine($"Added entity-association for {@interface} : {i}. Added {rows} {nameof(rows)} in {tables} {nameof(tables)} (last inserted id: {id}).", null);
+                }
+
+                ActionIn<System.Type> _add = check ? (in System.Type i) =>
+                {
+                    System.Type __i = i;
+
+                    if (!interfaceImplementations.Where(_i => checkAll(wholeNamespace, _i.Interface, @interface)).Any(_i => checkInterfaceImplementation(_i, __i)))
+
+                        add(i);
+                }
+                :
+#if !CS9
+                (ActionIn<System.Type>)
+#endif
+                add;
+
+                foreach (System.Type i in _interfaces.Where(checkInterface))
+
+                    _add(i);
+
+                id = 0;
+                t = null;
+                interfaces.Clear();
+
+                WriteLine($"Added entity-associations for {@interface}", false);
+            }
+
+            void removeEntityAssociations(in Type type, in DotNetInterface
+#if CS8
+                ?
+#endif
+                @interface)
+            {
+                Type _t = type;
+
+                WriteLine($"Removing entity-associations for {_t.Name}.", true);
+
+                bool defaultPredicate(InterfaceImplementation i) => i.Interface.Id == _t.Id;
+
+                Predicate<InterfaceImplementation> predicate;
+
+                if (@interface == null)
+
+                    predicate = defaultPredicate;
+
+                else
+                {
+                    updateInterfaces(@interface);
+
+                    predicate = i => defaultPredicate(i) && !_interfaces.Any(_i => checkInterface(_i) && checkInterfaceImplementation(i, _i));
+                }
+
+                foreach (InterfaceImplementation interfaceImplementation in interfaceImplementations.WherePredicate(predicate))
+
+                    WriteLine($"Removed {interfaceImplementation.Remove(out uint tables)} rows in {tables} {nameof(tables)} for {interfaceImplementation.Interface.Name} : {interfaceImplementation.ImplementedInterface.Namespace.Name}.{interfaceImplementation.ImplementedInterface.Name}.", null);
+
+                interfaces.Clear();
+
+                WriteLine($"Removed entity-associations for {type.Name}.", false);
+            }
+
+            IEnumerable<DotNetInterface> dotNetInterfaces = GetAllInterfacesInPackages();
+
+            UpdateItems<Type, DotNetInterface>("Interface", @namespace, true, type => type.TypeType.Name == "Interface", (type, @interface) => addEntityAssociations(type, @interface, false), _t => removeEntityAssociations(_t, null),
+
+                 Delegates.Self, () => dotNetInterfaces, (@interface, __interfaces, type) =>
+                   {
+                       setGenericTypeCount(@interface, type);
+
+                       return type;
+
+                   }, (@interface, _interface) =>
+      {
+          setGenericTypeCount(@interface, _interface);
+
+          removeEntityAssociations(_interface, @interface);
+
+          addEntityAssociations(_interface, @interface, true);
+      }, CreateInterfaceFile);
+        }
+
+        public void UpdateTypes(DotNetNamespace @namespace)
+        {
+            UpdateEnums(@namespace);
+
+            UpdateInterfaces(@namespace);
         }
 
         public void UpdateNamespaces()
@@ -714,7 +1209,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
                 else
 
-                    UpdateTypes(@namespace.Path, @namespace);
+                    UpdateTypes(@namespace);
 
                 WriteLine($"Processed {@namespace.Path}.", false);
             }

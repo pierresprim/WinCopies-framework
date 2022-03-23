@@ -10,27 +10,22 @@ namespace WinCopies.GUI.IO.ObjectModel
 
             public bool _isSelected;
             public IBrowsableObjectInfo _selectedItem;
-            public int _selectedIndex
-#if CS10
-                = DefaultSelectedIndex;
-#else
-                ;
+            public int _selectedIndex;
 
-            private Selection(in bool isSelected, in IBrowsableObjectInfo selectedItem, in int selectedIndex)
+            private Selection(in bool isSelected, in IBrowsableObjectInfo selectedItem)
             {
                 _isSelected = isSelected;
 
                 _selectedItem = selectedItem;
 
-                _selectedIndex = selectedIndex;
+                _selectedIndex = DefaultSelectedIndex;
             }
 
             public static Selection GetInstance() => new
 #if !CS9
                 Selection
 #endif
-                (false, null, DefaultSelectedIndex);
-#endif
+                (false, null);
         }
     }
 }

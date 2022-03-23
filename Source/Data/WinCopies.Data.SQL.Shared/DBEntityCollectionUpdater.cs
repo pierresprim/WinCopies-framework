@@ -141,7 +141,11 @@ namespace WinCopies.Data.SQL
 
                 return null;
 
-            return Connection.GetInsert(table, Columns, new SQLItemCollection<SQLItemCollection<IParameter>>(Values));
+            IInsert insert = Connection.GetInsert(table, Columns, new SQLItemCollection<SQLItemCollection<IParameter>>(Values));
+
+            //insert.Ignore = true;
+
+            return insert;
         }
     }
 

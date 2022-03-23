@@ -18,7 +18,9 @@
 #if DEBUG
 using System;
 using System.Collections;
+using System.Globalization;
 using System.IO;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -27,11 +29,24 @@ using WinCopies.Linq;
 
 using static WinCopies.ThrowHelper;
 using static WinCopies.Temp.ForLoop;
-using System.Reflection;
-using System.Globalization;
 
 namespace WinCopies.Temp
 {
+    namespace Linq
+    {
+        public static class Extensions
+        {
+            public static System.Collections.Generic.IEnumerable<TOut> WhereSelectPredicateConverter<TIn, TOut>(this System.Collections.Generic.IEnumerable<TIn> enumerable, Predicate<TIn> where, Converter<TIn, TOut> select)
+            {
+                foreach (TIn item in enumerable)
+
+                    if (where(item))
+
+                        yield return select(item);
+            }
+        }
+    }
+
     //public interface IMinimalLinkedList<T> : System.Collections.Generic.IEnumerable<T>
     //{
     //    IReadOnlyLinkedListNodeBase<T> Add(T item);
@@ -294,20 +309,20 @@ namespace WinCopies.Temp
 
     public class TypeArgumentException<TExpected> : ArgumentException
     {
-        private const string MESSAGE = " an instance of or an instance of a type that inherits or implement ";
+        private const string MESSAGE = "an instance of or an instance of a type that inherits or implement ";
 
         public TypeArgumentException(in Type
 #if CS8
             ?
 #endif
-            type, in string argumentName) : base($"{argumentName} should be{MESSAGE}{GetTypeFullName(typeof(TExpected))}. {argumentName} was{(type == null ? "null" : MESSAGE + GetTypeFullName(type))}.") { /* Left empty. */ }
+            type, in string argumentName) : base($"{argumentName} should be {MESSAGE}{GetTypeFullName(typeof(TExpected))}. {argumentName} was {(type == null ? "null" : MESSAGE + GetTypeFullName(type))}.") { /* Left empty. */ }
 
         private static string GetTypeFullName(in Type t) => t.FullName ?? t.Name;
     }
 
     public static class Extensions
     {
-        public static U AsOfType<T, U>(this T obj) where T : U => obj;
+        public static string GetRealName(this Type type) => type.ContainsGenericParameters ? type.Name.Remove(type.Name.IndexOf('`')) : type.Name;
 
         public static ConstructorInfo
 #if CS8
@@ -629,6 +644,23 @@ namespace WinCopies.Temp
 #endif
 
         public static System.Collections.Generic.IEnumerable<TOut> ForEach<TIn, TOut>(this System.Collections.Generic.IEnumerable<TIn> enumerable, Func<TIn, System.Collections.Generic.IEnumerable<TOut>> func)
+        {
+            foreach (TIn
+#if CS9
+                ?
+#endif
+                item in enumerable)
+
+                foreach (TOut
+#if CS9
+                ?
+#endif
+                _item in func(item))
+
+                    yield return _item;
+        }
+
+        public static System.Collections.Generic.IEnumerable<TOut> ForEachConverter<TIn, TOut>(this System.Collections.Generic.IEnumerable<TIn> enumerable, Converter<TIn, System.Collections.Generic.IEnumerable<TOut>> func)
         {
             foreach (TIn
 #if CS9

@@ -9,6 +9,7 @@
     <Import_RootNamespace>WinCopies.Reflection.DotNetParser.Shared</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)DotNetHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DotNetNamespaceEnumerator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DotNetPackage.cs" />
   </ItemGroup>

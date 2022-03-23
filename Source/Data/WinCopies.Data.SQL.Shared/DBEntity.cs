@@ -117,7 +117,7 @@ namespace WinCopies.Data.SQL
         protected override IEntityIdRefresher GetRefresher() => new EntityIdRefresher(Connection);
     }
 
-    public class DefaultDBEntity<T> : DBEntity<T> where T : IEntity
+    public class DefaultDBEntity<T> : DBEntity<T>, IDefaultEntity where T : IEntity
     {
         [EntityProperty(nameof(Id), IsId = true)]
         public int Id { get; set; }

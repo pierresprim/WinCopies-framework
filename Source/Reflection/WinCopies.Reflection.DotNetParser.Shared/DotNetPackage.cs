@@ -6,6 +6,8 @@ using System.Reflection;
 
 using WinCopies.Collections.Generic;
 using WinCopies.Linq;
+using WinCopies.Temp;
+using WinCopies.Temp.Linq;
 
 using static WinCopies.Temp.Util;
 using static WinCopies.ThrowHelper;
@@ -17,6 +19,8 @@ namespace WinCopies.Reflection.DotNetParser
     public class DotNetType : IComparable<DotNetType>
     {
         public Type Type { get; }
+
+        public string Name => Type.GetRealName();
 
         public DotNetType(in Type type) => Type = type ?? throw GetArgumentNullException(nameof(type));
 
@@ -46,213 +50,6 @@ namespace WinCopies.Reflection.DotNetParser
         Int64 = 6,
 
         UInt64 = 7
-    }
-
-    public static class DotNetHelper
-    {
-        public static string
-#if CS8
-            ?
-#endif
-            GetCSAccessModifier(Type type) => type.IsPublic
-                ? "public"
-                : type.IsNestedFamily
-                ? type.IsNestedFamANDAssem ? "private protected" : type.IsNestedFamORAssem ? "protected internal" : "protected"
-                : type.IsNestedAssembly ? "internal" : type.IsNestedPrivate ? "private" : null;
-
-        public static string GetCSAccessModifier<T>() => GetCSAccessModifier(typeof(T));
-
-        public static System.Collections.Generic.IEnumerable<Type
-#if CS8
-            ?
-#endif
-            > GetDefinedTypes(this Assembly assembly)
-        {
-            try
-            {
-                return assembly.DefinedTypes;
-            }
-
-            catch (ReflectionTypeLoadException ex)
-            {
-                return ex.Types;
-            }
-        }
-
-        public static ArgumentException GetTypeIsNotEnumException(in string paramName) => new
-#if !CS9
-            ArgumentException
-#endif
-            ($"The current type does not represent an {nameof(Enum)} type.", paramName);
-
-        public static EUT ToDotNetEnumUnderlyingType(this Type type)
-        {
-            if (type.IsEnum)
-            {
-                Type t = type.GetEnumUnderlyingType();
-
-#if CS8
-                static
-#endif
-                KeyValuePair<Type, EUT> getType<T>(in EUT enumType) => new
-#if !CS9
-                    KeyValuePair<Type, EUT>
-#endif
-                    (typeof(T), enumType);
-
-                KeyValuePair<Type, EUT>[] types = GetArray(getType<int>(EUT.Int32), getType<uint>(EUT.UInt32), getType<short>(EUT.Int16), getType<ushort>(EUT.UInt16), getType<long>(EUT.Int64), getType<ulong>(EUT.UInt64), getType<byte>(EUT.Byte), getType<sbyte>(EUT.SByte));
-
-                foreach (KeyValuePair<Type, EUT> underlyingType in types)
-
-                    if (t == underlyingType.Key)
-
-                        return underlyingType.Value;
-            }
-
-            throw GetTypeIsNotEnumException(nameof(type));
-        }
-
-        public static string ToCSName(this EUT value)
-#if CS8
-            =>
-#else
-        {
-#endif
-#if !CS8
-            switch (
-#endif
-                value
-#if CS8
-                switch
-#else
-                )
-#endif
-            {
-#if !CS8
-                case
-#endif
-                    EUT.Int32
-#if CS8
-                    =>
-#else
-                    :
-                    return
-#endif
-                    "int"
-#if CS8
-                    ,
-#else
-                    ;
-                case
-#endif
-                    EUT.UInt32
-#if CS8
-                    =>
-#else
-                    :
-                    return
-#endif
-                    "uint"
-#if CS8
-                    ,
-#else
-                    ;
-                case
-#endif
-                    EUT.Int16
-#if CS8
-                    =>
-#else
-                    :
-                    return
-#endif
-                    "short"
-#if CS8
-                    ,
-#else
-                    ;
-                case
-#endif
-                    EUT.UInt16
-#if CS8
-                    =>
-#else
-                    :
-                    return
-#endif
-                    "ushort"
-#if CS8
-                    ,
-#else
-                    ;
-                case
-#endif
-                    EUT.Int64
-#if CS8
-                    =>
-#else
-                    :
-                    return
-#endif
-                    "long"
-#if CS8
-                    ,
-#else
-                    ;
-                case
-#endif
-                    EUT.UInt64
-#if CS8
-                    =>
-#else
-                    :
-                    return
-#endif
-                    "ulong"
-#if CS8
-                    ,
-#else
-                    ;
-                case
-#endif
-                    EUT.Byte
-#if CS8
-                    =>
-#else
-                    :
-                    return
-#endif
-                    "byte"
-#if CS8
-                    ,
-#else
-                    ;
-                case
-#endif
-                    EUT.SByte
-#if CS8
-                    =>
-#else
-                    :
-                    return
-#endif
-                    "sbyte"
-#if CS8
-                    ,
-                    _ =>
-#else
-                    ;
-                default:
-#endif
-                    throw new ArgumentOutOfRangeException(nameof(value))
-#if CS8
-        }
-        ;
-#else
-            ;
-            }
-        }
-#endif
     }
 
     public struct DotNetEnumValue
@@ -345,6 +142,18 @@ namespace WinCopies.Reflection.DotNetParser
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 
+    public class DotNetInterface : DotNetType
+    {
+        public DotNetInterface(in Type type) : base(type.IsInterface ? type : throw DotNetHelper.GetTypeIsNotEnumException(nameof(type))) { /* Left empty. */ }
+
+        public System.Collections.Generic.IEnumerable<DotNetInterface> GetBaseInterfaces()
+        {
+            foreach (Type type in Type.GetInterfaces())
+
+                yield return new DotNetInterface(type);
+        }
+    }
+
     public class DotNetNamespace : IComparable<DotNetNamespace>
     {
         public DotNetPackage DotNetPackage { get; }
@@ -385,7 +194,7 @@ namespace WinCopies.Reflection.DotNetParser
 #else
                     "."
 #endif
-                    , stringBuilder);
+                    , stringBuilder.AsEnumerable<string>());
             }
         }
 
@@ -426,16 +235,40 @@ namespace WinCopies.Reflection.DotNetParser
 #endif
             ));
 
-        public System.Collections.Generic.IEnumerable<T> GetTypes<T>(Predicate<Type> predicate, in Func<Type, T> func) => func == null ? throw GetArgumentNullException(nameof(func)) : DotNetPackage.Assembly.GetDefinedTypes().WhereSelect(type => type != null && type.IsPublic && !type.IsNested && predicate(type) && type.Namespace == Path, func);
+        public bool DefaultTypePredicate(Type t) => t != null && t.IsPublic && !t.IsNested && t.Namespace == Path;
+
+        public System.Collections.Generic.IEnumerable<Type> GetDefinedTypes() => DotNetPackage.Assembly.GetDefinedTypes();
+
+        public System.Collections.Generic.IEnumerable<T> GetTypes<T>(Predicate<Type> predicate, in Converter<Type, T> func) => func == null ? throw GetArgumentNullException(nameof(func)) : predicate == null ? throw GetArgumentNullException(nameof(predicate)) : GetDefinedTypes().WhereSelectPredicateConverter(type => DefaultTypePredicate(type) && predicate(type), func);
 
         public System.Collections.Generic.IEnumerable<DotNetEnum> GetEnums() => GetTypes(type => type.IsEnum, type => new DotNetEnum(type));
 
-        public System.Collections.Generic.IEnumerable<DotNetType> GetTypes()
+        public System.Collections.Generic.IEnumerable<DotNetInterface> GetInterfaces()
         {
-            return GetEnums();
+#if CS8
+            static
+#endif
+                System.Collections.Generic.IEnumerable<DotNetInterface> getInterfaces(Type t)
+            {
+                foreach (Type _t in t.GetInterfaces())
 
-            // TODO
+                    foreach (DotNetInterface __t in getInterfaces(_t))
+
+                        yield return __t;
+
+                yield return new DotNetInterface(t);
+            }
+
+            foreach (Type type in GetDefinedTypes())
+
+                if (type.IsInterface && DefaultTypePredicate(type))
+
+                    foreach (DotNetInterface @interface in getInterfaces(type))
+
+                        yield return @interface;
         }
+
+        public System.Collections.Generic.IEnumerable<DotNetType> GetTypes() => Enumerate<DotNetType>(GetEnums(), GetInterfaces() /* TODO */);
 
         public int CompareTo(DotNetNamespace
 #if CS8

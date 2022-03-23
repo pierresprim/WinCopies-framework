@@ -291,7 +291,7 @@ namespace WinCopies.Data.SQL
 #if CS8
             ?
 #endif
-            orderBy = null) => IsDisposed ? throw GetExceptionForDispose(false) : DBEntityCollection.GetItems(this, new EntityCollectionNewItemLoadingFactory<T, DBEntityCollection<T>>(_connection, Temp.ThrowHelper.GetOrThrowIfInvalidType<OrderByColumns>(orderBy, nameof(orderBy)), null));
+            orderBy = null) => IsDisposed ? throw GetExceptionForDispose(false) : DBEntityCollection.GetItems(this, new EntityCollectionNewItemLoadingFactory<T, DBEntityCollection<T>>(_connection, Temp.ThrowHelper.GetValueOrThrowIfInvalidType<OrderByColumns>(orderBy, nameof(orderBy), true), null));
 
         public IEnumerator<T> GetEnumerator() => GetItems().GetEnumerator();
 

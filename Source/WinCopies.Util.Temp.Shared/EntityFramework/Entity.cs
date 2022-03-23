@@ -327,17 +327,17 @@ namespace WinCopies.EntityFramework
                 ?
 #endif
                 value;
-            PropertyInfo
+            KeyValuePair<string
 #if CS8
                 ?
 #endif
-                foreignKeyProperty;
+                , PropertyInfo>? foreignKeyProperty;
 
             foreach (KeyValuePair<PropertyInfo, EntityPropertyAttribute> property in properties)
             {
                 _propertyInfo = property.Key;
 
-                refresher.Add(column = property.Value.Column ?? _propertyInfo.Name, column.FirstCharToLower(), (value = _propertyInfo.GetValue(this)) is IEntity && !(_propertyInfo.GetCustomAttributes<ForeignKeyAttribute>().FirstOrDefault() == null || (foreignKeyProperty = EntityCollection.GetEntityProperties(value.GetType()).FirstOrDefault()) == null) ? foreignKeyProperty.GetValue(value) : value);
+                refresher.Add(column = property.Value.Column ?? _propertyInfo.Name, column.FirstCharToLower(), (value = _propertyInfo.GetValue(this)) is IEntity && _propertyInfo.GetCustomAttributes<ForeignKeyAttribute>().FirstOrDefault() != null &&(foreignKeyProperty = EntityCollection.GetIdProperties(value.GetType()).FirstOrNull()).HasValue ? foreignKeyProperty.Value.Value.GetValue(value) : value);
             }
 
             if (refresher.TryGetId(table, idColumn, out object
@@ -531,7 +531,12 @@ namespace WinCopies.EntityFramework
         }
     }
 
-    public abstract class DefaultEntity : Entity
+    public interface IDefaultEntity : IEntity
+    {
+        int Id { get; set; }
+    }
+
+    public abstract class DefaultEntity : Entity, IDefaultEntity
     {
         [EntityProperty(nameof(Id), IsId = true)]
         public int Id { get; set; }

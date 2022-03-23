@@ -128,7 +128,13 @@ namespace WinCopies.Data.MySQL
 #endif
                 ();
 
-            _ = sb.Append($"INSERT INTO `{TableName}` ");
+            _ = sb.Append("INSERT ");
+
+            if (Ignore)
+
+                _ = sb.Append("IGNORE ");
+
+            _ = sb.Append($"INTO `{TableName}` ");
 
 #if CS8
             static
