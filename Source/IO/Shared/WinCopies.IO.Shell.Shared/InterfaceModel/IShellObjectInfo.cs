@@ -22,7 +22,6 @@ using System.IO;
 using WinCopies.IO.AbstractionInterop;
 using WinCopies.IO.Enumeration;
 using WinCopies.IO.PropertySystem;
-using WinCopies.Temp;
 
 namespace WinCopies.IO.ObjectModel
 {

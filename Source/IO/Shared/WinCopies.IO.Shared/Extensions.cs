@@ -22,6 +22,7 @@ using WinCopies.Collections;
 using WinCopies.Collections.DotNetFix.Generic;
 using WinCopies.Collections.Generic;
 using WinCopies.IO.ObjectModel;
+using WinCopies.Util;
 
 using static WinCopies.ThrowHelper;
 using static WinCopies.IO.ObjectModel.BrowsableObjectInfo;
@@ -61,6 +62,25 @@ namespace WinCopies.IO
 
     public static class Extensions
     {
+        public static string GetCanonicalName(this ExtensionCommand command)
+        {
+            const string COPY = "Copy";
+
+            string valueName =
+#if CS9
+                Enum.GetName(
+#endif
+                command
+#if CS9
+                )
+#else
+                .GetName()
+#endif
+                ;
+
+            return valueName != null && valueName.StartsWith(COPY) ? COPY.ToLower() : null;
+        }
+
         public static BrowsableAs GetBrowsableAsValue(this IBrowsableObjectInfo browsableObjectInfo) => browsableObjectInfo.IsBrowsable() ? browsableObjectInfo.IsLocalRoot ? BrowsableAs.LocalRoot : BrowsableAs.Folder : BrowsableAs.File;
 
         public static BitmapSource TryGetBitmapSource(this IBitmapSources bitmapSources, in int size)

@@ -19,7 +19,6 @@ using System;
 using System.Collections.ObjectModel;
 
 using WinCopies.IO.ObjectModel;
-using WinCopies.Temp;
 
 namespace WinCopies.GUI.IO.ObjectModel
 {

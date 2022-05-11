@@ -17,11 +17,14 @@
 
 using Microsoft.WindowsAPICodePack.Shell;
 
+#region System
 using System;
 using System.Drawing;
 using System.IO;
 using System.Windows.Media.Imaging;
+#endregion System
 
+#region WinCopies
 using WinCopies.Collections.Generic;
 using WinCopies.GUI.Drawing;
 using WinCopies.IO.AbstractionInterop;
@@ -31,7 +34,7 @@ using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Selectors;
 using WinCopies.Linq;
 using WinCopies.PropertySystem;
-using WinCopies.Temp;
+#endregion WinCopies
 
 namespace WinCopies.IO.ObjectModel
 {
@@ -140,6 +143,8 @@ namespace WinCopies.IO.ObjectModel
 #if !CS9
         }
 #endif
+
+        public override string Protocol => null;
 
         protected override bool IsLocalRootOverride => false;
 

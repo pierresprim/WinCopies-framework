@@ -12,7 +12,9 @@
     xmlns:guiDialogs="clr-namespace:WinCopies.GUI.Windows;assembly=WinCopies.GUI.Models"
     xmlns:windows="clr-namespace:WinCopies.GUI.Windows"
     xmlns:propertySystem="clr-namespace:WinCopies.GUI.Controls.PropertySystem"
-    xmlns:controls="clr-namespace:System.Windows.Controls;assembly=PresentationFramework">
+    xmlns:controls="clr-namespace:System.Windows.Controls;assembly=PresentationFramework"
+    xmlns:primitives="clr-namespace:System.Windows.Controls.Primitives;assembly=PresentationFramework"
+    xmlns:diagnostics="clr-namespace:WinCopies.Diagnostics;assembly=WinCopies.Util">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/wincopies.gui.templates;component/Themes/Generic.xaml" />
         <ResourceDictionary>
@@ -64,6 +66,13 @@
 
             <SolidColorBrush x:Key="TabItem.Selected.Background" Color="#FFFFFF"/>
             <SolidColorBrush x:Key="TabItem.Selected.Border" Color="#ACACAC"/>
+
+            <LinearGradientBrush x:Key="IntermediateSwitchBackground" StartPoint="0,0" EndPoint="1,0">
+                <GradientStop Color="Green" Offset="0"/>
+                <GradientStop Color="Green" Offset="0.5"/>
+                <GradientStop Color="Red" Offset="0.5"/>
+                <GradientStop Color="Red" Offset="1"/>
+            </LinearGradientBrush>
             <!--End of Colors Section-->
             <!--Styles-->
             <Style x:Key="WinCopies.GUI.Controls.TextBoxStyle" TargetType="{x:Type local:TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
@@ -91,6 +100,223 @@
         </ResourceDictionary>
     </ResourceDictionary.MergedDictionaries>
 
+    <ControlTemplate x:Key="SwitchBaseTemplate" TargetType="{x:Type local:SwitchBase}">
+        <Border Height="26" Width="50" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}">
+            <Grid>
+                <Grid Height="20" Width="45" HorizontalAlignment="Center">
+                    <Rectangle RadiusX="10" RadiusY="10" Fill="{TemplateBinding Background}" />
+                    <Rectangle x:Name="shadow" RadiusX="10" RadiusY="10" Opacity="0.7">
+                        <Rectangle.Style>
+                            <Style TargetType="{x:Type Rectangle}">
+                                <Setter Property="Fill">
+                                    <Setter.Value>
+                                        <RadialGradientBrush RadiusX="0.7" RadiusY="0.7">
+                                            <GradientStop Color="Transparent"/>
+                                            <GradientStop Color="DimGray" Offset="1"/>
+                                        </RadialGradientBrush>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </Rectangle.Style>
+                    </Rectangle>
+                </Grid>
+                <Rectangle x:Name="rectangle" VerticalAlignment="Center">
+                    <Rectangle.Style>
+                        <Style TargetType="{x:Type Rectangle}">
+                            <Setter Property="Height" Value="26" />
+                            <Setter Property="Width" Value="26" />
+                            <Setter Property="HorizontalAlignment" Value="Left" />
+                            <Setter Property="RadiusX" Value="100" />
+                            <Setter Property="RadiusY" Value="100" />
+                            <Setter Property="Fill" Value="{Binding Foreground, RelativeSource={RelativeSource TemplatedParent}}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding SwitcherShape, RelativeSource={RelativeSource TemplatedParent}}" Value="Ellipse">
+                                    <Setter Property="Height" Value="20" />
+                                    <Setter Property="Margin" Value="2.5,0,2.5,0" />
+                                    <Setter Property="RadiusX" Value="10" />
+                                    <Setter Property="RadiusY" Value="10" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Status, RelativeSource={RelativeSource TemplatedParent}}" Value="Checked">
+                                    <Setter Property="HorizontalAlignment" Value="Right" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Status, RelativeSource={RelativeSource TemplatedParent}}" Value="Checking">
+                                    <Setter Property="HorizontalAlignment" Value="Center" />
+                                    <Setter Property="Margin" Value="10,0,0,0" />
+                                    <Setter Property="Fill" Value="Orange" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Status, RelativeSource={RelativeSource TemplatedParent}}" Value="Unchecking">
+                                    <Setter Property="HorizontalAlignment" Value="Center" />
+                                    <Setter Property="Margin" Value="0,0,10,0" />
+                                    <Setter Property="Fill" Value="Orange" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Rectangle.Style>
+                </Rectangle>
+                <Rectangle x:Name="shadowRectangle">
+                    <Rectangle.Style>
+                        <Style TargetType="{x:Type Rectangle}">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Setter Property="Height" Value="{Binding Height, ElementName=rectangle}" />
+                            <Setter Property="Width" Value="{Binding Width, ElementName=rectangle}" />
+                            <Setter Property="HorizontalAlignment" Value="{Binding HorizontalAlignment, ElementName=rectangle}" />
+                            <Setter Property="RadiusX" Value="{Binding RadiusX, ElementName=rectangle}" />
+                            <Setter Property="RadiusY" Value="{Binding RadiusY, ElementName=rectangle}" />
+                            <Setter Property="Margin" Value="{Binding Margin, ElementName=rectangle}" />
+                            <Setter Property="Opacity" Value="0.25" />
+                            <Setter Property="Fill">
+                                <Setter.Value>
+                                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                        <GradientStop Color="LightGray"/>
+                                        <GradientStop Color="Black" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Rectangle.Style>
+                </Rectangle>
+            </Grid>
+        </Border>
+        <ControlTemplate.Triggers>
+            <DataTrigger Binding="{Binding Status, RelativeSource={RelativeSource Self}}" Value="Checking">
+                <Setter Property="Visibility" TargetName="shadowRectangle" Value="Visible" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Status, RelativeSource={RelativeSource Self}}" Value="Unchecking">
+                <Setter Property="Visibility" TargetName="shadowRectangle" Value="Visible" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Status, RelativeSource={RelativeSource Self}}" Value="None">
+                <Setter Property="HorizontalAlignment" TargetName="rectangle" Value="Center" />
+            </DataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding IsIndeterminateAState, RelativeSource={RelativeSource Self}}" Value="true" />
+                    <Condition Binding="{Binding Status, RelativeSource={RelativeSource Self}}" Value="None" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Background" Value="Orange" />
+            </MultiDataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding IsIndeterminateAState, RelativeSource={RelativeSource Self}}" Value="false" />
+                    <Condition Binding="{Binding Status, RelativeSource={RelativeSource Self}}" Value="None" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Background" Value="{StaticResource IntermediateSwitchBackground}" />
+            </MultiDataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding IsHighlighted, RelativeSource={RelativeSource Self}}" Value="true" />
+                    <Condition Binding="{Binding IsPressed, RelativeSource={RelativeSource Self}}" Value="false" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Fill" TargetName="shadow">
+                    <Setter.Value>
+                        <RadialGradientBrush RadiusX="0.7" RadiusY="0.7">
+                            <GradientStop Color="Transparent"/>
+                            <GradientStop Color="LightGray" Offset="1"/>
+                        </RadialGradientBrush>
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="Foreground">
+                    <Setter.Value>
+                        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                            <GradientStop Color="White"/>
+                            <GradientStop Color="LightGray" Offset="0.5"/>
+                        </LinearGradientBrush>
+                    </Setter.Value>
+                </Setter>
+            </MultiDataTrigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+
+    <Style TargetType="{x:Type local:SwitchBase}">
+        <Setter Property="FlowDirection" Value="LeftToRight" />
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="Background" Value="Red" />
+        <Setter Property="Foreground">
+            <Setter.Value>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="LightGray"/>
+                    <GradientStop Color="DimGray" Offset="1"/>
+                </LinearGradientBrush>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="IsHighlighted">
+            <Setter.Value>
+                <MultiBinding Converter="{converters:BooleanMultiConverter}" ConverterParameter="{x:Static diagnostics:ComparisonType.Or}">
+                    <Binding Path="IsMouseOver" RelativeSource="{RelativeSource Self}" />
+                    <Binding Path="IsFocused" RelativeSource="{RelativeSource Self}" />
+                </MultiBinding>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Template" Value="{StaticResource SwitchBaseTemplate}" />
+
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Status, RelativeSource={RelativeSource Self}}" Value="Checked">
+                <Setter Property="Background" Value="Green" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Status, RelativeSource={RelativeSource Self}}" Value="Checking">
+                <Setter Property="Background" Value="{StaticResource IntermediateSwitchBackground}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Status, RelativeSource={RelativeSource Self}}" Value="Unchecking">
+                <Setter Property="Background" Value="{StaticResource IntermediateSwitchBackground}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding IsEnabled, RelativeSource={RelativeSource Self}}" Value="false">
+                <Setter Property="Foreground" Value="DarkGray" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding IsPressed, RelativeSource={RelativeSource Self}}" Value="true">
+                <Setter Property="Foreground">
+                    <Setter.Value>
+                        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                            <GradientStop Color="LightGray"/>
+                            <GradientStop Color="White" Offset="0.5"/>
+                        </LinearGradientBrush>
+                    </Setter.Value>
+                </Setter>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <ControlTemplate x:Key="SwitchTemplate" TargetType="{x:Type local:Switch}">
+        <Border Background="{TemplateBinding Background}" HorizontalAlignment="Stretch" CornerRadius="{TemplateBinding CornerRadius}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}">
+                <ContentPresenter VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                <local:SwitchBase Margin="{TemplateBinding Padding}" IsEnabled="{TemplateBinding IsEnabled}" Status="{TemplateBinding Status}" SwitcherShape="{TemplateBinding SwitcherShape}" IsPressed="{TemplateBinding IsPressed}" IsHighlighted="{TemplateBinding IsHighlighted}" IsIndeterminateAState="{TemplateBinding IsIndeterminateAState}" CornerRadius="2">
+                    <local:SwitchBase.Style>
+                        <Style TargetType="{x:Type local:SwitchBase}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsFocused, RelativeSource={RelativeSource TemplatedParent}}" Value="true">
+                                    <Setter Property="BorderBrush" Value="SkyBlue" />
+                                    <Setter Property="BorderThickness" Value="1" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </local:SwitchBase.Style>
+                </local:SwitchBase>
+            </StackPanel>
+        </Border>
+    </ControlTemplate>
+
+    <Style BasedOn="{StaticResource {x:Type primitives:ToggleButton}}" TargetType="{x:Type local:Switch}">
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="IsHighlighted">
+            <Setter.Value>
+                <MultiBinding Converter="{converters:BooleanMultiConverter}" ConverterParameter="{x:Static diagnostics:ComparisonType.Or}">
+                    <Binding Path="IsMouseOver" RelativeSource="{RelativeSource Self}" />
+                    <Binding Path="IsFocused" RelativeSource="{RelativeSource Self}" />
+                </MultiBinding>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Template" Value="{StaticResource SwitchTemplate}" />
+
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsEnabled, RelativeSource={RelativeSource Self}}" Value="false">
+                <Setter Property="Foreground" Value="{x:Static SystemColors.GrayTextBrush}" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
     <Style x:Key="WinCopies.TabControlStyle" TargetType="{x:Type TabControl}">
         <Setter Property="Padding" Value="2"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
@@ -99,6 +325,13 @@
         <Setter Property="BorderBrush" Value="{StaticResource TabItem.Selected.Border}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+        <Setter Property="ItemsPanel">
+            <Setter.Value>
+                <ItemsPanelTemplate>
+                    <TabPanel Background="Transparent" IsItemsHost="true" ScrollViewer.CanContentScroll="True"/>
+                </ItemsPanelTemplate>
+            </Setter.Value>
+        </Setter>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type TabControl}">
@@ -111,8 +344,8 @@
                             <RowDefinition x:Name="RowDefinition0" Height="Auto"/>
                             <RowDefinition x:Name="RowDefinition1" Height="*"/>
                         </Grid.RowDefinitions>
-                        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" Margin="2,2,2,0" KeyboardNavigation.TabIndex="1" Panel.ZIndex="1">
-                            <TabPanel x:Name="headerPanel" Background="Transparent" IsItemsHost="true" ScrollViewer.CanContentScroll="True"/>
+                        <ScrollViewer HorizontalAlignment="Left" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" Margin="2,2,2,0" KeyboardNavigation.TabIndex="1" Panel.ZIndex="1">
+                            <ItemsPresenter x:Name="headerPanel" />
                         </ScrollViewer>
                         <Border x:Name="contentPanel" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Grid.Column="0" KeyboardNavigation.DirectionalNavigation="Contained" Grid.Row="1" KeyboardNavigation.TabIndex="2" KeyboardNavigation.TabNavigation="Local">
                             <ContentPresenter x:Name="PART_SelectedContentHost" ContentSource="SelectedContent" Margin="{TemplateBinding Padding}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>

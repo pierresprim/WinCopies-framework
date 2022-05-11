@@ -5,20 +5,19 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using WinCopies.EntityFramework;
-using WinCopies.Temp;
 
 namespace WinCopies.Data.SQL
 {
     public struct SelectParameters<T> : ISelectParameters<T> where T : ISQLColumn
     {
-        public IExtensibleEnumerable<string>
+        public Collections.Generic.IExtensibleEnumerable<string>
 #if CS8
             ?
 #endif
             Tables
         { get; set; }
 
-        public IExtensibleEnumerable<T>
+        public Collections.Generic.IExtensibleEnumerable<T>
 #if CS8
             ?
 #endif

@@ -10,7 +10,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AssemblyInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\AddressBar.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\ExplorerControlDefaultListViewItemContent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\ExplorerControlPropertyGrid.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\ExplorerControlTabControl.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\Process\ProcessErrorItemControl.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\Process\ProcessManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\BrowsableObjectInfoViewModel.Partial\Browsability.Partial\Browsability.cs" />
@@ -20,7 +23,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\BrowsableObjectInfoViewModel.Partial\BrowsableObjectInfoViewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\BrowsableObjectInfoViewModel.Partial\Selection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessWindow.cs" />
-    <Compile Include="..\WinCopies.GUI.IO.Shared\ObjectModel\BrowsableObjectInfoCollectionViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\BrowsableObjectInfoCollectionViewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\DuplicateFindingOptions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\Collections\ProcessCollections.Partial\EnumerableInfoLinkedCollections.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\Collections\IProcessCollections.cs" />

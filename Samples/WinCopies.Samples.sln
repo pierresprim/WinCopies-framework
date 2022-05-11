@@ -17,10 +17,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GUI", "GUI", "{AC0AD4A2-239
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3.x", "3.x", "{4197EE1D-BAA5-4A92-8F27-B55C861CB1BF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinCopies.Util.Temp", "..\Source\WinCopies.Util.Temp\WinCopies.Util.Temp.csproj", "{1283CBBF-9C3B-4A37-A95A-801D4666BC68}"
-EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "WinCopies.Util.Temp.Shared", "..\Source\WinCopies.Util.Temp.Shared\WinCopies.Util.Temp.Shared.shproj", "{971FCA65-9999-4B74-BDDE-947BC38435F0}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinCopies.Console", "..\Source\WinCopies.Console\WinCopies.Console.csproj", "{21E48B4B-C5DB-4BFA-A6BB-9F362470F1ED}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "WinCopies.Console.Shared", "..\Source\WinCopies.Console.Shared\WinCopies.Console.Shared.shproj", "{41DCC223-D715-4631-B32D-7A55B03077A0}"
@@ -111,42 +107,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinCopies.IO", "..\Source\I
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinCopies.IO.Shell", "..\Source\IO\3.x\WinCopies.IO.Shell\WinCopies.IO.Shell.csproj", "{C374BD8D-9E69-49B2-B80F-7614B8DDAAAB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinCopies.Reflection.DotNetDocBuilder.SampleDll", "WinCopies.Reflection.DotNetDocBuilder.SampleDll\WinCopies.Reflection.DotNetDocBuilder.SampleDll.csproj", "{FA72EBAC-14A9-436C-95AE-41F52439092A}"
+EndProject
 Global
-	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		..\Source\Reflection\Shared\WinCopies.Reflection.DotNetDocBuilder.Shared\WinCopies.Reflection.DotNetDocBuilder.Shared.projitems*{079b572e-0d46-41d7-8a4a-60a6b3060ac8}*SharedItemsImports = 5
-		..\Source\WinCopies.Util.Temp.Shared\WinCopies.Util.Temp.Shared.projitems*{1283cbbf-9c3b-4a37-a95a-801d4666bc68}*SharedItemsImports = 5
-		..\Source\Data\Shared\WinCopies.Data.SQL.Shared\WinCopies.Data.SQL.Shared.projitems*{13ca494b-5b82-4e62-b546-35b2aa2510b2}*SharedItemsImports = 5
-		..\Source\GUI\Shared\WinCopies.GUI.Templates.Shared\WinCopies.GUI.Templates.Shared.projitems*{1a137597-3a0a-41a6-844e-c10c46b85d03}*SharedItemsImports = 5
-		..\Source\GUI\Shared\WinCopies.GUI.Templates.Shared\WinCopies.GUI.Templates.Shared.projitems*{1af939a9-d753-48e4-b114-fb59e5f3f7fb}*SharedItemsImports = 13
-		..\Source\WinCopies.Console.Shared\WinCopies.Console.Shared.projitems*{21e48b4b-c5db-4bfa-a6bb-9f362470f1ed}*SharedItemsImports = 5
-		..\Source\IO\Shared\WinCopies.GUI.IO.Shared\WinCopies.GUI.IO.Shared.projitems*{25b4d3e5-22db-4e0e-a8a9-079fa78b6ca4}*SharedItemsImports = 5
-		..\Source\GUI\Shared\WinCopies.GUI.Shared\WinCopies.GUI.Shared.projitems*{3aaf402a-7c4a-455f-8f42-6f4f13c5e185}*SharedItemsImports = 13
-		..\Source\GUI\Shared\WinCopies.GUI.Windows.Shared\WinCopies.GUI.Windows.Shared.projitems*{3fa63940-0513-455d-a3d1-fba954c22869}*SharedItemsImports = 13
-		..\Source\WinCopies.Console.Shared\WinCopies.Console.Shared.projitems*{41dcc223-d715-4631-b32d-7a55b03077a0}*SharedItemsImports = 13
-		..\Source\GUI\Shared\WinCopies.GUI.Shared\WinCopies.GUI.Shared.projitems*{44f96b37-3a29-4be2-8478-4cc6451982d3}*SharedItemsImports = 5
-		..\Source\Reflection\Shared\WinCopies.Reflection.DotNetDocBuilder.Shared\WinCopies.Reflection.DotNetDocBuilder.Shared.projitems*{479febe9-432f-4e15-82f6-626e519b68a3}*SharedItemsImports = 13
-		WinCopies.GUI.Samples.Shared\WinCopies.GUI.Samples.Shared.projitems*{4fb1033c-a609-482f-8f9c-6d8fea96424c}*SharedItemsImports = 5
-		..\Source\Reflection\Shared\WinCopies.Reflection.DotNetParser.Shared\WinCopies.Reflection.DotNetParser.Shared.projitems*{56cf56f4-3aa8-420f-8d83-65cd2a1ef09c}*SharedItemsImports = 5
-		..\Source\GUI\Shared\WinCopies.GUI.ViewModels.Shared\WinCopies.GUI.ViewModels.Shared.projitems*{589fcd51-85a1-46ff-ab94-3cdd133f92de}*SharedItemsImports = 13
-		..\Source\IO\Shared\WinCopies.IO.Shell.Shared\WinCopies.IO.Shell.Shared.projitems*{5c6a8e8f-21ab-4c80-b898-5fb090cb72bd}*SharedItemsImports = 13
-		..\Source\IO\Shared\WinCopies.GUI.Shell.Shared\WinCopies.GUI.Shell.Shared.projitems*{5dc4f3fe-2a36-419f-99e5-aa1a2dbab33b}*SharedItemsImports = 5
-		..\Source\Reflection\Shared\WinCopies.Reflection.DotNetParser.Shared\WinCopies.Reflection.DotNetParser.Shared.projitems*{65ba5ac0-50dc-4948-b145-ba0f82ec4fb5}*SharedItemsImports = 13
-		..\Source\IO\Shared\WinCopies.GUI.IO.Shared\WinCopies.GUI.IO.Shared.projitems*{690260b7-f85d-481e-9527-0a6034e39053}*SharedItemsImports = 13
-		WinCopies.GUI.Samples.Shared\WinCopies.GUI.Samples.Shared.projitems*{692404ea-80c6-4d74-8455-4a9103d8e20e}*SharedItemsImports = 13
-		..\Source\IO\Shared\WinCopies.IO.Shared\WinCopies.IO.Shared.projitems*{76656453-c025-42e6-86a0-dfbb520ed7d9}*SharedItemsImports = 13
-		..\Source\Data\Shared\WinCopies.Data.SQL.Shared\WinCopies.Data.SQL.Shared.projitems*{78129f5e-4eba-4662-8f8a-fcbb2ef36fb9}*SharedItemsImports = 13
-		..\Source\GUI\Shared\WinCopies.GUI.Controls.Shared\WinCopies.GUI.Controls.Shared.projitems*{8e59282e-c7fb-44dc-8617-a1b2a932c5a9}*SharedItemsImports = 13
-		..\Source\GUI\Shared\WinCopies.GUI.Models.Shared\WinCopies.GUI.Models.Shared.projitems*{9029e20a-9793-4127-9118-ff425bfad3ab}*SharedItemsImports = 5
-		..\Source\WinCopies.Util.Temp.Shared\WinCopies.Util.Temp.Shared.projitems*{971fca65-9999-4b74-bdde-947bc38435f0}*SharedItemsImports = 13
-		..\Source\Data\Shared\WinCopies.Data.MySQL.Shared\WinCopies.Data.MySQL.Shared.projitems*{97de8f2d-3077-4efd-a0ec-5030ea874254}*SharedItemsImports = 13
-		..\Source\GUI\Shared\WinCopies.GUI.Models.Shared\WinCopies.GUI.Models.Shared.projitems*{a43aee04-0665-4d64-a4b9-7ff1e471bf29}*SharedItemsImports = 13
-		..\Source\IO\Shared\WinCopies.IO.Shell.Shared\WinCopies.IO.Shell.Shared.projitems*{c374bd8d-9e69-49b2-b80f-7614b8ddaaab}*SharedItemsImports = 5
-		..\Source\GUI\Shared\WinCopies.GUI.ViewModels.Shared\WinCopies.GUI.ViewModels.Shared.projitems*{c85c5ce9-6cb9-4efd-bc3a-9c5435ee06fa}*SharedItemsImports = 5
-		..\Source\IO\Shared\WinCopies.GUI.Shell.Shared\WinCopies.GUI.Shell.Shared.projitems*{d5ddacc8-7290-4f0c-9505-78822411e6ba}*SharedItemsImports = 13
-		..\Source\Data\Shared\WinCopies.Data.MySQL.Shared\WinCopies.Data.MySQL.Shared.projitems*{dbfa093c-6b26-4f34-a1c0-f38d0b2b03e7}*SharedItemsImports = 5
-		..\Source\GUI\Shared\WinCopies.GUI.Drawing.Shared\WinCopies.GUI.Drawing.Shared.projitems*{dcdd5153-960c-4b7f-a707-dc49e0149f76}*SharedItemsImports = 5
-		..\Source\GUI\Shared\WinCopies.GUI.Drawing.Shared\WinCopies.GUI.Drawing.Shared.projitems*{f96f9167-8d67-49f6-a4fb-cffd49725150}*SharedItemsImports = 13
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -156,10 +119,6 @@ Global
 		{4FB1033C-A609-482F-8F9C-6D8FEA96424C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4FB1033C-A609-482F-8F9C-6D8FEA96424C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4FB1033C-A609-482F-8F9C-6D8FEA96424C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1283CBBF-9C3B-4A37-A95A-801D4666BC68}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1283CBBF-9C3B-4A37-A95A-801D4666BC68}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1283CBBF-9C3B-4A37-A95A-801D4666BC68}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1283CBBF-9C3B-4A37-A95A-801D4666BC68}.Release|Any CPU.Build.0 = Release|Any CPU
 		{21E48B4B-C5DB-4BFA-A6BB-9F362470F1ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{21E48B4B-C5DB-4BFA-A6BB-9F362470F1ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{21E48B4B-C5DB-4BFA-A6BB-9F362470F1ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -220,6 +179,10 @@ Global
 		{C374BD8D-9E69-49B2-B80F-7614B8DDAAAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C374BD8D-9E69-49B2-B80F-7614B8DDAAAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C374BD8D-9E69-49B2-B80F-7614B8DDAAAB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA72EBAC-14A9-436C-95AE-41F52439092A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA72EBAC-14A9-436C-95AE-41F52439092A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA72EBAC-14A9-436C-95AE-41F52439092A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA72EBAC-14A9-436C-95AE-41F52439092A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -227,8 +190,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{AC0AD4A2-239C-4049-9CAD-E8EE02D27D4B} = {169DE35F-7B50-4B22-B7FA-77E00A07A2D1}
 		{4197EE1D-BAA5-4A92-8F27-B55C861CB1BF} = {AC0AD4A2-239C-4049-9CAD-E8EE02D27D4B}
-		{1283CBBF-9C3B-4A37-A95A-801D4666BC68} = {1B005F95-E606-4202-A1AB-4E0205229C88}
-		{971FCA65-9999-4B74-BDDE-947BC38435F0} = {6BF6586A-387E-4831-B571-12DB701BB9DE}
 		{21E48B4B-C5DB-4BFA-A6BB-9F362470F1ED} = {1B005F95-E606-4202-A1AB-4E0205229C88}
 		{41DCC223-D715-4631-B32D-7A55B03077A0} = {6BF6586A-387E-4831-B571-12DB701BB9DE}
 		{C307D188-A7E6-45A3-84EE-93A5F4C180A7} = {169DE35F-7B50-4B22-B7FA-77E00A07A2D1}
@@ -276,5 +237,38 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3386B857-2186-4D61-A62F-00A9EAAF603B}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		..\Source\Reflection\Shared\WinCopies.Reflection.DotNetDocBuilder.Shared\WinCopies.Reflection.DotNetDocBuilder.Shared.projitems*{079b572e-0d46-41d7-8a4a-60a6b3060ac8}*SharedItemsImports = 5
+		..\Source\Data\Shared\WinCopies.Data.SQL.Shared\WinCopies.Data.SQL.Shared.projitems*{13ca494b-5b82-4e62-b546-35b2aa2510b2}*SharedItemsImports = 5
+		..\Source\GUI\Shared\WinCopies.GUI.Templates.Shared\WinCopies.GUI.Templates.Shared.projitems*{1a137597-3a0a-41a6-844e-c10c46b85d03}*SharedItemsImports = 5
+		..\Source\GUI\Shared\WinCopies.GUI.Templates.Shared\WinCopies.GUI.Templates.Shared.projitems*{1af939a9-d753-48e4-b114-fb59e5f3f7fb}*SharedItemsImports = 13
+		..\Source\WinCopies.Console.Shared\WinCopies.Console.Shared.projitems*{21e48b4b-c5db-4bfa-a6bb-9f362470f1ed}*SharedItemsImports = 5
+		..\Source\IO\Shared\WinCopies.GUI.IO.Shared\WinCopies.GUI.IO.Shared.projitems*{25b4d3e5-22db-4e0e-a8a9-079fa78b6ca4}*SharedItemsImports = 5
+		..\Source\GUI\Shared\WinCopies.GUI.Shared\WinCopies.GUI.Shared.projitems*{3aaf402a-7c4a-455f-8f42-6f4f13c5e185}*SharedItemsImports = 13
+		..\Source\GUI\Shared\WinCopies.GUI.Windows.Shared\WinCopies.GUI.Windows.Shared.projitems*{3fa63940-0513-455d-a3d1-fba954c22869}*SharedItemsImports = 13
+		..\Source\WinCopies.Console.Shared\WinCopies.Console.Shared.projitems*{41dcc223-d715-4631-b32d-7a55b03077a0}*SharedItemsImports = 13
+		..\Source\GUI\Shared\WinCopies.GUI.Shared\WinCopies.GUI.Shared.projitems*{44f96b37-3a29-4be2-8478-4cc6451982d3}*SharedItemsImports = 5
+		..\Source\Reflection\Shared\WinCopies.Reflection.DotNetDocBuilder.Shared\WinCopies.Reflection.DotNetDocBuilder.Shared.projitems*{479febe9-432f-4e15-82f6-626e519b68a3}*SharedItemsImports = 13
+		WinCopies.GUI.Samples.Shared\WinCopies.GUI.Samples.Shared.projitems*{4fb1033c-a609-482f-8f9c-6d8fea96424c}*SharedItemsImports = 5
+		..\Source\Reflection\Shared\WinCopies.Reflection.DotNetParser.Shared\WinCopies.Reflection.DotNetParser.Shared.projitems*{56cf56f4-3aa8-420f-8d83-65cd2a1ef09c}*SharedItemsImports = 5
+		..\Source\GUI\Shared\WinCopies.GUI.ViewModels.Shared\WinCopies.GUI.ViewModels.Shared.projitems*{589fcd51-85a1-46ff-ab94-3cdd133f92de}*SharedItemsImports = 13
+		..\Source\IO\Shared\WinCopies.IO.Shell.Shared\WinCopies.IO.Shell.Shared.projitems*{5c6a8e8f-21ab-4c80-b898-5fb090cb72bd}*SharedItemsImports = 13
+		..\Source\IO\Shared\WinCopies.GUI.Shell.Shared\WinCopies.GUI.Shell.Shared.projitems*{5dc4f3fe-2a36-419f-99e5-aa1a2dbab33b}*SharedItemsImports = 5
+		..\Source\Reflection\Shared\WinCopies.Reflection.DotNetParser.Shared\WinCopies.Reflection.DotNetParser.Shared.projitems*{65ba5ac0-50dc-4948-b145-ba0f82ec4fb5}*SharedItemsImports = 13
+		..\Source\IO\Shared\WinCopies.GUI.IO.Shared\WinCopies.GUI.IO.Shared.projitems*{690260b7-f85d-481e-9527-0a6034e39053}*SharedItemsImports = 13
+		WinCopies.GUI.Samples.Shared\WinCopies.GUI.Samples.Shared.projitems*{692404ea-80c6-4d74-8455-4a9103d8e20e}*SharedItemsImports = 13
+		..\Source\IO\Shared\WinCopies.IO.Shared\WinCopies.IO.Shared.projitems*{76656453-c025-42e6-86a0-dfbb520ed7d9}*SharedItemsImports = 13
+		..\Source\Data\Shared\WinCopies.Data.SQL.Shared\WinCopies.Data.SQL.Shared.projitems*{78129f5e-4eba-4662-8f8a-fcbb2ef36fb9}*SharedItemsImports = 13
+		..\Source\GUI\Shared\WinCopies.GUI.Controls.Shared\WinCopies.GUI.Controls.Shared.projitems*{8e59282e-c7fb-44dc-8617-a1b2a932c5a9}*SharedItemsImports = 13
+		..\Source\GUI\Shared\WinCopies.GUI.Models.Shared\WinCopies.GUI.Models.Shared.projitems*{9029e20a-9793-4127-9118-ff425bfad3ab}*SharedItemsImports = 5
+		..\Source\Data\Shared\WinCopies.Data.MySQL.Shared\WinCopies.Data.MySQL.Shared.projitems*{97de8f2d-3077-4efd-a0ec-5030ea874254}*SharedItemsImports = 13
+		..\Source\GUI\Shared\WinCopies.GUI.Models.Shared\WinCopies.GUI.Models.Shared.projitems*{a43aee04-0665-4d64-a4b9-7ff1e471bf29}*SharedItemsImports = 13
+		..\Source\IO\Shared\WinCopies.IO.Shell.Shared\WinCopies.IO.Shell.Shared.projitems*{c374bd8d-9e69-49b2-b80f-7614b8ddaaab}*SharedItemsImports = 5
+		..\Source\GUI\Shared\WinCopies.GUI.ViewModels.Shared\WinCopies.GUI.ViewModels.Shared.projitems*{c85c5ce9-6cb9-4efd-bc3a-9c5435ee06fa}*SharedItemsImports = 5
+		..\Source\IO\Shared\WinCopies.GUI.Shell.Shared\WinCopies.GUI.Shell.Shared.projitems*{d5ddacc8-7290-4f0c-9505-78822411e6ba}*SharedItemsImports = 13
+		..\Source\Data\Shared\WinCopies.Data.MySQL.Shared\WinCopies.Data.MySQL.Shared.projitems*{dbfa093c-6b26-4f34-a1c0-f38d0b2b03e7}*SharedItemsImports = 5
+		..\Source\GUI\Shared\WinCopies.GUI.Drawing.Shared\WinCopies.GUI.Drawing.Shared.projitems*{dcdd5153-960c-4b7f-a707-dc49e0149f76}*SharedItemsImports = 5
+		..\Source\GUI\Shared\WinCopies.GUI.Drawing.Shared\WinCopies.GUI.Drawing.Shared.projitems*{f96f9167-8d67-49f6-a4fb-cffd49725150}*SharedItemsImports = 13
 	EndGlobalSection
 EndGlobal

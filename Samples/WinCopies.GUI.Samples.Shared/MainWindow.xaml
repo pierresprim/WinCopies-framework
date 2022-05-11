@@ -20,15 +20,16 @@ along with the WinCopies Framework.  If not, see<https://www.gnu.org/licenses/>.
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:windows="clr-namespace:WinCopies.GUI.Windows;assembly=WinCopies.GUI"
+                xmlns:local="clr-namespace:WinCopies.GUI.Samples"
         xmlns:controls="clr-namespace:WinCopies.GUI.Controls;assembly=WinCopies.GUI"
+        xmlns:windows="clr-namespace:WinCopies.GUI.Windows;assembly=WinCopies.GUI"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" HelpButtonClick="Window_HelpButtonClick">
+        Title="MainWindow" Height="450" Width="800" AeroGlassCompositionActivated="True" HelpButtonClick="Window_HelpButtonClick">
     <windows:Window.CommandBindings>
         <CommandBinding Command="Close" Executed="CommandBinding_Executed" CanExecute="CommandBinding_CanExecute" />
     </windows:Window.CommandBindings>
-    <Grid>
-        <Menu VerticalAlignment="Top">
+    <StackPanel VerticalAlignment="Top">
+        <Menu HorizontalAlignment="Left" VerticalAlignment="Top">
             <MenuItem Header="File">
                 <MenuItem Header="Open dialog..." Click="Button_Click" />
                 <MenuItem Command="Close" />
@@ -40,5 +41,78 @@ along with the WinCopies Framework.  If not, see<https://www.gnu.org/licenses/>.
                 <MenuItem Header="Menu" Click="MenuItem_Click_3" />
             </MenuItem>
         </Menu>
-    </Grid>
+        <CheckBox IsChecked="{Binding AeroGlassCompositionActivated, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type windows:Window}}}" />
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <GroupBox>
+                <StackPanel>
+                    <controls:Switch SwitcherShape="Ellipse" FlowDirection="RightToLeft" IsChecked="True" Content="{Binding IsChecked, RelativeSource={RelativeSource Self}}" Command="{Binding Command, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}" />
+                    <controls:Switch SwitcherShape="Ellipse" FlowDirection="RightToLeft" IsChecked="False" Content="Uncheckable" Command="{Binding Command2, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}" />
+                    <controls:Switch IsThreeState="True" IsChecked="{x:Null}" SwitcherShape="Ellipse" FlowDirection="RightToLeft" Content="{Binding IsChecked, TargetNullValue=&lt;Null&gt;, RelativeSource={RelativeSource Self}}" Command="{Binding Command, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}" />
+                    <controls:Switch IsThreeState="True" IsChecked="{x:Null}" SwitcherShape="Ellipse" FlowDirection="RightToLeft" Content="Uncheckable" Command="{Binding Command2, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Right" />
+                    <controls:Switch IsEnabled="False" SwitcherShape="Ellipse" IsChecked="True" FlowDirection="RightToLeft" Content="Uncheckable" Command="{Binding Command2, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Right" />
+                    <controls:Switch IsEnabled="False" SwitcherShape="Ellipse" FlowDirection="RightToLeft" Content="Uncheckable" Command="{Binding Command2, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Right" />
+                    <controls:Switch IsEnabled="False" IsThreeState="True" IsChecked="{x:Null}" SwitcherShape="Ellipse" FlowDirection="RightToLeft" Content="Uncheckable" Command="{Binding Command2, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Right" />
+                    <controls:Switch FlowDirection="RightToLeft" IsChecked="True" Content="{Binding IsChecked, RelativeSource={RelativeSource Self}}" Command="{Binding Command, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Right" />
+                    <controls:Switch FlowDirection="RightToLeft" IsChecked="False" Content="Uncheckable" Command="{Binding Command2, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Right" />
+                    <controls:Switch IsThreeState="True" IsChecked="{x:Null}" FlowDirection="RightToLeft" Content="{Binding IsChecked, TargetNullValue=&lt;Null&gt;, RelativeSource={RelativeSource Self}}" Command="{Binding Command, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Right" />
+                    <controls:Switch IsThreeState="True" IsChecked="{x:Null}" FlowDirection="RightToLeft" Content="Uncheckable" Command="{Binding Command2, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Right" />
+                    <controls:Switch IsEnabled="False" IsChecked="True" FlowDirection="RightToLeft" Content="Uncheckable" Command="{Binding Command2, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Right" />
+                    <controls:Switch IsEnabled="False" FlowDirection="RightToLeft" Content="Uncheckable" Command="{Binding Command2, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Right" />
+                    <controls:Switch IsEnabled="False" IsThreeState="True" IsChecked="{x:Null}" FlowDirection="RightToLeft" Content="Uncheckable" Command="{Binding Command2, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Right" />
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Grid.Column="1">
+                <StackPanel>
+                    <controls:Switch IsIndeterminateAState="True" SwitcherShape="Ellipse" FlowDirection="RightToLeft" IsChecked="True" Content="{Binding IsChecked, RelativeSource={RelativeSource Self}}" Command="{Binding Command, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Right" />
+                    <controls:Switch IsIndeterminateAState="True" SwitcherShape="Ellipse" FlowDirection="RightToLeft" IsChecked="False" Content="Uncheckable" Command="{Binding Command2, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Right" />
+                    <controls:Switch IsIndeterminateAState="True" IsThreeState="True" IsChecked="{x:Null}" SwitcherShape="Ellipse" FlowDirection="RightToLeft" Content="{Binding IsChecked, TargetNullValue=&lt;Null&gt;, RelativeSource={RelativeSource Self}}" Command="{Binding Command, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Right" />
+                    <controls:Switch IsIndeterminateAState="True" IsThreeState="True" IsChecked="{x:Null}" SwitcherShape="Ellipse" FlowDirection="RightToLeft" Content="Uncheckable" Command="{Binding Command2, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Right" />
+                    <controls:Switch IsIndeterminateAState="True" IsEnabled="False" SwitcherShape="Ellipse" IsChecked="True" FlowDirection="RightToLeft" Content="Uncheckable" Command="{Binding Command2, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Right" />
+                    <controls:Switch IsIndeterminateAState="True" IsEnabled="False" SwitcherShape="Ellipse" FlowDirection="RightToLeft" Content="Uncheckable" Command="{Binding Command2, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Right" />
+                    <controls:Switch IsIndeterminateAState="True" IsEnabled="False" IsThreeState="True" IsChecked="{x:Null}" SwitcherShape="Ellipse" FlowDirection="RightToLeft" Content="Uncheckable" Command="{Binding Command2, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Right" />
+                    <controls:Switch IsIndeterminateAState="True" FlowDirection="RightToLeft" IsChecked="True" Content="{Binding IsChecked, RelativeSource={RelativeSource Self}}" Command="{Binding Command, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Right" />
+                    <controls:Switch IsIndeterminateAState="True" FlowDirection="RightToLeft" IsChecked="False" Content="Uncheckable" Command="{Binding Command2, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Right" />
+                    <controls:Switch IsIndeterminateAState="True" IsThreeState="True" IsChecked="{x:Null}" FlowDirection="RightToLeft" Content="{Binding IsChecked, TargetNullValue=&lt;Null&gt;, RelativeSource={RelativeSource Self}}" Command="{Binding Command, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Right" />
+                    <controls:Switch IsIndeterminateAState="True" IsThreeState="True" IsChecked="{x:Null}" FlowDirection="RightToLeft" Content="Uncheckable" Command="{Binding Command2, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Right" />
+                    <controls:Switch IsIndeterminateAState="True" IsEnabled="False" IsChecked="True" FlowDirection="RightToLeft" Content="Uncheckable" Command="{Binding Command2, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Right" />
+                    <controls:Switch IsIndeterminateAState="True" IsEnabled="False" FlowDirection="RightToLeft" Content="Uncheckable" Command="{Binding Command2, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Right" />
+                    <controls:Switch IsIndeterminateAState="True" IsEnabled="False" IsThreeState="True" IsChecked="{x:Null}" FlowDirection="RightToLeft" Content="Uncheckable" Command="{Binding Command2, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Right" />
+                </StackPanel>
+            </GroupBox>
+        </Grid>
+        <!--<Border Height="26" Width="50">
+            <Grid>
+                <Rectangle Height="20" RadiusX="10" RadiusY="10">
+                    <Rectangle.Fill>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                            <GradientStop Color="Green" Offset="0"/>
+                            <GradientStop Color="Green" Offset="0.5"/>
+                            <GradientStop Color="Red" Offset="0.5"/>
+                            <GradientStop Color="Red" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Rectangle.Fill>
+                </Rectangle>
+                <Rectangle Height="20" RadiusX="10" RadiusY="10" Opacity="0.7">
+                    <Rectangle.Fill>
+                        <RadialGradientBrush RadiusX="0.7" RadiusY="0.7">
+                            <GradientStop Color="Transparent"/>
+                            <GradientStop Color="DimGray" Offset="1"/>
+                        </RadialGradientBrush>
+                    </Rectangle.Fill>
+                </Rectangle>
+                <Ellipse Height="26" Width="26" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <Ellipse.Fill>
+                        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                            <GradientStop Color="LightGray"/>
+                            <GradientStop Color="DimGray" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Ellipse.Fill>
+                </Ellipse>
+            </Grid>
+        </Border>-->
+    </StackPanel>
 </windows:Window>

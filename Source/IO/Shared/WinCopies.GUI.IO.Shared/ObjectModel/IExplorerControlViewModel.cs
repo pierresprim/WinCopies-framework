@@ -67,11 +67,13 @@ namespace WinCopies.GUI.IO
 
             Predicate<IBrowsableObjectInfo> Filter { get; set; }
 
-            HistoryObservableCollection<IBrowsableObjectInfo> History { get; }
+            ReadOnlyHistoryObservableCollection<IBrowsableObjectInfo> History { get; }
 
             bool IsCheckBoxVisible { get; set; }
 
             DelegateCommand<IBrowsableObjectInfoViewModel> ItemClickCommand { get; }
+
+            DelegateCommand<IBrowsableObjectInfo> OpenInNewContextCommand { get; set; }
 
             IButtonModel NewItemCommand { get; }
 

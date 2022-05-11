@@ -5,8 +5,9 @@ using System.Linq;
 using System.Reflection;
 
 using WinCopies.Collections.DotNetFix.Generic;
+using WinCopies.Collections.Generic;
 using WinCopies.Linq;
-using WinCopies.Temp;
+using WinCopies.Util;
 
 using static WinCopies.ThrowHelper;
 
@@ -14,7 +15,7 @@ namespace WinCopies.EntityFramework
 {
     public interface IEntityCollection : IAsEnumerable<IEntity>, DotNetFix.IDisposable
     {
-        long? Add(IEntity entity, out uint tables, out ulong rows, IReadOnlyDictionary<string, object>
+        long? Add(IEntity entity, out uint tables, out ulong rows, System.Collections.Generic.IReadOnlyDictionary<string, object>
 #if CS8
                 ?
 #endif
@@ -23,7 +24,7 @@ namespace WinCopies.EntityFramework
 
     public interface IEntityCollection<T> : IEntityCollection, IMultiTypeEnumerable<T, IEntity> where T : IEntity
     {
-        long? Add(T entity, out uint tables, out ulong rows, IReadOnlyDictionary<string, object>
+        long? Add(T entity, out uint tables, out ulong rows, System.Collections.Generic.IReadOnlyDictionary<string, object>
 #if CS8
                 ?
 #endif
@@ -32,7 +33,11 @@ namespace WinCopies.EntityFramework
         System.Collections.Generic.IEnumerable<T> GetItems(IOrderByColumns orderBy);
 
 #if CS8
-        long? IEntityCollection.Add(IEntity entity, out uint tables, out ulong rows, IReadOnlyDictionary<string, object>? extraColumns) => Add(entity is T _entity ? _entity : throw new InvalidArgumentException(nameof(entity)), out tables, out rows, extraColumns);
+        long? IEntityCollection.Add(IEntity entity, out uint tables, out ulong rows, System.Collections.Generic.IReadOnlyDictionary<string, object>
+#if CS8
+            ?
+#endif
+            extraColumns) => Add(entity is T _entity ? _entity : throw new InvalidArgumentException(nameof(entity)), out tables, out rows, extraColumns);
 #endif
     }
 
@@ -43,17 +48,17 @@ namespace WinCopies.EntityFramework
         public EntityCollection() => _ = EntityCollection.ValidateConstructor<TItems, TCollection>();
 
 #if !CS8
-        IEnumerable<IEntity> IAsEnumerable<IEntity>.AsEnumerable() => this.As<TItems, IEntity>();
+        System.Collections.Generic.IEnumerable<IEntity> IAsEnumerable<IEntity>.AsEnumerable() => this.As<TItems, IEntity>();
 #endif
 
-        public abstract long? Add(TItems entity, out uint tables, out ulong rows, IReadOnlyDictionary<string, object>
+        public abstract long? Add(TItems entity, out uint tables, out ulong rows, System.Collections.Generic.IReadOnlyDictionary<string, object>
 #if CS8
                 ?
 #endif
                 extraColumns = null);
 
 #if !CS8
-        long? IEntityCollection.Add(IEntity entity, out uint tables, out ulong rows, IReadOnlyDictionary<string, object> extraColumns) => Add(entity is TItems _entity ? _entity : throw new InvalidArgumentException(nameof(entity)), out tables, out rows, extraColumns);
+        long? IEntityCollection.Add(IEntity entity, out uint tables, out ulong rows, System.Collections.Generic.IReadOnlyDictionary<string, object> extraColumns) => Add(entity is TItems _entity ? _entity : throw new InvalidArgumentException(nameof(entity)), out tables, out rows, extraColumns);
 #endif
 
         public abstract System.Collections.Generic.IEnumerable<TItems> GetItems(IOrderByColumns
@@ -79,6 +84,8 @@ namespace WinCopies.EntityFramework
 
     public interface IEntityIdRefresher : DotNetFix.IDisposable
     {
+        Collections.IUIntCountable Columns { get; }
+
         void Add(string column, string paramName, object
 #if CS8
                 ?
@@ -92,9 +99,11 @@ namespace WinCopies.EntityFramework
                 id);
     }
 
-    public interface IEntity : System.IDisposable
+    public interface IEntity
     {
         bool RefreshNeeded { get; }
+
+        Nullable TryRefreshIdWhen { get; }
 
         bool TryRefreshId(IEntityIdRefresher refresher, PropertyInfo idProperty, System.Collections.Generic.IEnumerable<string> properties);
 
@@ -118,11 +127,15 @@ namespace WinCopies.EntityFramework
 
         bool Refresh();
 
-        void AddOrUpdate(IReadOnlyDictionary<string, object>
+        void AddOrUpdate(System.Collections.Generic.IReadOnlyDictionary<string, object>
 #if CS8
                 ?
 #endif
                 extraColumns);
+
+        ulong Update();
+
+        ulong Remove();
 
         ulong Update(out uint tables);
 
@@ -184,7 +197,7 @@ namespace WinCopies.EntityFramework
             ;
 
 #if !CS8
-        IEnumerable<IEntity> IAsEnumerable<IEntity>.AsEnumerable() => this.As<TItems, IEntity>();
+        System.Collections.Generic.IEnumerable<IEntity> IAsEnumerable<IEntity>.AsEnumerable() => this.As<TItems, IEntity>();
 #endif
 
         public void Add(TItems item) => _items.AddLast(item);
@@ -284,11 +297,116 @@ namespace WinCopies.EntityFramework
         public void Dispose() => Entity.EndParse();
     }
 
+    public static class EntityHelper
+    {
+        private static bool? Equals(IEntity x, IEntity y, Type tx, Type ty, in bool forcePseudoIdsEqualityComparison)
+        {
+            bool comparePseudoIdsEquality()
+            {
+#if CS8
+                static
+#endif
+                    System.Collections.Generic.IEnumerable<PropertyInfo> getProperties(in Type type) => type.GetProperties().Where(property => property.GetCustomAttributes(true).FirstOrDefault<EntityPropertyAttribute>()?.IsPseudoId == true);
+
+                return getProperties(tx).All(p => Equals(p.GetValue(x), getProperties(ty).First().GetValue(y)));
+            }
+
+            if (forcePseudoIdsEqualityComparison)
+
+                return comparePseudoIdsEquality();
+
+            PropertyInfo
+#if CS8
+                    ?
+#endif
+                    getPropertyInfo(in Type type) => type.GetProperties().FirstOrDefault(property => property.GetCustomAttributes(true).FirstOrDefault<EntityPropertyAttribute>()?.IsId == true);
+
+            PropertyInfo
+#if CS8
+                    ?
+#endif
+                    px = getPropertyInfo(tx);
+
+            if (px == null)
+
+                return comparePseudoIdsEquality();
+
+            else
+            {
+                PropertyInfo
+#if CS8
+                    ?
+#endif
+                    py = getPropertyInfo(ty);
+
+                if (py == null)
+
+                    return comparePseudoIdsEquality();
+
+                else
+                {
+                    bool? refreshResult;
+
+                    bool refresh(IEntity entity, in PropertyInfo p)
+                    {
+                        bool _refresh()
+                        {
+                            entity.MarkForRefresh();
+
+                            return entity.TryRefreshId(true);
+                        }
+
+                        refreshResult = entity.RefreshNeeded ? _refresh() : entity.TryRefreshIdWhen.HasValue ? !Equals(p.GetValue(entity), entity.TryRefreshIdWhen.Value) || _refresh() :
+#if !CS9
+                        (bool?)
+#endif
+                        null;
+
+                        if (refreshResult.HasValue)
+                        {
+                            if (refreshResult.Value)
+
+                                return true;
+
+                            refreshResult = null;
+                        }
+
+                        else
+
+                            refreshResult = comparePseudoIdsEquality();
+
+                        return false;
+                    }
+
+                    return refresh(x, px) && refresh(y, py) ? Equals(px.GetValue(x), py.GetValue(y)) : refreshResult;
+                }
+            }
+        }
+
+        private static bool? Equals(in IEntity x, in IEntity y, in FuncIn<Type, Type, bool?> func)
+        {
+            Type tx = (x ?? throw GetArgumentNullException(nameof(x))).GetType();
+            Type ty = (y ?? throw GetArgumentNullException(nameof(y))).GetType();
+
+            return tx == ty ? func(tx, ty) : false;
+        }
+
+        private static bool? Equals(IEntity x, IEntity y, bool forcePseudoIdsEqualityComparison) => Equals(x, y, (in Type tx, in Type ty) => Equals(x, y, tx, ty, forcePseudoIdsEqualityComparison));
+
+        public static bool? Equals(IEntity x, IEntity y) => Equals(x, y, (in Type tx, in Type ty) => Equals(x, y, tx, ty, false));
+
+        public static bool ComparePseudoIdsEquality(in IEntity x, in IEntity y) => Equals(x, y, true).Value;
+
+        public static bool? TryComparePseudoIdsEquality(IEntity x, IEntity y) => Equals(x, y, (in Type tx, in Type ty) => x.RefreshNeeded || y.RefreshNeeded ? null : Equals(x, y, tx, ty, true));
+    }
+
     public abstract class Entity : IEntity
     {
         public bool IsParsing { get; private set; }
 
         public bool RefreshNeeded { get; protected set; }
+
+        public virtual Nullable TryRefreshIdWhen { get; } = new Nullable();
 
         protected IEntityCollection Collection { get; }
 
@@ -337,20 +455,31 @@ namespace WinCopies.EntityFramework
             {
                 _propertyInfo = property.Key;
 
-                refresher.Add(column = property.Value.Column ?? _propertyInfo.Name, column.FirstCharToLower(), (value = _propertyInfo.GetValue(this)) is IEntity && _propertyInfo.GetCustomAttributes<ForeignKeyAttribute>().FirstOrDefault() != null &&(foreignKeyProperty = EntityCollection.GetIdProperties(value.GetType()).FirstOrNull()).HasValue ? foreignKeyProperty.Value.Value.GetValue(value) : value);
+                refresher.Add(column = property.Value.Column ?? _propertyInfo.Name, column.FirstCharToLower(), (value = _propertyInfo.GetValue(this)) is IEntity && _propertyInfo.GetCustomAttributes<ForeignKeyAttribute>().FirstOrDefault() != null && (foreignKeyProperty = EntityCollection.GetIdProperties(value.GetType()).FirstOrNull()).HasValue ? foreignKeyProperty.Value.Value.GetValue(value) : value);
             }
 
-            if (refresher.TryGetId(table, idColumn, out object
-#if CS8
-                ?
-#endif
-                id))
+            bool result;
 
-                idProperty.SetValue(this, Convert.ChangeType(id, idProperty.PropertyType));
+            if (refresher.Columns.Count > 0u)
+            {
+                if (refresher.TryGetId(table, idColumn, out object
+#if CS8
+                    ?
+#endif
+                    id))
+
+                    idProperty.SetValue(this, Convert.TryChangeType(id, idProperty.PropertyType));
+
+                result = true;
+            }
+
+            else
+
+                result = false;
 
             RefreshNeeded = false;
 
-            return true;
+            return result;
         }
 
         public bool TryRefreshId(IEntityIdRefresher refresher, PropertyInfo idProperty, System.Collections.Generic.IEnumerable<string> properties) => TryRefreshId(refresher, idProperty, EntityCollection.GetDBPropertyInfo(GetType()).Where(property => properties.Contains(property.Key.Name)));
@@ -443,6 +572,8 @@ namespace WinCopies.EntityFramework
 
         public abstract ulong Remove(out uint tables);
 
+        public ulong Remove() => Remove(out _);
+
         protected void TryEndRefresh(bool endRefresh)
         {
             if (endRefresh)
@@ -469,7 +600,7 @@ namespace WinCopies.EntityFramework
             return result;
         }
 
-        public void AddOrUpdate(IReadOnlyDictionary<string, object>
+        public void AddOrUpdate(System.Collections.Generic.IReadOnlyDictionary<string, object>
 #if CS8
                 ?
 #endif
@@ -490,6 +621,8 @@ namespace WinCopies.EntityFramework
 
             return result;
         }
+
+        public ulong Update() => Update(out _);
 
         public void MarkForRefresh() => RefreshNeeded = true;
 
@@ -520,26 +653,19 @@ namespace WinCopies.EntityFramework
         public void BeginParse() => IsParsing = IsParsing ? throw new InvalidOperationException("Parsing already started.") : true;
 
         public void EndParse() => IsParsing = IsParsing ? false : throw new InvalidOperationException("Not parsing currently.");
-
-        protected virtual void Dispose(bool disposing) { /* Left empty. */ }
-
-        public void Dispose()
-        {
-            Dispose(disposing: true);
-
-            GC.SuppressFinalize(this);
-        }
     }
 
-    public interface IDefaultEntity : IEntity
+    public interface IDefaultEntity<T> : IEntity
     {
-        int Id { get; set; }
+        T Id { get; set; }
     }
 
-    public abstract class DefaultEntity : Entity, IDefaultEntity
+    public abstract class DefaultEntity<T> : Entity, IDefaultEntity<T>
     {
         [EntityProperty(nameof(Id), IsId = true)]
-        public int Id { get; set; }
+        public T Id { get; set; }
+
+        public virtual Nullable TryRefreshIdWhen { get; } = new Nullable(default(T));
 
         protected DefaultEntity(IEntityCollection collection) : base(collection) { /* Left empty. */ }
     }

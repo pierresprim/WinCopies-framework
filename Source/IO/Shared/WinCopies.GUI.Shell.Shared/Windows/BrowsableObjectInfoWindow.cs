@@ -15,19 +15,32 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+#region Usings
+#region Namespaces
+#region WAPICP
 using Microsoft.WindowsAPICodePack;
-using Microsoft.WindowsAPICodePack.COMNative.Shell;
-using Microsoft.WindowsAPICodePack.Shell;
+using Microsoft.WindowsAPICodePack.Win32Native;
+using Microsoft.WindowsAPICodePack.Win32Native.Menus;
+using Microsoft.WindowsAPICodePack.Win32Native.Shell.DesktopWindowManager;
+#endregion
 
+#region System
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
+using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
+using System.Windows.Media;
+#endregion
 
+#region WinCopies
 using WinCopies.Desktop;
 using WinCopies.GUI.IO.Controls;
 using WinCopies.GUI.IO.ObjectModel;
@@ -36,22 +49,117 @@ using WinCopies.IO;
 using WinCopies.IO.ObjectModel;
 using WinCopies.IO.Process;
 using WinCopies.Linq;
+#endregion
+#endregion
 
+#region Static Usings
+#region System
+using static System.Windows.Clipboard;
 using static System.Windows.Input.ApplicationCommands;
 
 using static System.Windows.MessageBoxButton;
 using static System.Windows.MessageBoxImage;
 using static System.Windows.MessageBoxResult;
+#endregion
 
+#region WinCopies
 using static WinCopies.Commands.ApplicationCommands;
 using static WinCopies.Commands.Commands;
-using static WinCopies.GUI.Shell.ObjectModel.BrowsableObjectInfo;
+using static WinCopies.GUI.Icons.Properties.Resources;
+#endregion
+#endregion
+
+using ShellResources = WinCopies.GUI.Shell.Properties.Resources;
+using ListViewItem = WinCopies.GUI.Controls.ListViewItem;
+using TabItem = WinCopies.GUI.Controls.TabItem;
+#endregion
 
 namespace WinCopies.GUI.Shell
 {
     public abstract class BrowsableObjectInfoWindow : Windows.Window
     {
-        private System.Windows.Interop.HwndSourceHook _hook;
+        private class HookRegistration
+        {
+            private System.Windows.Interop.HwndSourceHook _hook;
+            private readonly BrowsableObjectInfoWindow _window;
+
+            public Microsoft.WindowsAPICodePack.HookRegistration InnerStruct { get; }
+
+            public FuncRef<uint?, string
+#if CS8
+                ?
+#endif
+                > Func
+            { get; }
+
+            public HookRegistration(IntPtr hwnd, in FuncRef<uint?, string
+#if CS8
+                ?
+#endif
+                > func, in BrowsableObjectInfoWindow window)
+            {
+                _window = window;
+
+                Func = func;
+
+                InnerStruct = new Microsoft.WindowsAPICodePack.HookRegistration(hook => HwndSource.FromHwnd(hwnd).AddHook(_hook = (IntPtr _hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled) =>
+                {
+                    if (msg == (int)WindowMessage.MenuSelect)
+                    {
+                        uint? value = Core.GetLoWord((ulong)wParam);
+
+                        string result = Func(ref value);
+
+                        if (result == null && value.HasValue)
+
+                            switch ((ContextMenuCommand)value.Value)
+                            {
+                                case ContextMenuCommand.None:
+
+                                    break;
+
+                                case ContextMenuCommand.Open:
+
+                                    result = ShellResources.OpenOrLaunchStatusBarLabel;
+
+                                    break;
+
+                                case ContextMenuCommand.OpenInNewTab:
+
+                                    result = ShellResources.OpenInNewTabStatusBarLabel;
+
+                                    break;
+
+                                case ContextMenuCommand.OpenInNewWindow:
+
+                                    result = ShellResources.OpenInNewWindowStatusBarLabel;
+
+                                    break;
+
+                                case ContextMenuCommand.CopyName:
+
+                                    result = ShellResources.CopyNameStatusBarLabel;
+
+                                    break;
+
+                                case ContextMenuCommand.CopyPath:
+
+                                    result = ShellResources.CopyPathStatusBarLabel;
+
+                                    break;
+                            }
+
+                        _window.StatusBarLabel = result;
+                    }
+
+                    return hook((WindowMessage)msg, wParam, lParam, ref handled);
+                }), hook => HwndSource.FromHwnd(hwnd).RemoveHook(_hook));
+            }
+        }
+
+        private static void RegisterClassHandler(in RoutedEvent routedEvent, in Delegate handler) => Util.Desktop.UtilHelpers.RegisterClassHandler<BrowsableObjectInfoWindow>(routedEvent, handler);
+
+        //private System.Windows.Interop.HwndSourceHook _hook;
 
         private static RoutedUICommand GetRoutedCommand(in string text, in string name) => new
 #if !CS9
@@ -59,19 +167,378 @@ namespace WinCopies.GUI.Shell
 #endif
             (text, name, typeof(BrowsableObjectInfoWindow));
 
-        public static RoutedCommand NewRegistryTab { get; } = GetRoutedCommand(Properties.Resources.NewRegistryTab, nameof(NewRegistryTab));
+        public abstract ClientVersion ClientVersion { get; }
 
-        public static RoutedCommand NewWMITab { get; } = GetRoutedCommand(Properties.Resources.NewWMITab, nameof(NewWMITab));
+        public static RoutedCommand NewRegistryTab { get; } = GetRoutedCommand(ShellResources.NewRegistryTab, nameof(NewRegistryTab));
 
-        public static RoutedCommand Quit { get; } = GetRoutedCommand(Properties.Resources.Quit, nameof(Quit));
+        public static RoutedCommand NewWMITab { get; } = GetRoutedCommand(ShellResources.NewWMITab, nameof(NewWMITab));
 
-        public static RoutedCommand SubmitABug { get; } = GetRoutedCommand(Properties.Resources.SubmitABug, nameof(SubmitABug));
+        public static RoutedCommand Quit { get; } = GetRoutedCommand(ShellResources.Quit, nameof(Quit));
+
+        public static RoutedCommand SubmitABug { get; } = GetRoutedCommand(ShellResources.SubmitABug, nameof(SubmitABug));
+
+        public static DependencyProperty StatusBarLabelProperty = Util.Desktop.UtilHelpers.Register<string, BrowsableObjectInfoWindow>(nameof(StatusBarLabel));
+
+        public string StatusBarLabel { get => (string)GetValue(StatusBarLabelProperty); set => SetValue(StatusBarLabelProperty, value); }
+
+        private delegate IBrowsableObjectInfoWindowViewModel GetPathsFunc<T>(in RoutedEventArgs e, out T sender, out BrowsableObjectInfoWindow window);
 
         static BrowsableObjectInfoWindow()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(BrowsableObjectInfoWindow), new FrameworkPropertyMetadata(typeof(BrowsableObjectInfoWindow)));
 
-            EventManager.RegisterClassHandler(typeof(BrowsableObjectInfoWindow), ExplorerControlListView.ContextMenuRequestedEvent, new RoutedEventHandler((object sender, RoutedEventArgs e) =>
+            Microsoft.WindowsAPICodePack.Shell.Window getWindow(in RoutedEventArgs e)
+            {
+                if (e.OriginalSource is DockPanel d)
+                {
+                    var window = (Microsoft.WindowsAPICodePack.Shell.Window)GetWindow(d);
+
+                    if (window.GetChild<DockPanel>(true, out _) == d)
+
+                        return window;
+                }
+
+                return null;
+            }
+
+            void registerClassHandler(in RoutedEvent @event, in Action<object, MouseButtonEventArgs> action) => RegisterClassHandler(@event, new MouseButtonEventHandler(action));
+
+            registerClassHandler(MouseLeftButtonDownEvent, (object sender, MouseButtonEventArgs e) =>
+            {
+                if (Mouse.LeftButton == MouseButtonState.Pressed)
+
+                    getWindow(e)?.DragMove();
+            });
+
+            registerClassHandler(MouseRightButtonDownEvent, (object sender, MouseButtonEventArgs e) =>
+            {
+                var window = getWindow(e);
+
+                if (window != null)
+                {
+                    var point = ((Visual)e.OriginalSource).PointToScreen(e.GetPosition(window));
+
+                    var command = (SystemCommand)Menus.TrackPopupMenu(Menus.GetSystemMenu(window.Handle, false), TrackPopupMenuFlags.ReturnCommand, new System.Drawing.Point((int)point.X, (int)point.Y), window.Handle);
+
+                    if (command > 0)
+
+                        Core.SendMessage(window.Handle, WindowMessage.SystemCommand, (IntPtr)command, IntPtr.Zero);
+                }
+            });
+
+            RegisterClassHandler(MouseMoveEvent, new MouseEventHandler((object sender, MouseEventArgs e) =>
+            {
+                if (Mouse.LeftButton == MouseButtonState.Pressed)
+                {
+                    var window = getWindow(e);
+
+                    if (window?.WindowState == WindowState.Maximized)
+                    {
+                        window.WindowState = WindowState.Normal;
+
+                        window.Top = 0;
+
+                        window.DragMove();
+                    }
+                }
+            }));
+
+            registerClassHandler(MouseDoubleClickEvent, (object sender, MouseButtonEventArgs e) =>
+            {
+                var window = getWindow(e);
+
+                if (window != null)
+
+                    window.WindowState = window.WindowState == WindowState.Normal ? WindowState.Maximized : WindowState.Normal;
+            });
+
+            IBrowsableObjectInfoWindowViewModel _getDataContext<T>(in RoutedEventArgs e, out T sender, out BrowsableObjectInfoWindow window) where T : DependencyObject
+            {
+                if (e.OriginalSource is T _sender)
+                {
+                    sender = _sender;
+
+                    window = _sender.GetParent<BrowsableObjectInfoWindow>(false);
+
+                    return (IBrowsableObjectInfoWindowViewModel)window?.DataContext;
+                }
+
+                sender = null;
+
+                window = null;
+
+                return null;
+            }
+
+            IBrowsableObjectInfoWindowViewModel getDataContext(in RoutedEventArgs e, out ExplorerControlListViewItem sender, out BrowsableObjectInfoWindow window) => _getDataContext(e, out sender, out window);
+
+            void _openInNewTab(in IBrowsableObjectInfoWindowViewModel dataContext, in IBrowsableObjectInfoViewModel _path, in bool selected) => dataContext.Paths.Paths.Add(ObjectModel.BrowsableObjectInfo.GetDefaultExplorerControlViewModel(_path, selected));
+
+            RegisterClassHandler(ExtraEvents.ClickEvent, new ClickEventHandler((object sender, ClickEventArgs e) =>
+                {
+                    if (e.Button == MouseButton.Middle)
+                    {
+                        IBrowsableObjectInfoCollectionViewModel getPaths<T>(in GetPathsFunc<T> func) => func(e, out _, out _).Paths;
+
+                        if (e.OriginalSource is ListViewItem)
+                        {
+                            IBrowsableObjectInfoCollectionViewModel paths = getPaths<ExplorerControlListViewItem>(getDataContext);
+                            IList<IExplorerControlViewModel> dataContext = paths.Paths;
+
+                            foreach (IBrowsableObjectInfoViewModel item in paths.SelectedItem.SelectedItems.Where(path => path.IsBrowsable()))
+
+                                dataContext.Add(ObjectModel.BrowsableObjectInfo.GetDefaultExplorerControlViewModel(item));
+                        }
+
+                        else if (e.OriginalSource is TabItem tabItem)
+
+                            getPaths<TabItem>(_getDataContext).Paths.Remove((IExplorerControlViewModel)tabItem.DataContext);
+                    }
+                }));
+
+            RegisterClassHandler(ExplorerControlListViewItem.ContextMenuRequestedEvent, new ContextMenuRequestedEventHandler((object sender, ContextMenuRequestedEventArgs e) =>
+           {
+               var dataContext = getDataContext(e, out ExplorerControlListViewItem _sender, out BrowsableObjectInfoWindow window);
+
+               if (dataContext == null)
+
+                   return;
+
+               IExplorerControlViewModel parent = dataContext.Paths.SelectedItem;
+
+               IBrowsableObjectInfoViewModel[] selectedItems = new Collections.Generic.ArrayBuilder<IBrowsableObjectInfoViewModel>(parent.SelectedItems).ToArray();
+
+               IBrowsableObjectInfoViewModel parentPath = parent.Path;
+
+               void process(IBrowsableObjectInfoViewModel path, in bool renameVerb, in PredicateIn<IBrowsableObjectInfo> browsabilityVerbs)
+               {
+                   if (path.ContextCommands != null)
+
+                       return;
+
+                   var hwnd = new WindowInteropHelper(window).Handle;
+
+                   System.Drawing.Point getPoint()
+                   {
+                       System.Windows.Point _point = _sender.PointToScreen(new System.Windows.Point(0, 0));
+
+                       return new System.Drawing.Point((int)_point.X, (int)_point.Y);
+                   }
+
+                   System.Drawing.Point point = getPoint();
+
+                   bool extendedVerbs = e.Shift;
+
+                   IContextMenu contextMenu = renameVerb ? path.GetContextMenu(extendedVerbs) : parentPath.GetContextMenu(selectedItems.Select(obj => obj.Model), extendedVerbs);
+
+                   if (contextMenu == null)
+
+                       return;
+
+#if CS8
+                   static
+#endif
+                        MenuItemInfo getMenuItemInfoBase() => new MenuItemInfo() { cbSize = (uint)Marshal.SizeOf<MenuItemInfo>() };
+
+#if CS8
+                   static
+#endif
+                        MenuItemInfo getMenuItemInfo(in string header, in Bitmap bitmap)
+                   {
+                       MenuItemInfo menuItemInfo = getMenuItemInfoBase();
+
+                       menuItemInfo.fMask = MenuItemInfoFlags.String | MenuItemInfoFlags.Bitmap;
+                       menuItemInfo.dwTypeData = header;
+                       menuItemInfo.hbmpItem = bitmap.GetHbitmap();
+                       menuItemInfo.cch = (uint)menuItemInfo.dwTypeData.Length;
+
+                       return menuItemInfo;
+                   }
+
+                   FuncRef<uint?, string> func;
+
+                   string getCommandTooltip(ref uint? command) => contextMenu.GetCommandTooltip(ref command);
+
+                   Func<ContextMenuCommand> showMenuFunc;
+
+                   ContextMenuCommand showMenu() => contextMenu.Show(hwnd, new HookRegistration(hwnd, func, window).InnerStruct, point, e.Ctrl, e.Shift);
+
+                   if (browsabilityVerbs(path))
+                   {
+                       contextMenu.AddCommands(new MenuItemInfo[] { getMenuItemInfo("&Open in WinCopies", folder), getMenuItemInfo("Open in new &tab", tab_add), getMenuItemInfo("Open in new &window", application_add) });
+
+                       func = getCommandTooltip;
+
+                       showMenuFunc = showMenu;
+                   }
+
+                   else
+                   {
+                       func = (ref uint? _command) =>
+                       {
+                           string _result = getCommandTooltip(ref _command);
+
+                           if (_result == null && _command.HasValue)
+
+                               _command = _command.Value + (uint)ContextMenuCommand.LastDelegatedCommand;
+
+                           return _result;
+                       };
+
+                       showMenuFunc = () =>
+                       {
+                           ContextMenuCommand _result = showMenu();
+
+                           if (_result > ContextMenuCommand.LastDelegatedCommand)
+
+                               _result += (sbyte)ContextMenuCommand.LastDelegatedCommand;
+
+                           return _result;
+                       };
+                   }
+
+                   if (renameVerb)
+                   {
+#if CS8
+                       static
+#endif
+                        KeyValuePair<ExtensionCommand, MenuItemInfo> getKeyValuePair(in ExtensionCommand extensionCommand, in string header, in Bitmap bitmap) => new KeyValuePair<ExtensionCommand, MenuItemInfo>(extensionCommand, getMenuItemInfo(header, bitmap));
+
+                       contextMenu.AddExtensionCommands(new KeyValuePair<ExtensionCommand, MenuItemInfo>[] { getKeyValuePair(ExtensionCommand.CopyPath, "Copy path", folder_edit), getKeyValuePair(ExtensionCommand.CopyName, "Copy name", textfield) });
+                   }
+
+                   ContextMenuCommand result = showMenuFunc();
+
+                   void openInNewTab(in IBrowsableObjectInfoViewModel _path, in bool selected = true) => _openInNewTab(dataContext, _path, selected);
+
+                   void open()
+                   {
+                       IBrowsableObjectInfo[] items = new Collections.Generic.ArrayBuilder<IBrowsableObjectInfo>(selectedItems.Where(item => !item.IsBrowsable())).ToArray();
+
+                       if (items.Length > 0)
+
+                           contextMenu.Open(items, point, e.Ctrl, e.Shift);
+                   }
+
+                   void openSelectedItemsInNewTabs(in ActionIn<IBrowsableObjectInfoViewModel> firstAction)
+                   {
+                       int i = 0;
+
+                       for (; i < selectedItems.Length; i++)
+
+                           if ((path = selectedItems[i]).IsBrowsable())
+                           {
+                               firstAction(path);
+
+                               break;
+                           }
+
+                       for (i++; i < selectedItems.Length; i++)
+                       {
+                           if ((path = selectedItems[i]).IsBrowsable())
+
+                               openInNewTab(path, false);
+                       }
+
+                       open();
+                   }
+
+                   switch (result)
+                   {
+                       case ContextMenuCommand.None:
+
+                           break;
+
+                       case ContextMenuCommand.NewFolder:
+
+                           break;
+
+                       case ContextMenuCommand.Rename:
+
+                           if (renameVerb)
+                           {
+                               IProcessCommand renameItemProcessCommand = parentPath.ProcessFactory.RenameItemProcessCommand;
+
+                               if (InputBox.ShowDialog(renameItemProcessCommand.Name, DialogButton.OKCancel, renameItemProcessCommand.Caption, path.Name, null, out string _result, (path.IsLocalRoot == true ? drive_rename : textfield_rename).ToImageSource()) == true && !renameItemProcessCommand.TryExecute(_result, Enumerable.Repeat(path, 1), out _))
+
+                                   _ = MessageBox.Show("An error occurred while renaming the selected item.", "Error", MessageBoxButton.OK, Error);
+                           }
+
+                           break;
+
+                       case ContextMenuCommand.Delete:
+
+                           RunCommand(window.OnRecycle, null);
+
+                           break;
+
+                       case ContextMenuCommand.Open:
+
+                           if (renameVerb)
+
+                               parent.Path = path;
+
+                           else
+
+                               openSelectedItemsInNewTabs((in IBrowsableObjectInfoViewModel obj) => parent.Path = obj);
+
+                           break;
+
+                       case ContextMenuCommand.OpenInNewTab:
+
+                           if (renameVerb)
+
+                               openInNewTab(path);
+
+                           else
+
+                               openSelectedItemsInNewTabs((in IBrowsableObjectInfoViewModel obj) => openInNewTab(obj));
+
+                           break;
+
+                       case ContextMenuCommand.OpenInNewWindow:
+
+                           foreach (IBrowsableObjectInfoViewModel item in selectedItems.Where(item => item.IsBrowsable()))
+
+                               window.GetNewBrowsableObjectInfoWindow(new BrowsableObjectInfoWindowViewModel(new BrowsableObjectInfoCollectionViewModel(ObjectModel.BrowsableObjectInfo.GetDefaultExplorerControlViewModel(item))));
+
+                           open();
+
+                           break;
+
+                       case ContextMenuCommand.CopyName:
+
+                           SetText(path.Name);
+
+                           break;
+
+                       case ContextMenuCommand.CopyPath:
+
+                           SetText(path.Path);
+
+                           break;
+                   }
+               }
+
+               if (selectedItems.Length == 1)
+
+                   process(selectedItems[0], true, (in IBrowsableObjectInfo selectedItem) => selectedItem.IsBrowsable());
+
+               else
+
+                   process(parentPath, false, (in IBrowsableObjectInfo selectedItem) =>
+                   {
+                       for (int i = 0; i < selectedItems.Length; i++)
+
+                           if (selectedItems[i].IsBrowsable())
+
+                               return true;
+
+                       return false;
+                   });
+           }));
+
+            /*EventManager.RegisterClassHandler(typeof(BrowsableObjectInfoWindow), ExplorerControlListView.ContextMenuRequestedEvent, new RoutedEventHandler((object sender, RoutedEventArgs e) =>
             {
                 var listView = (ExplorerControlListView)e.OriginalSource;
 
@@ -83,7 +550,7 @@ namespace WinCopies.GUI.Shell
 
                     return;
 
-                if ((selectedItem.SelectedItems[0]).InnerObject is ShellObject shellObject)
+                if (selectedItem.SelectedItems[0].InnerObject is ShellObject shellObject)
                 {
                     var folder = (ShellContainer)selectedItem.Path.InnerObject;
 
@@ -103,12 +570,19 @@ namespace WinCopies.GUI.Shell
 
                     contextMenu.Show(new WindowInteropHelper(window).Handle, _point);
                 }
-            }));
+            }));*/
         }
 
-        public BrowsableObjectInfoWindow(in IBrowsableObjectInfoWindowViewModel dataContext)
+        protected BrowsableObjectInfoWindow(in IBrowsableObjectInfoWindowViewModel dataContext)
         {
             ThrowHelper.ThrowIfNull(dataContext, nameof(dataContext));
+
+            /*dataContext.HookRegistration = new HookRegistration(hook =>
+            {
+                _hook = (IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled) => hook((WindowMessage)msg, wParam, lParam, ref handled);
+
+                HwndSource.FromHwnd(new WindowInteropHelper(this).Handle).AddHook(_hook);
+            }, hook => HwndSource.FromHwnd(new WindowInteropHelper(this).Handle).RemoveHook(_hook));*/
 
             SetResourceReference(StyleProperty, typeof(BrowsableObjectInfoWindow));
 
@@ -195,11 +669,11 @@ namespace WinCopies.GUI.Shell
 
         private void SubmitABug_Executed(object sender, ExecutedRoutedEventArgs e) => RunCommand(OnSubmitABug, e);
 
-        protected System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetEnumerable() => ((BrowsableObjectInfoWindowViewModel)DataContext).Paths.SelectedItem.Path.Items.WhereSelect(item => item.IsSelected, item => item.Model);
+        protected IEnumerable<IBrowsableObjectInfo> GetEnumerable() => ((BrowsableObjectInfoWindowViewModel)DataContext).Paths.SelectedItem.Path.Items.WhereSelect(item => item.IsSelected, item => item.Model);
 
         private void CanRunCommand(in IProcessFactoryProcessInfo processFactory, in CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = processFactory.CanRun(GetEnumerable());
+            e.CanExecute = processFactory?.CanRun(GetEnumerable()) == true;
 
             e.Handled = true;
         }
@@ -209,7 +683,7 @@ namespace WinCopies.GUI.Shell
             // todo:
             //e.CanExecute = new EmptyCheckEnumerator<IBrowsableObjectInfoViewModel>(((MainWindowViewModel)DataContext).SelectedItem.Path.Items.Where(item => item.IsSelected).GetEnumerator()).HasItems;
 
-            CanRunCommand(GetProcessFactory().Copy, e);
+            CanRunCommand(GetProcessFactory()?.Copy, e);
 
         protected IProcessFactory GetProcessFactory() => ((BrowsableObjectInfoWindowViewModel)DataContext).Paths.SelectedItem.Path.ProcessFactory;
 
@@ -242,25 +716,29 @@ namespace WinCopies.GUI.Shell
 
         private void Paste_Executed(object sender, ExecutedRoutedEventArgs e) => RunCommand(OnPaste, e);
 
-        private void Recycle_CanExecute(object sender, CanExecuteRoutedEventArgs e) => CanRunCommand(GetProcessFactory().Recycling, e);
+        private void Recycle_CanExecute(object sender, CanExecuteRoutedEventArgs e) => CanRunCommand(GetProcessFactory()?.Recycling, e);
 
         protected abstract void OnRecycle(ExecutedRoutedEventArgs e); // => StartInstance(GetProcessFactory().Recycling.TryGetProcessParameters(GetEnumerable()));
 
         private void Recycle_Executed(object sender, ExecutedRoutedEventArgs e) => RunCommand(OnRecycle, e);
 
-        private void Empty_CanExecute(object sender, CanExecuteRoutedEventArgs e) => CanRunCommand(GetProcessFactory().Clearing, e);
+        private void Empty_CanExecute(object sender, CanExecuteRoutedEventArgs e) => CanRunCommand(GetProcessFactory()?.Clearing, e);
 
         protected abstract void OnEmpty(ExecutedRoutedEventArgs e); // => StartInstance(GetProcessFactory().Clearing.TryGetProcessParameters(GetEnumerable()));
 
         private void Empty_Executed(object sender, ExecutedRoutedEventArgs e) => RunCommand(OnEmpty, e);
 
-        private void Delete_CanExecute(object sender, CanExecuteRoutedEventArgs e) => CanRunCommand(GetProcessFactory().Deletion, e);
+        private void Delete_CanExecute(object sender, CanExecuteRoutedEventArgs e) => CanRunCommand(GetProcessFactory()?.Deletion, e);
 
         protected abstract void OnDelete(ExecutedRoutedEventArgs e); // => StartInstance(GetProcessFactory().Deletion.TryGetProcessParameters(GetEnumerable()));
 
         private void Delete_Executed(object sender, ExecutedRoutedEventArgs e) => RunCommand(OnDelete, e);
 
-        private static InvalidOperationException GetInvalidParameterException() => new InvalidOperationException("The given parameter is not valid.");
+        private static InvalidOperationException GetInvalidParameterException() => new
+#if !CS9
+            InvalidOperationException
+#endif
+            ("The given parameter is not valid.");
 
         private void CloseTabsTo_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
@@ -366,29 +844,43 @@ namespace WinCopies.GUI.Shell
 
             var menuItems = new TitleBarMenuItemQueue();
 
-            menuItems.Enqueue(new TitleBarMenuItem() { Command = Commands.ApplicationCommands.NewTab });
-            menuItems.Enqueue(new TitleBarMenuItem() { Command = Commands.ApplicationCommands.CloseTab, CommandParameter = ((BrowsableObjectInfoWindowViewModel)DataContext).Paths.SelectedItem });
+            void enqueue(in TitleBarMenuItem item)
+            {
+                item.Icon.MakeTransparent();
+
+                menuItems.Enqueue(item);
+            }
+
+            enqueue(new TitleBarMenuItem() { Command = NewTab, Icon = tab_add });
+            enqueue(new TitleBarMenuItem() { Command = CloseTab, CommandParameter = new Func(() => ((BrowsableObjectInfoWindowViewModel)DataContext).Paths.SelectedItem), Icon = tab_delete });
 
             TitleBarMenuItems = menuItems;
         }
 
         private void Window_PreviousCanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = ((BrowsableObjectInfoWindowViewModel)DataContext).Paths.SelectedItem.History.CanMovePreviousFromCurrent;
+            e.CanExecute = ((BrowsableObjectInfoWindowViewModel)DataContext).Paths.SelectedItem.History.CanMoveBack;
 
             e.Handled = true;
         }
 
         private void Window_NextCanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = ((BrowsableObjectInfoWindowViewModel)DataContext).Paths.SelectedItem.History.CanMoveNextFromCurrent;
+            e.CanExecute = ((BrowsableObjectInfoWindowViewModel)DataContext).Paths.SelectedItem.History.CanMoveForward;
+
+            e.Handled = true;
+        }
+
+        private void Window_BrowseToParentCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = ((BrowsableObjectInfoWindowViewModel)DataContext).Paths.SelectedItem.BrowseToParent.CanExecute(null);
 
             e.Handled = true;
         }
 
         private void Window_PreviousExecuted(object sender, ExecutedRoutedEventArgs e)
         {
-            ((BrowsableObjectInfoWindowViewModel)DataContext).Paths.SelectedItem.History.CurrentIndex++;
+            ((BrowsableObjectInfoWindowViewModel)DataContext).Paths.SelectedItem.History.MoveBack();
 
             CommandManager.InvalidateRequerySuggested();
 
@@ -397,7 +889,16 @@ namespace WinCopies.GUI.Shell
 
         private void Window_NextExecuted(object sender, ExecutedRoutedEventArgs e)
         {
-            ((BrowsableObjectInfoWindowViewModel)DataContext).Paths.SelectedItem.History.CurrentIndex--;
+            ((BrowsableObjectInfoWindowViewModel)DataContext).Paths.SelectedItem.History.MoveForward();
+
+            CommandManager.InvalidateRequerySuggested();
+
+            e.Handled = true;
+        }
+
+        private void Window_BrowseToParentExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            _ = ((BrowsableObjectInfoWindowViewModel)DataContext).Paths.SelectedItem.BrowseToParent.TryExecute(null);
 
             CommandManager.InvalidateRequerySuggested();
 
@@ -410,13 +911,11 @@ namespace WinCopies.GUI.Shell
 
             add(NavigationCommands.BrowseBack, Window_PreviousExecuted, Window_PreviousCanExecute);
             add(NavigationCommands.BrowseForward, Window_NextExecuted, Window_NextCanExecute);
+            add(Commands.NavigationCommands.BrowseToParent, Window_BrowseToParentExecuted, Window_BrowseToParentCanExecute);
 
             #region File
             #region New
             add(NewTab, NewTab_Executed, Command_CanExecute);
-            add(NewRegistryTab, NewRegistryTab_Executed, Command_CanExecute);
-            add(NewWMITab, NewWMITab_Executed, Command_CanExecute);
-
             add(NewWindow, NewWindow_Executed, Command_CanExecute);
             #endregion New
 
@@ -461,7 +960,7 @@ namespace WinCopies.GUI.Shell
 
         protected IExplorerControlViewModel GetCurrentExplorerControlViewModel() => ((BrowsableObjectInfoWindowViewModel)DataContext).Paths.SelectedItem;
 
-        protected System.Collections.IList GetSelectedItems() => GetCurrentExplorerControlViewModel().SelectedItems;
+        protected IList GetSelectedItems() => GetCurrentExplorerControlViewModel().SelectedItems;
 
         private void Open_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
@@ -477,7 +976,7 @@ namespace WinCopies.GUI.Shell
 
             if (_selectedItems?.Count > 0)
             {
-                System.Collections.IList selectedItems = new ArrayList(_selectedItems.Count);
+                IList selectedItems = new ArrayList(_selectedItems.Count);
 
                 foreach (object item in _selectedItems)
 
@@ -491,7 +990,7 @@ namespace WinCopies.GUI.Shell
 
                     if (item != null)
 
-                        AddNewDefaultTab(GetDefaultExplorerControlViewModel(item), false);
+                        AddNewDefaultTab(ObjectModel.BrowsableObjectInfo.GetDefaultExplorerControlViewModel(item), false);
                 }
 
                 void openItem(IBrowsableObjectInfoViewModel browsableObjectInfo)
@@ -517,9 +1016,9 @@ namespace WinCopies.GUI.Shell
             }
         }, e);
 
-        public bool AreSelectedItemsBrowsableByDefault(out System.Collections.Generic.IEnumerable<IBrowsableObjectInfoViewModel> selectedItems)
+        public bool AreSelectedItemsBrowsableByDefault(out IEnumerable<IBrowsableObjectInfoViewModel> selectedItems)
         {
-            System.Collections.IList _selectedItems = GetSelectedItems();
+            IList _selectedItems = GetSelectedItems();
 
             selectedItems = _selectedItems.As<IBrowsableObjectInfoViewModel>();
 
@@ -548,7 +1047,7 @@ namespace WinCopies.GUI.Shell
                     action(item);
         }
 
-        protected void OpenInNewTabOrWindow(ActionIn<IExplorerControlViewModel, bool> action) => OpenInNewTabOrWindow((in IBrowsableObjectInfoViewModel item) => action(GetDefaultExplorerControlViewModel(item), false));
+        protected void OpenInNewTabOrWindow(ActionIn<IExplorerControlViewModel, bool> action) => OpenInNewTabOrWindow((in IBrowsableObjectInfoViewModel item) => action(ObjectModel.BrowsableObjectInfo.GetDefaultExplorerControlViewModel(item), false));
 
         private void OpenInNewTab_Executed(object sender, ExecutedRoutedEventArgs e) => TryExecuteRoutedCommand(() => OpenInNewTabOrWindow(AddNewDefaultTab), e);
 
@@ -626,11 +1125,11 @@ namespace WinCopies.GUI.Shell
             return false;
         }
 
+        protected abstract IBrowsableObjectInfo GetDefaultBrowsableObjectInfo();
+
+        public virtual IExplorerControlViewModel GetDefaultExplorerControlViewModel(in bool selected = false) => ObjectModel.BrowsableObjectInfo.GetDefaultExplorerControlViewModel(GetDefaultBrowsableObjectInfo(), selected);
+
         private void NewTab_Executed(object sender, ExecutedRoutedEventArgs e) => AddNewTab(GetDefaultExplorerControlViewModel(), e);
-
-        private void NewRegistryTab_Executed(object sender, ExecutedRoutedEventArgs e) => AddNewTab(GetDefaultExplorerControlViewModel(new RegistryItemInfo()), e);
-
-        private void NewWMITab_Executed(object sender, ExecutedRoutedEventArgs e) => AddNewTab(GetDefaultExplorerControlViewModel(new WMIItemInfo()), e);
 
         protected abstract BrowsableObjectInfoWindow GetNewBrowsableObjectInfoWindow();
         protected abstract BrowsableObjectInfoWindow GetNewBrowsableObjectInfoWindow(in IBrowsableObjectInfoWindowViewModel dataContext);

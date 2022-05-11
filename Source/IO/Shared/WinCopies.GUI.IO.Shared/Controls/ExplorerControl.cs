@@ -21,8 +21,8 @@ using System.Windows.Controls;
 using System.Windows.Input;
 
 using WinCopies.Desktop;
-using WinCopies.GUI.Controls;
 using WinCopies.GUI.Controls.Models;
+using WinCopies.GUI.IO.ObjectModel;
 using WinCopies.IO.ObjectModel;
 using WinCopies.Util.Data;
 
@@ -60,9 +60,9 @@ namespace WinCopies.GUI.IO.Controls
 
         public string Text { get => (string)GetValue(TextProperty); set => SetValue(TextProperty, value); }
 
-        public static readonly DependencyProperty HistoryProperty = Register<HistoryObservableCollection<IBrowsableObjectInfo>>(nameof(History));
+        public static readonly DependencyProperty HistoryProperty = Register<ReadOnlyHistoryObservableCollection<IBrowsableObjectInfo>>(nameof(History));
 
-        public HistoryObservableCollection<IBrowsableObjectInfo> History { get => (HistoryObservableCollection<IBrowsableObjectInfo>)GetValue(HistoryProperty); set => SetValue(HistoryProperty, value); }
+        public ReadOnlyHistoryObservableCollection<IBrowsableObjectInfo> History { get => (ReadOnlyHistoryObservableCollection<IBrowsableObjectInfo>)GetValue(HistoryProperty); set => SetValue(HistoryProperty, value); }
 
         /// <summary>
         /// Identifies the <see cref="TreeViewStyle"/> dependency property.
@@ -177,6 +177,10 @@ namespace WinCopies.GUI.IO.Controls
 
         protected virtual void OnGoToPageCanExecute(CanExecuteRoutedEventArgs e)
         {
+            if (e == null)
+
+                return;
+
             e.CanExecute = true;
 
             e.Handled = true;
@@ -184,15 +188,15 @@ namespace WinCopies.GUI.IO.Controls
 
         protected virtual void OnListViewSelectionChanged(SelectionChangedEventArgs e)
         {
-            if (SelectedItems == null && e.Source is ExplorerControlListView listView && listView.GetParent<ExplorerControl>(false) == this)
-            {
-                //e.RoutedEvent = SelectionChangedEvent;
-                //e.Source = this;
+            if (e != null && SelectedItems == null && e.Source is ExplorerControlListView listView && listView.GetParent<ExplorerControl>(false) == this)
+                /*{
+                    e.RoutedEvent = SelectionChangedEvent;
+                    e.Source = this;*/
 
                 SelectedItems = listView.SelectedItems;
 
-                //RaiseEvent(e);
-            }
+            /*RaiseEvent(e);
+        }*/
         }
 
         private void ListView_SelectionChanged(object sender, SelectionChangedEventArgs e) => OnListViewSelectionChanged(e);

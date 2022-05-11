@@ -6,7 +6,9 @@ using System.Reflection;
 
 using WinCopies.Collections.Generic;
 using WinCopies.Linq;
-using WinCopies.Temp;
+using WinCopies.Util;
+
+using static WinCopies.ThrowHelper;
 
 namespace WinCopies.EntityFramework
 {
@@ -20,8 +22,8 @@ namespace WinCopies.EntityFramework
              * Initialization
             */
 
-            Temp.ThrowHelper.ThrowIfNull(collection, nameof(collection));
-            Temp.ThrowHelper.ThrowIfNull(loadingFactory, nameof(loadingFactory));
+            ThrowIfNull(collection, nameof(collection));
+            ThrowIfNull(loadingFactory, nameof(loadingFactory));
 
             if (itemsType == null)
 
@@ -129,24 +131,24 @@ namespace WinCopies.EntityFramework
 
                         void setValue() =>
                         /*{
-                            object getNewEntity()
-                            {
-                                object e = getValidatedDBEntity(column.PropertyType);
+                                object getNewEntity()
+                                {
+                                    object e = getValidatedDBEntity(column.PropertyType);
 
-                                KeyValuePair<string
-#if CS8
-                                    ?
-#endif
-                                    , PropertyInfo>? p = GetIdProperties(column.PropertyType).FirstOrNull();
+                                    KeyValuePair<string
+    #if CS8
+                                        ?
+    #endif
+                                        , PropertyInfo>? p = GetIdProperties(column.PropertyType).FirstOrNull();
 
-                                if (p.HasValue)
+                                    if (p.HasValue)
 
-                                    p.Value.Value.SetValue(e, value);
+                                        p.Value.Value.SetValue(e, value);
 
-                                return e;
-                            }*/
+                                    return e;
+                                }*/
 
-                            column.SetValue(obj, (value == null || value == DBNull.Value) ? null : value);
+                            column.SetValue(obj, (value == null || value == DBNull.Value) ? null : Convert.TryChangeType(value, column.PropertyType));
                         //}
 
                         if ((attribute = (column = _column.Key).GetCustomAttributes<ForeignKeyAttribute>().FirstOrDefault()) != null)
@@ -159,7 +161,7 @@ namespace WinCopies.EntityFramework
 
                                     _foreignKeyIdProperty = foreignKeyIdProperty.Value.Value;
 
-                                    loadingFactory.InitSelector(_attribute.Table, Temp.Util.GetArray(_attribute.IdColumn));
+                                    loadingFactory.InitSelector(_attribute.Table, UtilHelpers.GetArray(_attribute.IdColumn));
 
                                     if (column.GetValue(obj) is IDBEntityItemCollection tmpCollection)
                                     {
@@ -195,7 +197,7 @@ namespace WinCopies.EntityFramework
 
                                     loadingFactory.SetConditions(getForeignKeyCondition(_attribute));
 
-                                    loadingFactory.InitSelector(_attribute.Table, Temp.Util.GetArray(_attribute.IdColumn));
+                                    loadingFactory.InitSelector(_attribute.Table, UtilHelpers.GetArray(_attribute.IdColumn));
 
                                     foreach (object id in loadingFactory.GetOnlyFirstItems(_attribute.IdColumn))
                                     {
@@ -227,7 +229,7 @@ namespace WinCopies.EntityFramework
                                         ? getValidatedDBEntity(column.PropertyType)
                                         : (IEntity)_tmp;
 
-                                    idProperty.SetValue(tmp, value);
+                                    idProperty.SetValue(tmp, Convert.TryChangeType(value, idProperty.PropertyType));
 
                                     tmp.MarkForRefresh();
                                 }

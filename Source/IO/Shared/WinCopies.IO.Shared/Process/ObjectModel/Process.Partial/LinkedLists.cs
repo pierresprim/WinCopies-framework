@@ -183,7 +183,6 @@ namespace WinCopies.IO.Process
         TErrorItems ISimpleLinkedList<TErrorItems>.Peek() => ((ISimpleLinkedList<TErrorItems>)InnerList).Peek();
 
 #if !CS8
-
         bool ISimpleLinkedList.TryPeek(out object result) => InnerList.TryPeek(out result);
 
         object ISimpleLinkedList.Peek() => ((ISimpleLinkedList)InnerList).Peek();
@@ -196,9 +195,9 @@ namespace WinCopies.IO.Process
 
         public Size TotalSize => InnerList.TotalSize;
 
-        object ISimpleLinkedListBase2.SyncRoot => ((ISimpleLinkedListBase2)InnerList).SyncRoot;
+        object ISimpleLinkedListBase2.SyncRoot => InnerList.AsFromType<ISimpleLinkedListBase2>().SyncRoot;
 
-        bool ISimpleLinkedListBase2.IsSynchronized => ((ISimpleLinkedListBase2)InnerList).IsSynchronized;
+        bool ISimpleLinkedListBase2.IsSynchronized => InnerList.AsFromType<ISimpleLinkedListBase2>().IsSynchronized;
 
         public bool HasItems => InnerList.HasItems;
 
@@ -214,17 +213,17 @@ namespace WinCopies.IO.Process
 
         public uint Count => InnerList.Count;
 
-        int ICollection<TItemsOut>.Count => ((ICollection<TItemsIn>)InnerList).Count;
+        int ICollection<TItemsOut>.Count => InnerList.AsFromType<ICollection<TItemsIn>>().Count;
 
         public bool IsReadOnly => true;
 
-        int ICollection.Count => ((ICollection)InnerList).Count;
+        int ICollection.Count => InnerList.AsFromType<ICollection>().Count;
 
-        public bool IsSynchronized => ((ICollection)InnerList).IsSynchronized;
+        public bool IsSynchronized => InnerList.AsFromType<ICollection>().IsSynchronized;
 
-        public object SyncRoot => ((ICollection)InnerList).SyncRoot;
+        public object SyncRoot => InnerList.AsFromType<ICollection>().SyncRoot;
 
-        int IReadOnlyCollection<TItemsOut>.Count => ((IReadOnlyCollection<TItemsIn>)InnerList).Count;
+        int IReadOnlyCollection<TItemsOut>.Count => InnerList.AsFromType<IReadOnlyCollection<TItemsIn>>().Count;
 
         public ReadOnlyProcessLinkedList(in IProcessLinkedList<TItems, TError, TItemsIn, TAction> list) => InnerList = list ?? throw GetArgumentNullException(nameof(list));
 
@@ -267,7 +266,7 @@ namespace WinCopies.IO.Process
             return false;
         }
 
-        TItemsOut ISimpleLinkedList<TItemsOut>.Peek() => ((ISimpleLinkedList<TItemsOut>)InnerList).Peek();
+        TItemsOut ISimpleLinkedList<TItemsOut>.Peek() => InnerList.AsFromType<ISimpleLinkedList<TItemsOut>>().Peek();
 
         protected IUIntCountableEnumerator<TItemsOut> GetEnumerator(in System.Collections.Generic.IEnumerable<TItemsIn> enumerable) => new UIntCountableEnumerator<EnumeratorInfo<TItemsOut>, TItemsOut>(new EnumeratorInfo<TItemsOut>(enumerable.Select<TItemsIn, TItemsOut>(item => item)), () => InnerList.Count);
 

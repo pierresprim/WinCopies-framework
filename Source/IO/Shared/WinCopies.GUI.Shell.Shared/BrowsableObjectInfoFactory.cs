@@ -25,19 +25,14 @@ namespace WinCopies.GUI.Shell
         /// <returns>An <see cref="IBrowsableObjectInfo"/> for <paramref name="path"/>.</returns>
         /// <remarks>This method cannot create <see cref="IBrowsableObjectInfo"/> for WMI paths.</remarks>
         /// <exception cref="ArgumentException"><paramref name="path"/> is not a Shell or a Registry path.</exception>
-        public override IBrowsableObjectInfo GetBrowsableObjectInfo(string path)
-        {
-            if (Path.IsFileSystemPath(path))
-
-                return ShellObjectInfo.From(ShellObjectFactory.Create(path), ClientVersion);
-
-            else if (WinCopies.IO.Shell.Path.IsRegistryPath(path))
-
-                return new RegistryItemInfo(path, BrowsableObjectInfo.GetDefaultClientVersion());
-
-            throw new ArgumentException("The factory cannot create an object for the given path.");
-        }
+        public override IBrowsableObjectInfo GetBrowsableObjectInfo(string path) => Path.IsFileSystemPath(path)
+                ? ShellObjectInfo.From(ShellObjectFactory.Create(path), ClientVersion)
+                : WinCopies.IO.Shell.Path.IsRegistryPath(path)
+                ? (IBrowsableObjectInfo)new RegistryItemInfo(path, BrowsableObjectInfo.GetDefaultClientVersion())
+                : throw new ArgumentException("The factory cannot create an object for the given path.");
 
         public override IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(string path) => GetBrowsableObjectInfoViewModel(GetBrowsableObjectInfo(path), false);
+
+        public override IExplorerControlViewModel GetExplorerControlViewModel(IBrowsableObjectInfoViewModel browsableObjectInfo) => ObjectModel.BrowsableObjectInfo.GetDefaultExplorerControlViewModel(browsableObjectInfo);
     }
 }

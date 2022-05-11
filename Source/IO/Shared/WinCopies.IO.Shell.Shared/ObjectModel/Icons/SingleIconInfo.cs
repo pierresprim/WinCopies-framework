@@ -15,11 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+#region System
 using System;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Media.Imaging;
+#endregion System
 
+#region WinCopies
 using WinCopies.Collections.Generic;
 using WinCopies.GUI.Drawing;
 using WinCopies.IO.AbstractionInterop;
@@ -28,6 +31,7 @@ using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Selectors;
 using WinCopies.Linq;
 using WinCopies.PropertySystem;
+#endregion WinCopies
 
 namespace WinCopies.IO.ObjectModel
 {
@@ -40,7 +44,7 @@ namespace WinCopies.IO.ObjectModel
     {
         protected class BrowsableObjectInfoBitmapSources : BitmapSources<SingleIcon>
         {
-            public static BitmapSource TryGetBitmapSource(in Icon icon, in ushort size) => Shell.ObjectModel.BrowsableObjectInfo.TryGetBitmapSource(Shell.ObjectModel.BrowsableObjectInfo.TryGetIcon(icon, size));
+            public static BitmapSource TryGetBitmapSource(in Icon icon, in ushort size) => BrowsableObjectInfo.TryGetBitmapSource(TryGetIcon(icon, size));
 
             protected override BitmapSource SmallOverride => TryGetBitmapSource(InnerObject.Icon, SmallIconSize);
 
@@ -108,18 +112,9 @@ namespace WinCopies.IO.ObjectModel
 
         protected override string ItemTypeNameOverride => "Icon";
 
-        protected override string DescriptionOverride => WinCopies.UtilHelpers.NotApplicable;
+        protected override string DescriptionOverride => WinCopies.Consts.NotApplicable;
 
         protected override bool IsSpecialItemOverride => false;
-
-        protected override ArrayBuilder<IBrowsableObjectInfo> GetRootItemsOverride()
-        {
-            var arrayBuilder = new ArrayBuilder<IBrowsableObjectInfo>();
-
-            _ = arrayBuilder.AddLast(Parent);
-
-            return arrayBuilder;
-        }
 
         public override string LocalizedName => GetValueIfNotDisposed(_singleIcon).Name;
 
@@ -129,7 +124,18 @@ namespace WinCopies.IO.ObjectModel
 
         protected override System.Collections.Generic.IEnumerable<IProcessInfo> CustomProcessesOverride => null;
 
+        public override string Protocol => null;
+
         public SingleIconInfo(in string parentPath, in ClientVersion clientVersion, in SingleIcon icon) : base($"{parentPath}\\{icon.Name}", clientVersion) => _singleIcon = icon;
+
+        protected override ArrayBuilder<IBrowsableObjectInfo> GetRootItemsOverride()
+        {
+            var arrayBuilder = new ArrayBuilder<IBrowsableObjectInfo>();
+
+            _ = arrayBuilder.AddLast(Parent);
+
+            return arrayBuilder;
+        }
 
         protected override IEnumerableSelectorDictionary<SingleIconInfoItemProvider, IBrowsableObjectInfo> GetSelectorDictionaryOverride() => DefaultItemSelectorDictionary;
 

@@ -17,9 +17,6 @@
 
 using System;
 using System.Collections;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -93,75 +90,13 @@ namespace WinCopies.GUI.Controls
 #endif
     }
 
-    public interface IHistoryCollection : IList
-    {
-        int CurrentIndex { get; set; }
-
-        object Current { get; }
-
-        bool CanMovePreviousFromCurrent { get; }
-
-        bool CanMoveNextFromCurrent { get; }
-
-        bool NotifyOnPropertyChanged { get; }
-    }
-
-    public class HistoryObservableCollection<T> : ObservableCollection<T>, IHistoryCollection, INotifyPropertyChanged, INotifyCollectionChanged
-    {
-        private int _currentIndex;
-        private bool _notifyOnPropertyChanged = true;
-
-        public int CurrentIndex
-        {
-            get => _currentIndex; set => UtilHelpers.UpdateValue(ref _currentIndex, value, OnPropertyChanged);
-        }
-
-        public T Current => this[CurrentIndex];
-
-        object IHistoryCollection.Current => Current;
-
-        public bool CanMovePreviousFromCurrent => CurrentIndex < Count - 1;
-
-        public bool CanMoveNextFromCurrent => CurrentIndex > 0;
-
-        public bool NotifyOnPropertyChanged
-        {
-            get => _notifyOnPropertyChanged; set => UtilHelpers.UpdateValue(ref _notifyOnPropertyChanged, value, () =>
-{
-    if (value)
-
-        OnPropertyChanged();
-});
-        }
-
-        protected virtual void OnPropertyChanged()
-        {
-            OnPropertyChanged(new PropertyChangedEventArgs(nameof(CurrentIndex)));
-            OnPropertyChanged(new PropertyChangedEventArgs(nameof(Current)));
-            OnPropertyChanged(new PropertyChangedEventArgs(nameof(CanMovePreviousFromCurrent)));
-            OnPropertyChanged(new PropertyChangedEventArgs(nameof(CanMoveNextFromCurrent)));
-        }
-
-        protected override void OnPropertyChanged(PropertyChangedEventArgs e)
-        {
-            if (NotifyOnPropertyChanged)
-            {
-                base.OnPropertyChanged(e);
-
-                if (e.PropertyName == nameof(Count))
-
-                    OnPropertyChanged();
-            }
-        }
-    }
-
     public class NavigationButton : CommandItemsControl<IHistoryCollection, object>
     {
         private static DependencyProperty Register(in string propertyName) => Register<Style, NavigationButton>(propertyName);
 
-        public bool CanBrowseBack => ItemsSource?.CanMovePreviousFromCurrent == true;
+        public bool CanBrowseBack => ItemsSource?.CanMoveBack == true;
 
-        public bool CanBrowseForward => ItemsSource?.CanMoveNextFromCurrent == true;
+        public bool CanBrowseForward => ItemsSource?.CanMoveForward == true;
 
         public static readonly DependencyProperty GoBackButtonStyleProperty = Register(nameof(GoBackButtonStyle));
 
@@ -193,7 +128,7 @@ namespace WinCopies.GUI.Controls
 
                 return;
 
-            ItemsSource.CurrentIndex++;
+            ItemsSource.MoveBack();
 
             _ = Command?.TryExecute(CommandParameter, CommandTarget);
         }
@@ -237,7 +172,7 @@ namespace WinCopies.GUI.Controls
 
                 return;
 
-            ItemsSource.CurrentIndex--;
+            ItemsSource.MoveForward();
 
             _ = Command?.TryExecute(CommandParameter, CommandTarget);
         }

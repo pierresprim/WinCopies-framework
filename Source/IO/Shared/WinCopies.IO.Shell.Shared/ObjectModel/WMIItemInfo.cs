@@ -17,25 +17,30 @@
 
 using Microsoft.WindowsAPICodePack.Shell;
 
+#region System
 using System;
 using System.Globalization;
 using System.Linq;
 using System.Management;
 using System.Windows.Media.Imaging;
+#endregion System
 
+#region WinCopies
 using WinCopies.Collections.Generic;
 using WinCopies.IO.AbstractionInterop;
 using WinCopies.IO.Process;
 using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Selectors;
-using WinCopies.IO.Shell;
 using WinCopies.Linq;
 using WinCopies.PropertySystem;
 using WinCopies.Util;
+#endregion WinCopies
 
+#region Static Usings
 using static WinCopies.IO.ObjectModel.WMIItemInfo;
 using static WinCopies.UtilHelpers;
 using static WinCopies.ThrowHelper;
+#endregion Static Usings
 
 namespace WinCopies.IO
 {
@@ -208,7 +213,7 @@ namespace WinCopies.IO
                     {
                         object value = _managementObject.Qualifiers[nameof(Description)].Value;
 
-                        _description = value == null ? NotApplicable : (string)value;
+                        _description = value == null ? WinCopies.Consts.NotApplicable : (string)value;
                     }
 
                     return _description;
@@ -532,6 +537,8 @@ namespace WinCopies.IO
             private IWMIItemInfoProperties _objectProperties;
 
             #region Properties
+            public override string Protocol => "wmi";
+
             public static IBrowsabilityPathStack<IWMIItemInfo> BrowsabilityPathStack { get; } = __browsabilityPathStack.AsWriteOnly();
 
             protected override System.Collections.Generic.IEnumerable<IBrowsabilityPath> BrowsabilityPathsOverride => __browsabilityPathStack.GetBrowsabilityPaths(this);

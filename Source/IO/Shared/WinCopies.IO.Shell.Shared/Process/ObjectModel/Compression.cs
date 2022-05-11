@@ -42,7 +42,7 @@ namespace WinCopies.IO.Process
 
     namespace ObjectModel
     {
-        [ProcessGuid(Guids.Shell.Process.Archive.Compression)]
+        [ProcessGuid(Consts.Guids.Shell.Process.Archive.Compression)]
         public class Compression<T> : // ArchiveProcess<WinCopies.IO.IPathInfo, ProcessQueueCollection, ReadOnlyProcessQueueCollection, ProcessErrorPathQueueCollection, ReadOnlyProcessErrorPathQueueCollection
                                       // #if DEBUG
                                       // , ProcessSimulationParameters
@@ -54,7 +54,7 @@ namespace WinCopies.IO.Process
 
             protected SevenZipCompressor ArchiveCompressor { get; }
 
-            public override string Guid => Guids.Shell.Process.Archive.Compression;
+            public override string Guid => Consts.Guids.Shell.Process.Archive.Compression;
 
             public override string Name => Shell.Properties.Resources.Compression;
 

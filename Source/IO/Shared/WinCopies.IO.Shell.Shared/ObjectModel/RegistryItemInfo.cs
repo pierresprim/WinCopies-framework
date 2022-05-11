@@ -16,29 +16,34 @@
  * along with the WinCopies Framework. If not, see <https://www.gnu.org/licenses/>. */
 
 using Microsoft.Win32;
+
 using Microsoft.WindowsAPICodePack.Shell;
 
+#region System
 using System;
 using System.Linq;
 using System.Security;
 using System.Security.AccessControl;
 using System.Text;
-using System.Windows.Media.Imaging;
+#endregion System
 
+#region WinCopies
 using WinCopies.Collections.Generic;
 using WinCopies.IO.AbstractionInterop;
 using WinCopies.IO.Process;
 using WinCopies.IO.Process.ObjectModel;
 using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Selectors;
-using WinCopies.IO.Shell;
 using WinCopies.Linq;
 using WinCopies.PropertySystem;
 using WinCopies.Util;
+#endregion WinCopies
 
+#region Static Usings
 using static WinCopies.UtilHelpers;
 using static WinCopies.ThrowHelper;
 using static WinCopies.IO.Shell.Resources.ExceptionMessages;
+#endregion Static Usings
 
 namespace WinCopies.IO.ObjectModel
 {
@@ -98,7 +103,7 @@ namespace WinCopies.IO.ObjectModel
             }
         }
 
-        protected override string DescriptionOverride => NotApplicable;
+        protected override string DescriptionOverride => WinCopies.Consts.NotApplicable;
 
         /// <summary>
         /// Gets the localized path of this <see cref="RegistryItemInfo"/>.
@@ -213,24 +218,23 @@ namespace WinCopies.IO.ObjectModel
 #endif
             )?.Value;
 
+        public override string Protocol => "registry";
+
         // public override FileSystemType ItemFileSystemType => FileSystemType.Registry;
         #endregion // Properties
 
         #region Constructors
-        public RegistryItemInfo() : this(GetDefaultClientVersion()) { /* Left empty. */ }
+        protected RegistryItemInfo() : this(GetDefaultClientVersion()) { /* Left empty. */ }
 
-        public RegistryItemInfo(in ClientVersion clientVersion) : base(Shell.Properties.Resources.RegistryRoot, clientVersion) => Name = Path;
+        protected RegistryItemInfo(in ClientVersion clientVersion) : base(Shell.Properties.Resources.RegistryRoot, clientVersion) => Name = Path;
 
-        public RegistryItemInfo(in RegistryKey registryKey, in ClientVersion clientVersion) : base(GetRegistryKeyName(registryKey), clientVersion) => Name = registryKey.Name.Split(WinCopies.IO.Path.PathSeparator).GetLast();
+        protected RegistryItemInfo(in RegistryKey registryKey, in ClientVersion clientVersion) : base(GetRegistryKeyName(registryKey), clientVersion) => Name = registryKey.Name.Split(IO.Path.PathSeparator).GetLast();
 
-        public RegistryItemInfo(in string path, in ClientVersion clientVersion) : base(IsNullEmptyOrWhiteSpace(path) ? throw GetNullEmptyOrWhiteSpaceStringException(nameof(path)) : path, clientVersion) => Name = path.Split(WinCopies.IO.Path.PathSeparator).GetLast();
+        protected RegistryItemInfo(in string path, in ClientVersion clientVersion) : base(IsNullEmptyOrWhiteSpace(path) ? throw GetNullEmptyOrWhiteSpaceStringException(nameof(path)) : path, clientVersion) => Name = path.Split(WinCopies.IO.Path.PathSeparator).GetLast();
 
-        public RegistryItemInfo(in RegistryKey registryKey, in string valueName, in ClientVersion clientVersion) : base($"{GetRegistryKeyName(registryKey)}{WinCopies.IO.Path.PathSeparator}{(IsNullEmptyOrWhiteSpace(valueName) ? throw GetNullEmptyOrWhiteSpaceStringException(nameof(valueName)) : valueName)}", clientVersion) => Name = valueName;
+        protected RegistryItemInfo(in RegistryKey registryKey, in string valueName, in ClientVersion clientVersion) : base($"{GetRegistryKeyName(registryKey)}{IO.Path.PathSeparator}{(IsNullEmptyOrWhiteSpace(valueName) ? throw GetNullEmptyOrWhiteSpaceStringException(nameof(valueName)) : valueName)}", clientVersion) => Name = valueName;
 
-        public RegistryItemInfo(in string registryKeyPath, in string valueName, in ClientVersion clientVersion) : this(Registry.OpenRegistryKey(registryKeyPath), valueName, clientVersion)
-        {
-            // Left empty.
-        }
+        protected RegistryItemInfo(in string registryKeyPath, in string valueName, in ClientVersion clientVersion) : this(Registry.OpenRegistryKey(registryKeyPath), valueName, clientVersion) { /* Left empty. */ }
         #endregion Constructors
 
         #region Methods
@@ -349,6 +353,7 @@ namespace WinCopies.IO.ObjectModel
 
     public class RegistryItemInfo : RegistryItemInfo<IRegistryItemInfoProperties, RegistryItemInfoItemProvider, IEnumerableSelectorDictionary<RegistryItemInfoItemProvider, IBrowsableObjectInfo>, RegistryItemInfoItemProvider>, IRegistryItemInfo
     {
+        #region Types
         protected class _ProcessFactory : IProcessFactory
         {
             protected class _NewItemProcessCommands : IProcessCommand
@@ -455,6 +460,7 @@ namespace WinCopies.IO.ObjectModel
                 base.Dispose(disposing);
             }
         }
+        #endregion
 
         #region Fields
         private IRegistryItemInfoProperties _objectProperties;
@@ -492,41 +498,43 @@ namespace WinCopies.IO.ObjectModel
         #endregion Properties
 
         #region Constructors
-        public RegistryItemInfo() { /* Left empty. */ }
+        public RegistryItemInfo() : this(GetDefaultClientVersion()) { /* Left empty. */ }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RegistryItemInfo"/> class as the Registry root.
         /// </summary>
-        public RegistryItemInfo(in ClientVersion clientVersion) : base(clientVersion) => _objectProperties = new RegistryItemInfoProperties<IRegistryItemInfoBase>(this, RegistryItemType.Root);
+        public RegistryItemInfo(in ClientVersion clientVersion) : base(clientVersion) => SetProperties(RegistryItemType.Root);
 
         ///// <summary>
         ///// Initializes a new instance of the <see cref="RegistryItemInfo"/> class using a custom factory for <see cref="RegistryItemInfo"/>s.
         ///// </summary>
         ///// <param name="registryKey">The <see cref="Microsoft.Win32.RegistryKey"/> that the new <see cref="RegistryItemInfo"/> represents.</param>
-        public RegistryItemInfo(in RegistryKey registryKey, in ClientVersion clientVersion) : base(registryKey, clientVersion) => _objectProperties = new RegistryItemInfoProperties<IRegistryItemInfoBase>(this, RegistryItemType.Key);
+        public RegistryItemInfo(in RegistryKey registryKey, in ClientVersion clientVersion) : base(registryKey, clientVersion) => SetProperties(RegistryItemType.Key);
 
         ///// <summary>
         ///// Initializes a new instance of the <see cref="RegistryItemInfo"/> class using a custom factory for <see cref="RegistryItemInfo"/>s.
         ///// </summary>
         ///// <param name="path">The path of the <see cref="Microsoft.Win32.RegistryKey"/> that the new <see cref="RegistryItemInfo"/> represents.</param>
-        public RegistryItemInfo(in string path, in ClientVersion clientVersion) : base(path, clientVersion) => _objectProperties = new RegistryItemInfoProperties<IRegistryItemInfoBase>(this, RegistryItemType.Key);
+        public RegistryItemInfo(in string path, in ClientVersion clientVersion) : base(path, clientVersion) => SetProperties(RegistryItemType.Key);
 
         ///// <summary>
         ///// Initializes a new instance of the <see cref="RegistryItemInfo"/> class using a custom factory for <see cref="RegistryItemInfo"/>s.
         ///// </summary>
         ///// <param name="registryKey">The <see cref="Microsoft.Win32.RegistryKey"/> that the new <see cref="RegistryItemInfo"/> represents.</param>
         ///// <param name="valueName">The name of the value that the new <see cref="RegistryItemInfo"/> represents.</param>
-        public RegistryItemInfo(in RegistryKey registryKey, in string valueName, in ClientVersion clientVersion) : base(registryKey, valueName, clientVersion) => _objectProperties = new RegistryItemInfoProperties<IRegistryItemInfoBase>(this, RegistryItemType.Value);
+        public RegistryItemInfo(in RegistryKey registryKey, in string valueName, in ClientVersion clientVersion) : base(registryKey, valueName, clientVersion) => SetProperties(RegistryItemType.Value);
 
         ///// <summary>
         ///// Initializes a new instance of the <see cref="RegistryItemInfo"/> class using a custom factory for <see cref="RegistryItemInfo"/>s.
         ///// </summary>
         ///// <param name="registryKeyPath">The path of the <see cref="Microsoft.Win32.RegistryKey"/> that the new <see cref="RegistryItemInfo"/> represents.</param>
         ///// <param name="valueName">The name of the value that the new <see cref="RegistryItemInfo"/> represents.</param>
-        public RegistryItemInfo(in string registryKeyPath, in string valueName, in ClientVersion clientVersion) : base(registryKeyPath, valueName, clientVersion) => _objectProperties = new RegistryItemInfoProperties<IRegistryItemInfoBase>(this, RegistryItemType.Value);
+        public RegistryItemInfo(in string registryKeyPath, in string valueName, in ClientVersion clientVersion) : base(registryKeyPath, valueName, clientVersion) => SetProperties(RegistryItemType.Value);
         #endregion Constructors
 
         #region Methods
+        private void SetProperties(in RegistryItemType registryItemType) => _objectProperties = new RegistryItemInfoProperties<IRegistryItemInfoBase>(this, registryItemType);
+
         public static ArrayBuilder<IBrowsableObjectInfo> GetDefaultRootItems()
         {
             var arrayBuilder = new ArrayBuilder<IBrowsableObjectInfo>();

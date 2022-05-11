@@ -16,6 +16,7 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using System.Windows;
+using WinCopies.Desktop;
 
 namespace WinCopies.GUI.Controls
 {
@@ -30,6 +31,6 @@ namespace WinCopies.GUI.Controls
 
 
 
-        static Label() => DefaultStyleKeyProperty.OverrideMetadata(typeof(Label), new FrameworkPropertyMetadata(typeof(Label)));
+        static Label() => DefaultStyleKeyProperty.OverrideFrameworkPropertyMetadata<Label>();
     }
 }

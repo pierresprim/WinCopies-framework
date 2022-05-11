@@ -18,10 +18,12 @@
 using System;
 using System.Drawing;
 
+#region WinCopies
 using WinCopies.Collections.Generic;
 using WinCopies.IO.Process;
 using WinCopies.IO.PropertySystem;
 using WinCopies.PropertySystem;
+#endregion WinCopies
 
 namespace WinCopies.IO.ObjectModel
 {
@@ -35,6 +37,8 @@ namespace WinCopies.IO.ObjectModel
         private Bitmap _bitmap;
         private IBrowsableObjectInfo _parent;
         private IBitmapSourceProvider _bitmapSourceProvider;
+
+        public override string Protocol => null;
 
         protected override bool IsLocalRootOverride => false;
 
@@ -62,7 +66,7 @@ namespace WinCopies.IO.ObjectModel
 #else
             ?? (_bitmapSourceProvider =
 #endif
-            new Shell.BitmapSourceProvider(this, new BrowsableObjectInfoBitmapBitmapSources(InnerObjectGeneric), true)
+            new Shell.BitmapSourceProvider(this, new BitmapBitmapSources(InnerObjectGeneric), true)
 #if !CS8
             )
 #endif

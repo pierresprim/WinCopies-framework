@@ -121,7 +121,7 @@ namespace WinCopies.IO
         }
 
         #region Methods
-        public static IProcessParameters GetCopyProcessParameters(in string sourcePath, in string destPath, in bool move, in System.Collections.Generic.IEnumerable<string> paths) => GetProcessParameters(Guids.Shell.Process.Shell.Copy, sourcePath, destPath, move, paths);
+        public static IProcessParameters GetCopyProcessParameters(in string sourcePath, in string destPath, in bool move, in System.Collections.Generic.IEnumerable<string> paths) => GetProcessParameters(Consts.Guids.Shell.Process.Shell.Copy, sourcePath, destPath, move, paths);
 
         public static ProcessParameters GetProcessParameters(in string processGuid, in string sourcePath, in string destinationPath, in bool move, in System.Collections.Generic.IEnumerable<string> paths) => new ProcessParameters(processGuid, paths.PrependValues(sourcePath, destinationPath, move ? "1" : "0"));
 

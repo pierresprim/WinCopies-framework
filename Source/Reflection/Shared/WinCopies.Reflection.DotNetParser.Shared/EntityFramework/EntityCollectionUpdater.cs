@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 
-using WinCopies.Temp;
-
 namespace WinCopies.EntityFramework
 {
     public interface IEntityCollectionUpdater<TParameter, TResult>

@@ -15,31 +15,44 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+#region Usings
+#region Namespaces
+#region WAPICP
 using Microsoft.WindowsAPICodePack;
 using Microsoft.WindowsAPICodePack.Shell;
 using Microsoft.WindowsAPICodePack.Win32Native.Menus;
 using Microsoft.WindowsAPICodePack.Win32Native.Shell.DesktopWindowManager;
+#endregion WAPICP
 
+#region System
 using System;
 using System.Collections.Specialized;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
+using WinCopies.Desktop;
+#endregion System
 
 using WinCopies.Linq;
+#endregion Namespaces
 
+#region Static Usings
+#region WAPICP
 using static Microsoft.WindowsAPICodePack.Shell.DesktopWindowManager;
 using static Microsoft.WindowsAPICodePack.Win32Native.InteropTools;
 using static Microsoft.WindowsAPICodePack.Win32Native.Menus.Menus;
 using static Microsoft.WindowsAPICodePack.Win32Native.Shell.DesktopWindowManager.DesktopWindowManager;
+#endregion WAPICP
 
 using static WinCopies.Delegates;
 using static WinCopies.Util.Desktop.UtilHelpers;
+#endregion Static Usings
+#endregion Usings
 
 namespace WinCopies.GUI.Windows
 {
-    public class Window : System.Windows.Window
+    public class Window : GlassWindow
     {
         private static DependencyProperty Register<T>(in string propertyName) => Register<T, Window>(propertyName);
 
@@ -47,11 +60,7 @@ namespace WinCopies.GUI.Windows
 
         private static DependencyPropertyKey RegisterReadOnly<T>(in string propertyName, in PropertyMetadata propertyMetadata) => RegisterReadOnly<T, Window>(propertyName, propertyMetadata);
 
-        private static readonly DependencyPropertyKey IsSourceInitializedPropertyKey = RegisterReadOnly<bool>(nameof(IsSourceInitialized), new PropertyMetadata(false));
-
-        public static readonly DependencyProperty IsSourceInitializedProperty = IsSourceInitializedPropertyKey.DependencyProperty;
-
-        public bool IsSourceInitialized => (bool)GetValue(IsSourceInitializedProperty);
+        private static RoutedEvent RegisterRoutedEvent<T>(in string eventName, in RoutingStrategy routingStrategy) => RegisterRoutedEvent<T, Window>(eventName, routingStrategy);
 
         public static readonly DependencyProperty CloseButtonProperty = Register<bool>(nameof(CloseButton), new PropertyMetadata(true, (DependencyObject d, DependencyPropertyChangedEventArgs e) => _ = (bool)e.NewValue ? EnableCloseMenuItem((Window)d) : DisableCloseMenuItem((Window)d)));
 
@@ -89,7 +98,7 @@ namespace WinCopies.GUI.Windows
         /// <summary>
         /// Identifies the <see cref="HelpButtonClick"/> routed event.
         /// </summary>
-        public static readonly RoutedEvent HelpButtonClickEvent = EventManager.RegisterRoutedEvent(nameof(HelpButtonClick), RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(Window));
+        public static readonly RoutedEvent HelpButtonClickEvent = RegisterRoutedEvent<RoutedEventHandler>(nameof(HelpButtonClick), RoutingStrategy.Bubble);
 
         public event RoutedEventHandler HelpButtonClick
         {
@@ -99,6 +108,15 @@ namespace WinCopies.GUI.Windows
         }
 
         static Window() => DefaultStyleKeyProperty.OverrideMetadata(typeof(Window), new FrameworkPropertyMetadata(typeof(Window)));
+
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            base.OnKeyDown(e);
+
+            if (!e.Handled && e.KeyboardDevice.Modifiers.HasFlag(ModifierKeys.Alt) && e.Key == Key.Up)
+
+                Commands.NavigationCommands.BrowseToParent.Execute(null, this);
+        }
 
         protected virtual void OnTitleBarMenuItemsCollectionChanged(TitleBarMenuItemQueue oldValue, TitleBarMenuItemQueue newValue)
         {
@@ -138,7 +156,7 @@ namespace WinCopies.GUI.Windows
             {
                 id = item.Id == 0u ? item.Collection.LastId + 1 : item.Id;
 
-                menuItemInfo = new MenuItemInfo() { cbSize = (uint)Marshal.SizeOf<MenuItemInfo>() };
+                menuItemInfo = new MenuItemInfo() { cbSize = (uint)Marshal.SizeOf<MenuItemInfo>(), fMask = MenuItemInfoFlags.ID };
 
                 bool ok = true;
 
@@ -176,6 +194,13 @@ namespace WinCopies.GUI.Windows
                 if (!item.IsEnabled)
 
                     _ = EnableMenuItemByCommand(menu, (SystemMenuCommands)id, Microsoft.WindowsAPICodePack.Win32Native.Menus.MenuFlags.Disabled);
+
+                if (item.Icon != null)
+                {
+                    menuItemInfo = new MenuItemInfo() { cbSize = (uint)Marshal.SizeOf<MenuItemInfo>(), fMask = MenuItemInfoFlags.Bitmap, hbmpItem = item.Icon.GetHbitmap() };
+
+                    _ = SetMenuItemInfoW(menu, id, false, ref menuItemInfo);
+                }
 
                 item.PropertyChanged += onPropertyChanged;
             }
@@ -237,6 +262,8 @@ namespace WinCopies.GUI.Windows
 
         protected virtual void OnSourceInitialized(HwndSource hwndSource)
         {
+            base.OnSourceInitialized(hwndSource);
+
             if (HelpButton)
             {
                 IntPtr hwnd = new WindowInteropHelper(this).Handle;
@@ -255,19 +282,15 @@ namespace WinCopies.GUI.Windows
                 //SetWindowPos(hwnd, IntPtr.Zero, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
                 //((HwndSource)PresentationSource.FromVisual(this)).AddHook(OnHelpButtonClickHook);
             }
-
-            hwndSource.AddHook(OnSourceHook);
         }
 
-        protected override void OnSourceInitialized(EventArgs e)
+        protected override void OnSourceInitializing(EventArgs e)
         {
-            base.OnSourceInitialized(e);
+            base.OnSourceInitializing(e);
 
             if (PresentationSource.FromVisual(this) is HwndSource hwndSource)
 
                 OnSourceInitialized(hwndSource);
-
-            SetValue(IsSourceInitializedPropertyKey, true);
         }
 
         // todo: really needed?
@@ -297,19 +320,18 @@ namespace WinCopies.GUI.Windows
 
             else if (TitleBarMenuItems != null)
             {
-                int menuId = LOWORD(wParam);
+                int menuId = Microsoft.WindowsAPICodePack.Win32Native.Core.GetLoWord(wParam);
 
                 var menuItems = (System.Collections.Generic.IEnumerable<TitleBarMenuItem>)TitleBarMenuItems;
 
                 foreach (TitleBarMenuItem menuItem in menuItems)
-                {
+
                     if (menuItem.Id == menuId && menuItem.IsEnabled)
                     {
                         menuItem.OnClick();
 
-                        break;
+                        return true;
                     }
-                }
             }
 
             return false;
@@ -322,23 +344,6 @@ namespace WinCopies.GUI.Windows
                 _ = DisableCloseMenuItem(this);
 
             return false;
-        }
-
-        protected virtual IntPtr OnSourceHook(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
-        {
-            if (handled)
-
-                return IntPtr.Zero;
-
-            var _msg = (WindowMessage)msg;
-
-            IntPtr result = OnSourceHook(hwnd, _msg, wParam, lParam, out bool _handled);
-
-            if (_handled)
-
-                handled = true;
-
-            return result;
         }
 
         protected virtual bool OnXButtonClick(XButton button, XButtonClick buttonClick)
@@ -363,10 +368,14 @@ namespace WinCopies.GUI.Windows
             return true;
         }
 
-        protected virtual IntPtr OnSourceHook(IntPtr hwnd, WindowMessage msg, IntPtr wParam, IntPtr lParam, out bool handled)
+        protected override IntPtr OnSourceHook2(WindowMessage msg, IntPtr wParam, IntPtr lParam, out bool handled)
         {
+            base.OnSourceHook2(msg, wParam, lParam, out handled);
+
+            if (!handled)
+            {
 #if CS8
-            handled =
+                handled =
 #else
             if (
 #endif
@@ -453,6 +462,7 @@ namespace WinCopies.GUI.Windows
                     ; break;
                 }
 #endif
+            }
 
             return IntPtr.Zero;
         }

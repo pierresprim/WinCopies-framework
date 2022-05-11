@@ -5,10 +5,8 @@ using System.Linq;
 
 using WinCopies.EntityFramework;
 using WinCopies.Linq;
-using WinCopies.Temp;
 
 using static WinCopies.EntityFramework.EntityCollection;
-using static WinCopies.Temp.Util;
 
 namespace WinCopies.Data.SQL
 {
@@ -112,7 +110,7 @@ namespace WinCopies.Data.SQL
 
         public void InitSelector(string table, IEnumerable<string> columns)
         {
-            _select = (Connection = Connection.GetConnection()).GetSelect(GetArray(table), columns.Select(column => Connection.GetColumn(column)));
+            _select = (Connection = Connection.GetConnection()).GetSelect(UtilHelpers.GetArray(table), columns.Select(column => Connection.GetColumn(column)));
 
             _select.OrderBy = OrderBy;
 

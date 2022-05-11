@@ -19,10 +19,18 @@ using System;
 using System.Reflection;
 
 using WinCopies.Collections.Generic;
-using WinCopies.IO.ObjectModel;
 
 namespace WinCopies.IO
 {
+    public enum ExtensionCommand : byte
+    {
+        None = 0,
+
+        CopyName = 1,
+
+        CopyPath = 2
+    }
+
     public enum FileSystemEntryEnumerationOrder : byte
     {
         /// <summary>

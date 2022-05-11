@@ -15,6 +15,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Browsability.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectInfoItemProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectInfoPlugin.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectInfoPluginStack.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectInfoStack.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Directory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enumeration\EnumerablePath.cs" />

@@ -15,15 +15,23 @@
 * You should have received a copy of the GNU General Public License
 * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-using System;
+using System.Collections.Generic;
 
-using WinCopies.Collections.DotNetFix.Generic;
+using WinCopies.IO.ObjectModel;
 
 namespace WinCopies.IO
 {
     public interface IBrowsableObjectInfoPlugin
     {
+        IBitmapSourceProvider BitmapSourceProvider { get; }
+
+        IEnumerable<IBrowsableObjectInfo> GetStartPages(ClientVersion clientVersion);
+
+        IEnumerable<IBrowsableObjectInfo> GetProtocols(IBrowsableObjectInfo parent, ClientVersion clientVersion);
+
         void RegisterBrowsabilityPaths();
+
+        void RegisterBrowsableObjectInfoSelectors();
 
         void RegisterProcessSelectors();
 
@@ -32,47 +40,11 @@ namespace WinCopies.IO
         void OnRegistrationCompleted();
     }
 
-    public class BrowsableObjectInfoPluginStack : BrowsableObjectInfoEnumerableStack<Action>
-    {
-        private Action _runActions = EmptyVoid;
-        private Action<Action> _pushAction;
-
-        public BrowsableObjectInfoPluginStack() : base(new EnumerableStack<Action>()) => InitializePushAction();
-
-        private void _Push(Action action) => Stack.Push(action);
-
-        private void InitializePushAction() => _pushAction = action =>
-        {
-            InitializeRunAction();
-
-            _Push(action);
-
-            _pushAction = _Push;
-        };
-
-        private void InitializeRunAction() => _runActions = () =>
-        {
-            foreach (Action action in Stack)
-
-                action();
-
-            _runActions = EmptyVoid;
-
-            Stack.Clear();
-
-            InitializePushAction();
-        };
-
-        protected static void EmptyVoid() { /* Left empty. */ }
-
-        public void Push(Action obj) => _pushAction(obj);
-
-        protected internal void RunActions() => _runActions();
-    }
-
-    public class BrowsableObjectInfoPlugin : IBrowsableObjectInfoPlugin
+    public abstract class BrowsableObjectInfoPlugin : IBrowsableObjectInfoPlugin
     {
         public static BrowsableObjectInfoPluginStack RegisterBrowsabilityPathsStack { get; } = new BrowsableObjectInfoPluginStack();
+
+        public static BrowsableObjectInfoPluginStack RegisterBrowsableObjectInfoSelectorsStack { get; } = new BrowsableObjectInfoPluginStack();
 
         public static BrowsableObjectInfoPluginStack RegisterProcessSelectorsStack { get; } = new BrowsableObjectInfoPluginStack();
 
@@ -80,7 +52,15 @@ namespace WinCopies.IO
 
         public static BrowsableObjectInfoPluginStack OnRegistrationCompletedStack { get; } = new BrowsableObjectInfoPluginStack();
 
+        public abstract IBitmapSourceProvider BitmapSourceProvider { get; }
+
+        public abstract IEnumerable<IBrowsableObjectInfo> GetStartPages(ClientVersion clientVersion);
+
+        public abstract IEnumerable<IBrowsableObjectInfo> GetProtocols(IBrowsableObjectInfo parent, ClientVersion clientVersion);
+
         public void RegisterBrowsabilityPaths() => RegisterBrowsabilityPathsStack.RunActions();
+
+        public void RegisterBrowsableObjectInfoSelectors() => RegisterBrowsableObjectInfoSelectorsStack.RunActions();
 
         public void RegisterProcessSelectors() => RegisterProcessSelectorsStack.RunActions();
 

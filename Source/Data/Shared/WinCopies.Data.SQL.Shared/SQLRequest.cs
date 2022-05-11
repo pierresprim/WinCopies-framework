@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-using WinCopies.Temp;
-
 using static WinCopies.ThrowHelper;
 
 namespace WinCopies.Data.SQL
@@ -62,7 +60,7 @@ namespace WinCopies.Data.SQL
 
     public interface ISQLColumnRequest<T> : ISQLColumnRequest where T : ISQLColumn
     {
-        new IExtensibleEnumerable<T>
+        new Collections.Generic.IExtensibleEnumerable<T>
 #if CS8
             ?
 #endif
@@ -76,7 +74,7 @@ namespace WinCopies.Data.SQL
 
     public interface ISQLTableRequest
     {
-        IExtensibleEnumerable<string>
+        Collections.Generic.IExtensibleEnumerable<string>
 #if CS8
             ?
 #endif
@@ -162,7 +160,7 @@ namespace WinCopies.Data.SQL
 
         public SQLItemCollection<string> Tables { get => _tables; set => _tables = value ?? throw GetArgumentNullException(nameof(value)); }
 
-        IExtensibleEnumerable<string> ISQLTableRequest.Tables => Tables;
+        Collections.Generic.IExtensibleEnumerable<string> ISQLTableRequest.Tables => Tables;
 
         public IConditionGroup
 #if CS8

@@ -20,7 +20,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="..\WinCopies.GUI.Samples.Shared\NavigationMenuItemButton.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NavigationMenuItemButton.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)NavigationMenuBar.xaml.cs">
       <DependentUpon>NavigationMenuBar.xaml</DependentUpon>
     </Compile>

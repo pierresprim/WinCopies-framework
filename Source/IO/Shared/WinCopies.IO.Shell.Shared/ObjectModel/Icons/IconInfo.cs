@@ -18,11 +18,13 @@
 using System;
 using System.Drawing;
 
+#region WinCopies
 using WinCopies.Collections.Generic;
 using WinCopies.IO.Process;
 using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Shell;
 using WinCopies.PropertySystem;
+#endregion WinCopies
 
 namespace WinCopies.IO.ObjectModel
 {
@@ -36,6 +38,8 @@ namespace WinCopies.IO.ObjectModel
         private Icon _icon;
         private IBrowsableObjectInfo _parent;
         private IBitmapSourceProvider _bitmapSourceProvider;
+
+        public override string Protocol => null;
 
         protected override bool IsLocalRootOverride => false;
 

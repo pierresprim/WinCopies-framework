@@ -1,20 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 
 using WinCopies.Linq;
-using WinCopies.Temp;
+using WinCopies.Util;
+
+using static WinCopies.ThrowHelper;
 
 namespace WinCopies.EntityFramework
 {
     public static partial class EntityCollection
     {
-        public static ulong RemoveItem(in IEntity entity, in Func<string, ulong> func, out uint tables)
+        public static ulong RemoveItem(
+#if CS8
+            [DisallowNull]
+#endif
+        in IEntity entity,
+#if CS8
+            [DisallowNull]
+#endif
+        in Func<string, ulong> func, out uint tables)
         {
+            ThrowIfNull(entity, nameof(entity));
+            ThrowIfNull(func, nameof(func));
+
             tables = 0;
             ulong rows = 0;
-
             Type t = entity.GetType();
             EntityAttribute
 #if CS8
@@ -79,8 +92,6 @@ namespace WinCopies.EntityFramework
 
                             tables += _tables;
                         }
-
-                    entity.Dispose();
                 }
             }
 

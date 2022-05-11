@@ -15,19 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+#region WAPICP
 using Microsoft.WindowsAPICodePack.PortableDevices;
 using Microsoft.WindowsAPICodePack.PropertySystem;
+#endregion
 
 using System;
-using System.Windows.Media.Imaging;
 
+#region WinCopies
 using WinCopies.IO.AbstractionInterop;
 using WinCopies.IO.Process;
 using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Selectors;
-using WinCopies.IO.Shell;
 using WinCopies.Linq;
 using WinCopies.PropertySystem;
+#endregion
 
 using static Microsoft.WindowsAPICodePack.PortableDevices.PropertySystem.Properties.Legacy.Object.Common;
 
@@ -85,7 +87,7 @@ namespace WinCopies.IO.ObjectModel
 
         protected override string ItemTypeNameOverride => FileSystemObjectInfo.GetItemTypeName(System.IO.Path.GetExtension(Path), ObjectPropertiesGeneric.FileType);
 
-        protected override string DescriptionOverride => UtilHelpers.NotApplicable;
+        protected override string DescriptionOverride => WinCopies.Consts.NotApplicable;
 
         protected override IBrowsableObjectInfo ParentOverride => _parent;
 
@@ -156,6 +158,8 @@ namespace WinCopies.IO.ObjectModel
         private IFileSystemObjectInfoProperties _objectProperties;
 
         #region Properties
+        public override string Protocol => null;
+
         protected override System.Collections.Generic.IEnumerable<IBrowsabilityPath> BrowsabilityPathsOverride => __browsabilityPathStack.GetBrowsabilityPaths(this);
 
         public static IBrowsabilityPathStack<IPortableDeviceObjectInfo> BrowsabilityPathStack { get; } = __browsabilityPathStack.AsWriteOnly();

@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
-using WinCopies.Temp;
+using WinCopies.Util;
 
 using static WinCopies.ThrowHelper;
 
@@ -45,13 +44,13 @@ namespace WinCopies.Data.SQL
             return sb.ToString();
         }
 
-        public static TO_BE_DELETED.LinkedListTEMP<T> GetEnumerable<T>(in IEnumerable<T> items) => new
+        public static Collections.DotNetFix.Generic.LinkedList<T> GetEnumerable<T>(in IEnumerable<T> items) => new
 #if !CS9
-            TO_BE_DELETED.LinkedListTEMP<T>
+           Collections.DotNetFix.Generic.LinkedList<T>
 #endif
-            (new TO_BE_DELETED.LinkedList<T>(items));
+            (new Collections.DotNetFix.Generic.LinkedList<T>(items));
 
-        public static TO_BE_DELETED.LinkedListTEMP<T> GetEnumerable<T>(params T[] items) => GetEnumerable((IEnumerable<T>)items);
+        public static Collections.DotNetFix.Generic.LinkedList<T> GetEnumerable<T>(params T[] items) => GetEnumerable(items.AsFromType<IEnumerable<T>>());
 
         public static T ExecuteNonQuery<T>(in Func<T> action, out long? lastInsertedId)
         {
@@ -120,7 +119,7 @@ namespace WinCopies.Data.SQL
     {
         bool Ignore { get; set; }
 
-        IExtensibleEnumerable<IEnumerable<IParameter>> Values { get; }
+        Collections.Generic.IExtensibleEnumerable<IEnumerable<IParameter>> Values { get; }
     }
 
     public abstract class Insert<TConnection, TCommand> : SQLRequest2<TConnection, TCommand>, IInsert where TConnection : IConnection<TCommand>
@@ -131,7 +130,7 @@ namespace WinCopies.Data.SQL
 
         public SQLItemCollection<StringSQLColumn> Columns { get; set; }
 
-        IExtensibleEnumerable<StringSQLColumn>
+        Collections.Generic.IExtensibleEnumerable<StringSQLColumn>
 #if CS8
             ?
 #endif
@@ -143,7 +142,7 @@ namespace WinCopies.Data.SQL
 
         public SQLItemCollection<SQLItemCollection<IParameter>> Values { get => _values; set => _values = value ?? throw GetArgumentNullException(nameof(value)); }
 
-        IExtensibleEnumerable<IEnumerable<IParameter>> IInsert.Values => new ExtensibleEnumerable<SQLItemCollection<IParameter>, IEnumerable<IParameter>>(_values);
+        Collections.Generic.IExtensibleEnumerable<IEnumerable<IParameter>> IInsert.Values => new Collections.Generic.ExtensibleEnumerable<SQLItemCollection<IParameter>, IEnumerable<IParameter>>(_values);
 
         protected Insert(in TConnection connection, in string tableName, in SQLItemCollection<StringSQLColumn> columns, in SQLItemCollection<SQLItemCollection<IParameter>> values) : base(connection, tableName)
         {
@@ -166,7 +165,7 @@ namespace WinCopies.Data.SQL
 
     public interface IUpdate : ISQLRequest3
     {
-        IExtensibleEnumerable<ICondition> Columns { get; }
+        Collections.Generic.IExtensibleEnumerable<ICondition> Columns { get; }
 
         IConditionGroup
 #if CS8
@@ -189,7 +188,7 @@ namespace WinCopies.Data.SQL
             ConditionGroup
         { get; set; }
 
-        IExtensibleEnumerable<ICondition> IUpdate.Columns { get => Columns; }
+        Collections.Generic.IExtensibleEnumerable<ICondition> IUpdate.Columns { get => Columns; }
 
         protected Update(in TConnection connection, in string tableName, in SQLItemCollection<ICondition> columns) : base(connection, tableName) => Columns = columns;
 

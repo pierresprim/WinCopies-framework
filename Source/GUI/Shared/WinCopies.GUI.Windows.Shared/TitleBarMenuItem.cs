@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
 using System.Windows;
 using System.Windows.Input;
 
@@ -27,6 +28,8 @@ namespace WinCopies.GUI.Windows
         DoubleClick = 3
     }
 
+    // This implementation does not allow to update a property while the menu is displayed. If a property value change in that context, the change won't take effect.
+
     public class TitleBarMenuItem : ViewModelBase, ICommandSource, DotNetFix.IDisposable
     {
         private ICommand _command;
@@ -34,6 +37,7 @@ namespace WinCopies.GUI.Windows
         private IInputElement _commandTarget;
         private string _header;
         private bool _isEnabled = true;
+        private Bitmap _icon;
 
         public uint Id { get; internal set; }
 
@@ -44,6 +48,8 @@ namespace WinCopies.GUI.Windows
         public bool IsEnabled { get => _isEnabled; set => _IsEnabled = Command == null ? value : throw new InvalidOperationException("Command is not null."); }
 
         protected bool _IsEnabled { set => UpdateValue(ref _isEnabled, value, nameof(IsEnabled)); }
+
+        public Bitmap Icon { get => _icon; set => UpdateValue(ref _icon, value, nameof(Icon)); }
 
         public ICommand Command
         {
@@ -98,7 +104,7 @@ namespace WinCopies.GUI.Windows
             _OnCommandCanExecuteChanged();
         }
 
-        private void _OnCommandCanExecuteChanged() => _IsEnabled = _command?.CanExecute(_commandParameter, _commandTarget)??true;
+        private void _OnCommandCanExecuteChanged() => _IsEnabled = _command?.CanExecute(_commandParameter, _commandTarget) ?? true;
 
         protected virtual void OnCommandCanExecuteChanged(EventArgs e) => _OnCommandCanExecuteChanged();
 

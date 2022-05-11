@@ -15,16 +15,92 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-using System;
+#region WAPICP
+using Microsoft.WindowsAPICodePack;
+using Microsoft.WindowsAPICodePack.Win32Native.Menus;
+#endregion WAPICP
 
+#region System
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+#endregion System
+
+#region WinCopies
 using WinCopies.Collections.Generic;
+using WinCopies.IO.ObjectModel;
 using WinCopies.IO.Process;
 using WinCopies.IO.PropertySystem;
 using WinCopies.PropertySystem;
 using WinCopies.Util.Commands.Primitives;
+#endregion WinCopies
 
 namespace WinCopies.IO
 {
+    public interface IBrowsableObjectInfoContextCommandEnumerable : System.Collections.Generic.IEnumerable<ICommand>
+    {
+        IBrowsableObjectInfo BrowsableObjectInfo { get; }
+    }
+
+    public enum ContextMenuCommand : sbyte
+    {
+        None = 0,
+
+        NewFolder = 1,
+
+        Rename,
+
+        Delete,
+
+        LastDelegatedCommand = Delete,
+
+        Open,
+
+        OpenInNewTab,
+
+        OpenInNewWindow,
+
+        CopyPath,
+
+        CopyName
+    }
+
+    public interface IContextMenu : System.IDisposable
+    {
+        void AddCommands(System.Collections.Generic.IEnumerable<MenuItemInfo> menuItem);
+
+        void AddExtensionCommands(System.Collections.Generic.IEnumerable<KeyValuePair<ExtensionCommand, MenuItemInfo>> menuItems);
+
+        string
+#if CS8
+            ?
+#endif
+            GetCommandTooltip(ref uint? command);
+
+        ContextMenuCommand Show(IntPtr hwnd, HookRegistration hookRegistration, Point point, bool ctrl = false, bool shift = false);
+
+        void Open(IBrowsableObjectInfo[] items, Point point, bool ctrl = false, bool shift = false);
+    }
+
+    public enum DisplayStyle
+    {
+        Size1 = 1,
+
+        Size2,
+
+        Size3,
+
+        Size4,
+
+        List,
+
+        Details,
+
+        Tiles,
+
+        Content
+    }
+
     namespace ObjectModel
     {
         /// <summary>
@@ -61,12 +137,10 @@ namespace WinCopies.IO
             /// </summary>
             object ObjectProperties { get; }
 
-#if WinCopies3
             /// <summary>
             /// Gets the specific properties of <see cref="InnerObject"/>. These properties are specific to this object.
             /// </summary>
             IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystem { get; }
-#endif
 
             /// <summary>
             /// Gets the <see cref="IBrowsableObjectInfo"/> parent of this <see cref="IBrowsableObjectInfo"/>. Returns <see langword="null"/> if this object is the root object of a hierarchy.
@@ -85,23 +159,17 @@ namespace WinCopies.IO
 
             ClientVersion ClientVersion { get; }
 
-            ///// <summary>
-            ///// Gets or sets the factory for this <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>. This factory is used to create new <see cref="IBrowsableObjectInfo"/>s from the current <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>.
-            ///// </summary>
-            ///// <exception cref="InvalidOperationException">The old <see cref="BrowsableObjectInfoLoader{TPath, TItems, TSubItems, TFactory}"/> is running. OR The given items loader has already been added to a <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>.</exception>
-            ///// <exception cref="ArgumentNullException">value is null.</exception>
-            //IBrowsableObjectInfoFactory Factory { get; }
+            IBrowsableObjectInfoContextCommandEnumerable ContextCommands { get; }
 
-            ///// <summary>
-            ///// Gets or sets the items loader for this <see cref="BrowsableObjectInfo"/>.
-            ///// </summary>
-            ///// <exception cref="InvalidOperationException">The old <see cref="BrowsableObjectInfoLoader{TPath, TItems, TSubItems, TFactory}"/> is running. OR The given items loader has already been added to a <see cref="BrowsableObjectInfo"/>.</exception>
-            //IBrowsableObjectInfoLoader ItemsLoader { get; }
+            string Protocol { get; }
 
-            ///// <summary>
-            ///// Gets the items of this <see cref="IBrowsableObjectInfo"/>.
-            ///// </summary>
-            //IReadOnlyCollection<IBrowsableObjectInfo> Items { get; }
+            string URI { get; }
+
+            DisplayStyle DisplayStyle { get; }
+
+            IContextMenu GetContextMenu(bool extendedVerbs);
+
+            IContextMenu GetContextMenu(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> children, bool extendedVerbs);
 
             IBrowsableObjectInfoCallback RegisterCallback(Action<BrowsableObjectInfoCallbackArgs> callback);
 
@@ -116,44 +184,6 @@ namespace WinCopies.IO
             System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetSubRootItems();
 
             System.Collections.Generic.IEnumerable<ICommand> GetCommands(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> items);
-
-            // IBrowsableObjectInfo GetBrowsableObjectInfo(IBrowsableObjectInfo browsableObjectInfo);
-
-            // IPathModifier<IBrowsableObjectInfo, IBrowsableObjectInfo> RegisterLoader(IBrowsableObjectInfoLoader browsableObjectInfoLoader);
-
-            // void UnregisterLoader();
-
-            ///// <summary>
-            ///// Loads the items of this <see cref="IBrowsableObjectInfo"/> asynchronously using a given items loader.
-            ///// </summary>
-            ///// <param name="itemsLoader">A custom items loader.</param>
-            //void LoadItemsAsync(IBrowsableObjectInfoLoader itemsLoader);
-
-            // bool IsRenamingSupported { get; }
-
-            ///// <summary>
-            ///// Renames or move to a relative path, or both, the current <see cref="IBrowsableObjectInfo"/> with the specified name.
-            ///// </summary>
-            ///// <param name="newValue">The new name or relative path for this <see cref="IBrowsableObjectInfo"/>.</param>
-            //void Rename(string newValue);
-
-            // string ToString();
-
-            ///// <summary>
-            ///// Gets a new <see cref="IBrowsableObjectInfo"/> that represents the same item that the current <see cref="IBrowsableObjectInfo"/>.
-            ///// </summary>
-            ///// <returns>A new <see cref="IBrowsableObjectInfo"/> that represents the same item that the current <see cref="IBrowsableObjectInfo"/>.</returns>
-            //IBrowsableObjectInfo Clone();
-
-            ///// <summary>
-            ///// Disposes the current <see cref="IBrowsableObjectInfo"/> and its parent and items recursively.
-            ///// </summary>
-            ///// <param name="disposeItemsLoader">Whether to dispose the items loader of the current path.</param>
-            ///// <param name="disposeParent">Whether to dispose the parent of the current path.</param>
-            ///// <param name="disposeItems">Whether to dispose the items of the current path.</param>
-            ///// <param name="recursively">Whether to dispose recursively.</param>
-            ///// <exception cref="InvalidOperationException">The <see cref="ItemsLoader"/> is busy and does not support cancellation.</exception>
-            //void Dispose(bool disposeItemsLoader, bool disposeParent, bool disposeItems, bool recursively);
         }
 
         public interface IBrowsableObjectInfo<out T> : IBrowsableObjectInfo

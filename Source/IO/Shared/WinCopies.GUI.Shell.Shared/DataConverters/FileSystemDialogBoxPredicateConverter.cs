@@ -17,7 +17,7 @@ namespace WinCopies.GUI.Shell
                 ? GetPredicate(values[0] as Predicate<IBrowsableObjectInfo>, values[1] as INamedObject<string>, mode)
                 : throw new ArgumentException("The arguments do not match the required pattern.", nameof(values));
 
-        public static Predicate<IBrowsableObjectInfo> GetPredicate(Predicate<IBrowsableObjectInfo> predicate, INamedObject<string> filter, in FileSystemDialogBoxMode mode)
+        public static Predicate<IBrowsableObjectInfo> GetPredicate(Predicate<IBrowsableObjectInfo> predicate, INamedObject<string> filter, FileSystemDialogBoxMode mode)
         {
             bool _predicate(in IBrowsableObjectInfo browsableObjectInfo, in PredicateIn<IShellObjectInfo> ___predicate)
             {
@@ -32,44 +32,22 @@ namespace WinCopies.GUI.Shell
 
             bool isFolder(in IShellObjectInfo shellObjectInfo) => shellObjectInfo.ObjectProperties.FileType.IsFolder() || ((shellObjectInfo.ObjectProperties.FileType == WinCopies.IO.FileType.Link) && shellObjectInfo.Browsability.Browsability == WinCopies.IO.Browsability.RedirectsToBrowsableItem);
 
-            PredicateIn<IShellObjectInfo> __predicate;
+            bool result(IBrowsableObjectInfo browsableObjectInfo) => _predicate(browsableObjectInfo, mode == FileSystemDialogBoxMode.SelectFolder
+                ?
+#if !CS9
+                (PredicateIn<IShellObjectInfo>)
+#endif
+                isFolder
+                : ((in IShellObjectInfo shellObjectInfo) => isFolder(shellObjectInfo)
+                        || (shellObjectInfo.ObjectProperties.FileType.IsFile()
+                        ? filter?.Value == null ? true : WinCopies.IO.Path.Match(shellObjectInfo.Name, filter.Value)
+                        : true)));
 
-            if (mode == FileSystemDialogBoxMode.SelectFolder)
-
-                __predicate = isFolder;
-
-            else
-
-                __predicate = (in IShellObjectInfo shellObjectInfo) =>
-                {
-                    if (isFolder(shellObjectInfo))
-
-                        return true;
-
-                    if (shellObjectInfo.ObjectProperties.FileType.IsFile())
-
-                        if (filter?.Value != null)
-
-                            return WinCopies.IO.Path.Match(shellObjectInfo.Name, filter.Value);
-
-                        else
-
-                            return true;
-
-                    else
-
-                        return true;
-                };
-
-            bool result(IBrowsableObjectInfo browsableObjectInfo) => _predicate(browsableObjectInfo, __predicate);
-
-            if (predicate == null)
-
-                return result;
-
-            else
-
-                return browsableObjectInfo => result(browsableObjectInfo) && predicate(browsableObjectInfo);
+            return predicate == null ?
+#if !CS9
+                (Predicate<IBrowsableObjectInfo>)
+#endif
+                result : (browsableObjectInfo => result(browsableObjectInfo) && predicate(browsableObjectInfo));
         }
     }
 }

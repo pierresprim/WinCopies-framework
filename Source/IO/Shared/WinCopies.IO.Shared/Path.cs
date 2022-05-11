@@ -59,6 +59,8 @@ namespace WinCopies.IO
         public const char PathSeparator = '\\';
         public const string System32Path = "%SystemRoot%\\System32\\";
 
+
+
         //public static readonly string[] PathEnvironmentVariables = { "AllUserProfile", "AppData", "CommonProgramFiles", "CommonProgramFiles(x86)", "HomeDrive", "LocalAppData", "ProgramData", "ProgramFiles", "ProgramFiles(x86)", "Public", "SystemDrive", "SystemRoot", "Temp", "UserProfile" };
 
         // public new event PropertyChangedEventHandler PropertyChanged;
@@ -645,6 +647,51 @@ namespace WinCopies.IO
         //            // Close()
 
         //        }
+
+
+        public static string ParsePath(string path)
+        {
+            string[] subPaths = path.Split(PathSeparator);
+
+            EnumerableHelper<string>.IEnumerableStack stack = EnumerableHelper<string>.GetEnumerableStack();
+
+            string tmp;
+
+            for (int i = subPaths.Length - 1; i >= 0; i--)
+
+                if ((tmp = subPaths[i]) == "..")
+
+                    i--;
+
+                else
+
+                    stack.Push(tmp);
+
+            return string.Join(
+#if CS8
+                PathSeparator
+#else
+                $"{PathSeparator}"
+#endif
+                , stack);
+        }
+
+        public static string GetCompletePath(string directory, in string subPath)
+        {
+            if (directory.EndsWith(PathSeparator))
+
+                directory = directory.Remove(directory.Length - 1);
+
+            return ParsePath(subPath.StartsWith($"..{PathSeparator}")
+                ? $"{directory}{PathSeparator}{subPath}"
+                : subPath.StartsWith(PathSeparator)
+                ? $"{directory}{subPath}"
+                : subPath.StartsWith($".{PathSeparator}")
+                ? System.IO.Directory.GetDirectoryRoot(directory)
+                : subPath.Contains(':')
+                ? subPath
+                : $"{directory}{PathSeparator}{subPath}");
+        }
 
         public static bool Match(in string name, in string filter) => SysRegex.IsMatch(name, Regex.FromPathFilter(filter), RegexOptions.IgnoreCase);
 

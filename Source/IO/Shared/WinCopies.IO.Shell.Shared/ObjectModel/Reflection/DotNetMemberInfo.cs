@@ -15,11 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+#region System
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
+#endregion System
 
+#region WinCopies
 using WinCopies.Diagnostics;
 using WinCopies.IO.AbstractionInterop.Reflection;
 using WinCopies.IO.Enumeration.Reflection;
@@ -29,9 +32,12 @@ using WinCopies.IO.Reflection;
 using WinCopies.IO.Reflection.PropertySystem;
 using WinCopies.IO.Selectors.Reflection;
 using WinCopies.PropertySystem;
+#endregion WinCopies
 
+#region Static Usings
 using static WinCopies.Diagnostics.IfHelpers;
 using static WinCopies.ThrowHelper;
+#endregion Static Usings
 
 namespace WinCopies.IO.ObjectModel.Reflection
 {

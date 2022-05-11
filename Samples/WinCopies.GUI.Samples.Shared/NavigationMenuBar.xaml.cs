@@ -3,16 +3,13 @@ using System.Collections;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Input;
-using System.Windows.Media;
+
 using WinCopies.Collections.Generic;
 using WinCopies.Desktop;
-using WinCopies.Temp;
 
 using static System.Windows.Input.Key;
 
-using static WinCopies.ThrowHelper;
 using static WinCopies.Util.Desktop.UtilHelpers;
 
 namespace WinCopies.GUI.Samples
@@ -29,8 +26,6 @@ namespace WinCopies.GUI.Samples
     public partial class NavigationMenuBar : ItemsControl
     {
         private Window _window;
-
-        private static DependencyProperty Register<T>(in string propertyName) => Register<T, NavigationMenuBar>(propertyName);
 
         private static readonly DependencyPropertyKey OpenItemPropertyKey = RegisterReadOnly<NavigationMenu, NavigationMenuBar>(nameof(OpenItem), new PropertyMetadata(null, (DependencyObject d, DependencyPropertyChangedEventArgs e) =>
         {
@@ -155,9 +150,9 @@ namespace WinCopies.GUI.Samples
                     menu.IsOpen = true;
             }
 
-            void tryOpenItemAfter(in Panel panel, in int index) => tryOpenItemRelative(panel, index, true, Temp.Extensions.TryGetFirstAfter<NavigationMenu>, Temp.Extensions.TryGetFirstAfter<NavigationMenu>);
+            void tryOpenItemAfter(in Panel panel, in int index) => tryOpenItemRelative(panel, index, true, Desktop.Extensions.TryGetFirstAfter<NavigationMenu>, Desktop.Extensions.TryGetFirstAfter<NavigationMenu>);
 
-            void tryOpenItemBefore(in Panel panel, in int index) => tryOpenItemRelative(panel, index, true, Temp.Extensions.TryGetFirstBefore<NavigationMenu>, Temp.Extensions.TryGetFirstAfter<NavigationMenu>);
+            void tryOpenItemBefore(in Panel panel, in int index) => tryOpenItemRelative(panel, index, true, Desktop.Extensions.TryGetFirstBefore<NavigationMenu>, Desktop.Extensions.TryGetFirstAfter<NavigationMenu>);
 
             void _action(in IList list, in Func<object, int> func, in Panel itemsHost, in TryOpenItemRelativeDelegate ltr, in TryOpenItemRelativeDelegate rtl)
             {

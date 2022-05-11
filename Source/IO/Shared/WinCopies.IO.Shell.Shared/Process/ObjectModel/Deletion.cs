@@ -41,7 +41,7 @@ using static WinCopies.ThrowHelper;
 
 namespace WinCopies.IO.Process.ObjectModel
 {
-    [ProcessGuid(Guids.Shell.Process.Shell.Deletion)]
+    [ProcessGuid(Consts.Guids.Shell.Process.Shell.Deletion)]
     public class Deletion<T> :
         ProcessObjectModelTypes<
             IPathInfo,
@@ -69,7 +69,7 @@ namespace WinCopies.IO.Process.ObjectModel
         private Func _func;
 
         #region Properties
-        public override string Guid => Guids.Shell.Process.Shell.Deletion;
+        public override string Guid => Consts.Guids.Shell.Process.Shell.Deletion;
 
         public override string Name
         {

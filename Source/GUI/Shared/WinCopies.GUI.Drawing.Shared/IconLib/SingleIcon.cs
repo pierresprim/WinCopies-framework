@@ -513,13 +513,7 @@ struct
                 ResetCurrent();
             }
 #else
-
-            protected override void ResetOverride()
-            {
-                base.ResetOverride();
-
-                mIndex = 0;
-            }
+            protected override void ResetOverride2() => mIndex = 0;
 #endif
             #endregion
         }

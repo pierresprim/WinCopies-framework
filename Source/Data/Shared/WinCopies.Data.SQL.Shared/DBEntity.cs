@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Linq;
+
+using WinCopies.Collections;
+using WinCopies.Collections.DotNetFix;
 using WinCopies.Collections.DotNetFix.Generic;
 using WinCopies.EntityFramework;
-using WinCopies.Temp;
+using WinCopies.Util;
 
 using static WinCopies.Data.SQL.DBEntityCollection;
-using static WinCopies.Temp.Util;
 using static WinCopies.ThrowHelper;
+using static WinCopies.UtilHelpers;
 
 namespace WinCopies.Data.SQL
 {
@@ -17,6 +20,7 @@ namespace WinCopies.Data.SQL
             ?
 #endif
             _connection;
+        private readonly IUIntCountable _columns;
 
         protected ISQLConnection Connection => IsDisposed ? throw GetExceptionForDispose(false) : _connection;
 
@@ -24,7 +28,14 @@ namespace WinCopies.Data.SQL
 
         protected IEnumerableQueue<ICondition> Columns { get; } = new EnumerableQueue<ICondition>();
 
-        public EntityIdRefresher(in ISQLConnection connection) => _connection = connection.GetConnection();
+        IUIntCountable IEntityIdRefresher.Columns => _columns;
+
+        public EntityIdRefresher(in ISQLConnection connection)
+        {
+            _connection = connection.GetConnection();
+
+            _columns = new ReadOnlyEnumerableQueueCollection<ICondition>(Columns);
+        }
 
         protected void ThrowIfDisposed() => ThrowHelper.ThrowIfDisposed(this);
 
@@ -117,11 +128,38 @@ namespace WinCopies.Data.SQL
         protected override IEntityIdRefresher GetRefresher() => new EntityIdRefresher(Connection);
     }
 
-    public class DefaultDBEntity<T> : DBEntity<T>, IDefaultEntity where T : IEntity
+    public class DefaultDBEntity<TItems, TId> : DBEntity<TItems>, IDefaultEntity<TId> where TItems : IEntity
     {
         [EntityProperty(nameof(Id), IsId = true)]
-        public int Id { get; set; }
+        public TId Id { get; set; }
 
-        public DefaultDBEntity(DBEntityCollection<T> collection) : base(collection) { /* Left empty. */ }
+        public override Nullable TryRefreshIdWhen { get; } = new Nullable(default(TId));
+
+        public DefaultDBEntity(DBEntityCollection<TItems> collection) : base(collection) { /* Left empty. */ }
+    }
+
+    public class NamedEntity<TItems, TId> : DefaultDBEntity<TItems, TId> where TItems : IEntity
+    {
+        private string _name;
+
+        protected string EntityName { get => TryRefreshAndGet(ref _name); set => _name = value; }
+
+        public NamedEntity(DBEntityCollection<TItems> collection) : base(collection) { /* Left empty. */ }
+    }
+
+    public class DefaultNamedEntity<TItems, TId> : NamedEntity<TItems, TId> where TItems : IEntity
+    {
+        [EntityProperty]
+        public string Name { get => EntityName; set => EntityName = value; }
+
+        public DefaultNamedEntity(DBEntityCollection<TItems> collection) : base(collection) { /* Left empty. */ }
+    }
+
+    public class DefaultNamedEntity2<TItems, TId> : NamedEntity<TItems, TId> where TItems : IEntity
+    {
+        [EntityProperty(IsPseudoId = true)]
+        public string Name { get => EntityName; set => EntityName = value; }
+
+        public DefaultNamedEntity2(DBEntityCollection<TItems> collection) : base(collection) { /* Left empty. */ }
     }
 }

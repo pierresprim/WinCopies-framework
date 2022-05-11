@@ -20,7 +20,6 @@ using Microsoft.WindowsAPICodePack.Win32Native;
 using SevenZip;
 
 using System;
-using System.Collections.Generic;
 
 using WinCopies.Collections.DotNetFix.Generic;
 using WinCopies.Collections.Generic;
@@ -30,7 +29,7 @@ namespace WinCopies.IO.Process
 {
     namespace ObjectModel
     {
-        [ProcessGuid(Guids.Shell.Process.Archive.Extraction)]
+        [ProcessGuid(Consts.Guids.Shell.Process.Archive.Extraction)]
         public class Extraction<T> : // ArchiveProcess<WinCopies.IO.IPathInfo, ProcessQueueCollection, ReadOnlyProcessQueueCollection, ProcessErrorPathQueueCollection, ReadOnlyProcessErrorPathQueueCollection
                                      // #if DEBUG
                                      // , ProcessSimulationParameters
@@ -38,11 +37,11 @@ namespace WinCopies.IO.Process
                                      // >
            ArchiveProcess<T> where T : ProcessErrorTypes<IPathInfo, ProcessError, object>.IProcessErrorFactories
         {
-            public override IReadOnlyDictionary<string, ICommand<IProcessErrorItem<IPathInfo, ProcessError, object>>> Actions => null;
+            public override System.Collections.Generic.IReadOnlyDictionary<string, ICommand<IProcessErrorItem<IPathInfo, ProcessError, object>>> Actions => null;
 
             protected Converter<string, SevenZipExtractor> ArchiveExtractorProvider { get; }
 
-            public override string Guid => Guids.Shell.Process.Archive.Extraction;
+            public override string Guid => Consts.Guids.Shell.Process.Archive.Extraction;
 
             public override string Name => Shell.Properties.Resources.Extraction;
 

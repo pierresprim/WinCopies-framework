@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+#region WinCopies
 using WinCopies.GUI.Windows;
 using WinCopies.IO;
 using WinCopies.IO.ObjectModel;
@@ -29,6 +30,7 @@ using WinCopies.IO.PropertySystem;
 using WinCopies.Linq;
 using WinCopies.Util;
 using WinCopies.Util.Data;
+#endregion WinCopies
 
 using static WinCopies.IO.Resources.ExceptionMessages;
 using static WinCopies.ThrowHelper;
@@ -39,7 +41,7 @@ namespace WinCopies.GUI.IO.Process
     {
         string DestinationPath { get; set; }
 
-        IProcessParameters ToProcessParameters(string sourcePath, System.Collections.Generic.IEnumerable<string> paths);
+        IProcessParameters ToProcessParameters(string sourcePath, IEnumerable<string> paths);
 
         object ToArchiveProcess();
     }
@@ -75,7 +77,7 @@ namespace WinCopies.GUI.IO.Process
 
         public abstract string Guid { get; }
 
-        public IProcessParameters ToProcessParameters(string sourcePath, System.Collections.Generic.IEnumerable<string> paths)
+        public IProcessParameters ToProcessParameters(string sourcePath, IEnumerable<string> paths)
         {
             System.Reflection.PropertyInfo[] properties = GetType().GetProperties();
 
@@ -88,7 +90,7 @@ namespace WinCopies.GUI.IO.Process
             return new ProcessParameters(Guid, values.Surround(Enumerable.Repeat(sourcePath, 1), paths));
         }
 
-        public static void InitFromProcessParameters<T>(T obj, System.Collections.Generic.IEnumerator<string> enumerator) where T : ArchiveProcessParameters
+        public static void InitFromProcessParameters<T>(T obj, IEnumerator<string> enumerator) where T : ArchiveProcessParameters
         {
             ThrowIfNull(obj, nameof(obj));
             ThrowIfNull(enumerator, nameof(enumerator));
@@ -135,13 +137,13 @@ namespace WinCopies.GUI.IO.Process
             }
         }
 
-        private static T __FromProcessParameters<T>(in IProcessParameters processParameters, in Converter<System.Collections.Generic.IEnumerator<string>, T> func) where T : ArchiveProcessParameters
+        private static T __FromProcessParameters<T>(in IProcessParameters processParameters, in Converter<IEnumerator<string>, T> func) where T : ArchiveProcessParameters
         {
             using
 #if !CS8
             (
 #endif
-                System.Collections.Generic.IEnumerator<string> enumerator = processParameters.Parameters.GetEnumerator()
+                IEnumerator<string> enumerator = processParameters.Parameters.GetEnumerator()
 #if CS8
             ;
 #else
@@ -152,9 +154,9 @@ namespace WinCopies.GUI.IO.Process
 
         private static IProcessParameters GetProcessParameters(in IProcessParameters processParameters, in string name) => processParameters ?? throw GetArgumentNullException(name);
 
-        private protected static T _FromProcessParameters<T>(in IProcessParameters processParameters, in Converter<System.Collections.Generic.IEnumerator<string>, T> func) where T : ArchiveProcessParameters => __FromProcessParameters(GetProcessParameters(processParameters, nameof(processParameters)), func);
+        private protected static T _FromProcessParameters<T>(in IProcessParameters processParameters, in Converter<IEnumerator<string>, T> func) where T : ArchiveProcessParameters => __FromProcessParameters(GetProcessParameters(processParameters, nameof(processParameters)), func);
 
-        public static T FromProcessParameters<T>(in IProcessParameters processParameters, in Converter<System.Collections.Generic.IEnumerator<string>, T> func) where T : ArchiveProcessParameters => __FromProcessParameters(GetProcessParameters(processParameters, nameof(processParameters)), func ?? throw GetArgumentNullException(nameof(func)));
+        public static T FromProcessParameters<T>(in IProcessParameters processParameters, in Converter<IEnumerator<string>, T> func) where T : ArchiveProcessParameters => __FromProcessParameters(GetProcessParameters(processParameters, nameof(processParameters)), func ?? throw GetArgumentNullException(nameof(func)));
 
         public abstract object ToArchiveProcess();
     }
@@ -171,7 +173,7 @@ namespace WinCopies.GUI.IO.Process
     [TypeForDataTemplate(typeof(IArchiveCompressionParameters))]
     public sealed class ArchiveCompressionParameters : ArchiveProcessParameters<SevenZipCompressor>, IArchiveCompressionParameters
     {
-        public override string Guid => WinCopies.IO.Guids.Shell.Process.Archive.Compression;
+        public override string Guid => WinCopies.IO.Consts.Guids.Shell.Process.Archive.Compression;
 
         public OutArchiveFormat ArchiveFormat { get; set; } = OutArchiveFormat.Zip;
 
@@ -192,7 +194,7 @@ namespace WinCopies.GUI.IO.Process
             ()
         { ArchiveFormat = ArchiveFormat, CompressionLevel = CompressionLevel, CompressionMethod = CompressionMethod, FastCompression = FastCompression, IncludeEmptyDirectories = IncludeEmptyDirectories, PreserveDirectoryRoot = PreserveDirectoryRoot };
 
-        public static ArchiveCompressionParameters FromProcessParameters(System.Collections.Generic.IEnumerator<string> enumerator)
+        public static ArchiveCompressionParameters FromProcessParameters(IEnumerator<string> enumerator)
         {
             var result = new ArchiveCompressionParameters();
 
@@ -207,7 +209,7 @@ namespace WinCopies.GUI.IO.Process
     [TypeForDataTemplate(typeof(IArchiveExtractionParameters))]
     public sealed class ArchiveExtractionParameters : ArchiveProcessParameters<Converter<string, SevenZipExtractor>>, IArchiveExtractionParameters
     {
-        public override string Guid => WinCopies.IO.Guids.Shell.Process.Archive.Extraction;
+        public override string Guid => WinCopies.IO.Consts.Guids.Shell.Process.Archive.Extraction;
 
         public bool PreserveDirectoryStructure { get; set; } = true;
 
@@ -218,7 +220,7 @@ namespace WinCopies.GUI.IO.Process
             (path)
         { PreserveDirectoryStructure = PreserveDirectoryStructure };
 
-        public static ArchiveExtractionParameters FromProcessParameters(System.Collections.Generic.IEnumerator<string> enumerator)
+        public static ArchiveExtractionParameters FromProcessParameters(IEnumerator<string> enumerator)
         {
             var result = new ArchiveExtractionParameters();
 
@@ -236,7 +238,7 @@ namespace WinCopies.GUI.IO.Process
 
         protected ArchiveProcessParametersViewModel(in T parameters) : base(parameters) { /* Left empty. */ }
 
-        IProcessParameters IArchiveProcessParameters.ToProcessParameters(string sourcePath, System.Collections.Generic.IEnumerable<string> paths) => ModelGeneric.ToProcessParameters(sourcePath, paths);
+        IProcessParameters IArchiveProcessParameters.ToProcessParameters(string sourcePath, IEnumerable<string> paths) => ModelGeneric.ToProcessParameters(sourcePath, paths);
 
         protected abstract object ToArchiveProcess();
 
@@ -299,9 +301,9 @@ namespace WinCopies.GUI.IO.Process
 
         public bool CanRun(object parameter, IBrowsableObjectInfo sourcePath, IEnumerable<IBrowsableObjectInfo> paths) => sourcePath != null && paths != null && CanRunOverride(parameter, sourcePath, paths);
 
-        public IProcessParameters GetProcessParameters(object parameter, IBrowsableObjectInfo sourcePath, System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths) => TryGetProcessParameters(parameter, sourcePath, paths) ?? throw new InvalidOperationException();
+        public IProcessParameters GetProcessParameters(object parameter, IBrowsableObjectInfo sourcePath, IEnumerable<IBrowsableObjectInfo> paths) => TryGetProcessParameters(parameter, sourcePath, paths) ?? throw new InvalidOperationException();
 
-        public abstract IProcessParameters TryGetProcessParameters(object parameter, IBrowsableObjectInfo sourcePath, System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths);
+        public abstract IProcessParameters TryGetProcessParameters(object parameter, IBrowsableObjectInfo sourcePath, IEnumerable<IBrowsableObjectInfo> paths);
 
         string IProcessFactoryProcessInfoBase.GetUserConfirmationText() => null;
     }
@@ -312,7 +314,7 @@ namespace WinCopies.GUI.IO.Process
 
         protected abstract object GetParametersViewModel(T parameters);
 
-        public override IProcessParameters TryGetProcessParameters(object parameter, IBrowsableObjectInfo sourcePath, System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> paths)
+        public override IProcessParameters TryGetProcessParameters(object parameter, IBrowsableObjectInfo sourcePath, IEnumerable<IBrowsableObjectInfo> paths)
         {
             var parameters = GetParameters();
 

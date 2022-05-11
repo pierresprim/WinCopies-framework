@@ -17,6 +17,7 @@
 
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media.Imaging;
 
 namespace WinCopies.GUI.Windows
 {
@@ -60,9 +61,9 @@ namespace WinCopies.GUI.Windows
 
             DefaultStyleKeyProperty.OverrideMetadata(typeof(InputBox), new FrameworkPropertyMetadata(typeof(InputBox))); // InputBox.StyleProperty.OverrideMetadata(typeof(InputBox), new FrameworkPropertyMetadata((Style) Application.Current. Resources["abcd"]));
 
-        public static bool? ShowDialog(in string title, in DialogButton? dialogButton, in object content, in string placeholder, out string result)
+        public static bool? ShowDialog(in string title, in DialogButton? dialogButton, in object content, in string text, in string placeholder, out string result, in BitmapSource icon = null)
         {
-            var dialog = new InputBox() { Title = title, DialogButton = dialogButton, Content = content, Placeholder = placeholder };
+            var dialog = new InputBox() { Title = title, DialogButton = dialogButton, Content = content, Text = text, Placeholder = placeholder, Icon = icon };
 
             bool? _result = dialog.ShowDialog();
 
@@ -77,6 +78,8 @@ namespace WinCopies.GUI.Windows
 
             return _result;
         }
+
+        public static bool? ShowDialog(in string title, in DialogButton? dialogButton, in object content, in string placeholder, out string result) => ShowDialog(title, dialogButton, content, placeholder, out result);
 
         ///// <summary>
         ///// Initializes a new instance of the <see cref="InputBox"/> class.

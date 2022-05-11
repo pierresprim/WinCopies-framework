@@ -19,9 +19,14 @@
 using System;
 using System.Collections;
 using System.Diagnostics;
+using System.Drawing;
 using System.Reflection;
+using System.Windows;
+using System.Windows.Interop;
+using System.Windows.Media.Imaging;
 
 using WinCopies.Collections.Generic;
+using WinCopies.GUI.Drawing;
 using WinCopies.IO.ObjectModel;
 using WinCopies.IO.Process;
 using WinCopies.IO.Process.ObjectModel;
@@ -57,6 +62,73 @@ namespace WinCopies.IO
         }
     }
 
+    public struct BrowsableObjectInfoURL : IEquatable<BrowsableObjectInfoURL>
+    {
+        public string Path { get; }
+
+        public string URI { get; }
+
+        public BrowsableObjectInfoURL(in string path, in string uri)
+        {
+            Path = path;
+
+            URI = uri;
+        }
+
+        public BrowsableObjectInfoURL(in string path) => this = new
+#if !CS9
+            BrowsableObjectInfoURL
+#endif
+            (path, path);
+
+        public bool Equals(BrowsableObjectInfoURL other) => other.URI == URI;
+
+        public static bool operator ==(BrowsableObjectInfoURL x, BrowsableObjectInfoURL y) => x.Equals(y);
+
+        public static bool operator !=(BrowsableObjectInfoURL x, BrowsableObjectInfoURL y) => !(x == y);
+    }
+
+    public struct BrowsableObjectInfoURL2 : IEquatable<BrowsableObjectInfoURL2>
+    {
+        public BrowsableObjectInfoURL URL { get; }
+
+        public string Protocol { get; }
+
+        public BrowsableObjectInfoURL2(in BrowsableObjectInfoURL url, in string protocol)
+        {
+            URL = url;
+
+            Protocol = protocol;
+        }
+
+        public BrowsableObjectInfoURL2(in string path)
+        {
+            int index = path.IndexOf("://");
+
+            this = new BrowsableObjectInfoURL2(new BrowsableObjectInfoURL(path.Substring(0, index)), path.Substring(index + 3));
+        }
+
+        public bool Equals(BrowsableObjectInfoURL2 other) => other.Protocol == Protocol && other.URL == URL;
+
+        public static bool operator ==(BrowsableObjectInfoURL2 x, BrowsableObjectInfoURL2 y) => x.Equals(y);
+
+        public static bool operator !=(BrowsableObjectInfoURL2 x, BrowsableObjectInfoURL2 y) => !(x == y);
+    }
+
+    public struct BrowsableObjectInfoURL3
+    {
+        public BrowsableObjectInfoURL2 URL { get; }
+
+        public ClientVersion ClientVersion { get; }
+
+        public BrowsableObjectInfoURL3(in BrowsableObjectInfoURL2 url, in ClientVersion clientVersion)
+        {
+            URL = url;
+
+            ClientVersion = clientVersion;
+        }
+    }
+
     namespace ObjectModel
     {
         /// <summary>
@@ -84,7 +156,11 @@ namespace WinCopies.IO
             #region Properties
             IBitmapSources IBrowsableObjectInfo.BitmapSources => BitmapSources;
 
+            IBrowsableObjectInfo Collections.Generic.IRecursiveEnumerable<IBrowsableObjectInfo>.Value => this;
+
             #region Static Properties
+            public static ISelectorDictionary<BrowsableObjectInfoURL3, IBrowsableObjectInfo> DefaultBrowsableObjectInfoSelectorDictionary { get; } = new DefaultNullableValueSelectorDictionary<BrowsableObjectInfoURL3, IBrowsableObjectInfo>();
+
             public static ISelectorDictionary<ProcessFactorySelectorDictionaryParameters, IProcess> DefaultProcessSelectorDictionary { get; } = new DefaultNullableValueSelectorDictionary<ProcessFactorySelectorDictionaryParameters, IProcess>();
 
             //public static Action RegisterDefaultSelectors { get; private set; } = () =>
@@ -125,6 +201,8 @@ namespace WinCopies.IO
             protected abstract IBrowsableObjectInfo ParentOverride { get; }
 
             protected abstract IProcessFactory ProcessFactoryOverride { get; }
+
+            protected virtual IBrowsableObjectInfoContextCommandEnumerable ContextCommandsOverride { get; }
             #endregion
 
             #region Public Properties
@@ -136,17 +214,7 @@ namespace WinCopies.IO
 
             public IBitmapSourceProvider BitmapSourceProvider => GetValueIfNotDisposed(() => BitmapSourceProviderOverride);
 
-            public IBitmapSourcesLinker BitmapSources => GetValueIfNotDisposed(() => _bitmapSources
-#if CS8
-            ??=
-#else
-            ?? (_bitmapSources =
-#endif
-            new BitmapSourcesLinker(BitmapSourceProviderOverride)
-#if !CS8
-            )
-#endif
-            );
+            public IBitmapSourcesLinker BitmapSources => GetValueIfNotDisposed(() => _bitmapSources ?? (BitmapSourceProviderOverride == null ? null : (_bitmapSources = new BitmapSourcesLinker(BitmapSourceProviderOverride))));
 
             public IBrowsabilityOptions Browsability => GetValueIfNotDisposed(() => BrowsabilityOverride);
 
@@ -179,7 +247,13 @@ namespace WinCopies.IO
 
             public IProcessFactory ProcessFactory => GetValueIfNotDisposed(() => ProcessFactoryOverride);
 
-            IBrowsableObjectInfo Collections.Generic.IRecursiveEnumerable<IBrowsableObjectInfo>.Value => this;
+            public IBrowsableObjectInfoContextCommandEnumerable ContextCommands => GetValueIfNotDisposed(ContextCommandsOverride);
+
+            public virtual string Protocol => null;
+
+            public virtual string URI => Path;
+
+            public virtual DisplayStyle DisplayStyle => DisplayStyle.Size3;
             #endregion
             #endregion
 
@@ -192,6 +266,79 @@ namespace WinCopies.IO
 
             #region Methods
             #region Static Methods
+            #region Drawing
+            #region Icons
+            public static Icon
+#if CS8
+                ?
+#endif
+                TryGetIcon(in Icon[] icons, in System.Drawing.Size size) => icons?.TryGetIcon(size, 64, true, true);
+
+            public static Icon
+#if CS8
+                ?
+#endif
+                TryGetIcon(in Icon icon, in System.Drawing.Size size)
+            {
+                Icon[]
+#if CS8
+                ?
+#endif
+                icons = icon?.Split();
+
+                return icons == null ? null : TryGetIcon(icons, size);
+            }
+
+            public static Icon
+#if CS8
+                ?
+#endif
+                TryGetIcon(in Icon[] icons, in ushort size) => TryGetIcon(icons, new System.Drawing.Size(size, size));
+
+            public static Icon
+#if CS8
+                ?
+#endif
+                TryGetIcon(in Icon icon, in ushort size) => TryGetIcon(icon, new System.Drawing.Size(size, size));
+            #endregion
+
+            #region BitmapSources
+            public static BitmapSource
+#if CS8
+                ?
+#endif
+                TryGetBitmapSource(in Icon
+#if CS8
+                ?
+#endif
+                icon) => icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+
+            public static BitmapSource
+#if CS8
+                ?
+#endif
+                TryGetBitmapSource(in Icon[] icons, in System.Drawing.Size size) => TryGetBitmapSource(TryGetIcon(icons, size));
+
+            public static BitmapSource
+#if CS8
+                ?
+#endif
+                TryGetBitmapSource(in Icon icon, in System.Drawing.Size size) => TryGetBitmapSource(TryGetIcon(icon, size));
+
+            public static BitmapSource
+#if CS8
+                ?
+#endif
+                TryGetBitmapSource(in Icon[] icons, in ushort size) => TryGetBitmapSource(TryGetIcon(icons, size));
+
+            public static BitmapSource
+#if CS8
+                ?
+#endif
+                TryGetBitmapSource(in Icon icon, in ushort size) => TryGetBitmapSource(TryGetIcon(icon, size));
+            #endregion
+            #endregion
+
             internal static bool _IsBrowsable(in IBrowsableObjectInfo browsableObjectInfo) => browsableObjectInfo.Browsability != null && (browsableObjectInfo.Browsability.Browsability == IO.Browsability.BrowsableByDefault || browsableObjectInfo.Browsability.Browsability == IO.Browsability.Browsable);
 
             public static ClientVersion GetDefaultClientVersion()
@@ -205,10 +352,16 @@ namespace WinCopies.IO
                 return new ClientVersion(assemblyName.Name, (uint)assemblyVersion.Major, (uint)assemblyVersion.Minor, (uint)assemblyVersion.Revision);
             }
 
+            public static bool Predicate(in BrowsableObjectInfoURL3 item, in Type t) => WinCopies.Extensions.UtilHelpers.ContainsFieldValue(t, null, item.URL.Protocol.ToString());
+
             public static bool Predicate(in ProcessFactorySelectorDictionaryParameters item, in Type t) => WinCopies.Extensions.UtilHelpers.ContainsFieldValue(t, null, item.ProcessParameters.Guid.ToString());
             #endregion
 
             #region Protected Methods
+            protected virtual IContextMenu GetContextMenuOverride(bool extendedVerbs) => null;
+
+            protected virtual IContextMenu GetContextMenuOverride(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> children, bool extendedVerbs) => null;
+
             protected virtual void RaiseCallbacksOverride(BrowsableObjectInfoCallbackArgs a) => _callbackQueue?.RaiseCallbacks(a);
 
             protected void RaiseCallbacks(in BrowsableObjectInfoCallbackArgs a)
@@ -240,6 +393,10 @@ namespace WinCopies.IO
             #endregion
 
             #region Public Methods
+            public IContextMenu GetContextMenu(bool extendedVerbs) => GetValueIfNotDisposed(GetContextMenuOverride(extendedVerbs));
+
+            public IContextMenu GetContextMenu(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> children, bool extendedVerbs) => GetValueIfNotDisposed(GetContextMenuOverride(children, extendedVerbs));
+
             public System.Collections.Generic.IEnumerable<ICommand> GetCommands(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> items) => GetValueIfNotDisposed(() => GetCommandsOverride(items));
 
             public IBrowsableObjectInfoCallback RegisterCallback(Action<BrowsableObjectInfoCallbackArgs> action)
@@ -295,7 +452,7 @@ namespace WinCopies.IO
 
             System.Collections.Generic.IEnumerator<IBrowsableObjectInfo> System.Collections.Generic.IEnumerable<IBrowsableObjectInfo>.GetEnumerator() => GetItems().GetEnumerator();
 
-            IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetItems().GetEnumerator();
+            IEnumerator IEnumerable.GetEnumerator() => GetItems().GetEnumerator();
             #endregion
 
             #region IDisposable
@@ -381,6 +538,38 @@ namespace WinCopies.IO
             #endregion
         }
 
+        public abstract class BrowsableObjectInfo2<T> : BrowsableObjectInfo, IEncapsulatorBrowsableObjectInfo<T>
+        {
+            #region Properties
+            protected abstract T InnerObjectGenericOverride { get; }
+
+            public T InnerObjectGeneric => GetValueIfNotDisposed(() => InnerObjectGenericOverride);
+
+            T IEncapsulatorBrowsableObjectInfo<T>.InnerObject => InnerObjectGenericOverride;
+
+            protected sealed override object InnerObjectOverride => InnerObjectGenericOverride;
+            #endregion
+
+            protected BrowsableObjectInfo2(in string path, in ClientVersion clientVersion) : base(path, clientVersion) { /* Left empty. */ }
+        }
+
+        public abstract class BrowsableObjectInfo3<T> : BrowsableObjectInfo2<T>
+        {
+            protected override T InnerObjectGenericOverride { get; }
+
+            protected BrowsableObjectInfo3(in T innerObject, in string path, in ClientVersion clientVersion) : base(path, clientVersion) => InnerObjectGenericOverride = innerObject
+#if CS8
+                ??
+#else
+                == null ?
+#endif
+                throw GetArgumentNullException(nameof(innerObject))
+#if !CS8
+                : innerObject
+#endif
+                ;
+        }
+
         public abstract class BrowsableObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : BrowsableObjectInfo<TObjectProperties>, IBrowsableObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
         {
             #region Properties
@@ -423,6 +612,61 @@ namespace WinCopies.IO
             public System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<TPredicateTypeParameter> predicate) => GetValueIfNotDisposed(() => predicate == null ? GetItems(GetItemProviders(item => true)) : GetItems(GetItemProviders(predicate)));
             #endregion
             #endregion
+        }
+
+        public abstract class ProtocolInfo : BrowsableObjectInfo
+        {
+            public override string LocalizedName => Name;
+
+            public override string Name { get; }
+
+            protected override bool IsLocalRootOverride => false;
+
+            protected override IBitmapSourceProvider BitmapSourceProviderOverride => null;
+
+            protected override IBrowsabilityOptions BrowsabilityOverride => BrowsabilityOptions.BrowsableByDefault;
+
+            protected override System.Collections.Generic.IEnumerable<IBrowsabilityPath> BrowsabilityPathsOverride => null;
+
+            protected override System.Collections.Generic.IEnumerable<IProcessInfo> CustomProcessesOverride => null;
+
+            protected override string DescriptionOverride => null;
+
+            protected override object InnerObjectOverride => null;
+
+            protected override bool IsRecursivelyBrowsableOverride => true;
+
+            protected override bool IsSpecialItemOverride => false;
+
+            protected override string ItemTypeNameOverride => "Protocol";
+
+            protected override object ObjectPropertiesOverride => null;
+
+            protected override IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystemOverride => null;
+
+            protected override IBrowsableObjectInfo ParentOverride { get; }
+
+            protected override IProcessFactory ProcessFactoryOverride => null;
+
+            public static T Update<T>(ref T value, in T defaultValue)
+            {
+                if (value == null)
+
+                    value = defaultValue;
+
+                return value;
+            }
+
+            public ProtocolInfo(string protocol, in IBrowsableObjectInfo parent, in ClientVersion clientVersion) : base($"{parent.Path}{IO.Path.PathSeparator}{Update(ref protocol, "file")}", clientVersion)
+            {
+                Name = protocol;
+
+                ParentOverride = parent;
+            }
+
+            protected override ArrayBuilder<IBrowsableObjectInfo> GetRootItemsOverride() => null;
+
+            protected override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetSubRootItemsOverride() => null;
         }
     }
 }

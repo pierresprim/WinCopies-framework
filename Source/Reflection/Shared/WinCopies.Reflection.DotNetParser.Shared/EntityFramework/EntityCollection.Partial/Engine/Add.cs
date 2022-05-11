@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reflection;
 
 using WinCopies.Linq;
-using WinCopies.Temp;
 
 namespace WinCopies.EntityFramework
 {
@@ -104,9 +103,25 @@ namespace WinCopies.EntityFramework
             {
                 value = property.Key.GetValue(_entity);
 
+                bool isId = property.Value.IsId;
+
+                if (isId)
+                {
+                    Nullable tryRefreshIdWhen = _entity.TryRefreshIdWhen;
+
+                    if (tryRefreshIdWhen.HasValue && tryRefreshIdWhen.Value?.Equals(value) == true)
+                    {
+                        _entity.MarkForRefresh();
+
+                        _entity.TryRefreshId(true);
+
+                        value = property.Key.GetValue(_entity);
+                    }
+                }
+
                 if ((oneToManyForeignKeyAttribute = property.Key.GetCustomAttributes(true).FirstOrDefault<OneToManyForeignKeyAttribute>()) == null)
 
-                    addValue(property.Value.Column ?? property.Key.Name, property.Value.IsId);
+                    addValue(property.Value.Column ?? property.Key.Name, isId);
 
                 else if (!(value == null || (idProperty == null && (idProperty = GetIdProperties(t).FirstOrNull()?.Value) == null)))
 
@@ -115,6 +130,8 @@ namespace WinCopies.EntityFramework
 
             void _addValues(in IEntity _entity)
             {
+                Type entityPropertyAttribute = typeof(EntityPropertyAttribute);
+
                 foreach (KeyValuePair<PropertyInfo, EntityPropertyAttribute> _property in GetDBPropertyInfo(t))
 
                     action(_property, _entity);
@@ -170,7 +187,7 @@ namespace WinCopies.EntityFramework
 #endif
                 )property.GetValue(_entity)) != null)
 
-                        add(_tmp, _addValues);
+                    add(_tmp, _addValues);
 
                 if ((attribute = (t = _entity.GetType()).GetCustomAttributes<EntityAttribute>(true).FirstOrDefault()) != null)
                 {
@@ -192,7 +209,7 @@ namespace WinCopies.EntityFramework
 
                     addValues(_entity);
 
-                    _rows += (__rows = updater.ExecuteRequest(attribute.Table ?? t.Name, out result));
+                    _rows += __rows = updater.ExecuteRequest(attribute.Table ?? t.Name, out result);
 
                     if (__rows > 0)
                     {
@@ -205,7 +222,7 @@ namespace WinCopies.EntityFramework
 
                         else
 
-                            idProperty?.SetValue(_entity, _result = Convert.ChangeType(result, idProperty.PropertyType));
+                            idProperty?.SetValue(_entity, _result = Convert.TryChangeType(result, idProperty.PropertyType));
 
                         if (_result == null)
                         {

@@ -4,7 +4,6 @@ using System.Text;
 
 using WinCopies.Collections;
 using WinCopies.Collections.DotNetFix.Generic;
-using WinCopies.Temp;
 
 namespace WinCopies.Data.SQL
 {

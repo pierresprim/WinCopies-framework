@@ -57,17 +57,6 @@ namespace WinCopies.GUI.IO.Controls
         public DroppedEventArgs(in IProcessParameters processParameters) => ProcessParameters = processParameters;
     }
 
-    public class ExplorerControlListViewContextMenuRequestedEventArgs : RoutedEventArgs
-    {
-        public MouseButtonEventArgs MouseButtonEventArgs { get; }
-
-        public ExplorerControlListViewContextMenuRequestedEventArgs(in MouseButtonEventArgs mouseButtonEventArgs) : base(ExplorerControlListView.ContextMenuRequestedEvent) => MouseButtonEventArgs = mouseButtonEventArgs;
-
-        public ExplorerControlListViewContextMenuRequestedEventArgs(in MouseButtonEventArgs mouseButtonEventArgs, in RoutedEvent routedEvent) : base(routedEvent) => MouseButtonEventArgs = mouseButtonEventArgs;
-
-        public ExplorerControlListViewContextMenuRequestedEventArgs(in MouseButtonEventArgs mouseButtonEventArgs, in RoutedEvent routedEvent, in object source) : base(routedEvent, source) => MouseButtonEventArgs = mouseButtonEventArgs;
-    }
-
     public class ExplorerControlListView : ListView
     {
         private Point _startPoint;
@@ -76,22 +65,13 @@ namespace WinCopies.GUI.IO.Controls
 
         //public ViewStyle ViewStyle { get => (ViewStyle)GetValue(ViewStyleProperty); set => SetValue(ViewStyleProperty, value); }
 
-        public static readonly RoutedEvent DroppedEvent = EventManager.RegisterRoutedEvent(nameof(Dropped), RoutingStrategy.Bubble, typeof(RoutedEventHandler<DroppedEventArgs>), typeof(ExplorerControlListView));
+        public static readonly RoutedEvent DroppedEvent = Util.Desktop.UtilHelpers.RegisterRoutedEvent<RoutedEventHandler<DroppedEventArgs>, ExplorerControlListView>(nameof(Dropped), RoutingStrategy.Bubble);
 
         public event RoutedEventHandler<DroppedEventArgs> Dropped
         {
             add => AddHandler(DroppedEvent, value);
 
             remove => RemoveHandler(DroppedEvent, value);
-        }
-
-        public static readonly RoutedEvent ContextMenuRequestedEvent = EventManager.RegisterRoutedEvent(nameof(ContextMenuRequested), RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(ExplorerControlListView));
-
-        public event RoutedEventHandler<DroppedEventArgs> ContextMenuRequested
-        {
-            add => AddHandler(ContextMenuRequestedEvent, value);
-
-            remove => RemoveHandler(ContextMenuRequestedEvent, value);
         }
 
         public ExplorerControlListView() => AllowDrop = true;
@@ -105,20 +85,20 @@ namespace WinCopies.GUI.IO.Controls
             _startPoint = e.GetPosition(null);
         }
 
-        protected override void OnMouseRightButtonUp(MouseButtonEventArgs e)
+        /*protected override void OnMouseRightButtonUp(MouseButtonEventArgs e)
         {
             base.OnMouseRightButtonUp(e);
 
             RaiseEvent(new ExplorerControlListViewContextMenuRequestedEventArgs(e) );
-        }
+        }*/
 
-        public IDragDropProcessInfo GetDragDropProcessInfo() => ((IExplorerControlViewModel)DataContext).Path.ProcessFactory.DragDrop;
+        public IDragDropProcessInfo GetDragDropProcessInfo() => ((IExplorerControlViewModel)DataContext).Path.ProcessFactory?.DragDrop;
 
-        protected virtual DataObject GetDragDropData()
+        protected virtual DataObject GetDragDropData(IDragDropProcessInfo dragDropProcessInfo)
         {
             DataObject data = new DataObject();
 
-            System.Collections.Generic.IDictionary<string, object> result = GetDragDropProcessInfo().TryGetData(GetSelectedPaths(), out DragDropEffects dragDropEffects);
+            IDictionary<string, object> result = dragDropProcessInfo.TryGetData(GetSelectedPaths(), out DragDropEffects dragDropEffects);
 
             if (result.Count == 1 && result.ContainsKey(DataFormats.FileDrop))
             {
@@ -152,13 +132,18 @@ namespace WinCopies.GUI.IO.Controls
         {
             base.OnMouseMove(e);
 
-            if (IsMouseCaptured && e.LeftButton == MouseButtonState.Pressed&& SelectedItems.Count > 0 &&GetDragDropProcessInfo().CanRun(GetSelectedPaths()))
+            if (IsMouseCaptured && e.LeftButton == MouseButtonState.Pressed && SelectedItems.Count > 0)
             {
-                Vector diff = _startPoint - e.GetPosition(null);
+                IDragDropProcessInfo dragDropProcessInfo = GetDragDropProcessInfo();
 
-                if (System.Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance || System.Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance)
+                if (dragDropProcessInfo?.CanRun(GetSelectedPaths()) == true)
+                {
+                    Vector diff = _startPoint - e.GetPosition(null);
 
-                    _ = DragDrop.DoDragDrop(this, GetDragDropData(), DragDropEffects.Copy | DragDropEffects.Move | DragDropEffects.Link);
+                    if (System.Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance || System.Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance)
+
+                        _ = DragDrop.DoDragDrop(this, GetDragDropData(dragDropProcessInfo), DragDropEffects.Copy | DragDropEffects.Move | DragDropEffects.Link);
+                }
             }
         }
 
@@ -189,7 +174,7 @@ namespace WinCopies.GUI.IO.Controls
 
                 dic.Add(item, e.Data.GetData(item));
 
-            var processParameters = GetDragDropProcessInfo().TryGetProcessParameters(dic);
+            var processParameters = GetDragDropProcessInfo()?.TryGetProcessParameters(dic);
 
             if (processParameters != null)
 

@@ -15,18 +15,24 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+#region System
 using System;
 using System.Diagnostics;
 using System.Windows.Media.Imaging;
+#endregion System
 
+#region WinCopies
 using WinCopies.Collections.Generic;
 using WinCopies.IO.Process;
 using WinCopies.IO.Reflection.PropertySystem;
 using WinCopies.IO.Shell;
+#endregion WinCopies
 
+#region Static Usings
 using static WinCopies.UtilHelpers;
 using static WinCopies.ThrowHelper;
 using static WinCopies.IO.Shell.Resources.ExceptionMessages;
+#endregion Static Usings
 
 namespace WinCopies.IO.ObjectModel.Reflection
 {
@@ -67,7 +73,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
         /// <summary>
         /// Gets the <see cref="NotApplicable"/> value.
         /// </summary>
-        protected override string DescriptionOverride => NotApplicable;
+        protected override string DescriptionOverride => WinCopies.Consts.NotApplicable;
 
         /// <summary>
         /// Gets the <see langword="false"/> value.

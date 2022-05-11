@@ -9,9 +9,18 @@
     <Import_RootNamespace>WinCopies.Reflection.DotNetDocBuilder.Shared</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)IWriter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Entities.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PackageInfo.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Writer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Writer.Partial\DeleteTypes.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Writer.Partial\FileCreation.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Writer.Partial\Namespace.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Writer.Partial\Update.Partial\UpdateClasses.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Writer.Partial\Update.Partial\UpdateEnums.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Writer.Partial\Update.Partial\UpdateTypes.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Writer.Partial\Update.Partial\UpdateItems.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Writer.Partial\Update.Partial\UpdateDoc.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Writer.Partial\Update.Partial\UpdateNamespaces.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Writer.Partial\Writer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)WriterConsts.cs" />
   </ItemGroup>
 </Project>

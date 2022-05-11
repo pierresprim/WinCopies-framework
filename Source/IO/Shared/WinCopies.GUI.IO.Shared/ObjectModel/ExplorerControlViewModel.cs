@@ -15,6 +15,7 @@
 * You should have received a copy of the GNU General Public License
 * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+#region Usings
 using Microsoft.WindowsAPICodePack.Shell;
 
 #region System
@@ -28,6 +29,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 #endregion
 
@@ -35,6 +37,7 @@ using System.Windows.Threading;
 using WinCopies.Collections;
 using WinCopies.Collections.Generic;
 using WinCopies.Commands;
+using WinCopies.Desktop;
 using WinCopies.GUI.Controls;
 using WinCopies.GUI.Controls.Models;
 using WinCopies.GUI.Controls.ViewModels;
@@ -45,18 +48,17 @@ using WinCopies.IO.ObjectModel;
 using WinCopies.IO.Process;
 using WinCopies.IO.PropertySystem;
 using WinCopies.Linq;
-using WinCopies.Temp;
 using WinCopies.Util.Data;
 #endregion
 
 #region Static Usings
-using static WinCopies.GUI.IO.Properties.Resources;
-using static WinCopies.ThrowHelper;
+using static WinCopies.Extensions.UtilHelpers;
 using static WinCopies.GUI.Icons.Properties.Resources;
 using static WinCopies.GUI.IO.ObjectModel.ExplorerControlViewModel.CommonCommandsUtilities;
+using static WinCopies.GUI.IO.Properties.Resources;
+using static WinCopies.ThrowHelper;
 #endregion
-
-using static WinCopies.Temp.Temp;
+#endregion Usings
 
 namespace WinCopies.GUI.IO
 {
@@ -139,7 +141,7 @@ namespace WinCopies.GUI.IO
 
             private class BackgroundWorker
             {
-                private WinCopies.BackgroundWorker _backgroundWorker = new
+                private readonly WinCopies.BackgroundWorker _backgroundWorker = new
 #if !CS9
                 WinCopies.BackgroundWorker
 #endif
@@ -271,29 +273,34 @@ namespace WinCopies.GUI.IO
             private Predicate<IBrowsableObjectInfo> _oldPredicate;
             private Predicate<IBrowsableObjectInfo> _predicate;
             private HistoryObservableCollection<IBrowsableObjectInfo> _historyObservable;
+            private ReadOnlyHistoryObservableCollection<IBrowsableObjectInfo> _history;
             private bool _isCheckBoxVisible;
             private bool _isSelected;
             private SelectionMode _selectionMode = SelectionMode.Extended;
-            private ObservableCollection<IBrowsableObjectInfoViewModel> _selectedItems = new ObservableCollection<IBrowsableObjectInfoViewModel>();
             private string _text;
             private System.Collections.Generic.IEnumerable<IBrowsableObjectInfoViewModel> _treeViewItems;
+            private ObservableCollection<IBrowsableObjectInfoViewModel> _selectedItems = new
+#if !CS9
+                ObservableCollection<IBrowsableObjectInfoViewModel>
+#endif
+                ();
             private readonly BackgroundWorker _backgroundWorker = new
 #if !CS9
-            BackgroundWorker
+                BackgroundWorker
 #endif
-            ();
+                ();
             #endregion
 
             #region Properties
             public bool AutoStartMonitoring { get => GetValueIfNotDisposed(_autoStartMonitoring); set => UpdateValueIfNotDisposed(ref _autoStartMonitoring, value, nameof(AutoStartMonitoring)); }
-
-            protected Converter<string, IBrowsableObjectInfo> GetBrowsableObjectInfoViewModelConverter { get; }
 
             public ICommand BrowseToParent { get; }
 
             public System.Collections.Generic.IEnumerable<IMenuItemModel<string>> BrowsabilityPaths => Path.SelectedItem?.BrowsabilityPaths?.Select(path => new MenuItemModel<string>(path.Name, new DelegateCommand(obj => path.IsValid(), obj => Path = new BrowsableObjectInfoViewModel(path.GetPath()) { SortComparison = Path.SortComparison, Factory = Path.Factory })));
 
             public System.Collections.Generic.IEnumerable<IButtonModel> CommonCommands => GetValueIfNotDisposed(_commonCommands);
+
+            private System.Collections.Generic.IReadOnlyList<ButtonModel> _CommonCommands { set => UpdateValueIfNotDisposed(ref _commonCommands, value, nameof(CommonCommands)); }
 
             public System.Collections.Generic.IEnumerable<IMenuItemModel<string, IMenuItemModel<string>, object>> CustomProcesses => Path.CustomProcesses?.GroupBy(item => item.GroupName, (groupName, processes) => new MenuItemModel<string, IMenuItemModel<string>, object>(null, null)
             {
@@ -340,7 +347,7 @@ namespace WinCopies.GUI.IO
 
             public static DelegateCommand<ExplorerControlViewModel> GoCommand { get; } = new DelegateCommand<ExplorerControlViewModel>(browsableObjectInfo => browsableObjectInfo != null && browsableObjectInfo.OnGoCommandCanExecute(), browsableObjectInfo => browsableObjectInfo.OnGoCommandExecuted());
 
-            public HistoryObservableCollection<IBrowsableObjectInfo> History => GetValueIfNotDisposed(_historyObservable);
+            public ReadOnlyHistoryObservableCollection<IBrowsableObjectInfo> History => GetValueIfNotDisposed(_history);
 
             public bool IsCheckBoxVisible
             {
@@ -395,33 +402,31 @@ namespace WinCopies.GUI.IO
             public string Text { get => GetValueIfNotDisposed(_text); set => UpdateValueIfNotDisposed(ref _text, value, nameof(Text)); }
 
             public System.Collections.Generic.IEnumerable<IBrowsableObjectInfoViewModel> TreeViewItems { get => GetValueIfNotDisposed(_treeViewItems); set => UpdateValueIfNotDisposed(ref _treeViewItems, value, nameof(TreeViewItems)); }
+
+            public DelegateCommand<IBrowsableObjectInfo> OpenInNewContextCommand { get; set; }
             #endregion
 
             public event System.EventHandler<CustomProcessParametersGeneratedEventArgs> CustomProcessParametersGenerated;
 
-            protected ExplorerControlViewModel(in IBrowsableObjectInfoViewModel path, in System.Collections.Generic.IEnumerable<IBrowsableObjectInfoViewModel> treeViewItems, in IBrowsableObjectInfoFactory factory, in Converter<string, IBrowsableObjectInfo> converter)
+            protected ExplorerControlViewModel(in IBrowsableObjectInfoViewModel path, in IBrowsableObjectInfoFactory factory)
             {
                 ThrowIfNull(path, nameof(path));
-                ThrowIfNull(converter, nameof(converter));
+                ThrowIfNull(factory, nameof(factory));
 
                 _path = new ExplorerControlViewModelStruct(path);
 
                 SelectedItems = new ReadOnlyObservableCollection<IBrowsableObjectInfoViewModel>(_selectedItems);
 
-                GetBrowsableObjectInfoViewModelConverter = converter;
+                IBrowsableObjectInfo _checkHistory(in FuncOut<IBrowsableObjectInfo, bool> func, in string _path) => func(out IBrowsableObjectInfo result) && _path == result.Path ? result : null;
 
-                BrowseToParent = new DelegateCommand(o => !IsDisposed && Path.Parent != null, o => Path = new BrowsableObjectInfoViewModel(Path.Parent));
-
-                ButtonModel getNewButtonModel(in Func<IProcessFactory, IProcessCommand> func, in string defaultName, in Bitmap icon, in object toolTip, in ICommand<object> command) => new ButtonModel(this, func, defaultName, icon)
+                BrowseToParent = new DelegateCommand(o => !IsDisposed && Path.Parent != null, o =>
                 {
-                    ToolTip = toolTip,
+                    string _path = Path.Parent.Path;
 
-                    Command = command
-                };
+                    IBrowsableObjectInfo checkHistory(in FuncOut<IBrowsableObjectInfo, bool> func) => _checkHistory(func, _path);
 
-                _commonCommands = new ButtonModel[] {
-                    getNewButtonModel(processFactory => processFactory.NewItemProcessCommand, NewItem, folder_add, NewItemCommandToolTip, new DelegateCommand<object>(OnCanCreateNewItem, OnCreateNewItem)),
-                    getNewButtonModel(processFactory => processFactory.RenameItemProcessCommand, RenameItem, Path?.IsLocalRoot == true ? drive_rename : textfield_rename, RenameItemCommandToolTip, new DelegateCommand<object>(OnCanRenameItem, OnRenameItem)) };
+                    Path = new BrowsableObjectInfoViewModel(checkHistory(_historyObservable.TryGetPrevious) ?? checkHistory(_historyObservable.TryGetNext) ?? Path.Parent);
+                });
 
                 ((INotifyPropertyChanged)(_historyObservable = new HistoryObservableCollection<IBrowsableObjectInfo>())).PropertyChanged += (object sender, System.ComponentModel.PropertyChangedEventArgs e) =>
                 {
@@ -430,9 +435,9 @@ namespace WinCopies.GUI.IO
                         OnHistoryCurrentChanged(e);
                 };
 
-                _historyObservable.Add(path.Model);
+                _historyObservable.Add(path);
 
-                _treeViewItems = treeViewItems;
+                _history = new ReadOnlyHistoryObservableCollection<IBrowsableObjectInfo>(_historyObservable);
 
                 ItemClickCommand = new DelegateCommand<IBrowsableObjectInfoViewModel>(browsableObjectInfo => true, OnItemClick);
 
@@ -442,33 +447,31 @@ namespace WinCopies.GUI.IO
             }
 
             #region Methods
-            #region Common commands
+            #region Common Commands
             public IButtonModel GetCommonCommand(CommonCommandsIndex index) => GetValueIfNotDisposed(_commonCommands)[(int)index];
 
             public IProcessFactory GetProcessFactory() => Path.ProcessFactory;
 
-            protected virtual bool OnCanExecuteCommand(object obj, Converter<IProcessFactory, IProcessCommand> command) => command == null ? throw GetArgumentNullException(nameof(command)) : !IsDisposed && command(GetProcessFactory())?.CanExecute(SelectedItemsInnerObjects) == true;
+            protected virtual bool OnCanExecuteCommand(object obj, Converter<IProcessFactory, IProcessCommand> command) => command == null ? throw GetArgumentNullException(nameof(command)) : !(IsDisposed || Path.ProcessFactory == null) && command(GetProcessFactory())?.CanExecute(SelectedItemsInnerObjects) == true;
 
             protected virtual bool OnCanCreateNewItem(object obj) => OnCanExecuteCommand(obj, GetNewItemCommand);
 
             protected virtual bool OnCanRenameItem(object obj) => OnCanExecuteCommand(obj, GetRenameItemCommand);
 
-            protected virtual void OnTryExecuteCommand(object obj, Converter<IProcessFactory, IProcessCommand> command, string errorMessage, string errorCaption)
+            protected virtual void OnTryExecuteCommand(Converter<IProcessFactory, IProcessCommand> command, string errorMessage, string errorCaption, in BitmapSource icon)
             {
-                ThrowIfNull(command, nameof(command));
+                IProcessCommand _command = (command ?? throw GetArgumentNullException(nameof(command)))(GetProcessFactory());
 
-                IProcessCommand _command = command(GetProcessFactory());
-
-                if (InputBox.ShowDialog(_command.Name, DialogButton.OKCancel, _command.Caption, null, out string result) == true)
+                if (InputBox.ShowDialog(_command.Name, DialogButton.OKCancel, _command.Caption, SelectedItemsInnerObjects.First().Name, null, out string result, icon) == true)
 
                     if (!_command.TryExecute(result, SelectedItemsInnerObjects, out _))
 
                         _ = MessageBox.Show(errorMessage, errorCaption, MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
-            protected virtual void OnCreateNewItem(object obj) => OnTryExecuteCommand(obj, GetNewItemCommand, ItemCouldNotBeCreated, ItemCreationError);
+            protected virtual void OnCreateNewItem() => OnTryExecuteCommand(GetNewItemCommand, ItemCouldNotBeCreated, ItemCreationError, folder_add.ToImageSource());
 
-            protected virtual void OnRenameItem(object obj) => OnTryExecuteCommand(obj, GetRenameItemCommand, ItemCouldNotBeRenamed, ItemRenameError);
+            protected virtual void OnRenameItem(BitmapSource icon) => OnTryExecuteCommand(GetRenameItemCommand, ItemCouldNotBeRenamed, ItemRenameError, icon);
             #endregion
 
             public static IBrowsableObjectInfoViewModel GetBrowsableObjectInfoOrLaunchItem(IBrowsableObjectInfoViewModel browsableObjectInfo)
@@ -498,7 +501,7 @@ namespace WinCopies.GUI.IO
 
             protected virtual void OnPathPropertyChanged(System.ComponentModel.PropertyChangedEventArgs e)
             {
-                if (e.PropertyName == nameof(IBrowsableObjectInfoViewModel.SelectedItem))
+                if (e?.PropertyName == nameof(IBrowsableObjectInfoViewModel.SelectedItem))
 
                     OnPropertyChanged(nameof(BrowsabilityPaths)
 #if !WinCopies4
@@ -524,7 +527,7 @@ namespace WinCopies.GUI.IO
             {
                 IBrowsableObjectInfoViewModel path = _path.Path;
 
-                System.Collections.ObjectModel.ObservableCollection<IBrowsableObjectInfoViewModel> items = path.Items;
+                ObservableCollection<IBrowsableObjectInfoViewModel> items = path.Items;
 
                 switch (parameters.CallbackReason)
                 {
@@ -577,7 +580,7 @@ namespace WinCopies.GUI.IO
 
             protected virtual void OnPathAdded(in IBrowsableObjectInfoViewModel path)
             {
-                path.PropertyChanged += Path_PropertyChanged;
+                (path ?? throw GetArgumentNullException(nameof(path))).PropertyChanged += Path_PropertyChanged;
                 path.SelectedItemsChanged += Path_SelectedItemsChanged;
 
                 _oldPredicate = path.Filter;
@@ -629,15 +632,18 @@ namespace WinCopies.GUI.IO
 
             protected virtual void OnUpdateCommands()
             {
-                foreach (ButtonModel command in _commonCommands)
+                if (_commonCommands != null)
+                {
+                    foreach (ButtonModel command in _commonCommands)
 
-                    command.Update();
+                        command.Update();
 
-                OnPropertyChanged(nameof(CustomProcesses)
+                    OnPropertyChanged(nameof(CustomProcesses)
 #if !WinCopies4
-                , null, CustomProcesses
+                    , null, CustomProcesses
 #endif
                 );
+                }
             }
 
             protected virtual void OnUpdateHistory()
@@ -657,11 +663,13 @@ namespace WinCopies.GUI.IO
                 {
                     _historyObservable.NotifyOnPropertyChanged = false;
 
-                    if (_historyObservable.CanMovePreviousFromCurrent && _path.Path.Path == _historyObservable[_historyObservable.CurrentIndex + 1].Path)
+                    bool checkPaths(in sbyte decrement) => _path.Path.Path == _historyObservable[_historyObservable.CurrentIndex - decrement].Path;
+
+                    if (_historyObservable.CanMoveBack && checkPaths(-1))
 
                         _historyObservable.CurrentIndex++;
 
-                    else if (_historyObservable.CanMoveNextFromCurrent && _path.Path.Path == _historyObservable[_historyObservable.CurrentIndex - 1].Path)
+                    else if (_historyObservable.CanMoveForward && checkPaths(1))
 
                         _historyObservable.CurrentIndex--;
 
@@ -686,13 +694,49 @@ namespace WinCopies.GUI.IO
             {
                 OnPathRemoved(oldPath);
 
-                OnPathAdded(_path.Path);
+                IBrowsableObjectInfoViewModel path = _path.Path;
+
+                OnPathAdded(path);
 
                 OnUpdateText();
 
-                OnUpdateCommands();
-
                 OnUpdateHistory();
+
+                if (oldPath.Protocol == path.Protocol)
+
+                    OnUpdateCommands();
+
+                else
+                {
+                    TreeViewItems = path.GetRootItems()?.Select<IBrowsableObjectInfo, IBrowsableObjectInfoViewModel>(Factory.GetBrowsableObjectInfoViewModel);
+
+                    if (Path.ProcessFactory == null)
+
+                        _CommonCommands = null;
+
+                    else
+                    {
+                        ButtonModel getNewButtonModel(in Func<IProcessFactory, IProcessCommand> func, in string defaultName, in Bitmap icon, in object toolTip, in ICommand<object> command) => new ButtonModel(this, func, defaultName, icon)
+                        {
+                            ToolTip = toolTip,
+
+                            Command = command
+                        };
+
+                        ButtonModel getRenameButtonModel()
+                        {
+                            // todo: not updated when browsing
+
+                            Bitmap icon = Path?.IsLocalRoot == true ? drive_rename : textfield_rename;
+
+                            return getNewButtonModel(processFactory => processFactory?.RenameItemProcessCommand, RenameItem, icon, RenameItemCommandToolTip, new DelegateCommand<object>(OnCanRenameItem, obj => OnRenameItem(icon.ToImageSource())));
+                        }
+
+                        _CommonCommands = new ButtonModel[] {
+                    getNewButtonModel(processFactory => processFactory?.NewItemProcessCommand, NewItem, folder_add, NewItemCommandToolTip, new DelegateCommand<object>(OnCanCreateNewItem, obj => OnCreateNewItem())),
+                    getRenameButtonModel() };
+                    }
+                }
             }
 
             protected virtual void OnHistoryCurrentChanged(System.ComponentModel.PropertyChangedEventArgs e)
@@ -704,18 +748,20 @@ namespace WinCopies.GUI.IO
 
             protected virtual bool OnGoCommandCanExecute() => true;
 
-            protected void OnGoCommandExecuted() => Path = _factory.GetBrowsableObjectInfoViewModel(GetBrowsableObjectInfoViewModelConverter(Text));
+            protected void OnGoCommandExecuted() => Path = _factory.GetBrowsableObjectInfoViewModel(BrowsableObjectInfo.DefaultBrowsableObjectInfoSelectorDictionary.Select(new BrowsableObjectInfoURL3(new BrowsableObjectInfoURL2(Text), BrowsableObjectInfo.GetDefaultClientVersion())));
 
             protected virtual void Dispose(bool disposing)
             {
-                foreach (ButtonModel command in _commonCommands)
+                if (_commonCommands != null)
+                {
+                    foreach (ButtonModel command in _commonCommands)
 
-                    command.Dispose();
+                        command.Dispose();
 
-                _commonCommands = null;
+                    _commonCommands = null;
+                }
 
                 _text = null;
-
                 _treeViewItems = null;
 
                 OnPathRemoved(_path.Path);
@@ -729,13 +775,13 @@ namespace WinCopies.GUI.IO
                     _historyObservable.Clear();
 
                 _historyObservable = null;
+                _history = null;
 
                 _factory = null;
 
                 if (_selectedItems != null)
                 {
                     _selectedItems.Clear();
-
                     _selectedItems = null;
                     SelectedItems = null;
                 }
@@ -756,10 +802,6 @@ namespace WinCopies.GUI.IO
             #endregion
 
             ~ExplorerControlViewModel() => Dispose(false);
-
-            //private ViewStyle _viewStyle = ViewStyle.SizeThree;
-
-            //public ViewStyle ViewStyle { get => _viewStyle; set { _viewStyle = value; OnPropertyChanged(nameof(ViewStyle)); } }
         }
     }
 }

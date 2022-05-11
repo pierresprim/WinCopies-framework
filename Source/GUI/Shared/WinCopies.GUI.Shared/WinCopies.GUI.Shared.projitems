@@ -10,6 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)ButtonAlignmentToHorizontalAlignmentConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)HistoryCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MessageBoxResult.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DialogWindowCommandParameters.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HorizontalAlignment.cs" />

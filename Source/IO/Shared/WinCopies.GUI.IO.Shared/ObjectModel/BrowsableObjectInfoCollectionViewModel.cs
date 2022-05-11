@@ -18,6 +18,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Linq;
 using System.Windows;
 
 using WinCopies.Util;
@@ -43,11 +44,7 @@ namespace WinCopies.GUI.IO.ObjectModel
         private IExplorerControlViewModel _selectedItem;
         private int _selectedIndex;
         private bool _checkBoxVisible;
-        private ObservableCollection<IExplorerControlViewModel> _paths = new
-#if !CS9
-            ObservableCollection<IExplorerControlViewModel>
-#endif
-            ();
+        private ObservableCollection<IExplorerControlViewModel> _paths;
 
         public bool IsDisposed => _paths == null;
 
@@ -69,7 +66,13 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         IList<IExplorerControlViewModel> IBrowsableObjectInfoCollectionViewModel.Paths => Paths;
 
-        public BrowsableObjectInfoCollectionViewModel() => Paths.CollectionChanged += Paths_CollectionChanged;
+        private BrowsableObjectInfoCollectionViewModel(in ObservableCollection<IExplorerControlViewModel> items) => (_paths = items).CollectionChanged += Paths_CollectionChanged;
+
+        public BrowsableObjectInfoCollectionViewModel() : this(new ObservableCollection<IExplorerControlViewModel>()) { /* Left empty. */ }
+
+        public BrowsableObjectInfoCollectionViewModel(in IEnumerable<IExplorerControlViewModel> items) : this(new ObservableCollection<IExplorerControlViewModel>(items)) { /* Left empty. */ }
+
+        public BrowsableObjectInfoCollectionViewModel(params IExplorerControlViewModel[] items) : this(items.AsEnumerable()) { /* Left empty. */ }
 
         private bool UpdateValue<T>(ref T value, in T newValue, in string propertyName)
         {
@@ -89,9 +92,26 @@ namespace WinCopies.GUI.IO.ObjectModel
             return false;
         }
 
-        protected virtual void OnPathAdded(IExplorerControlViewModel path) => path.IsCheckBoxVisible = _checkBoxVisible;
+        protected virtual void OnPathAdded(IExplorerControlViewModel path)
+        {
+            path.IsCheckBoxVisible = _checkBoxVisible;
 
-        protected virtual void OnPathRemoved(IExplorerControlViewModel path) => path.Dispose();
+            path.OpenInNewContextCommand = new Commands.DelegateCommand<WinCopies.IO.ObjectModel.IBrowsableObjectInfo>(Bool.True, obj =>
+            {
+                IExplorerControlViewModel _obj = SelectedItem.Factory.GetExplorerControlViewModel(SelectedItem.Factory.GetBrowsableObjectInfoViewModel(obj));
+
+                _obj.IsSelected = true;
+
+                Paths.Add(_obj);
+            });
+        }
+
+        protected virtual void OnPathRemoved(IExplorerControlViewModel path)
+        {
+            path.OpenInNewContextCommand = null;
+
+            path.Dispose();
+        }
 
         protected virtual void OnPathCollectionChanged(NotifyCollectionChangedEventArgs e)
         {

@@ -20,7 +20,6 @@ using System;
 using WinCopies.IO.ObjectModel;
 using WinCopies.IO.Process;
 using WinCopies.IO.PropertySystem;
-using WinCopies.Util.Shared.Delegates;
 
 using static WinCopies.IO.Shell.Resources.ExceptionMessages;
 using static WinCopies.IO.FileType;

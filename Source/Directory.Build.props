@@ -37,12 +37,17 @@
     <DefineConstants>CS6;CS7;CS8;NETCORE;$(DefineConstants)</DefineConstants>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(TargetFramework.TrimEnd(`0123456789-windows`))' == 'net5.'">
+    <DefineConstants>CS4;CS5;CS6;CS7;CS8;CS9;NET5;$(DefineConstants)</DefineConstants>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(TargetFramework.TrimEnd(`0123456789-windows`))' == 'net6.'">
     <DefineConstants>CS4;CS5;CS6;CS7;CS8;CS9;CS10;NET5;NET6;$(DefineConstants)</DefineConstants>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework.TrimEnd(`0123456789-windows`))' == 'net5.'">
-    <DefineConstants>CS4;CS5;CS6;CS7;CS8;CS9;NET5;$(DefineConstants)</DefineConstants>
+  <PropertyGroup Condition="'$(TargetFramework.TrimEnd(`0123456789-windows`))' == 'net7.'">
+    <DefineConstants>CS4;CS5;CS6;CS7;CS8;CS9;CS10;CS11;NET5;NET6;NET7;$(DefineConstants)</DefineConstants>
+	<LangVersion>preview</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)'=='net35'">
@@ -77,6 +82,10 @@
     <DefineConstants>NETSTANDARD;$(DefineConstants)</DefineConstants>
   </PropertyGroup>
 
+	<PropertyGroup Condition="$(DefineConstants.Contains('CS8'))">
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
   <PropertyGroup Condition="'$(Platform)'=='x64'">
     <DefineConstants>WIN64;$(DefineConstants)</DefineConstants>
   </PropertyGroup>
@@ -91,6 +100,13 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
+
+	<ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789-windows`))' == 'net7.'">
+		<PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="7.0.0-preview">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
 
 	<ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789-windows`))' == 'net6.'">
 		<PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="6.0.0">

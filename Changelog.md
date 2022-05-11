@@ -8,23 +8,82 @@ CHANGELOG
 
 ### 3.13-preview
 
+- Add:
+	- support for .Net 7.
+	- new types.
+	- new static and extension methods.
+	- new constants.
+	- new WPF templates, styles, resources and controls.
+	- new packages.
+	- IBrowsableInfoObjects that represent the application root path and an application plugin.
+	- (Preview)TripleClick routed events to WinCopies.GUI.Controls.DotNetFix.TextBox.
+	- a sample DLL for doc building testing.
 - Bug fixes and misc improvements.
+- Update:
+	- WinCopies.GUI.Shell.ObjectModel.ExplorerControlViewModel methods.
+	- BrowsableObjectInfoWindowTemplate display style.
+	- BrowsableObjectInfoWindow(Template) to display context menu info tips in the status bar.
+	- BrowsableObjectInfoWindow:
+		- add property: StatusBarLabel.
+		- all constructors are protected.
+		- handles the BrowseToParent command (from Util/Desktop).
+- Remove:
+	- ExplorerControlListViewContextMenuRequestedEventArgs (replaced with ContextMenuRequestedEventArgs).
+	- ExplorerControlListView:
+		- ContextMenuRequestedEvent
+		- ContextMenuRequested
+		as they are not used in the new implementation.
+- InputBox: add new ShowDialog method overload.
+- Window:
+	- inherits from GlassWindow from WAPICP.
+	- handles Alt+Up keyboard shortcut as the BrowseToParent command from Util/Desktop.
+	- bugs fixed in window system menu handling.
+- WinCopies.IO.ObjectModel.(I)BrowsableObjectInfo: new properties and methods.
 - IShellObjectInfoBase:
 	- add IsArchiveOpen property.
 	- replace ArchiveFileStream property with GetArchiveFileStream() method. The return type now is StreamInfo.
 - IExplorerControlViewModel:
 	- SelectedItems has new return type.
 	- SelectedItems2 has been removed.
+- IBrowsableObjectInfoViewModel has new events.
+- BrowsableObjectInfoViewModel has new methods and events.
+- BrowsableObjectInfoCollectionViewModel has new constructors.
+- IBrowsableObjectInfoFactory has a new method.
+- IExplorerControlViewModel: new property: OpenInNewContextCommand.
 - ExplorerControlViewModel:
+	- New property: OpenInNewContextCommand.
 	- New method: OnPathSelectedItemsChanged.
 	- OnTryExecuteCommand and OnPathAdded has new parameters.
 	- Selected items are cleared when disposing.
-- IBrowsableObjectInfoViewModel has new events.
-- BrowsableObjectInfoViewModel has new methods and events.
+	- Update OnCreateNew/RenameItem method definitions.
+	- Root items can be updated depending on the current item.
+	- Bugs fixed in command handling.
+- ExplorerControl:
+	- OnGoToPageCanExecute(CanExecuteRoutedEventArgs e): bug fixed: an exception was thrown when 'e' is null.
+	- Update default list display style.
+- (I)ExplorerControlViewModel and ExplorerControl:
+	- History property type is ReadOnlyHistoryObservableCollection<IBrowsableObjectInfo>.
+- ExplorerControlListViewItem:
+	- inherits from the new ListViewItem control instead of the system one.
+	- has new:
+		- routed event: ContextMenuRequested.
+		- method(s) (overrides) and behavior to handle mouse right click and Apps key down events, and raise the new ContextMenuRequested consequently.
+- ExplorerControlListViewItemContent has new properties for other image sizes.
+- FileSystemDialogBoxPredicateConverter.GetPredicate's 'mode' method parameter no longer has the 'in' modifier.
+- IHistoryCollection.CanMovePrevious/NextFromCurrent => CanMoveBack/Forward
+- BrowsableObjectInfoWindow: bugs fixed in command handling.
+- BrowsableObjectInfoWindowTemplate: remove 'new tab' menu items. They have been replaced with a single one.
+- WinCopies.GUI.Shell.ObjectModel:
+	- ArchiveProcessInitializer\<T> has been moved to the WinCopies.GUI.Shell namespace.
+	- redesign BrowsableObjectInfo.
+- Redesign WinCopies.IO.BitmapSources-related types.
 - Redesign ArchiveFileInfoEnumeratorStruct.
-- Add new types.
-- Add Preview/TripleClick routed events to WinCopies.GUI.Controls.DotNetFix.TextBox
-- Disable support for .Net Core 3.0.
+- Redesign ShellObjectInfo types + bug fixes.
+- Redesign non-WinCopies.IO.ObjectModel BrowsableObjectInfo-related types.
+- BrowsableObjectInfoPlugin: new abstract property and methods.
+- SingleIconInfo returns its parent IBrowsableObjectInfo as root items.
+- WinCopies.IO.ObjectModel.RegistryItemInfo\<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>'s constructors are protected.
+- WinCopies.IO.Guids.Shell.Process has been moved to WinCopies.IO.Consts.Guids.Shell.
 
 ### 3.12.1-preview
 

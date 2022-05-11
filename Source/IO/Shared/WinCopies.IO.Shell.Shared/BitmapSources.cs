@@ -72,41 +72,74 @@ namespace WinCopies.IO
         {
             private static IBitmapSources GetDefaultBitmapSources(in BrowsableAs browsableAs)
             {
-                switch (browsableAs)
-                {
-                    case BrowsableAs.File:
-
-                        return Icons.File.Instance;
-
-                    case BrowsableAs.Folder:
-
-                        return Icons.Folder.Instance;
-
-                    case BrowsableAs.LocalRoot:
-
-                        return Icons.Computer.Instance;
+#if CS8
+                return
+#else
+                switch (
+#endif
+                    browsableAs
+#if CS8
+                    switch
+#else
+                    )
+#endif
+                    {
+#if !CS8
+                    case
+#endif
+                        BrowsableAs.File
+#if CS8
+                        =>
+#else
+                        : return
+#endif
+                        Icons.File.Instance
+#if CS8
+                        ,
+#else
+                        ; case
+#endif
+                        BrowsableAs.Folder
+#if CS8
+                        =>
+#else
+                        : return
+#endif
+                        Icons.Folder.Instance
+#if CS8
+                        ,
+#else
+                        ; case
+#endif
+                        BrowsableAs.LocalRoot
+#if CS8
+                        =>
+#else
+                        : return
+#endif
+                        Icons.Computer.Instance
+#if CS8
+                        ,
+                        _ =>
+#else
+                        ; default:
+#endif
+                        throw new InvalidEnumArgumentException(nameof(BrowsableAs), browsableAs)
+#if CS8
+                    };
+#else
+                    ;
                 }
-
-                throw new InvalidEnumArgumentException(nameof(BrowsableAs), browsableAs);
+#endif
             }
 
-            public BitmapSourceProvider(in BrowsableAs browsableAs, in IBitmapSources intermediate, in IBitmapSources sources, in bool disposeBitmapSources) : base(GetDefaultBitmapSources(browsableAs), intermediate, sources, disposeBitmapSources)
-            { /* Left empty. */ }
+            public BitmapSourceProvider(in BrowsableAs browsableAs, in IBitmapSources intermediate, in IBitmapSources sources, in bool disposeBitmapSources) : base(GetDefaultBitmapSources(browsableAs), intermediate, sources, disposeBitmapSources) { /* Left empty. */ }
 
-            public BitmapSourceProvider(in IBrowsableObjectInfo browsableObjectInfo, in IBitmapSources intermediate, in IBitmapSources bitmapSources, in bool disposeBitmapSources) : this(browsableObjectInfo.GetBrowsableAsValue(), intermediate, bitmapSources, disposeBitmapSources)
-            {
-                // Left empty.
-            }
+            public BitmapSourceProvider(in IBrowsableObjectInfo browsableObjectInfo, in IBitmapSources intermediate, in IBitmapSources bitmapSources, in bool disposeBitmapSources) : this(browsableObjectInfo.GetBrowsableAsValue(), intermediate, bitmapSources, disposeBitmapSources) { /* Left empty. */ }
 
-            public BitmapSourceProvider(in IBrowsableObjectInfo browsableObjectInfo, in IBitmapSources bitmapSources, in bool disposeBitmapSources) : this(browsableObjectInfo.GetBrowsableAsValue(), null, bitmapSources, disposeBitmapSources)
-            {
-                // Left empty.
-            }
+            public BitmapSourceProvider(in IBrowsableObjectInfo browsableObjectInfo, in IBitmapSources bitmapSources, in bool disposeBitmapSources) : this(browsableObjectInfo.GetBrowsableAsValue(), null, bitmapSources, disposeBitmapSources) { /* Left empty. */ }
 
-            public BitmapSourceProvider(in IBrowsableObjectInfo browsableObjectInfo) : this(browsableObjectInfo, null, false)
-            {
-                // Left empty.
-            }
+            public BitmapSourceProvider(in IBrowsableObjectInfo browsableObjectInfo) : this(browsableObjectInfo, null, false) { /* Left empty. */ }
         }
     }
 }

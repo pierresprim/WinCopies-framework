@@ -7,7 +7,6 @@ using System.Linq;
 
 using WinCopies.Collections.Generic;
 using WinCopies.Data.SQL;
-using WinCopies.Temp;
 
 using static WinCopies.Data.SQL.SQLHelper;
 using static WinCopies.Data.MySQL.MySQLConnection;
@@ -20,11 +19,7 @@ namespace WinCopies.Data.MySQL
 
         protected override string GetSQL()
         {
-            StringBuilder sb = new
-#if !CS9
-                StringBuilder
-#endif
-                ();
+            var sb = new StringBuilder();
 
             _ = sb.Append($"SELECT {Columns} FROM {Tables.ToString(tableName => tableName.Surround('`'))}");
 
@@ -77,7 +72,7 @@ namespace WinCopies.Data.MySQL
     {
         public Delete(MySQLConnection connection, SQLItemCollection<string> defaultTables) : base(connection, defaultTables) { /* Left empty. */ }
 
-        protected override string GetSQL() => SQLHelper.GetSQL($"DELETE FROM {Tables.ToString(Temp.Delegates.GetSurrounder<string>("`"))}", ConditionGroup);
+        protected override string GetSQL() => SQLHelper.GetSQL($"DELETE FROM {Tables.ToString(Delegates.GetSurrounder<string>("`"))}", ConditionGroup);
 
         protected override Action<MySqlCommand, IConditionGroup
 #if CS8

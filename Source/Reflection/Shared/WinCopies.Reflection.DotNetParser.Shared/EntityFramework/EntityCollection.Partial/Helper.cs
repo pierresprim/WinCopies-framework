@@ -6,7 +6,7 @@ using System.Linq;
 using System.Reflection;
 
 using WinCopies.Linq;
-using WinCopies.Temp;
+using WinCopies.Util;
 
 namespace WinCopies.EntityFramework
 {
@@ -155,11 +155,11 @@ namespace WinCopies.EntityFramework
 #if CS8
             ?
 #endif
-            [] { checkEntityAttribute ? collectionConstructor.Invoke(Temp.Util.GetArray(value)) : value }) : throw new ArgumentException($"Can not assign a value of {nameof(t)} to {nameof(U)}.");
+            [] { checkEntityAttribute ? collectionConstructor.Invoke(UtilHelpers.GetArray(value)) : value }) : throw new ArgumentException($"Can not assign a value of {nameof(t)} to {nameof(U)}.");
 
         public static bool IsDBAttribute(object attribute) => attribute is EntityPropertyAttribute;
 
-        public static IEnumerable<Predicate<PropertyInfo>> GetPropertyDefaultPredicates() => Temp.Util.GetArray<Predicate<PropertyInfo>>(property => property.CanRead && property.CanWrite, CheckIndexParameters, CheckAccessors);
+        public static IEnumerable<Predicate<PropertyInfo>> GetPropertyDefaultPredicates() => UtilHelpers.GetArray<Predicate<PropertyInfo>>(property => property.CanRead && property.CanWrite, CheckIndexParameters, CheckAccessors);
 
         public static IEnumerable<Predicate<PropertyInfo>> GetDBPropertyPredicates() => GetPropertyDefaultPredicates().Append(property => property.GetCustomAttributes(true).Any(IsDBAttribute));
 
@@ -195,9 +195,9 @@ namespace WinCopies.EntityFramework
         {
             EntityPropertyAttribute
 #if CS8
-                ?
+        ?
 #endif
-                attribute;
+        attribute;
 
             foreach (PropertyInfo property in GetDBProperties(t))
 
@@ -220,9 +220,9 @@ namespace WinCopies.EntityFramework
         {
             EntityPropertyAttribute
 #if CS8
-                ?
+        ?
 #endif
-                attribute;
+        attribute;
 
             foreach (PropertyInfo
 #if CS8

@@ -19,35 +19,53 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
+using WinCopies.Desktop;
+
 namespace WinCopies.GUI.IO.Controls
 {
     public class ExplorerControlListViewItemContent : Control
     {
+        private static DependencyProperty Register<T>(in string propertyName) => Util.Desktop.UtilHelpers.Register<T, ExplorerControlListViewItemContent>(propertyName);
+
         /// <summary>
         /// Identifies the <see cref="IsCheckBoxVisible"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty IsCheckBoxVisibleProperty = DependencyProperty.Register(nameof(IsCheckBoxVisible), typeof(bool), typeof(ExplorerControlListViewItemContent));
+        public static readonly DependencyProperty IsCheckBoxVisibleProperty = Register<bool>(nameof(IsCheckBoxVisible));
 
         public bool IsCheckBoxVisible { get => (bool)GetValue(IsCheckBoxVisibleProperty); set => SetValue(IsCheckBoxVisibleProperty, value); }
 
         /// <summary>
         /// Identifies the <see cref="SmallIcon"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty SmallIconProperty = DependencyProperty.Register(nameof(SmallIcon), typeof(ImageSource), typeof(ExplorerControlListViewItemContent));
+        public static readonly DependencyProperty SmallIconProperty = Register<ImageSource>(nameof(SmallIcon));
 
         public ImageSource SmallIcon { get => (ImageSource)GetValue(SmallIconProperty); set => SetValue(SmallIconProperty, value); }
 
         /// <summary>
+        /// Identifies the <see cref="MediumIcon"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty MediumIconProperty = Register<ImageSource>(nameof(MediumIcon));
+
+        public ImageSource MediumIcon { get => (ImageSource)GetValue(MediumIconProperty); set => SetValue(MediumIconProperty, value); }
+
+        /// <summary>
         /// Identifies the <see cref="LargeIcon"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty LargeIconProperty = DependencyProperty.Register(nameof(LargeIcon), typeof(ImageSource), typeof(ExplorerControlListViewItemContent));
+        public static readonly DependencyProperty LargeIconProperty = Register<ImageSource>(nameof(LargeIcon));
 
         public ImageSource LargeIcon { get => (ImageSource)GetValue(LargeIconProperty); set => SetValue(LargeIconProperty, value); }
 
         /// <summary>
+        /// Identifies the <see cref="ExtraLargeIcon"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ExtraLargeIconProperty = Register<ImageSource>(nameof(ExtraLargeIcon));
+
+        public ImageSource ExtraLargeIcon { get => (ImageSource)GetValue(ExtraLargeIconProperty); set => SetValue(ExtraLargeIconProperty, value); }
+
+        /// <summary>
         /// Identifies the <see cref="ItemName"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty ItemNameProperty = DependencyProperty.Register(nameof(ItemName), typeof(string), typeof(ExplorerControlListViewItemContent));
+        public static readonly DependencyProperty ItemNameProperty = Register<string>(nameof(ItemName));
 
         public string ItemName { get => (string)GetValue(ItemNameProperty); set => SetValue(ItemNameProperty, value); }
 
@@ -58,10 +76,10 @@ namespace WinCopies.GUI.IO.Controls
         /// <summary>
         /// Identifies the <see cref="HasTransparency"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty HasTransparencyProperty = DependencyProperty.Register(nameof(HasTransparency), typeof(bool), typeof(ExplorerControlListViewItemContent));
+        public static readonly DependencyProperty HasTransparencyProperty = Register<bool>(nameof(HasTransparency));
 
         public bool HasTransparency { get => (bool)GetValue(HasTransparencyProperty); set => SetValue(HasTransparencyProperty, value); }
 
-        static ExplorerControlListViewItemContent() => DefaultStyleKeyProperty.OverrideMetadata(typeof(ExplorerControlListViewItemContent), new FrameworkPropertyMetadata(typeof(ExplorerControlListViewItemContent)));
+        static ExplorerControlListViewItemContent() => DefaultStyleKeyProperty.OverrideFrameworkPropertyMetadata<ExplorerControlListViewItemContent>();
     }
 }

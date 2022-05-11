@@ -21,6 +21,7 @@ using System.Windows.Media.Imaging;
 
 using WinCopies.Desktop;
 
+using static WinCopies.IO.ObjectModel.BrowsableObjectInfo;
 using static WinCopies.ThrowHelper;
 
 namespace WinCopies.IO
@@ -95,9 +96,9 @@ namespace WinCopies.IO
     {
         private T _innerObject;
 
-        public T InnerObject => IsDisposed ? throw GetExceptionForDispose(false) : _innerObject;
+        protected T InnerObject => IsDisposed ? throw GetExceptionForDispose(false) : _innerObject;
 
-        public BitmapSources(in T browsableObjectInfo) => _innerObject = browsableObjectInfo;
+        public BitmapSources(in T obj) => _innerObject = obj;
 
         protected override void Dispose(bool disposing)
         {
@@ -107,7 +108,7 @@ namespace WinCopies.IO
         }
     }
 
-    public struct BitmapSources2Struct
+    public struct BitmapSourcesStruct
     {
         public BitmapSource Small;
         public BitmapSource Medium;
@@ -125,7 +126,7 @@ namespace WinCopies.IO
 
     public abstract class BitmapSources2<T> : BitmapSources<T>
     {
-        private BitmapSources2Struct _bitmapSources;
+        private BitmapSourcesStruct _bitmapSources;
 
         protected sealed override BitmapSource SmallOverride => _bitmapSources.Small
 #if CS8
@@ -175,7 +176,9 @@ namespace WinCopies.IO
 #endif
             ;
 
-        public BitmapSources2(in T browsableObjectInfo) : base(browsableObjectInfo) { /* Left empty. */ }
+        public BitmapSources2(in T obj) : base(obj) { /* Left empty. */ }
+
+        public BitmapSources2(in T obj, in BitmapSourcesStruct bitmapSources) : base(obj) => _bitmapSources = bitmapSources;
 
         protected abstract BitmapSource GetSmall();
 
@@ -193,16 +196,31 @@ namespace WinCopies.IO
         }
     }
 
-    public class BrowsableObjectInfoBitmapBitmapSources : BitmapSources<Bitmap>
+    public class IconBitmapSources : BitmapSources2<Icon>
     {
-        protected override BitmapSource SmallOverride => InnerObject.ToImageSource();
+        public IconBitmapSources(in Icon icon) : base(icon) { /* Left empty. */ }
 
-        protected override BitmapSource MediumOverride => InnerObject.ToImageSource();
+        protected virtual BitmapSource TryGetBitmapSource(in ushort size) => ObjectModel.BrowsableObjectInfo.TryGetBitmapSource(InnerObject, size);
 
-        protected override BitmapSource LargeOverride => InnerObject.ToImageSource();
+        protected override BitmapSource GetSmall() => TryGetBitmapSource(SmallIconSize);
 
-        protected override BitmapSource ExtraLargeOverride => InnerObject.ToImageSource();
+        protected override BitmapSource GetMedium() => TryGetBitmapSource(MediumIconSize);
 
-        public BrowsableObjectInfoBitmapBitmapSources(in Bitmap bitmap) : base(bitmap) { /* Left empty. */ }
+        protected override BitmapSource GetLarge() => TryGetBitmapSource(LargeIconSize);
+
+        protected override BitmapSource GetExtraLarge() => TryGetBitmapSource(ExtraLargeIconSize);
+    }
+
+    public class BitmapBitmapSources : BitmapSources2<Bitmap>
+    {
+        public BitmapBitmapSources(in Bitmap bitmap) : base(bitmap) { /* Left empty. */ }
+
+        protected override BitmapSource GetSmall() => InnerObject.ToImageSource();
+
+        protected override BitmapSource GetMedium() => InnerObject.ToImageSource();
+
+        protected override BitmapSource GetLarge() => InnerObject.ToImageSource();
+
+        protected override BitmapSource GetExtraLarge() => InnerObject.ToImageSource();
     }
 }

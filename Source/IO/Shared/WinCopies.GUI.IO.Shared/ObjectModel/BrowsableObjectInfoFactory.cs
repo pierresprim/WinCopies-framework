@@ -36,6 +36,8 @@ namespace WinCopies.GUI.IO
         IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(string path);
 
         IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo, IBrowsableObjectInfoViewModel parent);
+
+        IExplorerControlViewModel GetExplorerControlViewModel(IBrowsableObjectInfoViewModel browsableObjectInfo);
     }
 
     public abstract class BrowsableObjectInfoFactory : IBrowsableObjectInfoFactory
@@ -43,7 +45,7 @@ namespace WinCopies.GUI.IO
         /// <summary>
         /// Gets the <see cref="ClientVersion"/> value associated to this factory. This value is used for <see cref="PortableDeviceInfo"/> and <see cref="PortableDeviceItemInfo"/> creation when browsing the Computer folder with a <see cref="ShellObjectInfo"/> item.
         /// </summary>
-        public WinCopies.IO.ClientVersion ClientVersion { get; }
+        public ClientVersion ClientVersion { get; }
 
         public Comparison<IBrowsableObjectInfo> SortComparison { get; set; }
 
@@ -71,5 +73,7 @@ namespace WinCopies.GUI.IO
         public virtual IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo) => GetBrowsableObjectInfoViewModel(browsableObjectInfo, true);
 
         public virtual IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo, IBrowsableObjectInfoViewModel parent) => GetBrowsableObjectInfoViewModel(browsableObjectInfo, parent.RootParentIsRootNode);
+
+        public abstract IExplorerControlViewModel GetExplorerControlViewModel(IBrowsableObjectInfoViewModel browsableObjectInfo);
     }
 }

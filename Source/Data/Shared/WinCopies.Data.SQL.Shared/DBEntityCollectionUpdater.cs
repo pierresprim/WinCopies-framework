@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 using WinCopies.EntityFramework;
 
-using static WinCopies.Temp.Util;
+using static WinCopies.UtilHelpers;
 
 namespace WinCopies.Data.SQL
 {
@@ -69,7 +69,7 @@ namespace WinCopies.Data.SQL
             return connection.GetDelete(GetArray(table), conditions: GetDefaultDeleteCondition(connection, foreignKeyIdColumn, foreignKeyId)).ExecuteNonQuery();
         }
 
-        protected override IEnumerable<Temp.IPopable<string, object
+        protected override IEnumerable<IPopable<string, object
 #if CS8
             ?
 #endif
@@ -85,12 +85,6 @@ namespace WinCopies.Data.SQL
 
     public class DBEntityCollectionAdder : DBEntityCollectionUpdaterBase
     {
-        private readonly TO_BE_DELETED.LinkedList<ICondition> _idColumns = new
-#if !CS9
-            TO_BE_DELETED.LinkedList<ICondition>
-#endif
-            ();
-
         protected SQLItemCollection<StringSQLColumn> Columns { get; } = new
 #if !CS9
             SQLItemCollection<StringSQLColumn>
@@ -103,15 +97,15 @@ namespace WinCopies.Data.SQL
 #endif
             ();
 
-        protected TO_BE_DELETED.LinkedListTEMP<ICondition> IdColumns { get; }
+        protected Collections.DotNetFix.Generic.LinkedList<ICondition> IdColumns { get; } = new Collections.DotNetFix.Generic.LinkedList<ICondition>();
 
-        public DBEntityCollectionAdder(in ISQLConnection connection) : base(connection) => IdColumns = new TO_BE_DELETED.LinkedListTEMP<ICondition>(_idColumns);
+        public DBEntityCollectionAdder(in ISQLConnection connection) : base(connection) { /* Left empty. */ }
 
         public override void AddValue(string column, IParameter parameter, bool isId)
         {
             if (isId)
             {
-                _ = IdColumns.List.AddLast(Connection.GetCondition(column, parameter.Name, parameter.Value));
+                _ = IdColumns.AddLast(Connection.GetCondition(column, parameter.Name, parameter.Value));
 
                 return;
             }
@@ -137,7 +131,7 @@ namespace WinCopies.Data.SQL
 #if CS8
             ?
 #endif
-            getter in connection.GetSelect(SQLHelper.GetEnumerable(table), SQLHelper.GetEnumerable(connection.GetColumn(_idColumns.FirstValue.InnerCondition.Column.Value)), connection.GetOperator(ConditionGroupOperator.And), IdColumns).ExecuteQuery())
+            getter in connection.GetSelect(SQLHelper.GetEnumerable(table), SQLHelper.GetEnumerable(connection.GetColumn(IdColumns.FirstValue.InnerCondition.Column.Value)), connection.GetOperator(ConditionGroupOperator.And), IdColumns).ExecuteQuery())
 
                 return null;
 
@@ -157,11 +151,11 @@ namespace WinCopies.Data.SQL
 #endif
             ();
 
-        protected TO_BE_DELETED.LinkedListTEMP<ICondition> IdColumns { get; } = new
+        protected Collections.DotNetFix.Generic.LinkedList<ICondition> IdColumns { get; } = new
 #if !CS9
-            TO_BE_DELETED.LinkedListTEMP<ICondition>
+            Collections.DotNetFix.Generic.LinkedList<ICondition>
 #endif
-            (new TO_BE_DELETED.LinkedList<ICondition>());
+            ();
 
         public DBEntityCollectionUpdater(in ISQLConnection connection) : base(connection) { /* Left empty. */ }
 
@@ -171,7 +165,7 @@ namespace WinCopies.Data.SQL
 
             if (isId)
 
-                _ = IdColumns.List.AddLast(condition);
+                _ = IdColumns.AddLast(condition);
 
             else
 

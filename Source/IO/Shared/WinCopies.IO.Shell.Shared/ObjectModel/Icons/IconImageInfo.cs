@@ -17,6 +17,7 @@
 
 using System;
 
+#region WinCopies
 using WinCopies.Collections.Generic;
 using WinCopies.GUI.Drawing;
 using WinCopies.IO.AbstractionInterop;
@@ -26,6 +27,7 @@ using WinCopies.IO.Selectors;
 using WinCopies.IO.Shell;
 using WinCopies.Linq;
 using WinCopies.PropertySystem;
+#endregion WinCopies
 
 using static WinCopies.ThrowHelper;
 
@@ -74,7 +76,7 @@ namespace WinCopies.IO.ObjectModel
 
         protected override string ItemTypeNameOverride => "Icon image";
 
-        protected override string DescriptionOverride => UtilHelpers.NotApplicable;
+        protected override string DescriptionOverride => WinCopies.Consts.NotApplicable;
 
         protected override bool IsSpecialItemOverride => false;
 

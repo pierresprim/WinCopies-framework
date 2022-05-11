@@ -1,12 +1,13 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:WinCopies.GUI.IO"
     xmlns:localControls="clr-namespace:WinCopies.GUI.IO.Controls"
     xmlns:localObjectModel="clr-namespace:WinCopies.GUI.IO.ObjectModel"
     xmlns:localProcess="clr-namespace:WinCopies.GUI.IO.Process"
     xmlns:localProcessControls="clr-namespace:WinCopies.GUI.IO.Controls.Process"
+    xmlns:gui="clr-namespace:WinCopies.GUI;assembly=WinCopies.GUI"
     xmlns:controls="clr-namespace:WinCopies.GUI.Controls;assembly=WinCopies.GUI"
-    xmlns:dotNetFix="clr-namespace:WinCopies.GUI.Controls.DotNetFix;assembly=WinCopies.GUI"
     xmlns:process="clr-namespace:WinCopies.IO.Process;assembly=WinCopies.IO"
     xmlns:icons="clr-namespace:WinCopies.GUI.Icons.Properties;assembly=WinCopies.GUI.Icons"
     xmlns:data="clr-namespace:WinCopies.Util.Data;assembly=WinCopies.Util.Desktop"
@@ -15,7 +16,8 @@
     xmlns:commands="clr-namespace:WinCopies.Commands;assembly=WinCopies.Util.Desktop"
     xmlns:util="clr-namespace:WinCopies;assembly=WinCopies.Util.Desktop"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
-    xmlns:utilCommands="clr-namespace:WinCopies.Util.Commands.Primitives;assembly=WinCopies.Util">
+    xmlns:utilCommands="clr-namespace:WinCopies.Util.Commands.Primitives;assembly=WinCopies.Util"
+    xmlns:templates="clr-namespace:WinCopies.GUI.Templates;assembly=WinCopies.GUI.Templates">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/wincopies.gui;component/Themes/Generic.xaml" />
         <ResourceDictionary Source="pack://application:,,,/wincopies.gui.templates;component/Themes/Generic.xaml" />
@@ -58,6 +60,16 @@
             <sys:String x:Key="CurrentPath">Current path:</sys:String>
             <sys:String x:Key="Status">Status</sys:String>
             <sys:String x:Key="ActualRemainingSize">Actual remaining size:</sys:String>
+
+            <!--Context menus-->
+            
+            <ContextMenu x:Key="ExplorerControlTabItemContextMenu">
+                <MenuItem Header="Close tab" Icon="{x:Static icons:Resources.tab_delete}" Command="{x:Static commands:ApplicationCommands.CloseTab}" />
+                <MenuItem Header="Close other tabs" Command="{x:Static commands:ApplicationCommands.CloseOtherTabs}" />
+                <MenuItem Header="Close all tabs" Command="{x:Static commands:ApplicationCommands.CloseAllTabs}" />
+                <MenuItem Header="Close tabs to the left" Command="{x:Static commands:ApplicationCommands.CloseTabsToTheLeftOrRight}" CommandParameter="{x:Static localControls:CloseTabsTo.Left}" />
+                <MenuItem Header="Close tabs to the right" Command="{x:Static commands:ApplicationCommands.CloseTabsToTheLeftOrRight}" CommandParameter="{x:Static localControls:CloseTabsTo.Right}" />
+            </ContextMenu>
         </ResourceDictionary>
     </ResourceDictionary.MergedDictionaries>
 
@@ -103,22 +115,61 @@
         </Setter>
     </Style>
 
-    <!--<Style x:Key="TreeViewItemFocusVisual">
-        <Setter Property="Control.Template">
-            <Setter.Value>
-                <ControlTemplate>
-                    <Rectangle/>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>-->
-
     <Style x:Key="WinCopies.GUI.IO.NavigationButtonItemContainerStyle" TargetType="{x:Type MenuItem}" BasedOn="{StaticResource NavigationButtonItemContainerStyle}">
         <Setter Property="Header" Value="{Binding Path}" />
     </Style>
 
+    <ControlTemplate x:Key="AddressBarTemplate" TargetType="{x:Type localControls:AddressBar}">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition />
+                <ColumnDefinition Width="auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Orientation="Horizontal">
+                <controls:NavigationButton ItemsSource="{Binding History, RelativeSource={RelativeSource TemplatedParent}}" ItemContainerStyle="{StaticResource WinCopies.GUI.IO.NavigationButtonItemContainerStyle}">
+                    <controls:NavigationButton.GoBackButtonStyle>
+                        <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
+                            <Setter Property="Content" Value="{x:Static icons:Resources.resultset_previous}" />
+                        </Style>
+                    </controls:NavigationButton.GoBackButtonStyle>
+                    <controls:NavigationButton.GoForwardButtonStyle>
+                        <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
+                            <Setter Property="Content" Value="{x:Static icons:Resources.resultset_next}" />
+                        </Style>
+                    </controls:NavigationButton.GoForwardButtonStyle>
+                </controls:NavigationButton>
+                <Button Content="{x:Static icons:Resources.arrow_up}" Command="{x:Static commands:NavigationCommands.BrowseToParent}" />
+            </StackPanel>
+            <controls:PlaceholderTextBox Grid.Column="1">
+                <TextBox.Style>
+                    <Style TargetType="{x:Type controls:PlaceholderTextBox}">
+                        <Setter Property="Text" Value="{Binding Path, RelativeSource={RelativeSource TemplatedParent}}" />
+                        <Setter Property="PlaceholderMode" Value="OnTextChanged" />
+                        <Setter Property="PlaceholderStyle">
+                            <Setter.Value>
+                                <Style TargetType="{x:Type TextBlock}">
+                                    <Setter Property="Text" Value="Enter a path such as: [&lt;protocol&gt;]://&lt;path&gt;" />
+                                </Style>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsFocused, RelativeSource={RelativeSource Self}}" Value="true">
+                                <Setter Property="Text" Value="{Binding Text, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBox.Style>
+            </controls:PlaceholderTextBox>
+            <Button Grid.Column="2" Command="{TemplateBinding GoButtonCommand}" CommandParameter="{TemplateBinding GoButtonCommandParameter}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{x:Static icons:Resources.accept}" />
+        </Grid>
+    </ControlTemplate>
+
+    <Style TargetType="{x:Type localControls:AddressBar}">
+        <Setter Property="Template" Value="{StaticResource AddressBarTemplate}" />
+    </Style>
+
     <ControlTemplate x:Key="ExplorerControlTemplate" TargetType="{x:Type localControls:ExplorerControl}">
-        <!--<DataTemplate DataType="{x:Type local:BrowsableObjectInfo}">-->
         <Grid Background="White">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="100" />
@@ -131,49 +182,40 @@
                 <RowDefinition />
             </Grid.RowDefinitions>
             <ToolBarTray Grid.ColumnSpan="3">
-                <ToolBar ItemsSource="{Binding Commands, RelativeSource={RelativeSource Mode=TemplatedParent}}">
+                <ToolBar ItemsSource="{TemplateBinding Commands}">
                     <ToolBar.ItemTemplateSelector>
                         <util:InterfaceDataTemplateSelector />
                     </ToolBar.ItemTemplateSelector>
                 </ToolBar>
             </ToolBarTray>
-            <Grid Grid.ColumnSpan="3" Grid.Row="1">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="auto" />
-                    <ColumnDefinition />
-                    <ColumnDefinition Width="auto" />
-                </Grid.ColumnDefinitions>
-                <StackPanel Orientation="Horizontal">
-                    <controls:NavigationButton ItemsSource="{Binding History, RelativeSource={RelativeSource TemplatedParent}}" ItemContainerStyle="{StaticResource WinCopies.GUI.IO.NavigationButtonItemContainerStyle}">
-                        <controls:NavigationButton.GoBackButtonStyle>
-                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
-                                <Setter Property="Content" Value="{x:Static icons:Resources.resultset_previous}" />
-                            </Style>
-                        </controls:NavigationButton.GoBackButtonStyle>
-                        <controls:NavigationButton.GoForwardButtonStyle>
-                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
-                                <Setter Property="Content" Value="{x:Static icons:Resources.resultset_next}" />
-                            </Style>
-                        </controls:NavigationButton.GoForwardButtonStyle>
-                    </controls:NavigationButton>
-                    <Button Content="{x:Static icons:Resources.arrow_up}" Command="{x:Static commands:NavigationCommands.BrowseToParent}" />
-                </StackPanel>
-                <dotNetFix:TextBox Grid.Column="1">
-                    <TextBox.Style>
-                        <Style TargetType="{x:Type TextBox}">
-                            <Setter Property="Text" Value="{Binding Path, RelativeSource={RelativeSource TemplatedParent}}" />
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsFocused, RelativeSource={RelativeSource Self}}" Value="true">
-                                    <Setter Property="Text" Value="{Binding Text, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TextBox.Style>
-                </dotNetFix:TextBox>
-                <Button Grid.Column="2" Command="{TemplateBinding GoButtonCommand}" CommandParameter="{TemplateBinding GoButtonCommandParameter}" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Content="{x:Static icons:Resources.accept}" />
-            </Grid>
+            <localControls:AddressBar Grid.ColumnSpan="3" Grid.Row="1" Path="{TemplateBinding Path}" Text="{TemplateBinding Text}" History="{TemplateBinding History}" GoButtonCommand="{TemplateBinding GoButtonCommand}" GoButtonCommandParameter="{TemplateBinding GoButtonCommandParameter}" />
             <localControls:ExplorerControlTreeView Grid.Row="2" Style="{TemplateBinding TreeViewStyle}" />
-            <localControls:ExplorerControlListView Grid.Column="1" Grid.Row="2" SelectedIndex="{Binding SelectedIndex, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" SelectedItem="{Binding SelectedItem, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" Style="{TemplateBinding ListViewStyle}" />
+            <localControls:ExplorerControlListView Grid.Column="1" Grid.Row="2" SelectedIndex="{Binding SelectedIndex, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" SelectedItem="{Binding SelectedItem, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" Style="{TemplateBinding ListViewStyle}">
+                <localControls:ExplorerControlListView.GroupStyle>
+                    <GroupStyle>
+                        <GroupStyle.ContainerStyle>
+                            <Style TargetType="{x:Type GroupItem}">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate>
+                                            <Expander IsExpanded="True">
+                                                <Expander.Header>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" Foreground="DimGray" FontSize="14" VerticalAlignment="Bottom" />
+                                                        <TextBlock Text="{Binding ItemCount}" FontSize="14" Foreground="Gray" FontWeight="Bold" FontStyle="Italic" Margin="10,0,0,0" VerticalAlignment="Bottom" />
+                                                        <TextBlock Text=" item(s)" FontSize="14" Foreground="Gray" FontStyle="Italic" VerticalAlignment="Bottom" />
+                                                    </StackPanel>
+                                                </Expander.Header>
+                                                <ItemsPresenter />
+                                            </Expander>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </GroupStyle.ContainerStyle>
+                    </GroupStyle>
+                </localControls:ExplorerControlListView.GroupStyle>
+            </localControls:ExplorerControlListView>
             <GridSplitter Grid.Column="1" Grid.Row="2" Width="5" HorizontalAlignment="Left" />
             <localControls:ExplorerControlPropertyGrid Grid.Column="2" Grid.Row="2" Item="{TemplateBinding PropertyGridItem}" Description="{TemplateBinding PropertyGridDescription}" />
             <GridSplitter Grid.Column="2" Grid.Row="2" Width="5" HorizontalAlignment="Left" />
@@ -215,7 +257,9 @@
             <localControls:ExplorerControlListViewItemContent.Style>
                 <Style TargetType="{x:Type localControls:ExplorerControlListViewItemContent}" >
                     <Setter Property="SmallIcon" Value="{Binding BitmapSources.Small}" />
+                    <Setter Property="MediumIcon" Value="{Binding BitmapSources.Medium}" />
                     <Setter Property="LargeIcon" Value="{Binding BitmapSources.Large}" />
+                    <Setter Property="ExtraLargeIcon" Value="{Binding BitmapSources.ExtraLarge}" />
                     <Setter Property="ItemName" Value="{Binding LocalizedName}" />
                     <Setter Property="HasTransparency" Value="{Binding IsSpecialItem}" />
                     <Setter Property="IsCheckBoxVisible" Value="{Binding IsCheckBoxVisible, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type localControls:ExplorerControl}}}" />
@@ -224,52 +268,50 @@
         </localControls:ExplorerControlListViewItemContent>
     </DataTemplate>
 
+    <ControlTemplate x:Key="ExplorerControlTreeViewItemTemplate" TargetType="{x:Type localControls:ExplorerControlTreeViewItem}">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition MinWidth="19" Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <ToggleButton x:Name="Expander" ClickMode="Press" IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}" Style="{StaticResource ExpandCollapseToggleStyle}" />
+            <Button Command="{TemplateBinding Command}" CommandParameter="{TemplateBinding CommandParameter}" CommandTarget="{TemplateBinding CommandTarget}" x:Name="Bd" Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}" Grid.Column="1" Padding="{TemplateBinding Padding}" SnapsToDevicePixels="true">
+                <ContentPresenter x:Name="PART_Header" ContentSource="Header" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+            </Button>
+            <ItemsPresenter x:Name="ItemsHost" Grid.ColumnSpan="2" Grid.Column="1" Grid.Row="1"/>
+        </Grid>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsExpanded" Value="false">
+                <Setter Property="Visibility" TargetName="ItemsHost" Value="Collapsed"/>
+            </Trigger>
+            <Trigger Property="HasItems" Value="false">
+                <Setter Property="Visibility" TargetName="Expander" Value="Hidden"/>
+            </Trigger>
+            <Trigger Property="IsSelected" Value="true">
+                <Setter Property="Background" TargetName="Bd" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
+                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}"/>
+            </Trigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsSelected" Value="true"/>
+                    <Condition Property="IsSelectionActive" Value="false"/>
+                </MultiTrigger.Conditions>
+                <Setter Property="Background" TargetName="Bd" Value="{DynamicResource {x:Static SystemColors.InactiveSelectionHighlightBrushKey}}"/>
+                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}}"/>
+            </MultiTrigger>
+            <Trigger Property="IsEnabled" Value="false">
+                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+
     <Style TargetType="{x:Type localControls:ExplorerControlTreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type localControls:ExplorerControlTreeViewItem}">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition MinWidth="19" Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition/>
-                        </Grid.RowDefinitions>
-                        <ToggleButton x:Name="Expander" ClickMode="Press" IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}" Style="{StaticResource ExpandCollapseToggleStyle}" />
-                        <Button Command="{TemplateBinding Command}" CommandParameter="{TemplateBinding CommandParameter}" CommandTarget="{TemplateBinding CommandTarget}" x:Name="Bd" Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}" Grid.Column="1" Padding="{TemplateBinding Padding}" SnapsToDevicePixels="true">
-                            <ContentPresenter x:Name="PART_Header" ContentSource="Header" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
-                        </Button>
-                        <ItemsPresenter x:Name="ItemsHost" Grid.ColumnSpan="2" Grid.Column="1" Grid.Row="1"/>
-                    </Grid>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsExpanded" Value="false">
-                            <Setter Property="Visibility" TargetName="ItemsHost" Value="Collapsed"/>
-                        </Trigger>
-                        <Trigger Property="HasItems" Value="false">
-                            <Setter Property="Visibility" TargetName="Expander" Value="Hidden"/>
-                        </Trigger>
-                        <Trigger Property="IsSelected" Value="true">
-                            <Setter Property="Background" TargetName="Bd" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
-                            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}"/>
-                        </Trigger>
-                        <MultiTrigger>
-                            <MultiTrigger.Conditions>
-                                <Condition Property="IsSelected" Value="true"/>
-                                <Condition Property="IsSelectionActive" Value="false"/>
-                            </MultiTrigger.Conditions>
-                            <Setter Property="Background" TargetName="Bd" Value="{DynamicResource {x:Static SystemColors.InactiveSelectionHighlightBrushKey}}"/>
-                            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}}"/>
-                        </MultiTrigger>
-                        <Trigger Property="IsEnabled" Value="false">
-                            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
+        <Setter Property="Template" Value="{StaticResource ExplorerControlTreeViewItemTemplate}" />
     </Style>
 
     <Style x:Key="ExplorerControlTreeViewItemStyle" TargetType="{x:Type localControls:ExplorerControlTreeViewItem}" BasedOn="{StaticResource {x:Type localControls:ExplorerControlTreeViewItem}}">
@@ -290,6 +332,26 @@
         <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
         <Setter Property="Command" Value="{Binding DataContext.ItemClickCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type localControls:ExplorerControl}}}" />
         <Setter Property="CommandParameter" Value="{Binding}" />
+        <Setter Property="gui:ExtraProperties.ListenedButtons" Value="Middle" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding ContextCommands, Converter={data:IsNullConverter}}" Value="False">
+                <Setter Property="ContextMenu">
+                    <Setter.Value>
+                        <ContextMenu UsesItemContainerTemplate="true">
+                            <ContextMenu.ItemsSource>
+                                <MultiBinding Converter="{local:ContextMenuConverter}">
+                                    <Binding Path="ContextCommands" />
+                                    <Binding RelativeSource="{RelativeSource Self}" />
+                                </MultiBinding>
+                            </ContextMenu.ItemsSource>
+                            <ContextMenu.ItemContainerTemplateSelector>
+                                <templates:MenuItemTemplateSelector />
+                            </ContextMenu.ItemContainerTemplateSelector>
+                        </ContextMenu>
+                    </Setter.Value>
+                </Setter>
+            </DataTrigger>
+        </Style.Triggers>
     </Style>
 
     <Style x:Key="ExplorerControlListViewStyle" TargetType="{x:Type ListView}" BasedOn="{StaticResource {x:Type ListBox}}">
@@ -308,7 +370,7 @@
     </Style>
 
     <DataTemplate DataType="{x:Type localObjectModel:IExplorerControlViewModel}">
-        <localControls:ExplorerControl x:Name="ExplorerControl" Path="{Binding Path.Path}" Text="{Binding Text, Mode=TwoWay}"
+        <localControls:ExplorerControl x:Name="ExplorerControl" Text="{Binding Text, Mode=TwoWay}"
                                        TreeViewStyle="{StaticResource ExplorerControlTreeViewStyle}" ListViewStyle="{StaticResource ExplorerControlListViewStyle}"
                                        Commands="{Binding CommonCommands}"
                                        History="{Binding History}" GoButtonCommand="{x:Static localObjectModel:ExplorerControlViewModel.GoCommand}" GoButtonCommandParameter="{Binding}"
@@ -316,6 +378,24 @@
                                        SelectedIndex="{Binding Path.SelectedIndex, Mode=TwoWay}" SelectedItem="{Binding Path.SelectedItem, Mode=TwoWay}"
                                        PropertyGridItem="{Binding Path}" PropertyGridDescription="{Binding Path.Items.Count, StringFormat={}{0} items}"
                                        BrowseToParent="{Binding BrowseToParent}">
+            <localControls:ExplorerControl.Style>
+                <Style TargetType="{x:Type localControls:ExplorerControl}">
+                    <Setter Property="Path">
+                        <Setter.Value>
+                            <MultiBinding Converter="{data:StringMergerConverter}" ConverterParameter="://">
+                                <Binding Path="Path.Protocol" />
+                                <Binding Path="Path.Path" />
+                            </MultiBinding>
+                        </Setter.Value>
+                    </Setter>
+
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Path.Protocol}" Value="file">
+                            <Setter Property="Path" Value="{Binding Path.Path}" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </localControls:ExplorerControl.Style>
             <!--<data:PushBindingManager.PushBindings>
                 <data:PushBinding TargetProperty="SelectedItems" Path="SelectedItems" />
             </data:PushBindingManager.PushBindings>-->
@@ -363,8 +443,8 @@
 
     <!-- todo: merged style to avoid the ancestor reference in binding?-->
     <Style x:Key="ExplorerControlListViewItemTextBlockStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
-        <Setter Property="Text" Value="{Binding ItemName, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
-        <Setter Property="ToolTip" Value="{Binding ItemName, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+        <Setter Property="Text" Value="{Binding ItemName, RelativeSource={RelativeSource TemplatedParent}}" />
+        <Setter Property="ToolTip" Value="{Binding ItemName, RelativeSource={RelativeSource TemplatedParent}}" />
         <Setter Property="TextTrimming" Value="CharacterEllipsis" />
     </Style>
 
@@ -385,18 +465,35 @@
         </Style.Triggers>
     </Style>
 
-    <ControlTemplate x:Key="ExplorerControlSizeThreeListViewItemContentTemplate" TargetType="{x:Type localControls:ExplorerControlListViewItemContent}">
+    <ControlTemplate x:Key="ExplorerControlDefaultListViewItemContentTemplate" TargetType="{x:Type localControls:ExplorerControlDefaultListViewItemContent}">
         <Grid Width="100">
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto" />
-                <RowDefinition Height="96" />
+                <RowDefinition />
                 <RowDefinition />
             </Grid.RowDefinitions>
-            <CheckBox Visibility="{Binding IsCheckBoxVisible, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource Mode=TemplatedParent}}" IsChecked="{Binding IsSelected}" />
-            <Image Grid.Row="1" Source="{Binding LargeIcon, RelativeSource={RelativeSource Mode=TemplatedParent}}" VerticalAlignment="Bottom" Style="{StaticResource ExplorerControlImageStyle}" />
+            <CheckBox Visibility="{TemplateBinding IsCheckBoxVisible, Converter={StaticResource BooleanToVisibilityConverter}}" IsChecked="{Binding IsSelected}" />
+            <Image Grid.Row="1" Height="{TemplateBinding ImageSize}" Source="{TemplateBinding Icon}" VerticalAlignment="Bottom" Style="{StaticResource ExplorerControlImageStyle}" />
             <!--, Converter={local:ImageSourceConverter}}-->
             <TextBlock Grid.Row="2" TextWrapping="Wrap" TextAlignment="Center" Height="32" Style="{StaticResource ExplorerControlListViewItemTextBlockStyle}" />
         </Grid>
+    </ControlTemplate>
+
+    <Style TargetType="{x:Type localControls:ExplorerControlDefaultListViewItemContent}">
+        <Setter Property="Template" Value="{StaticResource ExplorerControlDefaultListViewItemContentTemplate}" />
+    </Style>
+
+    <Style x:Key="ExplorerControlDefaultListViewItemContentStyle" TargetType="{x:Type localControls:ExplorerControlDefaultListViewItemContent}" BasedOn="{StaticResource {x:Type localControls:ExplorerControlDefaultListViewItemContent}}">
+        <Setter Property="IsCheckBoxVisible" Value="{Binding IsCheckBoxVisible, RelativeSource={RelativeSource TemplatedParent}}" />
+        <Setter Property="ItemName" Value="{Binding ItemName, RelativeSource={RelativeSource TemplatedParent}}" />
+    </Style>
+
+    <ControlTemplate x:Key="ExplorerControlSizeTwoListViewItemContentTemplate" TargetType="{x:Type localControls:ExplorerControlListViewItemContent}">
+        <localControls:ExplorerControlDefaultListViewItemContent Style="{StaticResource ExplorerControlDefaultListViewItemContentStyle}" Icon="{TemplateBinding MediumIcon}" ImageSize="48" />
+    </ControlTemplate>
+
+    <ControlTemplate x:Key="ExplorerControlSizeThreeListViewItemContentTemplate" TargetType="{x:Type localControls:ExplorerControlListViewItemContent}">
+        <localControls:ExplorerControlDefaultListViewItemContent Style="{StaticResource ExplorerControlDefaultListViewItemContentStyle}" Icon="{TemplateBinding LargeIcon}" ImageSize="96" />
     </ControlTemplate>
 
     <Style TargetType="{x:Type localControls:ExplorerControlListViewItemContent}">
@@ -411,7 +508,17 @@
                 <DataTemplate DataType="{x:Type localObjectModel:IExplorerControlViewModel}">
                     <DockPanel>
                         <Image DockPanel.Dock="Left" Source="{Binding Path.BitmapSources.Medium}" Height="32" Width="32" />
-                        <controls:Label Content="{Binding Path.Name}" RecognizesAccessKey="False" VerticalContentAlignment="Center" />
+                        <TextBlock Text="{Binding Path.Name}" TextTrimming="CharacterEllipsis" Margin="5,0,5,0" VerticalAlignment="Center" Width="100">
+                            <TextBlock.ToolTip>
+                                <TextBlock>
+                                    <Run Text="{Binding Path.Name, Mode=OneWay, StringFormat=Name: {0}}" />
+                                    <LineBreak />
+                                    <Run Text="{Binding Path.Path, Mode=OneWay, StringFormat=Path: {0}, Converter={local:PathConverter}}" />
+                                    <LineBreak />
+                                    <Run Text="{Binding Path.Protocol, Mode=OneWay, StringFormat=Protocol: {0}}" />
+                                </TextBlock>
+                            </TextBlock.ToolTip>
+                        </TextBlock>
                         <Button DockPanel.Dock="Right" Content="X" Command="{x:Static commands:ApplicationCommands.CloseTab}" CommandParameter="{Binding}" Height="20" Width="20" />
                     </DockPanel>
                 </DataTemplate>
@@ -422,21 +529,24 @@
                 <util:InterfaceDataTemplateSelector />
             </Setter.Value>
         </Setter>
-        <Setter Property="ContextMenu">
-            <Setter.Value>
-                <ContextMenu>
-                    <MenuItem Header="Close tab" Icon="{x:Static icons:Resources.tab_delete}" Command="{x:Static commands:ApplicationCommands.CloseTab}" />
-                    <MenuItem Header="Close other tabs" Command="{x:Static commands:ApplicationCommands.CloseOtherTabs}" />
-                    <MenuItem Header="Close all tabs" Command="{x:Static commands:ApplicationCommands.CloseAllTabs}" />
-                    <MenuItem Header="Close tabs to the left" Command="{x:Static commands:ApplicationCommands.CloseTabsToTheLeftOrRight}" CommandParameter="{x:Static localControls:CloseTabsTo.Left}" />
-                    <MenuItem Header="Close tabs to the right" Command="{x:Static commands:ApplicationCommands.CloseTabsToTheLeftOrRight}" CommandParameter="{x:Static localControls:CloseTabsTo.Right}" />
-                </ContextMenu>
-            </Setter.Value>
-        </Setter>
+        <Setter Property="ContextMenu" Value="{StaticResource ExplorerControlTabItemContextMenu}" />
     </Style>
 
     <DataTemplate DataType="{x:Type localObjectModel:IBrowsableObjectInfoCollectionViewModel}">
-        <TabControl Style="{StaticResource WinCopies.TabControlStyle}" ItemsSource="{Binding Paths}" SelectedItem="{Binding SelectedItem, Mode=OneWayToSource}" SelectedIndex="{Binding SelectedIndex, Mode=OneWayToSource}" ItemContainerStyle="{StaticResource WinCopies.IO.TabItemStyle}" />
+        <localControls:ExplorerControlTabControl Style="{StaticResource WinCopies.TabControlStyle}" ItemsSource="{Binding Paths}" SelectedItem="{Binding SelectedItem, Mode=OneWayToSource}" SelectedIndex="{Binding SelectedIndex, Mode=OneWayToSource}">
+            <TabControl.ItemContainerStyle>
+                <util:MergedStyles>
+                    <util:MergedStyles.Styles>
+                        <x:Array Type="{x:Type Style}">
+                            <StaticResource ResourceKey="WinCopies.IO.TabItemStyle" />
+                            <Style TargetType="{x:Type controls:TabItem}">
+                                <Setter Property="gui:ExtraProperties.ListenedButtons" Value="Middle" />
+                            </Style>
+                        </x:Array>
+                    </util:MergedStyles.Styles>
+                </util:MergedStyles>
+            </TabControl.ItemContainerStyle>
+        </localControls:ExplorerControlTabControl>
     </DataTemplate>
 
     <!--Processes-->

@@ -8,15 +8,19 @@ namespace WinCopies.GUI.Samples
     /// </summary>
     public partial class App : Application
     {
+        internal IBrowsableObjectInfoPlugin PluginParameters { get; private set; }
+
+        public static new App Current => (App)Application.Current;
+
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
 
-            IBrowsableObjectInfoPlugin pluginParameters = Shell.ObjectModel.BrowsableObjectInfo.GetPluginParameters();
+            PluginParameters = Shell.ObjectModel.BrowsableObjectInfo.GetPluginParameters();
 
-            pluginParameters.RegisterBrowsabilityPaths();
-            pluginParameters.RegisterItemSelectors();
-            pluginParameters.RegisterProcessSelectors();
+            PluginParameters.RegisterBrowsabilityPaths();
+            PluginParameters.RegisterItemSelectors();
+            PluginParameters.RegisterProcessSelectors();
         }
     }
 }

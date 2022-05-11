@@ -33,26 +33,24 @@ using WinCopies.IO.ObjectModel;
 using WinCopies.IO.Process;
 using WinCopies.IO.PropertySystem;
 using WinCopies.PropertySystem;
-using WinCopies.Temp;
 using WinCopies.Util.Commands.Primitives;
 using WinCopies.Util.Data;
 #endregion
 
 using static WinCopies.
-#if !WinCopies3
-    Util.Util
-#else
+#if WinCopies3
     ThrowHelper
+#else
+    Util.Util
 #endif
     ;
+using static WinCopies.Extensions.UtilHelpers;
 
 using IEnumerable = System.Collections.IEnumerable;
 
 #if CS8
 using System.Diagnostics.CodeAnalysis;
 #endif
-
-using static WinCopies.Temp.Temp;
 
 namespace WinCopies.GUI.IO.ObjectModel
 {
@@ -76,6 +74,10 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         #region Properties
         //public static Predicate<IBrowsableObjectInfo> Predicate { get; } = browsableObjectInfo => browsableObjectInfo.IsBrowsable;
+
+        public string Protocol => ModelGeneric.Protocol;
+
+        public string URI => ModelGeneric.URI;
 
         public bool IsMonitoringSupported => ModelGeneric.IsMonitoringSupported;
 
@@ -225,6 +227,10 @@ namespace WinCopies.GUI.IO.ObjectModel
         public System.Collections.Generic.IEnumerable<IBrowsabilityPath> BrowsabilityPaths => ModelGeneric.BrowsabilityPaths;
 
         public System.Collections.Generic.IEnumerable<IProcessInfo> CustomProcesses => ModelGeneric.CustomProcesses;
+
+        public IBrowsableObjectInfoContextCommandEnumerable ContextCommands => ModelGeneric.ContextCommands;
+
+        public DisplayStyle DisplayStyle => ModelGeneric.DisplayStyle;
         #endregion
 
         public event EventHandler<IBrowsableObjectInfoViewModel> SelectionChanged;
@@ -240,6 +246,10 @@ namespace WinCopies.GUI.IO.ObjectModel
         #endregion
 
         #region Methods
+        public IContextMenu GetContextMenu(bool extendedVerbs) => ModelGeneric.GetContextMenu(extendedVerbs);
+
+        public IContextMenu GetContextMenu(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> children, bool extendedVerbs) => ModelGeneric.GetContextMenu(children, extendedVerbs);
+
         public System.Collections.Generic.IEnumerable<ICommand> GetCommands(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> items) => ModelGeneric.GetCommands(items);
 
         protected T GetIfNotDisposed<T>(in T value) => GetOrThrowIfDisposed(this, value);
@@ -387,15 +397,7 @@ namespace WinCopies.GUI.IO.ObjectModel
 
                     ref Predicate<IBrowsableObjectInfo> filter = ref itemManagement._filter;
 
-                    collectionView = CollectionViewSource.GetDefaultView(items._items);
-
-                    if (filter == null)
-
-                        collectionView.Filter = null;
-
-                    else
-
-                        collectionView.Filter = Predicate;
+                    UpdateCollectionView(items._items, ref collectionView);
 
                     OnPropertyChanged(nameof(Items));
 
@@ -435,7 +437,7 @@ namespace WinCopies.GUI.IO.ObjectModel
 #if CS8
             static
 #endif
-                void runAction(in System.Collections.IEnumerable enumerable, in Action<IBrowsableObjectInfoViewModel> action) => RunActionIfNotNull(enumerable, action);
+                void runAction(in IEnumerable enumerable, in Action<IBrowsableObjectInfoViewModel> action) => RunActionIfNotNull(enumerable, action);
 
             IList<IBrowsableObjectInfoViewModel> getList(in ArrayBuilder<IBrowsableObjectInfoViewModel> arrayBuilder) => arrayBuilder.Count > 0 ? arrayBuilder.ToList() : null;
 
@@ -466,11 +468,22 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         public void LoadItems() => LoadItems2();
 
+        private void UpdateCollectionView(in ObservableCollection<IBrowsableObjectInfoViewModel> items, ref System.ComponentModel.ICollectionView collectionView)
+        {
+            collectionView = CollectionViewSource.GetDefaultView(items);
+
+            collectionView.Filter = Filter == null ? null : (Predicate<object>)Predicate;
+
+            var groupDescription = new PropertyGroupDescription(nameof(IBrowsableObjectInfo.ItemTypeName));
+
+            collectionView.GroupDescriptions.Add(groupDescription);
+        }
+
         public void UpdateItems()
         {
             ref _Browsability.Items _items = ref LoadItems2();
             ref ObservableCollection<IBrowsableObjectInfoViewModel> items = ref _items._items;
-            ref var collectionView = ref _items._itemManagement._collectionView;
+            ref System.ComponentModel.ICollectionView collectionView = ref _items._itemManagement._collectionView;
 
             var list = new List<IBrowsableObjectInfoViewModel>(items.Count);
 
@@ -484,15 +497,7 @@ namespace WinCopies.GUI.IO.ObjectModel
 
             collectionView.Filter = null;
 
-            collectionView = CollectionViewSource.GetDefaultView(items);
-
-            if (Filter == null)
-
-                collectionView.Filter = null;
-
-            else
-
-                collectionView.Filter = Predicate;
+            UpdateCollectionView(items, ref collectionView);
 
             items = new ObservableCollection<IBrowsableObjectInfoViewModel>(list);
 
@@ -535,9 +540,13 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         public Collections.Generic.IComparer<IBrowsableObjectInfoBase> GetDefaultComparer() => ModelGeneric.GetDefaultComparer();
 
-        public override bool Equals(object obj) => obj is null ? false : ReferenceEquals(this, obj) || ModelGeneric.Equals(obj);
+        public override bool Equals(object obj) => !(obj is null) && (ReferenceEquals(this, obj) || ModelGeneric.Equals(obj));
 
         public override int GetHashCode() => ModelGeneric.GetHashCode();
+
+        public bool Equals(IBrowsableObjectInfoViewModel other) => ModelGeneric.Equals(other.Model);
+
+        public int CompareTo(IBrowsableObjectInfoViewModel other) => ModelGeneric.CompareTo(other.Model);
         #endregion
 
         #region Operators
@@ -570,10 +579,6 @@ namespace WinCopies.GUI.IO.ObjectModel
 
             GC.SuppressFinalize(this);
         }
-
-        public bool Equals(IBrowsableObjectInfoViewModel other) => ModelGeneric.Equals(other.Model);
-
-        public int CompareTo(IBrowsableObjectInfoViewModel other) => ModelGeneric.CompareTo(other.Model);
         #endregion
     }
 }

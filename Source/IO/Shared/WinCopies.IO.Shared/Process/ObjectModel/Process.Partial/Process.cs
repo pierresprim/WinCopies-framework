@@ -115,7 +115,7 @@ namespace WinCopies.IO.Process
                 #region Properties
                 public abstract string Guid { get; }
 
-                public abstract IReadOnlyDictionary<string, ICommand<IProcessErrorItem<TItemsOut, TError, TAction>>> Actions { get; }
+                public abstract System.Collections.Generic.IReadOnlyDictionary<string, ICommand<IProcessErrorItem<TItemsOut, TError, TAction>>> Actions { get; }
 
                 System.Collections.Generic.IEnumerable<ICommand<IProcessErrorItem>> IProcess.Actions => Actions?.Select(item => new Command<IProcessErrorItem<TItemsOut, TError, TAction>, IProcessErrorItem>(item.Value));
 

@@ -15,18 +15,22 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+#region System
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using System.Windows.Media.Imaging;
+#endregion System
 
+#region WinCopies
 using WinCopies.IO.Process;
 using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Reflection;
 using WinCopies.IO.Reflection.PropertySystem;
 using WinCopies.PropertySystem;
 using WinCopies.IO.Shell;
+#endregion WinCopies
 
 #if DEBUG
 using WinCopies.Diagnostics;

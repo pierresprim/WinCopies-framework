@@ -173,7 +173,7 @@ namespace WinCopies.Data.MySQL
 
         protected override bool MoveNextOverride() => _moveNext();
 
-        protected virtual void DisposeUnmanaged()
+        protected override void DisposeUnmanaged()
         {
             ResetCurrent();
 
@@ -192,13 +192,6 @@ namespace WinCopies.Data.MySQL
 
                 _connection = null;
             }
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            DisposeUnmanaged();
-
-            base.Dispose(disposing);
         }
     }
 }

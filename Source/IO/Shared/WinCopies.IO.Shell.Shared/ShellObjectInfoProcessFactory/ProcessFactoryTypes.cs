@@ -194,12 +194,12 @@ namespace WinCopies.IO
                                 return true;
                             };
 
-                            return new Enumerable<string>(() => enumerator).ForEachANDALSO(predicate) ? ShellObjectInfoProcessFactory.GetProcessParameters(Guids.Shell.Process.Shell.Deletion, sourcePath, RemoveOption, _paths) : null;
+                            return new Enumerable<string>(() => enumerator).ForEachANDALSO(predicate) ? ShellObjectInfoProcessFactory.GetProcessParameters(Consts.Guids.Shell.Process.Shell.Deletion, sourcePath, RemoveOption, _paths) : null;
                         }
 
                         else if (RemoveOption == RemoveOption.Clear)
 
-                            return ShellObjectInfoProcessFactory.GetProcessParameters(Guids.Shell.Process.Shell.Deletion, ShellObjectFactory.Create(RecycleBin.ParsingName).Properties.System.ItemName.Value, RemoveOption, new CustomEnumeratorEnumerable<string, EmptyEnumerator<string>>(new EmptyEnumerator<string>()));
+                            return ShellObjectInfoProcessFactory.GetProcessParameters(Consts.Guids.Shell.Process.Shell.Deletion, ShellObjectFactory.Create(RecycleBin.ParsingName).Properties.System.ItemName.Value, RemoveOption, new CustomEnumeratorEnumerable<string, EmptyEnumerator<string>>(new EmptyEnumerator<string>()));
                     }
 
                     return null;

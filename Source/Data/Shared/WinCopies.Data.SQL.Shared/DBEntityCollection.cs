@@ -5,7 +5,6 @@ using System.Linq;
 using WinCopies.Collections;
 using WinCopies.EntityFramework;
 using WinCopies.Linq;
-using WinCopies.Temp;
 
 using static WinCopies.ThrowHelper;
 using static WinCopies.Data.SQL.SQLHelper;
@@ -263,7 +262,12 @@ namespace WinCopies.Data.SQL
         public static bool RefreshItem<T, U>(in DBEntityCollection<U> collection, in ISQLConnection connection, in T item, in IConditionGroup conditionGroup) where T : IEntity where U : IEntity => GetItems(collection, new EntityCollectionItemRefreshingFactory<T, DBEntityCollection<U>>(connection.GetConnection(), item, conditionGroup), item.GetType()).FirstOrDefault() != null;
     }
 
-    public class DBEntityCollection<T> : EntityCollection<T, DBEntityCollection<T>> where T : IEntity
+    public interface IDBEntityCollection<T> : IEntityCollection<T> where T : IEntity
+    {
+        IOrderByColumns OrderByColumns { get; set; }
+    }
+
+    public class DBEntityCollection<T> : EntityCollection<T, DBEntityCollection<T>>, IDBEntityCollection<T> where T : IEntity
     {
         private ISQLConnection
 #if CS8
@@ -276,6 +280,8 @@ namespace WinCopies.Data.SQL
             ?
 #endif
             Connection => IsDisposed ? throw GetExceptionForDispose(false) : _connection;
+
+        public IOrderByColumns OrderByColumns { get; set; }
 
         public override bool IsDisposed => _connection == null;
 
@@ -291,17 +297,15 @@ namespace WinCopies.Data.SQL
 #if CS8
             ?
 #endif
-            orderBy = null) => IsDisposed ? throw GetExceptionForDispose(false) : DBEntityCollection.GetItems(this, new EntityCollectionNewItemLoadingFactory<T, DBEntityCollection<T>>(_connection, Temp.ThrowHelper.GetValueOrThrowIfInvalidType<OrderByColumns>(orderBy, nameof(orderBy), true), null));
+            orderBy) => IsDisposed ? throw GetExceptionForDispose(false) : DBEntityCollection.GetItems(this, new EntityCollectionNewItemLoadingFactory<T, DBEntityCollection<T>>(_connection, GetValueOrThrowIfInvalidType<OrderByColumns>(orderBy, nameof(orderBy), true), null));
 
-        public IEnumerator<T> GetEnumerator() => GetItems().GetEnumerator();
+        public IEnumerator<T> GetEnumerator() => GetItems(OrderByColumns).GetEnumerator();
 
         protected override void Dispose(bool disposing)
         {
             if (!IsDisposed)
-            {
-                _connection.Dispose();
-                _connection = null;
-            }
+
+                UtilHelpers.TryDispose2(ref _connection);
 
             base.Dispose(disposing);
         }

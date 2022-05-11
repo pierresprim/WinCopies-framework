@@ -83,6 +83,26 @@
                 <Setter Property="CommandParameter" Value="{Binding CommandParameter}" />
                 <Setter Property="CommandTarget" Value="{Binding CommandTarget}" />
             </Style>
+            <Style x:Key="MenuItemStyle2" TargetType="{x:Type MenuItem}">
+                <Setter Property="Icon" Value="{Binding Icon}" />
+                <Setter Property="Header" Value="{Binding Name}" />
+                <Setter Property="ToolTip" Value="{Binding Description}" />
+
+                <Setter Property="IsEnabled" Value="{Binding IsEnabled}" />
+
+                <Setter Property="IsChecked" Value="{Binding IsChecked}" />
+
+                <Setter Property="Command" Value="{Binding Command}" />
+
+                <Setter Property="ItemsSource" Value="{Binding Items}" />
+
+                <Setter Property="UsesItemContainerTemplate" Value="true" />
+                <Setter Property="ItemContainerTemplateSelector">
+                    <Setter.Value>
+                        <local:MenuItemTemplateSelector />
+                    </Setter.Value>
+                </Setter>
+            </Style>
             <Style x:Key="TextBoxStyleTextOriented" TargetType="{x:Type TextBox}" BasedOn="{StaticResource ControlStyle}" x:Shared="false">
                 <Setter Property="Text" Value="{Binding Text}" />
                 <Setter Property="IsReadOnly" Value="{Binding IsReadOnly}" />
@@ -113,6 +133,13 @@
             <Style x:Key="RadioButtonStyle" TargetType="{x:Type RadioButton}" BasedOn="{StaticResource ControlStyle}" x:Shared="false">
                 <Setter Property="GroupName" Value="{Binding GroupName}" />
             </Style>
+
+            <DataTemplate x:Key="MenuItemDataTemplate">
+                <MenuItem Style="{StaticResource MenuItemStyle2}" />
+            </DataTemplate>
+            <DataTemplate x:Key="SeparatorDataTemplate">
+                <Separator />
+            </DataTemplate>
         </ResourceDictionary>
     </ResourceDictionary.MergedDictionaries>
 

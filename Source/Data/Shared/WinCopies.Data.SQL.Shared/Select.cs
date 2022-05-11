@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using WinCopies.EntityFramework;
-using WinCopies.Temp;
 
 using static WinCopies.ThrowHelper;
 
@@ -63,7 +62,7 @@ namespace WinCopies.Data.SQL
 
         public SQLItemCollection<T> Columns { get => _columns; set => _columns = value ?? throw GetArgumentNullException(nameof(value)); }
 
-        IExtensibleEnumerable<T> ISQLColumnRequest<T>.Columns => Columns;
+        Collections.Generic.IExtensibleEnumerable<T> ISQLColumnRequest<T>.Columns => Columns;
 
         public OrderByColumns? OrderBy { get; set; }
 

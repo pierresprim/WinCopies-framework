@@ -19,6 +19,7 @@ using System;
 using System.Diagnostics;
 using System.Reflection;
 
+#region WinCopies
 using WinCopies.IO.AbstractionInterop.Reflection;
 using WinCopies.IO.Enumeration.Reflection;
 using WinCopies.IO.Process;
@@ -27,6 +28,7 @@ using WinCopies.IO.Reflection;
 using WinCopies.IO.Reflection.PropertySystem;
 using WinCopies.IO.Selectors.Reflection;
 using WinCopies.PropertySystem;
+#endregion WinCopies
 
 using static WinCopies.IO.Path;
 using static WinCopies.ThrowHelper;

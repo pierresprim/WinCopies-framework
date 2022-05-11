@@ -1,12 +1,32 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>netcoreapp3.1;net5.0-windows;net6.0-windows;net472;net48</TargetFrameworks>
+		<PackageId>WinCopies.Data.SQL</PackageId>
+		<AssemblyName>WinCopies.Data.SQL</AssemblyName>
+		<RootNamespace>WinCopies.Data.SQL</RootNamespace>
+		<TargetFrameworks>netcoreapp3.0;netcoreapp3.1;net5.0-windows;net6.0-windows;net7.0-windows;net472;net48</TargetFrameworks>
+		<!--<Description></Description>
+		<PackageTags></PackageTags>-->
+		<Copyright>Copyright © 2022 Pierre Sprimont</Copyright>
+		<DocumentationFile>WinCopies.Data.SQL.xml</DocumentationFile>
+		<SignAssembly>true</SignAssembly>
+		<AssemblyOriginatorKeyFile>WinCopies.Data.SQL.snk</AssemblyOriginatorKeyFile>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="$(DefineConstants.Contains('CS8'))">
-		<Nullable>enable</Nullable>
-	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="WinCopies.Collections" Version="3.16.0-preview" />
+	</ItemGroup>
+		
+	<ItemGroup>
+		<None Include="..\..\..\LICENSE.md">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+		<None Include="..\..\WinCopies.png">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+	</ItemGroup>
 
 	<Import Project="..\..\Shared\WinCopies.Data.SQL.Shared\WinCopies.Data.SQL.Shared.projitems" Label="Shared" />
 

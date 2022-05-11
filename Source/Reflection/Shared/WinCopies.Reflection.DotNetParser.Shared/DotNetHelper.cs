@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-
-using static WinCopies.Temp.Util;
 
 using EUT = WinCopies.Reflection.DotNetParser.DotNetEnumUnderlyingType;
 
@@ -26,11 +25,15 @@ namespace WinCopies.Reflection.DotNetParser
 #if CS8
             ?
 #endif
-            > GetDefinedTypes(this Assembly assembly)
+            >
+#if CS8
+            ?
+#endif
+             GetDefinedTypes(this Assembly assembly)
         {
             try
             {
-                return assembly.DefinedTypes;
+                return (assembly ?? throw ThrowHelper.GetArgumentNullException(nameof(assembly))).DefinedTypes;
             }
 
             catch (ReflectionTypeLoadException ex)
@@ -44,6 +47,12 @@ namespace WinCopies.Reflection.DotNetParser
             ArgumentException
 #endif
             ($"The current type does not represent an {nameof(Enum)} type.", paramName);
+
+        public static ArgumentException GetTypeHasWrongTypeTypeException(in string paramName, in string typeType) => new
+#if !CS9
+            ArgumentException
+#endif
+            ($"The current type does not represent {typeType} type.", paramName);
 
         public static EUT ToDotNetEnumUnderlyingType(this Type type)
         {
@@ -60,7 +69,7 @@ namespace WinCopies.Reflection.DotNetParser
 #endif
                     (typeof(T), enumType);
 
-                KeyValuePair<Type, EUT>[] types = GetArray(getType<int>(EUT.Int32), getType<uint>(EUT.UInt32), getType<short>(EUT.Int16), getType<ushort>(EUT.UInt16), getType<long>(EUT.Int64), getType<ulong>(EUT.UInt64), getType<byte>(EUT.Byte), getType<sbyte>(EUT.SByte));
+                KeyValuePair<Type, EUT>[] types = UtilHelpers.GetArray(getType<int>(EUT.Int32), getType<uint>(EUT.UInt32), getType<short>(EUT.Int16), getType<ushort>(EUT.UInt16), getType<long>(EUT.Int64), getType<ulong>(EUT.UInt64), getType<byte>(EUT.Byte), getType<sbyte>(EUT.SByte));
 
                 foreach (KeyValuePair<Type, EUT> underlyingType in types)
 

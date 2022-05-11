@@ -16,6 +16,7 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using System.Drawing.Imaging;
+
 using WinCopies.GUI.Drawing;
 
 namespace WinCopies.IO.PropertySystem

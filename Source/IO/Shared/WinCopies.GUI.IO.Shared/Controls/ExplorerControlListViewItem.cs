@@ -21,9 +21,28 @@ using System.Windows.Input;
 
 using WinCopies.Desktop;
 
+using static System.Windows.Input.Key;
+using static System.Windows.Input.Keyboard;
+
 namespace WinCopies.GUI.IO.Controls
 {
-    public class ExplorerControlListViewItem : ListViewItem, ICommandSource
+    public class ContextMenuRequestedEventArgs : RoutedEventArgs
+    {
+        public bool Ctrl { get; }
+
+        public bool Shift { get; }
+
+        public ContextMenuRequestedEventArgs(in bool ctrl = false, in bool shift = false)
+        {
+            Ctrl = ctrl;
+
+            Shift = shift;
+        }
+    }
+
+    public delegate void ContextMenuRequestedEventHandler(object sender, ContextMenuRequestedEventArgs e);
+
+    public class ExplorerControlListViewItem : GUI.Controls.ListViewItem, ICommandSource
     {
         /// <summary>
         /// Identifies the <see cref="Command"/> dependency property.
@@ -46,6 +65,10 @@ namespace WinCopies.GUI.IO.Controls
 
         public IInputElement CommandTarget { get => (IInputElement)GetValue(CommandTargetProperty); set => SetValue(CommandTargetProperty, value); }
 
+        public static readonly RoutedEvent ContextMenuRequestedEvent = Util.Desktop.UtilHelpers.RegisterRoutedEvent<ContextMenuRequestedEventHandler, ExplorerControlListView>(nameof(ContextMenuRequested), RoutingStrategy.Bubble);
+
+        public event ContextMenuRequestedEventHandler ContextMenuRequested { add => AddHandler(ContextMenuRequestedEvent, value); remove => RemoveHandler(ContextMenuRequestedEvent, value); }
+
         //static ExplorerControlListViewItem() => DefaultStyleKeyProperty.OverrideMetadata(typeof(ExplorerControlListViewItem), new FrameworkPropertyMetadata(typeof(ExplorerControlListViewItem)));
 
         private bool TryExecuteCommand() => CommandTarget == null ? Command.TryExecute(CommandParameter) : Command.TryExecute(CommandParameter, CommandTarget);
@@ -63,6 +86,40 @@ namespace WinCopies.GUI.IO.Controls
                 e.Handled = true;
         }
 
+        protected virtual ContextMenuRequestedEventArgs GetContextMenuRequestedEventArgs()
+        {
+#if CS8
+            static
+#endif
+            bool isKeyDown(in Key leftKey, in Key rightKey) => IsKeyDown(leftKey) || IsKeyDown(rightKey);
+
+            return new
+#if !CS9
+            ContextMenuRequestedEventArgs
+#endif
+            (isKeyDown(LeftCtrl, RightCtrl), isKeyDown(LeftShift, RightShift))
+            { RoutedEvent = ContextMenuRequestedEvent };
+        }
+
+        protected override void OnMouseRightButtonDown(MouseButtonEventArgs e)
+        {
+            base.OnMouseRightButtonDown(e);
+
+            _ = CaptureMouse();
+        }
+
+        protected override void OnMouseRightButtonUp(MouseButtonEventArgs e)
+        {
+            base.OnMouseRightButtonUp(e);
+
+            if (IsMouseCaptured)
+            {
+                ReleaseMouseCapture();
+
+                RaiseEvent(GetContextMenuRequestedEventArgs());
+            }
+        }
+
         /// <summary>
         /// Invoked when an unhandled System.Windows.Input.Keyboard.KeyDown attached event reaches an element in its route that is derived from this class. If the <see cref="KeyEventArgs.Key"/> property of <paramref name="e"/> is defined to <see cref="Key.Enter"/>, tries to execute the command and, if succeeded, handles the event. Implement this method to add class handling for this event.
         /// </summary>
@@ -71,9 +128,22 @@ namespace WinCopies.GUI.IO.Controls
         {
             base.OnKeyDown(e);
 
-            if (e.Key == Key.Enter && TryExecuteCommand())
+            switch (e.Key)
+            {
+                case Enter:
 
-                e.Handled = true;
+                    if (TryExecuteCommand())
+
+                        e.Handled = true;
+
+                    break;
+
+                case Apps:
+
+                    RaiseEvent(GetContextMenuRequestedEventArgs());
+
+                    break;
+            }
         }
     }
 }

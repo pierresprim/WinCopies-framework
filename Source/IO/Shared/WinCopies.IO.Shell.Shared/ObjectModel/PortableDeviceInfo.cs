@@ -15,12 +15,15 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+#region WAPICP
 using Microsoft.WindowsAPICodePack.PortableDevices;
 using Microsoft.WindowsAPICodePack.Shell;
 using Microsoft.WindowsAPICodePack.Win32Native;
+#endregion WAPICP
 
 using System;
 
+#region WinCopies
 using WinCopies.IO.AbstractionInterop;
 using WinCopies.IO.Process;
 using WinCopies.IO.PropertySystem;
@@ -28,6 +31,7 @@ using WinCopies.IO.Selectors;
 using WinCopies.IO.Shell;
 using WinCopies.Linq;
 using WinCopies.PropertySystem;
+#endregion WinCopies
 
 using static WinCopies.ThrowHelper;
 
@@ -39,6 +43,8 @@ namespace WinCopies.IO.ObjectModel
         private IBitmapSourceProvider _bitmapSourceProvider;
 
         #region Properties
+        public override string Protocol => "mtp";
+
         protected override bool IsLocalRootOverride => false;
 
         protected override IBitmapSourceProvider BitmapSourceProviderOverride => _bitmapSourceProvider
@@ -47,7 +53,7 @@ namespace WinCopies.IO.ObjectModel
 #else
             ?? (_bitmapSourceProvider =
 #endif
-            FileSystemObjectInfo.GetDefaultBitmapSourcesProvider(this, new Shell.BitmapSources(new BitmapSourcesStruct(38, "imageres.dll")))
+            FileSystemObjectInfo.GetDefaultBitmapSourcesProvider(this, new Shell.BitmapSources(new Shell.BitmapSourcesStruct(38, "imageres.dll")))
 #if !CS8
             )
 #endif
@@ -63,7 +69,7 @@ namespace WinCopies.IO.ObjectModel
 
         protected override string ItemTypeNameOverride => Shell.Properties.Resources.PortableDevice;
 
-        protected override string DescriptionOverride => UtilHelpers.NotApplicable;
+        protected override string DescriptionOverride => WinCopies.Consts.NotApplicable;
 
         protected override IBrowsableObjectInfo ParentOverride => ShellObjectInfo.From(ShellObjectFactory.Create(KnownFolders.Computer.ParsingName), ClientVersion);
 

@@ -17,13 +17,15 @@
 
 using System;
 using System.Collections.ObjectModel;
-using System.Reflection;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 
 using WinCopies.GUI.IO.ObjectModel;
 using WinCopies.GUI.IO.Process;
 using WinCopies.GUI.Shell;
+using WinCopies.GUI.Shell.ObjectModel;
+using WinCopies.IO;
 using WinCopies.IO.ObjectModel;
 using WinCopies.IO.Process;
 
@@ -36,23 +38,38 @@ namespace WinCopies.GUI.Samples
         protected override bool ValidateClosing() => true;
     }
 
+    public class PluginInfo : PluginInfo<IBrowsableObjectInfoPlugin>
+    {
+        protected override IBrowsableObjectInfo ParentOverride => new BrowsableObjectInfoStartPage(ClientVersion);
+
+        public PluginInfo(in IBrowsableObjectInfoPlugin plugin, in ClientVersion clientVersion) : base(plugin, clientVersion) { /* Left empty. */ }
+    }
+
+    public class BrowsableObjectInfoStartPage : BrowsableObjectInfoStartPage<IEncapsulatorBrowsableObjectInfo<IBrowsableObjectInfoPlugin>>
+    {
+        protected override IBitmapSourceProvider BitmapSourceProviderOverride => new BitmapSourceProvider(new IconBitmapSources(Properties.Resources.WinCopies), null, null, true);
+
+        public BrowsableObjectInfoStartPage(in ClientVersion clientVersion) : base(Enumerable.Repeat(new PluginInfo(App.Current.PluginParameters, clientVersion), 1), clientVersion) { /* Left empty. */ }
+    }
+
     public partial class ExplorerControlWindow : BrowsableObjectInfoWindow2
     {
         private static ProcessWindow _processWindow;
+        private ClientVersion? _clientVersion;
 
         public static ProcessWindow ProcessWindow
         {
             get
             {
-                if (_processWindow == null)
-
-                    (_processWindow = new ProcessWindow()).Show();
+                (_processWindow ??= new ProcessWindow()).Show();
 
                 return _processWindow;
             }
         }
 
         public static IProcessPathCollectionFactory DefaultProcessPathCollectionFactory { get; } = new ProcessPathCollectionFactory();
+
+        public override ClientVersion ClientVersion => _clientVersion ??= WinCopies.IO.ObjectModel.BrowsableObjectInfo.GetDefaultClientVersion();
 
         public ExplorerControlWindow() : base(GetDefaultDataContext())
         {
@@ -113,7 +130,7 @@ namespace WinCopies.GUI.Samples
         {
             if (!(factory.UserConfirmationRequired && MessageBox.Show(factory.GetUserConfirmationText(), "Process confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.No))
             {
-                IProcess result = new Process(BrowsableObjectInfo.DefaultProcessSelectorDictionary.Select(new ProcessFactorySelectorDictionaryParameters(parameters(factory), DefaultProcessPathCollectionFactory)));
+                IProcess result = new Process(WinCopies.IO.ObjectModel.BrowsableObjectInfo.DefaultProcessSelectorDictionary.Select(new ProcessFactorySelectorDictionaryParameters(parameters(factory), DefaultProcessPathCollectionFactory)));
 
                 ((ProcessManager<IProcess>)ProcessWindow.Content).Processes.Add(result);
             }
@@ -148,5 +165,7 @@ namespace WinCopies.GUI.Samples
 
             GetPathCollection().CollectionChanged -= ExplorerControlWindow_CollectionChanged;
         }
+
+        protected override IBrowsableObjectInfo GetDefaultBrowsableObjectInfo() => new BrowsableObjectInfoStartPage(ClientVersion);
     }
 }

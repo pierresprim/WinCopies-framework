@@ -3,8 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
-using WinCopies.Temp;
-
 using static WinCopies.ThrowHelper;
 
 namespace WinCopies.Data.SQL
@@ -89,23 +87,23 @@ namespace WinCopies.Data.SQL
         SQLColumn ISQLColumn.ToSQLColumn() => this;
     }
 
-    public class SQLItemCollection<T> : IExtensibleEnumerable<T>
+    public class SQLItemCollection<T> : Collections.Generic.IExtensibleEnumerable<T>
     {
-        private IExtensibleEnumerable<T> _items;
+        private Collections.Generic.IExtensibleEnumerable<T> _items;
 
-        public IExtensibleEnumerable<T> Items { get => _items; set => _items = value ?? throw GetArgumentNullException(nameof(value)); }
+        public Collections.Generic.IExtensibleEnumerable<T> Items { get => _items; set => _items = value ?? throw GetArgumentNullException(nameof(value)); }
 
 #if CS8
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 #endif
-        public SQLItemCollection(in IExtensibleEnumerable<T> items) => Items = items; // The null-check is performed by the Items property.
+        public SQLItemCollection(in Collections.Generic.IExtensibleEnumerable<T> items) => Items = items; // The null-check is performed by the Items property.
 #if CS8
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 #endif
 
-        public SQLItemCollection(in IEnumerable<T> items) : this(new TO_BE_DELETED.LinkedList<T>(items)) { /* Left empty. */ }
+        public SQLItemCollection(in IEnumerable<T> items) : this(new Collections.DotNetFix.Generic.LinkedList<T>(items)) { /* Left empty. */ }
 
-        public SQLItemCollection(params T[] items) : this(new TO_BE_DELETED.LinkedList<T>(items)) { /* Left empty. */ }
+        public SQLItemCollection(params T[] items) : this(new Collections.DotNetFix.Generic.LinkedList<T>(items)) { /* Left empty. */ }
 
         IEnumerator<T> IEnumerable<T>.GetEnumerator() => Items.GetEnumerator();
 
@@ -133,18 +131,18 @@ namespace WinCopies.Data.SQL
             return sb.ToString();
         }
 
-        public override string ToString() => ToString(Temp.Delegates.ToStringT);
+        public override string ToString() => ToString(Delegates.ToStringT);
 
         //public static SQLItemCollection<T> GetCollectionForItems(System.Collections.Generic.IEnumerable<T> items) => new(TO_BE_DELETED.LinkedList<T>.From(items));
 
         //public static SQLItemCollection<T> GetCollectionForItems(params T[] items) => GetCollectionForItems((System.Collections.Generic.IEnumerable<T>)items);
 
-        void IPrependableExtensibleEnumerable<T>.Prepend(T item) => _items.Prepend(item);
+        void Collections.Generic.IPrependableExtensibleEnumerable<T>.Prepend(T item) => _items.Prepend(item);
 
-        void IPrependableExtensibleEnumerable<T>.PrependRange(IEnumerable<T> items) => _items.PrependRange(items);
+        void Collections.Generic.IPrependableExtensibleEnumerable<T>.PrependRange(IEnumerable<T> items) => _items.PrependRange(items);
 
-        void IAppendableExtensibleEnumerable<T>.Append(T item) => _items.Append(item);
+        void Collections.Generic.IAppendableExtensibleEnumerable<T>.Append(T item) => _items.Append(item);
 
-        void IAppendableExtensibleEnumerable<T>.AppendRange(IEnumerable<T> items) => _items.AppendRange(items);
+        void Collections.Generic.IAppendableExtensibleEnumerable<T>.AppendRange(IEnumerable<T> items) => _items.AppendRange(items);
     }
 }

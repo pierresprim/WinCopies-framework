@@ -16,7 +16,6 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using System;
-using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
 
@@ -35,6 +34,24 @@ namespace WinCopies.GUI.Samples
     public partial class MainWindow : Windows.Window
     {
         private TitleBarMenuItem _menuItem;
+
+        public static readonly DependencyProperty CommandProperty = Util.Desktop.UtilHelpers.Register<IQueryCommand<bool>, MainWindow>(nameof(Command), new PropertyMetadata(new DelegateQueryCommand<bool>(o => true, o =>
+          {
+              _=MessageBox.Show("Ok");
+
+              return true;
+          })));
+
+        public static readonly DependencyProperty Command2Property = Util.Desktop.UtilHelpers.Register<IQueryCommand<bool>, MainWindow>(nameof(Command2), new PropertyMetadata(new DelegateQueryCommand<bool>(o => true, o =>
+        {
+_=            MessageBox.Show("Error");
+
+            return false;
+        })));
+
+        public IQueryCommand<bool> Command { get => (IQueryCommand<bool>)GetValue(CommandProperty); set => SetValue(CommandProperty, value); }
+
+        public IQueryCommand<bool> Command2 { get => (IQueryCommand<bool>)GetValue(Command2Property); set => SetValue(Command2Property, value); }
 
         public MainWindow()
         {

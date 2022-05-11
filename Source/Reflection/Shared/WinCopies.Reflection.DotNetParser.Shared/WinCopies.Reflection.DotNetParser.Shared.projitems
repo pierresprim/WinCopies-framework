@@ -12,5 +12,11 @@
     <Compile Include="$(MSBuildThisFileDirectory)DotNetHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DotNetNamespaceEnumerator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DotNetPackage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EntityFramework\Entity.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EntityFramework\EntityCollection.Partial\Engine\Add.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EntityFramework\EntityCollection.Partial\Engine\GetItems.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EntityFramework\EntityCollection.Partial\Engine\Remove.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EntityFramework\EntityCollection.Partial\Helper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EntityFramework\EntityCollectionUpdater.cs" />
   </ItemGroup>
 </Project>

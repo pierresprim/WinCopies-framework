@@ -22,6 +22,7 @@ using SevenZip;
 using System;
 using System.Linq;
 
+#region WinCopies
 using WinCopies.Collections.Generic;
 using WinCopies.Extensions;
 using WinCopies.IO.AbstractionInterop;
@@ -30,12 +31,13 @@ using WinCopies.IO.Process;
 using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Selectors;
 using WinCopies.PropertySystem;
+#endregion WinCopies
 
 using static WinCopies.
-#if !WinCopies3
-    Util.Util
-#else
+#if WinCopies3
     ThrowHelper
+#else
+    Util.Util
 #endif
     ;
 
@@ -131,7 +133,7 @@ namespace WinCopies.IO.ObjectModel
         /// <summary>
         /// Not applicable for this item type.
         /// </summary>
-        protected override string DescriptionOverride => UtilHelpers.NotApplicable;
+        protected override string DescriptionOverride => WinCopies.Consts.NotApplicable;
 
         /// <summary>
         /// The <see cref="ArchiveFileInfo"/> that this <see cref="ArchiveItemInfo"/> represents.
@@ -235,6 +237,8 @@ namespace WinCopies.IO.ObjectModel
         #region Properties
         public static IBrowsabilityPathStack<IArchiveItemInfo> BrowsabilityPathStack { get; } = __browsabilityPathStack.AsWriteOnly();
 
+        public override string Protocol => null;
+
         protected override System.Collections.Generic.IEnumerable<IBrowsabilityPath> BrowsabilityPathsOverride => __browsabilityPathStack.GetBrowsabilityPaths(this);
 
         public static ISelectorDictionary<IArchiveItemInfoBase, System.Collections.Generic.IEnumerable<IProcessInfo>> DefaultCustomProcessesSelectorDictionary { get; } = new DefaultNullableValueSelectorDictionary<IArchiveItemInfoBase, System.Collections.Generic.IEnumerable<IProcessInfo>>();
@@ -247,19 +251,11 @@ namespace WinCopies.IO.ObjectModel
         #endregion Properties
 
         protected internal ArchiveItemInfo(in string path, in FileType fileType, in IShellObjectInfoBase archiveShellObject, in ArchiveFileInfo? archiveFileInfo, ClientVersion clientVersion/*, DeepClone<ArchiveFileInfo?> archiveFileInfoDelegate*/) : base(path, archiveShellObject, archiveFileInfo, clientVersion)
-#if CS9
-                => _objectProperties = archiveFileInfo.HasValue ? new ArchiveItemInfoProperties<IArchiveItemInfoBase>(this, fileType) : new FileSystemObjectInfoProperties(this, fileType);
-#else
-        {
-            if (archiveFileInfo.HasValue)
-
-                _objectProperties = new ArchiveItemInfoProperties<IArchiveItemInfoBase>(this, fileType);
-
-            else
-
-                _objectProperties = new FileSystemObjectInfoProperties(this, fileType);
-        }
+            => _objectProperties = archiveFileInfo.HasValue ? new ArchiveItemInfoProperties<IArchiveItemInfoBase>(this, fileType) :
+#if !CS9
+            (IFileSystemObjectInfoProperties)
 #endif
+            new FileSystemObjectInfoProperties(this, fileType);
 
         #region Methods
         #region Construction helpers

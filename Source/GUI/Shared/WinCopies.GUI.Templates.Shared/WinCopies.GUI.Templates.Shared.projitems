@@ -11,6 +11,7 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AssemblyInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DecoratedContentControlContent.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MenuItemTemplateSelector.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ModelToBooleanConverter.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -1,21 +1,38 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>netcoreapp3.1;net5.0-windows;net6.0-windows;net472;net48</TargetFrameworks>
+		<PackageId>WinCopies.Data.MySQL</PackageId>
+		<AssemblyName>WinCopies.Data.MySQL</AssemblyName>
+		<RootNamespace>WinCopies.Data.MySQL</RootNamespace>
+		<TargetFrameworks>netcoreapp3.0;netcoreapp3.1;net5.0-windows;net6.0-windows;net7.0-windows;net472;net48</TargetFrameworks>
+		<!--<Description></Description>
+		<PackageTags></PackageTags>-->
+		<Copyright>Copyright © 2022 Pierre Sprimont</Copyright>
+		<DocumentationFile>WinCopies.Data.MySQL.xml</DocumentationFile>
+		<SignAssembly>true</SignAssembly>
+		<AssemblyOriginatorKeyFile>WinCopies.Data.MySQL.snk</AssemblyOriginatorKeyFile>
 	</PropertyGroup>
-
-	<PropertyGroup Condition="$(DefineConstants.Contains('CS8'))">
-		<Nullable>enable</Nullable>
-	</PropertyGroup>
-
-	<Import Project="..\..\Shared\WinCopies.Data.MySQL.Shared\WinCopies.Data.MySQL.Shared.projitems" Label="Shared" />
 
 	<ItemGroup>
 		<PackageReference Include="MySql.Data" Version="8.0.28" />
+		<PackageReference Include="WinCopies.Collections" Version="3.16.0-preview" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\WinCopies.Data.SQL\WinCopies.Data.SQL.csproj" />
 	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\..\..\LICENSE.md">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+		<None Include="..\..\WinCopies.png">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+	</ItemGroup>
+
+	<Import Project="..\..\Shared\WinCopies.Data.MySQL.Shared\WinCopies.Data.MySQL.Shared.projitems" Label="Shared" />
 
 </Project>

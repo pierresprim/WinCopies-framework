@@ -21,21 +21,21 @@ namespace WinCopies.Collections.Generic
 
         public THeader Header { get; set; }
 
-        bool ICollection<IHeaderedList<THeader, TItems>>.IsReadOnly => false;
+        bool System.Collections.Generic.ICollection<IHeaderedList<THeader, TItems>>.IsReadOnly => false;
 
-        void ICollection<IHeaderedList<THeader, TItems>>.Add(IHeaderedList<THeader, TItems> item) => Add((TList)item);
+        void System.Collections.Generic.ICollection<IHeaderedList<THeader, TItems>>.Add(IHeaderedList<THeader, TItems> item) => Add((TList)item);
 
-        bool ICollection<IHeaderedList<THeader, TItems>>.Contains(IHeaderedList<THeader, TItems> item) => item is TList list && Contains(list);
+        bool System.Collections.Generic.ICollection<IHeaderedList<THeader, TItems>>.Contains(IHeaderedList<THeader, TItems> item) => item is TList list && Contains(list);
 
-        void ICollection<IHeaderedList<THeader, TItems>>.CopyTo(IHeaderedList<THeader, TItems>[] array, int arrayIndex) => ((IList)this).CopyTo(array, arrayIndex);
+        void System.Collections.Generic.ICollection<IHeaderedList<THeader, TItems>>.CopyTo(IHeaderedList<THeader, TItems>[] array, int arrayIndex) => ((IList)this).CopyTo(array, arrayIndex);
 
-        System.Collections.Generic.IEnumerator<IHeaderedList<THeader, TItems>> System.Collections.Generic.IEnumerable<IHeaderedList<THeader, TItems>>.GetEnumerator() => this.ToEnumerable<TList, IHeaderedList<THeader, TItems>>().GetEnumerator();
+        IEnumerator<IHeaderedList<THeader, TItems>> System.Collections.Generic.IEnumerable<IHeaderedList<THeader, TItems>>.GetEnumerator() => this.ToEnumerable<TList, IHeaderedList<THeader, TItems>>().GetEnumerator();
 
         int IList<IHeaderedList<THeader, TItems>>.IndexOf(IHeaderedList<THeader, TItems> item) => item is TList list ? IndexOf(list) : -1;
 
         void IList<IHeaderedList<THeader, TItems>>.Insert(int index, IHeaderedList<THeader, TItems> item) => Insert(index, (TList)item);
 
-        bool ICollection<IHeaderedList<THeader, TItems>>.Remove(IHeaderedList<THeader, TItems> item) => item is TList list && Remove(list);
+        bool System.Collections.Generic.ICollection<IHeaderedList<THeader, TItems>>.Remove(IHeaderedList<THeader, TItems> item) => item is TList list && Remove(list);
     }
 
     public class HeaderedList<THeader, TItems> : HeaderedList<THeader, TItems, HeaderedList<THeader, TItems>>

@@ -15,15 +15,18 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-using Microsoft.WindowsAPICodePack.PortableDevices;
+#region Usings
 using Microsoft.WindowsAPICodePack.Shell;
 
+#region System
 using System;
 using System.Drawing;
 using System.Reflection;
 using System.Security;
 using System.Windows.Media.Imaging;
+#endregion System
 
+#region WinCopies
 using WinCopies.Collections;
 using WinCopies.Collections.Generic;
 using WinCopies.IO.AbstractionInterop;
@@ -34,13 +37,16 @@ using WinCopies.IO.Process;
 using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Reflection;
 using WinCopies.PropertySystem;
-using WinCopies.Temp;
 using WinCopies.Util;
+#endregion WinCopies
 
+#region Static Usings
 using static WinCopies.IO.DotNetAssemblyInfoHandledExtensions;
 using static WinCopies.IO.Shell.Resources.ExceptionMessages;
 using static WinCopies.UtilHelpers;
 using static WinCopies.ThrowHelper;
+#endregion Static Usings
+#endregion Usings
 
 namespace WinCopies.IO
 {

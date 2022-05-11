@@ -19,12 +19,14 @@ using System;
 using System.Linq;
 using System.Reflection;
 
+#region WinCopies
 using WinCopies.IO.AbstractionInterop.Reflection;
 using WinCopies.IO.Process;
 using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Reflection.PropertySystem;
 using WinCopies.Linq;
 using WinCopies.PropertySystem;
+#endregion WinCopies
 
 using static WinCopies.ThrowHelper;
 

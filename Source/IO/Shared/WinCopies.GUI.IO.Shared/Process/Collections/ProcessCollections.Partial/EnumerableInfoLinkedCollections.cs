@@ -35,7 +35,7 @@ using static WinCopies.ThrowHelper;
 
 namespace WinCopies.GUI.IO.Process
 {
-    public interface IProcessLinkedList<TItems, TError, TErrorItems, TAction> : ICollection<TErrorItems>, System.Collections.Generic.IEnumerable<TErrorItems>, System.Collections.IEnumerable, IReadOnlyCollection<TErrorItems>, System.Collections.ICollection, ILinkedList3<TErrorItems>, IReadOnlyLinkedList2<TErrorItems>, IReadOnlyLinkedList<TErrorItems>, IUIntCountable, Collections.Generic.IEnumerable<TErrorItems>, Collections.Generic.IEnumerable<ILinkedListNode<TErrorItems>>, System.Collections.Generic.IEnumerable<ILinkedListNode<TErrorItems>>, INotifyPropertyChanged, INotifyLinkedCollectionChanged<TErrorItems>, WinCopies.IO.Process.IProcessLinkedList<TItems, TError, TErrorItems, TAction> where TItems : IPath where TErrorItems : IProcessErrorItem<TItems, TError, TAction>
+    public interface IProcessLinkedList<TItems, TError, TErrorItems, TAction> : ICollection<TErrorItems>, System.Collections.Generic.IEnumerable<TErrorItems>, IEnumerable, System.Collections.Generic.IReadOnlyCollection<TErrorItems>, ICollection, ILinkedList3<TErrorItems>, IReadOnlyLinkedList2<TErrorItems>, IReadOnlyLinkedList<TErrorItems>, IUIntCountable, Collections.Generic.IEnumerable<TErrorItems>, Collections.Generic.IEnumerable<ILinkedListNode<TErrorItems>>, System.Collections.Generic.IEnumerable<ILinkedListNode<TErrorItems>>, INotifyPropertyChanged, INotifyLinkedCollectionChanged<TErrorItems>, WinCopies.IO.Process.IProcessLinkedList<TItems, TError, TErrorItems, TAction> where TItems : IPath where TErrorItems : IProcessErrorItem<TItems, TError, TAction>
     {
         new object SyncRoot { get; }
 
@@ -208,19 +208,19 @@ namespace WinCopies.GUI.IO.Process
     {
         protected ObservableProcessLinkedCollection<TItems, TError, TItemsIn, TAction> InnerLinkedCollection { get; }
 
-        public Size TotalSize => ((IProcessQueue)InnerLinkedCollection).TotalSize;
+        public Size TotalSize => InnerLinkedCollection.AsFromType<IProcessQueue>().TotalSize;
 
-        object ISimpleLinkedListBase2.SyncRoot => ((ISimpleLinkedListBase2)InnerLinkedCollection).SyncRoot;
+        object ISimpleLinkedListBase2.SyncRoot => InnerLinkedCollection.AsFromType<ISimpleLinkedListBase2>().SyncRoot;
 
-        bool ISimpleLinkedListBase2.IsSynchronized => ((ISimpleLinkedListBase2)InnerLinkedCollection).IsSynchronized;
+        bool ISimpleLinkedListBase2.IsSynchronized => InnerLinkedCollection.AsFromType<ISimpleLinkedListBase2>().IsSynchronized;
 
-        public bool HasItems => ((ISimpleLinkedListBase)InnerLinkedCollection).HasItems;
+        public bool HasItems => InnerLinkedCollection.AsFromType<ISimpleLinkedListBase>().HasItems;
 
         public uint Count => InnerLinkedCollection.Count;
 
         public bool IsReadOnly => true;
 
-        int ICollection<TItemsOut>.Count => ((ICollection<TItemsIn>)InnerLinkedCollection).Count;
+        int ICollection<TItemsOut>.Count => InnerLinkedCollection.AsFromType<ICollection<TItemsIn>>().Count;
 
         public bool SupportsReversedEnumeration => InnerLinkedCollection.SupportsReversedEnumeration;
 
@@ -228,13 +228,13 @@ namespace WinCopies.GUI.IO.Process
 
         IReadOnlyLinkedListNode<TItemsOut> IReadOnlyLinkedList<TItemsOut>.Last => throw GetReadOnlyListOrCollectionException();
 
-        int ICollection.Count => ((ICollection)InnerLinkedCollection).Count;
+        int ICollection.Count => InnerLinkedCollection.AsFromType<ICollection>().Count;
 
-        bool ICollection.IsSynchronized => ((ICollection)InnerLinkedCollection).IsSynchronized;
+        bool ICollection.IsSynchronized => InnerLinkedCollection.AsFromType<ICollection>().IsSynchronized;
 
-        object ICollection.SyncRoot => ((ICollection)InnerLinkedCollection).SyncRoot;
+        object ICollection.SyncRoot => InnerLinkedCollection.AsFromType<ICollection>().SyncRoot;
 
-        int IReadOnlyCollection<TItemsOut>.Count => ((IReadOnlyCollection<TItemsIn>)InnerLinkedCollection).Count;
+        int IReadOnlyCollection<TItemsOut>.Count => InnerLinkedCollection.AsFromType<IReadOnlyCollection<TItemsIn>>().Count;
 
         TItemsOut IReadOnlyLinkedList2<TItemsOut>.FirstValue => InnerLinkedCollection.FirstValue;
 

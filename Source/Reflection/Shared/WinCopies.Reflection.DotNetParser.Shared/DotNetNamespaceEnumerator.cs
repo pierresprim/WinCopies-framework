@@ -3,9 +3,10 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
-using WinCopies;
 using WinCopies.Collections.DotNetFix.Generic;
 using WinCopies.Collections.Generic;
+
+using static WinCopies.Bool;
 
 namespace WinCopies.Reflection.DotNetParser
 {
@@ -27,6 +28,27 @@ namespace WinCopies.Reflection.DotNetParser
 
         protected override string CurrentOverride => _current;
 
+        public NamespaceEnumerator(in System.Collections.Generic.IEnumerable<Type
+#if CS8
+            ?
+#endif
+            > definedTypes, Predicate<Type>
+#if CS8
+            ?
+#endif
+            prePredicate, in Predicate<Type>
+#if CS8
+            ?
+#endif
+            postPredicate) : base(definedTypes)
+        {
+            _moveNext = prePredicate == null ? MoveNextOverride2 : PrependPredicateIn(prePredicate, MoveNextOverride2);
+
+            _predicate = PrependPredicateIn(PrependPredicateNULL(type => !type.IsNested, postPredicate));
+
+            ResetMoveNext();
+        }
+
         public NamespaceEnumerator(in Assembly assembly, Predicate<Type>
 #if CS8
             ?
@@ -35,14 +57,7 @@ namespace WinCopies.Reflection.DotNetParser
 #if CS8
             ?
 #endif
-            postPredicate) : base(assembly.GetDefinedTypes())
-        {
-            _moveNext = prePredicate == null ? MoveNextOverride2 : Temp.Bool.PrependPredicateIn(prePredicate, MoveNextOverride2);
-
-            _predicate = Temp. Bool.PrependPredicateIn(Temp.Bool.PrependPredicateNULL(type => !type.IsNested, postPredicate));
-
-            ResetMoveNext();
-        }
+            postPredicate) : this(assembly.GetDefinedTypes() ?? Enumerable.Empty<Type>(), prePredicate, postPredicate) { /* Left empty. */ }
 
         protected virtual void OnTypeValidated(in string
 #if CS8
@@ -97,11 +112,7 @@ namespace WinCopies.Reflection.DotNetParser
 
                             string[] namespaces = current.Namespace.Split('.');
 
-                            StringBuilder sb = new
-#if !CS9
-                            StringBuilder
-#endif
-                            ();
+                            var sb = new StringBuilder();
 
                             _ = sb.Append(namespaces[0]);
 

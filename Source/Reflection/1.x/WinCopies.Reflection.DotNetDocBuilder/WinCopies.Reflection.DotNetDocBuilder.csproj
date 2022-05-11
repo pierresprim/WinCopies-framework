@@ -1,15 +1,19 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	  <TargetFrameworks>netcoreapp3.1;net5.0-windows;net6.0-windows;net472;net48</TargetFrameworks>
+	  <PackageId>WinCopies.Reflection.DotNetDocBuilder</PackageId>
+	  <AssemblyName>WinCopies.Reflection.DotNetDocBuilder</AssemblyName>
+	  <RootNamespace>WinCopies.Reflection.DotNetDocBuilder</RootNamespace>
+	  <TargetFrameworks>netcoreapp3.0;netcoreapp3.1;net5.0-windows;net6.0-windows;net7.0-windows;net472;net48</TargetFrameworks>
+	  <!--<Description></Description>
+		<PackageTags></PackageTags>-->
+	  <Copyright>Copyright © 2022 Pierre Sprimont</Copyright>
+	  <DocumentationFile>WinCopies.Reflection.DotNetDocBuilder.xml</DocumentationFile>
+	  <SignAssembly>true</SignAssembly>
+	  <AssemblyOriginatorKeyFile>WinCopies.Reflection.DotNetDocBuilder.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
-	<PropertyGroup Condition="$(DefineConstants.Contains('CS8'))">
-		<Nullable>enable</Nullable>
-	</PropertyGroup>
-
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Data\1.x\WinCopies.Data.SQL\WinCopies.Data.SQL.csproj" />
     <ProjectReference Include="..\WinCopies.Reflection.DotNetParser\WinCopies.Reflection.DotNetParser.csproj" />
   </ItemGroup>
 

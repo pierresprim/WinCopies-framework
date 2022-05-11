@@ -22,12 +22,11 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
+
 using WinCopies.Util;
 using WinCopies.Util.Data;
 
 using static WinCopies.UtilHelpers;
-
-using PropertyChangedEventArgs = System.ComponentModel.PropertyChangedEventArgs;
 
 namespace WinCopies.GUI.Controls
 {
@@ -195,19 +194,15 @@ namespace WinCopies.GUI.Controls
 
     public class ListView : System.Windows.Controls.ListView
     {
-        public static readonly DependencyProperty FiltersProperty = DependencyProperty.Register(nameof(Filters), typeof(System.Collections.Generic.IEnumerable<IFilterEnumerable>), typeof(ListView), new PropertyMetadata(null, (DependencyObject d, DependencyPropertyChangedEventArgs e) => ((ListView)d).OnFilterChanged((System.Collections.Generic.IEnumerable<IFilterEnumerable>)e.OldValue, (System.Collections.Generic.IEnumerable<IFilterEnumerable>)e.NewValue)));
+        public static readonly DependencyProperty FiltersProperty = DependencyProperty.Register(nameof(Filters), typeof(IEnumerable<IFilterEnumerable>), typeof(ListView), new PropertyMetadata(null, (DependencyObject d, DependencyPropertyChangedEventArgs e) => ((ListView)d).OnFilterChanged((IEnumerable<IFilterEnumerable>)e.OldValue, (IEnumerable<IFilterEnumerable>)e.NewValue)));
 
-        public System.Collections.Generic.IEnumerable<IFilterEnumerable> Filters { get => (System.Collections.Generic.IEnumerable<IFilterEnumerable>)GetValue(FiltersProperty); set => SetValue(FiltersProperty, value); }
+        public IEnumerable<IFilterEnumerable> Filters { get => (IEnumerable<IFilterEnumerable>)GetValue(FiltersProperty); set => SetValue(FiltersProperty, value); }
 
         public static readonly DependencyProperty ContentProperty = DependencyProperty.Register(nameof(Content), typeof(object), typeof(ListView));
 
         public object Content { get => GetValue(ContentProperty); set => SetValue(ContentProperty, value); }
 
-
-
         static ListView() => DefaultStyleKeyProperty.OverrideMetadata(typeof(ListView), new FrameworkPropertyMetadata(typeof(ListView)));
-
-
 
         public ListView() => OnAddCommandBindings();
 

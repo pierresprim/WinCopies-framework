@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <DefineConstants>COMPLETE;$(DefineConstants)</DefineConstants>
+  </PropertyGroup>
+
+	<PropertyGroup Condition="!$(DefineConstants.Contains('COMPLETE'))">
+	<OutDir>bin\$(Configuration)\2\$(TargetFramework)</OutDir>
+	</PropertyGroup>
+
+</Project>
