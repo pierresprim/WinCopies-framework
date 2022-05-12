@@ -10,13 +10,30 @@
 		<Copyright>Copyright © 2022 Pierre Sprimont</Copyright>
 		<DocumentationFile>WinCopies.Reflection.DotNetParser.xml</DocumentationFile>
 		<SignAssembly>true</SignAssembly>
-		<AssemblyOriginatorKeyFile>WinCopies.Reflection.DotNetParser.snk</AssemblyOriginatorKeyFile>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="WinCopies.Collections" Version="3.16-preview" />
+		<PackageReference Include="WinCopies.Collections" Version="3.17-preview" />
 	</ItemGroup>
 
 	<Import Project="..\..\Shared\WinCopies.Reflection.DotNetParser.Shared\WinCopies.Reflection.DotNetParser.Shared.projitems" Label="Shared" />
+
+	<ItemGroup>
+		<None Include="..\..\..\..\LICENSE.md">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+		<None Include="..\..\..\WinCopies.png">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="README.md">
+	    <PackagePath></PackagePath>
+	    <Pack>true</Pack>
+	  </None>
+	</ItemGroup>
 
 </Project>

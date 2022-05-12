@@ -1,12 +1,12 @@
-﻿WinCopies-framework (WinCopies.IO package)
-==========================================
+﻿WinCopies-framework (WinCopies.Reflection.DotNetParser package)
+===============================================================
 
 The WinCopies® software framework
 
 README
 ======
 
-[![NuGet Badge](https://buildstats.info/nuget/WinCopies.IO)](https://www.nuget.org/packages/WinCopies.IO/)
+[![NuGet Badge](https://buildstats.info/nuget/WinCopies.Reflection.DotNetParser)](https://www.nuget.org/packages/WinCopies.Reflection.DotNetParser/)
 
 Updates
 -------
@@ -16,7 +16,7 @@ See the Change log.
 Description
 -----------
 
-Provides a WPF GUI for the WinCopies.IO package.
+Provides helpers to parse .Net assemblies.
 
 Project link
 ------------

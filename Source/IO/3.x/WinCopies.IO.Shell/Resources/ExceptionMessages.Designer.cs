@@ -187,6 +187,15 @@ namespace WinCopies.IO.Shell.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No BrowsableObjectInfo could be generated..
+        /// </summary>
+        public static string NoBrowsableObjectInfoCouldBeGenerated {
+            get {
+                return ResourceManager.GetString("NoBrowsableObjectInfoCouldBeGenerated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No process could be generated..
         /// </summary>
         public static string NoProcessCouldBeGenerated {

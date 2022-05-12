@@ -13,28 +13,28 @@
 		<SignAssembly>true</SignAssembly>
 		<AssemblyOriginatorKeyFile>WinCopies.GUI.snk</AssemblyOriginatorKeyFile>
 		<DefineConstants>WinCopies2;WinCopies3;$(DefineConstants)</DefineConstants>
-		<VersionPrefix>3.12</VersionPrefix>
+		<VersionPrefix>3.13</VersionPrefix>
 		<VersionSuffix>preview</VersionSuffix>
-		<AssemblyVersion>3.12</AssemblyVersion>
-		<FileVersion>3.12</FileVersion>
+		<AssemblyVersion>3.13</AssemblyVersion>
+		<FileVersion>3.13</FileVersion>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="WinCopies.Util" Version="3.16-preview" />
-		<PackageReference Include="WinCopies.Collections" Version="3.16-preview" />
-		<PackageReference Include="WinCopies.Util.Extensions" Version="3.14-preview" />
-		<PackageReference Include="WinCopies.Util.Desktop" Version="3.16-preview" />
+		<PackageReference Include="WinCopies.Util" Version="3.17-preview" />
+		<PackageReference Include="WinCopies.Collections" Version="3.17-preview" />
+		<PackageReference Include="WinCopies.Util.Extensions" Version="3.17-preview" />
+		<PackageReference Include="WinCopies.Util.Desktop" Version="3.17-preview" />
 
-		<PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="3.8.2-preview" />
-		<PackageReference Include="WinCopies.WindowsAPICodePack.Win32Native" Version="3.9-preview" />
+		<PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="3.10-preview" />
+		<PackageReference Include="WinCopies.WindowsAPICodePack.Win32Native" Version="3.10-preview" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Include="..\..\..\LICENSE.md">
+		<None Include="..\..\..\..\LICENSE.md">
 			<Pack>True</Pack>
 			<PackagePath></PackagePath>
 		</None>
-		<None Include="..\..\WinCopies.png">
+		<None Include="..\..\..\WinCopies.png">
 			<Pack>True</Pack>
 			<PackagePath></PackagePath>
 		</None>
@@ -54,9 +54,7 @@
 	</ItemGroup>
 
 	<Import Project="..\..\Shared\WinCopies.GUI.Shared\WinCopies.GUI.Shared.projitems" Label="Shared" />
-
 	<Import Project="..\..\Shared\WinCopies.GUI.Controls.Shared\WinCopies.GUI.Controls.Shared.projitems" Label="Shared" />
-
 	<Import Project="..\..\Shared\WinCopies.GUI.Windows.Shared\WinCopies.GUI.Windows.Shared.projitems" Label="Shared" />
 
 </Project>

@@ -125,7 +125,7 @@ namespace WinCopies.IO.Process
             #region Types
             private class Dictionary : Dictionary<string, ICommand<IProcessErrorItem<IPathInfo, ProcessError, CopyErrorAction>>>
             {
-                public static IReadOnlyDictionary<string, ICommand<IProcessErrorItem<IPathInfo, ProcessError, CopyErrorAction>>> Instance { get; } = new Dictionary();
+                public static System.Collections.Generic.IReadOnlyDictionary<string, ICommand<IProcessErrorItem<IPathInfo, ProcessError, CopyErrorAction>>> Instance { get; } = new Dictionary();
 
                 private Dictionary()
                 {
@@ -167,7 +167,7 @@ namespace WinCopies.IO.Process
 
             public override string Name => Options.Move ? Shell.Properties.Resources.Move : Shell.Properties.Resources.Copy;
 
-            public override IReadOnlyDictionary<string, ICommand<IProcessErrorItem<IPathInfo, ProcessError, CopyErrorAction>>> Actions => Dictionary.Instance;
+            public override System.Collections.Generic.IReadOnlyDictionary<string, ICommand<IProcessErrorItem<IPathInfo, ProcessError, CopyErrorAction>>> Actions => Dictionary.Instance;
 
             protected NewPathStruct NewPath { get; set; }
             #endregion Properties

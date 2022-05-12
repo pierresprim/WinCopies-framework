@@ -277,6 +277,66 @@
             Identifies the <see cref="P:WinCopies.GUI.Controls.LinkRun.Uri"/> dependency property.
             </summary>
         </member>
+        <member name="F:WinCopies.GUI.Controls.SwitchBase.StatusProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.SwitchBase.Status"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.SwitchBase.SwitcherShapeProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.SwitchBase.SwitcherShape"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.SwitchBase.IsHighlightedProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.SwitchBase.IsHighlighted"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.SwitchBase.IsPressedProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.SwitchBase.IsPressed"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.SwitchBase.IsIndeterminateAStateProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.SwitchBase.IsIndeterminateAState"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.SwitchBase.CornerRadiusProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.SwitchBase.CornerRadius"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.Switch.StatusProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.Switch.Status"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.Switch.SwitcherShapeProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.Switch.SwitcherShape"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.Switch.IsHighlightedProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.Switch.IsHighlighted"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.Switch.IsIndeterminateAStateProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.Switch.IsIndeterminateAState"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.Switch.CornerRadiusProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.Switch.CornerRadius"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.Switch.CommandProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.Switch.Command"/> dependency property.
+            </summary>
+        </member>
         <member name="T:WinCopies.GUI.Controls.TextBox">
             <summary>
             Represents a <see cref="T:System.Windows.Controls.TextBox"/> that can display items on the left and right of the text.
@@ -377,36 +437,6 @@
         <member name="F:WinCopies.GUI.Controls.PropertyGrid.IconProperty">
             <summary>
             Identifies the <see cref="P:WinCopies.GUI.Controls.PropertyGrid.Icon"/> dependency property.
-            </summary>
-        </member>
-        <member name="T:XamlGeneratedNamespace.GeneratedInternalTypeHelper">
-            <summary>
-            GeneratedInternalTypeHelper
-            </summary>
-        </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateInstance(System.Type,System.Globalization.CultureInfo)">
-            <summary>
-            CreateInstance
-            </summary>
-        </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.GetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Globalization.CultureInfo)">
-            <summary>
-            GetPropertyValue
-            </summary>
-        </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.SetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Object,System.Globalization.CultureInfo)">
-            <summary>
-            SetPropertyValue
-            </summary>
-        </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateDelegate(System.Type,System.Object,System.String)">
-            <summary>
-            CreateDelegate
-            </summary>
-        </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.AddEventHandler(System.Reflection.EventInfo,System.Object,System.Delegate)">
-            <summary>
-            AddEventHandler
             </summary>
         </member>
     </members>

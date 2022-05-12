@@ -17,14 +17,13 @@
 
 using System;
 using System.Collections.ObjectModel;
-using System.Linq;
+using System.Drawing;
 using System.Windows;
 using System.Windows.Input;
 
 using WinCopies.GUI.IO.ObjectModel;
 using WinCopies.GUI.IO.Process;
 using WinCopies.GUI.Shell;
-using WinCopies.GUI.Shell.ObjectModel;
 using WinCopies.IO;
 using WinCopies.IO.ObjectModel;
 using WinCopies.IO.Process;
@@ -38,18 +37,18 @@ namespace WinCopies.GUI.Samples
         protected override bool ValidateClosing() => true;
     }
 
-    public class PluginInfo : PluginInfo<IBrowsableObjectInfoPlugin>
+    public class PluginInfo : Shell.ObjectModel.PluginInfo
     {
-        protected override IBrowsableObjectInfo ParentOverride => new BrowsableObjectInfoStartPage(ClientVersion);
-
         public PluginInfo(in IBrowsableObjectInfoPlugin plugin, in ClientVersion clientVersion) : base(plugin, clientVersion) { /* Left empty. */ }
+
+        protected override Shell.ObjectModel.BrowsableObjectInfoStartPage GetBrowsableObjectInfoStartPage() => new BrowsableObjectInfoStartPage(ClientVersion);
     }
 
-    public class BrowsableObjectInfoStartPage : BrowsableObjectInfoStartPage<IEncapsulatorBrowsableObjectInfo<IBrowsableObjectInfoPlugin>>
+    public class BrowsableObjectInfoStartPage : Shell.ObjectModel.BrowsableObjectInfoStartPage
     {
-        protected override IBitmapSourceProvider BitmapSourceProviderOverride => new BitmapSourceProvider(new IconBitmapSources(Properties.Resources.WinCopies), null, null, true);
-
-        public BrowsableObjectInfoStartPage(in ClientVersion clientVersion) : base(Enumerable.Repeat(new PluginInfo(App.Current.PluginParameters, clientVersion), 1), clientVersion) { /* Left empty. */ }
+        public BrowsableObjectInfoStartPage(in ClientVersion clientVersion) : base(new PluginInfo(App.Current.PluginParameters, clientVersion), clientVersion) { /* Left empty. */ }
+       
+        protected override Icon GetIcon() => Properties.Resources.WinCopies;
     }
 
     public partial class ExplorerControlWindow : BrowsableObjectInfoWindow2
@@ -69,7 +68,7 @@ namespace WinCopies.GUI.Samples
 
         public static IProcessPathCollectionFactory DefaultProcessPathCollectionFactory { get; } = new ProcessPathCollectionFactory();
 
-        public override ClientVersion ClientVersion => _clientVersion ??= WinCopies.IO.ObjectModel.BrowsableObjectInfo.GetDefaultClientVersion();
+        public override ClientVersion ClientVersion => _clientVersion ??= BrowsableObjectInfo.GetDefaultClientVersion();
 
         public ExplorerControlWindow() : base(GetDefaultDataContext())
         {

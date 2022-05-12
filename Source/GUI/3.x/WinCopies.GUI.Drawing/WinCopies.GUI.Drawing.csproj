@@ -10,15 +10,16 @@
     <DocumentationFile>WinCopies.GUI.Drawing.xml</DocumentationFile>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DefineConstants>WinCopies2;WinCopies3;$(DefineConstants)</DefineConstants>
-    <VersionPrefix>3.6</VersionPrefix>
-    <AssemblyVersion>3.6</AssemblyVersion>
-    <FileVersion>3.6</FileVersion>
+	  <VersionPrefix>3.13</VersionPrefix>
+	  <AssemblyVersion>3.13</AssemblyVersion>
+	  <FileVersion>3.13</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="WinCopies.Util" Version="3.12-preview" />
-    <PackageReference Include="WinCopies.Collections" Version="3.12-preview" />
-    <PackageReference Include="WinCopies.WindowsAPICodePack.Win32Native" Version="3.4-preview" />
+    <PackageReference Include="WinCopies.Util" Version="3.17-preview" />
+    <PackageReference Include="WinCopies.Collections" Version="3.17-preview" />
+	  
+    <PackageReference Include="WinCopies.WindowsAPICodePack.Win32Native" Version="3.10-preview" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework.TrimEnd(`-windows`))'=='net5.0'">
@@ -56,16 +57,16 @@
     </EmbeddedResource>
   </ItemGroup>
 
-  <ItemGroup>
-    <None Include="..\..\..\LICENSE.md">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
-    <None Include="..\..\WinCopies.png">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
-  </ItemGroup>
+	<ItemGroup>
+		<None Include="..\..\..\..\LICENSE.md">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+		<None Include="..\..\..\WinCopies.png">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+	</ItemGroup>
 
   <ItemGroup>
     <Compile Update="Resources\ExceptionMessages.Designer.cs">

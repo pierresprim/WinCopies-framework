@@ -211,6 +211,11 @@
               Looks up a localized string similar to The item is not a directory..
             </summary>
         </member>
+        <member name="P:WinCopies.IO.Shell.Resources.ExceptionMessages.NoBrowsableObjectInfoCouldBeGenerated">
+            <summary>
+              Looks up a localized string similar to No BrowsableObjectInfo could be generated..
+            </summary>
+        </member>
         <member name="P:WinCopies.IO.Shell.Resources.ExceptionMessages.NoProcessCouldBeGenerated">
             <summary>
               Looks up a localized string similar to No process could be generated..
@@ -368,7 +373,7 @@
         </member>
         <member name="P:WinCopies.IO.ObjectModel.Reflection.DotNetItemInfo`5.DescriptionOverride">
             <summary>
-            Gets the <see cref="F:WinCopies.UtilHelpers.NotApplicable"/> value.
+            Gets the <see cref="!:NotApplicable"/> value.
             </summary>
         </member>
         <member name="P:WinCopies.IO.ObjectModel.Reflection.DotNetItemInfo`5.IsSpecialItemOverride">
@@ -573,9 +578,9 @@
         </member>
         <member name="M:WinCopies.IO.ObjectModel.ShellObjectInfo`4.GetParent">
             <summary>
-            Returns the parent of this <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/>.
+            Returns the parent of this <see cref="T:WinCopies.IO.ObjectModel.BrowsableObjectInfo"/>.
             </summary>
-            <returns>The parent of this <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/>.</returns>
+            <returns>The parent of this <see cref="T:WinCopies.IO.ObjectModel.BrowsableObjectInfo"/>.</returns>
         </member>
         <member name="M:WinCopies.IO.ObjectModel.ShellObjectInfo`4.ToString">
             <summary>

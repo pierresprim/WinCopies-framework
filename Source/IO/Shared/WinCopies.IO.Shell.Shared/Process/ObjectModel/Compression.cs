@@ -50,7 +50,7 @@ namespace WinCopies.IO.Process
                                       // >
            ArchiveProcess<T> where T : ProcessErrorTypes<IPathInfo, ProcessError, object>.IProcessErrorFactories
         {
-            public override IReadOnlyDictionary<string, ICommand<IProcessErrorItem<IPathInfo, ProcessError, object>>> Actions => null;
+            public override System.Collections.Generic.IReadOnlyDictionary<string, ICommand<IProcessErrorItem<IPathInfo, ProcessError, object>>> Actions => null;
 
             protected SevenZipCompressor ArchiveCompressor { get; }
 

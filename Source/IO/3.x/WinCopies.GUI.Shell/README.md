@@ -6,7 +6,7 @@ The WinCopies® software framework
 README
 ======
 
-[![NuGet Badge](https://buildstats.info/nuget/WinCopies.GUI.IO)](https://www.nuget.org/packages/WinCopies.GUI.IO/)
+[![NuGet Badge](https://buildstats.info/nuget/WinCopies.GUI.Shell)](https://www.nuget.org/packages/WinCopies.GUI.Shell/)
 
 Updates
 -------
@@ -16,7 +16,7 @@ See the Change log.
 Description
 -----------
 
-Provides a WPF GUI for the WinCopies.IO package.
+Provides a WPF GUI for the WinCopies.IO.Shell package.
 
 Project link
 ------------

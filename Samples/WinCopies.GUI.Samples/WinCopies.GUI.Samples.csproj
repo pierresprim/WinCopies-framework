@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
   <PropertyGroup>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net7.0-windows</TargetFramework>
     <OutputType>WinExe</OutputType>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
@@ -9,9 +9,10 @@
   <Import Project="..\WinCopies.GUI.Samples.Shared\WinCopies.GUI.Samples.Shared.projitems" Label="Shared" />
 
   <ItemGroup>
-    <PackageReference Include="WinCopies.Util.Desktop" Version="3.16-preview" />
-    <PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="3.8.2-preview" />
-    <PackageReference Include="WinCopies.WindowsAPICodePack.Win32Native" Version="3.9.0-preview" />
+    <PackageReference Include="WinCopies.Util.Desktop" Version="3.17-preview" />
+	  
+    <PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="3.10-preview" />
+    <PackageReference Include="WinCopies.WindowsAPICodePack.Win32Native" Version="3.10-preview" />
   </ItemGroup>
 
   <ItemGroup>
@@ -22,8 +23,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Source\GUI\WinCopies.GUI.Templates\WinCopies.GUI.Templates.csproj" />
-    <ProjectReference Include="..\..\Source\GUI\WinCopies.GUI\WinCopies.GUI.csproj" />
+    <ProjectReference Include="..\..\Source\GUI\3.x\WinCopies.GUI.Templates\WinCopies.GUI.Templates.csproj" />
+    <ProjectReference Include="..\..\Source\GUI\3.x\WinCopies.GUI\WinCopies.GUI.csproj" />
+    <ProjectReference Include="..\..\Source\IO\3.x\WinCopies.GUI.Shell\WinCopies.GUI.Shell.csproj" />
   </ItemGroup>
 
   <ItemGroup>

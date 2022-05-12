@@ -185,7 +185,7 @@ namespace WinCopies.IO
             {
                 _ = merger.AddFirst(new UIntCountableEnumerable<char, IUIntCountableEnumerator<char>>(RepeatEnumerator<char>.Get('\\', 1)));
 
-                _ = merger.AddFirst(new UIntCountableEnumerable<char>(new StringCharArray(_path.RelativePath)));
+                _ = merger.AddFirst(new Collections.Generic.UIntCountableEnumerable<char>(new StringCharArray(_path.RelativePath)));
             }
 
             if (ignoreRoot && merger.Count > 0)
@@ -195,7 +195,7 @@ namespace WinCopies.IO
                 merger.RemoveFirst();
             }
 
-            _ = merger.AddLast(new UIntCountableEnumerable<char>(new StringCharArray(path.RelativePath)));
+            _ = merger.AddLast(new Collections.Generic.UIntCountableEnumerable<char>(new StringCharArray(path.RelativePath)));
 
             char[] result = merger.ToArray();
 

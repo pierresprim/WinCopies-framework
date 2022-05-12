@@ -165,6 +165,12 @@
   <data name="Copy" xml:space="preserve">
     <value>Copy</value>
   </data>
+  <data name="CopyNameStatusBarLabel" xml:space="preserve">
+    <value>Copies the name of the selected item.</value>
+  </data>
+  <data name="CopyPathStatusBarLabel" xml:space="preserve">
+    <value>Copies the path of the selected item.</value>
+  </data>
   <data name="CopyStatusBarLabel" xml:space="preserve">
     <value>Copies the selected items to the Clipboard.</value>
   </data>

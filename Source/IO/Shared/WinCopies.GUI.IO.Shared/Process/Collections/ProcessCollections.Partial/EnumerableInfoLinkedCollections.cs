@@ -29,13 +29,14 @@ using WinCopies.Collections.Enumeration.Generic;
 using WinCopies.Collections.Generic;
 using WinCopies.IO;
 using WinCopies.IO.Process;
+using WinCopies.Util;
 
 using static WinCopies.Collections.ThrowHelper;
 using static WinCopies.ThrowHelper;
 
 namespace WinCopies.GUI.IO.Process
 {
-    public interface IProcessLinkedList<TItems, TError, TErrorItems, TAction> : ICollection<TErrorItems>, System.Collections.Generic.IEnumerable<TErrorItems>, IEnumerable, System.Collections.Generic.IReadOnlyCollection<TErrorItems>, ICollection, ILinkedList3<TErrorItems>, IReadOnlyLinkedList2<TErrorItems>, IReadOnlyLinkedList<TErrorItems>, IUIntCountable, Collections.Generic.IEnumerable<TErrorItems>, Collections.Generic.IEnumerable<ILinkedListNode<TErrorItems>>, System.Collections.Generic.IEnumerable<ILinkedListNode<TErrorItems>>, INotifyPropertyChanged, INotifyLinkedCollectionChanged<TErrorItems>, WinCopies.IO.Process.IProcessLinkedList<TItems, TError, TErrorItems, TAction> where TItems : IPath where TErrorItems : IProcessErrorItem<TItems, TError, TAction>
+    public interface IProcessLinkedList<TItems, TError, TErrorItems, TAction> : System.Collections.Generic.ICollection<TErrorItems>, System.Collections.Generic.IEnumerable<TErrorItems>, IEnumerable, System.Collections.Generic.IReadOnlyCollection<TErrorItems>, ICollection, ILinkedList3<TErrorItems>, IReadOnlyLinkedList2<TErrorItems>, IReadOnlyLinkedList<TErrorItems>, IUIntCountable, Collections.Generic.IEnumerable<TErrorItems>, Collections.Generic.IEnumerable<ILinkedListNode<TErrorItems>>, System.Collections.Generic.IEnumerable<ILinkedListNode<TErrorItems>>, INotifyPropertyChanged, INotifyLinkedCollectionChanged<TErrorItems>, WinCopies.IO.Process.IProcessLinkedList<TItems, TError, TErrorItems, TAction> where TItems : IPath where TErrorItems : IProcessErrorItem<TItems, TError, TAction>
     {
         new object SyncRoot { get; }
 
@@ -200,7 +201,7 @@ namespace WinCopies.GUI.IO.Process
 #endif
     }
 
-    public class ReadOnlyObservableProcessLinkedCollection<TItems, TError, TItemsIn, TItemsOut, TAction> : ICollection<TItemsOut>, System.Collections.Generic.IEnumerable<TItemsOut>, IReadOnlyCollection<TItemsOut>, ICollection, INotifyPropertyChanged, INotifyLinkedCollectionChanged<TItemsOut>, IReadOnlyLinkedList2<TItemsOut>, IReadOnlyLinkedList<TItemsOut>, IUIntCountable, Collections.Generic.IEnumerable<TItemsOut>,
+    public class ReadOnlyObservableProcessLinkedCollection<TItems, TError, TItemsIn, TItemsOut, TAction> : System.Collections.Generic.ICollection<TItemsOut>, System.Collections.Generic.IEnumerable<TItemsOut>, System.Collections.Generic.IReadOnlyCollection<TItemsOut>, ICollection, INotifyPropertyChanged, INotifyLinkedCollectionChanged<TItemsOut>, IReadOnlyLinkedList2<TItemsOut>, IReadOnlyLinkedList<TItemsOut>, IUIntCountable, Collections.Generic.IEnumerable<TItemsOut>,
 #if CS8
         Collections.DotNetFix.Generic.IEnumerable<TItemsOut>, 
 #endif
@@ -220,7 +221,7 @@ namespace WinCopies.GUI.IO.Process
 
         public bool IsReadOnly => true;
 
-        int ICollection<TItemsOut>.Count => InnerLinkedCollection.AsFromType<ICollection<TItemsIn>>().Count;
+        int System.Collections.Generic.ICollection<TItemsOut>.Count => InnerLinkedCollection.AsFromType<System.Collections.Generic.ICollection<TItemsIn>>().Count;
 
         public bool SupportsReversedEnumeration => InnerLinkedCollection.SupportsReversedEnumeration;
 
@@ -234,7 +235,7 @@ namespace WinCopies.GUI.IO.Process
 
         object ICollection.SyncRoot => InnerLinkedCollection.AsFromType<ICollection>().SyncRoot;
 
-        int IReadOnlyCollection<TItemsOut>.Count => InnerLinkedCollection.AsFromType<IReadOnlyCollection<TItemsIn>>().Count;
+        int System.Collections.Generic.IReadOnlyCollection<TItemsOut>.Count => InnerLinkedCollection.AsFromType<System.Collections.Generic.IReadOnlyCollection<TItemsIn>>().Count;
 
         TItemsOut IReadOnlyLinkedList2<TItemsOut>.FirstValue => InnerLinkedCollection.FirstValue;
 
@@ -314,9 +315,9 @@ namespace WinCopies.GUI.IO.Process
 
         ProcessTypes<TItemsOut>.IProcessQueue ProcessTypes<TItemsOut>.IProcessQueue.AsReadOnly() => this;
 
-        void ICollection<TItemsOut>.Add(TItemsOut item) => throw GetReadOnlyListOrCollectionException();
+        void System.Collections.Generic.ICollection<TItemsOut>.Add(TItemsOut item) => throw GetReadOnlyListOrCollectionException();
 
-        void ICollection<TItemsOut>.Clear() => throw GetReadOnlyListOrCollectionException();
+        void System.Collections.Generic.ICollection<TItemsOut>.Clear() => throw GetReadOnlyListOrCollectionException();
 
         public bool Contains(TItemsOut item) => item is TItemsIn _item && InnerLinkedCollection.Contains(_item);
 
@@ -333,7 +334,7 @@ namespace WinCopies.GUI.IO.Process
                 array[++i] = item;
         }
 
-        bool ICollection<TItemsOut>.Remove(TItemsOut item) => throw GetReadOnlyListOrCollectionException();
+        bool System.Collections.Generic.ICollection<TItemsOut>.Remove(TItemsOut item) => throw GetReadOnlyListOrCollectionException();
 
         IReadOnlyLinkedListNode<TItemsOut> IReadOnlyLinkedList<TItemsOut>.Find(TItemsOut value) => throw GetReadOnlyListOrCollectionException();
 

@@ -90,7 +90,7 @@ namespace WinCopies.IO.Process.ObjectModel
             }
         }
 
-        public override IReadOnlyDictionary<string, ICommand<IProcessErrorItem<IPathInfo, ProcessError, ErrorAction>>> Actions => null;
+        public override System.Collections.Generic.IReadOnlyDictionary<string, ICommand<IProcessErrorItem<IPathInfo, ProcessError, ErrorAction>>> Actions => null;
         #endregion Properties
 
         public Deletion(in IEnumerableQueue<IPathInfo> initialPaths, in IPathInfo sourcePath, in ProcessTypes<IPathInfo>.IProcessQueue paths, in IProcessLinkedList<IPathInfo, ProcessError, ProcessTypes<IPathInfo, ProcessError, ErrorAction>.ProcessErrorItem, ErrorAction> errorsQueue, in ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessDelegates<ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessEventDelegates> progressDelegate, DeletionOptions<IPathInfo> options, T factory) : base(options.RemoveOption == RemoveOption.Clear && ((IUIntCountable)(initialPaths ?? throw GetArgumentNullException(nameof(initialPaths)))).Count != 0 ? throw new ArgumentException($"The initial paths collection must be empty (not null) when {nameof(options)}.{nameof(DeletionOptions<IPathInfo>.RemoveOption)} is set to {nameof(RemoveOption.Clear)}.") : initialPaths, sourcePath, paths, errorsQueue, progressDelegate, factory, options)

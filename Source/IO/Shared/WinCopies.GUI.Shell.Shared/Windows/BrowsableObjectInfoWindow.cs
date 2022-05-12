@@ -44,6 +44,7 @@ using System.Windows.Media;
 using WinCopies.Desktop;
 using WinCopies.GUI.IO.Controls;
 using WinCopies.GUI.IO.ObjectModel;
+using WinCopies.GUI.Shell.ObjectModel;
 using WinCopies.GUI.Windows;
 using WinCopies.IO;
 using WinCopies.IO.ObjectModel;
@@ -157,15 +158,7 @@ namespace WinCopies.GUI.Shell
             }
         }
 
-        private static void RegisterClassHandler(in RoutedEvent routedEvent, in Delegate handler) => Util.Desktop.UtilHelpers.RegisterClassHandler<BrowsableObjectInfoWindow>(routedEvent, handler);
-
-        //private System.Windows.Interop.HwndSourceHook _hook;
-
-        private static RoutedUICommand GetRoutedCommand(in string text, in string name) => new
-#if !CS9
-            RoutedUICommand
-#endif
-            (text, name, typeof(BrowsableObjectInfoWindow));
+        private delegate IBrowsableObjectInfoWindowViewModel GetPathsFunc<T>(in RoutedEventArgs e, out T sender, out BrowsableObjectInfoWindow window);
 
         public abstract ClientVersion ClientVersion { get; }
 
@@ -180,8 +173,6 @@ namespace WinCopies.GUI.Shell
         public static DependencyProperty StatusBarLabelProperty = Util.Desktop.UtilHelpers.Register<string, BrowsableObjectInfoWindow>(nameof(StatusBarLabel));
 
         public string StatusBarLabel { get => (string)GetValue(StatusBarLabelProperty); set => SetValue(StatusBarLabelProperty, value); }
-
-        private delegate IBrowsableObjectInfoWindowViewModel GetPathsFunc<T>(in RoutedEventArgs e, out T sender, out BrowsableObjectInfoWindow window);
 
         static BrowsableObjectInfoWindow()
         {
@@ -597,6 +588,16 @@ namespace WinCopies.GUI.Shell
 
         protected BrowsableObjectInfoWindow() : this(GetDefaultDataContext()) { /* Left empty. */ }
 
+        private static void RegisterClassHandler(in RoutedEvent routedEvent, in Delegate handler) => Util.Desktop.UtilHelpers.RegisterClassHandler<BrowsableObjectInfoWindow>(routedEvent, handler);
+
+        //private System.Windows.Interop.HwndSourceHook _hook;
+
+        private static RoutedUICommand GetRoutedCommand(in string text, in string name) => new
+#if !CS9
+            RoutedUICommand
+#endif
+            (text, name, typeof(BrowsableObjectInfoWindow));
+
         public static IBrowsableObjectInfoWindowViewModel GetDefaultDataContext()
         {
             var dataContext = new BrowsableObjectInfoWindowViewModel();
@@ -628,7 +629,7 @@ namespace WinCopies.GUI.Shell
             e.Handled = true;
         }
 
-        protected virtual bool OnCanCancelClose(IList<IExplorerControlViewModel> paths) => /* !Current.IsClosing && */ paths.Count > 1 && MessageBox.Show(this, Properties.Resources.WindowClosingMessage, "WinCopies", YesNo, Question, No) != Yes;
+        protected virtual bool OnCanCancelClose(IList<IExplorerControlViewModel> paths) => /* !Current.IsClosing && */ paths.Count > 1 && MessageBox.Show(this, ShellResources.WindowClosingMessage, "WinCopies", YesNo, Question, No) != Yes;
 
         protected override void OnClosing(CancelEventArgs e)
         {
@@ -707,7 +708,7 @@ namespace WinCopies.GUI.Shell
 
         private void Paste_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = GetProcessFactory().CanPaste(10u);
+            e.CanExecute = GetProcessFactory()?.CanPaste(10u) == true;
 
             e.Handled = true;
         }
@@ -986,7 +987,7 @@ namespace WinCopies.GUI.Shell
 
                 void _openItem(IBrowsableObjectInfoViewModel browsableObjectInfo)
                 {
-                    IBrowsableObjectInfoViewModel item = ExplorerControlViewModel.GetBrowsableObjectInfoOrLaunchItem(browsableObjectInfo);
+                    IBrowsableObjectInfoViewModel item = IO.ObjectModel.ExplorerControlViewModel.GetBrowsableObjectInfoOrLaunchItem(browsableObjectInfo);
 
                     if (item != null)
 

@@ -6,7 +6,7 @@ The WinCopies® software framework
 README
 ======
 
-[![NuGet Badge](https://buildstats.info/nuget/WinCopies.IO)](https://www.nuget.org/packages/WinCopies.IO/)
+[![NuGet Badge](https://buildstats.info/nuget/WinCopies.IO.Shell)](https://www.nuget.org/packages/WinCopies.IO.Shell/)
 
 Description
 -----------

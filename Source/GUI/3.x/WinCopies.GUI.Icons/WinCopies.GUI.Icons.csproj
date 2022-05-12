@@ -9,9 +9,9 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>WinCopies.GUI.Icons.snk</AssemblyOriginatorKeyFile>
     <DefineConstants>WinCopies2;WinCopies3;$(DefineConstants)</DefineConstants>
-    <VersionPrefix>3.6</VersionPrefix>
-    <AssemblyVersion>3.6</AssemblyVersion>
-    <FileVersion>3.6</FileVersion>
+	  <VersionPrefix>3.13</VersionPrefix>
+	  <AssemblyVersion>3.13</AssemblyVersion>
+	  <FileVersion>3.13</FileVersion>
   </PropertyGroup>
 
   <ItemGroup Condition="$(DefineConstants.Contains('CS8'))">
@@ -39,7 +39,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WinCopies.Util.Desktop" Version="3.12-preview" />
+    <PackageReference Include="WinCopies.Util.Desktop" Version="3.17-preview" />
   </ItemGroup>
 
   <ItemGroup>
@@ -57,15 +57,15 @@
     </EmbeddedResource>
   </ItemGroup>
 
-  <ItemGroup>
-    <None Include="..\..\..\LICENSE.md">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
-    <None Include="..\..\WinCopies.png">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
-  </ItemGroup>
+	<ItemGroup>
+		<None Include="..\..\..\..\LICENSE.md">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+		<None Include="..\..\..\WinCopies.png">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+	</ItemGroup>
 
 </Project>

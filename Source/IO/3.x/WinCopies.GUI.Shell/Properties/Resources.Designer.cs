@@ -205,6 +205,24 @@ namespace WinCopies.GUI.Shell.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Copies the name of the selected item..
+        /// </summary>
+        public static string CopyNameStatusBarLabel {
+            get {
+                return ResourceManager.GetString("CopyNameStatusBarLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Copies the path of the selected item..
+        /// </summary>
+        public static string CopyPathStatusBarLabel {
+            get {
+                return ResourceManager.GetString("CopyPathStatusBarLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Copies the selected items to the Clipboard..
         /// </summary>
         public static string CopyStatusBarLabel {

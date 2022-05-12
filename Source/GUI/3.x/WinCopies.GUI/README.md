@@ -16,7 +16,7 @@ See the Change log.
 Description
 -----------
 
-Dependency package for other packages of the WinCopies framework.
+Common GUIs (controls, dialog boxes, windows).
 
 Project link
 ------------

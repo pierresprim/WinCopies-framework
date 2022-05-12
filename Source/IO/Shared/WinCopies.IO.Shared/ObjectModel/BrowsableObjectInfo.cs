@@ -15,7 +15,8 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-
+#region Usings
+#region System
 using System;
 using System.Collections;
 using System.Diagnostics;
@@ -24,7 +25,9 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
+#endregion System
 
+#region WinCopies
 using WinCopies.Collections.Generic;
 using WinCopies.GUI.Drawing;
 using WinCopies.IO.ObjectModel;
@@ -33,9 +36,11 @@ using WinCopies.IO.Process.ObjectModel;
 using WinCopies.IO.PropertySystem;
 using WinCopies.PropertySystem;
 using WinCopies.Util.Commands.Primitives;
+#endregion WinCopies
 
 using static WinCopies.ThrowHelper;
 using static WinCopies.Collections.Util;
+#endregion Usings
 
 namespace WinCopies.IO
 {

@@ -10,22 +10,33 @@
 		<Copyright>Copyright © 2022 Pierre Sprimont</Copyright>
 		<DocumentationFile>WinCopies.Data.SQL.xml</DocumentationFile>
 		<SignAssembly>true</SignAssembly>
-		<AssemblyOriginatorKeyFile>WinCopies.Data.SQL.snk</AssemblyOriginatorKeyFile>
+		<VersionSuffix>preview</VersionSuffix>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="WinCopies.Collections" Version="3.16.0-preview" />
+		<PackageReference Include="WinCopies.Collections" Version="3.17-preview" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\..\..\..\LICENSE.md">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+		<None Include="..\..\..\WinCopies.png">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
 	</ItemGroup>
 		
 	<ItemGroup>
-		<None Include="..\..\..\LICENSE.md">
-			<Pack>True</Pack>
-			<PackagePath></PackagePath>
-		</None>
-		<None Include="..\..\WinCopies.png">
-			<Pack>True</Pack>
-			<PackagePath></PackagePath>
-		</None>
+	  <ProjectReference Include="..\..\..\Reflection\1.x\WinCopies.Reflection.DotNetParser\WinCopies.Reflection.DotNetParser.csproj" />
+	</ItemGroup>
+		
+	<ItemGroup>
+	  <None Update="README.md">
+	    <PackagePath></PackagePath>
+	    <Pack>true</Pack>
+	  </None>
 	</ItemGroup>
 
 	<Import Project="..\..\Shared\WinCopies.Data.SQL.Shared\WinCopies.Data.SQL.Shared.projitems" Label="Shared" />

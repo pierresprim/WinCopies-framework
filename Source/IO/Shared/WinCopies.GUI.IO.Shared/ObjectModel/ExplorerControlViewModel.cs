@@ -417,16 +417,14 @@ namespace WinCopies.GUI.IO
 
                 SelectedItems = new ReadOnlyObservableCollection<IBrowsableObjectInfoViewModel>(_selectedItems);
 
-                IBrowsableObjectInfo _checkHistory(in FuncOut<IBrowsableObjectInfo, bool> func, in string _path) => func(out IBrowsableObjectInfo result) && _path == result.Path ? result : null;
-
-                BrowseToParent = new DelegateCommand(o => !IsDisposed && Path.Parent != null, o =>
+                IBrowsableObjectInfo checkHistory(in FuncOut<IBrowsableObjectInfo, bool> func)
                 {
-                    string _path = Path.Parent.Path;
+                    IBrowsableObjectInfo _path = Path.Parent;
 
-                    IBrowsableObjectInfo checkHistory(in FuncOut<IBrowsableObjectInfo, bool> func) => _checkHistory(func, _path);
+                    return func(out IBrowsableObjectInfo result) && _path.Path == result.Path && _path.Protocol == result.Protocol ? result : null;
+                }
 
-                    Path = new BrowsableObjectInfoViewModel(checkHistory(_historyObservable.TryGetPrevious) ?? checkHistory(_historyObservable.TryGetNext) ?? Path.Parent);
-                });
+                BrowseToParent = new DelegateCommand(o => !IsDisposed && Path.Parent != null, o => Path = new BrowsableObjectInfoViewModel(checkHistory(_historyObservable.TryGetPrevious) ?? checkHistory(_historyObservable.TryGetNext) ?? Path.Parent));
 
                 ((INotifyPropertyChanged)(_historyObservable = new HistoryObservableCollection<IBrowsableObjectInfo>())).PropertyChanged += (object sender, System.ComponentModel.PropertyChangedEventArgs e) =>
                 {
@@ -435,7 +433,7 @@ namespace WinCopies.GUI.IO
                         OnHistoryCurrentChanged(e);
                 };
 
-                _historyObservable.Add(path);
+                _historyObservable.Add(path.Model);
 
                 _history = new ReadOnlyHistoryObservableCollection<IBrowsableObjectInfo>(_historyObservable);
 

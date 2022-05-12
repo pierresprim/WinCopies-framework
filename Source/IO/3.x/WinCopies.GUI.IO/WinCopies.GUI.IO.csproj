@@ -10,15 +10,16 @@
 		<SignAssembly>true</SignAssembly>
 		<AssemblyOriginatorKeyFile>WinCopies.GUI.IO.snk</AssemblyOriginatorKeyFile>
 		<DefineConstants>WinCopies2;WinCopies3;ProcessesWork;$(DefineConstants)</DefineConstants>
-		<VersionPrefix>3.12.1</VersionPrefix>
+		<VersionPrefix>3.13.1</VersionPrefix>
 		<VersionSuffix>preview</VersionSuffix>
-		<AssemblyVersion>3.12.1</AssemblyVersion>
-		<FileVersion>3.12.1</FileVersion>
+		<AssemblyVersion>3.13.1</AssemblyVersion>
+		<FileVersion>3.13.1</FileVersion>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="WinCopies.Util" Version="3.16-preview" />
-		<PackageReference Include="WinCopies.Util.Desktop" Version="3.16-preview" />
+		<PackageReference Include="WinCopies.Util" Version="3.17-preview" />
+		<PackageReference Include="WinCopies.Util.Desktop" Version="3.17-preview" />
+		
 		<PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.19" />
 	</ItemGroup>
 
@@ -32,11 +33,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Include="..\..\..\LICENSE.md">
+		<None Include="..\..\..\..\LICENSE.md">
 			<Pack>True</Pack>
 			<PackagePath></PackagePath>
 		</None>
-		<None Include="..\..\WinCopies.png">
+		<None Include="..\..\..\WinCopies.png">
 			<Pack>True</Pack>
 			<PackagePath></PackagePath>
 		</None>

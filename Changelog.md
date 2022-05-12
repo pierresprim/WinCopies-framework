@@ -6,6 +6,12 @@ The WinCopies® software framework
 CHANGELOG
 ---------
 
+### 3.13.1-preview
+
+- Move AppBrowsableObjectInfo\<T>, PluginInfo\<T>, BrowsableObjectInfoStartPage\<T>, to WinCopies.IO.Shell.ObjectModel.
+- BrowsableObjectInfoWindow: bug fixed in Paste command handling.
+- ExplorerControlViewModel: bug fixed: it was the view model that added to the history instead of the inner object.
+
 ### 3.13-preview
 
 - Add:

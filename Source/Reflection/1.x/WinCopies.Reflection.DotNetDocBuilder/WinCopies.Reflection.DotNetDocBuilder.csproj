@@ -10,13 +10,35 @@
 	  <Copyright>Copyright © 2022 Pierre Sprimont</Copyright>
 	  <DocumentationFile>WinCopies.Reflection.DotNetDocBuilder.xml</DocumentationFile>
 	  <SignAssembly>true</SignAssembly>
-	  <AssemblyOriginatorKeyFile>WinCopies.Reflection.DotNetDocBuilder.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
+	<ItemGroup>
+		<PackageReference Include="WinCopies.Util.Extensions" Version="3.17-preview" />
+	</ItemGroup>
+
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Data\1.x\WinCopies.Data.SQL\WinCopies.Data.SQL.csproj" />
     <ProjectReference Include="..\WinCopies.Reflection.DotNetParser\WinCopies.Reflection.DotNetParser.csproj" />
   </ItemGroup>
 
   <Import Project="..\..\Shared\WinCopies.Reflection.DotNetDocBuilder.Shared\WinCopies.Reflection.DotNetDocBuilder.Shared.projitems" Label="Shared" />
+
+	<ItemGroup>
+		<None Include="..\..\..\..\LICENSE.md">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+		<None Include="..\..\..\WinCopies.png">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="README.md">
+	    <PackagePath></PackagePath>
+	    <Pack>true</Pack>
+	  </None>
+	</ItemGroup>
 
 </Project>

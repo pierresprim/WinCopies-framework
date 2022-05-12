@@ -419,12 +419,8 @@ namespace WinCopies.Reflection.DotNetDocBuilder
             }
 
             int dotIndex;
-#if CS5
-            (string parentNamespace, string namespaceName)
-#else
-            ValueTuple<string, string>
-#endif
-                tuple;
+
+            (string parentNamespace, string namespaceName) tuple;
 
             if ((dotIndex = wholeNamespace.LastIndexOf('.')) > -1)
 

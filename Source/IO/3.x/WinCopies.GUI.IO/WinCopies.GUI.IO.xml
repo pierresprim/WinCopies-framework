@@ -91,6 +91,46 @@
               Looks up a localized string similar to &quot;This operation is not supported for this type of BackgroundWorker.&quot;.
             </summary>
         </member>
+        <member name="F:WinCopies.GUI.IO.Controls.AddressBar.GoButtonCommandProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.AddressBar.GoButtonCommand"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.AddressBar.GoButtonCommandParameterProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.AddressBar.GoButtonCommandParameter"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.AddressBar.PathProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.AddressBar.Path"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.AddressBar.TextProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.AddressBar.Text"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.ExplorerControlDefaultListViewItemContent.IsCheckBoxVisibleProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.ExplorerControlDefaultListViewItemContent.IsCheckBoxVisible"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.ExplorerControlDefaultListViewItemContent.IconProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.ExplorerControlDefaultListViewItemContent.Icon"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.ExplorerControlDefaultListViewItemContent.ImageSizeProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.ExplorerControlDefaultListViewItemContent.ImageSize"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.ExplorerControlDefaultListViewItemContent.ItemNameProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.ExplorerControlDefaultListViewItemContent.ItemName"/> dependency property.
+            </summary>
+        </member>
         <member name="T:WinCopies.GUI.IO.Controls.Process.ProcessControl">
             <summary>
             Represents a process control.
@@ -333,9 +373,19 @@
             Identifies the <see cref="P:WinCopies.GUI.IO.Controls.ExplorerControlListViewItemContent.SmallIcon"/> dependency property.
             </summary>
         </member>
+        <member name="F:WinCopies.GUI.IO.Controls.ExplorerControlListViewItemContent.MediumIconProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.ExplorerControlListViewItemContent.MediumIcon"/> dependency property.
+            </summary>
+        </member>
         <member name="F:WinCopies.GUI.IO.Controls.ExplorerControlListViewItemContent.LargeIconProperty">
             <summary>
             Identifies the <see cref="P:WinCopies.GUI.IO.Controls.ExplorerControlListViewItemContent.LargeIcon"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.Controls.ExplorerControlListViewItemContent.ExtraLargeIconProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.Controls.ExplorerControlListViewItemContent.ExtraLargeIcon"/> dependency property.
             </summary>
         </member>
         <member name="F:WinCopies.GUI.IO.Controls.ExplorerControlListViewItemContent.ItemNameProperty">

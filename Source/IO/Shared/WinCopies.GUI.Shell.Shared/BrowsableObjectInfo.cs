@@ -15,27 +15,25 @@
 * You should have received a copy of the GNU General Public License
 * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+#region Usings
 using SevenZip;
 
 using System;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
 
 #region WinCopies
 using WinCopies.Collections.DotNetFix.Generic;
-using WinCopies.Collections.Generic;
 using WinCopies.GUI.IO.ObjectModel;
 using WinCopies.GUI.IO.Process;
 using WinCopies.IO;
 using WinCopies.IO.ObjectModel;
 using WinCopies.IO.Process;
-using WinCopies.IO.PropertySystem;
-using WinCopies.Linq;
-using WinCopies.PropertySystem;
+using WinCopies.IO.Shell.ObjectModel;
 #endregion WinCopies
 
 using static WinCopies.IO.Consts.Guids.Shell.Process.Archive;
+#endregion Usings
 
 namespace WinCopies.GUI.Shell
 {
@@ -73,7 +71,7 @@ namespace WinCopies.GUI.Shell
             {
                 ProcessInitialization<IPathInfo, ProcessError, ProcessTypes<IPathInfo, ProcessError, object>.ProcessErrorItem, object>.ProcessInitializer _processInitializer = processInitializer.ProcessInitializer;
 
-                return func(_processInitializer.GetInitialPaths(), _processInitializer.SourcePath, processInitializer.GetDestPath(), _processInitializer.GetPathsQueue(), _processInitializer.GetErrorsQueue(), ProcessHelper<WinCopies.IO.IPathInfo>.GetDefaultProcessDelegates(), processInitializer.ExtraParameters.ToArchiveProcess());
+                return func(_processInitializer.GetInitialPaths(), _processInitializer.SourcePath, processInitializer.GetDestPath(), _processInitializer.GetPathsQueue(), _processInitializer.GetErrorsQueue(), ProcessHelper<IPathInfo>.GetDefaultProcessDelegates(), processInitializer.ExtraParameters.ToArchiveProcess());
             }
 
             public static WinCopies.IO.Process.ObjectModel.IProcess GetArchiveCompressionProcess(in IEnumerableQueue<IPathInfo> initialPaths, in IPathInfo sourcePath, in IPathInfo destinationPath, in ProcessTypes<IPathInfo>.IProcessQueue paths, in WinCopies.IO.Process.IProcessLinkedList<IPathInfo, ProcessError, ProcessTypes<IPathInfo, ProcessError, object>.ProcessErrorItem, object> errorsQueue, in ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessDelegates<ProcessDelegateTypes<IPathInfo, IProcessProgressDelegateParameter>.IProcessEventDelegates> progressDelegate, in SevenZipCompressor archiveCompressor) =>
@@ -129,119 +127,34 @@ namespace WinCopies.GUI.Shell
             public static WinCopies.IO.Process.ObjectModel.IProcess GetArchiveProcess(ProcessFactorySelectorDictionaryParameters processParameters) => TryGetArchiveProcess(processParameters) ?? throw new InvalidOperationException("No process could be generated.");
         }
 
-        public abstract class AppBrowsableObjectInfo<T> : BrowsableObjectInfo3<T>
+        public abstract class PluginInfo : PluginInfo<IBrowsableObjectInfoPlugin>
         {
-            public sealed override string Protocol => "about";
+            private IBrowsableObjectInfo _parent;
 
-            public override string URI => Path;
-
-            protected AppBrowsableObjectInfo(in T innerObject, in string path, in ClientVersion clientVersion) : base(innerObject, path, clientVersion) { /* Left empty. */ }
-        }
-
-        public abstract class PluginInfo<T> : BrowsableObjectInfo3<T>, IEncapsulatorBrowsableObjectInfo<IBrowsableObjectInfoPlugin> where T : IBrowsableObjectInfoPlugin
-        {
-            public override string LocalizedName => GetName(InnerObjectGenericOverride.GetType().Assembly);
-
-            public override string Name => LocalizedName;
-
-            protected override bool IsLocalRootOverride => false;
-
-            protected override IBitmapSourceProvider BitmapSourceProviderOverride => InnerObjectGenericOverride.BitmapSourceProvider;
-
-            protected override IBrowsabilityOptions BrowsabilityOverride => BrowsabilityOptions.BrowsableByDefault;
-
-            protected override System.Collections.Generic.IEnumerable<IBrowsabilityPath> BrowsabilityPathsOverride => null;
-
-            protected override System.Collections.Generic.IEnumerable<IProcessInfo> CustomProcessesOverride => null;
-
-            protected override string DescriptionOverride => InnerObjectGeneric.GetType().Assembly.GetCustomAttributes<AssemblyDescriptionAttribute>().FirstOrDefault()?.Description;
-
-            protected override bool IsRecursivelyBrowsableOverride => true;
-
-            protected override bool IsSpecialItemOverride => false;
-
-            protected override string ItemTypeNameOverride => "Plug-in Start Page";
-
-            protected override object ObjectPropertiesOverride => null;
-
-            protected override IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystemOverride => null;
-
-            protected override IProcessFactory ProcessFactoryOverride => null;
-
-            public override string Protocol => "plugin";
-
-            public override string URI { get; }
-
-            IBrowsableObjectInfoPlugin IEncapsulatorBrowsableObjectInfo<IBrowsableObjectInfoPlugin>.InnerObject => InnerObjectGeneric;
-
-            private PluginInfo(in T plugin, in ClientVersion clientVersion, Assembly assembly) : base(plugin, GetName(assembly), clientVersion) => URI = GetURI(assembly);
-
-            protected PluginInfo(in T plugin, in ClientVersion clientVersion) : this(plugin, clientVersion, (plugin
+            protected override IBrowsableObjectInfo ParentOverride => _parent
 #if CS8
-                ??
+                ??=
 #else
-                == null ?
+                ?? (_parent =
 #endif
-                throw ThrowHelper.GetArgumentNullException(nameof(plugin))
+                GetBrowsableObjectInfoStartPage()
 #if !CS8
-                : plugin
+                )
 #endif
-                ).GetType().Assembly)
-            { /* Left empty. */ }
+                ;
 
-            public static string GetName(in Assembly assembly)
-            {
-                AssemblyName name = (assembly ?? throw ThrowHelper.GetArgumentNullException(nameof(assembly))).GetName();
+            protected PluginInfo(in IBrowsableObjectInfoPlugin plugin, in ClientVersion clientVersion) : base(plugin, clientVersion) { /* Left empty. */ }
 
-                return name.Name ?? name.FullName;
-            }
-
-            public static string GetURI(in Assembly assembly) => assembly.GetCustomAttributes<GuidAttribute>().FirstOrDefault()?.Value ?? GetName(assembly);
-
-            protected override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItemsOverride() => InnerObjectGenericOverride.GetStartPages(ClientVersion).AppendValues(InnerObjectGenericOverride.GetProtocols(this, ClientVersion));
-
-            protected override ArrayBuilder<IBrowsableObjectInfo> GetRootItemsOverride() => null;
-
-            protected override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetSubRootItemsOverride() => null;
+            protected abstract BrowsableObjectInfoStartPage GetBrowsableObjectInfoStartPage();
         }
 
-        public abstract class BrowsableObjectInfoStartPage<T> : AppBrowsableObjectInfo<System.Collections.Generic.IEnumerable<T>> where T : IEncapsulatorBrowsableObjectInfo<IBrowsableObjectInfoPlugin>
+        public abstract class BrowsableObjectInfoStartPage : BrowsableObjectInfoStartPage<IEncapsulatorBrowsableObjectInfo<IBrowsableObjectInfoPlugin>>
         {
-            public override string LocalizedName => "Start Here";
+            protected override IBitmapSourceProvider BitmapSourceProviderOverride { get; }
 
-            public override string Name => LocalizedName;
+            protected BrowsableObjectInfoStartPage(in PluginInfo pluginInfo, in ClientVersion clientVersion) : base(Enumerable.Repeat(pluginInfo, 1), clientVersion) => BitmapSourceProviderOverride = new BitmapSourceProvider(new IconBitmapSources(GetIcon()), null, null, true);
 
-            protected override bool IsLocalRootOverride => true;
-
-            protected override IBrowsabilityOptions BrowsabilityOverride => BrowsabilityOptions.BrowsableByDefault;
-
-            protected override System.Collections.Generic.IEnumerable<IBrowsabilityPath> BrowsabilityPathsOverride => null;
-
-            protected override System.Collections.Generic.IEnumerable<IProcessInfo> CustomProcessesOverride => null;
-
-            protected override string DescriptionOverride => "This is the start page of the Explorer window. Here you can find all the root browsable items from the plug-ins you have installed.";
-
-            protected override bool IsRecursivelyBrowsableOverride => true;
-
-            protected override bool IsSpecialItemOverride => false;
-
-            protected override string ItemTypeNameOverride => "Start Page";
-
-            protected override object ObjectPropertiesOverride => null;
-
-            protected override IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystemOverride => null;
-
-            protected override IBrowsableObjectInfo ParentOverride => null;
-
-            protected override IProcessFactory ProcessFactoryOverride => null;
-
-            protected BrowsableObjectInfoStartPage(in System.Collections.Generic.IEnumerable<T> plugins, in ClientVersion clientVersion) : base(plugins, "start", clientVersion) { /* Left empty. */ }
-
-            protected override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItemsOverride() => InnerObjectGenericOverride.As<IBrowsableObjectInfo>();
-
-            protected override ArrayBuilder<IBrowsableObjectInfo> GetRootItemsOverride() => null;
-
-            protected override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetSubRootItemsOverride() => null;
+            protected abstract System.Drawing.Icon GetIcon();
         }
 
         public static class BrowsableObjectInfo

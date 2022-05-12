@@ -21,11 +21,17 @@ using Microsoft.WindowsAPICodePack.Win32Native.Shell;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Windows.Media.Imaging;
-
+using WinCopies.Collections.Generic;
 using WinCopies.GUI.Drawing;
 using WinCopies.IO.ObjectModel;
-
+using WinCopies.IO.Process;
+using WinCopies.IO.PropertySystem;
+using WinCopies.Linq;
+using WinCopies.PropertySystem;
 using static Microsoft.WindowsAPICodePack.Shell.KnownFolders;
 
 using static WinCopies.IO.ObjectModel.BrowsableObjectInfo;
@@ -49,9 +55,9 @@ namespace WinCopies.IO.Shell
     {
         public override IBitmapSourceProvider BitmapSourceProvider => null;
 
-        public override IEnumerable<IBrowsableObjectInfo> GetStartPages(ClientVersion clientVersion) => Collections.Generic.Enumerable<IBrowsableObjectInfo>.GetEnumerable(ShellObjectInfo.GetDefault(clientVersion), new RegistryItemInfo(), new WMIItemInfo());
+        public override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetStartPages(ClientVersion clientVersion) => Collections.Generic.Enumerable<IBrowsableObjectInfo>.GetEnumerable(ShellObjectInfo.GetDefault(clientVersion), new RegistryItemInfo(), new WMIItemInfo());
 
-        public override IEnumerable<IBrowsableObjectInfo> GetProtocols(IBrowsableObjectInfo parent, ClientVersion clientVersion) => Collections.Generic.Enumerable<IBrowsableObjectInfo>.GetEnumerable(new ObjectModel.FileProtocolInfo(parent, clientVersion), new ObjectModel.ShellProtocolInfo(parent, clientVersion));
+        public override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetProtocols(IBrowsableObjectInfo parent, ClientVersion clientVersion) => Collections.Generic.Enumerable<IBrowsableObjectInfo>.GetEnumerable(new ObjectModel.FileProtocolInfo(parent, clientVersion), new ObjectModel.ShellProtocolInfo(parent, clientVersion));
 
         public BrowsableObjectInfoPlugin()
         {
@@ -69,7 +75,7 @@ namespace WinCopies.IO.Shell
         {
             public FileProtocolInfo(in IBrowsableObjectInfo parent, in ClientVersion clientVersion) : base(null, parent, clientVersion) { /* Left empty. */ }
 
-            protected override IEnumerable<IBrowsableObjectInfo> GetItemsOverride()
+            protected override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItemsOverride()
             {
                 ShellObjectInfo getShellObjectInfo(in IKnownFolder knownFolder) => new ShellObjectInfo(knownFolder, ClientVersion);
 
@@ -81,7 +87,7 @@ namespace WinCopies.IO.Shell
         {
             public ShellProtocolInfo(in IBrowsableObjectInfo parent, in ClientVersion clientVersion) : base("shell", parent, clientVersion) { /* Left empty. */ }
 
-            protected override IEnumerable<IBrowsableObjectInfo> GetItemsOverride()
+            protected override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItemsOverride()
             {
                 ShellObjectInfo shellObjectInfo;
 
@@ -170,6 +176,121 @@ namespace WinCopies.IO.Shell
 
                 return IO.ObjectModel.BrowsableObjectInfo.TryGetBitmapSource(icon);
             }
+        }
+
+        public abstract class AppBrowsableObjectInfo<T> : BrowsableObjectInfo3<T>
+        {
+            public sealed override string Protocol => "about";
+
+            public override string URI => Path;
+
+            protected AppBrowsableObjectInfo(in T innerObject, in string path, in ClientVersion clientVersion) : base(innerObject, path, clientVersion) { /* Left empty. */ }
+        }
+
+        public abstract class PluginInfo<T> : BrowsableObjectInfo3<T>, IEncapsulatorBrowsableObjectInfo<IBrowsableObjectInfoPlugin> where T : IBrowsableObjectInfoPlugin
+        {
+            public override string LocalizedName => GetName(InnerObjectGenericOverride.GetType().Assembly);
+
+            public override string Name => LocalizedName;
+
+            protected override bool IsLocalRootOverride => false;
+
+            protected override IBitmapSourceProvider BitmapSourceProviderOverride => InnerObjectGenericOverride.BitmapSourceProvider;
+
+            protected override IBrowsabilityOptions BrowsabilityOverride => BrowsabilityOptions.BrowsableByDefault;
+
+            protected override System.Collections.Generic.IEnumerable<IBrowsabilityPath> BrowsabilityPathsOverride => null;
+
+            protected override System.Collections.Generic.IEnumerable<IProcessInfo> CustomProcessesOverride => null;
+
+            protected override string DescriptionOverride => InnerObjectGeneric.GetType().Assembly.GetCustomAttributes<AssemblyDescriptionAttribute>().FirstOrDefault()?.Description;
+
+            protected override bool IsRecursivelyBrowsableOverride => true;
+
+            protected override bool IsSpecialItemOverride => false;
+
+            protected override string ItemTypeNameOverride => "Plug-in Start Page";
+
+            protected override object ObjectPropertiesOverride => null;
+
+            protected override IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystemOverride => null;
+
+            protected override IProcessFactory ProcessFactoryOverride => null;
+
+            public override string Protocol => "plugin";
+
+            public override string URI { get; }
+
+            IBrowsableObjectInfoPlugin IEncapsulatorBrowsableObjectInfo<IBrowsableObjectInfoPlugin>.InnerObject => InnerObjectGeneric;
+
+            private PluginInfo(in T plugin, in ClientVersion clientVersion, Assembly assembly) : base(plugin, GetName(assembly), clientVersion) => URI = GetURI(assembly);
+
+            protected PluginInfo(in T plugin, in ClientVersion clientVersion) : this(plugin, clientVersion, (plugin
+#if CS8
+                ??
+#else
+                == null ?
+#endif
+                throw ThrowHelper.GetArgumentNullException(nameof(plugin))
+#if !CS8
+                : plugin
+#endif
+                ).GetType().Assembly)
+            { /* Left empty. */ }
+
+            public static string GetName(in Assembly assembly)
+            {
+                AssemblyName name = (assembly ?? throw ThrowHelper.GetArgumentNullException(nameof(assembly))).GetName();
+
+                return name.Name ?? name.FullName;
+            }
+
+            public static string GetURI(in Assembly assembly) => assembly.GetCustomAttributes<GuidAttribute>().FirstOrDefault()?.Value ?? GetName(assembly);
+
+            protected override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItemsOverride() => InnerObjectGenericOverride.GetStartPages(ClientVersion).AppendValues(InnerObjectGenericOverride.GetProtocols(this, ClientVersion));
+
+            protected override ArrayBuilder<IBrowsableObjectInfo> GetRootItemsOverride() => null;
+
+            protected override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetSubRootItemsOverride() => null;
+        }
+
+        public abstract class BrowsableObjectInfoStartPage<T> : AppBrowsableObjectInfo<System.Collections.Generic.IEnumerable<T>> where T : IEncapsulatorBrowsableObjectInfo<IBrowsableObjectInfoPlugin>
+        {
+            public override string LocalizedName => "Start Here";
+
+            public override string Name => LocalizedName;
+
+            protected override bool IsLocalRootOverride => true;
+
+            protected override IBrowsabilityOptions BrowsabilityOverride => BrowsabilityOptions.BrowsableByDefault;
+
+            protected override System.Collections.Generic.IEnumerable<IBrowsabilityPath> BrowsabilityPathsOverride => null;
+
+            protected override System.Collections.Generic.IEnumerable<IProcessInfo> CustomProcessesOverride => null;
+
+            protected override string DescriptionOverride => "This is the start page of the Explorer window. Here you can find all the root browsable items from the plug-ins you have installed.";
+
+            protected override bool IsRecursivelyBrowsableOverride => true;
+
+            protected override bool IsSpecialItemOverride => false;
+
+            protected override string ItemTypeNameOverride => "Start Page";
+
+            protected override object ObjectPropertiesOverride => null;
+
+            protected override IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystemOverride => null;
+
+            protected override IBrowsableObjectInfo ParentOverride => null;
+
+            protected override IProcessFactory ProcessFactoryOverride => null;
+
+            protected BrowsableObjectInfoStartPage(in System.Collections.Generic.IEnumerable<T> plugins, in ClientVersion clientVersion) : base(plugins, "start", clientVersion) { /* Left empty. */ }
+
+            protected override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItemsOverride() => InnerObjectGenericOverride.As<IBrowsableObjectInfo>();
+
+            protected override ArrayBuilder<IBrowsableObjectInfo> GetRootItemsOverride() => null;
+
+            protected override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetSubRootItemsOverride() => null;
         }
     }
 }

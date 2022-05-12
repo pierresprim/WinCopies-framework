@@ -1,12 +1,12 @@
-﻿WinCopies-framework (WinCopies.IO package)
-==========================================
+﻿WinCopies-framework (WinCopies.Data.SQL package)
+================================================
 
 The WinCopies® software framework
 
 README
 ======
 
-[![NuGet Badge](https://buildstats.info/nuget/WinCopies.IO)](https://www.nuget.org/packages/WinCopies.IO/)
+[![NuGet Badge](https://buildstats.info/nuget/WinCopies.Data.SQL)](https://www.nuget.org/packages/WinCopies.Data.SQL/)
 
 Updates
 -------
@@ -16,7 +16,7 @@ See the Change log.
 Description
 -----------
 
-Provides a WPF GUI for the WinCopies.IO package.
+Provides an abstraction for SQL connectors.
 
 Project link
 ------------

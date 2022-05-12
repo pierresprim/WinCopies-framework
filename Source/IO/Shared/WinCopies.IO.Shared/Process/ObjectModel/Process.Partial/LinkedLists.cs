@@ -24,6 +24,7 @@ using WinCopies.Collections.DotNetFix;
 using WinCopies.Collections.DotNetFix.Generic;
 using WinCopies.Collections.Enumeration.Generic;
 using WinCopies.Collections.Generic;
+using WinCopies.Util;
 
 using static WinCopies.Collections.ThrowHelper;
 using static WinCopies.ThrowHelper;
@@ -213,7 +214,7 @@ namespace WinCopies.IO.Process
 
         public uint Count => InnerList.Count;
 
-        int ICollection<TItemsOut>.Count => InnerList.AsFromType<ICollection<TItemsIn>>().Count;
+        int System.Collections.Generic.ICollection<TItemsOut>.Count => InnerList.AsFromType<System.Collections.Generic.ICollection<TItemsIn>>().Count;
 
         public bool IsReadOnly => true;
 
@@ -223,7 +224,7 @@ namespace WinCopies.IO.Process
 
         public object SyncRoot => InnerList.AsFromType<ICollection>().SyncRoot;
 
-        int IReadOnlyCollection<TItemsOut>.Count => InnerList.AsFromType<IReadOnlyCollection<TItemsIn>>().Count;
+        int System.Collections.Generic.IReadOnlyCollection<TItemsOut>.Count => InnerList.AsFromType<System.Collections.Generic.IReadOnlyCollection<TItemsIn>>().Count;
 
         public ReadOnlyProcessLinkedList(in IProcessLinkedList<TItems, TError, TItemsIn, TAction> list) => InnerList = list ?? throw GetArgumentNullException(nameof(list));
 
@@ -266,7 +267,7 @@ namespace WinCopies.IO.Process
             return false;
         }
 
-        TItemsOut ISimpleLinkedList<TItemsOut>.Peek() => InnerList.AsFromType<ISimpleLinkedList<TItemsOut>>().Peek();
+        TItemsOut ISimpleLinkedList<TItemsOut>.Peek() => InnerList.AsFromType<ISimpleLinkedList<TItemsIn>>().Peek();
 
         protected IUIntCountableEnumerator<TItemsOut> GetEnumerator(in System.Collections.Generic.IEnumerable<TItemsIn> enumerable) => new UIntCountableEnumerator<EnumeratorInfo<TItemsOut>, TItemsOut>(new EnumeratorInfo<TItemsOut>(enumerable.Select<TItemsIn, TItemsOut>(item => item)), () => InnerList.Count);
 

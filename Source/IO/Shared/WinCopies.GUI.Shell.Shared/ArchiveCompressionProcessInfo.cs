@@ -107,7 +107,7 @@ namespace WinCopies.GUI.IO.Process
                     {
                         if (enumerator.MoveNext())
 
-                            __p.SetValue(obj, typeof(Enum).IsAssignableFrom(__p.PropertyType) ? Enum.Parse(__p.PropertyType, enumerator.Current) : Convert.ChangeType(enumerator.Current, __p.PropertyType));
+                            __p.SetValue(obj, typeof(Enum).IsAssignableFrom(__p.PropertyType) ? Enum.Parse(__p.PropertyType, enumerator.Current) : System.Convert.ChangeType(enumerator.Current, __p.PropertyType));
 
                         else
 

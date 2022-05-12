@@ -9,6 +9,7 @@
     <RepositoryType>Git</RepositoryType>
     <PackageReleaseNotes>See https://github.com/pierresprim/WinCopies-framework/blob/master/Changelog.md</PackageReleaseNotes>
     <PackageIcon>WinCopies.png</PackageIcon>
+	  <!--<ProduceReferenceAssembly>true</ProduceReferenceAssembly>-->
   </PropertyGroup>
 
   <!--Constants-->
@@ -31,7 +32,12 @@
     
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+	  <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
+
+	<ItemGroup Condition="'$(Configuration)'=='Release'">
+		<None Include="README.md" Pack="true" PackagePath="" />
+	</ItemGroup>
 
   <PropertyGroup Condition="'$(TargetFramework.TrimEnd(`0123456789.`))'=='netcoreapp'">
     <DefineConstants>CS6;CS7;CS8;NETCORE;$(DefineConstants)</DefineConstants>
@@ -100,6 +106,10 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
+
+	<PropertyGroup Condition="'$(TargetFramework.TrimEnd(`0123456789-windows`))' == 'net7.'">
+		<WarningLevel>7</WarningLevel>
+	</PropertyGroup>
 
 	<ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789-windows`))' == 'net7.'">
 		<PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="7.0.0-preview">

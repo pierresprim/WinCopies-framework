@@ -159,6 +159,9 @@
   <data name="ItemIsNotDirectory" xml:space="preserve">
     <value>The item is not a directory.</value>
   </data>
+  <data name="NoBrowsableObjectInfoCouldBeGenerated" xml:space="preserve">
+    <value>No BrowsableObjectInfo could be generated.</value>
+  </data>
   <data name="NoProcessCouldBeGenerated" xml:space="preserve">
     <value>No process could be generated.</value>
   </data>
