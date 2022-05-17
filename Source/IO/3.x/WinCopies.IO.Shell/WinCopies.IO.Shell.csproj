@@ -63,11 +63,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="WinCopies.Util" Version="3.17-preview" />
-		<PackageReference Include="WinCopies.Collections" Version="3.17-preview" />
-		<PackageReference Include="WinCopies.Util.Extensions" Version="3.17-preview" />
-		<PackageReference Include="WinCopies.Util.Desktop" Version="3.17-preview" />
-
 		<PackageReference Include="Squid-Box.SevenZipSharp" Version="1.2.231" />
 
 		<PackageReference Include="WinCopies.WindowsAPICodePack.Consts" Version="3.10-preview" />

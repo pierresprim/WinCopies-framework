@@ -54,7 +54,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
             {
 #endif
             Collections.DotNetFix.Generic.IEnumerableQueue<System.Type> interfaces = new Collections.DotNetFix.Generic.EnumerableQueue<System.Type>();
-            System.Type[] _interfaces;
+            IEnumerable<System.Type> _interfaces;
             Type
 #if CS8
             ?
@@ -64,9 +64,11 @@ namespace WinCopies.Reflection.DotNetDocBuilder
             TInterfaceImplementation interfaceImplementation;
             Type tmpType;
 
+            IEnumerable<System.Type> _getInterfaces(in System.Type type) => type.GetInterfaces().Where(DotNetNamespace.DefaultTypePredicate);
+
             void getInterfaces(in System.Type type)
             {
-                foreach (System.Type i in type.GetInterfaces())
+                foreach (System.Type i in _getInterfaces(type))
 
                     getInterfaces(i);
 
@@ -77,9 +79,9 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
             void updateInterfaces(in DotNetType _t)
             {
-                foreach (System.Type i in _interfaces = _t.Type.GetInterfaces())
+                foreach (System.Type i in _interfaces = _getInterfaces(_t.Type))
 
-                    foreach (System.Type _i in i.GetInterfaces())
+                    foreach (System.Type _i in _getInterfaces(i))
 
                         getInterfaces(_i);
             }
@@ -94,7 +96,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
             void addEntityAssociations(TDBType type, TType @interface, in bool check)
             {
-                WriteLine($"Adding entity-associations for {@interface}", true);
+                Logger($"Adding entity-associations for {@interface}", true);
 
                 updateInterfaces(@interface);
 
@@ -118,7 +120,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
                     id = interfaceImplementations.Add(interfaceImplementation, out uint tables, out ulong rows);
 
-                    WriteLine($"Added entity-association for {@interface} : {i}. Added {rows} {nameof(rows)} in {tables} {nameof(tables)} (last inserted id: {id}).", null);
+                    Logger($"Added entity-association for {@interface} : {i}. Added {rows} {nameof(rows)} in {tables} {nameof(tables)} (last inserted id: {id}).", null);
                 }
 
                 ActionIn<System.Type> _add = check ? (in System.Type i) =>
@@ -143,7 +145,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
                 t = null;
                 interfaces.Clear();
 
-                WriteLine($"Added entity-associations for {@interface}", false);
+                Logger($"Added entity-associations for {@interface}", false);
             }
 
             void removeEntityAssociations(in TDBType type, in TType
@@ -154,7 +156,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
             {
                 tmpType = convertFrom(type);
 
-                WriteLine($"Removing entity-associations for {tmpType.Name}.", true);
+                Logger($"Removing entity-associations for {tmpType.Name}.", true);
 
                 bool defaultPredicate(IInterfaceImplementation i) => i.ImplementorType.Id == tmpType.Id;
 
@@ -175,7 +177,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
                 {
                     foreach (IInterfaceImplementation _interfaceImplementation in _interfaceImplementations.WherePredicate(predicate))
 
-                        WriteLine($"Removed {_interfaceImplementation.Remove(out uint tables)} rows in {tables} {nameof(tables)} for {_interfaceImplementation.ImplementorType} : {_interfaceImplementation.GetImplementedInterface()}.", null);
+                        Logger($"Removed {_interfaceImplementation.Remove(out uint tables)} rows in {tables} {nameof(tables)} for {_interfaceImplementation.ImplementorType} : {_interfaceImplementation.GetImplementedInterface()}.", null);
                 }
 
                 remove(interfaceImplementations);
@@ -188,7 +190,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
                 interfaces.Clear();
 
-                WriteLine($"Removed entity-associations for {tmpType.Name}.", false);
+                Logger($"Removed entity-associations for {tmpType.Name}.", false);
             }
 
             void removeEntityAssociations2(in TDBType _t) => removeEntityAssociations(_t, null);

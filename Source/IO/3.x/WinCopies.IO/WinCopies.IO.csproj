@@ -20,9 +20,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="WinCopies.Util" Version="3.17-preview" />
-		<PackageReference Include="WinCopies.Collections" Version="3.17-preview" />
-		<PackageReference Include="WinCopies.Util.Extensions" Version="3.17-preview" />
+		<PackageReference Include="WinCopies.Collections" Version="3.17.1-preview" />
 		<PackageReference Include="WinCopies.Util.Desktop" Version="3.17-preview" />
 		
 		<PackageReference Include="WinCopies.WindowsAPICodePack" Version="3.10-preview" />

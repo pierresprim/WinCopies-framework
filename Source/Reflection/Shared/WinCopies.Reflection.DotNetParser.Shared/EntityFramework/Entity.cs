@@ -37,7 +37,7 @@ namespace WinCopies.EntityFramework
 #if CS8
             ?
 #endif
-            extraColumns) => Add(entity is T _entity ? _entity : throw new InvalidArgumentException(nameof(entity)), out tables, out rows, extraColumns);
+            extraColumns) => Add(entity is T _entity ? _entity : throw GetArgumentException(nameof(entity)), out tables, out rows, extraColumns);
 #endif
     }
 
@@ -58,7 +58,7 @@ namespace WinCopies.EntityFramework
                 extraColumns = null);
 
 #if !CS8
-        long? IEntityCollection.Add(IEntity entity, out uint tables, out ulong rows, System.Collections.Generic.IReadOnlyDictionary<string, object> extraColumns) => Add(entity is TItems _entity ? _entity : throw new InvalidArgumentException(nameof(entity)), out tables, out rows, extraColumns);
+        long? IEntityCollection.Add(IEntity entity, out uint tables, out ulong rows, System.Collections.Generic.IReadOnlyDictionary<string, object> extraColumns) => Add(entity is TItems _entity ? _entity : throw GetArgumentException(nameof(entity)), out tables, out rows, extraColumns);
 #endif
 
         public abstract System.Collections.Generic.IEnumerable<TItems> GetItems(IOrderByColumns

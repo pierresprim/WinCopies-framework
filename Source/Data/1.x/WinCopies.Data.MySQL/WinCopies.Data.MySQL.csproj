@@ -15,7 +15,6 @@
 
 	<ItemGroup>
 		<PackageReference Include="MySql.Data" Version="8.0.28" />
-		<PackageReference Include="WinCopies.Collections" Version="3.17-preview" />
 	</ItemGroup>
 
 	<ItemGroup>

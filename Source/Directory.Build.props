@@ -9,7 +9,7 @@
     <RepositoryType>Git</RepositoryType>
     <PackageReleaseNotes>See https://github.com/pierresprim/WinCopies-framework/blob/master/Changelog.md</PackageReleaseNotes>
     <PackageIcon>WinCopies.png</PackageIcon>
-	  <!--<ProduceReferenceAssembly>true</ProduceReferenceAssembly>-->
+	  <ProduceReferenceAssembly>true</ProduceReferenceAssembly>
   </PropertyGroup>
 
   <!--Constants-->

@@ -13,7 +13,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
     {
         public void UpdateTypeDoc()
         {
-            WriteLine("Updating XML doc for types.", true);
+            Logger("Updating XML doc for types.", true);
 
             int length = TYPE_PREFIX.Length;
             string
@@ -85,13 +85,13 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
             foreach (Type type in collection)
             {
-                WriteLine($"Searching XML doc for type {type}.", true, ConsoleColor.DarkYellow);
+                Logger($"Searching XML doc for type {type}.", true, ConsoleColor.DarkYellow);
 
                 setParentTypesPath(type);
 
                 if ((node = Packages.Select(package => File.Exists(package.Path) ? XElement.Load(Path.ChangeExtension(package.Path, "xml")).Descendants("member") : null).Join(false).SelectWhere(doc => (_name = doc?.Attribute("name")?.Value)?.StartsWith(TYPE_PREFIX) == true && (index = (_name = _name.Substring(length)).LastIndexOf('.')) > -1 && (fullName = _name.Split(index)).@namespace == GetWholeNamespace(type.Namespace.Id) + parentTypesPath && fullName.name == getTypeName(type) ? doc /*.Elements().FirstOrDefault()*/ : null, doc => doc != null).FirstOrDefault()) == null)
                 {
-                    WriteLine($"No XML doc found for type {type}.", false);
+                    Logger($"No XML doc found for type {type}.", false);
 
                     continue;
                 }
@@ -100,7 +100,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 #if CS8
                 ?
 #endif
-                otherMsg, in bool? increment, in ConsoleColor? color) => WriteLine($"Updat{suffix} XML doc for type {type}.{otherMsg}", increment, color);
+                otherMsg, in bool? increment, in ConsoleColor? color) => Logger($"Updat{suffix} XML doc for type {type}.{otherMsg}", increment, color);
 
                 writeLine("ing", null, null, ConsoleColor.DarkGreen);
 
@@ -142,16 +142,16 @@ namespace WinCopies.Reflection.DotNetDocBuilder
                 writeLine("ed", $" Updated {type.Update(out uint tables)} rows in {tables} {nameof(tables)}.", false, null);
             }
 
-            WriteLine("Updated XML doc for types.", false);
+            Logger("Updated XML doc for types.", false);
         }
 
         public void UpdateDoc()
         {
-            WriteLine("Updating XML doc.", true);
+            Logger("Updating XML doc.", true);
 
             UpdateTypeDoc();
 
-            WriteLine("Updated XML doc.", false);
+            Logger("Updated XML doc.", false);
         }
 
         public void UpdateTypes()

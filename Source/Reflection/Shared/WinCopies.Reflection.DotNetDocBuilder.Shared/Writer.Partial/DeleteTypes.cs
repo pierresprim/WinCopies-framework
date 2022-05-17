@@ -81,7 +81,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 #if CS8
                 ?
 #endif
-                value = null) => WriteLine($"Deleting all {typeTypeName} from {wholeNamespace}{value}", value == null);
+                value = null) => Logger($"Deleting all {typeTypeName} from {wholeNamespace}{value}", value == null);
 
             writeLine();
 
@@ -106,7 +106,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
             foreach (T type in types.Where(_type => GetWholeNamespace((__type = converter(_type)).Namespace.Id) == wholeNamespace))
             {
-                WriteLine($"Removing {type}.", true);
+                Logger($"Removing {type}.", true);
 
                 beforeRemove?.Invoke(type, __type);
 
@@ -114,11 +114,11 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
                 if (rows > 0)
                 {
-                    WriteLine($"Removed {rows} {nameof(rows)} in {tables} {nameof(tables)}.", null);
+                    Logger($"Removed {rows} {nameof(rows)} in {tables} {nameof(tables)}.", null);
 
                     TryDeleteDirectory(wholePath, __type);
 
-                    WriteLine($"Deleted file for {type}.", false);
+                    Logger($"Deleted file for {type}.", false);
                 }
 
                 else
@@ -138,7 +138,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 #if CS8
             ?
 #endif
-            value = null) => WriteLine($"Deleting all types from {wholeNamespace}{value}.", value == null);
+            value = null) => Logger($"Deleting all types from {wholeNamespace}{value}.", value == null);
 
             writeLine();
 
@@ -174,7 +174,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
                 )
             {
 #endif
-                    WriteLine($"Removing {metadataName} for {_type}", true);
+                    Logger($"Removing {metadataName} for {_type}", true);
 
                     bool defaultPredicate() => keyValuePair.Key == _type.Id;
 
@@ -190,10 +190,10 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
                         if (predicate())
 
-                            WriteLine($"Removed {metadataName} for {_converter(item)}. Rows: {item.Remove(out uint tables)}; {nameof(tables)}: {tables}.", null);
+                            Logger($"Removed {metadataName} for {_converter(item)}. Rows: {item.Remove(out uint tables)}; {nameof(tables)}: {tables}.", null);
                     }
 
-                    WriteLine($"Removed {metadataName} for {_type}", false);
+                    Logger($"Removed {metadataName} for {_type}", false);
 #if !CS8
                 }
 #endif

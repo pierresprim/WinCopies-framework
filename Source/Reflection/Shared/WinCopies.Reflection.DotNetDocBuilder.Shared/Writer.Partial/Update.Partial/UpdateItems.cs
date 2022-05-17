@@ -53,7 +53,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 #endif
             updateItemsStruct) where T : IDefaultEntity<ulong> where U : DotNetType
         {
-            WriteLine($"Updating {name}s", true);
+            Logger($"Updating {name}s", true);
 
             ISQLConnection connection = GetConnection();
 
@@ -81,7 +81,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 #endif
 
             #region Local Data Parsing
-            WriteLine("Parsing local data.", true);
+            Logger("Parsing local data.", true);
 
             long? id;
 
@@ -147,7 +147,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
             {
                 _gt.Modifier = new GenericTypeModifier(gtmColl) { Name = _name };
 
-                WriteLine($"Variance: {_name}.", null);
+                Logger($"Variance: {_name}.", null);
             }
 
             bool hasFlag(in System.Type _gt, in GenericParameterAttributes gpa) => _gt.GenericParameterAttributes.HasFlag(gpa);
@@ -168,7 +168,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
                 {
                     __gt.Modifier = null;
 
-                    WriteLine($"No variance.", null);
+                    Logger($"No variance.", null);
                 }
 
                 __gt.MarkForRefresh();
@@ -189,7 +189,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 #if CS8
     ?
 #endif
-                param2 = null) => WriteLine($"{_type.Namespace}.{_type.Name} is {param1}generic.{param2}", null);
+                param2 = null) => Logger($"{_type.Namespace}.{_type.Name} is {param1}generic.{param2}", null);
 
                 if (_i.Type.ContainsRealGenericParameters())
                 {
@@ -199,13 +199,13 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
                     foreach (System.Type gt in getGenericTypeParameters(_i.Type))
                     {
-                        WriteLine($"Adding {gt.Name}.", true);
+                        Logger($"Adding {gt.Name}.", true);
 
                         _gt = new GenericType(gtColl) { Type = _item };
 
                         _setModifier(gt, _gt);
 
-                        WriteLine($"Added {_gt.Name}. Id: {gtColl.Add(_gt, out tables, out rows)}. Rows: {rows}. Tables: {tables}.", false);
+                        Logger($"Added {_gt.Name}. Id: {gtColl.Add(_gt, out tables, out rows)}. Rows: {rows}. Tables: {tables}.", false);
                     }
                 }
 
@@ -263,7 +263,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
             foreach (U item in func().Where(item => !browsed.Contains(item.Type)))
             {
-                WriteLine($"{++i}: Processing {item}.", true, ConsoleColor.DarkYellow);
+                Logger($"{++i}: Processing {item}.", true, ConsoleColor.DarkYellow);
 
                 browsed.Enqueue(item.Type);
 
@@ -276,7 +276,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
                 {
                     foreach (T _item in items.WherePredicate(_item => itemPredicate(_item) && GetWholeNamespace((type = converter(_item)).Namespace.Id) == item.Type.Namespace && checkAll(type, item)))
                     {
-                        WriteLine("Exists. Updating.", true, ConsoleColor.DarkGreen);
+                        Logger("Exists. Updating.", true, ConsoleColor.DarkGreen);
 
                         update(item, _item, items);
 
@@ -286,7 +286,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
                         if (item.Type.ContainsRealGenericParameters())
                         {
-                            WriteLine($"Updating generic type parameters for {type.Namespace.Name}.{type.Name}.", true);
+                            Logger($"Updating generic type parameters for {type.Namespace.Name}.{type.Name}.", true);
 
                             genericTypeParameters = getGenericTypeParameters(item.Type);
 
@@ -296,21 +296,21 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
                             _gt.Type.Id == type.Id))
                             {
-                                WriteLine($"Updating generic type parameter {(genericTypeParameter = genericTypeParameters[j++]).Name}.", true);
+                                Logger($"Updating generic type parameter {(genericTypeParameter = genericTypeParameters[j++]).Name}.", true);
 
                                 _setModifier(genericTypeParameter, gt);
 
-                                WriteLine($"Updated {gt.Update(out tables)} rows in {tables} {nameof(tables)}. Id: {gt.Id}.", false);
+                                Logger($"Updated {gt.Update(out tables)} rows in {tables} {nameof(tables)}. Id: {gt.Id}.", false);
                             }
 
                             if (j != item.Type.GetRealGenericTypeParameterLength())
 
                                 updateGenericTypes(type, item);
 
-                            WriteLine($"Updated generic type parameters for {type.Namespace.Name}.{type.Name}.", false);
+                            Logger($"Updated generic type parameters for {type.Namespace.Name}.{type.Name}.", false);
                         }
 
-                        WriteLine($"Updated {_item.Update(out uint _tables)} rows in {_tables} {nameof(tables)}. Id: {_item.Id}.", false);
+                        Logger($"Updated {_item.Update(out uint _tables)} rows in {_tables} {nameof(tables)}. Id: {_item.Id}.", false);
 
                         return false;
                     }
@@ -323,7 +323,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
                  */
                 if (process())
                 {
-                    WriteLine("Does not exist. Adding.", true, ConsoleColor.DarkRed);
+                    Logger("Does not exist. Adding.", true, ConsoleColor.DarkRed);
 
                     T _item = getItem(item, typeTmp = GetType(item.Type, name, tColl, amColl, nColl, ttColl), items);
 
@@ -361,11 +361,11 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
                     if (id.HasValue)
                     {
-                        WriteLine($"Added {rows} {nameof(rows)} in {tables} {nameof(tables)}. Id: {id.Value}", null);
+                        Logger($"Added {rows} {nameof(rows)} in {tables} {nameof(tables)}. Id: {id.Value}", null);
 
                         _onAdded(_item, item);
 
-                        WriteLine($"Creating files for {item.Type.Name}.", null);
+                        Logger($"Creating files for {item.Type.Name}.", null);
 
                         ActionIn<System.Type> action = (in System.Type __type) =>
                         {
@@ -378,7 +378,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
                             action(_type);
 
-                        WriteLine($"Files created for {item.Type.Name}.", false);
+                        Logger($"Files created for {item.Type.Name}.", false);
                     }
 
                     else
@@ -386,17 +386,17 @@ namespace WinCopies.Reflection.DotNetDocBuilder
                         throw new InvalidOperationException($"Failed to add {item.Type.Name}.");
                 }
 
-                WriteLine($"Processed {item.Type.Name}.", false);
+                Logger($"Processed {item.Type.Name}.", false);
             }
 #if !CS8
             }
 #endif
 
-            WriteLine("Parsing local data completed.", false);
+            Logger("Parsing local data completed.", false);
             #endregion
 
             #region DB Parsing
-            WriteLine("Parsing DB", true);
+            Logger("Parsing DB", true);
 
             i = 0;
 
@@ -421,13 +421,13 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
                     string logMessage = $" generic type parameters for {t = converter(item)}.";
 
-                    WriteLine("Removing" + logMessage, true);
+                    Logger("Removing" + logMessage, true);
 
                     foreach (GenericType genericType in gtColl.Where(gt => gt.Type.Id == t.Id))
 
-                        WriteLine($"Removed generic type parameter '{genericType.Name}'. Rows: {genericType.Remove(out tables)}. Tables: {tables}.", null);
+                        Logger($"Removed generic type parameter '{genericType.Name}'. Rows: {genericType.Remove(out tables)}. Tables: {tables}.", null);
 
-                    WriteLine("Removed" + logMessage, false);
+                    Logger("Removed" + logMessage, false);
 
                     updateRows(item);
                 };
@@ -447,17 +447,17 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
             foreach (T item in _items.WherePredicate(item => itemPredicate(item)))
             {
-                WriteLine($"{++i}: Searching {item} in all packages.", true, ConsoleColor.DarkYellow);
+                Logger($"{++i}: Searching {item} in all packages.", true, ConsoleColor.DarkYellow);
 
                 type = converter(item);
 
                 if (func().Any(_item => checkAll(type, _item)))
 
-                    WriteLine($"{item} found. Not removed from DB.", null, ConsoleColor.DarkGreen);
+                    Logger($"{item} found. Not removed from DB.", null, ConsoleColor.DarkGreen);
 
                 else
                 {
-                    WriteLine($"{item} not found in any package. Deleting.", true, ConsoleColor.DarkRed);
+                    Logger($"{item} not found in any package. Deleting.", true, ConsoleColor.DarkRed);
 
                     delete(item);
 
@@ -465,11 +465,11 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
                     if (rows > 0)
                     {
-                        WriteLine($"Removed {rows} {nameof(rows)} in {tables} {nameof(tables)}.", null);
+                        Logger($"Removed {rows} {nameof(rows)} in {tables} {nameof(tables)}.", null);
 
                         TryDeleteDirectory(GetWholePath(wholeNamespace), type);
 
-                        WriteLine($"{item} successfully deleted.", false);
+                        Logger($"{item} successfully deleted.", false);
                     }
 
                     else
@@ -477,20 +477,20 @@ namespace WinCopies.Reflection.DotNetDocBuilder
                         throw new InvalidOperationException($"Could not remove {wholeNamespace}.{item}.");
                 }
 
-                WriteLine($"Processing {item} completed.", false);
+                Logger($"Processing {item} completed.", false);
             }
 #if !CS8
                     }
 #endif
 
-            WriteLine("Parsing DB completed.", false);
+            Logger("Parsing DB completed.", false);
             #endregion
 #if !CS8
                 }
             }
 #endif
 
-            WriteLine($"Updating {name}s completed.", false);
+            Logger($"Updating {name}s completed.", false);
         }
     }
 }

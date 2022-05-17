@@ -87,7 +87,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
             {
                 bool addInheritance()
                 {
-                    if (ValidPackages.Contains(tmpType.Assembly.GetName().Name))
+                    if (DotNetNamespace.DefaultTypePredicate(tmpType) && ValidPackages.Contains(tmpType.Assembly.GetName().Name))
                     {
                         (string left, string
 #if CS8

@@ -6,6 +6,24 @@ The WinCopies® software framework
 CHANGELOG
 ---------
 
+### 3.13.2-preview
+
+- New types.
+
+- MySQLConnectionConstants:
+	- was renamed to MySQLConnectionHelper.
+	- EQUAL and IS moved to new type WinCopies.Data.SQL.SQLConstants.
+- MySQLConnection:
+	- PrepareCommand(MySqlCommand, IEnumerable\<IParameter>) was renamed to PrepareCommandParameters. There is still a method named PrepareCommand, but it will also prepare the command itself.
+- SQLConnection.UseDBOverride returns a uint? value.
+- (I)(My)SQLConnection: new properties and methods.
+
+- BrowsableObjectInfoWindow: update window design.
+
+- DocBuilder:
+	- Writer has new methods, some of them can be called directly in a Main procedure.
+	- bug fixed: non public or non protected parent classes were processed when a nested type was.
+
 ### 3.13.1-preview
 
 - Move AppBrowsableObjectInfo\<T>, PluginInfo\<T>, BrowsableObjectInfoStartPage\<T>, to WinCopies.IO.Shell.ObjectModel.

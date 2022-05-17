@@ -12,7 +12,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
     {
         public void UpdateNamespaces()
         {
-            WriteLine("Updating namespaces", true);
+            Logger("Updating namespaces", true);
 
             using
 #if !CS8
@@ -38,7 +38,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 #endif
             string wholeNamespace;
 
-            WriteLine("Parsing DB.", true);
+            Logger("Parsing DB.", true);
 
             uint i = 0;
 
@@ -52,15 +52,15 @@ namespace WinCopies.Reflection.DotNetDocBuilder
             {
                 wholeNamespace = GetWholeNamespace(@namespace.Id);
 
-                WriteLine($"{++i}: Searching {wholeNamespace} in all packages.", true, ConsoleColor.DarkYellow);
+                Logger($"{++i}: Searching {wholeNamespace} in all packages.", true, ConsoleColor.DarkYellow);
 
                 if (GetAllNamespacesInPackages().Any(_namespace => _namespace.Path == wholeNamespace))
 
-                    WriteLine($"{wholeNamespace} found. Not removed from DB.", null, ConsoleColor.DarkGreen);
+                    Logger($"{wholeNamespace} found. Not removed from DB.", null, ConsoleColor.DarkGreen);
 
                 else
                 {
-                    WriteLine($"{wholeNamespace} not found in any package. Deleting.", true, ConsoleColor.DarkRed);
+                    Logger($"{wholeNamespace} not found in any package. Deleting.", true, ConsoleColor.DarkRed);
 
                     DeleteTypes(wholeNamespace);
 
@@ -68,11 +68,11 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
                     if (rows > 0)
                     {
-                        WriteLine($"Removed {rows} {nameof(rows)} in {tables} {nameof(tables)}.", null);
+                        Logger($"Removed {rows} {nameof(rows)} in {tables} {nameof(tables)}.", null);
 
                         Directory.Delete(GetWholePath(wholeNamespace), true);
 
-                        WriteLine($"{wholeNamespace} successfully deleted.", false);
+                        Logger($"{wholeNamespace} successfully deleted.", false);
                     }
 
                     else
@@ -80,12 +80,12 @@ namespace WinCopies.Reflection.DotNetDocBuilder
                         throw new InvalidOperationException($"Could not remove {wholeNamespace}.");
                 }
 
-                WriteLine($"Processing {wholeNamespace} completed.", false);
+                Logger($"Processing {wholeNamespace} completed.", false);
             }
 
             wholeNamespace = null;
 
-            WriteLine("Parsing DB completed.", false);
+            Logger("Parsing DB completed.", false);
 
             long? id;
 
@@ -97,7 +97,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 #endif
                 @namespace in GetAllNamespacesInPackages())
             {
-                WriteLine($"{++i}: Processing {@namespace.Path}.", true, ConsoleColor.DarkYellow);
+                Logger($"{++i}: Processing {@namespace.Path}.", true, ConsoleColor.DarkYellow);
 
                 bool process()
                 {
@@ -105,11 +105,11 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
                         if (_namespace.Name == @namespace.Name && _namespace.ParentId == (@namespace.Parent == null ? null : GetNamespaceId(@namespace.Parent.Path)))
                         {
-                            WriteLine("Exists. Updating.", true, ConsoleColor.DarkGreen);
+                            Logger("Exists. Updating.", true, ConsoleColor.DarkGreen);
 
                             _namespace.FrameworkId = PackageInfo.FrameworkId;
 
-                            WriteLine($"Updated {_namespace.Update(out uint tables)} rows in {tables} {nameof(tables)}. Id: {_namespace.Id}.", false);
+                            Logger($"Updated {_namespace.Update(out uint tables)} rows in {tables} {nameof(tables)}. Id: {_namespace.Id}.", false);
 
                             return false;
                         }
@@ -119,7 +119,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
                 if (process())
                 {
-                    WriteLine("Does not exist. Adding.", true, ConsoleColor.DarkRed);
+                    Logger("Does not exist. Adding.", true, ConsoleColor.DarkRed);
 
                     var _namespace = new Namespace(namespaces)
                     {
@@ -134,13 +134,13 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
                     if (id.HasValue)
                     {
-                        WriteLine($"Added {rows} {nameof(rows)} in {tables} {nameof(tables)}. Id: {id.Value}", null);
+                        Logger($"Added {rows} {nameof(rows)} in {tables} {nameof(tables)}. Id: {id.Value}", null);
 
-                        WriteLine($"Creating file for {@namespace.Path}.", null);
+                        Logger($"Creating file for {@namespace.Path}.", null);
 
                         CreateNamespaceFile(@namespace, (ulong)id.Value);
 
-                        WriteLine($"File created for {@namespace.Path}.", false);
+                        Logger($"File created for {@namespace.Path}.", false);
                     }
 
                     else
@@ -148,13 +148,13 @@ namespace WinCopies.Reflection.DotNetDocBuilder
                         throw new InvalidOperationException($"Failed to add {@namespace.Path}.");
                 }
 
-                WriteLine($"Processed {@namespace.Path}.", false);
+                Logger($"Processed {@namespace.Path}.", false);
             }
 #if !CS8
             }
 #endif
 
-            WriteLine("Updating namespaces completed.", false);
+            Logger("Updating namespaces completed.", false);
         }
     }
 }

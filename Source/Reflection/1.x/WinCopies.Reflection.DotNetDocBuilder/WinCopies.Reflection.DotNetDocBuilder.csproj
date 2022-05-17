@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Data\1.x\WinCopies.Data.SQL\WinCopies.Data.SQL.csproj" />
+    <ProjectReference Include="..\..\..\IO\3.x\WinCopies.IO\WinCopies.IO.csproj" />
     <ProjectReference Include="..\WinCopies.Reflection.DotNetParser\WinCopies.Reflection.DotNetParser.csproj" />
   </ItemGroup>
 

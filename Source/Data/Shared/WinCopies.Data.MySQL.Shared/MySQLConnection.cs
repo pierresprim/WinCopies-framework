@@ -3,24 +3,179 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 using WinCopies.Data.SQL;
 
-using static WinCopies.Data.MySQL.MySQLConnectionConstants;
+using static WinCopies.Data.SQL.SQLConstants;
+using static WinCopies.Data.MySQL.MySQLConnectionHelper;
 
 namespace WinCopies.Data.MySQL
 {
-    public static class MySQLConnectionConstants
+    public static class MySQLConnectionHelper
     {
-        public const string EQUAL = "=";
+        public const string NULL = nameof(NULL);
 
-        public const string IS = "IS";
-
-        public const string NULL = "NULL";
+        public const string NOT = nameof(NOT);
 
         public const string COLUMN_DECORATOR = "`";
+
+        public const string AUTO_INCREMENT = nameof(AUTO_INCREMENT);
+
+        public const string DEFAULT = nameof(DEFAULT);
+
+        public static string GetItemName(string itemName) => $"`{itemName}`";
+    }
+
+    public class MySQLColumnInfo : SQLColumnInfo, ISQLColumnInfo
+    {
+        public override string GetSQL()
+        {
+            var result = new StringBuilder();
+
+            result.Append($"{GetItemName(Name)} ");
+
+            ISQLColumnType
+#if CS8
+                ?
+#endif
+                columnType = ColumnType;
+
+            result.Append(columnType.Name);
+
+            if (columnType.Length.HasValue)
+
+                result.Append($"({columnType.Length.Value})");
+
+            IEnumerable<string>
+#if CS8
+                ?
+#endif
+                columnTypeAttributes = columnType.Attributes;
+
+            if (columnTypeAttributes != null)
+
+                foreach (string columnTypeAttribute in columnTypeAttributes)
+
+                    result.Append($" {columnTypeAttribute}");
+
+            void appendDefault(in object value) => result.Append($" {DEFAULT} {value}");
+
+            if (AllowNull)
+
+                appendDefault(Default ?? NULL);
+
+            else
+            {
+                result.Append($" {NOT} {NULL}");
+
+                if (Default != null)
+
+                    appendDefault(Default);
+            }
+
+            if (AutoIncrement)
+
+                result.Append($" {AUTO_INCREMENT}");
+
+            return result.ToString();
+        }
+
+        public override string ToString() => GetSQL();
+    }
+
+    public class MySQLUnicityIndex : SQLUnicityIndex2
+    {
+        public override string GetSQL()
+        {
+            var result = new StringBuilder();
+
+            void append(in string text) => result.Append(text);
+
+            append($"UNIQUE KEY {GetItemName(Name)} (");
+
+            Action<string> action = column =>
+            {
+                action = _column => append($", {_column}");
+
+                append(column);
+            };
+
+            foreach (string column in Columns)
+
+                action(GetItemName(column));
+
+            append(") USING BTREE");
+
+            return result.ToString();
+        }
+    }
+
+    public class MySQLTable : SQLTable2
+    {
+        public override string GetCreateTableSQL(bool ifNotExists)
+        {
+            var result = new StringBuilder();
+            Collections.DotNetFix.Generic.IQueue<string> primaryKeys = new Collections.DotNetFix.Generic.Queue<string>();
+
+            void append(in string text) => result.Append(text);
+
+            append("CREATE TABLE ");
+
+            if (ifNotExists)
+
+                append("IF NOT EXISTS ");
+
+            append(GetItemName(Name));
+
+            append(" (\n");
+
+            Converter<ISQLColumnInfo, string> getSQL = column =>
+            {
+                getSQL = _column => ",\r\n" + _column.GetSQL();
+
+                return column.GetSQL();
+            };
+
+            foreach (ISQLColumnInfo column in Columns)
+            {
+                append(getSQL(column));
+
+                if (column.IsPrimaryKey)
+
+                    primaryKeys.Enqueue(column.Name);
+            }
+
+            if (primaryKeys.Count > 0)
+            {
+                Converter<string, string> getPrimaryKeysSQL = column =>
+                {
+                    getPrimaryKeysSQL = _column => ", " + GetItemName(_column);
+
+                    return GetItemName(column);
+                };
+
+                append(",\r\nPRIMARY KEY (");
+
+                while (primaryKeys.TryDequeue(out string column))
+
+                    append(getPrimaryKeysSQL(column));
+
+                _ = result.Append(')');
+            }
+
+            foreach (IUnicityIndex unicityIndex in UnicityKeys)
+
+                append($",\r\n{unicityIndex.GetSQL()}");
+
+            append($"\n) ENGINE={Engine} {AUTO_INCREMENT}={AutoIncrement} {DEFAULT} CHARSET={CharacterSet}");
+
+            return result.ToString();
+        }
+
+        public override string GetRemoveTableSQL(bool ifExists) => $"DROP TABLE {(ifExists ? "IF EXISTS " : null)}{GetItemName(Name)}";
     }
 
     public class MySQLConnection : SQLConnection<MySqlConnection>, IConnection<MySqlCommand>
@@ -36,6 +191,14 @@ namespace WinCopies.Data.MySQL
         public override string ColumnDecorator => COLUMN_DECORATOR;
 
         internal MySqlConnection InnerConnection => Connection;
+
+        public override bool CanUseDB => true;
+        public override bool CanCreateDB => true;
+        public override bool CanSelect => true;
+        public override bool CanCount => true;
+        public override bool CanInsert => true;
+        public override bool CanUpdate => true;
+        public override bool CanDelete => true;
 
         public MySQLConnection(in MySqlConnection connection, in bool autoDispose = true) : base(connection, autoDispose) { /* Left empty. */ }
 
@@ -54,9 +217,18 @@ namespace WinCopies.Data.MySQL
 
         public MySqlCommand GetCommand(string sql) => new
 #if !CS9
-            MySqlCommand
+               MySqlCommand
 #endif
-            (sql, Connection);
+               (sql, Connection);
+
+        public MySqlCommand GetPreparedCommand(string sql)
+        {
+            var command = GetCommand(sql);
+
+            command.Prepare();
+
+            return command;
+        }
 
         public override ISelect GetSelect(SQLItemCollection<string> defaultTables, SQLItemCollection<SQLColumn> defaultColumns) => new Select(this, defaultTables, defaultColumns);
 
@@ -68,11 +240,25 @@ namespace WinCopies.Data.MySQL
 #endif
             columns, SQLItemCollection<SQLItemCollection<IParameter>> values) => new Insert(this, tableName, columns, values);
 
-        public override ISQLTableRequest2 GetDelete(SQLItemCollection<string> defaultTables) => new Delete(this, defaultTables is SQLItemCollection<string> _defaultTables ? _defaultTables : throw new InvalidArgumentException(nameof(defaultTables)));
+        public override ISQLTableRequest2 GetDelete(SQLItemCollection<string> defaultTables) => new Delete(this, defaultTables is SQLItemCollection<string> _defaultTables ? _defaultTables : throw ThrowHelper.GetArgumentException(nameof(defaultTables)));
 
         public override IUpdate GetUpdate(string tableName, SQLItemCollection<ICondition> columns) => new Update(this, tableName, columns);
 
-        protected override int? UseDBOverride(string dbName) => GetCommand($"USE {dbName};").ExecuteNonQuery();
+        protected override uint? UseDBOverride(string dbName) => ExecuteNonQuery($"USE {dbName};");
+
+        public override string GetItemName(string itemName) => MySQLConnectionHelper.GetItemName(itemName);
+
+
+
+        public override string GetBeginTransactionSQL() => "START TRANSACTION";
+
+        public override string GetCreateDBSQL(ISQLDatabase database, bool ifNotExists) => $"CREATE DATABASE {(ifNotExists ? "IF NOT EXISTS " : null)}{GetItemName(database.Name)} {DEFAULT} CHARACTER SET {database.CharacterSet} COLLATE {database.Collate}";
+
+        public override string GetEndTransactionSQL() => "COMMIT";
+
+        public override string GetResetTransactionSQL() => "ROLLBACK";
+
+
 
         public static ICondition GetCondition<T>(string columnName, SQL.Parameter<T>
 #if CS8
@@ -121,6 +307,8 @@ namespace WinCopies.Data.MySQL
 
         private static uint GetResultOrThrow(uint? result) => result ?? throw new InvalidOperationException("The request was not a modifier one.");
 
+        public override uint? ExecuteNonQuery(string sql) => ExecuteNonQuery(GetCommand(sql));
+
         public static uint? ExecuteNonQuery(MySqlCommand command) => GetResult(command.ExecuteNonQuery());
 
         public static async Task<uint?> ExecuteNonQueryAsync(MySqlCommand command) => GetResult(await command.ExecuteNonQueryAsync());
@@ -129,7 +317,7 @@ namespace WinCopies.Data.MySQL
 
         public static async Task<uint> ExecuteNonQueryAsync2(MySqlCommand command) => GetResultOrThrow(await ExecuteNonQueryAsync(command));
 
-        public static void PrepareCommand(MySqlCommand command, IEnumerable<IParameter> parameters)
+        public static void PrepareCommandParameters(MySqlCommand command, IEnumerable<IParameter> parameters)
         {
             foreach (IParameter
 #if CS8
@@ -140,6 +328,13 @@ namespace WinCopies.Data.MySQL
                 _ = command.Parameters.Add(new MySqlParameter(parameter.Name, parameter.Value));
         }
 
+        public static void PrepareCommand(MySqlCommand command, IEnumerable<IParameter> parameters)
+        {
+            PrepareCommandParameters(command, parameters);
+
+            command.Prepare();
+        }
+
         public static void PrepareCommand(MySqlCommand command, IConditionGroup
 #if CS8
             ?
@@ -148,7 +343,7 @@ namespace WinCopies.Data.MySQL
         {
             if (conditionGroup != null)
 
-                PrepareCommand(command, conditionGroup.AsEnumerable());
+                PrepareCommandParameters(command, conditionGroup.AsEnumerable());
 
             command.Prepare();
         }

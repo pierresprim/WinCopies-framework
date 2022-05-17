@@ -35,6 +35,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
@@ -44,7 +45,6 @@ using System.Windows.Media;
 using WinCopies.Desktop;
 using WinCopies.GUI.IO.Controls;
 using WinCopies.GUI.IO.ObjectModel;
-using WinCopies.GUI.Shell.ObjectModel;
 using WinCopies.GUI.Windows;
 using WinCopies.IO;
 using WinCopies.IO.ObjectModel;
@@ -178,18 +178,44 @@ namespace WinCopies.GUI.Shell
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(BrowsableObjectInfoWindow), new FrameworkPropertyMetadata(typeof(BrowsableObjectInfoWindow)));
 
-            Microsoft.WindowsAPICodePack.Shell.Window getWindow(in RoutedEventArgs e)
+            Microsoft.WindowsAPICodePack.Shell.Window getWindow(RoutedEventArgs e)
             {
-                if (e.OriginalSource is DockPanel d)
+                Microsoft.WindowsAPICodePack.Shell.Window window;
+
+                Microsoft.WindowsAPICodePack.Shell.Window _getWindow()
                 {
-                    var window = (Microsoft.WindowsAPICodePack.Shell.Window)GetWindow(d);
+                    void setWindow(in DependencyObject __d) => window = (Microsoft.WindowsAPICodePack.Shell.Window)GetWindow(__d);
 
-                    if (window.GetChild<DockPanel>(true, out _) == d)
+                    if (e.OriginalSource is DockPanel d)
+                    {
+                        setWindow(d);
 
-                        return window;
+                        if (window?.GetChild<Grid>(true, out _)?.GetChild<DockPanel>(true, out _) == d)
+
+                            return window;
+                    }
+
+                    else if (e.OriginalSource is Border _d)
+                    {
+                        setWindow(_d);
+
+                        if (window?.GetChild<Grid>(true, out _)?.GetChild<StatusBar>(true, out _) == _d.GetParent<StatusBar>(false))
+
+                            return window;
+                    }
+
+                    return null;
                 }
 
-                return null;
+                window = _getWindow();
+
+                if (window == null)
+
+                    return null;
+
+                e.Handled = true;
+
+                return window;
             }
 
             void registerClassHandler(in RoutedEvent @event, in Action<object, MouseButtonEventArgs> action) => RegisterClassHandler(@event, new MouseButtonEventHandler(action));
@@ -672,7 +698,11 @@ namespace WinCopies.GUI.Shell
 
         protected IEnumerable<IBrowsableObjectInfo> GetEnumerable() => ((BrowsableObjectInfoWindowViewModel)DataContext).Paths.SelectedItem.Path.Items.WhereSelect(item => item.IsSelected, item => item.Model);
 
-        private void CanRunCommand(in IProcessFactoryProcessInfo processFactory, in CanExecuteRoutedEventArgs e)
+        private void CanRunCommand(in IProcessFactoryProcessInfo
+#if CS8
+            ?
+#endif
+            processFactory, in CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = processFactory?.CanRun(GetEnumerable()) == true;
 
