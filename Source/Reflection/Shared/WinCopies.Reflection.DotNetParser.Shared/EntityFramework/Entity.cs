@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
+using WinCopies.Collections;
 using WinCopies.Collections.DotNetFix.Generic;
 using WinCopies.Collections.Generic;
 using WinCopies.Linq;
@@ -13,7 +14,7 @@ using static WinCopies.ThrowHelper;
 
 namespace WinCopies.EntityFramework
 {
-    public interface IEntityCollection : IAsEnumerable<IEntity>, DotNetFix.IDisposable
+    public interface IEntityCollection : IAsEnumerable<IEntity>, DotNetFix.IDisposable, IDisposableEnumerable
     {
         long? Add(IEntity entity, out uint tables, out ulong rows, System.Collections.Generic.IReadOnlyDictionary<string, object>
 #if CS8
@@ -22,7 +23,7 @@ namespace WinCopies.EntityFramework
                 extraColumns);
     }
 
-    public interface IEntityCollection<T> : IEntityCollection, IMultiTypeEnumerable<T, IEntity> where T : IEntity
+    public interface IEntityCollection<T> : IEntityCollection, IDisposableEnumerable<T>, IMultiTypeEnumerable<T, IEntity> where T : IEntity
     {
         long? Add(T entity, out uint tables, out ulong rows, System.Collections.Generic.IReadOnlyDictionary<string, object>
 #if CS8
@@ -84,7 +85,7 @@ namespace WinCopies.EntityFramework
 
     public interface IEntityIdRefresher : DotNetFix.IDisposable
     {
-        Collections.IUIntCountable Columns { get; }
+        IUIntCountable Columns { get; }
 
         void Add(string column, string paramName, object
 #if CS8

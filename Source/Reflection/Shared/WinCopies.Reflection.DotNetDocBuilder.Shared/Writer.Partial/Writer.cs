@@ -301,6 +301,12 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 #endif
             (GetConnection());
 
+        protected ulong Remove<T>() where T : IEntity => DBEntityCollection<T>.Remove(GetConnection());
+
+        protected ulong Remove<T>(in Func<T, bool> predicate) where T : IEntity => DBEntityCollection<T>.Remove(GetConnection(), predicate);
+
+        protected ulong RemovePredicate<T>(in Predicate<T> predicate) where T : IEntity => DBEntityCollection<T>.RemovePredicate(GetConnection(), predicate);
+
         public IEnumerable<DotNetNamespace> GetAllNamespacesInPackages()
         {
             if (_dotNetNamespaces == null)

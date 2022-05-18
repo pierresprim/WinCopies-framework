@@ -287,6 +287,37 @@ namespace WinCopies.Data.SQL
 
         public DBEntityCollection(ISQLConnection connection) => _connection = connection;
 
+        public static ulong Remove(in IEnumerable<T> collection)
+        {
+            ulong rows = 0;
+
+            foreach (T c in collection)
+
+                rows += c.Remove();
+
+            return rows;
+        }
+
+        public static ulong Remove(in IEnumerable<T> collection, in Func<T, bool> predicate) => Remove(collection.Where(predicate));
+
+        public static ulong RemovePredicate(in IEnumerable<T> collection, in Predicate<T> predicate) => Remove(collection.WherePredicate(predicate));
+
+        public static DBEntityCollection<T> GetCollection(in ISQLConnection connection) => new
+#if !CS9
+            DBEntityCollection<T>
+#endif
+            (connection);
+
+        public static Func<DBEntityCollection<T>> GetCollectionFunc(ISQLConnection connection) => () => GetCollection(connection);
+
+        public static ulong Remove(ISQLConnection connection, Converter<DBEntityCollection<T>, IEnumerable<T>> converter) => UtilHelpers.UsingIn2(GetCollectionFunc(connection), (in DBEntityCollection<T> collection) => Remove(converter(collection)));
+
+        public static ulong Remove(ISQLConnection connection) => Remove(connection, Delegates.Self);
+
+        public static ulong Remove(in ISQLConnection connection, Func<T, bool> predicate) => Remove(connection, collection => collection.Where(predicate));
+
+        public static ulong RemovePredicate(in ISQLConnection connection, Predicate<T> predicate) => Remove(connection, collection => collection.WherePredicate(predicate));
+
         public override long? Add(T entity, out uint tables, out ulong rows, IReadOnlyDictionary<string, object>
 #if CS8
             ?

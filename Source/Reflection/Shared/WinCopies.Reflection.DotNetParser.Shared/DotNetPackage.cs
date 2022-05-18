@@ -139,6 +139,8 @@ namespace WinCopies.Reflection.DotNetParser
 
         public DotNetEnum(in Type type) : base(type.IsEnum ? type : throw DotNetHelper.GetTypeIsNotEnumException(nameof(type))) => UnderlyingType = Type.ToDotNetEnumUnderlyingType();
 
+        public Type GetEnumUnderlyingType() => Type.GetEnumUnderlyingType();
+
         public IEnumerator<DotNetEnumValue> GetEnumerator() => new Enumerator(this);
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

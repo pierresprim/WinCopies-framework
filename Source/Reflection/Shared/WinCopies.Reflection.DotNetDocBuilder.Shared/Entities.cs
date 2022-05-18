@@ -386,6 +386,8 @@ namespace WinCopies.Reflection.DotNetDocBuilder
     public interface IConst : IEntity
     {
         object Value { get; set; }
+
+        Member Member { get; set; }
     }
 
     public class Const<TEntity, TValue> : DefaultDBEntity<TEntity>, IConst where TEntity : IEntity
@@ -409,11 +411,23 @@ namespace WinCopies.Reflection.DotNetDocBuilder
     public class Const16 : Const<Const16, ushort>
     {
         public Const16(DBEntityCollection<Const16> collection) : base(collection) { /* Left empty. */ }
+
+        public static Const16 GetNewConstant(in DBEntityCollection<Const16> dbec) => new
+#if !CS9
+            Const16
+#endif
+            (dbec);
     }
 
     [Entity("docconst64")]
     public class Const64 : Const<Const64, ulong>
     {
         public Const64(DBEntityCollection<Const64> collection) : base(collection) { /* Left empty. */ }
+
+        public static Const64 GetNewConstant(in DBEntityCollection<Const64> dbec) => new
+#if !CS9
+            Const64
+#endif
+            (dbec);
     }
 }
