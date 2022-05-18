@@ -6,6 +6,13 @@ The WinCopies® software framework
 CHANGELOG
 ---------
 
+### 3.13.3-preview
+
+- New types.
+- DBEntity\<T> has a new constructor.
+- Writer.UpdateItems\<T, U>(in string, bool, Predicate\<T>, Action\<T, U>?, Action\<T>?, Converter\<T, Type>, in Func\<IEnumerable\<U>>, in Func\<U, Type, DBEntityCollection\<T>, T>, Action\<U, T, DBEntityCollection\<T>>, Action\<U, ulong>, Action\<UpdateItemsStruct>?) has a new parameter: in bool isGenericType.
+- Add support for constants in doc builder.
+
 ### 3.13.2-preview
 
 - New types.

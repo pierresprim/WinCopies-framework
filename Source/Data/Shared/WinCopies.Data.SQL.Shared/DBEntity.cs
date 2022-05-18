@@ -2,10 +2,8 @@
 using System.Linq;
 
 using WinCopies.Collections;
-using WinCopies.Collections.DotNetFix;
 using WinCopies.Collections.DotNetFix.Generic;
 using WinCopies.EntityFramework;
-using WinCopies.Util;
 
 using static WinCopies.Data.SQL.DBEntityCollection;
 using static WinCopies.ThrowHelper;
@@ -104,6 +102,8 @@ namespace WinCopies.Data.SQL
         protected ISQLConnection Connection => Collection.Connection;
 
         public DBEntity(in DBEntityCollection<T> collection) : base(collection) { /* Left empty. */ }
+
+        public DBEntity(in ISQLConnection connection) : this(new DBEntityCollection<T>(connection)) { /* Left empty. */ }
 
         public System.Collections.Generic.IEnumerable<ICondition> GetIdProperties()
         {

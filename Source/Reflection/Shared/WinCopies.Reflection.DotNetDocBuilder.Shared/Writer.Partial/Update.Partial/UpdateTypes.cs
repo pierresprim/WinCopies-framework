@@ -230,7 +230,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
             UpdateItems(typeName, true, type => convertFrom(type).TypeType.Name == typeName, (type, @interface) => addEntityAssociations(type, @interface, false), _t => _onRemove(_t), convertFrom, () => dotNetInterfaces, convertTo,
             _action,
-            action, _updateItemsStruct => updateItemsStruct = _updateItemsStruct);
+            action, _updateItemsStruct => updateItemsStruct = _updateItemsStruct, true);
 #if !CS8
             }
 #endif

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 
@@ -51,7 +50,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 #if CS8
             ?
 #endif
-            updateItemsStruct) where T : IDefaultEntity<ulong> where U : DotNetType
+            updateItemsStruct, in bool isGenericType) where T : IDefaultEntity<ulong> where U : DotNetType
         {
             Logger($"Updating {name}s", true);
 
@@ -89,7 +88,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 #if !CS8
                         (
 #endif
-    var gtmColl = new DBEntityCollection<GenericTypeModifier>(Connection)
+                var gtmColl = new DBEntityCollection<GenericTypeModifier>(Connection)
 #if CS8
 ;
 #else
@@ -140,7 +139,6 @@ namespace WinCopies.Reflection.DotNetDocBuilder
                         )
                     {
 #endif
-
             void tryRefreshAccessModifierId() => type.AccessModifier.TryRefreshId(true);
 
             void setModifier(in GenericType _gt, in string _name)
@@ -214,20 +212,14 @@ namespace WinCopies.Reflection.DotNetDocBuilder
                     writeLine("not ");
             }
 
-            ActionIn<T, U> _onAdded = onAdded == null ?
-#if !CS9
-                            (ActionIn<T, U>)(
-#endif
-                (in T _item, in U _i) => { /* Left empty. */ }
-#if !CS9
-                        )
-#endif
-            : (in T _item, in U _i) =>
+            Action<T, U> _onAdded = onAdded == null ? (T _item, U _i) => { /* Left empty. */ }
+            : isGenericType ? (T _item, U _i) =>
             {
                 onAdded(_item, _i);
 
                 updateGenericTypes(converter(_item), _i);
-            };
+            }
+            : onAdded;
 
             void setWholeNamespace(in DotNetType item) => wholeNamespace = item.Type.Namespace;
 
@@ -260,7 +252,6 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 #else
                             )
 #endif
-
             foreach (U item in func().Where(item => !browsed.Contains(item.Type)))
             {
                 Logger($"{++i}: Processing {item}.", true, ConsoleColor.DarkYellow);
@@ -292,9 +283,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
                             j = 0;
 
-                            foreach (GenericType gt in gtColl.GetItems(Connection.GetOrderByColumns(OrderBy.Asc, nameof(GenericType.Id))).Where(_gt =>
-
-                            _gt.Type.Id == type.Id))
+                            foreach (GenericType gt in gtColl.GetItems(Connection.GetOrderByColumns(OrderBy.Asc, nameof(GenericType.Id))).Where(_gt => _gt.Type.Id == type.Id))
                             {
                                 Logger($"Updating generic type parameter {(genericTypeParameter = genericTypeParameters[j++]).Name}.", true);
 
@@ -411,7 +400,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
             ActionIn<T> delete = onDeleting == null ?
 #if !CS9
-                            (ActionIn<T>)
+                (ActionIn<T>)
 #endif
                 updateRows : (in T item) =>
                 {
