@@ -106,11 +106,23 @@ namespace WinCopies.IO
             Protocol = protocol;
         }
 
-        public BrowsableObjectInfoURL2(in string path)
+        public BrowsableObjectInfoURL2(string path)
         {
             int index = path.IndexOf("://");
+            string protocol;
 
-            this = new BrowsableObjectInfoURL2(new BrowsableObjectInfoURL(path.Substring(0, index)), path.Substring(index + 3));
+            if (index >= 0)
+            {
+                protocol = path.Substring(index + 3);
+
+                path = path.Substring(0, index);
+            }
+
+            else
+
+                protocol = "shell";
+
+            this = new BrowsableObjectInfoURL2(new BrowsableObjectInfoURL(path), protocol);
         }
 
         public bool Equals(BrowsableObjectInfoURL2 other) => other.Protocol == Protocol && other.URL == URL;

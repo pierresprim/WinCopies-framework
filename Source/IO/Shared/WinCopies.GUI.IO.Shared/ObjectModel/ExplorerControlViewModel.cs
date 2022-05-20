@@ -456,11 +456,15 @@ namespace WinCopies.GUI.IO
 
             protected virtual bool OnCanRenameItem(object obj) => OnCanExecuteCommand(obj, GetRenameItemCommand);
 
-            protected virtual void OnTryExecuteCommand(Converter<IProcessFactory, IProcessCommand> command, string errorMessage, string errorCaption, in BitmapSource icon)
+            protected virtual void OnTryExecuteCommand(Converter<IProcessFactory, IProcessCommand> command, string errorMessage, string errorCaption, in BitmapSource icon, string
+#if CS8
+                ?
+#endif
+                text = null)
             {
                 IProcessCommand _command = (command ?? throw GetArgumentNullException(nameof(command)))(GetProcessFactory());
 
-                if (InputBox.ShowDialog(_command.Name, DialogButton.OKCancel, _command.Caption, SelectedItemsInnerObjects.First().Name, null, out string result, icon) == true)
+                if (InputBox.ShowDialog(_command.Name, DialogButton.OKCancel, _command.Caption, text, null, out string result, icon) == true)
 
                     if (!_command.TryExecute(result, SelectedItemsInnerObjects, out _))
 
@@ -469,7 +473,7 @@ namespace WinCopies.GUI.IO
 
             protected virtual void OnCreateNewItem() => OnTryExecuteCommand(GetNewItemCommand, ItemCouldNotBeCreated, ItemCreationError, folder_add.ToImageSource());
 
-            protected virtual void OnRenameItem(BitmapSource icon) => OnTryExecuteCommand(GetRenameItemCommand, ItemCouldNotBeRenamed, ItemRenameError, icon);
+            protected virtual void OnRenameItem(BitmapSource icon) => OnTryExecuteCommand(GetRenameItemCommand, ItemCouldNotBeRenamed, ItemRenameError, icon, SelectedItemsInnerObjects.First().Name);
             #endregion
 
             public static IBrowsableObjectInfoViewModel GetBrowsableObjectInfoOrLaunchItem(IBrowsableObjectInfoViewModel browsableObjectInfo)

@@ -6,6 +6,10 @@ The WinCopies® software framework
 CHANGELOG
 ---------
 
+### 3.14-preview
+
+- Bug fixed in IO commands.
+
 ### 3.13.2-preview
 
 - New types.
