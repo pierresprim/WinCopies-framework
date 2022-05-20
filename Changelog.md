@@ -6,7 +6,7 @@ The WinCopies® software framework
 CHANGELOG
 ---------
 
-### 3.13.3-preview
+### 3.14-preview
 
 - New types.
 - IEntityCollection/\<T>: implement respectively IDisposableEnumerable/\<T>.
