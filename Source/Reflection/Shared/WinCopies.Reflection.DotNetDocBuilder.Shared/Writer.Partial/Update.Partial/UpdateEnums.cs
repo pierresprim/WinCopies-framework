@@ -125,7 +125,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
             void setConverter16() => setConverter<ushort>();
 
-            void setConverter64 ()=>setConverter<ulong>();
+            void setConverter64() => setConverter<ulong>();
 
             UpdateItems("Enum", false, @enum => true, (Enum @enum, DotNetEnum dotNetEnum) =>
             {
