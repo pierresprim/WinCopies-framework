@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows;
+﻿using System.Windows;
+using System.Windows.Controls;
+
+using WinCopies.Desktop;
 
 namespace WinCopies.GUI.Controls
 {
     /// <summary>
     /// Represents a WPF control that can display a header.
     /// </summary>
-    public class HeaderedControl : System.Windows.Controls.Control
+    public class HeaderedControl : Control
     {
         /// <summary>
         /// Identifies the <see cref="Header"/> dependency property.
@@ -19,5 +19,14 @@ namespace WinCopies.GUI.Controls
         /// Gets or sets the header of the control. This is a dependency property.
         /// </summary>
         public object Header { get => GetValue(HeaderProperty); set => SetValue(HeaderProperty, value); }
+    }
+
+    public class HeaderedContentControl : System.Windows.Controls.HeaderedContentControl
+    {
+        public static readonly DependencyProperty DockProperty = Util.Desktop.UtilHelpers.Register<Dock, HeaderedContentControl>(nameof(Dock));
+
+        public Dock Dock { get => (Dock)GetValue(DockProperty); set => SetValue(DockProperty, value); }
+
+        static HeaderedContentControl() => DefaultStyleKeyProperty.OverrideDefaultStyleKey<HeaderedContentControl>();
     }
 }

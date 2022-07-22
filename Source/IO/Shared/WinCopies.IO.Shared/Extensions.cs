@@ -21,6 +21,7 @@ using System.Windows.Media.Imaging;
 using WinCopies.Collections;
 using WinCopies.Collections.DotNetFix.Generic;
 using WinCopies.Collections.Generic;
+using WinCopies.IO.ComponentSources.Bitmap;
 using WinCopies.IO.ObjectModel;
 using WinCopies.Util;
 
@@ -62,6 +63,82 @@ namespace WinCopies.IO
 
     public static class Extensions
     {
+        public static bool IsFolder(this FileType fileType)
+#if CS9
+            =>
+#else
+        {
+            switch (
+#endif
+            fileType
+#if CS9
+            switch
+#else
+            )
+#endif
+            {
+#if !CS9
+                case
+#endif
+                FileType.Folder
+#if CS9
+                or
+#else
+                :
+                case
+#endif
+                FileType.KnownFolder
+#if CS9
+                or
+#else
+                :
+                case
+#endif
+                FileType.Drive
+#if CS9
+                or
+#else
+                :
+                case
+#endif
+                FileType.Library
+#if CS9
+                =>
+#else
+                :
+                    return
+#endif
+                    true
+#if CS9
+                ,
+                _ =>
+#else
+                    ;
+                default:
+                    return
+#endif
+                    false
+#if CS9
+            };
+#else
+                    ;
+            }
+        }
+#endif
+
+        public static bool IsFile(this FileType fileType)
+        {
+            switch (fileType)
+            {
+                case FileType.File:
+                case FileType.Archive:
+
+                    return true;
+            }
+
+            return false;
+        }
+
         public static string GetCanonicalName(this ExtensionCommand command)
         {
             const string COPY = "Copy";

@@ -64,7 +64,7 @@ namespace WinCopies.IO
 
                     var sc = new StringCollection();
 
-                    sc.AddRange(new ArrayBuilder<string>(paths.As<IShellObjectInfoBase2>().Select(path => path.Path)).ToArray());
+                    sc.AddRange(new ArrayBuilder<string>(paths.OfType<IShellObjectInfoBase2>().Select(path => path.Path)).ToArray());
 
                     for (int i = 0; i < count; i++)
 

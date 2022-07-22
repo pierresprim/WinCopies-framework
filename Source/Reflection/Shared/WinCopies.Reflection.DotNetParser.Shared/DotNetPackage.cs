@@ -24,6 +24,8 @@ namespace WinCopies.Reflection.DotNetParser
 
         public string Name => Type.GetRealName();
 
+        public string Namespace => Type.Namespace;
+
         public DotNetType(in Type type) => Type = type ?? throw GetArgumentNullException(nameof(type));
 
         public int CompareTo(DotNetType
@@ -35,7 +37,7 @@ namespace WinCopies.Reflection.DotNetParser
         public override string ToString() => Type.ToString();
     }
 
-    public enum DotNetEnumUnderlyingType
+    public enum DotNetEnumUnderlyingType : byte
     {
         Byte = 0,
 
@@ -65,9 +67,7 @@ namespace WinCopies.Reflection.DotNetParser
         public DotNetEnumValue(in string name, in long? value, in ulong? uValue)
         {
             Name = name ?? throw GetArgumentNullException(nameof(value));
-
             Value = value;
-
             UValue = uValue;
         }
     }
@@ -327,21 +327,6 @@ namespace WinCopies.Reflection.DotNetParser
         public override string ToString() => Path;
     }
 
-#if CS8
-    public class PackageLoadContext : AssemblyLoadContext
-    {
-        private readonly AssemblyDependencyResolver _resolver;
-
-        public string Path { get; }
-
-        public PackageLoadContext(string packagePath) : base(true) => _resolver = new AssemblyDependencyResolver(Path = packagePath);
-
-        protected override Assembly Load(AssemblyName assemblyName) => UtilHelpers.PerformActionIfNotNull(_resolver.ResolveAssemblyToPath(assemblyName), LoadFromAssemblyPath);
-
-        protected override IntPtr LoadUnmanagedDll(string unmanagedDllName) => UtilHelpers.PerformActionIfNull(_resolver.ResolveUnmanagedDllToPath(unmanagedDllName), IntPtr.Zero, LoadUnmanagedDllFromPath);
-    }
-#endif
-
     public class DotNetPackage : System.Collections.Generic.IEnumerable<DotNetNamespace>
 #if !CS8
         , DotNetFix.IDisposable
@@ -396,12 +381,12 @@ namespace WinCopies.Reflection.DotNetParser
             ($"The package is {msg} open.");
 
 #if CS8
-        public void Open(PackageLoadContext packageLoadContext) => Assembly = Assembly == null ? ((packageLoadContext ?? throw GetArgumentNullException(nameof(packageLoadContext))).Path == Path ? packageLoadContext : throw new ArgumentException("The given context does not have the same path as the current package.", nameof(packageLoadContext))).LoadFromAssemblyPath(Path) : throw GetPackageOpenStatusException("already");
+        public void Open(AssemblyLoadContext assemblyLoadContext) => Assembly = Assembly == null ? ((assemblyLoadContext ?? throw GetArgumentNullException(nameof(assemblyLoadContext))).Path == Path ? assemblyLoadContext : throw new ArgumentException("The given context does not have the same path as the current package.", nameof(assemblyLoadContext))).LoadFromAssemblyPath(Path) : throw GetPackageOpenStatusException("already");
 #endif
 
         public void Open() =>
 #if CS8
-            Open(new PackageLoadContext(Path));
+            Open(new AssemblyLoadContext(Path));
 #else
             Assembly = Assembly.ReflectionOnlyLoadFrom(Path);
 #endif

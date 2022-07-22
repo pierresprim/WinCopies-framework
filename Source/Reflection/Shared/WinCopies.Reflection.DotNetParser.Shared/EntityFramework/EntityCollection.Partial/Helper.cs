@@ -201,7 +201,7 @@ namespace WinCopies.EntityFramework
 
             foreach (PropertyInfo property in GetDBProperties(t))
 
-                if ((attribute = property.GetCustomAttributes<EntityPropertyAttribute>(true).FirstOrDefault()) != null && attribute.IsId)
+                if ((attribute = property.GetCustomAttributes<EntityPropertyAttribute>(true).FirstOrDefault()) != null && attribute.IdStatus == IdStatus.Id)
 
                     yield return new KeyValuePair<string
 #if CS8

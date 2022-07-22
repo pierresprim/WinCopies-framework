@@ -19,6 +19,7 @@ using System;
 using System.Reflection;
 
 using WinCopies.Collections.Generic;
+using WinCopies.IO.ObjectModel;
 
 namespace WinCopies.IO
 {
@@ -164,5 +165,10 @@ namespace WinCopies.IO
         }
 
         ~BrowsableObjectInfoCallback() => Dispose();
+    }
+
+    public class EnumerableSelectorDictionary<T> : EnumerableSelectorDictionary<T, T> where T : IBrowsableObjectInfo
+    {
+        protected override Converter<T, T> DefaultActionOverride => Delegates.Self;
     }
 }

@@ -61,6 +61,24 @@ namespace WinCopies.GUI.IO.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Copies the name of the selected item..
+        /// </summary>
+        public static string CopyNameStatusBarLabel {
+            get {
+                return ResourceManager.GetString("CopyNameStatusBarLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Copies the path of the selected item..
+        /// </summary>
+        public static string CopyPathStatusBarLabel {
+            get {
+                return ResourceManager.GetString("CopyPathStatusBarLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Destination path:.
         /// </summary>
         public static string DestinationPath {
@@ -133,6 +151,33 @@ namespace WinCopies.GUI.IO.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Opens the selected item in a new tab..
+        /// </summary>
+        public static string OpenInNewTabStatusBarLabel {
+            get {
+                return ResourceManager.GetString("OpenInNewTabStatusBarLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Opens the selected item in a new window..
+        /// </summary>
+        public static string OpenInNewWindowStatusBarLabel {
+            get {
+                return ResourceManager.GetString("OpenInNewWindowStatusBarLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Opens the selected items..
+        /// </summary>
+        public static string OpenOrLaunchStatusBarLabel {
+            get {
+                return ResourceManager.GetString("OpenOrLaunchStatusBarLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Preserve directory root.
         /// </summary>
         public static string PreserveDirectoryRoot {
@@ -142,11 +187,56 @@ namespace WinCopies.GUI.IO.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to _Quit.
+        /// </summary>
+        public static string Quit {
+            get {
+                return ResourceManager.GetString("Quit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Closes all windows of the current process..
+        /// </summary>
+        public static string QuitStatusBarLabel {
+            get {
+                return ResourceManager.GetString("QuitStatusBarLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Opens a dialog for item renaming..
         /// </summary>
         public static string RenameItemCommandToolTip {
             get {
                 return ResourceManager.GetString("RenameItemCommandToolTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Submit a _bug....
+        /// </summary>
+        public static string SubmitABug {
+            get {
+                return ResourceManager.GetString("SubmitABug", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Opens your default browser at the WinCopies&apos; GitHub page..
+        /// </summary>
+        public static string SubmitABugStatusBarLabel {
+            get {
+                return ResourceManager.GetString("SubmitABugStatusBarLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You have multiple tabs open. Are you sure you want to close the window?.
+        /// </summary>
+        public static string WindowClosingMessage {
+            get {
+                return ResourceManager.GetString("WindowClosingMessage", resourceCulture);
             }
         }
     }

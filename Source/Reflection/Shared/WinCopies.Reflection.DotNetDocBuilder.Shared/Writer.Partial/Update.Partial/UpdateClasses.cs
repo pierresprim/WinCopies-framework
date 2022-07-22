@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
 
+using WinCopies.Collections.Generic;
 using WinCopies.Data.SQL;
 using WinCopies.Extensions;
 using WinCopies.Reflection.DotNetParser;
@@ -11,7 +11,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 {
     public partial class Writer
     {
-        public void UpdateClasses()
+        public void UpdateClasses(in ArrayBuilder<IWriterCallback<Class, DotNetClass>> callbacks)
         {
             Type _type;
             System.Type tmpType;
@@ -116,14 +116,14 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
                         setClassModifier(@class.InheritsFromDocType);
 
-                        return true;
+                        return false;
                     }
 
                     else if (tmpType != typeof(object))
 
                         @class.InheritsFrom = tmpType.FullName;
 
-                    return false;
+                    return true;
                 }
 
                 Func<bool> func = () =>
@@ -138,10 +138,22 @@ namespace WinCopies.Reflection.DotNetDocBuilder
                     return addInheritance();
                 };
 
-                while ((tmpType = tmpType.BaseType) != null && func()) { /* Left empty. */ }
+                while (!((tmpType = tmpType.BaseType) == null || func())) { /* Left empty. */ }
             }
 
-            UpdateTypes<DotNetClass, Class, ClassInterfaceImplementation>("Class", @class => @class.Type, (dotNetClass, type, classes) =>
+            callbacks.AddFirst(GetConstantUpdater<Class, DotNetClass>(c => c.Type, DefaultConverter<DotNetClass>));
+            callbacks.AddFirst(new WriterDelegateCallback<Class, DotNetClass>(
+                null, null, (Class @class, DotNetClass type, DBEntityCollection<Class> classes) =>
+                {
+                    tmpType = type.Type;
+
+                    setClassModifier(@class);
+                    updateInheritance(@class, classes);
+                },
+
+                (type, __type) => DeleteClassMetadata(type, null)));
+
+            UpdateTypes<Class, DotNetClass, ClassInterfaceImplementation>("Class", @class => @class.Type, (type, dotNetClass, classes) =>
             {
                 var @class = new Class(classes) { Type = type };
 
@@ -151,18 +163,14 @@ namespace WinCopies.Reflection.DotNetDocBuilder
                 updateInheritance(@class, classes);
 
                 return @class;
-            },
-            (type, items) => new ClassInterfaceImplementation(items) { Class = type }, (DotNetClass type, Class @class, DBEntityCollection<Class> classes) =>
-            {
-                tmpType = type.Type;
-
-                setClassModifier(@class);
-                updateInheritance(@class, classes);
-            },
-            DotNetClasses, CreateClassFile, type => DeleteClassMetadata(type, null));
+            }, (type, items) => new ClassInterfaceImplementation(items) { Class = type }, DotNetClasses, CreateClassFile, callbacks);
 #if !CS8
             }
 #endif
         }
+
+        public void UpdateClasses(in System.Collections.Generic.IEnumerable<IWriterCallback<Class, DotNetClass>> callbacks) => UpdateClasses(new ArrayBuilder<IWriterCallback<Class, DotNetClass>>(callbacks));
+
+        public void UpdateClasses(params IWriterCallback<Class, DotNetClass>[] callbacks) => UpdateClasses(callbacks.AsEnumerable());
     }
 }

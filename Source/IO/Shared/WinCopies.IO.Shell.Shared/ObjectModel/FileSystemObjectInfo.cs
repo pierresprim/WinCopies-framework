@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+#region Usings
 #region WAPICP
 using Microsoft.WindowsAPICodePack.COMNative.Shell;
 using Microsoft.WindowsAPICodePack.Shell;
@@ -34,8 +35,10 @@ using System.Windows.Media.Imaging;
 
 #region WinCopies
 using WinCopies.Collections.Generic;
+using WinCopies.IO.ComponentSources.Bitmap;
 using WinCopies.IO.PropertySystem;
 #endregion WinCopies
+#endregion Usings
 
 namespace WinCopies.IO
 {
@@ -50,7 +53,7 @@ namespace WinCopies.IO
 
     namespace ObjectModel
     {
-        public abstract class FileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : BrowsableObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IFileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IFileSystemObjectInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
+        public abstract class FileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : BrowsableObjectInfo<IBrowsableObjectInfo, TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>, IFileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IFileSystemObjectInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
         {
             private IBitmapSourceProvider _bitmapSourceProvider;
 
@@ -86,9 +89,17 @@ namespace WinCopies.IO
             public static FileSystemObjectInfoComparer<IFileSystemObjectInfo> GetDefaultComparer() => new FileSystemObjectInfoComparer<IFileSystemObjectInfo>();*/
 
             #region TryGetIcon/BitmapSource
-            public Icon TryGetIcon(in int size) => FileSystemObjectInfo.TryGetIcon(System.IO.Path.GetExtension(Path), ObjectPropertiesGeneric.FileType, new System.Drawing.Size(size, size));
+            public Icon
+#if CS8
+                ?
+#endif
+                TryGetIcon(in int size) => FileSystemObjectInfo.TryGetIcon(System.IO.Path.GetExtension(Path), ObjectPropertiesGeneric?.FileType ?? FileType.Other, new System.Drawing.Size(size, size));
 
-            public BitmapSource TryGetBitmapSource(in int size) => FileSystemObjectInfo.TryGetDefaultBitmapSource(this, size);
+            public BitmapSource
+#if CS8
+                ?
+#endif
+                TryGetBitmapSource(in int size) => FileSystemObjectInfo.TryGetDefaultBitmapSource(this, size);
             #endregion
             #endregion
 
@@ -129,7 +140,7 @@ namespace WinCopies.IO
 
             protected override ArrayBuilder<IBrowsableObjectInfo> GetRootItemsOverride() => FileSystemObjectInfo.GetRootItems();
 
-            protected override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetSubRootItemsOverride() => GetItems().Where(item => item.Browsability?.Browsability == IO.Browsability.BrowsableByDefault);
+            protected override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetSubRootItemsOverride() => GetDefaultEnumerable().Where(item => item.Browsability?.Browsability == IO.Browsability.BrowsableByDefault);
 
             protected override void DisposeUnmanaged()
             {
@@ -151,7 +162,15 @@ namespace WinCopies.IO
             /// <param name="left">Left operand.</param>
             /// <param name="right">Right operand.</param>
             /// <returns>A <see cref="bool"/> value that indicates whether the two <see cref="FileSystemObjectInfo{TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/>s are equal.</returns>
-            public static bool operator ==(in FileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> left, in FileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> right) => left is null ? right is null : left.Equals(right);
+            public static bool operator ==(in FileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>
+#if CS8
+                ?
+#endif
+                left, in FileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>
+#if CS8
+                ?
+#endif
+                right) => left is null ? right is null : left.Equals(right);
 
             /// <summary>
             /// Checks if two <see cref="FileSystemObjectInfo{TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/>s are different.
@@ -159,7 +178,15 @@ namespace WinCopies.IO
             /// <param name="left">Left operand.</param>
             /// <param name="right">Right operand.</param>
             /// <returns>A <see cref="bool"/> value that indicates whether the two <see cref="FileSystemObjectInfo{TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/>s are different.</returns>
-            public static bool operator !=(in FileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> left, in FileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> right) => !(left == right);
+            public static bool operator !=(in FileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>
+#if CS8
+                ?
+#endif
+                left, in FileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>
+#if CS8
+                ?
+#endif
+                right) => !(left == right);
 
             /// <summary>
             /// Checks if a given <see cref="FileSystemObjectInfo{TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/> is lesser than an other <see cref="FileSystemObjectInfo{TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/>.
@@ -167,7 +194,27 @@ namespace WinCopies.IO
             /// <param name="left">Left operand.</param>
             /// <param name="right">Right operand.</param>
             /// <returns>A <see cref="bool"/> value that indicates whether the given <see cref="FileSystemObjectInfo{TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/> is lesser than the <see cref="FileSystemObjectInfo{TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/> to compare with.</returns>
-            public static bool operator <(in FileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> left, in FileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> right) => left is null ? right is object : left.CompareTo(right) < 0;
+            public static bool operator <(in FileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>
+#if CS8
+                ?
+#endif
+                left, in FileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>
+#if CS8
+                ?
+#endif
+                right) => left is null ?
+#if !CS9
+                !(
+#endif
+                right is
+#if CS9
+                not
+#endif
+                null
+#if !CS9
+                )
+#endif
+                : left.CompareTo(right) < 0;
 
             /// <summary>
             /// Checks if a given <see cref="FileSystemObjectInfo{TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/> is lesser or equal to an other <see cref="FileSystemObjectInfo{TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/>.
@@ -175,7 +222,15 @@ namespace WinCopies.IO
             /// <param name="left">Left operand.</param>
             /// <param name="right">Right operand.</param>
             /// <returns>A <see cref="bool"/> value that indicates whether the given <see cref="FileSystemObjectInfo{TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/> is lesser or equal to the <see cref="FileSystemObjectInfo{TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/> to compare with.</returns>
-            public static bool operator <=(in FileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> left, in FileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> right) => left is null || left.CompareTo(right) <= 0;
+            public static bool operator <=(in FileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>
+#if CS8
+                ?
+#endif
+                left, in FileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>
+#if CS8
+                ?
+#endif
+                right) => left is null || left.CompareTo(right) <= 0;
 
             /// <summary>
             /// Checks if a given <see cref="FileSystemObjectInfo{TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/> is greater than an other <see cref="FileSystemObjectInfo{TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/>.
@@ -183,7 +238,27 @@ namespace WinCopies.IO
             /// <param name="left">Left operand.</param>
             /// <param name="right">Right operand.</param>
             /// <returns>A <see cref="bool"/> value that indicates whether the given <see cref="FileSystemObjectInfo{TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/> is greater than the <see cref="FileSystemObjectInfo{TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/> to compare with.</returns>
-            public static bool operator >(in FileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> left, in FileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> right) => left is object && left.CompareTo(right) > 0;
+            public static bool operator >(in FileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>
+#if CS8
+                ?
+#endif
+                left, in FileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>
+#if CS8
+                ?
+#endif
+                right) =>
+#if !CS9
+                !(
+#endif
+                left is
+#if CS9
+                not
+#endif
+                null
+#if !CS9
+                )
+#endif
+                && left.CompareTo(right) > 0;
 
             /// <summary>
             /// Checks if a given <see cref="FileSystemObjectInfo{TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/> is greater or equal to an other <see cref="FileSystemObjectInfo{TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/>.
@@ -191,13 +266,21 @@ namespace WinCopies.IO
             /// <param name="left">Left operand.</param>
             /// <param name="right">Right operand.</param>
             /// <returns>A <see cref="bool"/> value that indicates whether the given <see cref="FileSystemObjectInfo{TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/> is greater or equal to the <see cref="FileSystemObjectInfo{TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/> to compare with.</returns>
-            public static bool operator >=(in FileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> left, in FileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> right) => left is null ? right is null : left.CompareTo(right) >= 0;
-            #endregion
+            public static bool operator >=(in FileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>
+#if CS8
+                ?
+#endif
+                left, in FileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems>
+#if CS8
+                ?
+#endif
+                right) => left is null ? right is null : left.CompareTo(right) >= 0;
+#endregion
         }
 
         public class ImageList
         {
-            private IImageList _imageList;
+            private readonly IImageList _imageList;
             private static ImageList _instance;
 
             public static ImageList Instance = _instance
@@ -234,11 +317,31 @@ namespace WinCopies.IO
                     ? ShellImageListIconSize.ExtraLarge
                     : size.Width <= 256 ? ShellImageListIconSize.Jumbo : ShellImageListIconSize.Last;
 
-            public static BitmapSource TryGetDefaultBitmapSource<T>(in IFileSystemObjectInfo<T> fileSystemObjectInfo, in int size) where T : IFileSystemObjectInfoProperties => TryGetBitmapSource(System.IO.Path.GetExtension(fileSystemObjectInfo.Path), fileSystemObjectInfo.ObjectProperties.FileType, size);
+            public static BitmapSource
+#if CS8
+                ?
+#endif
+                TryGetDefaultBitmapSource<T>(in IFileSystemObjectInfo<T> fileSystemObjectInfo, in int size) where T : IFileSystemObjectInfoProperties => TryGetBitmapSource(System.IO.Path.GetExtension(fileSystemObjectInfo.Path), fileSystemObjectInfo.ObjectProperties?.FileType ?? FileType.Other, size);
 
-            public static Shell.BitmapSourceProvider GetDefaultBitmapSourcesProvider<T>(in IFileSystemObjectInfo<T> fileSystemObjectInfo, in IBitmapSources bitmapSources = null) where T : IFileSystemObjectInfoProperties => new Shell.BitmapSourceProvider(fileSystemObjectInfo, new FileSystemObjectInfoBitmapSources<T>(fileSystemObjectInfo), bitmapSources, true);
+            public static Shell.ComponentSources.Bitmap.BitmapSourceProvider GetDefaultBitmapSourcesProvider<T>(in IFileSystemObjectInfo<T> fileSystemObjectInfo, in IBitmapSources
+#if CS8
+                ?
+#endif
+                bitmapSources = null) where T : IFileSystemObjectInfoProperties => new
+#if !CS9
+                Shell.ComponentSources.Bitmap.BitmapSourceProvider
+#endif
+                (fileSystemObjectInfo, new FileSystemObjectInfoBitmapSources<T>(fileSystemObjectInfo), bitmapSources, true);
 
-            public static Shell.BitmapSourceProvider GetDefaultBitmapSourcesProvider<T>(in IFileSystemObjectInfo<T> fileSystemObjectInfo, in IBitmapSources intermediate, in IBitmapSources bitmapSources = null) where T : IFileSystemObjectInfoProperties => new Shell.BitmapSourceProvider(fileSystemObjectInfo, intermediate, bitmapSources, true);
+            public static Shell.ComponentSources.Bitmap.BitmapSourceProvider GetDefaultBitmapSourcesProvider<T>(in IFileSystemObjectInfo<T> fileSystemObjectInfo, in IBitmapSources intermediate, in IBitmapSources
+#if CS8
+            ?
+#endif
+            bitmapSources = null) where T : IFileSystemObjectInfoProperties => new
+#if !CS9
+                Shell.ComponentSources.Bitmap.BitmapSourceProvider
+#endif
+                (fileSystemObjectInfo, intermediate, bitmapSources, true);
 
             public static ArrayBuilder<IBrowsableObjectInfo> GetRootItems()
             {
@@ -258,26 +361,42 @@ namespace WinCopies.IO
                 return arrayBuilder;
             }
 
-            private static Icon TryGetIcon(in int index, in System.Drawing.Size size) => Shell.ObjectModel.BrowsableObjectInfo.TryGetIcon(index, Microsoft.WindowsAPICodePack.NativeAPI.Consts.DllNames.Shell32, size);
+            private static Icon
+#if CS8
+                ?
+#endif
+                TryGetIcon(in int index, in System.Drawing.Size size) => BrowsableObjectInfo.TryGetIcon(index, Microsoft.WindowsAPICodePack.NativeAPI.Consts.DllNames.Shell32, size);
 
             public static string GetItemTypeName(in string extension, in FileType fileType) => fileType == FileType.Folder
                         ? FileOperation.GetFileInfo(string.Empty, FileAttributes.Directory, GetFileInfoOptions.TypeName).TypeName
                         : FileOperation.GetFileInfo(extension, FileAttributes.Normal, GetFileInfoOptions.TypeName).TypeName;
 
-            public static Icon TryGetIcon(in string extension, in FileType fileType, in System.Drawing.Size size) =>
+            public static Icon
+#if CS8
+                ?
+#endif
+                TryGetIcon(in string extension, in FileType fileType, in System.Drawing.Size size) =>
 
                // if (System.IO.Path.HasExtension(Path))
 
                fileType == FileType.Folder || fileType == FileType.KnownFolder ? TryGetIcon(3, size) : CoreErrorHelper.Succeeded(ImageList.Instance.TryExtractIcon(extension, GetIconSizeFromSize(size), out Icon icon)) ? icon  /*?.TryGetIcon(size, 32, true, true)*/ : TryGetIcon(0, size);// else// return TryGetIcon(FileType == FileType.Folder ? 3 : 0, "SHELL32.dll", size);
 
-            public static BitmapSource TryGetBitmapSource(in string extension, in FileType fileType, in int size)
+            public static BitmapSource
+#if CS8
+            ?
+#endif
+            TryGetBitmapSource(in string extension, in FileType fileType, in int size)
             {
                 using
 #if !CS8
                     (
 #endif
 
-                Icon icon = TryGetIcon(extension, fileType, new System.Drawing.Size(size, size))
+                Icon
+#if CS8
+                ?
+#endif
+                icon = TryGetIcon(extension, fileType, new System.Drawing.Size(size, size))
 
 #if CS8
                     ;

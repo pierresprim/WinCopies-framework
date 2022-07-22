@@ -25,17 +25,35 @@ namespace WinCopies.IO.AbstractionInterop
 {
     public class WMIItemInfoItemProvider
     {
-        public string Path { get; }
+        public string
+#if CS8
+            ?
+#endif
+            Path
+        { get; }
 
         public ManagementBaseObject ManagementObject { get; }
 
         public WMIItemType ItemType { get; }
 
-        public IWMIItemInfoOptions Options { get; }
+        public IWMIItemInfoOptions
+#if CS8
+            ?
+#endif
+            Options
+        { get; }
 
         public ClientVersion ClientVersion { get; }
 
-        public WMIItemInfoItemProvider(in string path, in ManagementBaseObject managementObject, in WMIItemType itemType, in IWMIItemInfoOptions options, in ClientVersion clientVersion)
+        public WMIItemInfoItemProvider(in string
+#if CS8
+            ?
+#endif
+            path, in ManagementBaseObject managementObject, in WMIItemType itemType, in IWMIItemInfoOptions
+#if CS8
+            ?
+#endif
+            options, in ClientVersion clientVersion)
         {
             Path = path;
 

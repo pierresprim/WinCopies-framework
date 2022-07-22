@@ -19,6 +19,7 @@
   </PropertyGroup>
   
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
+		<DocumentationFile>$(PackageId).xml</DocumentationFile>
     <!-- SourceLink related properties https://github.com/dotnet/SourceLink#using-sourcelink -->
     <!-- Optional: Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element) -->
     <PublishRepositoryUrl>true</PublishRepositoryUrl>

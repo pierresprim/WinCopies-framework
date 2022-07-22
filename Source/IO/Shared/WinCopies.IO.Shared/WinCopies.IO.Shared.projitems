@@ -9,14 +9,16 @@
     <Import_RootNamespace>WinCopies.IO.Shared</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)BitmapSources\BitmapSourceProvider.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)BitmapSources\BitmapSources.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)BitmapSources\BitmapSourcesLinker.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectInfoURL.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentSources\BitmapSources\BitmapSourceProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentSources\BitmapSources\BitmapSources.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentSources\BitmapSources\BitmapSourcesLinker.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Browsability.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectInfoItemProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectInfoPlugin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectInfoPluginStack.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectInfoStack.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentSources\ItemSources\ItemSourcesProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Directory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enumeration\EnumerablePath.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enumeration\EnumerablePath.Static.cs" />
@@ -26,6 +28,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)FileSystemObjectComparer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FileSystemObjectEqualityComparer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FileTypes.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Icons.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IFileSystemObjectComparer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\IBrowsableObjectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\IBrowsableObjectInfoBase.cs" />
@@ -56,5 +59,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\BrowsableObjectInfoProperties.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\ShellPropertyGroup.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Size.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentSources\ItemSources\ItemSource.cs" />
   </ItemGroup>
 </Project>

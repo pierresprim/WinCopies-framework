@@ -17,7 +17,7 @@
 
 using Microsoft.Win32;
 
-using System;
+using System.Security.AccessControl;
 
 using WinCopies.IO.AbstractionInterop;
 using WinCopies.IO.PropertySystem;
@@ -26,7 +26,15 @@ namespace WinCopies.IO.ObjectModel
 {
     public interface IRegistryItemInfoBase : IEncapsulatorBrowsableObjectInfo<RegistryKey>
     {
-        // Left empty.
+        NullableReference<RegistryKey> TryOpenKey();
+
+        void OpenKey();
+
+        void OpenKey(RegistryKeyPermissionCheck registryKeyPermissionCheck, RegistryRights registryRights);
+
+        void OpenKey(bool writable);
+
+        void CloseKey();
     }
 
     public interface IRegistryItemInfo<TObjectProperties, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : IRegistryItemInfoBase, IBrowsableObjectInfo<TObjectProperties, RegistryKey, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IRegistryItemInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
@@ -36,6 +44,6 @@ namespace WinCopies.IO.ObjectModel
 
     public interface IRegistryItemInfo : IRegistryItemInfo<IRegistryItemInfoProperties, RegistryItemInfoItemProvider, IEnumerableSelectorDictionary<RegistryItemInfoItemProvider, IBrowsableObjectInfo>, RegistryItemInfoItemProvider>
     {
-        System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<RegistryItemInfoItemProvider> predicate);
+        // Left empty.
     }
 }

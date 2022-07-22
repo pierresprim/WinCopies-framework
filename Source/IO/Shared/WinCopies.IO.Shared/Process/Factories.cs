@@ -127,30 +127,153 @@ namespace WinCopies.IO.Process
 
     public interface IProcessFactory : DotNetFix.IDisposable
     {
-        IProcessCommand NewItemProcessCommand { get; }
+        IProcessCommand
+#if CS8
+            ?
+#endif
+            NewItemProcessCommand
+        { get; }
 
-        IProcessCommand RenameItemProcessCommand { get; }
+        IProcessCommand
+#if CS8
+            ?
+#endif
+            RenameItemProcessCommand
+        { get; }
 
-        IRunnableProcessInfo Copy { get; }
+        IRunnableProcessInfo
+#if CS8
+            ?
+#endif
+            Copy
+        { get; }
 
-        IRunnableProcessInfo Cut { get; }
+        IRunnableProcessInfo
+#if CS8
+            ?
+#endif
+            Cut
+        { get; }
 
-        IDirectProcessInfo Recycling { get; }
+        IDirectProcessInfo
+#if CS8
+            ?
+#endif
+            Recycling
+        { get; }
 
-        IDirectProcessInfo Deletion { get; }
+        IDirectProcessInfo
+#if CS8
+            ?
+#endif
+            Deletion
+        { get; }
 
-        IDirectProcessInfo Clearing { get; }
+        IDirectProcessInfo
+#if CS8
+            ?
+#endif
+            Clearing
+        { get; }
 
-        IDragDropProcessInfo DragDrop { get; }
+        IDragDropProcessInfo
+#if CS8
+            ?
+#endif
+            DragDrop
+        { get; }
 
         bool CanPaste(uint count);
 
         IProcess GetProcess(ProcessFactorySelectorDictionaryParameters processParameters);
 
-        IProcess TryGetProcess(ProcessFactorySelectorDictionaryParameters processParameters);
+        IProcess
+#if CS8
+            ?
+#endif
+            TryGetProcess(ProcessFactorySelectorDictionaryParameters processParameters);
     }
 
-    public static class ProcessFactory
+    public abstract class ProcessInfoNullableProcessFactory : IProcessFactory
+    {
+        public abstract IProcessCommand
+#if CS8
+            ?
+#endif
+            NewItemProcessCommand
+        { get; }
+
+        public abstract IProcessCommand
+#if CS8
+            ?
+#endif
+            RenameItemProcessCommand
+        { get; }
+
+        public abstract bool IsDisposed { get; }
+
+        public virtual IRunnableProcessInfo
+#if CS8
+            ?
+#endif
+            Copy => null;
+
+        public virtual IRunnableProcessInfo
+#if CS8
+            ?
+#endif
+            Cut => null;
+
+        public virtual IDirectProcessInfo
+#if CS8
+            ?
+#endif
+            Recycling => null;
+
+        public virtual IDirectProcessInfo
+#if CS8
+            ?
+#endif
+            Deletion => null;
+
+        public virtual IDirectProcessInfo
+#if CS8
+            ?
+#endif
+            Clearing => null;
+
+        public virtual IDragDropProcessInfo
+#if CS8
+            ?
+#endif
+            DragDrop => null;
+
+        public abstract bool CanPaste(uint count);
+        public abstract IProcess GetProcess(ProcessFactorySelectorDictionaryParameters processParameters);
+        public abstract IProcess
+#if CS8
+            ?
+#endif
+            TryGetProcess(ProcessFactorySelectorDictionaryParameters processParameters);
+
+        protected abstract void DisposeManaged();
+        protected abstract void DisposeUnmanaged();
+        
+        public void Dispose()
+        {
+            if (IsDisposed)
+
+                return;
+
+            DisposeUnmanaged();
+            DisposeManaged();
+            GC.SuppressFinalize(this);
+        }
+
+        ~ProcessInfoNullableProcessFactory() => DisposeUnmanaged();
+    }
+
+    /*public static class ProcessFactory
     {
         public static IDirectProcessInfo DefaultProcessInfo { get; } = new _DefaultProcessFactory.DefaultDirectProcessInfo();
 
@@ -232,11 +355,11 @@ namespace WinCopies.IO.Process
 
             IProcess IProcessFactory.TryGetProcess(ProcessFactorySelectorDictionaryParameters processParameters) => null;
 
-            void System.IDisposable.Dispose() { /* Left empty. */ }
+            void System.IDisposable.Dispose() { /* Left empty. */ /*}
         }
 
         public static IProcessFactory DefaultProcessFactory { get; } = new _DefaultProcessFactory();
-    }
+    }*/
 
     public interface IProcessPathCollectionFactory
     {

@@ -2,6 +2,9 @@
 
 using WinCopies.Data.SQL;
 using WinCopies.EntityFramework;
+using WinCopies.Reflection.DotNetParser;
+
+using static WinCopies.EntityFramework.IdStatus;
 
 namespace WinCopies.Reflection.DotNetDocBuilder
 {
@@ -25,10 +28,10 @@ namespace WinCopies.Reflection.DotNetDocBuilder
         [EntityProperty]
         public int FrameworkId { get => TryRefreshAndGet(ref _frameworkId); set => _frameworkId = value; }
 
-        [EntityProperty(IsPseudoId = true)]
+        [EntityProperty(IdStatus = PseudoId)]
         public string Name { get => TryRefreshAndGet(ref _name); set => _name = value; }
 
-        [EntityProperty(IsPseudoId = true)]
+        [EntityProperty(IdStatus = PseudoId)]
         public ulong? ParentId { get => TryRefreshAndGet(ref _parentId); set => _parentId = value; }
 
         public Namespace(DBEntityCollection<Namespace> collection) : base(collection) { /* Left empty. */ }
@@ -93,7 +96,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 #else
             "NamespaceId"
 #endif
-            , IsPseudoId = true)]
+            , IdStatus = PseudoId)]
         [ForeignKey]
         public Namespace Namespace { get => TryRefreshAndGet(ref _namespace); set => _namespace = value; }
 
@@ -111,10 +114,10 @@ namespace WinCopies.Reflection.DotNetDocBuilder
         [ForeignKey]
         public AccessModifier AccessModifier { get => TryRefreshAndGet(ref _accessModifier); set => _accessModifier = value; }
 
-        [EntityProperty(IsPseudoId = true)]
+        [EntityProperty(IdStatus = PseudoId)]
         public byte GenericTypeCount { get => TryRefreshAndGet(ref _genericTypeCount); set => _genericTypeCount = value; }
 
-        [EntityProperty(IsPseudoId = true)]
+        [EntityProperty(IdStatus = PseudoId)]
         [ForeignKey]
         public Class
 #if CS8
@@ -211,7 +214,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 #else
             "TypeId"
 #endif
-            , IsPseudoId = true)]
+            , IdStatus = PseudoId)]
         [ForeignKey(RemoveAlso = true)]
         public Type Type { get => TryRefreshAndGet(ref _type); set => _type = value; }
 
@@ -230,6 +233,13 @@ namespace WinCopies.Reflection.DotNetDocBuilder
         public UnderlyingType UnderlyingType { get => TryRefreshAndGet(ref _underlyingType); set => _underlyingType = value; }
 
         public Enum(DBEntityCollection<Enum> collection) : base(collection) { /* Left empty. */ }
+
+        public static Enum GetNewEnum(Type type, DotNetEnum dotNetType, DBEntityCollection<Enum> dBTypes) => new
+#if !CS9
+            Enum
+#endif
+            (dBTypes)
+        { Type = type };
 
         public override string ToString() => Type?.ToString();
     }
@@ -317,11 +327,11 @@ namespace WinCopies.Reflection.DotNetDocBuilder
     {
         private Class _class;
 
-        [EntityProperty(IsPseudoId = true)]
+        [EntityProperty(IdStatus = PseudoId)]
         [ForeignKey]
         public Class Class { get => TryRefreshAndGet(ref _class); set => _class = value; }
 
-        [EntityProperty(IsPseudoId = true)]
+        [EntityProperty(IdStatus = PseudoId)]
         [ForeignKey]
         public Type Interface { get => ImplementedInterface; set => ImplementedInterface = value; }
 
@@ -335,11 +345,11 @@ namespace WinCopies.Reflection.DotNetDocBuilder
     {
         private Type _interface;
 
-        [EntityProperty(IsPseudoId = true)]
+        [EntityProperty(IdStatus = PseudoId)]
         [ForeignKey]
         public Type Interface { get => TryRefreshAndGet(ref _interface); set => _interface = value; }
 
-        [EntityProperty(IsPseudoId = true)]
+        [EntityProperty(IdStatus = PseudoId)]
         [ForeignKey]
         public new Type ImplementedInterface { get => base.ImplementedInterface; set => base.ImplementedInterface = value; }
 
@@ -360,7 +370,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
         private Type _type;
         private GenericTypeModifier _modifier;
 
-        [EntityProperty("DocType", IsPseudoId = true)]
+        [EntityProperty("DocType", IdStatus = PseudoId)]
         [ForeignKey]
         public Type Type { get => TryRefreshAndGet(ref _type); set => _type = value; }
 
@@ -374,9 +384,14 @@ namespace WinCopies.Reflection.DotNetDocBuilder
     [Entity("docmember")]
     public class Member : DocItem<Member>
     {
+        private AccessModifier _accessModifier;
         private Type _type;
 
-        [EntityProperty("TypeId", IsPseudoId = true)]
+        [EntityProperty]
+        [ForeignKey]
+        public AccessModifier AccessModifier { get => TryRefreshAndGet(ref _accessModifier); set => _accessModifier = value; }
+
+        [EntityProperty("TypeId", IdStatus = PseudoId)]
         [ForeignKey]
         public Type Type { get => TryRefreshAndGet(ref _type); set => _type = value; }
 
@@ -400,7 +415,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
         object IConst.Value { get => Value; set => Value = (TValue)value; }
 
-        [EntityProperty(IsPseudoId = true)]
+        [EntityProperty("MemberId", IdStatus = PseudoId)]
         [ForeignKey(RemoveAlso = true)]
         public Member Member { get => TryRefreshAndGet(ref _memberId); set => _memberId = value; }
 
@@ -429,5 +444,124 @@ namespace WinCopies.Reflection.DotNetDocBuilder
             Const64
 #endif
             (dbec);
+    }
+
+    [Entity("docconstfp32")]
+    public class ConstFP32 : Const<ConstFP32, float>
+    {
+        public ConstFP32(DBEntityCollection<ConstFP32> collection) : base(collection) { /* Left empty. */ }
+
+        public static ConstFP32 GetNewConstant(in DBEntityCollection<ConstFP32> dbec) => new
+#if !CS9
+            ConstFP32
+#endif
+            (dbec);
+    }
+
+    [Entity("docconstfp64")]
+    public class ConstFP64 : Const<ConstFP64, double>
+    {
+        public ConstFP64(DBEntityCollection<ConstFP64> collection) : base(collection) { /* Left empty. */ }
+
+        public static ConstFP64 GetNewConstant(in DBEntityCollection<ConstFP64> dbec) => new
+#if !CS9
+            ConstFP64
+#endif
+            (dbec);
+    }
+
+    [Entity("docconstfp128")]
+    public class ConstFP128 : Const<ConstFP128, decimal>
+    {
+        public ConstFP128(DBEntityCollection<ConstFP128> collection) : base(collection) { /* Left empty. */ }
+
+        public static ConstFP128 GetNewConstant(in DBEntityCollection<ConstFP128> dbec) => new
+#if !CS9
+            ConstFP128
+#endif
+            (dbec);
+    }
+
+    [Entity("docconststring")]
+    public class ConstString : Const<ConstString, decimal>
+    {
+        public ConstString(DBEntityCollection<ConstString> collection) : base(collection) { /* Left empty. */ }
+
+        public static ConstString GetNewConstant(in DBEntityCollection<ConstString> dbec) => new
+#if !CS9
+            ConstString
+#endif
+            (dbec);
+    }
+
+    [Entity("field_modifier")]
+    public class FieldModifier : DefaultNamedEntity2<FieldModifier>
+    {
+        public FieldModifier(DBEntityCollection<FieldModifier> collection) : base(collection) { /* Left empty. */ }
+    }
+
+    [Entity("membertype")]
+    public class MemberType : DefaultDBEntity<MemberType>
+    {
+        private Type _type;
+        private string __type;
+
+        [EntityProperty("TypeId", IdStatus = PseudoId)]
+        [ForeignKey]
+        public Type Type { get => TryRefreshAndGet(ref _type); set => _type = value; }
+
+        [EntityProperty(nameof(Type), IdStatus = PseudoId)]
+        public string FieldType { get => TryRefreshAndGet(ref __type); set => __type = value; }
+
+        public MemberType(DBEntityCollection<MemberType> collection) : base(collection) { /* Left empty. */ }
+    }
+
+    public interface IMember : IEntity
+    {
+        MemberType MemberType { get; set; }
+
+        Member Member { get; set; }
+    }
+
+    public class MemberBase<TMember, TModifier> : DefaultDBEntity<TMember>, IMember where TMember : IEntity
+    {
+        private MemberType _memberType;
+        private Member _member;
+        private TModifier
+#if CS9
+            ?
+#endif
+            _modifier;
+
+        [EntityProperty("MemberTypeId")]
+        [ForeignKey(RemoveAlso = true)]
+        public MemberType MemberType { get => TryRefreshAndGet(ref _memberType); set => _memberType = value; }
+
+        [EntityProperty("MemberId", IdStatus = PseudoId)]
+        [ForeignKey(RemoveAlso = true)]
+        public Member Member { get => TryRefreshAndGet(ref _member); set => _member = value; }
+
+        [EntityProperty]
+        [ForeignKey]
+        public TModifier
+#if CS9
+            ?
+#endif
+            Modifier
+        { get => TryRefreshAndGet(ref _modifier); set => _modifier = value; }
+
+        public MemberBase(DBEntityCollection<TMember> collection) : base(collection) { /* Left empty. */ }
+    }
+
+    [Entity("docfield")]
+    public class Field : MemberBase<Field, FieldModifier>
+    {
+        public Field(DBEntityCollection<Field> collection) : base(collection) { /* Left empty. */ }
+    }
+
+    [Entity("docproperty")]
+    public class Property : MemberBase<Property, ClassModifier>, IMember
+    {
+        public Property(DBEntityCollection<Property> collection) : base(collection) { /* Left empty. */ }
     }
 }

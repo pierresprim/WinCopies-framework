@@ -43,18 +43,18 @@ namespace WinCopies.IO.Enumeration
 {
     public static class ShellObjectInfoEnumeration
     {
-        public static System.Collections.Generic.IEnumerable<ShellObjectInfoItemProvider> From(ShellObjectInfo shellObjectInfo, Predicate<ShellObjectInfoEnumeratorStruct> func)
+        public static System.Collections.Generic.IEnumerable<ShellObjectInfoItemProvider> From(IShellObjectInfo shellObjectInfo, Predicate<ShellObjectInfoEnumeratorStruct> func)
         {
             ThrowIfNull(shellObjectInfo, nameof(shellObjectInfo));
 
             System.Collections.Generic.IEnumerable<ShellObject> shellObjects;
             System.Collections.Generic.IEnumerable<IPortableDevice> portableDevices;
 
-            shellObjects = (System.Collections.Generic.IEnumerable<ShellObject>)shellObjectInfo.InnerObjectGeneric;
+            shellObjects = (System.Collections.Generic.IEnumerable<ShellObject>)shellObjectInfo.InnerObject;
 
             System.Collections.Generic.IEnumerable<ShellObjectInfoItemProvider> getShellObjects(in System.Collections.Generic.IEnumerable<IPortableDevice> _portableDevices) => GetShellObjects(shellObjects, _portableDevices,  shellObjectInfo.ClientVersion, func);
 
-            if (shellObjectInfo.InnerObjectGeneric.ParsingName == Computer.ParsingName)
+            if (shellObjectInfo.InnerObject.ParsingName == Computer.ParsingName)
             {
                 var portableDeviceManager = new PortableDeviceManager();
 

@@ -21,6 +21,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
+
 using WinCopies.Commands;
 
 namespace WinCopies.GUI.Controls.Models
@@ -123,10 +124,10 @@ namespace WinCopies.GUI.Controls.Models
         /// <summary>
         /// Gets or sets the items of this <see cref="IItemsControlModel{T}"/>.
         /// </summary>
-        new System.Collections.Generic.IEnumerable<T> Items { get; set; }
+        new IEnumerable<T> Items { get; set; }
 
 #if CS8
-        System.Collections.IEnumerable IItemsControlModel.Items { get => Items; set => Items = (System.Collections.Generic.IEnumerable<T>)value; }
+        System.Collections.IEnumerable IItemsControlModel.Items { get => Items; set => Items = (IEnumerable<T>)value; }
 #endif
     }
 

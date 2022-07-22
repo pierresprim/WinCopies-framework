@@ -14,9 +14,155 @@ using static System.Reflection.GenericParameterAttributes;
 
 namespace WinCopies.Reflection.DotNetDocBuilder
 {
+    public interface IWriterCallback<T, U> where T : IEntity
+    {
+        void OnGetItem(T item, Type type, U @enum, DBEntityCollection<T> enums);
+
+        void OnAdded(T item, Type type, U dotNetType);
+
+        void OnUpdated(T item, U dotNetType, DBEntityCollection<T> collection);
+
+        void OnDeleting(T item, Type type);
+    }
+
+    public abstract class WriterCallback<T, U> : IWriterCallback<T, U> where T : IEntity
+    {
+        public abstract void OnGetItem(T item, Type _type, U @enum, DBEntityCollection<T> enums);
+
+        public abstract void OnAdded(T item, Type type, U dotNetType);
+
+        public abstract void OnUpdated(T item, U dotNetType, DBEntityCollection<T> collection);
+
+        public abstract void OnDeleting(T item, Type type);
+    }
+
+    public class WriterDelegateCallback<T, U> : IWriterCallback<T, U> where T : IEntity
+    {
+        public Writer.OnGetItem<T, U>
+#if CS8
+            ?
+#endif
+            OnGetItemDelegate
+        {
+            get;
+#if CS9
+            init;
+#endif
+        }
+
+        public Action<T, U>
+#if CS8
+            ?
+#endif
+            OnAddedDelegate
+        {
+            get;
+#if CS9
+            init;
+#endif
+        }
+
+        public Writer.OnUpdated<T, U>
+#if CS8
+            ?
+#endif
+            OnUpdatedDelegate
+        {
+            get;
+#if CS9
+            init;
+#endif
+        }
+
+        public Action<T, Type>
+#if CS8
+            ?
+#endif
+            OnDeletingDelegate
+        {
+            get;
+#if CS9
+            init;
+#endif
+        }
+
+        public WriterDelegateCallback() { /* Left empty. */ }
+
+        public WriterDelegateCallback(Writer.OnGetItem<T, U>
+#if CS8
+            ?
+#endif
+            onGetItemDelegate, Action<T, U>
+#if CS8
+            ?
+#endif
+            onAddedDelegate, Writer.OnUpdated<T, U>
+#if CS8
+            ?
+#endif
+            onUpdatedDelegate, Action<T, Type>
+#if CS8
+            ?
+#endif
+            onDeletingDelegate)
+        {
+            OnGetItemDelegate = onGetItemDelegate;
+            OnAddedDelegate = onAddedDelegate;
+            OnUpdatedDelegate = onUpdatedDelegate;
+            OnDeletingDelegate = onDeletingDelegate;
+        }
+
+        public void OnGetItem(T item, Type _type, U @enum, DBEntityCollection<T> enums) => OnGetItemDelegate?.Invoke(item, _type, @enum, enums);
+
+        public void OnAdded(T item, Type type, U dotNetType) => OnAddedDelegate?.Invoke(item, dotNetType);
+
+        public void OnUpdated(T item, U dotNetType, DBEntityCollection<T> collection) => OnUpdatedDelegate?.Invoke(item, dotNetType, collection);
+
+        public void OnDeleting(T item, Type type) => OnDeletingDelegate?.Invoke(item, type);
+    }
+
+    public class WriterCallbackCollection<T, U> : IWriterCallback<T, U> where T : IEntity
+    {
+        public IEnumerable<IWriterCallback<T, U>> Callbacks { get; }
+
+        public WriterCallbackCollection(in IEnumerable<IWriterCallback<T, U>> callbacks) => Callbacks = callbacks;
+
+        public void OnGetItem(T item, Type _type, U @enum, DBEntityCollection<T> enums)
+        {
+            foreach (IWriterCallback<T, U> callback in Callbacks)
+
+                callback.OnGetItem(item, _type, @enum, enums);
+        }
+
+        public void OnAdded(T item, Type type, U dotNetType)
+        {
+            foreach (IWriterCallback<T, U> callback in Callbacks)
+
+                callback.OnAdded(item, type, dotNetType);
+        }
+
+        public void OnUpdated(T item, U dotNetType, DBEntityCollection<T> collection)
+        {
+            foreach (IWriterCallback<T, U> callback in Callbacks)
+
+                callback.OnUpdated(item, dotNetType, collection);
+        }
+
+        public void OnDeleting(T item, Type type)
+        {
+            foreach (IWriterCallback<T, U> callback in Callbacks)
+
+                callback.OnDeleting(item, type);
+        }
+    }
+
     public partial class Writer
     {
-        public struct UpdateItemsStruct
+        public delegate TDBType GetItem<TDBType, TDotNetType>(Type type, TDotNetType dotNetType, DBEntityCollection<TDBType> dBTypes) where TDBType : IEntity;
+        public delegate void OnGetItem<TDBType, TDotNetType>(TDBType item, Type type, TDotNetType dotNetType, DBEntityCollection<TDBType> dBTypes) where TDBType : IEntity;
+        public delegate void OnUpdated<TDBType, TDotNetType>(TDBType dBType, TDotNetType dotNetType, DBEntityCollection<TDBType> dBTypes) where TDBType : IEntity;
+
+        protected struct UpdateItemsStruct
         {
             public DBEntityCollection<Type> TColl { get; }
 
@@ -38,27 +184,21 @@ namespace WinCopies.Reflection.DotNetDocBuilder
             }
         }
 
-        protected void UpdateItems<T, U>(in string name, bool checkGenericity, Predicate<T> itemPredicate, Action<T, U>
+        protected void UpdateItems<T, U>(in string name, bool checkGenericity, Predicate<T> itemPredicate, Converter<T, Type> converter, in Func<IEnumerable<U>> func, in GetItem<T, U> getItem, Action<U, ulong> createFile, Action<UpdateItemsStruct>
 #if CS8
             ?
 #endif
-            onAdded, Action<T>
-#if CS8
-            ?
-#endif
-            onDeleting, Converter<T, Type> converter, in Func<IEnumerable<U>> func, in Func<U, Type, DBEntityCollection<T>, T> getItem, Action<U, T, DBEntityCollection<T>> update, Action<U, ulong> createFile, Action<UpdateItemsStruct>
-#if CS8
-            ?
-#endif
-            updateItemsStruct, in bool isGenericType) where T : IDefaultEntity<ulong> where U : DotNetType
+            updateItemsStruct, in bool isGenericType, IEnumerable<IWriterCallback<T, U>> callbacks) where T : IDefaultEntity<ulong> where U : DotNetType
         {
             Logger($"Updating {name}s", true);
 
             ISQLConnection connection = GetConnection();
 
+            IWriterCallback<T, U> callback = new WriterCallbackCollection<T, U>(callbacks);
+
             DBEntityCollection<T> getCollection() => new
 #if !CS9
-                DBEntityCollection<T>     
+                DBEntityCollection<T>
 #endif
                 (connection);
 
@@ -172,7 +312,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
                 __gt.MarkForRefresh();
             }
 
-            IReadOnlyList<System.Type> getGenericTypeParameters(in System.Type t) => t.GetRealGenericParameters();
+            IReadOnlyList<System.Type> getGenericTypeParameters(in System.Type _t) => _t.GetRealGenericParameters();
 
             void updateGenericTypes(in Type _item, in U _i)
             {
@@ -212,22 +352,26 @@ namespace WinCopies.Reflection.DotNetDocBuilder
                     writeLine("not ");
             }
 
-            Action<T, U> _onAdded = onAdded == null ? (T _item, U _i) => { /* Left empty. */ }
-            : isGenericType ? (T _item, U _i) =>
+            Action<T, Type, U> _onAdded = isGenericType ? (T _item, Type _type, U _i) =>
             {
-                onAdded(_item, _i);
+                callback.OnAdded(_item, _type, _i);
 
                 updateGenericTypes(converter(_item), _i);
             }
-            : onAdded;
+            :
+#if !CS9
+            (Action<T, Type, U>)
+#endif
+            callback.OnAdded;
 
-            void setWholeNamespace(in DotNetType item) => wholeNamespace = item.Type.Namespace;
+            void setWholeNamespace(in DotNetType item) => wholeNamespace = item.Namespace;
 
             Collections.DotNetFix.Generic.IEnumerableQueue<System.Type> browsed = new Collections.DotNetFix.Generic.EnumerableQueue<System.Type>();
             int j;
             Type typeTmp;
             System.Type genericTypeParameter;
             IReadOnlyList<System.Type> genericTypeParameters;
+            T __item;
 
             using
 #if !CS8
@@ -269,7 +413,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
                     {
                         Logger("Exists. Updating.", true, ConsoleColor.DarkGreen);
 
-                        update(item, _item, items);
+                        callback.OnUpdated(_item, item, items);
 
                         type.AccessModifier = new AccessModifier(amColl) { Name = item.Type.IsPublicType() ? "public" : "protected" };
 
@@ -314,15 +458,13 @@ namespace WinCopies.Reflection.DotNetDocBuilder
                 {
                     Logger("Does not exist. Adding.", true, ConsoleColor.DarkRed);
 
-                    T _item = getItem(item, typeTmp = GetType(item.Type, name, tColl, amColl, nColl, ttColl), items);
+                    callback.OnGetItem(__item = getItem(typeTmp = GetType(item.Type, name, tColl, amColl, nColl, ttColl), item, items), typeTmp, item, items);
 
 
 
-                    UpdateParentType(item.Type, typeTmp, tColl, amColl, nColl, ttColl, cColl);
+                    UpdateType(item.Type, typeTmp, tColl, amColl, nColl, ttColl, cColl);
 
 
-
-                    UpdateNamespace(typeTmp, wholeNamespace);
 
                     void _process()
                     {
@@ -333,26 +475,26 @@ namespace WinCopies.Reflection.DotNetDocBuilder
                         _ = type.TypeType.TryRefreshId(true);
                     }
 
-                    if (Equals(type = converter(_item), _item))
+                    if (Equals(type = converter(__item), __item))
 
                         _process();
 
                     else
                     {
-                        _item.MarkForRefresh();
+                        __item.MarkForRefresh();
 
                         _process();
 
-                        _ = _item.TryRefreshId(false);
+                        _ = __item.TryRefreshId(false);
                     }
 
-                    id = items.Add(_item, out tables, out rows);
+                    id = items.Add(__item, out tables, out rows);
 
                     if (id.HasValue)
                     {
                         Logger($"Added {rows} {nameof(rows)} in {tables} {nameof(tables)}. Id: {id.Value}", null);
 
-                        _onAdded(_item, item);
+                        _onAdded(__item, type, item);
 
                         Logger($"Creating files for {item.Type.Name}.", null);
 
@@ -396,19 +538,36 @@ namespace WinCopies.Reflection.DotNetDocBuilder
                 return CheckTypeEquality2(_type, item, checkGenericity);
             }
 
-            void updateRows(in T item) => rows = item.Remove(out tables);
+            void remove(T item)
+            {
+                Logger($"Removing type references for {item}.", true);
 
-            ActionIn<T> delete = onDeleting == null ?
-#if !CS9
-                (ActionIn<T>)
-#endif
-                updateRows : (in T item) =>
+                void removeTypeReferences<V>() where V : IMember
                 {
-                    onDeleting(item);
+                    Logger($"Removing type references for {item}.", true);
 
-                    Type t;
+                    foreach (V member in new DBEntityCollection<V>(connection))
 
-                    string logMessage = $" generic type parameters for {t = converter(item)}.";
+                        Logger($"Removed {member.MemberType.Remove(out tables)}.", null);
+                }
+
+                removeTypeReferences<Field>();
+                removeTypeReferences<Property>();
+
+                Logger($"Removing type references for {item}.", true);
+
+                Logger($"Removed type references for {item}.", false);
+
+                rows = item.Remove(out tables);
+            }
+
+            Type t;
+
+            Action<T> delete = isGenericType ? item =>
+                {
+                    callback.OnDeleting(item, t = converter(item));
+
+                    string logMessage = $" generic type parameters for {t}.";
 
                     Logger("Removing" + logMessage, true);
 
@@ -418,8 +577,13 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
                     Logger("Removed" + logMessage, false);
 
-                    updateRows(item);
-                };
+                    remove(item);
+                }
+            :
+#if !CS9
+                (Action<T>)
+#endif
+                remove;
 
             using
 #if !CS8
@@ -481,5 +645,11 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
             Logger($"Updating {name}s completed.", false);
         }
+
+        protected void UpdateItems<T, U>(in string name, bool checkGenericity, Predicate<T> itemPredicate, Converter<T, Type> converter, in Func<IEnumerable<U>> func, in GetItem<T, U> getItem, Action<U, ulong> createFile, Action<UpdateItemsStruct>
+#if CS8
+            ?
+#endif
+            updateItemsStruct, in bool isGenericType, params IWriterCallback<T, U>[] callbacks) where T : IDefaultEntity<ulong> where U : DotNetType => UpdateItems(name, checkGenericity, itemPredicate, converter, func, getItem, createFile, updateItemsStruct, isGenericType, callbacks.AsEnumerable());
     }
 }

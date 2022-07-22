@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
 using WinCopies.Desktop;
-using WinCopies.Util;
 
 using static WinCopies.Util.Desktop.UtilHelpers;
 
@@ -33,7 +31,7 @@ namespace WinCopies.GUI
 
     public static class ExtraEvents
     {
-        public static readonly RoutedEvent ClickEvent = RegisterRoutedEvent<ClickEventHandler, ListViewItem>("Click", RoutingStrategy.Bubble);
+        public static readonly RoutedEvent ClickEvent = Register<ClickEventHandler, ListViewItem>("Click", RoutingStrategy.Bubble);
 
         public static void AddClickHandler(DependencyObject d, Delegate handler) => AddAttachedRoutedEventHandler(d, ClickEvent, handler);
 

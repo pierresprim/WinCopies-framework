@@ -26,6 +26,7 @@ using System.Linq;
 using WinCopies.Collections.Generic;
 using WinCopies.Extensions;
 using WinCopies.IO.AbstractionInterop;
+using WinCopies.IO.ComponentSources.Item;
 using WinCopies.IO.Enumeration;
 using WinCopies.IO.Process;
 using WinCopies.IO.PropertySystem;
@@ -78,30 +79,30 @@ namespace WinCopies.IO.ObjectModel
                 ObjectPropertiesGeneric.FileType
 #if CS9
                 switch
-            {
+                {
 #else
                 )
 
                     {
                         case
 #endif
-                FileType.Folder
+                    FileType.Folder
 #if CS9
-                    or
+                        or
 #else
                         :
 
                         case
 #endif
-                    FileType.Drive
+                        FileType.Drive
 #if CS9
-                    =>
+                        =>
 #else
                         :
 
                             _browsability =
 #endif
-                    BrowsabilityOptions.BrowsableByDefault
+                        BrowsabilityOptions.BrowsableByDefault
 #if CS9
                 ,
 #else
@@ -109,21 +110,21 @@ namespace WinCopies.IO.ObjectModel
 
                             break;
 #endif
-                        // case FileType.Archive:
+                    // case FileType.Archive:
 #if CS9
-                _ =>
+                    _ =>
 #else
                         default:
 
                             _browsability =
 #endif
-                BrowsabilityOptions.NotBrowsable
+                    BrowsabilityOptions.NotBrowsable
 #if !CS9
                 ;
 
                             break;
 #endif
-                    };
+                };
 #if !CS9
                 return _browsability;
             }
@@ -172,14 +173,12 @@ namespace WinCopies.IO.ObjectModel
         /// </summary>
         public override string Name => System.IO.Path.GetFileName(Path);
 
-        protected override IBrowsableObjectInfo ParentOverride => _parent
+        protected override IBrowsableObjectInfo ParentGenericOverride => _parent
 #if CS8
             ??= GetParent();
 #else
             ?? (_parent = GetParent());
 #endif
-
-        protected override IProcessFactory ProcessFactoryOverride => Process.ProcessFactory.DefaultProcessFactory;
         #endregion Overrides
         #endregion Properties
 
@@ -191,13 +190,11 @@ namespace WinCopies.IO.ObjectModel
         }
 
         #region Methods
-        protected override System.Collections.Generic.IEnumerable<IProcessInfo> CustomProcessesOverride => ArchiveItemInfo.DefaultCustomProcessesSelectorDictionary.Select(this);
-
         private IBrowsableObjectInfo GetParent()
         {
             if (Path.Length > ArchiveShellObject.Path.Length)
             {
-                string path = Path.Substring(0, Path.LastIndexOf(WinCopies.IO.Path.PathSeparator));
+                string path = Path.Substring(0, Path.LastIndexOf(System.IO.Path.DirectorySeparatorChar));
 
                 ArchiveFileInfo? archiveFileInfo = null;
 
@@ -230,14 +227,53 @@ namespace WinCopies.IO.ObjectModel
 
     public class ArchiveItemInfo : ArchiveItemInfo<IFileSystemObjectInfoProperties, ArchiveFileInfoEnumeratorStruct, IEnumerableSelectorDictionary<ArchiveItemInfoItemProvider, IBrowsableObjectInfo>, ArchiveItemInfoItemProvider>, IArchiveItemInfo
     {
-        private static readonly BrowsabilityPathStack<IArchiveItemInfo> __browsabilityPathStack = new BrowsabilityPathStack<IArchiveItemInfo>();
+        public class ItemSource : ItemSourceBase4<IArchiveItemInfo, ArchiveFileInfoEnumeratorStruct, IEnumerableSelectorDictionary<ArchiveItemInfoItemProvider, IBrowsableObjectInfo>, ArchiveItemInfoItemProvider>
+        {
+            private IProcessSettings
+#if CS8
+                ?
+#endif
+                _processSettings;
 
+            protected override IProcessSettings
+#if CS8
+                ?
+#endif
+                ProcessSettingsOverride => _processSettings;
+
+            public override bool IsPaginationSupported => false;
+
+            public ItemSource(in IArchiveItemInfo browsableObjectInfo) : base(browsableObjectInfo) => _processSettings = new ProcessSettings(null, DefaultCustomProcessesSelectorDictionary.Select(browsableObjectInfo));
+
+            protected override System.Collections.Generic.IEnumerable<ArchiveItemInfoItemProvider> GetItemProviders(Predicate<ArchiveFileInfoEnumeratorStruct> predicate) => GetArchiveItemInfoItems(BrowsableObjectInfo, predicate);
+
+            /// <summary>
+            /// Returns the items of this <see cref="ArchiveItemInfo"/>.
+            /// </summary>
+            /// <returns>An <see cref="System.Collections.Generic.IEnumerable{IBrowsableObjectInfo}"/> that enumerates through the items of this <see cref="ArchiveItemInfo"/>.</returns>
+            protected override System.Collections.Generic.IEnumerable<ArchiveItemInfoItemProvider> GetItemProviders() => GetArchiveItemInfoItems(BrowsableObjectInfo, item => true);
+
+            protected override void DisposeManaged()
+            {
+                _processSettings = null;
+
+                base.DisposeManaged();
+            }
+        }
+
+        private static readonly BrowsabilityPathStack<IArchiveItemInfo> __browsabilityPathStack = new BrowsabilityPathStack<IArchiveItemInfo>();
         private IFileSystemObjectInfoProperties _objectProperties;
 
         #region Properties
+        protected override IItemSourcesProvider<ArchiveFileInfoEnumeratorStruct> ItemSourcesGenericOverride { get; }
+
         public static IBrowsabilityPathStack<IArchiveItemInfo> BrowsabilityPathStack { get; } = __browsabilityPathStack.AsWriteOnly();
 
-        public override string Protocol => null;
+        public override string
+#if CS8
+            ?
+#endif
+            Protocol => null;
 
         protected override System.Collections.Generic.IEnumerable<IBrowsabilityPath> BrowsabilityPathsOverride => __browsabilityPathStack.GetBrowsabilityPaths(this);
 
@@ -251,11 +287,15 @@ namespace WinCopies.IO.ObjectModel
         #endregion Properties
 
         protected internal ArchiveItemInfo(in string path, in FileType fileType, in IShellObjectInfoBase archiveShellObject, in ArchiveFileInfo? archiveFileInfo, ClientVersion clientVersion/*, DeepClone<ArchiveFileInfo?> archiveFileInfoDelegate*/) : base(path, archiveShellObject, archiveFileInfo, clientVersion)
-            => _objectProperties = archiveFileInfo.HasValue ? new ArchiveItemInfoProperties<IArchiveItemInfoBase>(this, fileType) :
+
+        {
+            _objectProperties = archiveFileInfo.HasValue ? new ArchiveItemInfoProperties<IArchiveItemInfoBase>(this, fileType) :
 #if !CS9
-            (IFileSystemObjectInfoProperties)
+                (IFileSystemObjectInfoProperties)
 #endif
-            new FileSystemObjectInfoProperties(this, fileType);
+                new FileSystemObjectInfoProperties(this, fileType);
+            ItemSourcesGenericOverride = ItemSourcesProvider.Construct(new ItemSource(this));
+        }
 
         #region Methods
         #region Construction helpers
@@ -281,7 +321,7 @@ namespace WinCopies.IO.ObjectModel
 
             return new ArchiveItemInfo(System.IO.Path.Combine(archiveShellObjectInfo.Path, archiveFilePath), FileType.Folder, archiveShellObjectInfo, null, archiveShellObjectInfo.ClientVersion);
         }
-        #endregion
+        #endregion Construction helpers
 
         protected override IEnumerableSelectorDictionary<ArchiveItemInfoItemProvider, IBrowsableObjectInfo> GetSelectorDictionaryOverride() => DefaultItemSelectorDictionary;
 
@@ -292,17 +332,7 @@ namespace WinCopies.IO.ObjectModel
             _objectProperties = null;
         }
 
-        #region GetItems
-        protected override System.Collections.Generic.IEnumerable<ArchiveItemInfoItemProvider> GetItemProviders(Predicate<ArchiveFileInfoEnumeratorStruct> predicate) => GetArchiveItemInfoItems(this, predicate);
-
-        /// <summary>
-        /// Returns the items of this <see cref="ArchiveItemInfo"/>.
-        /// </summary>
-        /// <returns>An <see cref="System.Collections.Generic.IEnumerable{IBrowsableObjectInfo}"/> that enumerates through the items of this <see cref="ArchiveItemInfo"/>.</returns>
-        protected override System.Collections.Generic.IEnumerable<ArchiveItemInfoItemProvider> GetItemProviders() => GetArchiveItemInfoItems(this, item => true);
-
         internal static System.Collections.Generic.IEnumerable<ArchiveItemInfoItemProvider> GetArchiveItemInfoItems(IArchiveItemInfoProvider item, Predicate<ArchiveFileInfoEnumeratorStruct> func) => new Enumerable<ArchiveItemInfoItemProvider>(() => new ArchiveItemInfoEnumerator(item, func));
-        #endregion // GetItems
-        #endregion // Methods
+        #endregion Methods
     }
 }

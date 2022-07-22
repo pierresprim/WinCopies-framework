@@ -6,6 +6,26 @@ The WinCopies® software framework
 CHANGELOG
 ---------
 
+### 3.15-preview
+
+- Add plugin support for WinCopies IO Framework based applications.
+- New packages:
+	- WinCopies.Installer: base package for GUI installer creation.
+	- WinCopies.IO.SQL(.Common): base package for SQL plugins (-.SQL) and effective plugin (-.Common) for WinCopies IO Framework based applications.
+- WinCopies.IO.Shell package split into three packages: itself, which contains effective IO code, WinCopies.IO.Drawing for drawing operations and WinCopies.IO.Reflection for reflection support. The last two are not yet functional.
+- New controls.
+- Completely redesign SQL, IO and doc building APIs.
+- .Net 6+: bug fixed in LinkRun: process runner restored to the same as for .Net 5.
+- InterfaceDataTemplateSelector XAML Static Resource: key renamed WinCopies.Templates.InterfaceDataTemplateSelector.
+- TabControl style no longer has a key.
+- New styles and templates.
+- All XAML items are now shared.
+- Add nullable attributes.
+- EntityPropertyAttribute: IsId and IsPseudoId properties replaced with the new IdStatus property, for which the value type is the new IdStatus enumeration.
+- PackageLoadContext moved to WinCopies.Util package. It is available starting with CS8 and was renamed AssemblyLoadContext.
+- DotNetEnumUnderlyingType enumeration: underlying type is byte.
+- DotNetType has a new property: Namespace.
+
 ### 3.14-preview
 
 - New types.

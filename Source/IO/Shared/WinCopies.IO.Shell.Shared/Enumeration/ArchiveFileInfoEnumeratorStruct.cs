@@ -53,7 +53,7 @@ namespace WinCopies.IO.Enumeration
 
         public string Name { get; }
 
-        public string Path => Name == null ? null : RelativePath == null ? Name : $"{RelativePath}{WinCopies.IO.Path.PathSeparator}{Name}";
+        public string Path => Name == null ? null : RelativePath == null ? Name : $"{RelativePath}{System.IO.Path.DirectorySeparatorChar}{Name}";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ArchiveFileInfoEnumeratorStruct"/> struct with a given path.

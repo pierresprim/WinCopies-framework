@@ -15,8 +15,10 @@
 * You should have received a copy of the GNU General Public License
 * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+using System;
 using System.Collections.Generic;
 
+using WinCopies.IO.ComponentSources.Bitmap;
 using WinCopies.IO.ObjectModel;
 
 namespace WinCopies.IO
@@ -54,9 +56,17 @@ namespace WinCopies.IO
 
         public abstract IBitmapSourceProvider BitmapSourceProvider { get; }
 
-        public abstract IEnumerable<IBrowsableObjectInfo> GetStartPages(ClientVersion clientVersion);
+        public abstract IEnumerable<IBrowsableObjectInfo>
+#if CS8
+            ?
+#endif
+            GetStartPages(ClientVersion clientVersion);
 
-        public abstract IEnumerable<IBrowsableObjectInfo> GetProtocols(IBrowsableObjectInfo parent, ClientVersion clientVersion);
+        public abstract IEnumerable<IBrowsableObjectInfo>
+#if CS8
+            ?
+#endif
+            GetProtocols(IBrowsableObjectInfo parent, ClientVersion clientVersion);
 
         public void RegisterBrowsabilityPaths() => RegisterBrowsabilityPathsStack.RunActions();
 

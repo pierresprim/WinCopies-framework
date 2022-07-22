@@ -69,7 +69,7 @@ namespace WinCopies.IO.Shell.Process
 
                     func = _path => _path is IShellObjectInfoBase2 shellObjectInfo
                         && shellObjectInfo.InnerObject.IsFileSystemObject
-                        && shellObjectInfo.Path.Validate(path, path.EndsWith(WinCopies.IO.Path.PathSeparator
+                        && shellObjectInfo.Path.Validate(path, path.EndsWith(System.IO.Path.DirectorySeparatorChar
 #if !CS8
                                 .ToString()
 #endif

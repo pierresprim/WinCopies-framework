@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>e9deebc4-db21-43d7-9fa9-5707af823d95</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>WinCopies.Installer</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Models\Misc\BrowsablePage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\Misc\CommonPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\Misc\Misc.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\Misc\Option.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\ObjectModel\Installer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\ObjectModel\Pages\Destination.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\ObjectModel\Pages\InstallerPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\ObjectModel\Pages\LicenseAgreement.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\ObjectModel\Pages\MainPages.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\ObjectModel\Pages\Option.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\Misc\OptionGroup.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\ObjectModel\Pages\Process.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\ObjectModel\Pages\UserGroup.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\CommonPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\Installer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\Pages\Destination.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\Pages\LicenseAgreement.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\Pages\Option.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\Pages\Process.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\Pages\StartPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\Pages\UserGroup.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Window.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="$(MSBuildThisFileDirectory)Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+</Project>

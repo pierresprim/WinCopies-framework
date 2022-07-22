@@ -103,7 +103,7 @@ namespace WinCopies.EntityFramework
             {
                 value = property.Key.GetValue(_entity);
 
-                bool isId = property.Value.IsId;
+                bool isId = property.Value.IdStatus == IdStatus.Id;
 
                 if (isId)
                 {
@@ -197,7 +197,7 @@ namespace WinCopies.EntityFramework
 
                     action = (in KeyValuePair<PropertyInfo, EntityPropertyAttribute> property, in IEntity __entity) =>
                     {
-                        if (property.Value.IsId /*&& property.Key.PropertyType.IsAssignableFrom<TResult>()*/)
+                        if (property.Value.IdStatus == IdStatus.Id /*&& property.Key.PropertyType.IsAssignableFrom<TResult>()*/)
                         {
                             idProperty = property.Key;
 

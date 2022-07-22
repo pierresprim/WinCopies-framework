@@ -15,15 +15,11 @@
 * You should have received a copy of the GNU General Public License
 * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-#if WinCopies3
-
 using Microsoft.WindowsAPICodePack.Shell;
 using Microsoft.WindowsAPICodePack.Shell.PropertySystem;
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 using WinCopies.Collections.Abstraction.Generic;
 using WinCopies.Collections.Generic;
@@ -34,7 +30,6 @@ using static WinCopies.ThrowHelper;
 
 namespace WinCopies.IO.PropertySystem
 {
-
     public class ShellObjectPropertySystemCollection : PropertySystemCollection<PropertyId, ShellPropertyGroup>
     {
         #region Fields
@@ -97,18 +92,30 @@ namespace WinCopies.IO.PropertySystem
         {
             var properties = new List<KeyValuePair<PropertyId, IProperty>>(Count);
 
-            foreach (Microsoft.WindowsAPICodePack.Shell.PropertySystem.IShellProperty property in _nativeProperties.Where(p=>!string.IsNullOrEmpty(p.CanonicalName)))
+            foreach (Microsoft.WindowsAPICodePack.Shell.PropertySystem.IShellProperty property in _nativeProperties.Where(p => !string.IsNullOrEmpty(p.CanonicalName)))
 
                 properties.Add(new KeyValuePair<PropertyId, IProperty>(new PropertyId(property.CanonicalName.Substring(property.CanonicalName.LastIndexOf('.') + 1), ShellProperty.GetPropertyGroup(property)), new ShellProperty(property)));
 
             _properties = properties.AsReadOnly();
         }
 
-        public static ShellObjectPropertySystemCollection GetShellObjectPropertySystemCollection(in ShellPropertyCollection shellProperties) => new ShellObjectPropertySystemCollection(shellProperties ?? throw GetArgumentNullException(nameof(shellProperties)));
+        public static ShellObjectPropertySystemCollection GetShellObjectPropertySystemCollection(in ShellPropertyCollection shellProperties) => new
+#if !CS9
+            ShellObjectPropertySystemCollection
+#endif
+            (shellProperties ?? throw GetArgumentNullException(nameof(shellProperties)));
 
-        public static ShellObjectPropertySystemCollection GetShellObjectPropertySystemCollection(in ShellObject shellObject) => new ShellObjectPropertySystemCollection(shellObject ?? throw GetArgumentNullException(nameof(shellObject)));
+        public static ShellObjectPropertySystemCollection GetShellObjectPropertySystemCollection(in ShellObject shellObject) => new
+#if !CS9
+            ShellObjectPropertySystemCollection
+#endif
+            (shellObject ?? throw GetArgumentNullException(nameof(shellObject)));
 
-        internal static ShellObjectPropertySystemCollection _GetShellObjectPropertySystemCollection<T>(in IEncapsulatorBrowsableObjectInfo<T> browsableObjectInfo) where T : ShellObject => new ShellObjectPropertySystemCollection(browsableObjectInfo.InnerObject);
+        internal static ShellObjectPropertySystemCollection _GetShellObjectPropertySystemCollection<T>(in IEncapsulatorBrowsableObjectInfo<T> browsableObjectInfo) where T : ShellObject => new
+#if !CS9
+            ShellObjectPropertySystemCollection
+#endif
+            (browsableObjectInfo.InnerObject);
 
         public static ShellObjectPropertySystemCollection GetShellObjectPropertySystemCollection<T>(in IEncapsulatorBrowsableObjectInfo<T> browsableObjectInfo) where T : ShellObject => _GetShellObjectPropertySystemCollection(browsableObjectInfo ?? throw GetArgumentNullException(nameof(ShellObjectInfo)));
 
@@ -118,5 +125,3 @@ namespace WinCopies.IO.PropertySystem
         #endregion
     }
 }
-
-#endif

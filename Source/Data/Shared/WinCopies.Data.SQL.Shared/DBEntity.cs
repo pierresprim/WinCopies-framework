@@ -114,9 +114,9 @@ namespace WinCopies.Data.SQL
 
         public string GetOperator() => Connection.GetOperator(ConditionGroupOperator.And);
 
-        public override ulong Remove(out uint tables) => EntityCollection.RemoveItem(this, table => Connection.GetConnection().GetDelete(SQLHelper.GetEnumerable(table), GetOperator(), GetIdProperties()).ExecuteNonQuery(), out tables);
+        public override ulong Remove(out uint tables) => EntityCollection.RemoveItem(this, table => Connection.GetConnection().GetDelete(SQLItemCollection.GetCollection(table), GetOperator(), GetIdProperties()).ExecuteNonQuery(), out tables);
 
-        protected override bool RefreshOverride() => RefreshItem(Collection, Connection, this, new ConditionGroup(GetOperator()) { Conditions = SQLHelper.GetEnumerable(GetIdProperties()) });
+        protected override bool RefreshOverride() => RefreshItem(Collection, Connection, this, new ConditionGroup(GetOperator()) { Conditions = Collections.DotNetFix.LinkedList.GetLinkedList(GetIdProperties()) });
 
         protected override ulong UpdateOverride(out uint tables)
         {
@@ -130,7 +130,7 @@ namespace WinCopies.Data.SQL
 
     public class DefaultDBEntity<TItems, TId> : DBEntity<TItems>, IDefaultEntity<TId> where TItems : IEntity
     {
-        [EntityProperty(nameof(Id), IsId = true)]
+        [EntityProperty(nameof(Id), IdStatus = IdStatus.Id)]
         public TId Id { get; set; }
 
         public override Nullable TryRefreshIdWhen { get; } = new Nullable(default(TId));
@@ -157,7 +157,7 @@ namespace WinCopies.Data.SQL
 
     public class DefaultNamedEntity2<TItems, TId> : NamedEntity<TItems, TId> where TItems : IEntity
     {
-        [EntityProperty(IsPseudoId = true)]
+        [EntityProperty(IdStatus = IdStatus.PseudoId)]
         public string Name { get => EntityName; set => EntityName = value; }
 
         public DefaultNamedEntity2(DBEntityCollection<TItems> collection) : base(collection) { /* Left empty. */ }

@@ -72,14 +72,8 @@ namespace WinCopies.Data.SQL
 #endif
     }
 
-    public interface ISQLTableRequest
+    public interface ISQLTableRequestBase
     {
-        Collections.Generic.IExtensibleEnumerable<string>
-#if CS8
-            ?
-#endif
-            Tables
-        { get; }
 
         IConditionGroup
 #if CS8
@@ -87,6 +81,16 @@ namespace WinCopies.Data.SQL
 #endif
             ConditionGroup
         { get; set; }
+    }
+
+    public interface ISQLTableRequest: ISQLTableRequestBase
+    {
+        Collections.Generic.IExtensibleEnumerable<string>
+#if CS8
+            ?
+#endif
+            Tables
+        { get; }
     }
 
     public interface ISQLTableRequest2 : ISQLTableRequest, ISQLRequest
@@ -100,9 +104,9 @@ namespace WinCopies.Data.SQL
 
         public SQLRequest(in TConnection connection) => Connection = connection;
 
-        protected abstract string GetSQL();
+        public abstract string GetSQL();
 
-        protected virtual TCommand GetCommand() => Connection.GetCommand(GetSQL());
+        public virtual TCommand GetCommand() => Connection.GetCommand(GetSQL());
 
         public sealed override string ToString() => GetSQL();
     }
@@ -177,7 +181,7 @@ namespace WinCopies.Data.SQL
 #endif
             > GetPrepareCommandAction();
 
-        protected override TCommand GetCommand()
+        public override TCommand GetCommand()
         {
             TCommand command = base.GetCommand();
 

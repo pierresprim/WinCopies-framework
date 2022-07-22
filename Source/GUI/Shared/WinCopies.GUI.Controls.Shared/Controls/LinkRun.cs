@@ -28,13 +28,13 @@ using static WinCopies.
 #if WinCopies3
     UtilHelpers;
 
-    using WinCopies.Commands
+using WinCopies.Commands
 #else
     Util.Util;
 
 using WinCopies.Util
 #endif
-    ;
+;
 using WinCopies.Desktop;
 
 namespace WinCopies.GUI.Controls
@@ -165,13 +165,13 @@ namespace WinCopies.GUI.Controls
 
         private void LinkRun_Click(object sender, RoutedEventArgs e) => OnClick(e);
 
-        protected virtual void RemoveUnderlining()=> TextDecorations = new TextDecorationCollection();
+        protected virtual void RemoveUnderlining() => TextDecorations = new TextDecorationCollection();
 
-        protected virtual void Underline() =>                        TextDecorations = new TextDecorationCollection() { new TextDecoration(TextDecorationLocation.Underline, null, 0, TextDecorationUnit.FontRecommended, TextDecorationUnit.FontRecommended) };
+        protected virtual void Underline() => TextDecorations = new TextDecorationCollection() { new TextDecoration(TextDecorationLocation.Underline, null, 0, TextDecorationUnit.FontRecommended, TextDecorationUnit.FontRecommended) };
 
         protected virtual void OnUnderliningModeChanged(DependencyPropertyChangedEventArgs e) => OnChangeUnderlining((LinkUnderliningMode)e.NewValue);
 
-            protected virtual void OnChangeUnderlining(LinkUnderliningMode underliningMode)
+        protected virtual void OnChangeUnderlining(LinkUnderliningMode underliningMode)
         {
             switch (underliningMode)
             {
@@ -215,11 +215,11 @@ namespace WinCopies.GUI.Controls
 
         protected virtual void OnSeenChanged(DependencyPropertyChangedEventArgs e)
         {
-             if ((bool)e.NewValue)
-            
+            if ((bool)e.NewValue)
+
                 OnHasBeenSeen();
-            
-            else             if ((IsMouseOver && Mouse.LeftButton == MouseButtonState.Released) || IsFocused)
+
+            else if ((IsMouseOver && Mouse.LeftButton == MouseButtonState.Released) || IsFocused)
 
                 Highlight();
 
@@ -360,10 +360,10 @@ namespace WinCopies.GUI.Controls
 
                 return;
 
-#if NETCORE || NET5
+#if CS8
             StartProcessNetCore(Uri);
 #else
-            _ = Process.Start(Uri);
+            _ = System.Diagnostics.Process.Start(Uri);
 #endif
         }
     }

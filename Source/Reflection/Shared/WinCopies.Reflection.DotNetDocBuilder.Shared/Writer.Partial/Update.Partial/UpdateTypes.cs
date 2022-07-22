@@ -1,36 +1,37 @@
-﻿using System;
+﻿#region Usings
+#region System
+using System;
 using System.Collections.Generic;
 using System.Linq;
+#endregion System
 
+#region WinCopies
 using WinCopies.Data.SQL;
 using WinCopies.EntityFramework;
 using WinCopies.Linq;
 using WinCopies.Reflection.DotNetParser;
 using WinCopies.Util;
+#endregion WinCopies
+#endregion Usings
 
 namespace WinCopies.Reflection.DotNetDocBuilder
 {
     public partial class Writer
     {
-        protected void UpdateTypes<TType, TDBType, TInterfaceImplementation>(
+        protected void UpdateTypes<TDBType, TType, TInterfaceImplementation>(
             string typeName,
             DBEntityCollection<TInterfaceImplementation> interfaceImplementations,
             IEnumerable<IEnumerable<IInterfaceImplementation>> otherInterfaceImplementations,
             Converter<TDBType, Type> convertFrom,
-            Func<TType, Type, DBEntityCollection<TDBType>, TDBType> convertTo,
+            GetItem<TDBType, TType> convertTo,
             Converter<TDBType, TInterfaceImplementation> interfaceImplementationInitializer,
-            Action<TType, TDBType, DBEntityCollection<TDBType>>
-#if CS8
-            ?
-#endif
-            update,
             IEnumerable<TType> dotNetInterfaces,
             Action<TType, ulong> action,
-            Action<TDBType>
-#if CS8
-            ?
-#endif
-            onRemove) where TType : DotNetType where TInterfaceImplementation : InterfaceImplementation<TInterfaceImplementation> where TDBType : IDefaultEntity<ulong>
+            Collections.Generic.ArrayBuilder<IWriterCallback<TDBType, TType>> callbacks)
+
+            where TType : DotNetType
+            where TInterfaceImplementation : InterfaceImplementation<TInterfaceImplementation>
+            where TDBType : IDefaultEntity<ulong>
         {
             using
 #if !CS8
@@ -88,7 +89,7 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
             bool checkAll(in Type _type, in DotNetType item) => CheckTypeEquality2(_type, item, true);
 
-            bool checkInterface(System.Type _i) => ValidPackages.Contains(_i.Assembly.GetName().Name) && !interfaces.Contains(_i);
+            bool checkInterface(System.Type _i) => IsTypeValid(_i) && !interfaces.Contains(_i);
 
             bool checkInterfaceImplementation(in IInterfaceImplementation _i, in System.Type i) => checkAll(_i.GetImplementedInterface(), new DotNetType(i));
 
@@ -195,18 +196,18 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
             void removeEntityAssociations2(in TDBType _t) => removeEntityAssociations(_t, null);
 
-            ActionIn<TDBType> _onRemove = onRemove == null ?
+            ActionIn<TDBType> _onRemove = /*onRemove == null ?
 #if !CS9
                     (ActionIn<TDBType>)
 #endif
-                removeEntityAssociations2 : (in TDBType _t) =>
+                */ removeEntityAssociations2 /*: (in TDBType _t) =>
             {
                 removeEntityAssociations2(_t);
 
                 onRemove(_t);
-            };
+            }*/;
 
-            void _update(TType type, TDBType dbType, DBEntityCollection<TDBType> collection)
+            void _update(TDBType dbType, TType type, DBEntityCollection<TDBType> collection)
             {
                 // setGenericTypeCount(type, tmpType = convertFrom(dbType));
 
@@ -215,110 +216,150 @@ namespace WinCopies.Reflection.DotNetDocBuilder
                 addEntityAssociations(dbType, type, true);
             }
 
-            Action<TType, TDBType, DBEntityCollection<TDBType>> _action = update == null
+            OnUpdated<TDBType, TType> _action = /*update == null
                 ?
 #if !CS9
-                    (Action<TType, TDBType, DBEntityCollection<TDBType>>)
+                    (OnUpdated<TDBType, TType>)
 #endif
-                _update
-                : (type, dbType, collection) =>
+                */ _update /*: (dbType, type, collection) =>
                     {
-                        _update(type, dbType, collection);
+                        _update(dbType, type, collection);
 
-                        update(type, dbType, collection);
-                    };
+                        update(dbType, type, collection);
+                    }*/;
 
-            UpdateItems(typeName, true, type => convertFrom(type).TypeType.Name == typeName, (type, @interface) => addEntityAssociations(type, @interface, false), _t => _onRemove(_t), convertFrom, () => dotNetInterfaces, convertTo,
-            _action,
-            action, _updateItemsStruct => updateItemsStruct = _updateItemsStruct, true);
+            callbacks.AddFirst(new WriterDelegateCallback<TDBType, TType>(null, (type, @interface) => addEntityAssociations(type, @interface, false), _action, (_t, __t) => _onRemove(_t)));
+
+            UpdateItems(typeName, true, type => convertFrom(type).TypeType.Name == typeName, convertFrom, () => dotNetInterfaces, convertTo, action, _updateItemsStruct => updateItemsStruct = _updateItemsStruct, true, callbacks);
 #if !CS8
             }
 #endif
         }
 
-        protected void UpdateTypes<TType, TDBType, TInterfaceImplementation>(
+        protected void UpdateTypes<TDBType, TType, TInterfaceImplementation>(
             string typeName,
             DBEntityCollection<TInterfaceImplementation> interfaceImplementations,
             Converter<TDBType, Type> convertFrom,
-            Func<TType, Type, DBEntityCollection<TDBType>, TDBType> convertTo,
+            GetItem<TDBType, TType> convertTo,
             Converter<TDBType, TInterfaceImplementation> interfaceImplementationInitializer,
-            Action<TType, TDBType, DBEntityCollection<TDBType>>
-#if CS8
-            ?
-#endif
-            update,
             IEnumerable<TType> dotNetInterfaces,
             Action<TType, ulong> action,
-            Action<TDBType>
-#if CS8
-            ?
-#endif
-            onRemove,
-            params IEnumerable<IInterfaceImplementation>[] otherInterfaceImplementations) where TType : DotNetType where TInterfaceImplementation : InterfaceImplementation<TInterfaceImplementation> where TDBType : IDefaultEntity<ulong> => UpdateTypes(typeName, interfaceImplementations, otherInterfaceImplementations, convertFrom, convertTo, interfaceImplementationInitializer, update, dotNetInterfaces, action, onRemove);
+            Collections.Generic.ArrayBuilder<IWriterCallback<TDBType, TType>> callbacks,
+            params IEnumerable<IInterfaceImplementation>[] otherInterfaceImplementations)
 
-        protected void UpdateTypes<TType, TDBType, TInterfaceImplementation>(
+            where TType : DotNetType
+            where TInterfaceImplementation : InterfaceImplementation<TInterfaceImplementation>
+            where TDBType : IDefaultEntity<ulong>
+
+            => UpdateTypes(typeName, interfaceImplementations, otherInterfaceImplementations, convertFrom, convertTo, interfaceImplementationInitializer, dotNetInterfaces, action, callbacks);
+
+        protected void UpdateTypes<TDBType, TType, TInterfaceImplementation>(
             string typeName,
             IEnumerable<IEnumerable<IInterfaceImplementation>> otherInterfaceImplementations,
             Converter<TDBType, Type> convertFrom,
-            Func<TType, Type, DBEntityCollection<TDBType>, TDBType> convertTo,
+            GetItem<TDBType, TType> convertTo,
             Func<TDBType, DBEntityCollection<TInterfaceImplementation>, TInterfaceImplementation> interfaceImplementationInitializer,
-            Action<TType, TDBType, DBEntityCollection<TDBType>>
-#if CS8
-            ?
-#endif
-            update,
             IEnumerable<TType> dotNetInterfaces,
             Action<TType, ulong> action,
-            Action<TDBType>
-#if CS8
-            ?
-#endif
-            onRemove) where TType : DotNetType where TInterfaceImplementation : InterfaceImplementation<TInterfaceImplementation> where TDBType : IDefaultEntity<ulong> => UtilHelpers.Using(GetCollection<TInterfaceImplementation>, items => UpdateTypes(
-            typeName,
-            items,
-            otherInterfaceImplementations,
-            convertFrom,
-            convertTo,
-            type => interfaceImplementationInitializer(type, items),
-            update,
-            dotNetInterfaces,
-            action,
-            onRemove));
+            Collections.Generic.ArrayBuilder<IWriterCallback<TDBType, TType>> callbacks)
 
-        protected void UpdateTypes<TType, TDBType, TInterfaceImplementation>(
+            where TType : DotNetType
+            where TInterfaceImplementation : InterfaceImplementation<TInterfaceImplementation>
+            where TDBType : IDefaultEntity<ulong>
+
+            => UtilHelpers.Using(
+                GetCollection<TInterfaceImplementation>,
+                items => UpdateTypes(
+                    typeName,
+                    items,
+                    otherInterfaceImplementations,
+                    convertFrom,
+                    convertTo,
+                    type => interfaceImplementationInitializer(type, items),
+                    dotNetInterfaces,
+                    action,
+                    callbacks));
+
+        protected void UpdateTypes<TDBType, TType, TInterfaceImplementation>(
             string typeName,
             Converter<TDBType, Type> convertFrom,
-            Func<TType, Type, DBEntityCollection<TDBType>, TDBType> convertTo,
+            GetItem<TDBType, TType> convertTo,
             Func<TDBType, DBEntityCollection<TInterfaceImplementation>, TInterfaceImplementation> interfaceImplementationInitializer,
-            Action<TType, TDBType, DBEntityCollection<TDBType>>
-#if CS8
-            ?
-#endif
-            update,
             IEnumerable<TType> dotNetInterfaces,
             Action<TType, ulong> action,
-            Action<TDBType>
-#if CS8
-            ?
-#endif
-            onRemove,
-            params IEnumerable<IInterfaceImplementation>[] otherInterfaceImplementations) where TType : DotNetType where TInterfaceImplementation : InterfaceImplementation<TInterfaceImplementation> where TDBType : IDefaultEntity<ulong> => UpdateTypes(
-            typeName,
-            otherInterfaceImplementations,
-            convertFrom,
-            convertTo,
-            interfaceImplementationInitializer,
-            update,
-            dotNetInterfaces,
-            action,
-            onRemove);
+            Collections.Generic.ArrayBuilder<IWriterCallback<TDBType, TType>> callbacks,
+            params IEnumerable<IInterfaceImplementation>[] otherInterfaceImplementations)
 
-        protected void UpdateTypes<T>(in string typeName, in IEnumerable<T> items, in Action<T, ulong> action, IEnumerable<IEnumerable<IInterfaceImplementation>> interfaceImplementations) where T : DotNetType => UpdateTypes<T, Type, InterfaceImplementation>(typeName, interfaceImplementations, Delegates.Self, (dotNetType, dbType, types) => dbType, (type, _items) => new InterfaceImplementation(_items) { Interface = type }, null, items, action, null);
+            where TType : DotNetType
+            where TInterfaceImplementation : InterfaceImplementation<TInterfaceImplementation>
+            where TDBType : IDefaultEntity<ulong>
 
-        protected void UpdateTypes<T>(in string typeName, in IEnumerable<T> items, in Action<T, ulong> action, params IEnumerable<IInterfaceImplementation>[] interfaceImplementations) where T : DotNetType => UpdateTypes(typeName, items, action, interfaceImplementations.AsEnumerable());
+            => UpdateTypes(
+                typeName,
+                otherInterfaceImplementations,
+                convertFrom,
+                convertTo,
+                interfaceImplementationInitializer,
+                dotNetInterfaces,
+                action,
+                callbacks);
 
-        public void UpdateInterfaces() => UtilHelpers.Using(GetCollection<ClassInterfaceImplementation>, items => UpdateTypes("Interface", DotNetInterfaces, CreateInterfaceFile, items));
+        protected void UpdateTypes<T>(in string typeName,
+            in IEnumerable<T> items,
+            in Action<T, ulong> action,
+            in IEnumerable<IEnumerable<IInterfaceImplementation>> interfaceImplementations,
+            in Collections.Generic.ArrayBuilder<IWriterCallback<Type, T>> callbacks)
 
-        public void UpdateStructs() => UpdateTypes("Struct", DotNetStructs, CreateStructFile);
+            where T : DotNetType
+
+            => UpdateTypes<
+                Type,
+                T,
+                InterfaceImplementation>(
+
+                typeName,
+                interfaceImplementations,
+                Delegates.Self,
+                (dbType,
+                    dotNetType,
+                    types) => dbType,
+                (type,
+                    _items)
+
+                    => new InterfaceImplementation(_items) { Interface = type },
+                items,
+                action,
+                callbacks);
+
+        protected void UpdateTypes<T>(
+            in string typeName,
+            in IEnumerable<T> items,
+            in Action<T, ulong> action,
+            in Collections.Generic.ArrayBuilder<IWriterCallback<Type, T>> callbacks,
+            params IEnumerable<IInterfaceImplementation>[] interfaceImplementations)
+
+            where T : DotNetType =>
+
+            UpdateTypes(
+                typeName,
+                items,
+                action,
+                interfaceImplementations.AsEnumerable(),
+                callbacks);
+
+        public void UpdateInterfaces(IEnumerable<IWriterCallback<Type, DotNetInterface>> callbacks) => UtilHelpers.Using(GetCollection<ClassInterfaceImplementation>, items => UpdateTypes("Interface", DotNetInterfaces, CreateInterfaceFile, new Collections.Generic.ArrayBuilder<IWriterCallback<Type, DotNetInterface>>(callbacks), items));
+
+        public void UpdateInterfaces(params IWriterCallback<Type, DotNetInterface>[] callbacks) => UpdateInterfaces(callbacks.AsEnumerable());
+
+        public void UpdateStructs(Collections.Generic.ArrayBuilder<IWriterCallback<Type, DotNetStruct>> callbacks)
+        {
+            _ = callbacks.AddFirst(GetConstantUpdater<Type, DotNetStruct>(Delegates.Self, DefaultConverter<DotNetStruct>));
+
+            UpdateTypes("Struct", DotNetStructs, CreateStructFile, callbacks);
+        }
+
+        public void UpdateStructs(IEnumerable<IWriterCallback<Type, DotNetStruct>> callbacks) => UpdateStructs(new Collections.Generic.ArrayBuilder<IWriterCallback<Type, DotNetStruct>>(callbacks));
+
+        public void UpdateStructs(params IWriterCallback<Type, DotNetStruct>[] callbacks) => UpdateStructs(callbacks.AsEnumerable());
     }
 }

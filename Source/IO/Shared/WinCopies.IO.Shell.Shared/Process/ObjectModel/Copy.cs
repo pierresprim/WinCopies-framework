@@ -289,7 +289,7 @@ namespace WinCopies.IO.Process
 
                 destPath = Path.RenameDuplicate(destPath);
 
-                NewPath = new NewPathStruct(path.Path + WinCopies.IO.Path.PathSeparator, oldPath, destPath);
+                NewPath = new NewPathStruct(path.Path + System.IO.Path.DirectorySeparatorChar, oldPath, destPath);
 
                 alreadyRenamed = true;
             }

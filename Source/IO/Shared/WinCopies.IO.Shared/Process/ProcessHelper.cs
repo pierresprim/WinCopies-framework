@@ -63,13 +63,13 @@ namespace WinCopies.IO.Process
 
     public static class ProcessHelper
     {
-        public static ProcessInitialization<WinCopies.IO.IPathInfo, T, ProcessTypes<WinCopies.IO.IPathInfo, T, object>.ProcessErrorItem, object>.ProcessInitializer GetDefaultProcessInitializer<T>(in ProcessFactorySelectorDictionaryParameters processParameters) => new ProcessInitialization<WinCopies.IO.IPathInfo, T, ProcessTypes<WinCopies.IO.IPathInfo, T, object>.ProcessErrorItem, object>.ProcessInitializer(processParameters);
+        public static ProcessInitialization<IPathInfo, T, ProcessTypes<IPathInfo, T, object>.ProcessErrorItem, object>.ProcessInitializer GetDefaultProcessInitializer<T>(in ProcessFactorySelectorDictionaryParameters processParameters) => new ProcessInitialization<IPathInfo, T, ProcessTypes<IPathInfo, T, object>.ProcessErrorItem, object>.ProcessInitializer(processParameters);
 
         public static IProcessProgressDelegateParameter GetDefaultNotifyCompletionParameters() => new ProcessProgressDelegateParameter(100u, null);
 
         public static IRecursiveEnumerable<IPathInfo> GetDefaultEnumerable(in IPathInfo path, in RecursiveEnumerationOrder recursiveEnumerationOrder) => ProcessHelper<IPathInfo>.GetDefaultEnumerable(path, recursiveEnumerationOrder, __path => __path);
 
-        public static string GetDestinationPath(in IPathInfo x, in IPathInfo y) => $"{x.Path}{WinCopies.IO.Path.PathSeparator}{y.GetPath(true)}";
+        public static string GetDestinationPath(in IPathInfo x, in IPathInfo y) => $"{x.Path}{System.IO.Path.DirectorySeparatorChar}{y.GetPath(true)}";
 
         public static void GetDefaultPathsLoadingErrorParameters<TPath, TError, TErrorAction, TFactory>(in TError error, in string message, in ErrorCode errorCode, in ProcessOptionsCommon<TPath> options, in TFactory factory, out IProcessError<TError, TErrorAction> _error, out bool clearOnError) where TPath : IPath where TFactory : ProcessErrorTypes<TPath, TError, TErrorAction>.IProcessErrorFactories
         {
@@ -128,6 +128,5 @@ namespace WinCopies.IO.Process
 
             public static bool OnPathLoaded(in T path, in ProcessOptionsCommon<T> options, in ProcessDelegateTypes<T, TProcessDelegateParam>.IProcessDelegates<TProcessEventDelegates> processDelegates, in Action<T> action) => OnPathLoaded(path, options, processDelegates, null, action);
         }
-
     }
 }

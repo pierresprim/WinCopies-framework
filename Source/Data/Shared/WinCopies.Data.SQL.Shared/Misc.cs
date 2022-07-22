@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+
 using WinCopies.Util;
 
 using static WinCopies.ThrowHelper;
@@ -10,6 +11,44 @@ namespace WinCopies.Data.SQL
 {
     public static class SQLHelper
     {
+        public static bool GetValue<T>(object
+#if CS8
+            ?
+#endif
+            obj, out T
+#if CS9
+            ?
+#endif
+            result)
+        {
+            if (obj == null || obj == DBNull.Value)
+            {
+                result = default;
+
+                return false;
+            }
+
+            result = (T)obj;
+
+            return true;
+        }
+
+        public static T
+#if CS9
+            ?
+#endif
+            GetValue<T>(object
+#if CS8
+            ?
+#endif
+            obj) => GetValue(obj, out T
+#if CS9
+                ?
+#endif
+                result) ? result : default;
+
+        public static ISQLGetter GetSQLGetter(this ISQLPropertiesProvider sqlPropertiesProvider) => sqlPropertiesProvider.GetProperties().ExecuteQuery(false).First();
+
         public static void AddConditions(in IConditionGroup
 #if CS8
             ?
@@ -44,14 +83,6 @@ namespace WinCopies.Data.SQL
             return sb.ToString();
         }
 
-        public static Collections.DotNetFix.Generic.LinkedList<T> GetEnumerable<T>(in IEnumerable<T> items) => new
-#if !CS9
-           Collections.DotNetFix.Generic.LinkedList<T>
-#endif
-            (new Collections.DotNetFix.Generic.LinkedList<T>(items));
-
-        public static Collections.DotNetFix.Generic.LinkedList<T> GetEnumerable<T>(params T[] items) => GetEnumerable(items.AsFromType<IEnumerable<T>>());
-
         public static T ExecuteNonQuery<T>(in Func<T> action, out long? lastInsertedId)
         {
             ThrowIfNull(action, nameof(action));
@@ -68,17 +99,6 @@ namespace WinCopies.Data.SQL
 
     //    IEnumerable<T> GetEnumerable();
     //}
-
-    public interface ISQLGetter : DotNetFix.IDisposable
-    {
-        bool IsIntIndexable { get; }
-
-        object this[int index] { get; }
-
-        bool IsStringIndexable { get; }
-
-        object this[string columnName] { get; }
-    }
 
     public interface IConnection<T>
     {
@@ -153,7 +173,7 @@ namespace WinCopies.Data.SQL
 
         protected abstract Action<TCommand> GetPrepareCommandAction();
 
-        protected override TCommand GetCommand()
+        public override TCommand GetCommand()
         {
             TCommand command = base.GetCommand();
 
@@ -198,7 +218,7 @@ namespace WinCopies.Data.SQL
 #endif
             > GetPrepareCommandAction();
 
-        protected override TCommand GetCommand()
+        public override TCommand GetCommand()
         {
             TCommand command = base.GetCommand();
 

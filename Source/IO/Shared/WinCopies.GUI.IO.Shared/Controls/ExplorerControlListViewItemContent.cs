@@ -80,6 +80,6 @@ namespace WinCopies.GUI.IO.Controls
 
         public bool HasTransparency { get => (bool)GetValue(HasTransparencyProperty); set => SetValue(HasTransparencyProperty, value); }
 
-        static ExplorerControlListViewItemContent() => DefaultStyleKeyProperty.OverrideFrameworkPropertyMetadata<ExplorerControlListViewItemContent>();
+        static ExplorerControlListViewItemContent() => DefaultStyleKeyProperty.OverrideDefaultStyleKey<ExplorerControlListViewItemContent>();
     }
 }

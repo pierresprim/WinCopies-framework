@@ -105,7 +105,9 @@ namespace WinCopies.GUI.Controls
     //    [System.Windows.TemplatePart(Name = PART_TextBox, Type = typeof(PlaceholderSubTextBox))]
     public class PlaceholderTextBox : ButtonTextBox /*Control, IAddChild*/
     {
-        public static readonly DependencyProperty PlaceholderStyleProperty = DependencyProperty.Register(nameof(PlaceholderStyle), typeof(Style), typeof(PlaceholderTextBox), new PropertyMetadata(null, (DependencyObject d, DependencyPropertyChangedEventArgs e) =>
+        private static DependencyProperty Register<T>(in string propertyName, in PropertyMetadata propertyMetadata) => Util.Desktop.UtilHelpers.Register<T, PlaceholderTextBox>(propertyName, propertyMetadata);
+
+        public static readonly DependencyProperty PlaceholderStyleProperty = Register<Style>(nameof(PlaceholderStyle), new PropertyMetadata(null, (DependencyObject d, DependencyPropertyChangedEventArgs e) =>
         {
             if (e.NewValue == null)
 
@@ -142,33 +144,68 @@ namespace WinCopies.GUI.Controls
 
         public Style PlaceholderStyle { get => (Style)GetValue(PlaceholderStyleProperty); set => SetValue(PlaceholderStyleProperty, value); }
 
-        public static readonly DependencyProperty PlaceholderModeProperty = DependencyProperty.Register(nameof(PlaceholderMode), typeof(PlaceholderMode), typeof(PlaceholderTextBox), new PropertyMetadata(PlaceholderMode.OnTextChanged, (DependencyObject d, DependencyPropertyChangedEventArgs e) =>
+        public static readonly DependencyProperty PlaceholderModeProperty = Register<PlaceholderMode>(nameof(PlaceholderMode), new PropertyMetadata(PlaceholderMode.OnTextChanged, (DependencyObject d, DependencyPropertyChangedEventArgs e) =>
+#if CS8
+            d.SetValue(IsPlaceholderVisiblePropertyKey,
+#else
         {
-            bool value;
-
-            switch ((PlaceholderMode)e.NewValue)
+            bool getValue()
             {
-                case PlaceholderMode.OnFocus:
+                switch (
+#endif
+                (PlaceholderMode)e.NewValue
+#if CS8
+            switch
+#else
+                )
+#endif
+                {
+#if !CS8
+                    case
+#endif
+                    PlaceholderMode.OnFocus
+#if CS8
+                    => 
+#else
+                    :
+                        return
+#endif
+                        !(d.GetValue(PlaceholderStyleProperty) == null || (bool)d.GetValue(IsFocusedProperty))
+#if CS8
+                        ,
+#else
+                        ;
+                    case
+#endif
+                        PlaceholderMode.OnTextChanged
+#if CS8
+                    => 
+#else
+                        :
+                        return
+#endif
+                        d.GetValue(PlaceholderStyleProperty) != null && string.IsNullOrEmpty((string)d.GetValue(TextProperty))
+#if CS8
+                        ,
+                        _ => 
+#else
+                        ;
+                }
 
-                    value = !(d.GetValue(PlaceholderStyleProperty) == null || (bool)d.GetValue(IsFocusedProperty));
-
-                    break;
-
-                case PlaceholderMode.OnTextChanged:
-
-                    value = d.GetValue(PlaceholderStyleProperty) != null && string.IsNullOrEmpty((string)d.GetValue(TextProperty));
-
-                    break;
-
-                default:
-
-                    value = false;
-
-                    break;
+                return
+#endif
+            false
+#if !CS8
+            ;
+#endif
             }
-
-            d.SetValue(IsPlaceholderVisiblePropertyKey, value);
-        }));
+#if CS8
+            )
+#else
+            d.SetValue(IsPlaceholderVisiblePropertyKey, getValue());
+        }
+#endif
+            ));
 
         public PlaceholderMode PlaceholderMode { get => (PlaceholderMode)GetValue(PlaceholderModeProperty); set => SetValue(PlaceholderModeProperty, value); }
 
@@ -1384,7 +1421,7 @@ namespace WinCopies.GUI.Controls
         public PlaceholderTextBoxViewModel(T model) : base(model) { /* Left empty. */ }
     }
 
-    public interface IPlaceholderTextBoxModel2:IPlaceholderTextBoxModel, IButtonTextBoxModel2
+    public interface IPlaceholderTextBoxModel2 : IPlaceholderTextBoxModel, IButtonTextBoxModel2
     {
         // Left empty.
     }

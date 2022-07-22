@@ -497,9 +497,21 @@ namespace WinCopies.IO
 
             string registryKeyName;
 
-            if (name.Contains(WinCopies.IO.Path.PathSeparator, out int result))
+            if (name.Contains(System.IO.Path.DirectorySeparatorChar, out int result))
             {
-                registryKeyName = name.Substring(0, result);
+                registryKeyName = name
+#if CS8
+                    [..
+#else
+                    .Substring(0,
+#endif
+                    result
+#if CS8
+                    ]
+#else
+                    )
+#endif
+                    ;
 
                 name = name.Length == 1 ? string.Empty : name
 #if CS8

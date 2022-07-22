@@ -14,6 +14,7 @@
 		<VersionSuffix>preview</VersionSuffix>
 		<AssemblyVersion>3.13.1</AssemblyVersion>
 		<FileVersion>3.13.1</FileVersion>
+		<Title>WinCopies GUI for Shell</Title>
 	</PropertyGroup>
 
 	<ItemGroup>

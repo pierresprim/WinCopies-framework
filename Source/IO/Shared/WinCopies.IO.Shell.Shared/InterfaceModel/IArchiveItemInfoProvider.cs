@@ -21,10 +21,15 @@ namespace WinCopies.IO.ObjectModel
 {
     public interface IArchiveItemInfoProvider : IFileSystemObjectInfo
     {
-        IShellObjectInfoBase ArchiveShellObject { get; }
+        IShellObjectInfoBase
+#if CS8
+            ?
+#endif
+            ArchiveShellObject
+        { get; }
     }
 
-    public interface IArchiveItemInfoProvider<out TObjectProperties, out TInnerObject, out TPredicateTypeParameter, out TSelectorDictionary, out TDictionaryItems> : IArchiveItemInfoProvider, IFileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IFileSystemObjectInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
+    public interface IArchiveItemInfoProvider<out TObjectProperties, out TInnerObject,  TPredicateTypeParameter, out TSelectorDictionary, out TDictionaryItems> : IArchiveItemInfoProvider, IFileSystemObjectInfo<TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IFileSystemObjectInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
     {
         // Left empty.
     }

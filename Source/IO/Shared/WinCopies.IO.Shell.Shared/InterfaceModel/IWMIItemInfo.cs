@@ -36,6 +36,6 @@ namespace WinCopies.IO.ObjectModel
 
     public interface IWMIItemInfo : IWMIItemInfo<IWMIItemInfoProperties, ManagementBaseObject, IEnumerableSelectorDictionary<WMIItemInfoItemProvider, IBrowsableObjectInfo>, WMIItemInfoItemProvider>
     {
-        IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<ManagementBaseObject> predicate);
+        // Left empty.
     }
 }

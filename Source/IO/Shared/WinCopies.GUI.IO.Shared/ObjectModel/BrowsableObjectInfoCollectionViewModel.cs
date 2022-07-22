@@ -1,26 +1,29 @@
-﻿//* Copyright © Pierre Sprimont, 2021
-//*
-//* This file is part of the WinCopies Framework.
-//*
-//* The WinCopies Framework is free software: you can redistribute it and/or modify
-//* it under the terms of the GNU General Public License as published by
-//* the Free Software Foundation, either version 3 of the License, or
-//* (at your option) any later version.
-//*
-//* The WinCopies Framework is distributed in the hope that it will be useful,
-//* but WITHOUT ANY WARRANTY; without even the implied warranty of
-//* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//* GNU General Public License for more details.
-//*
-//* You should have received a copy of the GNU General Public License
-//* along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
+﻿/* Copyright © Pierre Sprimont, 2021
+ *
+ * This file is part of the WinCopies Framework.
+ *
+ * The WinCopies Framework is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * The WinCopies Framework is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Windows;
 
+using WinCopies.Commands;
+using WinCopies.IO.ObjectModel;
 using WinCopies.Util;
 using WinCopies.Util.Data;
 
@@ -34,12 +37,16 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         IExplorerControlViewModel SelectedItem { get; set; }
 
+        IEnumerable TabCommands { get; }
+
         int SelectedIndex { get; set; }
 
         bool IsCheckBoxVisible { get; set; }
+
+        IBrowsableObjectInfo GetDefaultBrowsableObjectInfo();
     }
 
-    public class BrowsableObjectInfoCollectionViewModel : ViewModelBase, IBrowsableObjectInfoCollectionViewModel
+    public abstract class BrowsableObjectInfoCollectionViewModel : ViewModelBase, IBrowsableObjectInfoCollectionViewModel
     {
         private IExplorerControlViewModel _selectedItem;
         private int _selectedIndex;
@@ -51,6 +58,8 @@ namespace WinCopies.GUI.IO.ObjectModel
         public ObservableCollection<IExplorerControlViewModel> Paths => GetIfNotDisposed(_paths);
 
         public IExplorerControlViewModel SelectedItem { get => _selectedItem; set => UpdateValue(ref _selectedItem, value, nameof(SelectedItem)); }
+
+        public IEnumerable TabCommands { get; }
 
         public int SelectedIndex { get => _selectedIndex; set => UpdateValue(ref _selectedIndex, value, nameof(SelectedIndex)); }
 
@@ -66,13 +75,20 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         IList<IExplorerControlViewModel> IBrowsableObjectInfoCollectionViewModel.Paths => Paths;
 
-        private BrowsableObjectInfoCollectionViewModel(in ObservableCollection<IExplorerControlViewModel> items) => (_paths = items).CollectionChanged += Paths_CollectionChanged;
+        private BrowsableObjectInfoCollectionViewModel(ObservableCollection<IExplorerControlViewModel> items)
+        {
+            (_paths = items).CollectionChanged += Paths_CollectionChanged;
 
-        public BrowsableObjectInfoCollectionViewModel() : this(new ObservableCollection<IExplorerControlViewModel>()) { /* Left empty. */ }
+            TabCommands = new object[] { new DelegateCommand(Bool.True, obj => items.Add(BrowsableObjectInfo.GetDefaultExplorerControlViewModel(GetDefaultBrowsableObjectInfo()))) };
+        }
 
-        public BrowsableObjectInfoCollectionViewModel(in IEnumerable<IExplorerControlViewModel> items) : this(new ObservableCollection<IExplorerControlViewModel>(items)) { /* Left empty. */ }
+        protected BrowsableObjectInfoCollectionViewModel() : this(new ObservableCollection<IExplorerControlViewModel>()) { /* Left empty. */ }
 
-        public BrowsableObjectInfoCollectionViewModel(params IExplorerControlViewModel[] items) : this(items.AsEnumerable()) { /* Left empty. */ }
+        protected BrowsableObjectInfoCollectionViewModel(in IEnumerable<IExplorerControlViewModel> items) : this(new ObservableCollection<IExplorerControlViewModel>(items)) { /* Left empty. */ }
+
+        protected BrowsableObjectInfoCollectionViewModel(params IExplorerControlViewModel[] items) : this(items.AsEnumerable()) { /* Left empty. */ }
+
+        public abstract IBrowsableObjectInfo GetDefaultBrowsableObjectInfo();
 
         private bool UpdateValue<T>(ref T value, in T newValue, in string propertyName)
         {
@@ -96,7 +112,7 @@ namespace WinCopies.GUI.IO.ObjectModel
         {
             path.IsCheckBoxVisible = _checkBoxVisible;
 
-            path.OpenInNewContextCommand = new Commands.DelegateCommand<WinCopies.IO.ObjectModel.IBrowsableObjectInfo>(Bool.True, obj =>
+            path.OpenInNewContextCommand = new DelegateCommand<IBrowsableObjectInfo>(Bool.True, obj =>
             {
                 IExplorerControlViewModel _obj = SelectedItem.Factory.GetExplorerControlViewModel(SelectedItem.Factory.GetBrowsableObjectInfoViewModel(obj));
 
@@ -145,9 +161,7 @@ namespace WinCopies.GUI.IO.ObjectModel
             if (disposing)
             {
                 _selectedItem = null;
-
                 _selectedIndex = -1;
-
                 _checkBoxVisible = false;
             }
         }

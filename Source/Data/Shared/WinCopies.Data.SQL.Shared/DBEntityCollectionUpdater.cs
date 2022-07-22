@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using WinCopies.EntityFramework;
+using WinCopies.Linq;
 
 using static WinCopies.UtilHelpers;
+using static WinCopies.Collections.DotNetFix.LinkedList;
 
 namespace WinCopies.Data.SQL
 {
@@ -127,13 +130,11 @@ namespace WinCopies.Data.SQL
 #endif
             connection = Connection.GetConnection();
 
-            foreach (ISQLGetter
-#if CS8
-            ?
-#endif
-            getter in connection.GetSelect(SQLHelper.GetEnumerable(table), SQLHelper.GetEnumerable(connection.GetColumn(IdColumns.FirstValue.InnerCondition.Column.Value)), connection.GetOperator(ConditionGroupOperator.And), IdColumns).ExecuteQuery())
+            using (Collections.Generic.IDisposableEnumerable<ISQLGetter> enumerable = connection.GetSelect(GetLinkedList(table), GetLinkedList(connection.GetColumn(IdColumns.FirstValue.InnerCondition.Column.Value)), connection.GetOperator(ConditionGroupOperator.And), IdColumns).ExecuteQuery(false))
 
-                return null;
+                if (enumerable.FirstOrDefault() == null)
+
+                    return null;
 
             IInsert insert = Connection.GetInsert(table, Columns, new SQLItemCollection<SQLItemCollection<IParameter>>(Values));
 
@@ -176,10 +177,7 @@ namespace WinCopies.Data.SQL
         {
             IUpdate request = Connection.GetUpdate(table, Values);
 
-            request.ConditionGroup = new ConditionGroup(Connection.GetOperator(ConditionGroupOperator.And))
-            {
-                Conditions = IdColumns
-            };
+            request.ConditionGroup = new ConditionGroup(Connection.GetOperator(ConditionGroupOperator.And)) { Conditions = IdColumns };
 
             return request;
         }

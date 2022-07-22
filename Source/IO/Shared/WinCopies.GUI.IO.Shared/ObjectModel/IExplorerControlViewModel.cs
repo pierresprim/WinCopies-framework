@@ -55,13 +55,23 @@ namespace WinCopies.GUI.IO
 
         public interface IExplorerControlViewModel : IBrowsableObjectInfoViewModelCommon, DotNetFix.IDisposable
         {
-            System.Collections.Generic.IEnumerable<IMenuItemModel<string>> BrowsabilityPaths { get; }
+            System.Collections.Generic.IEnumerable<IMenuItemModel<string>>
+#if CS8
+                ?
+#endif
+                BrowsabilityPaths
+            { get; }
 
             ICommand BrowseToParent { get; }
 
             System.Collections.Generic.IEnumerable<IButtonModel> CommonCommands { get; }
 
-            System.Collections.Generic.IEnumerable<IMenuItemModel<string, IMenuItemModel<string>, object>> CustomProcesses { get; }
+            System.Collections.Generic.IEnumerable<IMenuItemModel<string, IMenuItemModel<string>, object>>
+#if CS8
+                ?
+#endif
+                CustomProcesses
+            { get; }
 
             IBrowsableObjectInfoFactory Factory { get; set; }
 
@@ -83,13 +93,22 @@ namespace WinCopies.GUI.IO
 
             ReadOnlyObservableCollection<IBrowsableObjectInfoViewModel> SelectedItems { get; }
 
-            System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> SelectedItemsInnerObjects { get; }
+            System.Collections.Generic.IEnumerable<IBrowsableObjectInfo>
+#if CS8
+                ?
+#endif
+                SelectedItemsInnerObjects { get; }
 
             SelectionMode SelectionMode { get; set; }
 
             string Text { get; set; }
 
-            System.Collections.Generic.IEnumerable<IBrowsableObjectInfoViewModel> TreeViewItems { get; set; }
+            System.Collections.Generic.IEnumerable<IBrowsableObjectInfoViewModel>
+#if CS8
+                ?
+#endif
+                TreeViewItems
+            { get; set; }
 
             event System.EventHandler<CustomProcessParametersGeneratedEventArgs> CustomProcessParametersGenerated;
 
@@ -97,7 +116,11 @@ namespace WinCopies.GUI.IO
 
             IButtonModel GetCommonCommand(CommonCommandsIndex index);
 
-            IProcessFactory GetProcessFactory();
+            IProcessFactory
+#if CS8
+                ?
+#endif
+                GetProcessFactory();
 
             void StartMonitoring();
 

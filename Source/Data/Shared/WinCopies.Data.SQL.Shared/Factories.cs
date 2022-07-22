@@ -119,7 +119,7 @@ namespace WinCopies.Data.SQL
                 _select.ConditionGroup = _conditionGroup;
         }
 
-        public void SetConditions(params ICondition[] conditions) => ConditionGroup.Conditions = SQLHelper.GetEnumerable(conditions);
+        public void SetConditions(params ICondition[] conditions) => ConditionGroup.Conditions = Collections.DotNetFix.LinkedList.GetLinkedList(conditions);
 
         public IEnumerable<IPopable<string, object
 #if CS8

@@ -205,24 +205,6 @@ namespace WinCopies.GUI.Shell.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Copies the name of the selected item..
-        /// </summary>
-        public static string CopyNameStatusBarLabel {
-            get {
-                return ResourceManager.GetString("CopyNameStatusBarLabel", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Copies the path of the selected item..
-        /// </summary>
-        public static string CopyPathStatusBarLabel {
-            get {
-                return ResourceManager.GetString("CopyPathStatusBarLabel", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Copies the selected items to the Clipboard..
         /// </summary>
         public static string CopyStatusBarLabel {
@@ -349,24 +331,6 @@ namespace WinCopies.GUI.Shell.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to New registry tab.
-        /// </summary>
-        public static string NewRegistryTab {
-            get {
-                return ResourceManager.GetString("NewRegistryTab", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Opens a new tab for Registry browsing..
-        /// </summary>
-        public static string NewRegistryTabStatusBarLabel {
-            get {
-                return ResourceManager.GetString("NewRegistryTabStatusBarLabel", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to _New tab.
         /// </summary>
         public static string NewTab {
@@ -403,24 +367,6 @@ namespace WinCopies.GUI.Shell.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to New WMI tab.
-        /// </summary>
-        public static string NewWMITab {
-            get {
-                return ResourceManager.GetString("NewWMITab", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Opens a new tab for WMI browsing..
-        /// </summary>
-        public static string NewWMITabStatusBarLabel {
-            get {
-                return ResourceManager.GetString("NewWMITabStatusBarLabel", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Open.
         /// </summary>
         public static string OpenFile {
@@ -439,15 +385,6 @@ namespace WinCopies.GUI.Shell.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Opens the selected item in a new tab..
-        /// </summary>
-        public static string OpenInNewTabStatusBarLabel {
-            get {
-                return ResourceManager.GetString("OpenInNewTabStatusBarLabel", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Open in new window.
         /// </summary>
         public static string OpenInNewWindow {
@@ -457,29 +394,11 @@ namespace WinCopies.GUI.Shell.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Opens the selected item in a new window..
-        /// </summary>
-        public static string OpenInNewWindowStatusBarLabel {
-            get {
-                return ResourceManager.GetString("OpenInNewWindowStatusBarLabel", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Open selected items.
         /// </summary>
         public static string OpenOrLaunch {
             get {
                 return ResourceManager.GetString("OpenOrLaunch", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Opens the selected items..
-        /// </summary>
-        public static string OpenOrLaunchStatusBarLabel {
-            get {
-                return ResourceManager.GetString("OpenOrLaunchStatusBarLabel", resourceCulture);
             }
         }
         
@@ -507,24 +426,6 @@ namespace WinCopies.GUI.Shell.Properties {
         public static string PreserveDirectoryStructure {
             get {
                 return ResourceManager.GetString("PreserveDirectoryStructure", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to _Quit.
-        /// </summary>
-        public static string Quit {
-            get {
-                return ResourceManager.GetString("Quit", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Closes all windows of the current process..
-        /// </summary>
-        public static string QuitStatusBarLabel {
-            get {
-                return ResourceManager.GetString("QuitStatusBarLabel", resourceCulture);
             }
         }
         
@@ -561,33 +462,6 @@ namespace WinCopies.GUI.Shell.Properties {
         public static string SelectFolder {
             get {
                 return ResourceManager.GetString("SelectFolder", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Submit a _bug....
-        /// </summary>
-        public static string SubmitABug {
-            get {
-                return ResourceManager.GetString("SubmitABug", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Opens your default browser at the WinCopies&apos; GitHub page..
-        /// </summary>
-        public static string SubmitABugStatusBarLabel {
-            get {
-                return ResourceManager.GetString("SubmitABugStatusBarLabel", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to You have multiple tabs open. Are you sure you want to close the window?.
-        /// </summary>
-        public static string WindowClosingMessage {
-            get {
-                return ResourceManager.GetString("WindowClosingMessage", resourceCulture);
             }
         }
     }

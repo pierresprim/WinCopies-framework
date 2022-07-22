@@ -29,8 +29,6 @@ namespace WinCopies.GUI.Controls
 
         public bool RecognizesAccessKey { get => (bool)GetValue(RecognizesAccessKeyProperty); set => SetValue(RecognizesAccessKeyProperty, value); }
 
-
-
-        static Label() => DefaultStyleKeyProperty.OverrideFrameworkPropertyMetadata<Label>();
+        static Label() => DefaultStyleKeyProperty.OverrideDefaultStyleKey<Label>();
     }
 }

@@ -15,10 +15,20 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+using System.Windows;
+
 namespace WinCopies.GUI.Controls
 {
     public class TabControl : System.Windows.Controls.TabControl
     {
+        private static DependencyProperty Register<T>(in string propertyName) => Util.Desktop.UtilHelpers.Register<T, TabControl>(propertyName);
 
+        public static readonly DependencyProperty LeftItemsProperty = Register<Style>(nameof(LeftItems));
+
+        public Style LeftItems { get => (Style)GetValue(LeftItemsProperty); set => SetValue(LeftItemsProperty, value); }
+
+        public static readonly DependencyProperty RightItemsProperty = Register<Style>(nameof(RightItems));
+
+        public Style RightItems { get => (Style)GetValue(LeftItemsProperty); set => SetValue(LeftItemsProperty, value); }
     }
 }

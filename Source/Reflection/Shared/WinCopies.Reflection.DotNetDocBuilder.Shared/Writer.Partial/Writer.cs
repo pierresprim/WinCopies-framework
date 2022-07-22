@@ -293,6 +293,8 @@ namespace WinCopies.Reflection.DotNetDocBuilder
         public static void Main(ConnectionConstructor connectionConstructor) => Main(() => UpdateLocally(connectionConstructor));
 #endif
 
+        public bool IsTypeValid(in System.Type type) => ValidPackages.Contains(type.Assembly.GetName().Name);
+
         protected ISQLConnection GetConnection() => Connection.GetConnection();
 
         protected DBEntityCollection<T> GetCollection<T>() where T : IEntity => new
@@ -631,6 +633,13 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
                 type = typeTmp;
             }
+        }
+
+        public void UpdateType(in System.Type dotNetType, Type type, in DBEntityCollection<Type> tColl, in DBEntityCollection<AccessModifier> amColl, in DBEntityCollection<Namespace> nColl, in DBEntityCollection<TypeType> ttColl, in DBEntityCollection<Class> cColl)
+        {
+            UpdateParentType(dotNetType,type, tColl, amColl, nColl, ttColl, cColl);
+
+            UpdateNamespace(type, dotNetType.Namespace);
         }
 
         public string GetWholePath(string wholeNamespace) => Path.Combine(RootPath, wholeNamespace.Replace('.', '\\'));

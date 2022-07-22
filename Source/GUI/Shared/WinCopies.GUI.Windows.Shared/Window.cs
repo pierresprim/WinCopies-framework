@@ -60,7 +60,7 @@ namespace WinCopies.GUI.Windows
 
         private static DependencyPropertyKey RegisterReadOnly<T>(in string propertyName, in PropertyMetadata propertyMetadata) => RegisterReadOnly<T, Window>(propertyName, propertyMetadata);
 
-        private static RoutedEvent RegisterRoutedEvent<T>(in string eventName, in RoutingStrategy routingStrategy) => RegisterRoutedEvent<T, Window>(eventName, routingStrategy);
+        private static RoutedEvent Register<T>(in string eventName, in RoutingStrategy routingStrategy) => Register<T, Window>(eventName, routingStrategy);
 
         public static readonly DependencyProperty CloseButtonProperty = Register<bool>(nameof(CloseButton), new PropertyMetadata(true, (DependencyObject d, DependencyPropertyChangedEventArgs e) => _ = (bool)e.NewValue ? EnableCloseMenuItem((Window)d) : DisableCloseMenuItem((Window)d)));
 
@@ -98,7 +98,7 @@ namespace WinCopies.GUI.Windows
         /// <summary>
         /// Identifies the <see cref="HelpButtonClick"/> routed event.
         /// </summary>
-        public static readonly RoutedEvent HelpButtonClickEvent = RegisterRoutedEvent<RoutedEventHandler>(nameof(HelpButtonClick), RoutingStrategy.Bubble);
+        public static readonly RoutedEvent HelpButtonClickEvent = Register<RoutedEventHandler>(nameof(HelpButtonClick), RoutingStrategy.Bubble);
 
         public event RoutedEventHandler HelpButtonClick
         {

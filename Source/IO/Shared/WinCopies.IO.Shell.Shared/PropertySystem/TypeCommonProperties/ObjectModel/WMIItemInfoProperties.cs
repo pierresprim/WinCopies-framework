@@ -77,7 +77,12 @@ namespace WinCopies.IO.PropertySystem
 
         bool IsRootNode { get; }
 
-        IWMIItemInfoOptions Options { get; }
+        IWMIItemInfoOptions
+#if CS8
+                ?
+#endif
+                Options
+        { get; }
     }
 
     public class WMIItemInfoProperties : BrowsableObjectInfoProperties<IWMIItemInfoBase>, IWMIItemInfoProperties
@@ -86,9 +91,18 @@ namespace WinCopies.IO.PropertySystem
 
         public bool IsRootNode { get; }
 
-        public IWMIItemInfoOptions Options { get; }
+        public IWMIItemInfoOptions
+#if CS8
+                ?
+#endif
+                Options
+        { get; }
 
-        public WMIItemInfoProperties(in IWMIItemInfoBase browsableObjectInfo, in WMIItemType itemType, in bool isRootNode, in IWMIItemInfoOptions options) : base(browsableObjectInfo)
+        public WMIItemInfoProperties(in IWMIItemInfoBase browsableObjectInfo, in WMIItemType itemType, in bool isRootNode, in IWMIItemInfoOptions
+#if CS8
+                ?
+#endif
+                options) : base(browsableObjectInfo)
         {
             ItemType = itemType;
 

@@ -17,6 +17,7 @@
 
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -25,7 +26,6 @@ using WinCopies.Collections.Generic;
 using WinCopies.GUI.IO.ObjectModel;
 using WinCopies.IO.ObjectModel;
 using WinCopies.IO.Process;
-using WinCopies.Linq;
 
 namespace WinCopies.GUI.IO.Controls
 {
@@ -65,7 +65,7 @@ namespace WinCopies.GUI.IO.Controls
 
         //public ViewStyle ViewStyle { get => (ViewStyle)GetValue(ViewStyleProperty); set => SetValue(ViewStyleProperty, value); }
 
-        public static readonly RoutedEvent DroppedEvent = Util.Desktop.UtilHelpers.RegisterRoutedEvent<RoutedEventHandler<DroppedEventArgs>, ExplorerControlListView>(nameof(Dropped), RoutingStrategy.Bubble);
+        public static readonly RoutedEvent DroppedEvent = Util.Desktop.UtilHelpers.Register<RoutedEventHandler<DroppedEventArgs>, ExplorerControlListView>(nameof(Dropped), RoutingStrategy.Bubble);
 
         public event RoutedEventHandler<DroppedEventArgs> Dropped
         {
@@ -92,13 +92,16 @@ namespace WinCopies.GUI.IO.Controls
             RaiseEvent(new ExplorerControlListViewContextMenuRequestedEventArgs(e) );
         }*/
 
-        public IDragDropProcessInfo GetDragDropProcessInfo() => ((IExplorerControlViewModel)DataContext).Path.ProcessFactory?.DragDrop;
+        public IDragDropProcessInfo
+#if CS8
+            ?
+#endif
+            GetDragDropProcessInfo() => ((IItemSourceViewModel)DataContext)?.ProcessSettings?.ProcessFactory?.DragDrop;
 
         protected virtual DataObject GetDragDropData(IDragDropProcessInfo dragDropProcessInfo)
         {
             DataObject data = new DataObject();
-
-            IDictionary<string, object> result = dragDropProcessInfo.TryGetData(GetSelectedPaths(), out DragDropEffects dragDropEffects);
+            IDictionary<string, object> result = dragDropProcessInfo.TryGetData(GetSelectedPaths(), out _);
 
             if (result.Count == 1 && result.ContainsKey(DataFormats.FileDrop))
             {
@@ -111,7 +114,7 @@ namespace WinCopies.GUI.IO.Controls
                     return data;
                 }
 
-                else if (obj is System.Collections.Generic.IEnumerable<string> paths)
+                else if (obj is IEnumerable<string> paths)
                 {
                     data.SetFileDropList(WinCopies.IO.Path.GetStringCollection(paths));
 
@@ -126,7 +129,7 @@ namespace WinCopies.GUI.IO.Controls
             return data;
         }
 
-        protected System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetSelectedPaths() => SelectedItems.To<IBrowsableObjectInfo>();
+        protected IEnumerable<IBrowsableObjectInfo> GetSelectedPaths() => SelectedItems.Cast<IBrowsableObjectInfo>();
 
         protected override void OnMouseMove(MouseEventArgs e)
         {

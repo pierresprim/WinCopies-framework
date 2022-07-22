@@ -21,6 +21,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Drawing;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -28,7 +29,8 @@ using System.Windows.Input;
 
 using WinCopies.Commands;
 using WinCopies.GUI.Controls.Models;
-using WinCopies.Linq;
+
+using static System.Windows.RoutingStrategy;
 
 using static WinCopies.Commands.TextCommands;
 using static WinCopies.GUI.Controls.ButtonTextBoxModel;
@@ -81,13 +83,17 @@ namespace WinCopies.GUI.Controls
     {
         public class TextBox : System.Windows.Controls.TextBox
         {
-            private static RoutedEvent Register<T>(in string eventName, in RoutingStrategy routingStrategy) => Util.Desktop.UtilHelpers.RegisterRoutedEvent<RoutedEventHandler, TextBox>(eventName, routingStrategy);
+            private static RoutedEvent Register<T>(in string eventName, in RoutingStrategy routingStrategy) => Util.Desktop.UtilHelpers.Register<RoutedEventHandler, TextBox>(eventName, routingStrategy);
 
-            public static readonly RoutedEvent TripleClickEvent = Register<RoutedEventHandler>(nameof(TripleClick), RoutingStrategy.Bubble);
+            public static DependencyProperty CaretIndexProperty = Util.Desktop.UtilHelpers.Register<int, TextBox>(nameof(CaretIndex), new PropertyMetadata(0, (DependencyObject d, DependencyPropertyChangedEventArgs e) => ((System.Windows.Controls.TextBox)d).CaretIndex = (int)e.NewValue));
+
+            public new int CaretIndex { get => (int)GetValue(CaretIndexProperty); set => SetValue(CaretIndexProperty, value); }
+
+            public static readonly RoutedEvent TripleClickEvent = Register<RoutedEventHandler>(nameof(TripleClick), Bubble);
 
             public event RoutedEventHandler TripleClick { add => AddHandler(TripleClickEvent, value); remove => RemoveHandler(TripleClickEvent, value); }
 
-            public static readonly RoutedEvent PreviewTripleClickEvent = Register<RoutedEventHandler>(nameof(PreviewTripleClick), RoutingStrategy.Tunnel);
+            public static readonly RoutedEvent PreviewTripleClickEvent = Register<RoutedEventHandler>(nameof(PreviewTripleClick), Tunnel);
 
             public event RoutedEventHandler PreviewTripleClick { add => AddHandler(PreviewTripleClickEvent, value); remove => RemoveHandler(PreviewTripleClickEvent, value); }
 
@@ -101,25 +107,23 @@ namespace WinCopies.GUI.Controls
 
             protected virtual void RegisterCommandBindings()
             {
-                Action<ExecutedRoutedEventArgs> getAction(Action action) => e => OnExecuteCommand(action, e);
-
-                Action<ExecutedRoutedEventArgs> getActionGeneric<T>(Func<T> action) => e => OnExecuteCommand(() => action(), e);
-
                 void setPredicateValue(in CanExecuteRoutedEventArgs e, in bool value) => e.CanExecute = value;
 
                 void predicate(CanExecuteRoutedEventArgs e) => setPredicateValue(e, true);
 
-                Action<CanExecuteRoutedEventArgs> getPredicate(bool value) => e => setPredicateValue(e, value);
+                void setAction(in ICommand command, Action action) => AddCommandBinding(command, e => OnExecuteCommand(action, e), predicate);
 
-                AddCommandBinding(SystemApplicationCommands.Undo, getActionGeneric(Undo), getPredicate(CanUndo));
-                AddCommandBinding(SystemApplicationCommands.Undo, getActionGeneric(Redo), getPredicate(CanRedo));
+                void setActionGeneric<T>(in ICommand command, Func<T> action, Func<bool> func) => AddCommandBinding(command, e => OnExecuteCommand(() => action(), e), e => setPredicateValue(e, func()));
 
-                AddCommandBinding(SystemApplicationCommands.Copy, getAction(Copy), predicate);
-                AddCommandBinding(SystemApplicationCommands.Cut, getAction(Cut), predicate);
-                AddCommandBinding(SystemApplicationCommands.Paste, getAction(Paste), predicate);
-                AddCommandBinding(SystemApplicationCommands.Delete, getAction(Delete), predicate);
+                setActionGeneric(SystemApplicationCommands.Undo, Undo, () => CanUndo);
+                setActionGeneric(SystemApplicationCommands.Redo, Redo, () => CanRedo);
 
-                AddCommandBinding(SystemApplicationCommands.SelectAll, getAction(SelectAll), predicate);
+                setAction(SystemApplicationCommands.Copy, Copy);
+                setAction(SystemApplicationCommands.Cut, Cut);
+                setAction(SystemApplicationCommands.Paste, Paste);
+                setAction(SystemApplicationCommands.Delete, Delete);
+
+                setAction(SystemApplicationCommands.SelectAll, SelectAll);
 
                 AddCaseCommandBinding(Upper, OnUpperCommandExecuted);
                 AddCaseCommandBinding(Lower, OnLowerCommandExecuted);
@@ -361,21 +365,21 @@ namespace WinCopies.GUI.Controls
             {
                 case NotifyCollectionChangedAction.Add:
 
-                    OnButtonsAdded(e.NewItems.To<IButtonModel>());
+                    OnButtonsAdded(e.NewItems.Cast<IButtonModel>());
 
                     break;
 
                 case NotifyCollectionChangedAction.Replace:
 
-                    OnButtonsRemoved(e.OldItems.To<IButtonModel>());
+                    OnButtonsRemoved(e.OldItems.Cast<IButtonModel>());
 
-                    OnButtonsAdded(e.NewItems.To<IButtonModel>());
+                    OnButtonsAdded(e.NewItems.Cast<IButtonModel>());
 
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
 
-                    OnButtonsRemoved(e.OldItems.To<IButtonModel>());
+                    OnButtonsRemoved(e.OldItems.Cast<IButtonModel>());
 
                     break;
             }

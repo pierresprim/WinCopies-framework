@@ -10,6 +10,8 @@ using WinCopies.Util.Data;
 
 using static WinCopies.ThrowHelper;
 
+using EventArgs = System.EventArgs;
+
 namespace WinCopies.GUI.Windows
 {
     public enum XButton : sbyte
