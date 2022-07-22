@@ -15,16 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+using System.Diagnostics.CodeAnalysis;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 
 namespace WinCopies.GUI.Windows
 {
-    /// <summary>
-    /// Interaction logic for InputBox.xaml
-    /// </summary>
-    public partial class InputBox : DialogWindow
+    public class InputBox : DialogWindow
     {
         /// <summary>
         /// Identifies the <see cref="Orientation"/> dependency property.
@@ -54,14 +52,35 @@ namespace WinCopies.GUI.Windows
         /// <summary>
         /// Gets or sets the placeholder for the text box. This is a dependency property.
         /// </summary>
-        public string Placeholder { get => (string)GetValue(PlaceholderProperty); set => SetValue(PlaceholderProperty, value); }
+        public string
+#if CS8
+                ?
+#endif
+                Placeholder
+        { get => (string)GetValue(PlaceholderProperty); set => SetValue(PlaceholderProperty, value); }
 
         static InputBox() =>
             // DefaultStyleKeyProperty.OverrideMetadata(typeof(DialogWindow), new FrameworkPropertyMetadata(typeof(DialogWindow)));
 
             DefaultStyleKeyProperty.OverrideMetadata(typeof(InputBox), new FrameworkPropertyMetadata(typeof(InputBox))); // InputBox.StyleProperty.OverrideMetadata(typeof(InputBox), new FrameworkPropertyMetadata((Style) Application.Current. Resources["abcd"]));
 
-        public static bool? ShowDialog(in string title, in DialogButton? dialogButton, in object content, in string text, in string placeholder, out string result, in BitmapSource icon = null)
+        public static bool? ShowDialog(in string title, in DialogButton? dialogButton, in object content, in string
+#if CS8
+            ?
+#endif
+            text, in string
+#if CS8
+            ?
+#endif
+            placeholder,
+#if CS8
+            [MaybeNullWhen(false)][NotNullWhen(true)]
+#endif
+            out string result, in BitmapSource
+#if CS8
+            ?
+#endif
+            icon = null)
         {
             var dialog = new InputBox() { Title = title, DialogButton = dialogButton, Content = content, Text = text, Placeholder = placeholder, Icon = icon };
 

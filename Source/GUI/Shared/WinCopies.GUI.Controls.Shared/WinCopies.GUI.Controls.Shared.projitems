@@ -10,8 +10,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AssemblyInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\ComboListBox.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\CommandableTextBox.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\DockControl.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\FontPicker.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\GroupedItemsControl.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\HeaderedControl.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\Label.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\Link.cs" />
@@ -20,11 +23,13 @@
     <Compile Include="$(MSBuildThisFileDirectory)Controls\ListViewItem.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\NavigationButton.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\PlaceholderTextBox.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\Progress.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\PropertySystem\ArrayPropertyViewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\PropertySystem\CheckBoxProperty.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\PropertySystem\PropertyConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\PropertySystem\PropertyViewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\PropertySystem\TextBoxProperty.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\RichTextBox.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\Switch.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\TabControl.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\TextBox.cs" />

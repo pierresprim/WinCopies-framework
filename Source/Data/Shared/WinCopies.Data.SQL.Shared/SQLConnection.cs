@@ -1,18 +1,23 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data.Common;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
 using WinCopies.EntityFramework;
+using WinCopies.Linq;
 using WinCopies.Util;
 
 using static WinCopies.Data.SQL.SQLConstants;
+using static WinCopies.Data.SQL.SQLItemCollection;
 
 namespace WinCopies.Data.SQL
 {
-    public struct SelectParameters<T> : ISelectParameters<T> where T : ISQLColumn
+    /*public struct SelectParameters<T> : ISelectParameters<T> where T : ISQLColumn
     {
         public Collections.Generic.IExtensibleEnumerable<string>
 #if CS8
@@ -38,71 +43,103 @@ namespace WinCopies.Data.SQL
 #if !CS8
         IEnumerable<SQLColumn> ISQLColumnRequest.Columns => Columns?.Select(column => column.ToSQLColumn());
 #endif
-    }
+    }*/
 
-    public abstract class SQLColumnInfo : ISQLColumnInfo
+    public abstract class SQLColumnInfo<TConnection, TTable> : SQLItem<TConnection, TTable>, ISQLColumnInfo<TConnection> where TConnection : ISQLConnection where TTable : ISQLTable<TConnection>
     {
-        public string Name { get; set; }
+        public ISQLTable Table => Parent;
 
-        public ISQLColumnType ColumnType { get; set; }
+        public ISQLColumnType ColumnType { get; }
 
-        public bool AllowNull { get; set; }
+        public abstract bool AllowNull { get; }
 
-        public object
+        public abstract object
 #if CS8
             ?
 #endif
             Default
-        { get; set; }
+        { get; }
 
-        public bool AutoIncrement { get; set; }
+        public abstract bool AutoIncrement { get; }
 
-        public bool IsPrimaryKey { get; set; }
+        public abstract bool IsPrimaryKey { get; }
 
-        // public ISQLForeignKey ForeignKey { get; set; }
+        public abstract string
+#if CS8
+            ?
+#endif
+            Collation
+        { get; }
+
+        // public ISQLForeignKey ForeignKey { get; }
+
+        protected SQLColumnInfo(in TTable table, in string name) : base(table, name) { /* Left empty. */ }
 
         public abstract string GetSQL();
+
+        public abstract ISelect GetProperties();
     }
 
-    public abstract class SQLUnicityIndex
+    /*public abstract class SQLUnicityIndex
     {
-        public string Name { get; set; }
+        public string Name { get; }
     }
 
     public abstract class SQLUnicityIndex2 : SQLUnicityIndex, IUnicityIndex
     {
-        public IEnumerable<string> Columns { get; set; }
+        public IEnumerable<string> Columns { get; }
 
         public abstract string GetSQL();
 
         protected IEnumerator<string> GetEnumerator() => Columns.GetEnumerator();
         IEnumerator<string> IEnumerable<string>.GetEnumerator() => GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    }*/
+
+    public abstract class SQLTable<TConnection, TDatabase> : SQLItem<TConnection, TDatabase> where TConnection : ISQLConnection where TDatabase : ISQLDatabase<TConnection>
+    {
+        public abstract string Engine { get; }
+
+        public abstract string
+#if CS8
+            ?
+#endif
+            Collation
+        { get; }
+
+        public abstract ulong AutoIncrement { get; }
+
+        protected SQLTable(in TDatabase database, in string name) : base(database, name) { /* Left empty. */ }
+
+        //public abstract IEnumerable<IUnicityIndex> UnicityKeys { get; }
     }
 
-    public abstract class SQLTable
+    public abstract class SQLTable2<TConnection, TDatabase> : SQLTable<TConnection, TDatabase>, ISQLTable where TConnection : ISQLConnection where TDatabase : ISQLDatabase<TConnection>
     {
-        public string Name { get; set; }
+        ISQLDatabase ISQLTable.Database => Parent;
 
-        public string Engine { get; set; }
+        public SQLTable2(in TDatabase database, in string name) : base(database, name) { /* Left empty. */ }
 
-        public string CharacterSet { get; set; }
+        public abstract ISelect GetProperties();
 
-        public ulong AutoIncrement { get; set; }
-
-        public IEnumerable<IUnicityIndex> UnicityKeys { get; set; }
-    }
-
-    public abstract class SQLTable2 : SQLTable, ISQLTable
-    {
-        public IEnumerable<ISQLColumnInfo> Columns { get; set; }
-
-        public abstract string GetCreateTableSQL(bool ifNotExists);
+        public abstract string GetCreateTableSQL(bool ifNotExists, string characterSet);
 
         public abstract string GetRemoveTableSQL(bool ifExists);
 
-        protected IEnumerator<ISQLColumnInfo> GetEnumerator() => Columns.GetEnumerator();
-        IEnumerator<ISQLColumnInfo> IEnumerable<ISQLColumnInfo>.GetEnumerator() => GetEnumerator();
+        public abstract IDatabaseSelect GetColumns();
+
+        public abstract IEnumerable<ISQLColumnInfo> AsEnumerable();
+    }
+
+    public abstract class SQLTable<TConnection, TDatabase, TColumn> : SQLTable2<TConnection, TDatabase>, ISQLTable<TConnection, TDatabase, TColumn> where TConnection : ISQLConnection where TDatabase : ISQLDatabase<TConnection> where TColumn : ISQLColumnInfo
+    {
+        protected SQLTable(in TDatabase database, in string name) : base(database, name) { /* Left empty. */ }
+
+        protected abstract TColumn GetColumn(string columnName);
+
+        public IEnumerable<TColumn> GetEnumerable() => GetColumns().ExecuteQuery(true).Select(GetColumn);
+
+        public IEnumerator<TColumn> GetEnumerator() => GetEnumerable().GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 
@@ -113,9 +150,141 @@ namespace WinCopies.Data.SQL
         public const string IS = nameof(IS);
     }
 
+    public readonly
+#if CS10
+        record
+#endif
+        struct SQLConnectionParametersStruct
+#if CS10
+        (
+#else
+    {
+        public
+#endif
+        string ServerName
+#if CS10
+        ,
+#else
+        {
+            get;
+#if CS9
+            init;
+#endif
+        }
+
+        public
+#endif
+        string UserName
+#if CS10
+        ,
+#else
+        {
+            get;
+#if CS9
+            init;
+#endif
+        }
+
+        public
+#endif
+        NetworkCredential Credential
+#if CS10
+        ,
+#else
+        {
+            get;
+#if CS9
+            init;
+#endif
+        }
+
+        public
+#endif
+        string
+#if CS8
+            ?
+#endif
+            DBName
+#if CS10
+        = null,
+#else
+        {
+            get;
+#if CS9
+            init;
+#endif
+        }
+
+        public
+#endif
+        Dictionary<string, string>
+#if CS8
+            ?
+#endif
+            Parameters
+#if CS10
+        = null);
+#else
+        {
+            get;
+#if CS9
+            init;
+#endif
+#if !CS10
+        }
+
+        public SQLConnectionParametersStruct(in string serverName, in string userName, in NetworkCredential credential, in string
+#if CS8
+            ?
+#endif
+            dbName = null, in Dictionary<string, string>
+#if CS8
+            ?
+#endif
+            parameters = null)
+        {
+            ServerName = serverName;
+
+            UserName = userName;
+
+            Credential = credential;
+
+            DBName = dbName;
+
+            Parameters = parameters;
+#endif
+        }
+    }
+#endif
+
+    public interface ISQLConnectionParameters<T>
+    {
+        SQLConnectionParametersStruct Parameters { get; }
+
+        T GetConnection(string dbName);
+    }
+
+    public abstract class SQLConnectionParameters<T> : ISQLConnectionParameters<T>
+    {
+        public SQLConnectionParametersStruct Parameters { get; }
+
+        public SQLConnectionParameters(in SQLConnectionParametersStruct parameters) => Parameters = parameters;
+
+        public abstract T GetConnection(string
+#if CS8
+            ?
+#endif
+            dbName);
+    }
+
     public abstract class SQLConnection : ISQLConnection
     {
+        #region Properties
         #region Common Properties
+        public abstract string ServerName { get; }
+
+        public abstract string UserName { get; }
+
         public abstract bool IsClosed { get; }
 
         public abstract string EqualityOperator { get; }
@@ -126,12 +295,12 @@ namespace WinCopies.Data.SQL
 
         public abstract string ColumnDecorator { get; }
 
-        public string
+        public abstract string
 #if CS8
             ?
 #endif
             DBName
-        { get; private set; }
+        { get; }
 
         public bool IsDisposed { get; private set; }
         #endregion Common Properties
@@ -146,17 +315,31 @@ namespace WinCopies.Data.SQL
         public abstract bool CanDelete { get; }
         #endregion Granted Actions
 
+        public abstract string Normalization { get; }
+        #endregion Properties
+
+        public event EventHandler<ISQLConnection> Opened;
+        public event EventHandler<ISQLConnection> Closed;
+
         public SQLConnection() { /* Left empty. */ }
 
-        public SQLConnection(in string dbName) => _ = UseDB(dbName);
+        public SQLConnection(in string
+#if CS8
+            ?
+#endif
+            dbName)
+        {
+            if (dbName == null)
 
+                return;
+
+            _ = UseDB(dbName);
+        }
+
+        #region Methods
         #region Misc
         public ISQLConnection GetConnection(bool autoDispose = true)
         {
-            if (DBName == null)
-
-                throw new InvalidOperationException("No DB open.");
-
             ISQLConnection
 #if CS8
             ?
@@ -165,7 +348,9 @@ namespace WinCopies.Data.SQL
 
             connection.Open();
 
-            _ = connection.UseDB(DBName);
+            if (!UtilHelpers.IsNullEmptyOrWhiteSpace(DBName))
+
+                _ = connection.UseDB(DBName);
 
             return connection;
         }
@@ -173,20 +358,14 @@ namespace WinCopies.Data.SQL
         #region UseDB
         protected abstract uint? UseDBOverride(string dbName);
 
-        public uint? UseDB(string dbName)
-        {
-            uint? result = UseDBOverride(dbName);
-
-            if (result.HasValue)
-            {
-                DBName = dbName;
-
-                return result.Value;
-            }
-
-            return 0;
-        }
+        public uint? UseDB(string dbName) => UseDBOverride(dbName) ??
+#if !CS9
+            (uint?)
+#endif
+            0;
         #endregion UseDB
+
+        private void TryInvokeEvent(in EventHandler<ISQLConnection> eventHandler) => eventHandler?.Invoke(this, EventArgs.Empty);
 
         public abstract ISQLConnection Clone(bool autoDispose = true);
 
@@ -196,11 +375,47 @@ namespace WinCopies.Data.SQL
         #endregion
 
         #region Open
-        public abstract bool Open();
+        protected abstract bool OpenOverride();
 
-        public abstract Task OpenAsync();
+        public bool Open()
+        {
+            if (OpenOverride())
+            {
+                TryInvokeEvent(Opened);
 
-        public abstract Task OpenAsync(CancellationToken cancellationToken);
+                return true;
+            }
+
+            return false;
+        }
+
+        protected abstract Task<bool> OpenAsyncOverride();
+
+        public async Task<bool> OpenAsync()
+        {
+            if (await OpenAsyncOverride())
+            {
+                TryInvokeEvent(Opened);
+
+                return true;
+            }
+
+            return false;
+        }
+
+        protected abstract Task<bool> OpenAsyncOverride(CancellationToken cancellationToken);
+
+        public async Task<bool> OpenAsync(CancellationToken cancellationToken)
+        {
+            if (await OpenAsyncOverride(cancellationToken))
+            {
+                TryInvokeEvent(Opened);
+
+                return true;
+            }
+
+            return false;
+        }
         #endregion Open
 
         #region Transaction
@@ -238,12 +453,12 @@ namespace WinCopies.Data.SQL
         #endregion Transaction
 
         #region Table
-        public uint? CreateTable(ISQLTable table, bool ifNotExists) => ExecuteNonQuery(table.GetCreateTableSQL(ifNotExists));
+        public uint? CreateTable(ISQLTable table, bool ifNotExists, string characterSet) => ExecuteNonQuery(table.GetCreateTableSQL(ifNotExists, characterSet));
 
         public uint? RemoveTable(ISQLTable table, bool ifExists) => ExecuteNonQuery(table.GetRemoveTableSQL(ifExists));
 
         #region UpdateTable
-        public uint? UpdateTable(ISQLTable table, TableDropping dropping, bool ifNotExists)
+        public uint? UpdateTable(ISQLTable table, TableDropping dropping, bool ifNotExists, string characterSet)
         {
             bool removeTable(in bool ifExists) => RemoveTable(table, ifExists).HasValue;
 
@@ -269,13 +484,13 @@ namespace WinCopies.Data.SQL
                     =>
 #else
                     :
-                    return
+                        return
 #endif
-                    removeTable(false)
+                        removeTable(false)
 #if CS8
                     ,
 #else
-                    ;
+                        ;
                     case
 #endif
                     TableDropping.DropIfExists
@@ -283,14 +498,14 @@ namespace WinCopies.Data.SQL
                     =>
 #else
                     :
-                    return
+                        return
 #endif
-                    removeTable(true)
+                        removeTable(true)
 #if CS8
                     ,
                     _ =>
 #else
-                    ;
+                        ;
                 }
 
                 return
@@ -303,16 +518,16 @@ namespace WinCopies.Data.SQL
             }
 #endif
 
-            return process() ? CreateTable(table, ifNotExists) : null;
+            return process() ? CreateTable(table, ifNotExists, characterSet) : null;
         }
 
-        public uint? UpdateTable(ISQLTable table, TableDropping dropping, bool ifNotExists, out bool reset) => PerformTransaction(out reset, () => UpdateTable(table, dropping, ifNotExists));
+        public uint? UpdateTable(ISQLTable table, TableDropping dropping, bool ifNotExists, string characterSet, out bool reset) => PerformTransaction(out reset, () => UpdateTable(table, dropping, ifNotExists, characterSet));
         #endregion UpdateTable
         #endregion Table
 
         #region DB
         #region AlterDB
-        public uint? AlterDB(ISQLDatabase database, TableDropping dropping, bool ifNotExists, out ISQLTable
+        public uint? AlterDB(ISQLDatabase database, TableDropping dropping, bool ifNotExists, string characterSet, out ISQLTable
 #if CS8
             ?
 #endif
@@ -321,9 +536,9 @@ namespace WinCopies.Data.SQL
             uint? tmp;
             uint result = 0;
 
-            foreach (ISQLTable table in database)
+            foreach (ISQLTable table in database.AsEnumerable())
 
-                if ((tmp = UpdateTable(table, dropping, ifNotExists)).HasValue)
+                if ((tmp = UpdateTable(table, dropping, ifNotExists, characterSet)).HasValue)
 
                     result += tmp.Value;
 
@@ -339,7 +554,7 @@ namespace WinCopies.Data.SQL
             return result;
         }
 
-        public uint? AlterDBTransacted(ISQLDatabase database, TableDropping dropping, bool ifNotExists, out ISQLTable
+        public uint? AlterDBTransacted(ISQLDatabase database, TableDropping dropping, bool ifNotExists, string characterSet, out ISQLTable
 #if CS8
             ?
 #endif
@@ -351,7 +566,7 @@ namespace WinCopies.Data.SQL
 #endif
             _errorTable = null;
 
-            uint? result = PerformTransaction(out _, () => AlterDB(database, dropping, ifNotExists, out _errorTable));
+            uint? result = PerformTransaction(out _, () => AlterDB(database, dropping, ifNotExists, characterSet, out _errorTable));
 
             errorTable = _errorTable;
 
@@ -364,7 +579,7 @@ namespace WinCopies.Data.SQL
 
         public uint? CreateDB(ISQLDatabase database, bool ifNotExists) => ExecuteNonQuery(GetCreateDBSQL(database, ifNotExists));
 
-        public uint? CreateDB(ISQLDatabase database, TableDropping dropping, bool ifNotExists, out bool reset) => PerformTransaction(out reset, () => CreateDB(database, ifNotExists), () => AlterDB(database, dropping, ifNotExists, out _));
+        public uint? CreateDB(ISQLDatabase database, TableDropping dropping, bool ifNotExists, string characterSet, out bool reset) => PerformTransaction(out reset, () => CreateDB(database, ifNotExists), () => AlterDB(database, dropping, ifNotExists, characterSet, out _));
         #endregion CreateDB
         #endregion DB
 
@@ -377,6 +592,14 @@ namespace WinCopies.Data.SQL
         #endregion ExecuteNonQuery
 
         #region Get Statements
+        public abstract IDatabaseSelect GetDatabases();
+
+        public ISelect GetSelect(string table, IEnumerable<ICondition> conditions) =>
+#if CS8
+            this.
+#endif
+            GetSelect(GetCollection(table), null, @operator: "AND", conditions: conditions);
+
         public abstract ISelect GetSelect(SQLItemCollection<string> defaultTables, SQLItemCollection<SQLColumn> defaultColumns);
 
         public abstract ISelect GetCountSelect(string tableName, IConditionGroup conditionGroup);
@@ -392,7 +615,11 @@ namespace WinCopies.Data.SQL
         public abstract ISQLTableRequest2 GetDelete(SQLItemCollection<string> defaultTables);
 
 #if !CS8
-        public ISelect GetSelect(IEnumerable<string> defaultTables, IEnumerable<SQLColumn> defaultColumns, string @operator = null, IEnumerable<ICondition> conditions = null, IEnumerable<IConditionGroup> conditionGroups = null, IEnumerable<KeyValuePair<SQLColumn, ISelect>> selects = null) => DBEntityCollection.GetSelect(this, defaultTables, defaultColumns, @operator, conditions, conditionGroups, selects);
+        public ISelect GetSelect(IEnumerable<string> defaultTables, IEnumerable<SQLColumn>
+#if CS8
+            ?
+#endif
+            defaultColumns, string @operator = null, IEnumerable<ICondition> conditions = null, IEnumerable<IConditionGroup> conditionGroups = null, IEnumerable<KeyValuePair<SQLColumn, ISelect>> selects = null) => DBEntityCollection.GetSelect(this, defaultTables, defaultColumns, @operator, conditions, conditionGroups, selects);
 
         public ISQLTableRequest2 GetDelete(IEnumerable<string> defaultTables, string @operator = null, IEnumerable<ICondition> conditions = null) => DBEntityCollection.GetDelete(this, defaultTables, @operator, conditions);
 #endif
@@ -437,7 +664,14 @@ namespace WinCopies.Data.SQL
         #endregion GetItems
 
         #region Disposing
-        public abstract void Close();
+        protected abstract void CloseOverride();
+
+        public void Close()
+        {
+            CloseOverride();
+
+            TryInvokeEvent(Closed);
+        }
 
         protected virtual void Dispose(bool disposing) => IsDisposed = true;
 
@@ -450,22 +684,29 @@ namespace WinCopies.Data.SQL
 
         ~SQLConnection() => Dispose(false);
         #endregion Disposing
+
+        public abstract IEnumerable<ISQLDatabase> AsEnumerable();
+        #endregion Methods
     }
 
-    public abstract class SQLConnection<T> : SQLConnection where T : ICloneable, System.IDisposable
+    public abstract class SQLConnection<TConnection, TDatabase> : SQLConnection, ISQLConnection<TDatabase> where TConnection : ICloneable, System.IDisposable where TDatabase : ISQLDatabase
     {
-        protected T Connection { get; }
+        protected TConnection Connection { get; }
 
         protected bool AutoDispose { get; }
 
-        protected SQLConnection(in T connection, in bool autoDispose = true)
+        protected SQLConnection(in TConnection connection, in bool autoDispose)
         {
             AutoDispose = autoDispose;
 
             Connection = connection;
         }
 
-        protected SQLConnection(in T connection, in string dbName, in bool autoDispose = true) : base(dbName)
+        protected SQLConnection(in TConnection connection, in string
+#if CS8
+            ?
+#endif
+            dbName = null, in bool autoDispose = true) : base(dbName)
         {
             AutoDispose = autoDispose;
 
@@ -496,5 +737,12 @@ namespace WinCopies.Data.SQL
                 disposeBase();
             }
         }
+
+        protected abstract TDatabase GetDatabase(string dbName);
+
+        public IEnumerable<TDatabase> GetEnumerable() => GetDatabases().ExecuteQuery(true).Select(GetDatabase);
+
+        public IEnumerator<TDatabase> GetEnumerator() => GetEnumerable().GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }

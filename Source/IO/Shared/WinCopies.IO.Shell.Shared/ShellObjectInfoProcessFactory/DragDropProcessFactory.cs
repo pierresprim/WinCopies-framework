@@ -63,7 +63,7 @@ namespace WinCopies.IO
                         {
                             parent = WinCopies.IO.Path.GetParent2(path);
 
-                            predicate = _path => _path.Validate(parent, parent.EndsWith(WinCopies.IO.Path.PathSeparator
+                            predicate = _path => _path.Validate(parent, parent.EndsWith(System.IO.Path.DirectorySeparatorChar
 #if !CS8
                                 .ToString()
 #endif

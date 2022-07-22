@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 using static WinCopies.ThrowHelper;
@@ -87,6 +88,13 @@ namespace WinCopies.Data.SQL
         SQLColumn ISQLColumn.ToSQLColumn() => this;
     }
 
+    public static class SQLItemCollection
+    {
+        public static SQLItemCollection<T> GetCollection<T>(in Collections.Generic.IExtensibleEnumerable<T> items) => new SQLItemCollection<T>(items);
+        public static SQLItemCollection<T> GetCollection<T>(in IEnumerable<T> items) => new SQLItemCollection<T>(items);
+        public static SQLItemCollection<T> GetCollection<T>(params T[] items) => new SQLItemCollection<T>(items);
+    }
+
     public class SQLItemCollection<T> : Collections.Generic.IExtensibleEnumerable<T>
     {
         private Collections.Generic.IExtensibleEnumerable<T> _items;
@@ -100,10 +108,8 @@ namespace WinCopies.Data.SQL
 #if CS8
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 #endif
-
         public SQLItemCollection(in IEnumerable<T> items) : this(new Collections.DotNetFix.Generic.LinkedList<T>(items)) { /* Left empty. */ }
-
-        public SQLItemCollection(params T[] items) : this(new Collections.DotNetFix.Generic.LinkedList<T>(items)) { /* Left empty. */ }
+        public SQLItemCollection(params T[] items) : this(items.AsEnumerable()) { /* Left empty. */ }
 
         IEnumerator<T> IEnumerable<T>.GetEnumerator() => Items.GetEnumerator();
 

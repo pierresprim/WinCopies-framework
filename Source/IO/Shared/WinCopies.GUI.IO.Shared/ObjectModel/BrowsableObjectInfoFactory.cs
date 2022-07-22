@@ -29,22 +29,15 @@ namespace WinCopies.GUI.IO
 
         Comparison<IBrowsableObjectInfo> SortComparison { get; set; }
 
-        IBrowsableObjectInfo GetBrowsableObjectInfo(string path);
-
         IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo);
-
-        IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(string path);
 
         IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo, IBrowsableObjectInfoViewModel parent);
 
         IExplorerControlViewModel GetExplorerControlViewModel(IBrowsableObjectInfoViewModel browsableObjectInfo);
     }
 
-    public abstract class BrowsableObjectInfoFactory : IBrowsableObjectInfoFactory
+    public class BrowsableObjectInfoFactory : IBrowsableObjectInfoFactory
     {
-        /// <summary>
-        /// Gets the <see cref="ClientVersion"/> value associated to this factory. This value is used for <see cref="PortableDeviceInfo"/> and <see cref="PortableDeviceItemInfo"/> creation when browsing the Computer folder with a <see cref="ShellObjectInfo"/> item.
-        /// </summary>
         public ClientVersion ClientVersion { get; }
 
         public Comparison<IBrowsableObjectInfo> SortComparison { get; set; }
@@ -53,27 +46,16 @@ namespace WinCopies.GUI.IO
         /// Initializes a new instance of the <see cref="BrowsableObjectInfoFactory"/> class.
         /// </summary>
         /// <param name="clientVersion">The <see cref="ClientVersion"/> value for PortableDevice items creation. See <see cref="ClientVersion"/>.</param>
-        protected BrowsableObjectInfoFactory(in ClientVersion clientVersion) => ClientVersion = clientVersion;
+        public BrowsableObjectInfoFactory(in ClientVersion clientVersion) => ClientVersion = clientVersion;
 
-        protected BrowsableObjectInfoFactory() : this(BrowsableObjectInfo.GetDefaultClientVersion()) { /* Left empty. */ }
-
-        /// <summary>
-        /// Creates an <see cref="IBrowsableObjectInfo"/> for a given path. See Remarks section.
-        /// </summary>
-        /// <param name="path">The path of the <see cref="IBrowsableObjectInfo"/> to create.</param>
-        /// <returns>An <see cref="IBrowsableObjectInfo"/> for <paramref name="path"/>.</returns>
-        /// <remarks>This method cannot create <see cref="IBrowsableObjectInfo"/> for WMI paths.</remarks>
-        /// <exception cref="ArgumentException"><paramref name="path"/> is not a Shell or a Registry path.</exception>
-        public abstract IBrowsableObjectInfo GetBrowsableObjectInfo(string path);
+        public BrowsableObjectInfoFactory() : this(WinCopies.IO.ObjectModel.BrowsableObjectInfo.GetDefaultClientVersion()) { /* Left empty. */ }
 
         protected virtual IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo, bool rootParentIsRootNode) => new BrowsableObjectInfoViewModel(browsableObjectInfo, rootParentIsRootNode) { SortComparison = SortComparison, Factory = this };
-
-        public virtual IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(string path) => GetBrowsableObjectInfoViewModel(GetBrowsableObjectInfo(path), false);
 
         public virtual IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo) => GetBrowsableObjectInfoViewModel(browsableObjectInfo, true);
 
         public virtual IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo, IBrowsableObjectInfoViewModel parent) => GetBrowsableObjectInfoViewModel(browsableObjectInfo, parent.RootParentIsRootNode);
 
-        public abstract IExplorerControlViewModel GetExplorerControlViewModel(IBrowsableObjectInfoViewModel browsableObjectInfo);
+        public virtual IExplorerControlViewModel GetExplorerControlViewModel(IBrowsableObjectInfoViewModel browsableObjectInfo) => ObjectModel.BrowsableObjectInfo.GetDefaultExplorerControlViewModel(browsableObjectInfo);
     }
 }

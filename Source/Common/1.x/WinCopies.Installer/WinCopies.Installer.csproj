@@ -1,0 +1,43 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<PackageId>WinCopies.Installer</PackageId>
+		<AssemblyName>WinCopies.Installer</AssemblyName>
+		<TargetFrameworks>netcoreapp3.0;netcoreapp3.1;net5.0-windows;net6.0-windows;net7.0-windows;net472;net48</TargetFrameworks>
+		<TargetPlatformIdentifier>windows</TargetPlatformIdentifier>
+		<UseWPF>true</UseWPF>
+		<SignAssembly>true</SignAssembly>
+		<VersionPrefix>3.0</VersionPrefix>
+		<AssemblyVersion>3.0</AssemblyVersion>
+		<FileVersion>3.0</FileVersion>
+		<PackageTags>WinCopies, Installer</PackageTags>
+		<DocumentationFile>WinCopies.Installer.xml</DocumentationFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="WinCopies.Util.Desktop" Version="3.17-preview" />
+		<PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="3.8.2-preview" />
+		<PackageReference Include="WinCopies.WindowsAPICodePack.Win32Native" Version="3.9-preview" />
+	</ItemGroup>
+
+	<Import Project="..\..\Shared\WinCopies.Installer.Shared\WinCopies.Installer.Shared.projitems" Label="Shared" />
+
+	<ItemGroup>
+		<Page Update="Themes\Generic.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\..\LICENSE.md">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+		<None Include="..\WinCopies.png">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+	</ItemGroup>
+
+</Project>

@@ -65,7 +65,7 @@ namespace WinCopies.GUI.IO.Controls
 
         public IInputElement CommandTarget { get => (IInputElement)GetValue(CommandTargetProperty); set => SetValue(CommandTargetProperty, value); }
 
-        public static readonly RoutedEvent ContextMenuRequestedEvent = Util.Desktop.UtilHelpers.RegisterRoutedEvent<ContextMenuRequestedEventHandler, ExplorerControlListView>(nameof(ContextMenuRequested), RoutingStrategy.Bubble);
+        public static readonly RoutedEvent ContextMenuRequestedEvent = Util.Desktop.UtilHelpers.Register<ContextMenuRequestedEventHandler, ExplorerControlListView>(nameof(ContextMenuRequested), RoutingStrategy.Bubble);
 
         public event ContextMenuRequestedEventHandler ContextMenuRequested { add => AddHandler(ContextMenuRequestedEvent, value); remove => RemoveHandler(ContextMenuRequestedEvent, value); }
 

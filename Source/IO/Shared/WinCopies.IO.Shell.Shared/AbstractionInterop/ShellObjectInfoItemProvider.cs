@@ -20,9 +20,6 @@ using Microsoft.WindowsAPICodePack.Shell;
 
 using SevenZip;
 
-using System.Drawing;
-
-using WinCopies.GUI.Drawing;
 using WinCopies.IO.ObjectModel;
 
 using static WinCopies.ThrowHelper;
@@ -51,7 +48,6 @@ namespace WinCopies.IO.AbstractionInterop
         public ShellObjectInfoItemProvider(in ShellObject shellObject, in ClientVersion clientVersion)
         {
             ShellObject = shellObject;
-
             ClientVersion = clientVersion;
         }
 
@@ -68,67 +64,15 @@ namespace WinCopies.IO.AbstractionInterop
         public ShellObjectInfoItemProvider(in IPortableDevice portableDevice, in ClientVersion clientVersion)
         {
             PortableDevice = portableDevice;
-
             ClientVersion = clientVersion;
         }
 
         public ShellObjectInfoItemProvider(in NonShellObjectRootItemType nonShellObjectRootItemType, in ClientVersion clientVersion)
         {
             NonShellObjectRootItemType = nonShellObjectRootItemType;
-
             ClientVersion = clientVersion;
         }
 
         public static ShellObjectInfoItemProvider ToShellObjectInfoItemProvider(ArchiveItemInfoItemProvider archiveItemInfoItemProvider) => (archiveItemInfoItemProvider ?? throw GetArgumentNullException(nameof(archiveItemInfoItemProvider))).ArchiveFileInfo.HasValue ? new ShellObjectInfoItemProvider(archiveItemInfoItemProvider.ShellObjectInfo, archiveItemInfoItemProvider.ArchiveFileInfo) : new ShellObjectInfoItemProvider(archiveItemInfoItemProvider.ShellObjectInfo, archiveItemInfoItemProvider.ArchiveFilePath);
-    }
-
-    public class MultiIconInfoItemProvider
-    {
-        public SingleIcon Icon { get; }
-
-        public MultiIconInfo MultiIconInfo { get; }
-
-        public MultiIconInfoItemProvider(in SingleIcon icon, in MultiIconInfo multiIconInfo)
-        {
-            Icon = icon;
-
-            MultiIconInfo = multiIconInfo;
-        }
-    }
-
-    public class SingleIconInfoItemProvider
-    {
-        public IconImage Icon { get; }
-
-        public SingleIconInfo Parent { get; }
-
-        public SingleIconInfoItemProvider(in IconImage icon, in SingleIconInfo parent)
-        {
-            Icon = icon;
-
-            Parent = parent;
-        }
-    }
-
-    public class IconImageInfoItemProvider
-    {
-        public Bitmap Bitmap { get; }
-
-        public Icon Icon { get; }
-
-        public string Name { get; } 
-
-        public IconImageInfo Parent { get; }
-
-        private IconImageInfoItemProvider(in string name, in IconImageInfo parent)
-        {
-            Name = name;
-
-            Parent = parent;
-        }
-
-        public IconImageInfoItemProvider( in string name, in Bitmap bitmap, in IconImageInfo iconImageInfo) : this(name, iconImageInfo) => Bitmap = bitmap;
-
-        public IconImageInfoItemProvider(in string name, in Icon icon, in IconImageInfo iconImageInfo) : this(name, iconImageInfo) => Icon = icon;
     }
 }

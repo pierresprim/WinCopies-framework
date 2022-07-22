@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>2b809653-ccdd-4498-8e54-5c5c3456aabf</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>WinCopies.IO.Drawing.Shared</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)BitmapInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IconImageInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IconImageInfoHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IconInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ItemProviders.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MultiIconInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PropertySystem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Selectors.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SingleIconInfo.cs" />
+  </ItemGroup>
+</Project>

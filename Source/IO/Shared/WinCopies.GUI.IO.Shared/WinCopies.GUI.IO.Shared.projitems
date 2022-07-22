@@ -10,18 +10,25 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AssemblyInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectInfoWindow.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\AddressBar.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\BrowsableObjectInfoWindowMenuItem.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\ExplorerControlDefaultListViewItemContent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\ExplorerControlPropertyGrid.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\ExplorerControlTabControl.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\FileSystemDialogBoxContent.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\MultiInputBox.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\Process\ProcessErrorItemControl.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\Process\ProcessManager.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\BrowsableObjectInfoViewModel.Partial\Browsability.Partial\Browsability.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\BrowsableObjectInfoViewModel.Partial\Browsability.Partial\Items.Partial\ItemManagement.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\BrowsableObjectInfoViewModel.Partial\Browsability.Partial\Items.Partial\Items.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\BrowsableObjectInfoViewModel.Partial\Browsability.Partial\Parent.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataConverters\BrowsabilityToOpenIconConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataConverters\FileSystemDialogBoxModeConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataConverters\FileSystemDialogBoxPredicateConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FileSystemDialog.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FileSystemDialogBox.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FileSystemDialogBoxViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\BrowsableObjectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\BrowsableObjectInfoViewModel.Partial\BrowsableObjectInfoViewModel.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\BrowsableObjectInfoViewModel.Partial\Selection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectInfoWindowViewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessWindow.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\BrowsableObjectInfoCollectionViewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process\DuplicateFindingOptions.cs" />

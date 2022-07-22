@@ -92,7 +92,7 @@ namespace WinCopies.GUI
 
             public CornerRadius CornerRadius { get => (CornerRadius)GetValue(CornerRadiusProperty); set => SetValue(CornerRadiusProperty, value); }
 
-            static SwitchBase() => DefaultStyleKeyProperty.OverrideFrameworkPropertyMetadata<SwitchBase>();
+            static SwitchBase() => DefaultStyleKeyProperty.OverrideDefaultStyleKey<SwitchBase>();
         }
 
         public class Switch : ToggleButton, IQueryCommandSource<bool>, ISwitch
@@ -145,7 +145,7 @@ namespace WinCopies.GUI
 
             IQueryCommand<bool> IQueryCommandSource<bool>.Command => Command;
 
-            static Switch() => DefaultStyleKeyProperty.OverrideFrameworkPropertyMetadata<Switch>();
+            static Switch() => DefaultStyleKeyProperty.OverrideDefaultStyleKey<Switch>();
 
             protected override void OnIndeterminate(RoutedEventArgs e)
             {

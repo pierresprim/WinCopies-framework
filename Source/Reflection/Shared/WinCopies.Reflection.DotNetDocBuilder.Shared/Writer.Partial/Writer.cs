@@ -293,6 +293,8 @@ namespace WinCopies.Reflection.DotNetDocBuilder
         public static void Main(ConnectionConstructor connectionConstructor) => Main(() => UpdateLocally(connectionConstructor));
 #endif
 
+        public bool IsTypeValid(in System.Type type) => ValidPackages.Contains(type.Assembly.GetName().Name);
+
         protected ISQLConnection GetConnection() => Connection.GetConnection();
 
         protected DBEntityCollection<T> GetCollection<T>() where T : IEntity => new
@@ -300,6 +302,12 @@ namespace WinCopies.Reflection.DotNetDocBuilder
             DBEntityCollection<T>
 #endif
             (GetConnection());
+
+        protected ulong Remove<T>() where T : IEntity => DBEntityCollection<T>.Remove(GetConnection());
+
+        protected ulong Remove<T>(in Func<T, bool> predicate) where T : IEntity => DBEntityCollection<T>.Remove(GetConnection(), predicate);
+
+        protected ulong RemovePredicate<T>(in Predicate<T> predicate) where T : IEntity => DBEntityCollection<T>.RemovePredicate(GetConnection(), predicate);
 
         public IEnumerable<DotNetNamespace> GetAllNamespacesInPackages()
         {
@@ -625,6 +633,13 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
                 type = typeTmp;
             }
+        }
+
+        public void UpdateType(in System.Type dotNetType, Type type, in DBEntityCollection<Type> tColl, in DBEntityCollection<AccessModifier> amColl, in DBEntityCollection<Namespace> nColl, in DBEntityCollection<TypeType> ttColl, in DBEntityCollection<Class> cColl)
+        {
+            UpdateParentType(dotNetType,type, tColl, amColl, nColl, ttColl, cColl);
+
+            UpdateNamespace(type, dotNetType.Namespace);
         }
 
         public string GetWholePath(string wholeNamespace) => Path.Combine(RootPath, wholeNamespace.Replace('.', '\\'));

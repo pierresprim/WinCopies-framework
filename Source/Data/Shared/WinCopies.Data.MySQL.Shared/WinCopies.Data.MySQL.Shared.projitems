@@ -10,9 +10,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Misc.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Statements.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MySQLConnection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MySQLEnumerator.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MySQLGetter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Where.cs" />
   </ItemGroup>
 </Project>

@@ -52,7 +52,7 @@ namespace WinCopies.GUI.IO
 
             for (int i = length; i >= 0; i--)
 
-                if (value[i] == Path.PathSeparator && i < length)
+                if (value[i] == System.IO.Path.DirectorySeparatorChar && i < length)
 
                     return value.Remove(i);
 
@@ -71,7 +71,13 @@ namespace WinCopies.GUI.IO
 
             public IEnumerable<ICommand> Items { get; }
 
-            public DelegateCommand(in string name, in string description, in Bitmap icon, IEnumerable<ICommand> items, in Predicate predicate, in Action<object> action) : base(name, description, predicate, action)
+            public DelegateCommand(in string name, in string description, in Bitmap icon, IEnumerable<ICommand> items, in
+#if CS8 && WinCopies4
+                PredicateNull
+#else
+                Predicate
+#endif
+                predicate, in Action<object> action) : base(name, description, predicate, action)
             {
                 Icon = icon?.ToImageSource();
 
@@ -93,7 +99,13 @@ namespace WinCopies.GUI.IO
             {
                 var _value = (IExplorerControlViewModel)((ContextMenu)values[1]).PlacementTarget.GetParent<ExplorerControl>(false).DataContext;
 
-                return value.PrependValues(new DelegateCommand("Open in WinCopies", "Opens the selected items in WinCopies.", Icons.Properties.Resources.folder, null, Bool.True, param => _value.Path = _value.Factory.GetBrowsableObjectInfoViewModel(value.BrowsableObjectInfo)), new DelegateCommand("Open", null, null, new List<ICommand>() { new DelegateCommand("Open in new tab", null, Icons.Properties.Resources.tab_add, null, Bool.True, obj => _value.OpenInNewContextCommand?.TryExecute(value.BrowsableObjectInfo)) }, null, null), null);
+                return value.PrependValues(new DelegateCommand("Open in WinCopies", "Opens the selected items in WinCopies.", Icons.Properties.Resources.folder, null, Bool.True, param => _value.Path = _value.Factory.GetBrowsableObjectInfoViewModel(value.BrowsableObjectInfo)), new DelegateCommand("Open", null, null, new List<ICommand>() { new DelegateCommand("Open in new tab", null, Icons.Properties.Resources.tab_add, null, Bool.
+#if CS8
+                    TrueNull
+#else
+                    True
+#endif
+                    , obj => _value.OpenInNewContextCommand?.TryExecute(value.BrowsableObjectInfo)) }, null, null), null);
             }
 
             else return value;

@@ -27,7 +27,12 @@ namespace WinCopies.IO.ObjectModel
         /// <summary>
         /// The parent <see cref="IShellObjectInfoBase"/> of this item. For <see cref="ShellObjectInfo"/> items, this property returns the current object.
         /// </summary>
-        public abstract IShellObjectInfoBase ArchiveShellObject { get; }
+        public abstract IShellObjectInfoBase
+#if CS8
+            ?
+#endif
+            ArchiveShellObject
+        { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ArchiveItemInfoProvider{TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/> class.

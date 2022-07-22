@@ -25,7 +25,9 @@
     xmlns:util="clr-namespace:WinCopies;assembly=WinCopies.Util.Desktop"
     xmlns:converters="clr-namespace:WinCopies.Util.Data;assembly=WinCopies.Util.Desktop"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
-    xmlns:input="clr-namespace:System.Windows.Input;assembly=PresentationCore">
+    xmlns:input="clr-namespace:System.Windows.Input;assembly=PresentationCore"
+    xmlns:gui="clr-namespace:WinCopies.GUI.Controls;assembly=WinCopies.GUI"
+    xmlns:models="clr-namespace:WinCopies.GUI.Controls.Models;assembly=WinCopies.GUI.Models">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary>
             <!--Data converters-->
@@ -34,14 +36,14 @@
             <converters:IconToImageSourceConverter x:Key="IconToImageSourceConverter" />
             <converters:ActionToDelegateCommand2Converter x:Key="ActionToDelegateCommand2Converter" />
             <!--End of Data Converters Section-->
-            <Style x:Key="ControlStyle" TargetType="{x:Type Control}" x:Shared="false">
+            <Style x:Key="ControlStyle" TargetType="{x:Type Control}">
                 <Setter Property="IsEnabled" Value="{Binding IsEnabled}" />
             </Style>
-            <Style x:Key="ToggleButtonStyle" TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource ControlStyle}" x:Shared="false">
+            <Style x:Key="ToggleButtonStyle" TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource ControlStyle}">
                 <Setter Property="IsChecked" Value="{Binding IsChecked}" />
                 <Setter Property="IsThreeState" Value="{Binding IsThreeState}" />
             </Style>
-            <Style x:Key="ContentControlStyle" TargetType="{x:Type ContentControl}" BasedOn="{StaticResource ControlStyle}" x:Shared="false">
+            <Style x:Key="ContentControlStyle" TargetType="{x:Type ContentControl}" BasedOn="{StaticResource ControlStyle}">
                 <Setter Property="Content" Value="{Binding Content}" />
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding Converter={StaticResource DefaultModelToBooleanConverter}, ConverterParameter={x:Static local:ModelToBooleanConverterParameter.Content}}" Value="true">
@@ -49,7 +51,7 @@
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
-            <Style x:Key="ItemsControlStyle" TargetType="{x:Type ItemsControl}" BasedOn="{StaticResource ControlStyle}" x:Shared="false">
+            <Style x:Key="ItemsControlStyle" TargetType="{x:Type ItemsControl}" BasedOn="{StaticResource ControlStyle}">
                 <Setter Property="ItemsSource" Value="{Binding Items}" />
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding Converter={StaticResource DefaultModelToBooleanConverter}, ConverterParameter={x:Static local:ModelToBooleanConverterParameter.Items}}" Value="true" >
@@ -57,7 +59,7 @@
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
-            <Style x:Key="HeaderedContentControlStyle" TargetType="{x:Type HeaderedContentControl}" BasedOn="{StaticResource ContentControlStyle}" x:Shared="false">
+            <Style x:Key="HeaderedContentControlStyle" TargetType="{x:Type HeaderedContentControl}" BasedOn="{StaticResource ContentControlStyle}">
                 <Setter Property="Header" Value="{Binding Header}" />
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding Converter={StaticResource DefaultModelToBooleanConverter}, ConverterParameter={x:Static local:ModelToBooleanConverterParameter.Header}}" Value="true">
@@ -65,7 +67,7 @@
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
-            <Style x:Key="HeaderedItemsControlStyle" TargetType="{x:Type HeaderedItemsControl}" BasedOn="{StaticResource ItemsControlStyle}" x:Shared="false">
+            <Style x:Key="HeaderedItemsControlStyle" TargetType="{x:Type HeaderedItemsControl}" BasedOn="{StaticResource ItemsControlStyle}">
                 <Setter Property="Header" Value="{Binding Header}" />
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding Converter={StaticResource DefaultModelToBooleanConverter}, ConverterParameter={x:Static local:ModelToBooleanConverterParameter.Header}}" Value="true">
@@ -73,12 +75,12 @@
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
-            <Style x:Key="ButtonStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource ControlStyle}" x:Shared="false">
+            <Style x:Key="ButtonStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource ControlStyle}">
                 <Setter Property="Command" Value="{Binding Command}" />
                 <Setter Property="CommandParameter" Value="{Binding CommandParameter}" />
                 <Setter Property="CommandTarget" Value="{Binding CommandTarget}" />
             </Style>
-            <Style x:Key="MenuItemStyle" TargetType="{x:Type MenuItem}" BasedOn="{StaticResource ControlStyle}" x:Shared="false">
+            <Style x:Key="MenuItemStyle" TargetType="{x:Type MenuItem}" BasedOn="{StaticResource ControlStyle}">
                 <Setter Property="Command" Value="{Binding Command}" />
                 <Setter Property="CommandParameter" Value="{Binding CommandParameter}" />
                 <Setter Property="CommandTarget" Value="{Binding CommandTarget}" />
@@ -103,11 +105,11 @@
                     </Setter.Value>
                 </Setter>
             </Style>
-            <Style x:Key="TextBoxStyleTextOriented" TargetType="{x:Type TextBox}" BasedOn="{StaticResource ControlStyle}" x:Shared="false">
+            <Style x:Key="TextBoxStyleTextOriented" TargetType="{x:Type TextBox}" BasedOn="{StaticResource ControlStyle}">
                 <Setter Property="Text" Value="{Binding Text}" />
                 <Setter Property="IsReadOnly" Value="{Binding IsReadOnly}" />
             </Style>
-            <Style x:Key="TextBoxStyleSelectionOriented" TargetType="{x:Type TextBox}" BasedOn="{StaticResource ControlStyle}" x:Shared="false">
+            <Style x:Key="TextBoxStyleSelectionOriented" TargetType="{x:Type TextBox}" BasedOn="{StaticResource ControlStyle}">
                 <Setter Property="IsReadOnlyCaretVisible" Value="{Binding IsReadOnlyCaretVisible}" />
                 <Setter Property="AutoWordSelection" Value="{Binding AutoWordSelection}" />
                 <Setter Property="SelectionBrush" Value="{Binding SelectionBrush}" />
@@ -116,7 +118,7 @@
                 <Setter Property="CaretBrush" Value="{Binding CaretBrush}" />
                 <Setter Property="IsInactiveSelectionHighlightEnabled" Value="{Binding IsInactiveSelectionHighlightEnabled}" />
             </Style>
-            <Style x:Key="TextBoxStyleTextEditingOriented" TargetType="{x:Type TextBox}" BasedOn="{StaticResource ControlStyle}" x:Shared="false">
+            <Style x:Key="TextBoxStyleTextEditingOriented" TargetType="{x:Type TextBox}" BasedOn="{StaticResource ControlStyle}">
                 <Setter Property="MinLines" Value="{Binding MinLines}" />
                 <Setter Property="MaxLines" Value="{Binding MaxLines}" />
                 <Setter Property="CharacterCasing" Value="{Binding CharacterCasing}" />
@@ -130,7 +132,7 @@
                 <Setter Property="UndoLimit" Value="{Binding UndoLimit}" />
             </Style>
             <!--todo: add a RadioButtonItemsControl control-->
-            <Style x:Key="RadioButtonStyle" TargetType="{x:Type RadioButton}" BasedOn="{StaticResource ControlStyle}" x:Shared="false">
+            <Style x:Key="RadioButtonStyle" TargetType="{x:Type RadioButton}" BasedOn="{StaticResource ControlStyle}">
                 <Setter Property="GroupName" Value="{Binding GroupName}" />
             </Style>
 
@@ -143,13 +145,45 @@
         </ResourceDictionary>
     </ResourceDictionary.MergedDictionaries>
 
+    <DataTemplate DataType="{x:Type controls:IMultiInput}">
+        <DockPanel>
+            <Label DockPanel.Dock="Top" Content="{Binding Description}"/>
+            <ListView ItemsSource="{Binding}">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}" />
+                        <GridViewColumn Header="Value">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <DockPanel>
+                                        <gui:PlaceholderTextBox Text="{Binding Text}" MinWidth="100">
+                                            <gui:PlaceholderTextBox.PlaceholderStyle>
+                                                <Style TargetType="{x:Type gui:PlaceholderTextBox}">
+                                                    <Setter Property="Text" Value="{Binding Placeholder}" />
+                                                </Style>
+                                            </gui:PlaceholderTextBox.PlaceholderStyle>
+                                        </gui:PlaceholderTextBox>
+                                        <Label DockPanel.Dock="Bottom" Content="{Binding Description}" FontStyle="Italic" />
+                                    </DockPanel>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </DockPanel>
+    </DataTemplate>
+
     <DataTemplate DataType="{x:Type sys:Action}">
         <Button Command="{Binding Converter={StaticResource ActionToDelegateCommand2Converter}}" />
     </DataTemplate>
     <DataTemplate DataType="{x:Type input:ICommandSource}">
         <Button Command="{Binding Command}" CommandParameter="{Binding CommandParameter}" CommandTarget="{Binding CommandTarget}" />
     </DataTemplate>
-    <ControlTemplate x:Key="DecoratedContentControlContentTemplate" TargetType="{x:Type local:DecoratedContentControlContent}" x:Shared="false">
+    <DataTemplate DataType="{x:Type input:RoutedUICommand}">
+        <Button Command="{Binding}" Content="{Binding Text}" />
+    </DataTemplate>
+    <ControlTemplate x:Key="DecoratedContentControlContentTemplate" TargetType="{x:Type local:DecoratedContentControlContent}">
         <DockPanel>
             <ContentControl DockPanel.Dock="Left" Content="{TemplateBinding ContentDecoration}" />
             <ContentControl Content="{TemplateBinding Content}" />
@@ -158,7 +192,7 @@
     <Style TargetType="{x:Type local:DecoratedContentControlContent}">
         <Setter Property="Template" Value="{StaticResource DecoratedContentControlContentTemplate}" />
     </Style>
-    <DataTemplate DataType="{x:Type controls:IExtendedButtonModel}" x:Shared="false">
+    <DataTemplate DataType="{x:Type controls:IExtendedButtonModel}">
         <Button>
             <Button.Style>
                 <util:MergedStyles>
@@ -180,28 +214,28 @@
             </Button.Style>
         </Button>
     </DataTemplate>
-    <DataTemplate DataType="{x:Type media:ImageSource}" x:Shared="false">
+    <DataTemplate DataType="{x:Type media:ImageSource}">
         <Image Source="{Binding Mode=OneWay}" />
     </DataTemplate>
-    <DataTemplate DataType="{x:Type drawing:Bitmap}" x:Shared="false">
+    <DataTemplate DataType="{x:Type drawing:Bitmap}">
         <Image Source="{Binding Mode=OneWay, Converter={StaticResource BitmapToImageSourceConverter}}" />
     </DataTemplate>
-    <DataTemplate DataType="{x:Type drawing:Icon}" x:Shared="false">
+    <DataTemplate DataType="{x:Type drawing:Icon}">
         <Image Source="{Binding Mode=OneWay, Converter={StaticResource IconToImageSourceConverter}}" />
     </DataTemplate>
-    <DataTemplate DataType="{x:Type controls:IContentControlModel}" x:Shared="false">
+    <DataTemplate DataType="{x:Type controls:IContentControlModel}">
         <ContentControl Style="{StaticResource ContentControlStyle}" />
     </DataTemplate>
-    <DataTemplate DataType="{x:Type controls:IHeaderedContentControlModel}" x:Shared="false">
+    <DataTemplate DataType="{x:Type controls:IHeaderedContentControlModel}">
         <HeaderedContentControl Style="{StaticResource HeaderedContentControlStyle}" />
     </DataTemplate>
-    <DataTemplate DataType="{x:Type controls:IItemsControlModel}" x:Shared="false">
+    <DataTemplate DataType="{x:Type controls:IItemsControlModel}">
         <ItemsControl Style="{StaticResource ItemsControlStyle}" />
     </DataTemplate>
-    <DataTemplate DataType="{x:Type controls:IHeaderedItemsControlModel}" x:Shared="false">
+    <DataTemplate DataType="{x:Type controls:IHeaderedItemsControlModel}">
         <HeaderedItemsControl Style="{StaticResource HeaderedItemsControlStyle}" />
     </DataTemplate>
-    <DataTemplate DataType="{x:Type controls:IGroupBoxModel}" x:Shared="false">
+    <DataTemplate DataType="{x:Type controls:IGroupBoxModel}">
         <GroupBox>
             <GroupBox.Style>
                 <util:MergedStyles>
@@ -215,7 +249,7 @@
             </GroupBox.Style>
         </GroupBox>
     </DataTemplate>
-    <DataTemplate DataType="{x:Type controls:ITabItemModel}" x:Shared="false">
+    <DataTemplate DataType="{x:Type controls:ITabItemModel}">
         <TabItem>
             <TabItem.Style>
                 <util:MergedStyles>
@@ -229,7 +263,7 @@
             </TabItem.Style>
         </TabItem>
     </DataTemplate>
-    <DataTemplate DataType="{x:Type controls:IButtonModel}" x:Shared="false">
+    <DataTemplate DataType="{x:Type controls:IButtonModel}">
         <Button>
             <Button.Style>
                 <util:MergedStyles>
@@ -244,7 +278,7 @@
             </Button.Style>
         </Button>
     </DataTemplate>
-    <DataTemplate DataType="{x:Type controls:IToggleButtonModel}" x:Shared="false">
+    <DataTemplate DataType="{x:Type controls:IToggleButtonModel}">
         <ToggleButton>
             <ToggleButton.Style>
                 <util:MergedStyles>
@@ -260,7 +294,7 @@
             </ToggleButton.Style>
         </ToggleButton>
     </DataTemplate>
-    <DataTemplate DataType="{x:Type controls:ITextBoxModelTextOriented}" x:Shared="false">
+    <DataTemplate DataType="{x:Type controls:ITextBoxModelTextOriented}">
         <TextBox>
             <TextBox.Style>
                 <util:MergedStyles>
@@ -274,7 +308,7 @@
             </TextBox.Style>
         </TextBox>
     </DataTemplate>
-    <DataTemplate DataType="{x:Type controls:ITextBoxModelSelectionOriented}" x:Shared="false">
+    <DataTemplate DataType="{x:Type controls:ITextBoxModelSelectionOriented}">
         <TextBox>
             <TextBox.Style>
                 <util:MergedStyles>
@@ -289,7 +323,7 @@
             </TextBox.Style>
         </TextBox>
     </DataTemplate>
-    <DataTemplate DataType="{x:Type controls:ITextBoxModelTextEditingOriented}" x:Shared="false">
+    <DataTemplate DataType="{x:Type controls:ITextBoxModelTextEditingOriented}">
         <TextBox>
             <TextBox.Style>
                 <util:MergedStyles>
@@ -304,7 +338,7 @@
             </TextBox.Style>
         </TextBox>
     </DataTemplate>
-    <DataTemplate DataType="{x:Type controls:ITextBoxModel}" x:Shared="false">
+    <DataTemplate DataType="{x:Type controls:ITextBoxModel}">
         <TextBox>
             <TextBox.Style>
                 <util:MergedStyles>
@@ -320,7 +354,7 @@
             </TextBox.Style>
         </TextBox>
     </DataTemplate>
-    <DataTemplate DataType="{x:Type controls:ICheckBoxModel}" x:Shared="false">
+    <DataTemplate DataType="{x:Type controls:ICheckBoxModel}">
         <CheckBox>
             <CheckBox.Style>
                 <util:MergedStyles>
@@ -343,7 +377,7 @@
             </CheckBox.Style>
         </CheckBox>
     </DataTemplate>
-    <DataTemplate DataType="{x:Type controls:IGroupingRadioButtonModel}" x:Shared="false">
+    <DataTemplate DataType="{x:Type controls:IGroupingRadioButtonModel}">
         <RadioButton>
             <RadioButton.Style>
                 <util:MergedStyles>
@@ -391,7 +425,7 @@
     </TabControl>
 </DataTemplate>
 
-<Style x:Shared="false" BasedOn="{StaticResource {x:Type guiDialogs:DialogWindow}}" TargetType="{x:Type dialogs:PropertyDialog}">
+<Style BasedOn="{StaticResource {x:Type guiDialogs:DialogWindow}}" TargetType="{x:Type dialogs:PropertyDialog}">
 
     <Setter Property="Title" Value="{Binding Title}" />
 

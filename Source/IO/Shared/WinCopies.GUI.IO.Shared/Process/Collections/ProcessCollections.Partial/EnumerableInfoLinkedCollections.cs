@@ -36,7 +36,7 @@ using static WinCopies.ThrowHelper;
 
 namespace WinCopies.GUI.IO.Process
 {
-    public interface IProcessLinkedList<TItems, TError, TErrorItems, TAction> : System.Collections.Generic.ICollection<TErrorItems>, System.Collections.Generic.IEnumerable<TErrorItems>, IEnumerable, System.Collections.Generic.IReadOnlyCollection<TErrorItems>, ICollection, ILinkedList3<TErrorItems>, IReadOnlyLinkedList2<TErrorItems>, IReadOnlyLinkedList<TErrorItems>, IUIntCountable, Collections.Generic.IEnumerable<TErrorItems>, Collections.Generic.IEnumerable<ILinkedListNode<TErrorItems>>, System.Collections.Generic.IEnumerable<ILinkedListNode<TErrorItems>>, INotifyPropertyChanged, INotifyLinkedCollectionChanged<TErrorItems>, WinCopies.IO.Process.IProcessLinkedList<TItems, TError, TErrorItems, TAction> where TItems : IPath where TErrorItems : IProcessErrorItem<TItems, TError, TAction>
+    public interface IProcessLinkedList<TItems, TError, TErrorItems, TAction> : System.Collections.Generic.ICollection<TErrorItems>, System.Collections.Generic.IEnumerable<TErrorItems>, IEnumerable, System.Collections.Generic.IReadOnlyCollection<TErrorItems>, ICollection, ILinkedList3<TErrorItems>, IReadOnlyLinkedList2<TErrorItems>, IReadOnlyLinkedList<TErrorItems>, IUIntCountable, Collections.Extensions.Generic.IEnumerable<TErrorItems>, Collections.Extensions.Generic.IEnumerable<ILinkedListNode<TErrorItems>>, System.Collections.Generic.IEnumerable<ILinkedListNode<TErrorItems>>, INotifyPropertyChanged, INotifyLinkedCollectionChanged<TErrorItems>, WinCopies.IO.Process.IProcessLinkedList<TItems, TError, TErrorItems, TAction> where TItems : IPath where TErrorItems : IProcessErrorItem<TItems, TError, TAction>
     {
         new object SyncRoot { get; }
 
@@ -201,7 +201,7 @@ namespace WinCopies.GUI.IO.Process
 #endif
     }
 
-    public class ReadOnlyObservableProcessLinkedCollection<TItems, TError, TItemsIn, TItemsOut, TAction> : System.Collections.Generic.ICollection<TItemsOut>, System.Collections.Generic.IEnumerable<TItemsOut>, System.Collections.Generic.IReadOnlyCollection<TItemsOut>, ICollection, INotifyPropertyChanged, INotifyLinkedCollectionChanged<TItemsOut>, IReadOnlyLinkedList2<TItemsOut>, IReadOnlyLinkedList<TItemsOut>, IUIntCountable, Collections.Generic.IEnumerable<TItemsOut>,
+    public class ReadOnlyObservableProcessLinkedCollection<TItems, TError, TItemsIn, TItemsOut, TAction> : System.Collections.Generic.ICollection<TItemsOut>, System.Collections.Generic.IEnumerable<TItemsOut>, System.Collections.Generic.IReadOnlyCollection<TItemsOut>, ICollection, INotifyPropertyChanged, INotifyLinkedCollectionChanged<TItemsOut>, IReadOnlyLinkedList2<TItemsOut>, IReadOnlyLinkedList<TItemsOut>, IUIntCountable, Collections.Extensions.Generic.IEnumerable<TItemsOut>,
 #if CS8
         Collections.DotNetFix.Generic.IEnumerable<TItemsOut>, 
 #endif
@@ -366,7 +366,7 @@ namespace WinCopies.GUI.IO.Process
 
         System.Collections.Generic.IEnumerator<TItemsOut> System.Collections.Generic.IEnumerable<TItemsOut>.GetEnumerator() => GetEnumerator();
 
-        System.Collections.Generic.IEnumerator<TItemsOut> Collections.Generic.IEnumerable<TItemsOut>.GetReversedEnumerator() => GetReversedEnumerator();
+        System.Collections.Generic.IEnumerator<TItemsOut> Collections.Extensions.Generic.IEnumerable<TItemsOut>.GetReversedEnumerator() => GetReversedEnumerator();
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
 

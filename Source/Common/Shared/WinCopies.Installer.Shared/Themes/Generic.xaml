@@ -1,0 +1,264 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:WinCopies.Installer"
+    xmlns:gui="clr-namespace:WinCopies.Installer.GUI"
+    xmlns:desktop="clr-namespace:WinCopies;assembly=WinCopies.Util.Desktop"
+    xmlns:commands="clr-namespace:WinCopies.Commands;assembly=WinCopies.Util.Desktop"
+    xmlns:icons="clr-namespace:WinCopies.GUI.Icons.Properties;assembly=WinCopies.GUI.Icons"
+    xmlns:controls="clr-namespace:WinCopies.GUI.Controls;assembly=WinCopies.GUI"
+    xmlns:converters="clr-namespace:WinCopies.Util.Data;assembly=WinCopies.Util.Desktop"
+    xmlns:properties="clr-namespace:WinCopies.Installer.Properties">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/wincopies.gui;component/Themes/Generic.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/wincopies.gui.templates;component/Themes/Generic.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+    <ControlTemplate x:Key="WinCopies.Templates.Installer" TargetType="{x:Type gui:InstallerControl}">
+        <DockPanel>
+            <StackPanel DockPanel.Dock="Bottom">
+                <DockPanel>
+                    <Label DockPanel.Dock="Left" Foreground="Gray" Padding="0,0,2,2">WinCopies Install System</Label>
+                    <Grid Background="LightGray">
+                        <Separator />
+                    </Grid>
+                </DockPanel>
+                <Grid Background="LightGray">
+                    <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                        <Button Command="BrowseBack">
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="{Binding Source={x:Static icons:Resources.resultset_previous}, Converter={StaticResource BitmapToImageSourceConverter}}" />
+                                <Label>Previous</Label>
+                            </StackPanel>
+                        </Button>
+                        <Button Command="BrowseForward" IsDefault="True">
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="{TemplateBinding NextStepName}" />
+                                <Image Source="{Binding Source={x:Static icons:Resources.resultset_next}, Converter={StaticResource BitmapToImageSourceConverter}}" />
+                            </StackPanel>
+                        </Button>
+                        <Button Command="{x:Static commands:DialogCommands.Cancel}">
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="{Binding Source={x:Static icons:Resources.cancel}, Converter={StaticResource BitmapToImageSourceConverter}}" />
+                                <Label Content="{Binding Command.Text, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Button}}}" />
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+            <ContentPresenter />
+        </DockPanel>
+    </ControlTemplate>
+
+    <Style TargetType="{x:Type gui:InstallerControl}">
+        <Setter Property="Template" Value="{StaticResource WinCopies.Templates.Installer}" />
+        <Setter Property="ContentTemplateSelector">
+            <Setter.Value>
+                <desktop:InterfaceDataTemplateSelector DirectInterfacesOnly="False" IgnoreClassType="True" />
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <DataTemplate DataType="{x:Type local:IInstallerModel}">
+        <gui:InstallerControl Content="{Binding Current}" NextStepName="{Binding Current.NextStepName}" />
+    </DataTemplate>
+
+    <ControlTemplate x:Key="WinCopies.Templates.Installer.MainPage" TargetType="{x:Type gui:InstallerPage}">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="175" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Image Grid.RowSpan="2" Source="{TemplateBinding ImageSource}" />
+            <TextBlock Grid.Column="1" Text="{TemplateBinding Title}" FontSize="16" FontWeight="Bold" TextWrapping="Wrap" />
+            <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding Content, RelativeSource={RelativeSource TemplatedParent}}" TextWrapping="Wrap" Margin="0,50,0,0" />
+        </Grid>
+    </ControlTemplate>
+
+    <Style x:Key="WinCopies.Styles.Installer.MainPage" TargetType="{x:Type gui:InstallerPage}">
+        <Setter Property="Template" Value="{StaticResource WinCopies.Templates.Installer.MainPage}" />
+    </Style>
+
+    <DataTemplate DataType="{x:Type local:IMainPage}">
+        <gui:InstallerPage Style="{StaticResource WinCopies.Styles.Installer.MainPage}" Title="{Binding Title}" Content="{Binding Description}" ImageSource="{Binding ImageSource}" />
+    </DataTemplate>
+
+    <ControlTemplate x:Key="WinCopies.Templates.Installer.LicenseAgreement" TargetType="{x:Type gui:LicenseAgreement}">
+        <DockPanel>
+            <TextBlock DockPanel.Dock="Bottom" TextWrapping="Wrap">
+                <TextBlock.Text>
+                    <MultiBinding StringFormat="{}You have to accept the terms of the license described below to install {0}. If you accept the terms of this agreement, you can press {1} to continue.">
+                        <Binding Path="Installer.ProgramName" RelativeSource="{RelativeSource TemplatedParent}" />
+                        <Binding Path="Installer.Current.NextStepName" RelativeSource="{RelativeSource TemplatedParent}" />
+                    </MultiBinding>
+                </TextBlock.Text>
+            </TextBlock>
+            <controls:RichTextBox Document="{TemplateBinding Document}" IsReadOnly="True" />
+        </DockPanel>
+    </ControlTemplate>
+
+    <Style TargetType="{x:Type gui:LicenseAgreement}">
+        <Setter Property="Template" Value="{StaticResource WinCopies.Templates.Installer.LicenseAgreement}" />
+    </Style>
+
+    <DataTemplate DataType="{x:Type local:ILicenseAgreementDataViewModel}">
+        <gui:LicenseAgreement Document="{Binding Document}" Installer="{Binding Installer}" />
+    </DataTemplate>
+
+    <ControlTemplate x:Key="WinCopies.Templates.Installer.UserGroup" TargetType="{x:Type gui:UserGroup}">
+        <StackPanel>
+            <TextBlock Text="{Binding Installer.ProgramName, RelativeSource={RelativeSource TemplatedParent}, StringFormat={}Select whether you want {0} to be installed for all users using this computer or only for yourself.}" TextWrapping="Wrap" />
+            <StackPanel Margin="10,50,0,0">
+                <RadioButton IsChecked="{Binding InstallForCurrentUserOnly, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay, Converter={converters:ReverseBooleanConverter}}">for all users</RadioButton>
+                <RadioButton IsChecked="{Binding InstallForCurrentUserOnly, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}">just for me</RadioButton>
+            </StackPanel>
+        </StackPanel>
+    </ControlTemplate>
+
+    <Style TargetType="{x:Type gui:UserGroup}">
+        <Setter Property="Template" Value="{StaticResource WinCopies.Templates.Installer.UserGroup}" />
+    </Style>
+
+    <DataTemplate DataType="{x:Type local:IUserGroupData}">
+        <gui:UserGroup InstallForCurrentUserOnly="{Binding InstallForCurrentUserOnly, Mode=TwoWay}" Installer="{Binding Installer}" />
+    </DataTemplate>
+
+    <ControlTemplate x:Key="WinCopies.Templates.Installer.Destination" TargetType="{x:Type gui:Destination}">
+        <StackPanel>
+            <TextBlock Text="{Binding Installer.ProgramName, RelativeSource={RelativeSource TemplatedParent}, StringFormat={x:Static properties:Resources.InstallDirectoryStringFormat}}" TextWrapping="Wrap" />
+            <Grid Margin="0,50,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="auto" />
+                </Grid.ColumnDefinitions>
+                <TextBox Grid.Row="1" Text="{Binding Location, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center" />
+                <Button Grid.Column="1" Grid.Row="1" Command="{x:Static commands:NavigationCommands.Browse}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="{Binding Source={x:Static icons:Resources.folder_explore}, Converter={StaticResource BitmapToImageSourceConverter}}" />
+                        <Label>Browse...</Label>
+                    </StackPanel>
+                </Button>
+                <Button Grid.Column="2" Grid.Row="1" Command="{x:Static commands:ApplicationCommands.Reset}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="{Binding Source={x:Static icons:Resources.arrow_rotate_clockwise}, Converter={StaticResource BitmapToImageSourceConverter}}" />
+                        <Label>Reset</Label>
+                    </StackPanel>
+                </Button>
+            </Grid>
+        </StackPanel>
+    </ControlTemplate>
+
+    <Style TargetType="{x:Type gui:Destination}">
+        <Setter Property="Template" Value="{StaticResource WinCopies.Templates.Installer.Destination}" />
+    </Style>
+
+    <DataTemplate DataType="{x:Type local:IDestinationData}">
+        <gui:Destination Location="{Binding Location, Mode=TwoWay}" Installer="{Binding Installer}" />
+    </DataTemplate>
+
+    <ControlTemplate x:Key="WinCopies.Templates.Installer.Options" TargetType="{x:Type gui:Options}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <TextBlock TextWrapping="Wrap">You can activate or deactivate the following options before installing the program.</TextBlock>
+            <ItemsControl Grid.Row="1" ItemsSource="{TemplateBinding OptionCollection}" />
+        </Grid>
+    </ControlTemplate>
+
+    <Style TargetType="{x:Type gui:Options}">
+        <Setter Property="Template" Value="{StaticResource WinCopies.Templates.Installer.Options}" />
+    </Style>
+
+    <DataTemplate DataType="{x:Type local:IOptionsData}">
+        <gui:Options OptionCollection="{Binding}" Installer="{Binding Installer}" />
+    </DataTemplate>
+
+    <Style x:Key="WinCopies.Styles.Installer.ToggleButton" TargetType="{x:Type ToggleButton}">
+        <Setter Property="IsChecked" Value="{Binding IsChecked}" />
+        <Setter Property="Content" Value="{Binding Name}" />
+    </Style>
+
+    <Style x:Key="WinCopies.Styles.Installer.CheckableGroupedItemsControl" TargetType="{x:Type controls:CheckableGroupedItemsControl}">
+        <Setter Property="IsChecked" Value="{Binding IsChecked, Mode=TwoWay}" />
+        <Setter Property="Header" Value="{Binding Name}" />
+        <Setter Property="ItemsSource" Value="{Binding}" />
+        <Setter Property="ItemContainerStyle" Value="{StaticResource WinCopies.Styles.Installer.ToggleButton}" />
+    </Style>
+
+    <Style x:Key="WinCopies.Styles.Installer.GroupedRadioButtonsControl" TargetType="{x:Type controls:GroupedRadioButtonsControl}" BasedOn="{StaticResource WinCopies.Styles.Installer.CheckableGroupedItemsControl}">
+        <Setter Property="ItemContainerStyle">
+            <Setter.Value>
+                <Style TargetType="{x:Type RadioButton}" BasedOn="{StaticResource WinCopies.Styles.Installer.ToggleButton}">
+                    <Setter Property="GroupName" Value="{Binding DataContext.Name, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type GroupBox}}}" />
+                </Style>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <DataTemplate DataType="{x:Type local:OptionsPageViewModel+CheckBoxListViewModel}">
+        <controls:GroupedCheckBoxesControl Style="{StaticResource WinCopies.Styles.Installer.CheckableGroupedItemsControl}" />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type local:OptionsPageViewModel+RadioButtonListViewModel}">
+        <controls:GroupedRadioButtonsControl Style="{StaticResource WinCopies.Styles.Installer.GroupedRadioButtonsControl}" />
+    </DataTemplate>
+
+    <ControlTemplate x:Key="WinCopies.Templates.Installer.ProcessPage" TargetType="{x:Type gui:Process}">
+        <DockPanel FocusManager.FocusedElement="{Binding ElementName=PART_TextBox}">
+            <controls:Progress DockPanel.Dock="Top" OverallProgressHeader="Overall progress:" OverallProgress="{TemplateBinding OverallProgress}" CurrentItemProgressHeader="Current item progress:" CurrentItemProgress="{TemplateBinding CurrentItemProgress}" Height="75" VerticalContentAlignment="Center" />
+            <controls:TextBox x:Name="PART_TextBox" IsReadOnly="True" IsReadOnlyCaretVisible="True" AcceptsReturn="True" Text="{TemplateBinding Log}" CaretIndex="{Binding Text.Length, RelativeSource={x:Static RelativeSource.Self}}" />
+        </DockPanel>
+    </ControlTemplate>
+
+    <Style TargetType="{x:Type gui:Process}">
+        <Setter Property="Template" Value="{StaticResource WinCopies.Templates.Installer.ProcessPage}" />
+    </Style>
+
+    <DataTemplate DataType="{x:Type local:IProcessDataViewModel}">
+        <gui:Process OverallProgress="{Binding OverallProgress}" CurrentItemProgress="{Binding CurrentItemProgress}" Command="{Binding}" Log="{Binding Log}" />
+    </DataTemplate>
+
+    <ControlTemplate x:Key="WinCopies.Templates.Installer.CommonPage" TargetType="{x:Type gui:CommonPage}">
+        <DockPanel>
+            <DockPanel DockPanel.Dock="Top" Height="70">
+                <DockPanel.Background>
+                    <ImageBrush ImageSource="{Binding ImageSource, RelativeSource={x:Static RelativeSource.TemplatedParent}}" Stretch="Fill" />
+                </DockPanel.Background>
+                <Separator DockPanel.Dock="Bottom" />
+                <DockPanel>
+                    <Image DockPanel.Dock="Right" Source="{TemplateBinding Icon}" Margin="15" />
+                    <StackPanel DockPanel.Dock="Top">
+                        <Label FontSize="14" FontWeight="Bold" Content="{TemplateBinding Title}" />
+                        <TextBlock Margin="10,0,0,0" Text="{TemplateBinding Description}" TextWrapping="Wrap" />
+                    </StackPanel>
+                </DockPanel>
+            </DockPanel>
+            <ContentPresenter />
+        </DockPanel>
+    </ControlTemplate>
+
+    <Style TargetType="{x:Type gui:CommonPage}" BasedOn="{StaticResource WinCopies.Styles.Installer.MainPage}">
+        <Setter Property="Template" Value="{StaticResource WinCopies.Templates.Installer.CommonPage}" />
+    </Style>
+
+    <DataTemplate DataType="{x:Type local:ICommonPage}">
+        <gui:CommonPage Title="{Binding Title}" Description="{Binding Description}" ImageSource="{Binding ImageSource}" Icon="{Binding Icon, Converter={StaticResource IconToImageSourceConverter}}" ContentTemplateSelector="{StaticResource WinCopies.Templates.InterfaceDataTemplateSelector}" Content="{Binding Data}" />
+    </DataTemplate>
+
+    <Style TargetType="{x:Type gui:InstallerWindow}" BasedOn="{StaticResource {x:Type Window}}">
+        <Setter Property="Height" Value="400" />
+        <Setter Property="Width" Value="530" />
+        <Setter Property="ResizeMode" Value="NoResize" />
+        <Setter Property="DataContext" Value="{Binding Installer, RelativeSource={RelativeSource Self}}" />
+        <Setter Property="ContentTemplateSelector" Value="{StaticResource WinCopies.Templates.InterfaceDataTemplateSelector}" />
+        <Setter Property="Content" Value="{Binding}" />
+        <Setter Property="Title" Value="{Binding ProgramName, StringFormat={}{0} Setup}" />
+    </Style>
+</ResourceDictionary>

@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>ec5f6afe-c86b-4ed1-affa-fb3ee9f5027b</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>WinCopies.IO.SQL.Shared</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)SQLColumnInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SQLConnectionInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SQLDatabaseInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SQLTableInfo.cs" />
+  </ItemGroup>
+</Project>

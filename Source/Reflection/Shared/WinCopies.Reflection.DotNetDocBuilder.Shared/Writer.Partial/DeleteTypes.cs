@@ -12,7 +12,11 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 {
     public partial class Writer
     {
-        private void DeleteClassMetadata(Class @class, Type type)
+        private void DeleteClassMetadata(Class @class, Type
+#if CS8
+            ?
+#endif
+            type)
         {
             using
 #if !CS8

@@ -31,7 +31,11 @@ namespace WinCopies.IO.ObjectModel
 
         void OpenArchive(FileMode fileMode, FileAccess fileAccess, FileShare fileShare, int? bufferSize, FileOptions fileOptions);
 
-        StreamInfo GetArchiveFileStream();
+        StreamInfo
+#if CS8
+            ?
+#endif
+            GetArchiveFileStream();
 
         void CloseArchive();
     }
@@ -46,37 +50,37 @@ namespace WinCopies.IO.ObjectModel
         // Left empty.
     }
 
-    public interface IShellObjectInfo<out TObjectProperties, out TPredicateTypeParameter, out TSelectorDictionary, out TDictionaryItems> : IShellObjectInfo<TObjectProperties>, IArchiveItemInfoProvider<TObjectProperties, ShellObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IFileSystemObjectInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
+    public interface IShellObjectInfo<out TObjectProperties,  TPredicateTypeParameter, out TSelectorDictionary, out TDictionaryItems> : IShellObjectInfo<TObjectProperties>, IArchiveItemInfoProvider<TObjectProperties, ShellObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TObjectProperties : IFileSystemObjectInfoProperties where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
     {
-        ///// <summary>
-        ///// Gets a <see cref="FileSystemInfo"/> object that provides info for the folders and files. This property returns <see langword="null"/> when this <see cref="IShellObjectInfo"/> is not a folder, drive or file. See the <see cref="IFileSystemObjectInfo.FileType"/> property for more details.
-        ///// </summary>
-        //FileSystemInfo FileSystemInfoProperties { get; }
+        /*/// <summary>
+        /// Gets a <see cref="FileSystemInfo"/> object that provides info for the folders and files. This property returns <see langword="null"/> when this <see cref="IShellObjectInfo"/> is not a folder, drive or file. See the <see cref="IFileSystemObjectInfo.FileType"/> property for more details.
+        /// </summary>
+        FileSystemInfo FileSystemInfoProperties { get; }
 
-        ///// <summary>
-        ///// Gets a <see cref="DriveInfo"/> object that provides info for drives. This property returns <see langword="null"/> when this <see cref="IShellObjectInfo"/> is not a drive. See the <see cref="IFileSystemObjectInfo.FileType"/> property for more details.
-        ///// </summary>
-        //DriveInfo DriveInfoProperties { get; }
+        /// <summary>
+        /// Gets a <see cref="DriveInfo"/> object that provides info for drives. This property returns <see langword="null"/> when this <see cref="IShellObjectInfo"/> is not a drive. See the <see cref="IFileSystemObjectInfo.FileType"/> property for more details.
+        /// </summary>
+        DriveInfo DriveInfoProperties { get; }
 
-        ///// <summary>
-        ///// Gets a <see cref="IKnownFolder"/> object that provides info for the system known folders. This property returns <see langword="null"/> when this <see cref="IShellObjectInfo"/> is not a system known folder. See the <see cref="IFileSystemObjectInfo.FileType"/> property for more details.
-        ///// </summary>
-        //IKnownFolder KnownFolderInfo { get; }
+        /// <summary>
+        /// Gets a <see cref="IKnownFolder"/> object that provides info for the system known folders. This property returns <see langword="null"/> when this <see cref="IShellObjectInfo"/> is not a system known folder. See the <see cref="IFileSystemObjectInfo.FileType"/> property for more details.
+        /// </summary>
+        IKnownFolder KnownFolderInfo { get; }
 
-        //private FileStream _archiveFileStream = null;
+        private FileStream _archiveFileStream = null;
 
-        ///// <summary>
-        ///// The <see cref="FileStream"/> for this <see cref="IShellObjectInfo"/> when it represents an archive file system item. See the remarks section.
-        ///// </summary>
-        ///// <remarks>
-        ///// This field is only used by the <see cref="IShellObjectInfo"/>, <see cref="FolderLoader"/> and the <see cref="ArchiveLoader{TPath, TItems, TFactory}"/> classes in order to lock the file that the <see cref="IShellObjectInfo"/> represents when the items of the archive are loaded.
-        ///// </remarks>
-        //public FileStream ArchiveFileStream { get => _archiveFileStream; internal set => OnPropertyChanged(nameof(ArchiveFileStream), nameof(_archiveFileStream), value, typeof(IShellObjectInfo)); }
+        /// <summary>
+        /// The <see cref="FileStream"/> for this <see cref="IShellObjectInfo"/> when it represents an archive file system item. See the remarks section.
+        /// </summary>
+        /// <remarks>
+        /// This field is only used by the <see cref="IShellObjectInfo"/>, <see cref="FolderLoader"/> and the <see cref="ArchiveLoader{TPath, TItems, TFactory}"/> classes in order to lock the file that the <see cref="IShellObjectInfo"/> represents when the items of the archive are loaded.
+        /// </remarks>
+        public FileStream ArchiveFileStream { get => _archiveFileStream; internal set => OnPropertyChanged(nameof(ArchiveFileStream), nameof(_archiveFileStream), value, typeof(IShellObjectInfo)); }
 
-        ///// <summary>
-        ///// Gets the special folder type of this <see cref="IShellObjectInfo"/>. <see cref="SpecialFolder.None"/> if this <see cref="IShellObjectInfo"/> is a casual file system item.
-        ///// </summary>
-        //SpecialFolder SpecialFolder { get; }
+        /// <summary>
+        /// Gets the special folder type of this <see cref="IShellObjectInfo"/>. <see cref="SpecialFolder.None"/> if this <see cref="IShellObjectInfo"/> is a casual file system item.
+        /// </summary>
+        SpecialFolder SpecialFolder { get; }*/
     }
 
     public interface IShellObjectInfo : IShellObjectInfo<IFileSystemObjectInfoProperties, ShellObjectInfoEnumeratorStruct, IEnumerableSelectorDictionary<ShellObjectInfoItemProvider, IBrowsableObjectInfo>, ShellObjectInfoItemProvider>

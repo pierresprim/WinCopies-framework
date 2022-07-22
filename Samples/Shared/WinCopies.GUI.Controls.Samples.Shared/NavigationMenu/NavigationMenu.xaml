@@ -1,0 +1,46 @@
+﻿<local:IconControl
+    x:Class="WinCopies.GUI.Controls.Samples.NavigationMenu"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:WinCopies.GUI.Controls.Samples"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignHeight="300"
+    d:DesignWidth="400">
+    <Control.Template>
+        <ControlTemplate TargetType="{x:Type Control}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Image Source="{Binding Icon, RelativeSource={RelativeSource TemplatedParent}}" Focusable="False" />
+                <ToggleButton Grid.Column="1" Content="{Binding Header, RelativeSource={RelativeSource TemplatedParent}}" IsChecked="{Binding IsOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" Focusable="False" />
+                <Popup IsOpen="{Binding IsOpen, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}" Focusable="False">
+                    <Grid Background="White" Focusable="False">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto" />
+                            <ColumnDefinition Width="auto" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <local:NavigationPreviousMenuItemButton CommandParameter="{Binding Items, RelativeSource={RelativeSource TemplatedParent}}" Background="Transparent" BorderThickness="0" Focusable="False" />
+                        <Image Grid.Column="1" Source="{Binding Items.Icon, RelativeSource={RelativeSource TemplatedParent}}" Focusable="False" />
+                        <Label Grid.Column="2" Content="{Binding Items.Header, RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" Focusable="False" />
+                        <ItemsControl Grid.ColumnSpan="3" Grid.Row="1" KeyboardNavigation.DirectionalNavigation="Cycle" ItemsSource="{Binding Items, RelativeSource={RelativeSource TemplatedParent}}" Focusable="False">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <local:NavigationMenuItemGroup Header="{Binding Header}" IsExpanded="{Binding IsExpanded}" Items="{Binding}" Icon="{Binding Icon}" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Grid>
+                </Popup>
+            </Grid>
+        </ControlTemplate>
+    </Control.Template>
+</local:IconControl>

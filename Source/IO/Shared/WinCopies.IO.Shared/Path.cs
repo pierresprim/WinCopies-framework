@@ -41,13 +41,15 @@ using WinCopies.Collections;
 using WinCopies.Collections.Generic;
 using WinCopies.Linq;
 
-#if !WinCopies3
+using static System.IO.Path;
+
+#if WinCopies3
+using static WinCopies.UtilHelpers;
+using static WinCopies.ThrowHelper;
+#else
 using WinCopies.Util;
 
 using static WinCopies.Util.Util;
-#else
-using static WinCopies.UtilHelpers;
-using static WinCopies.ThrowHelper;
 #endif
 
 using SysRegex = System.Text.RegularExpressions.Regex;
@@ -56,11 +58,6 @@ namespace WinCopies.IO
 {
     public static class Path
     {
-        public const char PathSeparator = '\\';
-        public const string System32Path = "%SystemRoot%\\System32\\";
-
-
-
         //public static readonly string[] PathEnvironmentVariables = { "AllUserProfile", "AppData", "CommonProgramFiles", "CommonProgramFiles(x86)", "HomeDrive", "LocalAppData", "ProgramData", "ProgramFiles", "ProgramFiles(x86)", "Public", "SystemDrive", "SystemRoot", "Temp", "UserProfile" };
 
         // public new event PropertyChangedEventHandler PropertyChanged;
@@ -69,15 +66,15 @@ namespace WinCopies.IO
 
         //        public static ITreeNode< FileSystemObjectInfo > GetBrowsableObjectInfoFromPath(string path, bool parent/*, bool deepArchiveCheck*/)
         //        {
-        //            path = path.Replace('/', PathSeparator);
+        //            path = path.Replace('/', DirectorySeparatorChar);
 
-        //            if (path.EndsWith(PathSeparator.ToString()) && !path.EndsWith(":\\") && !path.EndsWith(":\\\\"))
+        //            if (path.EndsWith(DirectorySeparatorChar.ToString()) && !path.EndsWith(":\\") && !path.EndsWith(":\\\\"))
 
-        //                path = path.Substring(0, path.LastIndexOf(PathSeparator));
+        //                path = path.Substring(0, path.LastIndexOf(DirectorySeparatorChar));
 
         //            path = GetRealPathFromEnvironmentVariables(path);
 
-        //            string[] paths = path.Split(PathSeparator);
+        //            string[] paths = path.Split(DirectorySeparatorChar);
 
         //            var shellObject = ShellObject.FromParsingName(paths[0]);
 
@@ -134,7 +131,7 @@ namespace WinCopies.IO
 
         //                    string s = paths[i].ToLower();
 
-        //                    browsableObjectInfo = new BrowsableObjectTreeNode<FileSystemObjectInfo, FileSystemObjectInfo, BrowsableObjectInfoFactory>( getBrowsableObjectInfo( ((System.Collections.Generic.IList< TreeNode< FileSystemObjectInfo >>) browsableObjectInfo).FirstOrDefault(item => item.Value.Path.Substring(item.Value.Path.LastIndexOf(IO.Path.PathSeparator) + 1).ToLower() == s).Value as FileSystemObjectInfo ?? throw new FileNotFoundException("The path could not be found.", browsableObjectInfo.Value)), new ShellObjectInfoFactory());
+        //                    browsableObjectInfo = new BrowsableObjectTreeNode<FileSystemObjectInfo, FileSystemObjectInfo, BrowsableObjectInfoFactory>( getBrowsableObjectInfo( ((System.Collections.Generic.IList< TreeNode< FileSystemObjectInfo >>) browsableObjectInfo).FirstOrDefault(item => item.Value.Path.Substring(item.Value.Path.LastIndexOf(DirectorySeparatorChar) + 1).ToLower() == s).Value as FileSystemObjectInfo ?? throw new FileNotFoundException("The path could not be found.", browsableObjectInfo.Value)), new ShellObjectInfoFactory());
         //                }
 
         //                else if (key && i < paths.Length - 1    /*&& deepArchiveCheck*/)
@@ -147,13 +144,13 @@ namespace WinCopies.IO
 
         //                    string s = shellObject.ParsingName;
 
-        //                    if (!s.EndsWith(PathSeparator.ToString()))
+        //                    if (!s.EndsWith(DirectorySeparatorChar.ToString()))
 
-        //                        s += PathSeparator;
+        //                        s += DirectorySeparatorChar;
 
         //                    s += paths[i];
 
-        //                    // string _s = s.Replace(IO.Path.PathSeparator, "\\\\");
+        //                    // string _s = s.Replace(DirectorySeparatorChar, "\\\\");
 
         //                    shellObject = ((ShellContainer)shellObject).FirstOrDefault(item => If(IfCT.Or, IfCM.Logical, IfComp.Equal, paths[i], item.Name, item.GetDisplayName(DisplayNameType.RelativeToParent))) as ShellObject ?? throw new FileNotFoundException("The path could not be found.", browsableObjectInfo.Value);
 
@@ -194,7 +191,7 @@ namespace WinCopies.IO
 
         //        {
 
-        //            string pathWithoutExtension = System.IO.Path.GetDirectoryName(path) + IO.Path.PathSeparator + System.IO.Path.GetFileNameWithoutExtension(path);
+        //            string pathWithoutExtension = System.IO.Path.GetDirectoryName(path) + DirectorySeparatorChar + System.IO.Path.GetFileNameWithoutExtension(path);
 
         //            bool checkFilters(string[] filters)
 
@@ -274,7 +271,7 @@ namespace WinCopies.IO
 
         //        //#endif
 
-        //        //            if (basePath.EndsWith(IO.Path.PathSeparator))
+        //        //            if (basePath.EndsWith(DirectorySeparatorChar))
 
         //        //                basePath = basePath.Substring(0, basePath.Length - 1);
 
@@ -362,7 +359,7 @@ namespace WinCopies.IO
 
         //        //                    fileType = FileType.Folder;
 
-        //        //                // else if (basePath.StartsWith(LibrariesName + IO.Path.PathSeparator) || basePath.StartsWith(LibrariesLocalizedName)) { shellObject=(ShellObject)KnownFolders.Libraries KnownFolders.Libraries.Path + basePath.Substring(KnownFolders.Libraries.LocalizedName.Length);
+        //        //                // else if (basePath.StartsWith(LibrariesName + DirectorySeparatorChar) || basePath.StartsWith(LibrariesLocalizedName)) { shellObject=(ShellObject)KnownFolders.Libraries KnownFolders.Libraries.Path + basePath.Substring(KnownFolders.Libraries.LocalizedName.Length);
 
         //        //                // else if
 
@@ -420,7 +417,7 @@ namespace WinCopies.IO
 
         //            SpecialFolder specialFolder = SpecialFolder.OtherFolderOrFile;
 
-        //            if (path.EndsWith(IO.Path.PathSeparator)) path = path.Substring(0, path.Length - 1);
+        //            if (path.EndsWith(DirectorySeparatorChar)) path = path.Substring(0, path.Length - 1);
 
         //#if DEBUG
 
@@ -454,7 +451,7 @@ namespace WinCopies.IO
 
         //                    specialFolder = SpecialFolder.UsersLibraries;
 
-        //            // else if (basePath.StartsWith(LibrariesName + IO.Path.PathSeparator) || basePath.StartsWith(LibrariesLocalizedName)) { shellObject=(ShellObject)KnownFolders.Libraries KnownFolders.Libraries.Path + basePath.Substring(KnownFolders.Libraries.LocalizedName.Length);
+        //            // else if (basePath.StartsWith(LibrariesName + DirectorySeparatorChar) || basePath.StartsWith(LibrariesLocalizedName)) { shellObject=(ShellObject)KnownFolders.Libraries KnownFolders.Libraries.Path + basePath.Substring(KnownFolders.Libraries.LocalizedName.Length);
 
         //            // else if
 
@@ -466,7 +463,7 @@ namespace WinCopies.IO
 
         //        {
 
-        //            string newPath = destPath + IO.Path.PathSeparator + System.IO.Path.GetFileName(path);
+        //            string newPath = destPath + DirectorySeparatorChar + System.IO.Path.GetFileName(path);
 
         //            if (!(Directory.Exists(newPath) || File.Exists(newPath)))
 
@@ -610,10 +607,10 @@ namespace WinCopies.IO
 
 
 
-        //            return destPath + PathSeparator + fileNameWithoutExtension + " (" + (pathParenthesesNumber + 1).ToString() + ")" + System.IO.Path.GetExtension(path);
+        //            return destPath + DirectorySeparatorChar + fileNameWithoutExtension + " (" + (pathParenthesesNumber + 1).ToString() + ")" + System.IO.Path.GetExtension(path);
 
 
-        //            // string new_Name = destPath + IO.Path.PathSeparator + fileNameWithoutExtension + " (" + (pathParenthesesNumber + 1).ToString() + ")" + System.IO.Path.GetExtension(path);
+        //            // string new_Name = destPath + DirectorySeparatorChar + fileNameWithoutExtension + " (" + (pathParenthesesNumber + 1).ToString() + ")" + System.IO.Path.GetExtension(path);
 
 
 
@@ -648,10 +645,9 @@ namespace WinCopies.IO
 
         //        }
 
-
         public static string ParsePath(string path)
         {
-            string[] subPaths = path.Split(PathSeparator);
+            string[] subPaths = path.Split(DirectorySeparatorChar);
 
             EnumerableHelper<string>.IEnumerableStack stack = EnumerableHelper<string>.GetEnumerableStack();
 
@@ -669,28 +665,28 @@ namespace WinCopies.IO
 
             return string.Join(
 #if CS8
-                PathSeparator
+                DirectorySeparatorChar
 #else
-                $"{PathSeparator}"
+                $"{DirectorySeparatorChar}"
 #endif
                 , stack);
         }
 
         public static string GetCompletePath(string directory, in string subPath)
         {
-            if (directory.EndsWith(PathSeparator))
+            if (directory.EndsWith(DirectorySeparatorChar))
 
                 directory = directory.Remove(directory.Length - 1);
 
-            return ParsePath(subPath.StartsWith($"..{PathSeparator}")
-                ? $"{directory}{PathSeparator}{subPath}"
-                : subPath.StartsWith(PathSeparator)
+            return ParsePath(subPath.StartsWith($"..{DirectorySeparatorChar}")
+                ? $"{directory}{DirectorySeparatorChar}{subPath}"
+                : subPath.StartsWith(DirectorySeparatorChar)
                 ? $"{directory}{subPath}"
-                : subPath.StartsWith($".{PathSeparator}")
+                : subPath.StartsWith($".{DirectorySeparatorChar}")
                 ? System.IO.Directory.GetDirectoryRoot(directory)
                 : subPath.Contains(':')
                 ? subPath
-                : $"{directory}{PathSeparator}{subPath}");
+                : $"{directory}{DirectorySeparatorChar}{subPath}");
         }
 
         public static bool Match(in string name, in string filter) => SysRegex.IsMatch(name, Regex.FromPathFilter(filter), RegexOptions.IgnoreCase);
@@ -712,7 +708,7 @@ namespace WinCopies.IO
 
         public static string GetRealPathFromEnvironmentVariables(in string path)
         {
-            string[] subPaths = path.Split(WinCopies.IO.Path.PathSeparator);
+            string[] subPaths = path.Split(DirectorySeparatorChar);
 
             var stringBuilder = new StringBuilder();
 
@@ -744,7 +740,7 @@ namespace WinCopies.IO
 
                 if (count < subPaths.Length)
 
-                    _ = stringBuilder.Append(WinCopies.IO.Path.PathSeparator);
+                    _ = stringBuilder.Append(DirectorySeparatorChar);
             }
 
             return stringBuilder.ToString();
@@ -756,22 +752,30 @@ namespace WinCopies.IO
 
                 throw GetArgumentNullException(nameof(path));
 
-            char[] invalidChars = System.IO.Path.GetInvalidPathChars();
+            char[] invalidChars = GetInvalidPathChars();
 
-            return !path.ContainsOneOrMoreValues(invalidChars) && System.IO.Path.IsPathRooted(path);
+            return !path.ContainsOneOrMoreValues(invalidChars) && IsPathRooted(path);
         }
 
-        public static bool Exists(in string path) => System.IO.File.Exists(path) || System.IO.Directory.Exists(path);
+        public static bool Exists(in string path) => File.Exists(path) || System.IO.Directory.Exists(path);
 
-        public static DirectoryInfo TryGetParent(in string path) => System.IO.Directory.Exists(path) ? System.IO.Directory.GetParent(path) : System.IO.File.Exists(path) ? new System.IO.FileInfo(path).Directory : null;
+        public static DirectoryInfo
+#if CS8
+            ?
+#endif
+            TryGetParent(in string path) => System.IO.Directory.Exists(path) ? System.IO.Directory.GetParent(path) : File.Exists(path) ? new FileInfo(path).Directory : null;
 
         public static DirectoryInfo GetParent(in string path) => TryGetParent(path) ?? throw new System.IO.IOException("The given path was not found.");
 
-        public static string TryGetParent2(in string path) => TryGetParent(path)?.FullName;
+        public static string
+#if CS8
+            ?
+#endif
+            TryGetParent2(in string path) => TryGetParent(path)?.FullName;
 
         public static string GetParent2(in string path) => GetParent(path).FullName;
 
-        public static uint? PathFileNameContainsParenthesesNumber(string path) => FileNameContainsParenthesesNumber(IsFileSystemPath(path) ? System.IO.Path.GetFileNameWithoutExtension(path) : throw new ArgumentException($"{nameof(path)} is not a file system path."));
+        public static uint? PathFileNameContainsParenthesesNumber(string path) => FileNameContainsParenthesesNumber(IsFileSystemPath(path) ? GetFileNameWithoutExtension(path) : throw new ArgumentException($"{nameof(path)} is not a file system path."));
 
         public static uint? FileNameContainsParenthesesNumber(string fileName) => _FileNameContainsParenthesesNumber(IsNullEmptyOrWhiteSpace(fileName) ? throw GetArgumentNullException(nameof(fileName)) : fileName);
 
@@ -798,13 +802,11 @@ namespace WinCopies.IO
                     _ = stringBuilder.Append(fileName[i]);
                 }
 
-                if (uint.TryParse(stringBuilder.ToString(), NumberStyles.None, CultureInfo.CurrentCulture, out uint result))
-
-                    return result;
-
-                else
-
-                    return null;
+                return uint.TryParse(stringBuilder.ToString(), NumberStyles.None, CultureInfo.CurrentCulture, out uint result) ?
+#if !CS9
+                    (uint?)
+#endif
+                    result : null;
             }
 
             return null;
@@ -818,16 +820,16 @@ namespace WinCopies.IO
 
             if (path.EndsWith(
 #if NETFRAMEWORK
-                $"{PathSeparator}", StringComparison.OrdinalIgnoreCase
+                $"{DirectorySeparatorChar}", StringComparison.OrdinalIgnoreCase
 #else
-                PathSeparator
+                DirectorySeparatorChar
 #endif
                 ))
 
                 throw new ArgumentException($"{nameof(path)} is a root path.");
 
             string parentPath = path.Remove(path.LastIndexOf('\\'));
-            string fileName = System.IO.Path.GetFileNameWithoutExtension(path);
+            string fileName = GetFileNameWithoutExtension(path);
             string _fileName;
             uint result;
 
@@ -847,7 +849,7 @@ namespace WinCopies.IO
                   return null;
               }).OrderByDescending(_value => _value).FirstOrDefaultValue(out result);
 
-            string getResult(in uint number) => $"{System.IO.Path.GetDirectoryName(path)}{PathSeparator}{fileName} ({number}){System.IO.Path.GetExtension(path)}";
+            string getResult(in uint number) => $"{System.IO.Path.GetDirectoryName(path)}{DirectorySeparatorChar}{fileName} ({number}){System.IO.Path.GetExtension(path)}";
 
             return value ? getResult(result < first ? first : result + 1) : getResult(first);
         }

@@ -26,6 +26,8 @@ using WinCopies.IO.AbstractionInterop;
 using WinCopies.IO.ObjectModel;
 using WinCopies.Util;
 
+using static System.IO.Path;
+
 using static WinCopies.ThrowHelper;
 
 namespace WinCopies.IO.Enumeration
@@ -275,7 +277,7 @@ new WinCopies.Collections.Generic.Queue
                             .Substring(relativePath.Length);
 #endif
 
-                        if (fileName.StartsWith(WinCopies.IO.Path.PathSeparator))
+                        if (fileName.StartsWith(DirectorySeparatorChar))
 
                             fileName = fileName
 #if CS8
@@ -284,13 +286,13 @@ new WinCopies.Collections.Generic.Queue
                             .Substring(1);
 #endif
 
-                        if (fileName.Contains(WinCopies.IO.Path.PathSeparator
+                        if (fileName.Contains(DirectorySeparatorChar
 #if CS8
                             , StringComparison.OrdinalIgnoreCase
 #endif
                             ))
 
-                            fileName = fileName.Substring(0, fileName.IndexOf(WinCopies.IO.Path.PathSeparator
+                            fileName = fileName.Substring(0, fileName.IndexOf(DirectorySeparatorChar
 #if CS8
                                 , StringComparison.OrdinalIgnoreCase
 #endif

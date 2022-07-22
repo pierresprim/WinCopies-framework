@@ -320,7 +320,7 @@ namespace WinCopies.IO.Process
 
         System.Collections.Generic.IEnumerator<TItemsOut> System.Collections.Generic.IEnumerable<TItemsOut>.GetEnumerator() => GetEnumerator();
 
-        System.Collections.Generic.IEnumerator<TItemsOut> Collections.Generic.IEnumerable<TItemsOut>.GetReversedEnumerator() => GetReversedEnumerator();
+        System.Collections.Generic.IEnumerator<TItemsOut> Collections.Extensions.Generic.IEnumerable<TItemsOut>.GetReversedEnumerator() => GetReversedEnumerator();
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
 

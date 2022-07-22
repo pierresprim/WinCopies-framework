@@ -30,6 +30,7 @@ using static WinCopies.ThrowHelper;
 #else
 using WinCopies.Util;
 using WinCopies.Util.Data;
+
 using static WinCopies.Util.Util;
 #endif
 
@@ -102,6 +103,35 @@ namespace WinCopies.GUI.Windows.Dialogs.Models
 
 namespace WinCopies.GUI.Controls.Models
 {
+    public interface IControlDescription
+    {
+        string Name { get; }
+
+        string
+#if CS8
+            ?
+#endif
+            Description
+        { get; }
+    }
+
+    public interface IInput : IControlDescription
+    {
+        string
+#if CS8
+            ?
+#endif
+            Placeholder
+        { get; }
+
+        string Text { get; set; }
+    }
+
+    public interface IMultiInput : IEnumerable<IInput>, IControlDescription
+    {
+        // Left empty.
+    }
+
     public interface IModelDataTemplateSelectors
     {
         DataTemplateSelector HeaderDataTemplateSelector { get; }

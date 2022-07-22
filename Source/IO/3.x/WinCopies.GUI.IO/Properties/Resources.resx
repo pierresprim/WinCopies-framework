@@ -117,6 +117,12 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="CopyNameStatusBarLabel" xml:space="preserve">
+    <value>Copies the name of the selected item.</value>
+  </data>
+  <data name="CopyPathStatusBarLabel" xml:space="preserve">
+    <value>Copies the path of the selected item.</value>
+  </data>
   <data name="DestinationPath" xml:space="preserve">
     <value>Destination path:</value>
   </data>
@@ -141,10 +147,34 @@
   <data name="NewItemCommandToolTip" xml:space="preserve">
     <value>Opens a dialog for item creation.</value>
   </data>
+  <data name="OpenInNewTabStatusBarLabel" xml:space="preserve">
+    <value>Opens the selected item in a new tab.</value>
+  </data>
+  <data name="OpenInNewWindowStatusBarLabel" xml:space="preserve">
+    <value>Opens the selected item in a new window.</value>
+  </data>
+  <data name="OpenOrLaunchStatusBarLabel" xml:space="preserve">
+    <value>Opens the selected items.</value>
+  </data>
   <data name="PreserveDirectoryRoot" xml:space="preserve">
     <value>Preserve directory root</value>
   </data>
+  <data name="Quit" xml:space="preserve">
+    <value>_Quit</value>
+  </data>
+  <data name="QuitStatusBarLabel" xml:space="preserve">
+    <value>Closes all windows of the current process.</value>
+  </data>
   <data name="RenameItemCommandToolTip" xml:space="preserve">
     <value>Opens a dialog for item renaming.</value>
+  </data>
+  <data name="SubmitABug" xml:space="preserve">
+    <value>Submit a _bug...</value>
+  </data>
+  <data name="SubmitABugStatusBarLabel" xml:space="preserve">
+    <value>Opens your default browser at the WinCopies' GitHub page.</value>
+  </data>
+  <data name="WindowClosingMessage" xml:space="preserve">
+    <value>You have multiple tabs open. Are you sure you want to close the window?</value>
   </data>
 </root>

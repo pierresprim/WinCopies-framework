@@ -7,7 +7,7 @@ using static WinCopies.ThrowHelper;
 
 namespace WinCopies.Data.SQL
 {
-    public interface ISelectParameters : ISQLTableRequest
+    public interface ISelectParametersBase : ISQLTableRequestBase
     {
         IConditionGroup
 #if CS8
@@ -15,6 +15,11 @@ namespace WinCopies.Data.SQL
 #endif
             ConditionGroup
         { get; set; }
+    }
+
+    public interface ISelectParameters : ISelectParametersBase, ISQLTableRequest
+    {
+        // Left empty.
     }
 
     public struct OrderByColumns : IOrderByColumns
@@ -37,13 +42,23 @@ namespace WinCopies.Data.SQL
         public OrderByColumns(in OrderBy orderBy, params SQLColumn[] columns) : this(columns.AsEnumerable(), orderBy) { /* Left empty. */ }
     }
 
-    public interface ISelect : ISelectParameters, ISQLColumnRequest
+    public interface ISelectBase<T> : ISelectParametersBase
     {
         OrderByColumns? OrderBy { get; set; }
 
-        IEnumerable<ISQLGetter> ExecuteQuery();
+        Interval? Interval { get; set; }
 
-        Task<IEnumerable<ISQLGetter>> ExecuteQueryAsync();
+        Collections.Generic.IDisposableEnumerable<T> ExecuteQuery(in bool dispose);
+    }
+
+    public interface ISelect : ISelectBase<ISQLGetter>, ISQLColumnRequest
+    {
+
+    }
+
+    public interface IDatabaseSelect : ISelectBase<string>
+    {
+
     }
 
     public interface ISelectParameters<T> : ISelectParameters, ISQLColumnRequest<T> where T : ISQLColumn
@@ -58,13 +73,22 @@ namespace WinCopies.Data.SQL
 
     public abstract class Select<TConnection, TCommand, T> : SQLTableRequest<TConnection, TCommand>, ISelect<T> where TConnection : IConnection<TCommand> where T : ISQLColumn
     {
-        private SQLItemCollection<T> _columns;
+        public SQLItemCollection<T>
+#if CS8
+            ?
+#endif
+            Columns
+        { get; set; }
 
-        public SQLItemCollection<T> Columns { get => _columns; set => _columns = value ?? throw GetArgumentNullException(nameof(value)); }
-
-        Collections.Generic.IExtensibleEnumerable<T> ISQLColumnRequest<T>.Columns => Columns;
+        Collections.Generic.IExtensibleEnumerable<T>
+#if CS8
+            ?
+#endif
+            ISQLColumnRequest<T>.Columns => Columns;
 
         public OrderByColumns? OrderBy { get; set; }
+
+        public Interval? Interval { get; set; }
 
 #if !CS8
         IEnumerable<SQLColumn> ISQLColumnRequest.Columns => Columns?.Select(column => column.ToSQLColumn());
@@ -72,8 +96,6 @@ namespace WinCopies.Data.SQL
 
         protected Select(in TConnection connection, in SQLItemCollection<string> tables, in SQLItemCollection<T> defaultColumns) : base(connection, tables) => Columns = defaultColumns;
 
-        public abstract IEnumerable<ISQLGetter> ExecuteQuery();
-
-        public abstract Task<IEnumerable<ISQLGetter>> ExecuteQueryAsync();
+        public abstract Collections.Generic.IDisposableEnumerable<ISQLGetter> ExecuteQuery(in bool dispose);
     }
 }

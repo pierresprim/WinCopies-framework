@@ -189,7 +189,7 @@ namespace WinCopies.IO.Shell
             return false;
         }
 
-        public static bool IsWMIPath(in string path) => (IsNullEmptyOrWhiteSpace(path) ? throw GetArgumentNullException(nameof(path)) : path).StartsWith(IO.Path.PathSeparator);
+        public static bool IsWMIPath(in string path) => (IsNullEmptyOrWhiteSpace(path) ? throw GetArgumentNullException(nameof(path)) : path).StartsWith(System.IO.Path.DirectorySeparatorChar);
 
         //public static string GetShortcutPath(string path)
         //{

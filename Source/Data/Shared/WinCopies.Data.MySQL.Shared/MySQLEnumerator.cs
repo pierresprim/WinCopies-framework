@@ -1,16 +1,13 @@
 ﻿using MySql.Data.MySqlClient;
 
-using System;
 using System.Data.Common;
 using System.Threading.Tasks;
-using WinCopies.Collections.Generic;
-using WinCopies.Data.SQL;
 
-using static WinCopies.ThrowHelper;
+using WinCopies.Data.SQL;
 
 namespace WinCopies.Data.MySQL
 {
-    public class MySQLEnumerator : Enumerator<ISQLGetter>
+    public class MySQLEnumerator : SQLEnumerator<MySQLConnection>
     {
         //private struct Async : IAsyncEnumerableProvider<ISQLGetter>
         //{
@@ -33,165 +30,24 @@ namespace WinCopies.Data.MySQL
         //    }
         //}
 
-        private DbDataReader
-#if CS8
-            ?
-#endif
-            _reader;
-        private MySQLGetter
-#if CS8
-            ?
-#endif
-            _current;
-        private Action
-#if CS8
-            ?
-#endif
-            _moveNextAction;
-        private Func<bool>
-#if CS8
-            ?
-#endif
-            _moveNext;
-        //ulong i = 0;
-        MySQLConnection _connection;
-        MySqlCommand _command;
-        bool _dispose;
+        protected internal MySQLEnumerator(in DbCommand command, in DbDataReader reader, in MySQLConnection connection, in bool closeReader) : base(command, reader, connection, closeReader) { /* Left empty. */ }
 
-        protected override
-#if CS9
-            MySQLGetter
-#else
-            ISQLGetter
-#endif
-            CurrentOverride => _current;
+        public MySQLEnumerator(in DbCommand command, in MySQLConnection connection, in bool closeReader) : base(command, connection, closeReader) { /* Left empty. */ }
 
-        public override bool? IsResetSupported => false;
+        public MySQLEnumerator(in string sql, in MySQLConnection connection, in bool closeReader) : this(new MySqlCommand(sql, connection.InnerConnection), connection, closeReader) { /* Left empty. */ }
 
-        private MySQLEnumerator(in MySqlCommand command, in DbDataReader
-#if CS8
-            ?
-#endif
-            reader, MySQLConnection connection /*Func<MySqlConnection> func*/  )
-        {
-            _connection = connection;
+        protected override MySQLConnection CloneConnection(MySQLConnection connection) => connection.GetConnection(false);
 
-            _command = command;
+        protected override DbConnection GetConnection(MySQLConnection connection) => connection.InnerConnection;
+    }
 
-            _reader = reader;
+    public class MySQLEnumerable : SQLEnumerable<MySQLConnection>
+    {
+        public MySQLEnumerable(in DbCommand command, in MySQLConnection connection, in bool closeReader) : base(command, connection, closeReader) { /* Left empty. */ }
+        public MySQLEnumerable(in SQLRequest<MySQLConnection, MySqlCommand> request, in MySQLConnection connection, in bool closeReader) : this(request.GetCommand(), connection, closeReader) { /* Left empty. */ }
 
-            _moveNextAction = () => _moveNextAction = () => _current.Dispose();
+        protected override SQLEnumerator<MySQLConnection> GetSQLEnumerator() => new MySQLEnumerator(Command, Connection, CloseReader);
 
-            bool moveNext()
-            {
-                //if (_reader.IsClosed)
-                //{
-                //    //command.Connection = func();
-
-                //    if (_connection.IsDisposed)
-
-                //        initCollection();
-
-                //    _reader = command.ExecuteReader();
-
-                //    for (ulong _i = 0; _i < i; _i++)
-
-                //        _reader.Read();
-                //}
-
-                if (_reader.Read())
-                {
-                    //i++;
-
-                    _moveNextAction();
-
-                    _current = new MySQLGetter(_reader);
-
-                    return true;
-                }
-
-                //ResetOverride2();
-
-                return false;
-            }
-
-            _moveNext = () =>
-            {
-                if (_reader == null)
-
-                    return false;
-
-                ResetConnection();
-
-                return (_moveNext = moveNext)();
-            };
-        }
-
-        public MySQLEnumerator(in MySqlCommand command, in MySQLConnection connection) : this(command ?? throw GetArgumentNullException(nameof(command)), command.ExecuteReader(), connection) { /* Left empty. */ }
-
-        public static async Task<MySQLEnumerator> GetEnumerableAsync(MySqlCommand command, MySQLConnection connection) => new MySQLEnumerator(command
-#if CS8
-            ??
-#else
-            == null ?
-#endif
-            throw GetArgumentNullException(nameof(command))
-#if !CS8
-            : command
-#endif
-            , await command.ExecuteReaderAsync(), connection);
-
-        protected void ResetConnection()
-        {
-            if (_connection.IsDisposed && !_connection.Open())
-            {
-                _command.Connection = (_connection = (MySQLConnection)_connection.GetConnection(false)).InnerConnection;
-
-                _dispose = true;
-            }
-        }
-
-        protected override void ResetCurrent()
-        {
-            base.ResetCurrent();
-
-            if (_current != null)
-            {
-                _current.Dispose();
-                _current = null;
-            }
-        }
-
-        protected override void ResetOverride2()
-        {
-            _moveNextAction = null;
-
-            _moveNext = null;
-
-            //i = 0;
-        }
-
-        protected override bool MoveNextOverride() => _moveNext();
-
-        protected override void DisposeUnmanaged()
-        {
-            ResetCurrent();
-
-            if (_reader != null)
-            {
-                _reader.Close();
-                _reader.Dispose();
-                _reader = null;
-
-                _command.Dispose();
-                _command = null;
-
-                if (_dispose)
-
-                    _connection.Dispose();
-
-                _connection = null;
-            }
-        }
+        protected override async Task<SQLEnumerator<MySQLConnection>> GetSQLEnumeratorAsync() => new MySQLEnumerator(Command, await Command.ExecuteReaderAsync(), Connection, CloseReader);
     }
 }

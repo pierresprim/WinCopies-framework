@@ -165,12 +165,6 @@
   <data name="Copy" xml:space="preserve">
     <value>Copy</value>
   </data>
-  <data name="CopyNameStatusBarLabel" xml:space="preserve">
-    <value>Copies the name of the selected item.</value>
-  </data>
-  <data name="CopyPathStatusBarLabel" xml:space="preserve">
-    <value>Copies the path of the selected item.</value>
-  </data>
   <data name="CopyStatusBarLabel" xml:space="preserve">
     <value>Copies the selected items to the Clipboard.</value>
   </data>
@@ -213,12 +207,6 @@
   <data name="NewFileSystemTabStatusBarLabel" xml:space="preserve">
     <value>Opens a new tab for file system browsing.</value>
   </data>
-  <data name="NewRegistryTab" xml:space="preserve">
-    <value>New registry tab</value>
-  </data>
-  <data name="NewRegistryTabStatusBarLabel" xml:space="preserve">
-    <value>Opens a new tab for Registry browsing.</value>
-  </data>
   <data name="NewTab" xml:space="preserve">
     <value>_New tab</value>
   </data>
@@ -231,32 +219,17 @@
   <data name="NewWindowStatusBarLabel" xml:space="preserve">
     <value>Opens a new window.</value>
   </data>
-  <data name="NewWMITab" xml:space="preserve">
-    <value>New WMI tab</value>
-  </data>
-  <data name="NewWMITabStatusBarLabel" xml:space="preserve">
-    <value>Opens a new tab for WMI browsing.</value>
-  </data>
   <data name="OpenFile" xml:space="preserve">
     <value>Open</value>
   </data>
   <data name="OpenInNewTab" xml:space="preserve">
     <value>Open in new tab</value>
   </data>
-  <data name="OpenInNewTabStatusBarLabel" xml:space="preserve">
-    <value>Opens the selected item in a new tab.</value>
-  </data>
   <data name="OpenInNewWindow" xml:space="preserve">
     <value>Open in new window</value>
   </data>
-  <data name="OpenInNewWindowStatusBarLabel" xml:space="preserve">
-    <value>Opens the selected item in a new window.</value>
-  </data>
   <data name="OpenOrLaunch" xml:space="preserve">
     <value>Open selected items</value>
-  </data>
-  <data name="OpenOrLaunchStatusBarLabel" xml:space="preserve">
-    <value>Opens the selected items.</value>
   </data>
   <data name="Paste" xml:space="preserve">
     <value>Paste</value>
@@ -266,12 +239,6 @@
   </data>
   <data name="PreserveDirectoryStructure" xml:space="preserve">
     <value>Preserve directory structure:</value>
-  </data>
-  <data name="Quit" xml:space="preserve">
-    <value>_Quit</value>
-  </data>
-  <data name="QuitStatusBarLabel" xml:space="preserve">
-    <value>Closes all windows of the current process.</value>
   </data>
   <data name="Recycle" xml:space="preserve">
     <value>Recycle</value>
@@ -284,14 +251,5 @@
   </data>
   <data name="SelectFolder" xml:space="preserve">
     <value>Select</value>
-  </data>
-  <data name="SubmitABug" xml:space="preserve">
-    <value>Submit a _bug...</value>
-  </data>
-  <data name="SubmitABugStatusBarLabel" xml:space="preserve">
-    <value>Opens your default browser at the WinCopies' GitHub page.</value>
-  </data>
-  <data name="WindowClosingMessage" xml:space="preserve">
-    <value>You have multiple tabs open. Are you sure you want to close the window?</value>
   </data>
 </root>

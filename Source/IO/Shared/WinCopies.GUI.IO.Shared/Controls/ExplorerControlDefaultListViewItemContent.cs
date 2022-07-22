@@ -38,6 +38,6 @@ namespace WinCopies.GUI.IO.Controls
 
         public string ItemName { get => (string)GetValue(ItemNameProperty); set => SetValue(ItemNameProperty, value); }
 
-        static ExplorerControlDefaultListViewItemContent() => DefaultStyleKeyProperty.OverrideFrameworkPropertyMetadata<ExplorerControlDefaultListViewItemContent>();
+        static ExplorerControlDefaultListViewItemContent() => DefaultStyleKeyProperty.OverrideDefaultStyleKey<ExplorerControlDefaultListViewItemContent>();
     }
 }

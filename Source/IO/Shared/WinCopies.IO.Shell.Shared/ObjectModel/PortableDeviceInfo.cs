@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+#region Usings
 #region WAPICP
 using Microsoft.WindowsAPICodePack.PortableDevices;
 using Microsoft.WindowsAPICodePack.Shell;
@@ -25,6 +26,8 @@ using System;
 
 #region WinCopies
 using WinCopies.IO.AbstractionInterop;
+using WinCopies.IO.ComponentSources.Bitmap;
+using WinCopies.IO.ComponentSources.Item;
 using WinCopies.IO.Process;
 using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Selectors;
@@ -34,6 +37,7 @@ using WinCopies.PropertySystem;
 #endregion WinCopies
 
 using static WinCopies.ThrowHelper;
+#endregion Usings
 
 namespace WinCopies.IO.ObjectModel
 {
@@ -53,13 +57,11 @@ namespace WinCopies.IO.ObjectModel
 #else
             ?? (_bitmapSourceProvider =
 #endif
-            FileSystemObjectInfo.GetDefaultBitmapSourcesProvider(this, new Shell.BitmapSources(new Shell.BitmapSourcesStruct(38, "imageres.dll")))
+            FileSystemObjectInfo.GetDefaultBitmapSourcesProvider(this, new Shell.ComponentSources.Bitmap.BitmapSources(new Shell.ComponentSources.Bitmap.BitmapSourcesStruct(38, "imageres.dll")))
 #if !CS8
             )
 #endif
             ;
-
-        protected override IProcessFactory ProcessFactoryOverride => Process.ProcessFactory.DefaultProcessFactory;
 
         protected sealed override IPortableDevice InnerObjectGenericOverride => _portableDevice;
 
@@ -71,13 +73,11 @@ namespace WinCopies.IO.ObjectModel
 
         protected override string DescriptionOverride => WinCopies.Consts.NotApplicable;
 
-        protected override IBrowsableObjectInfo ParentOverride => ShellObjectInfo.From(ShellObjectFactory.Create(KnownFolders.Computer.ParsingName), ClientVersion);
+        protected override IBrowsableObjectInfo ParentGenericOverride => ShellObjectInfo.From(ShellObjectFactory.Create(KnownFolders.Computer.ParsingName), ClientVersion);
 
         public override string LocalizedName => Name;
 
         public override string Name => InnerObjectGeneric.DeviceFriendlyName;
-
-        protected override System.Collections.Generic.IEnumerable<IProcessInfo> CustomProcessesOverride => PortableDeviceInfo.DefaultCustomProcessesSelectorDictionary.Select(this);
         #endregion Properties
 
         public PortableDeviceInfo(in IPortableDevice portableDevice, in ClientVersion clientVersion) : base((portableDevice ?? throw GetArgumentNullException(nameof(portableDevice))).DeviceFriendlyName, clientVersion) => _portableDevice = portableDevice;
@@ -104,32 +104,61 @@ namespace WinCopies.IO.ObjectModel
 
     public class PortableDeviceInfo : PortableDeviceInfo<IPortableDeviceInfoProperties, IPortableDeviceObject, IEnumerableSelectorDictionary<PortableDeviceObjectInfoItemProvider, IBrowsableObjectInfo>, PortableDeviceObjectInfoItemProvider>, IPortableDeviceInfo
     {
-        private static readonly BrowsabilityPathStack<IPortableDeviceInfo> __browsabilityPathStack = new BrowsabilityPathStack<IPortableDeviceInfo>();
+        public class ItemSource : ItemSourceBase4<IPortableDeviceInfo, IPortableDeviceObject, IEnumerableSelectorDictionary<PortableDeviceObjectInfoItemProvider, IBrowsableObjectInfo>, PortableDeviceObjectInfoItemProvider>
+        {
+            protected override IProcessSettings ProcessSettingsOverride { get; } 
 
+            public override bool IsPaginationSupported => false;
+
+            public ItemSource(in IPortableDeviceInfo browsableObjectInfo) : base(browsableObjectInfo) => ProcessSettingsOverride = new ProcessSettings(null, DefaultCustomProcessesSelectorDictionary.Select(BrowsableObjectInfo));
+
+            protected override System.Collections.Generic.IEnumerable<PortableDeviceObjectInfoItemProvider> GetItemProviders(Predicate<IPortableDeviceObject>
+#if CS8
+                ?
+#endif
+                predicate)
+            {
+                if (!BrowsableObjectInfo.InnerObject.IsOpen)
+
+                    BrowsableObjectInfo.InnerObject.Open(BrowsableObjectInfo.ClientVersion.ToPortableDeviceClientVersion(), BrowsableObjectInfo.ObjectProperties.OpeningOptions);
+
+                return (predicate == null ? BrowsableObjectInfo.InnerObject : BrowsableObjectInfo.InnerObject.WherePredicate(predicate)).SelectConverter(item => new PortableDeviceObjectInfoItemProvider(item, BrowsableObjectInfo, BrowsableObjectInfo.ClientVersion));
+            }
+
+            protected override System.Collections.Generic.IEnumerable<PortableDeviceObjectInfoItemProvider> GetItemProviders() => GetItemProviders(null);
+        }
+
+        private static readonly BrowsabilityPathStack<IPortableDeviceInfo> _browsabilityPathStack = new BrowsabilityPathStack<IPortableDeviceInfo>();
         private IPortableDeviceInfoProperties _objectProperties;
 
         #region Properties
+        protected override IItemSourcesProvider<IPortableDeviceObject> ItemSourcesGenericOverride { get; }
+
         public static ISelectorDictionary<IPortableDeviceInfoBase, System.Collections.Generic.IEnumerable<IProcessInfo>> DefaultCustomProcessesSelectorDictionary { get; } = new DefaultNullableValueSelectorDictionary<IPortableDeviceInfoBase, System.Collections.Generic.IEnumerable<IProcessInfo>>();
 
-        public static IBrowsabilityPathStack<IPortableDeviceInfo> BrowsabilityPathStack { get; } = __browsabilityPathStack.AsWriteOnly();
+        public static IBrowsabilityPathStack<IPortableDeviceInfo> BrowsabilityPathStack { get; } = _browsabilityPathStack.AsWriteOnly();
 
-        protected override System.Collections.Generic.IEnumerable<IBrowsabilityPath> BrowsabilityPathsOverride => __browsabilityPathStack.GetBrowsabilityPaths(this);
+        protected override System.Collections.Generic.IEnumerable<IBrowsabilityPath> BrowsabilityPathsOverride => _browsabilityPathStack.GetBrowsabilityPaths(this);
 
         public static IEnumerableSelectorDictionary<PortableDeviceObjectInfoItemProvider, IBrowsableObjectInfo> DefaultItemSelectorDictionary { get; } = new PortableDeviceInfoSelectorDictionary();
 
         protected sealed override IPortableDeviceInfoProperties ObjectPropertiesGenericOverride => _objectProperties;
 
-        protected override IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystemOverride => null;
-        #endregion // Properties
+        protected override IPropertySystemCollection<PropertyId, ShellPropertyGroup>
+#if CS8
+            ?
+#endif
+            ObjectPropertySystemOverride => null;
+        #endregion Properties
 
-        public PortableDeviceInfo(in IPortableDevice portableDevice, in PortableDeviceOpeningOptions openingOptions, in ClientVersion clientVersion) : base(portableDevice, clientVersion) => _objectProperties = new PortableDeviceInfoProperties<IPortableDeviceInfo>(this, openingOptions);
-
-        public PortableDeviceInfo(in IPortableDevice portableDevice, in ClientVersion clientVersion) : this(portableDevice, new PortableDeviceOpeningOptions(GenericRights.Read, FileShareOptions.Read, true), clientVersion)
+        public PortableDeviceInfo(in IPortableDevice portableDevice, in PortableDeviceOpeningOptions openingOptions, in ClientVersion clientVersion) : base(portableDevice, clientVersion)
         {
-            // Left empty.
+            _objectProperties = new PortableDeviceInfoProperties<IPortableDeviceInfo>(this, openingOptions);
+            ItemSourcesGenericOverride = ItemSourcesProvider.Construct(new ItemSource(this));
         }
 
-        #region Methods
+        public PortableDeviceInfo(in IPortableDevice portableDevice, in ClientVersion clientVersion) : this(portableDevice, new PortableDeviceOpeningOptions(GenericRights.Read, FileShareOptions.Read, true), clientVersion) { /* Left empty. */ }
+
         protected override IEnumerableSelectorDictionary<PortableDeviceObjectInfoItemProvider, IBrowsableObjectInfo> GetSelectorDictionaryOverride() => DefaultItemSelectorDictionary;
 
         protected override void DisposeManaged()
@@ -138,19 +167,5 @@ namespace WinCopies.IO.ObjectModel
 
             base.DisposeManaged();
         }
-
-        #region GetItems
-        protected override System.Collections.Generic.IEnumerable<PortableDeviceObjectInfoItemProvider> GetItemProviders(Predicate<IPortableDeviceObject> predicate)
-        {
-            if (!InnerObjectGeneric.IsOpen)
-
-                InnerObjectGeneric.Open(ClientVersion.ToPortableDeviceClientVersion(), ObjectPropertiesGeneric.OpeningOptions);
-
-            return (predicate == null ? InnerObjectGeneric : InnerObjectGeneric.WherePredicate(predicate)).SelectConverter(item => new PortableDeviceObjectInfoItemProvider(item, this, ClientVersion));
-        }
-
-        protected override System.Collections.Generic.IEnumerable<PortableDeviceObjectInfoItemProvider> GetItemProviders() => GetItemProviders(null);
-        #endregion GetItems
-        #endregion Methods
     }
 }

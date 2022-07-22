@@ -22,7 +22,7 @@ using System.Windows.Input;
 
 using WinCopies.Desktop;
 using WinCopies.GUI.Controls.Models;
-using WinCopies.GUI.IO.ObjectModel;
+using WinCopies.IO.ComponentSources.Item;
 using WinCopies.IO.ObjectModel;
 using WinCopies.Util.Data;
 
@@ -32,7 +32,7 @@ using static WinCopies.Util.Desktop.UtilHelpers;
 
 namespace WinCopies.GUI.IO.Controls
 {
-    public class ExplorerControl : Control
+    public class ExplorerControl : ItemsControl
     {
         private static DependencyProperty Register<T>(in string propertyName) => Register<T, ExplorerControl>(propertyName);
 
@@ -40,7 +40,11 @@ namespace WinCopies.GUI.IO.Controls
 
         private static DependencyPropertyKey RegisterReadOnly<T>(in string propertyName, in PropertyMetadata propertyMetadata) => RegisterReadOnly<T, ExplorerControl>(propertyName, propertyMetadata);
 
-        private static RoutedEvent RegisterRoutedEvent<T>(in string eventName, in RoutingStrategy routingStrategy) => RegisterRoutedEvent<T, ExplorerControl>(eventName, routingStrategy);
+        private static RoutedEvent RegisterRoutedEvent<T>(in string eventName, in RoutingStrategy routingStrategy) => Register<T, ExplorerControl>(eventName, routingStrategy);
+
+        public static readonly DependencyProperty SelectionModeProperty = Register<SelectionMode, ExplorerControl>(nameof(SelectionMode), SelectionMode.Extended);
+
+        public SelectionMode SelectionMode { get => (SelectionMode)GetValue(SelectionModeProperty); set => SetValue(SelectionModeProperty, value); }
 
         public static readonly DependencyProperty BrowseToParentProperty = Register<ICommand>(nameof(BrowseToParent));
 
@@ -109,9 +113,9 @@ namespace WinCopies.GUI.IO.Controls
         /// <summary>
         /// Identifies the <see cref="SelectedItemProperty"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty SelectedItemProperty = Register<object>(nameof(SelectedItem));
+        public static readonly DependencyProperty SelectedItemProperty = Register<IItemSource>(nameof(SelectedItem));
 
-        public object SelectedItem { get => GetValue(SelectedItemProperty); set => SetValue(SelectedItemProperty, value); }
+        public IItemSource SelectedItem { get => (IItemSource)GetValue(SelectedItemProperty); set => SetValue(SelectedItemProperty, value); }
 
         private static readonly DependencyPropertyKey SelectedItemsPropertyKey = RegisterReadOnly<IList>(nameof(SelectedItems), new PropertyMetadata(null));
 

@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>4b8a702b-60af-4747-895c-73cfc0d83d44</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>WinCopies.IO.Reflection.Shared</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\DotNetAssemblyInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\DotNetAttributeInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\DotNetItemInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\DotNetMemberInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\DotNetNamespaceInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\DotNetParameterInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\DotNetTypeInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Enumeration\DotNetEnumeration.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Enumeration\DotNetMemberInfoEnumeration.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Enumeration\DotNetNamespaceInfoEnumeration.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Enumeration\DotNetTypeInfoEnumeration.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AbstractionInterop\DotNetMemberInfoItemProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AbstractionInterop\DotNetNamespaceInfoItemProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AbstractionInterop\DotNetParameterInfoItemProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AbstractionInterop\DotNetTypeInfoEnumeratorProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\IDotNetAssemblyInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\IDotNetAttributeInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\IDotNetItemInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\IDotNetMemberInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\IDotNetNamespaceInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\IDotNetParameterInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InterfaceModel\IDotNetTypeInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\TypeCommonProperties\InterfaceModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\TypeCommonProperties\ObjectModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Selectors\DotNetMemberInfoSelectorDictionary.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Selectors\DotNetNamespaceInfoSelectorDictionary.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Selectors\DotNetTypeInfoSelectorDictionary.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)ObjectModel\" />
+    <Folder Include="$(MSBuildThisFileDirectory)PropertySystem\TypeCommonProperties\" />
+  </ItemGroup>
+</Project>

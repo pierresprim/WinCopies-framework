@@ -9,7 +9,7 @@ namespace WinCopies.GUI.Controls
     {
         public MouseButtons ListenedButtons { get => ExtraProperties.GetListenedButtons(this); set => ExtraProperties.SetListenedButtons(this, value); }
 
-        public static readonly RoutedEvent ClickEvent = RegisterRoutedEvent<ClickEventHandler, TabItem>(nameof(Click), RoutingStrategy.Bubble);
+        public static readonly RoutedEvent ClickEvent = Register<ClickEventHandler, TabItem>(nameof(Click), RoutingStrategy.Bubble);
 
         public event ClickEventHandler Click { add => AddHandler(ClickEvent, value); remove => RemoveHandler(ClickEvent, value); }
 

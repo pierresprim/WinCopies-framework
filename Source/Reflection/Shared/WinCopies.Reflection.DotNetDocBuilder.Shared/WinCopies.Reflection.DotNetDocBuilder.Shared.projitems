@@ -11,6 +11,9 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Entities.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PackageInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Writer.Partial\Updaters\ConstantUpdater.Partial\ConstantUpdater.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Writer.Partial\Updaters\ConstantUpdater.Partial\OnUpdated.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Writer.Partial\Updaters\FieldUpdater.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Writer.Partial\DeleteTypes.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Writer.Partial\FileCreation.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Writer.Partial\Namespace.cs" />

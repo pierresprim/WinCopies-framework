@@ -16,7 +16,9 @@
 * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using Microsoft.WindowsAPICodePack.PortableDevices;
+
 using WinCopies.IO.ObjectModel;
+
 using static WinCopies.ThrowHelper;
 
 namespace WinCopies.IO.AbstractionInterop

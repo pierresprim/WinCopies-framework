@@ -5,45 +5,30 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 {
     public partial class Writer
     {
-        public void UpdateEnums()
+        protected struct EnumCallback : IWriterCallback<Enum, DotNetEnum>, DotNetFix.IDisposable
         {
-#if CS8
-            static
-#endif
-                string getUnderlyingTypeCSName(in DotNetEnum @enum) => @enum.UnderlyingType.ToCSName();
+            private DBEntityCollection<UnderlyingType> _utColl;
 
-            using
-#if !CS8
-                (
-#endif
-                var utColl = new DBEntityCollection<UnderlyingType>(Connection)
-#if CS8
-                ;
-#else
-                )
+            public bool IsDisposed => _utColl == null;
+
+            public EnumCallback(in Writer writer) => _utColl = new DBEntityCollection<UnderlyingType>(writer.Connection);
+
+            private void SetUnderlyingType(Enum @enum, DotNetEnum dotNetEnum) => @enum.UnderlyingType = new UnderlyingType(ThrowHelper.GetOrThrowIfDisposed(this, _utColl)) { Name = dotNetEnum.UnderlyingType.ToCSName() };
+
+            public void OnGetItem(Enum item, Type type, DotNetEnum @enum, DBEntityCollection<Enum> enums) => SetUnderlyingType(item, @enum);
+            public void OnAdded(Enum item, Type type, DotNetEnum dotNetType) { /* Left empty. */ }
+            public void OnUpdated(Enum item, DotNetEnum dotNetType, DBEntityCollection<Enum> collection) => SetUnderlyingType(item, dotNetType);
+            public void OnDeleting(Enum item, Type type) { /* Left empty. */ }
+
+            public void Dispose()
             {
-#endif
-            UnderlyingType getUnderlyingType(DotNetEnum @enum) => new
-#if !CS9
-                UnderlyingType
-#endif
-                (utColl)
-            { Name = getUnderlyingTypeCSName(@enum) };
+                if (IsDisposed) return;
 
-            UpdateItems("Enum", false, @enum => true, null, null, item => item.Type, GetAllEnumsInPackages, (@enum, type, enums) => new
-#if !CS9
-                Enum
-#endif
-                (enums)
-            {
-                UnderlyingType = getUnderlyingType(@enum),
-
-                Type = type
-            },
-            (DotNetEnum type, Enum @enum, DBEntityCollection<Enum> enums) => @enum.UnderlyingType = getUnderlyingType(type), CreateEnumFile, null);
-#if !CS8
+                _utColl.Dispose();
+                _utColl = null;
             }
-#endif
         }
+
+        public void UpdateEnums() => UpdateItems("Enum", false, Bool.True, item => item.Type, GetAllEnumsInPackages, Enum.GetNewEnum, CreateEnumFile, null, false, new EnumCallback(this), GetConstantUpdater<Enum, DotNetEnum>(e => e.Type, item => item.GetEnumUnderlyingType()));
     }
 }

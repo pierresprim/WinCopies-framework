@@ -3,10 +3,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-
 using WinCopies.Data.SQL;
 
 using static WinCopies.Data.SQL.SQLConstants;
@@ -14,172 +12,35 @@ using static WinCopies.Data.MySQL.MySQLConnectionHelper;
 
 namespace WinCopies.Data.MySQL
 {
-    public static class MySQLConnectionHelper
+    public class MySQLConnection : SQLConnection<MySqlConnection, MySQLDatabase>, IConnection<MySqlCommand>
     {
-        public const string NULL = nameof(NULL);
+        private string _userName;
 
-        public const string NOT = nameof(NOT);
+        #region Properties
+        public override string Normalization => "MySQL";
 
-        public const string COLUMN_DECORATOR = "`";
+        public override string ServerName => Connection.DataSource;
 
-        public const string AUTO_INCREMENT = nameof(AUTO_INCREMENT);
-
-        public const string DEFAULT = nameof(DEFAULT);
-
-        public static string GetItemName(string itemName) => $"`{itemName}`";
-    }
-
-    public class MySQLColumnInfo : SQLColumnInfo, ISQLColumnInfo
-    {
-        public override string GetSQL()
+        public override string UserName
         {
-            var result = new StringBuilder();
+            get
+            {
+                if (_userName == null)
 
-            result.Append($"{GetItemName(Name)} ");
+                    using (ISQLGetter getter = Collections.Enumerable.FromEnumerator(new MySQLEnumerator("SELECT CURRENT_USER();", this, false)).First())
 
-            ISQLColumnType
+                        _userName = (string)getter[0];
+
+                return _userName;
+            }
+        }
+
+        public override string
 #if CS8
-                ?
+            ?
 #endif
-                columnType = ColumnType;
+            DBName => Connection.Database;
 
-            result.Append(columnType.Name);
-
-            if (columnType.Length.HasValue)
-
-                result.Append($"({columnType.Length.Value})");
-
-            IEnumerable<string>
-#if CS8
-                ?
-#endif
-                columnTypeAttributes = columnType.Attributes;
-
-            if (columnTypeAttributes != null)
-
-                foreach (string columnTypeAttribute in columnTypeAttributes)
-
-                    result.Append($" {columnTypeAttribute}");
-
-            void appendDefault(in object value) => result.Append($" {DEFAULT} {value}");
-
-            if (AllowNull)
-
-                appendDefault(Default ?? NULL);
-
-            else
-            {
-                result.Append($" {NOT} {NULL}");
-
-                if (Default != null)
-
-                    appendDefault(Default);
-            }
-
-            if (AutoIncrement)
-
-                result.Append($" {AUTO_INCREMENT}");
-
-            return result.ToString();
-        }
-
-        public override string ToString() => GetSQL();
-    }
-
-    public class MySQLUnicityIndex : SQLUnicityIndex2
-    {
-        public override string GetSQL()
-        {
-            var result = new StringBuilder();
-
-            void append(in string text) => result.Append(text);
-
-            append($"UNIQUE KEY {GetItemName(Name)} (");
-
-            Action<string> action = column =>
-            {
-                action = _column => append($", {_column}");
-
-                append(column);
-            };
-
-            foreach (string column in Columns)
-
-                action(GetItemName(column));
-
-            append(") USING BTREE");
-
-            return result.ToString();
-        }
-    }
-
-    public class MySQLTable : SQLTable2
-    {
-        public override string GetCreateTableSQL(bool ifNotExists)
-        {
-            var result = new StringBuilder();
-            Collections.DotNetFix.Generic.IQueue<string> primaryKeys = new Collections.DotNetFix.Generic.Queue<string>();
-
-            void append(in string text) => result.Append(text);
-
-            append("CREATE TABLE ");
-
-            if (ifNotExists)
-
-                append("IF NOT EXISTS ");
-
-            append(GetItemName(Name));
-
-            append(" (\n");
-
-            Converter<ISQLColumnInfo, string> getSQL = column =>
-            {
-                getSQL = _column => ",\r\n" + _column.GetSQL();
-
-                return column.GetSQL();
-            };
-
-            foreach (ISQLColumnInfo column in Columns)
-            {
-                append(getSQL(column));
-
-                if (column.IsPrimaryKey)
-
-                    primaryKeys.Enqueue(column.Name);
-            }
-
-            if (primaryKeys.Count > 0)
-            {
-                Converter<string, string> getPrimaryKeysSQL = column =>
-                {
-                    getPrimaryKeysSQL = _column => ", " + GetItemName(_column);
-
-                    return GetItemName(column);
-                };
-
-                append(",\r\nPRIMARY KEY (");
-
-                while (primaryKeys.TryDequeue(out string column))
-
-                    append(getPrimaryKeysSQL(column));
-
-                _ = result.Append(')');
-            }
-
-            foreach (IUnicityIndex unicityIndex in UnicityKeys)
-
-                append($",\r\n{unicityIndex.GetSQL()}");
-
-            append($"\n) ENGINE={Engine} {AUTO_INCREMENT}={AutoIncrement} {DEFAULT} CHARSET={CharacterSet}");
-
-            return result.ToString();
-        }
-
-        public override string GetRemoveTableSQL(bool ifExists) => $"DROP TABLE {(ifExists ? "IF EXISTS " : null)}{GetItemName(Name)}";
-    }
-
-    public class MySQLConnection : SQLConnection<MySqlConnection>, IConnection<MySqlCommand>
-    {
         public override bool IsClosed => Connection.State != System.Data.ConnectionState.Open;
 
         public override string EqualityOperator => EQUAL;
@@ -199,21 +60,39 @@ namespace WinCopies.Data.MySQL
         public override bool CanInsert => true;
         public override bool CanUpdate => true;
         public override bool CanDelete => true;
+        #endregion Properties
 
-        public MySQLConnection(in MySqlConnection connection, in bool autoDispose = true) : base(connection, autoDispose) { /* Left empty. */ }
+        public MySQLConnection(in MySQLConnectionParameters connectionParameters, in string
+#if CS8
+            ?
+#endif
+            dbName = null, in bool autoDispose = true) : base(connectionParameters.GetConnection(dbName), dbName, autoDispose) { /* Left empty. */ }
 
-        public MySQLConnection(in MySqlConnection connection, in string dbName, in bool autoDispose = true) : base(connection, dbName, autoDispose) { /* Left empty. */ }
+        public MySQLConnection(in MySqlConnection connection, in bool autoDispose) : base(connection, autoDispose) { /* Left empty. */ }
 
-        public override bool Open()
+        #region Methods
+        public new MySQLConnection GetConnection(bool autoDispose = true) => (MySQLConnection)base.GetConnection(autoDispose);
+
+        protected override bool OpenOverride()
         {
             Connection.Open();
 
             return true;
         }
 
-        public override Task OpenAsync() => Connection.OpenAsync();
+        protected override async Task<bool> OpenAsyncOverride()
+        {
+            await Connection.OpenAsync();
 
-        public override Task OpenAsync(CancellationToken cancellationToken) => Connection.OpenAsync(cancellationToken);
+            return true;
+        }
+
+        protected override async Task<bool> OpenAsyncOverride(CancellationToken cancellationToken)
+        {
+            await Connection.OpenAsync(cancellationToken);
+
+            return true;
+        }
 
         public MySqlCommand GetCommand(string sql) => new
 #if !CS9
@@ -229,6 +108,10 @@ namespace WinCopies.Data.MySQL
 
             return command;
         }
+
+        public override IDatabaseSelect GetDatabases() => new DatabaseSelect(this, "information_schema.schemata", "schema_name");
+
+        protected override MySQLDatabase GetDatabase(string dbName) => new MySQLDatabase(this, dbName);
 
         public override ISelect GetSelect(SQLItemCollection<string> defaultTables, SQLItemCollection<SQLColumn> defaultColumns) => new Select(this, defaultTables, defaultColumns);
 
@@ -252,7 +135,7 @@ namespace WinCopies.Data.MySQL
 
         public override string GetBeginTransactionSQL() => "START TRANSACTION";
 
-        public override string GetCreateDBSQL(ISQLDatabase database, bool ifNotExists) => $"CREATE DATABASE {(ifNotExists ? "IF NOT EXISTS " : null)}{GetItemName(database.Name)} {DEFAULT} CHARACTER SET {database.CharacterSet} COLLATE {database.Collate}";
+        public override string GetCreateDBSQL(ISQLDatabase database, bool ifNotExists) => $"CREATE DATABASE {(ifNotExists ? "IF NOT EXISTS " : null)}{GetItemName(database.Name)} {DEFAULT} CHARACTER SET {database.CharacterSet} COLLATE {database.Collation}";
 
         public override string GetEndTransactionSQL() => "COMMIT";
 
@@ -293,9 +176,19 @@ namespace WinCopies.Data.MySQL
 #endif
             >(columnName, null, tableName, @operator);
 
-        public override ISQLConnection Clone(bool autoDispose = true) => new MySQLConnection((MySqlConnection)Connection.Clone(), autoDispose);
+        public override
+#if CS9
+            MySQLConnection
+#else
+            ISQLConnection
+#endif
+            Clone(bool autoDispose = true) => new
+#if !CS9
+            MySQLConnection
+#endif
+            ((MySqlConnection)Connection.Clone(), autoDispose);
 
-        public override void Close() => Connection.Close();
+        protected override void CloseOverride() => Connection.Close();
 
         public static long? GetLastInsertedId(MySqlCommand command) => command.LastInsertedId;
 
@@ -417,5 +310,14 @@ namespace WinCopies.Data.MySQL
 #if CS8
         ;
 #endif
+
+        public override IEnumerable<
+#if CS9
+            MySQLDatabase
+#else
+            ISQLDatabase
+#endif
+            > AsEnumerable() => GetEnumerable();
+        #endregion Methods
     }
 }

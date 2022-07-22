@@ -6,8 +6,9 @@ using WinCopies.Collections;
 using WinCopies.EntityFramework;
 using WinCopies.Linq;
 
+using static WinCopies.Collections.DotNetFix.LinkedList;
+using static WinCopies.Data.SQL.SQLItemCollection;
 using static WinCopies.ThrowHelper;
-using static WinCopies.Data.SQL.SQLHelper;
 
 namespace WinCopies.Data.SQL
 {
@@ -131,7 +132,11 @@ namespace WinCopies.Data.SQL
             }
         }
 
-        public static ISelect GetSelect(this ISQLConnection connection, in IEnumerable<string> defaultTables, in IEnumerable<SQLColumn> defaultColumns, string
+        public static ISelect GetSelect(this ISQLConnection connection, in IEnumerable<string> defaultTables, in IEnumerable<SQLColumn>
+#if CS8
+            ?
+#endif
+            defaultColumns, string
 #if CS8
             ?
 #endif
@@ -151,7 +156,7 @@ namespace WinCopies.Data.SQL
         {
             ThrowIfNull(connection, nameof(connection));
 
-            ISelect select = connection.GetSelect(new SQLItemCollection<string>(defaultTables), new SQLItemCollection<SQLColumn>(defaultColumns));
+            ISelect select = connection.GetSelect(GetCollection(defaultTables), defaultColumns == null ? null : GetCollection(defaultColumns));
 
             IConditionGroup initConditionGroup() => select.ConditionGroup = new ConditionGroup(@operator);
 
@@ -159,15 +164,15 @@ namespace WinCopies.Data.SQL
 
             if (conditions != null)
 
-                initConditionGroup().Conditions = GetEnumerable(conditions);
+                initConditionGroup().Conditions = GetLinkedList(conditions);
 
             if (conditionGroups != null)
 
-                initConditionGroup2(conditionGroup => conditionGroup.ConditionGroups = GetEnumerable(conditionGroups));
+                initConditionGroup2(conditionGroup => conditionGroup.ConditionGroups = GetLinkedList(conditionGroups));
 
             if (selects != null)
 
-                initConditionGroup2(conditionGroup => conditionGroup.Selects = GetEnumerable(selects));
+                initConditionGroup2(conditionGroup => conditionGroup.Selects = GetLinkedList(selects));
 
             return select;
         }
@@ -188,14 +193,11 @@ namespace WinCopies.Data.SQL
 #if CS8
             ?
 #endif
-            delete = connection.GetDelete(new SQLItemCollection<string>(defaultTables));
+            delete = connection.GetDelete(GetCollection(defaultTables));
 
             if (conditions != null)
 
-                delete.ConditionGroup = new ConditionGroup(@operator)
-                {
-                    Conditions = GetEnumerable(conditions)
-                };
+                delete.ConditionGroup = new ConditionGroup(@operator) { Conditions = GetLinkedList(conditions) };
 
             return delete;
         }
@@ -208,7 +210,7 @@ namespace WinCopies.Data.SQL
 
         public static IEnumerable<T> GetItems<T>(this ISelect select, Func<ISQLGetter, T> intAction, Func<ISQLGetter, T> stringAction)
         {
-            foreach (ISQLGetter getter in select.ExecuteQuery())
+            foreach (ISQLGetter getter in select.ExecuteQuery(true))
 
                 yield return Parse(getter, intAction, stringAction);
         }
@@ -286,6 +288,37 @@ namespace WinCopies.Data.SQL
         public override bool IsDisposed => _connection == null;
 
         public DBEntityCollection(ISQLConnection connection) => _connection = connection;
+
+        public static ulong Remove(in IEnumerable<T> collection)
+        {
+            ulong rows = 0;
+
+            foreach (T c in collection)
+
+                rows += c.Remove();
+
+            return rows;
+        }
+
+        public static ulong Remove(in IEnumerable<T> collection, in Func<T, bool> predicate) => Remove(collection.Where(predicate));
+
+        public static ulong RemovePredicate(in IEnumerable<T> collection, in Predicate<T> predicate) => Remove(collection.WherePredicate(predicate));
+
+        public static DBEntityCollection<T> GetCollection(in ISQLConnection connection) => new
+#if !CS9
+            DBEntityCollection<T>
+#endif
+            (connection);
+
+        public static Func<DBEntityCollection<T>> GetCollectionFunc(ISQLConnection connection) => () => GetCollection(connection);
+
+        public static ulong Remove(ISQLConnection connection, Converter<DBEntityCollection<T>, IEnumerable<T>> converter) => UtilHelpers.UsingIn2(GetCollectionFunc(connection), (in DBEntityCollection<T> collection) => Remove(converter(collection)));
+
+        public static ulong Remove(ISQLConnection connection) => Remove(connection, Delegates.Self);
+
+        public static ulong Remove(in ISQLConnection connection, Func<T, bool> predicate) => Remove(connection, collection => collection.Where(predicate));
+
+        public static ulong RemovePredicate(in ISQLConnection connection, Predicate<T> predicate) => Remove(connection, collection => collection.WherePredicate(predicate));
 
         public override long? Add(T entity, out uint tables, out ulong rows, IReadOnlyDictionary<string, object>
 #if CS8

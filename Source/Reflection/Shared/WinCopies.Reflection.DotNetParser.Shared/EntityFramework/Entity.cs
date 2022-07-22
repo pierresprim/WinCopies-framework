@@ -4,16 +4,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
+using WinCopies.Collections;
 using WinCopies.Collections.DotNetFix.Generic;
 using WinCopies.Collections.Generic;
 using WinCopies.Linq;
 using WinCopies.Util;
 
+using static WinCopies.EntityFramework.IdStatus;
 using static WinCopies.ThrowHelper;
 
 namespace WinCopies.EntityFramework
 {
-    public interface IEntityCollection : IAsEnumerable<IEntity>, DotNetFix.IDisposable
+    public interface IEntityCollection : IAsEnumerable<IEntity>, DotNetFix.IDisposable, IDisposableEnumerable
     {
         long? Add(IEntity entity, out uint tables, out ulong rows, System.Collections.Generic.IReadOnlyDictionary<string, object>
 #if CS8
@@ -22,7 +24,7 @@ namespace WinCopies.EntityFramework
                 extraColumns);
     }
 
-    public interface IEntityCollection<T> : IEntityCollection, IMultiTypeEnumerable<T, IEntity> where T : IEntity
+    public interface IEntityCollection<T> : IEntityCollection, WinCopies.Collections.Generic.IDisposableEnumerable<T>, IMultiTypeEnumerable<T, IEntity> where T : IEntity
     {
         long? Add(T entity, out uint tables, out ulong rows, System.Collections.Generic.IReadOnlyDictionary<string, object>
 #if CS8
@@ -84,7 +86,7 @@ namespace WinCopies.EntityFramework
 
     public interface IEntityIdRefresher : DotNetFix.IDisposable
     {
-        Collections.IUIntCountable Columns { get; }
+        IUIntCountable Columns { get; }
 
         void Add(string column, string paramName, object
 #if CS8
@@ -234,12 +236,19 @@ namespace WinCopies.EntityFramework
                 table = null) => Table = table;
     }
 
+    public enum IdStatus
+    {
+        None = 0,
+
+        Id = 1,
+
+        PseudoId = 2
+    }
+
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
     public class EntityPropertyAttribute : Attribute
     {
-        public bool IsId { get; set; }
-
-        public bool IsPseudoId { get; set; }
+        public IdStatus IdStatus { get; set; }
 
         public string
 #if CS8
@@ -306,7 +315,7 @@ namespace WinCopies.EntityFramework
 #if CS8
                 static
 #endif
-                    System.Collections.Generic.IEnumerable<PropertyInfo> getProperties(in Type type) => type.GetProperties().Where(property => property.GetCustomAttributes(true).FirstOrDefault<EntityPropertyAttribute>()?.IsPseudoId == true);
+                    System.Collections.Generic.IEnumerable<PropertyInfo> getProperties(in Type type) => type.GetProperties().Where(property => property.GetCustomAttributes(true).FirstOrDefault<EntityPropertyAttribute>()?.IdStatus == PseudoId);
 
                 return getProperties(tx).All(p => Equals(p.GetValue(x), getProperties(ty).First().GetValue(y)));
             }
@@ -319,7 +328,7 @@ namespace WinCopies.EntityFramework
 #if CS8
                     ?
 #endif
-                    getPropertyInfo(in Type type) => type.GetProperties().FirstOrDefault(property => property.GetCustomAttributes(true).FirstOrDefault<EntityPropertyAttribute>()?.IsId == true);
+                    getPropertyInfo(in Type type) => type.GetProperties().FirstOrDefault(property => property.GetCustomAttributes(true).FirstOrDefault<EntityPropertyAttribute>()?.IdStatus == Id);
 
             PropertyInfo
 #if CS8
@@ -385,8 +394,10 @@ namespace WinCopies.EntityFramework
 
         private static bool? Equals(in IEntity x, in IEntity y, in FuncIn<Type, Type, bool?> func)
         {
-            Type tx = (x ?? throw GetArgumentNullException(nameof(x))).GetType();
-            Type ty = (y ?? throw GetArgumentNullException(nameof(y))).GetType();
+            Type getType(in IEntity entity, in string paramName) => (entity ?? throw GetArgumentNullException(paramName)).GetType();
+
+            Type tx = getType(x, nameof(x));
+            Type ty = getType(y, nameof(y));
 
             return tx == ty ? func(tx, ty) : false;
         }
@@ -521,7 +532,7 @@ namespace WinCopies.EntityFramework
 #endif
                 )property.GetValue(this))?.TryRefreshId(true);
 
-            return thisType && TryRefreshId(refresher, (EntityCollection.GetIdProperties(t).FirstOrNull() ?? throw new InvalidOperationException($"{t.Namespace}.{t.Name} does not have any id property.")).Value, EntityCollection.GetDBPropertyInfo(t).Where(property => property.Value.IsPseudoId));
+            return thisType && TryRefreshId(refresher, (EntityCollection.GetIdProperties(t).FirstOrNull() ?? throw new InvalidOperationException($"{t.Namespace}.{t.Name} does not have any id property.")).Value, EntityCollection.GetDBPropertyInfo(t).Where(property => property.Value.IdStatus == PseudoId));
         }
 
         protected abstract IEntityIdRefresher GetRefresher();
@@ -662,7 +673,7 @@ namespace WinCopies.EntityFramework
 
     public abstract class DefaultEntity<T> : Entity, IDefaultEntity<T>
     {
-        [EntityProperty(nameof(Id), IsId = true)]
+        [EntityProperty(nameof(Id), IdStatus = IdStatus.Id)]
         public T Id { get; set; }
 
         public virtual Nullable TryRefreshIdWhen { get; } = new Nullable(default(T));
