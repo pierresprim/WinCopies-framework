@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 using WinCopies.Data.SQL;
 using WinCopies.Reflection.DotNetParser;
 
-using static WinCopies.Data.SQL.SQLHelper;
+using static WinCopies.Collections.DotNetFix.LinkedList;
 using static WinCopies.Reflection.DotNetDocBuilder.WriterConsts;
 using static WinCopies.UtilHelpers;
 
@@ -83,26 +84,18 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 #endif
                 getNameCondition(in string _namespace) => connection.GetCondition(NAME, getParamName(), _namespace);
 
-            ISelect select = getSelect((in IConditionGroup conditionGroup) => conditionGroup.Conditions = GetEnumerable(connection.GetNullityCondition(PARENT_ID), getNameCondition(namespaces[0])));
+            ISelect select = getSelect((in IConditionGroup conditionGroup) => conditionGroup.Conditions = GetLinkedList(connection.GetNullityCondition(PARENT_ID), getNameCondition(namespaces[0])));
 
             for (int i = 1; i < namespaces.Length; i++)
 
                 select = getSelect((in IConditionGroup conditionGroup) =>
                 {
-                    conditionGroup.Conditions = GetEnumerable(getNameCondition(namespaces[i]));
+                    conditionGroup.Conditions = GetLinkedList(getNameCondition(namespaces[i]));
 
-                    conditionGroup.Selects = GetEnumerable(new KeyValuePair<SQLColumn, ISelect>(connection.GetColumn(PARENT_ID), select));
+                    conditionGroup.Selects = GetLinkedList(new KeyValuePair<SQLColumn, ISelect>(connection.GetColumn(PARENT_ID), select));
                 });
 
-            foreach (ISQLGetter
-#if CS8
-                ?
-#endif
-                value in select.ExecuteQuery())
-
-                return Convert.ChangeType<ulong>(value[0]);
-
-            return null;
+            return PerformActionIfNotNull(select.ExecuteQuery(false).FirstOrDefault(), value => Convert.ChangeType<ulong>(value[0]));
         }
 
         public static string GetWholeNamespace(ulong id, in ISQLConnection connection)
@@ -131,24 +124,15 @@ namespace WinCopies.Reflection.DotNetDocBuilder
 
             do
             {
-                IEnumerable<ISQLGetter>
-#if CS8
-            ?
-#endif
-                result = connection.GetSelect(GetArray(DOC_NAMESPACE), GetArray(connection.GetColumn(NAME), connection.GetColumn(PARENT_ID)), conditions: GetArray(connection.GetCondition(ID, nameof(id), id))).ExecuteQuery();
+                ISQLGetter item = connection.GetSelect(GetArray(DOC_NAMESPACE), GetArray(connection.GetColumn(NAME), connection.GetColumn(PARENT_ID)), conditions: GetArray(connection.GetCondition(ID, nameof(id), id))).ExecuteQuery(false).First();
 
-                foreach (ISQLGetter item in result)
-                {
-                    obj = item[PARENT_ID];
+                obj = item[PARENT_ID];
 
-                    namespaces.Prepend((first = new KeyValuePair<string, ulong?>((string)item[NAME], obj == null || obj == DBNull.Value ? null : (ulong
+                namespaces.Prepend((first = new KeyValuePair<string, ulong?>((string)item[NAME], obj == null || obj == DBNull.Value ? null : (ulong
 #if !CS9
-                            ?
+                    ?
 #endif
-                        )Convert.TryChangeType<ulong>(obj))).Value.Key);
-
-                    break;
-                }
+                    )Convert.TryChangeType<ulong>(obj))).Value.Key);
             }
             while (whileCondition());
 

@@ -6,7 +6,7 @@
     <SharedGUID>97de8f2d-3077-4efd-a0ec-5030ea874254</SharedGUID>
   </PropertyGroup>
   <PropertyGroup Label="Configuration">
-    <Import_RootNamespace>WinCopies.Data.MySQL.Shared</Import_RootNamespace>
+    <Import_RootNamespace>WinCopies.Data.MySQL</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Misc.cs" />

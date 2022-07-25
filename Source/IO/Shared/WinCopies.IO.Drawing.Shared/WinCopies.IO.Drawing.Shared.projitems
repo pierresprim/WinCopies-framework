@@ -6,7 +6,7 @@
     <SharedGUID>2b809653-ccdd-4498-8e54-5c5c3456aabf</SharedGUID>
   </PropertyGroup>
   <PropertyGroup Label="Configuration">
-    <Import_RootNamespace>WinCopies.IO.Drawing.Shared</Import_RootNamespace>
+    <Import_RootNamespace>WinCopies.IO.Drawing</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)BitmapInfo.cs" />

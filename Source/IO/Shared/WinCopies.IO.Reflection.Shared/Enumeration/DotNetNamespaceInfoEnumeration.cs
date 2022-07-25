@@ -29,7 +29,8 @@ using WinCopies.IO.Reflection;
 using WinCopies.Linq;
 using WinCopies.Util;
 
-using static WinCopies.IO.Path;
+using static System.IO.Path;
+
 using static WinCopies.UtilHelpers;
 using static WinCopies.ThrowHelper;
 
@@ -206,7 +207,7 @@ namespace WinCopies.IO.Enumeration.Reflection
 
                     return null;
 
-                typePredicate = t => t.Namespace == dotNetNamespaceInfo.Path.Replace(WinCopies.IO.Path.PathSeparator, '.');
+                typePredicate = t => t.Namespace == dotNetNamespaceInfo.Path.Replace(DirectorySeparatorChar, '.');
             }
 
             else
@@ -227,7 +228,7 @@ namespace WinCopies.IO.Enumeration.Reflection
             void addNamespaceEnumerable(in System.Collections.Generic.IEnumerable<Type> _types, IBrowsableObjectInfo parent)
             {
                 EnumerableHelper<string>.IEnumerableQueue _queue = EnumerableHelper<string>.GetEnumerableQueue();
-                string _namespace = parent is IDotNetNamespaceInfoBase ? parent.Path.Replace(PathSeparator, '.') : null;
+                string _namespace = parent is IDotNetNamespaceInfoBase ? parent.Path.Replace(DirectorySeparatorChar, '.') : null;
 
                 // DotNetNamespaceInfoItemProvider select(string ____namespace) => new DotNetNamespaceInfoItemProvider(____namespace, false, parent);
 

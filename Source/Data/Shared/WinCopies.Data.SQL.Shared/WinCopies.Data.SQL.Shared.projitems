@@ -6,7 +6,7 @@
     <SharedGUID>78129f5e-4eba-4662-8f8a-fcbb2ef36fb9</SharedGUID>
   </PropertyGroup>
   <PropertyGroup Label="Configuration">
-    <Import_RootNamespace>WinCopies.Data.SQL.Shared</Import_RootNamespace>
+    <Import_RootNamespace>WinCopies.Data.SQL</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)DBEntity.cs" />

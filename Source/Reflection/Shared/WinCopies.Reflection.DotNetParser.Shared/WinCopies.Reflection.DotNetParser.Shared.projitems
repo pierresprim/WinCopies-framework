@@ -6,7 +6,7 @@
     <SharedGUID>65ba5ac0-50dc-4948-b145-ba0f82ec4fb5</SharedGUID>
   </PropertyGroup>
   <PropertyGroup Label="Configuration">
-    <Import_RootNamespace>WinCopies.Reflection.DotNetParser.Shared</Import_RootNamespace>
+    <Import_RootNamespace>WinCopies.Reflection.DotNetParser</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)DotNetHelper.cs" />

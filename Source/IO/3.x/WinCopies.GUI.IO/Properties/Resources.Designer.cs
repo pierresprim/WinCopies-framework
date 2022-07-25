@@ -151,6 +151,15 @@ namespace WinCopies.GUI.IO.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Open.
+        /// </summary>
+        public static string OpenFile {
+            get {
+                return ResourceManager.GetString("OpenFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Opens the selected item in a new tab..
         /// </summary>
         public static string OpenInNewTabStatusBarLabel {
@@ -210,6 +219,24 @@ namespace WinCopies.GUI.IO.Properties {
         public static string RenameItemCommandToolTip {
             get {
                 return ResourceManager.GetString("RenameItemCommandToolTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save.
+        /// </summary>
+        public static string Save {
+            get {
+                return ResourceManager.GetString("Save", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select.
+        /// </summary>
+        public static string SelectFolder {
+            get {
+                return ResourceManager.GetString("SelectFolder", resourceCulture);
             }
         }
         

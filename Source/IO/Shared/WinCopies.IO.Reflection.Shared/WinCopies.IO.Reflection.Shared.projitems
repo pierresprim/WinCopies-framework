@@ -6,7 +6,7 @@
     <SharedGUID>4b8a702b-60af-4747-895c-73cfc0d83d44</SharedGUID>
   </PropertyGroup>
   <PropertyGroup Label="Configuration">
-    <Import_RootNamespace>WinCopies.IO.Reflection.Shared</Import_RootNamespace>
+    <Import_RootNamespace>WinCopies.IO.Reflection</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\DotNetAssemblyInfo.cs" />

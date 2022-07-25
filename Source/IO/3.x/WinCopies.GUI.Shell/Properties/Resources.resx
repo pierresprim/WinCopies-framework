@@ -219,9 +219,6 @@
   <data name="NewWindowStatusBarLabel" xml:space="preserve">
     <value>Opens a new window.</value>
   </data>
-  <data name="OpenFile" xml:space="preserve">
-    <value>Open</value>
-  </data>
   <data name="OpenInNewTab" xml:space="preserve">
     <value>Open in new tab</value>
   </data>
@@ -245,11 +242,5 @@
   </data>
   <data name="RecycleStatusBarLabel" xml:space="preserve">
     <value>Moves the selected items to the Recycle Bin.</value>
-  </data>
-  <data name="Save" xml:space="preserve">
-    <value>Save</value>
-  </data>
-  <data name="SelectFolder" xml:space="preserve">
-    <value>Select</value>
   </data>
 </root>

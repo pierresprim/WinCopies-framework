@@ -2,16 +2,16 @@
 
 	<PropertyGroup>
 		<PackageId>WinCopies.Data.MySQL</PackageId>
-		<AssemblyName>WinCopies.Data.MySQL</AssemblyName>
 		<RootNamespace>WinCopies.Data.MySQL</RootNamespace>
 		<TargetFrameworks>netcoreapp3.0;netcoreapp3.1;net5.0-windows;net6.0-windows;net7.0-windows;net472;net48</TargetFrameworks>
-		<!--<Description></Description>
-		<PackageTags></PackageTags>-->
 		<Copyright>Copyright © 2022 Pierre Sprimont</Copyright>
-		<DocumentationFile>WinCopies.Data.MySQL.xml</DocumentationFile>
-		<SignAssembly>true</SignAssembly>
+		<VersionPrefix>3.0</VersionPrefix>
+		<AssemblyVersion>3.0</AssemblyVersion>
+		<FileVersion>3.0</FileVersion>
 		<VersionSuffix>preview</VersionSuffix>
 	</PropertyGroup>
+
+	<Import Project="$(SolutionDir)\ExtraProperties.props" Condition="'$(Configuration)'=='Release'" />
 
 	<ItemGroup>
 		<PackageReference Include="MySql.Data" Version="8.0.28" />
@@ -19,24 +19,6 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\WinCopies.Data.SQL\WinCopies.Data.SQL.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<None Include="..\..\..\..\LICENSE.md">
-			<Pack>True</Pack>
-			<PackagePath></PackagePath>
-		</None>
-		<None Include="..\..\..\WinCopies.png">
-			<Pack>True</Pack>
-			<PackagePath></PackagePath>
-		</None>
-	</ItemGroup>
-
-	<ItemGroup>
-	  <None Update="README.md">
-	    <PackagePath></PackagePath>
-	    <Pack>true</Pack>
-	  </None>
 	</ItemGroup>
 
 	<Import Project="..\..\Shared\WinCopies.Data.MySQL.Shared\WinCopies.Data.MySQL.Shared.projitems" Label="Shared" />

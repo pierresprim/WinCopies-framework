@@ -6,7 +6,7 @@
     <SharedGUID>479febe9-432f-4e15-82f6-626e519b68a3</SharedGUID>
   </PropertyGroup>
   <PropertyGroup Label="Configuration">
-    <Import_RootNamespace>WinCopies.Reflection.DotNetDocBuilder.Shared</Import_RootNamespace>
+    <Import_RootNamespace>WinCopies.Reflection.DotNetDocBuilder</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Entities.cs" />

@@ -6,7 +6,7 @@
     <SharedGUID>f96f9167-8d67-49f6-a4fb-cffd49725150</SharedGUID>
   </PropertyGroup>
   <PropertyGroup Label="Configuration">
-    <Import_RootNamespace>WinCopies.GUI.Drawing.Shared</Import_RootNamespace>
+    <Import_RootNamespace>WinCopies.GUI.Drawing</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)IconExtractor\IconExtractor.cs" />

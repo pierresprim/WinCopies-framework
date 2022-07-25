@@ -2,39 +2,21 @@
 
 	<PropertyGroup>
 		<PackageId>WinCopies.Data.SQL</PackageId>
-		<AssemblyName>WinCopies.Data.SQL</AssemblyName>
 		<RootNamespace>WinCopies.Data.SQL</RootNamespace>
 		<TargetFrameworks>netcoreapp3.0;netcoreapp3.1;net5.0-windows;net6.0-windows;net7.0-windows;net472;net48</TargetFrameworks>
-		<!--<Description></Description>
-		<PackageTags></PackageTags>-->
 		<Copyright>Copyright © 2022 Pierre Sprimont</Copyright>
-		<DocumentationFile>WinCopies.Data.SQL.xml</DocumentationFile>
-		<SignAssembly>true</SignAssembly>
+		<VersionPrefix>3.0</VersionPrefix>
+		<AssemblyVersion>3.0</AssemblyVersion>
+		<FileVersion>3.0</FileVersion>
 		<VersionSuffix>preview</VersionSuffix>
 	</PropertyGroup>
 
-	<ItemGroup>
-		<None Include="..\..\..\..\LICENSE.md">
-			<Pack>True</Pack>
-			<PackagePath></PackagePath>
-		</None>
-		<None Include="..\..\..\WinCopies.png">
-			<Pack>True</Pack>
-			<PackagePath></PackagePath>
-		</None>
-	</ItemGroup>
-		
+	<Import Project="$(SolutionDir)\ExtraProperties.props" Condition="'$(Configuration)'=='Release'" />
+
 	<ItemGroup>
 	  <ProjectReference Include="..\..\..\Reflection\1.x\WinCopies.Reflection.DotNetParser\WinCopies.Reflection.DotNetParser.csproj" />
 	</ItemGroup>
 		
-	<ItemGroup>
-	  <None Update="README.md">
-	    <PackagePath></PackagePath>
-	    <Pack>true</Pack>
-	  </None>
-	</ItemGroup>
-
 	<Import Project="..\..\Shared\WinCopies.Data.SQL.Shared\WinCopies.Data.SQL.Shared.projitems" Label="Shared" />
 
 </Project>

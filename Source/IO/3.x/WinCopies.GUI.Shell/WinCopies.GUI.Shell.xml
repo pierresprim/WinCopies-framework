@@ -100,16 +100,6 @@
               Looks up a localized string similar to Copy.
             </summary>
         </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.CopyNameStatusBarLabel">
-            <summary>
-              Looks up a localized string similar to Copies the name of the selected item..
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.CopyPathStatusBarLabel">
-            <summary>
-              Looks up a localized string similar to Copies the path of the selected item..
-            </summary>
-        </member>
         <member name="P:WinCopies.GUI.Shell.Properties.Resources.CopyStatusBarLabel">
             <summary>
               Looks up a localized string similar to Copies the selected items to the Clipboard..
@@ -180,16 +170,6 @@
               Looks up a localized string similar to Opens a new tab for file system browsing..
             </summary>
         </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.NewRegistryTab">
-            <summary>
-              Looks up a localized string similar to New registry tab.
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.NewRegistryTabStatusBarLabel">
-            <summary>
-              Looks up a localized string similar to Opens a new tab for Registry browsing..
-            </summary>
-        </member>
         <member name="P:WinCopies.GUI.Shell.Properties.Resources.NewTab">
             <summary>
               Looks up a localized string similar to _New tab.
@@ -210,29 +190,9 @@
               Looks up a localized string similar to Opens a new window..
             </summary>
         </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.NewWMITab">
-            <summary>
-              Looks up a localized string similar to New WMI tab.
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.NewWMITabStatusBarLabel">
-            <summary>
-              Looks up a localized string similar to Opens a new tab for WMI browsing..
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.OpenFile">
-            <summary>
-              Looks up a localized string similar to Open.
-            </summary>
-        </member>
         <member name="P:WinCopies.GUI.Shell.Properties.Resources.OpenInNewTab">
             <summary>
               Looks up a localized string similar to Open in new tab.
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.OpenInNewTabStatusBarLabel">
-            <summary>
-              Looks up a localized string similar to Opens the selected item in a new tab..
             </summary>
         </member>
         <member name="P:WinCopies.GUI.Shell.Properties.Resources.OpenInNewWindow">
@@ -240,19 +200,9 @@
               Looks up a localized string similar to Open in new window.
             </summary>
         </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.OpenInNewWindowStatusBarLabel">
-            <summary>
-              Looks up a localized string similar to Opens the selected item in a new window..
-            </summary>
-        </member>
         <member name="P:WinCopies.GUI.Shell.Properties.Resources.OpenOrLaunch">
             <summary>
               Looks up a localized string similar to Open selected items.
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.OpenOrLaunchStatusBarLabel">
-            <summary>
-              Looks up a localized string similar to Opens the selected items..
             </summary>
         </member>
         <member name="P:WinCopies.GUI.Shell.Properties.Resources.Paste">
@@ -270,16 +220,6 @@
               Looks up a localized string similar to Preserve directory structure:.
             </summary>
         </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.Quit">
-            <summary>
-              Looks up a localized string similar to _Quit.
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.QuitStatusBarLabel">
-            <summary>
-              Looks up a localized string similar to Closes all windows of the current process..
-            </summary>
-        </member>
         <member name="P:WinCopies.GUI.Shell.Properties.Resources.Recycle">
             <summary>
               Looks up a localized string similar to Recycle.
@@ -290,75 +230,11 @@
               Looks up a localized string similar to Moves the selected items to the Recycle Bin..
             </summary>
         </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.Save">
-            <summary>
-              Looks up a localized string similar to Save.
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.SelectFolder">
-            <summary>
-              Looks up a localized string similar to Select.
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.SubmitABug">
-            <summary>
-              Looks up a localized string similar to Submit a _bug....
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.SubmitABugStatusBarLabel">
-            <summary>
-              Looks up a localized string similar to Opens your default browser at the WinCopies&apos; GitHub page..
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.WindowClosingMessage">
-            <summary>
-              Looks up a localized string similar to You have multiple tabs open. Are you sure you want to close the window?.
-            </summary>
-        </member>
         <member name="M:WinCopies.GUI.Shell.BrowsableObjectInfoFactory.#ctor(WinCopies.IO.ClientVersion@)">
             <summary>
             Initializes a new instance of the <see cref="T:WinCopies.GUI.Shell.BrowsableObjectInfoFactory"/> class.
             </summary>
             <param name="clientVersion">The <see cref="T:WinCopies.IO.ClientVersion"/> value for PortableDevice items creation. See <see cref="T:WinCopies.IO.ClientVersion"/>.</param>
-        </member>
-        <member name="M:WinCopies.GUI.Shell.BrowsableObjectInfoFactory.GetBrowsableObjectInfo(System.String)">
-            <summary>
-            Creates an <see cref="T:WinCopies.IO.ObjectModel.IBrowsableObjectInfo"/> for a given path. See Remarks section.
-            </summary>
-            <param name="path">The path of the <see cref="T:WinCopies.IO.ObjectModel.IBrowsableObjectInfo"/> to create.</param>
-            <returns>An <see cref="T:WinCopies.IO.ObjectModel.IBrowsableObjectInfo"/> for <paramref name="path"/>.</returns>
-            <remarks>This method cannot create <see cref="T:WinCopies.IO.ObjectModel.IBrowsableObjectInfo"/> for WMI paths.</remarks>
-            <exception cref="T:System.ArgumentException"><paramref name="path"/> is not a Shell or a Registry path.</exception>
-        </member>
-        <member name="T:XamlGeneratedNamespace.GeneratedInternalTypeHelper">
-            <summary>
-            GeneratedInternalTypeHelper
-            </summary>
-        </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateInstance(System.Type,System.Globalization.CultureInfo)">
-            <summary>
-            CreateInstance
-            </summary>
-        </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.GetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Globalization.CultureInfo)">
-            <summary>
-            GetPropertyValue
-            </summary>
-        </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.SetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Object,System.Globalization.CultureInfo)">
-            <summary>
-            SetPropertyValue
-            </summary>
-        </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateDelegate(System.Type,System.Object,System.String)">
-            <summary>
-            CreateDelegate
-            </summary>
-        </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.AddEventHandler(System.Reflection.EventInfo,System.Object,System.Delegate)">
-            <summary>
-            AddEventHandler
-            </summary>
         </member>
     </members>
 </doc>

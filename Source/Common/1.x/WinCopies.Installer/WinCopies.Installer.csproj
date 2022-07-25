@@ -2,22 +2,21 @@
 
 	<PropertyGroup>
 		<PackageId>WinCopies.Installer</PackageId>
-		<AssemblyName>WinCopies.Installer</AssemblyName>
 		<TargetFrameworks>netcoreapp3.0;netcoreapp3.1;net5.0-windows;net6.0-windows;net7.0-windows;net472;net48</TargetFrameworks>
 		<TargetPlatformIdentifier>windows</TargetPlatformIdentifier>
 		<UseWPF>true</UseWPF>
-		<SignAssembly>true</SignAssembly>
 		<VersionPrefix>3.0</VersionPrefix>
 		<AssemblyVersion>3.0</AssemblyVersion>
 		<FileVersion>3.0</FileVersion>
 		<PackageTags>WinCopies, Installer</PackageTags>
-		<DocumentationFile>WinCopies.Installer.xml</DocumentationFile>
 	</PropertyGroup>
 
+	<Import Project="$(SolutionDir)\ExtraProperties.props" Condition="'$(Configuration)'=='Release'" />
+
 	<ItemGroup>
-		<PackageReference Include="WinCopies.Util.Desktop" Version="3.17-preview" />
-		<PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="3.8.2-preview" />
-		<PackageReference Include="WinCopies.WindowsAPICodePack.Win32Native" Version="3.9-preview" />
+		<PackageReference Include="WinCopies.Util.Desktop" Version="3.18-preview" />
+		<PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="3.11-preview" />
+		<PackageReference Include="WinCopies.WindowsAPICodePack.Win32Native" Version="3.11-preview" />
 	</ItemGroup>
 
 	<Import Project="..\..\Shared\WinCopies.Installer.Shared\WinCopies.Installer.Shared.projitems" Label="Shared" />
@@ -30,14 +29,22 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Include="..\..\LICENSE.md">
-			<Pack>True</Pack>
-			<PackagePath></PackagePath>
-		</None>
-		<None Include="..\WinCopies.png">
-			<Pack>True</Pack>
-			<PackagePath></PackagePath>
-		</None>
+		<ProjectReference Include="..\..\..\GUI\3.x\WinCopies.GUI\WinCopies.GUI.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Update="Properties\Resources.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Resources.resx</DependentUpon>
+		</Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Update="Properties\Resources.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
 	</ItemGroup>
 
 </Project>

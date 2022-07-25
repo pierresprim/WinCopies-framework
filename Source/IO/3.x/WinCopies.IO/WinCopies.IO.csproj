@@ -2,28 +2,26 @@
 
 	<PropertyGroup>
 		<PackageId>WinCopies.IO</PackageId>
-		<AssemblyName>WinCopies.IO</AssemblyName>
 		<RootNamespace>WinCopies.IO</RootNamespace>
 		<TargetFrameworks>netcoreapp3.0;netcoreapp3.1;net5.0-windows;net6.0-windows;net7.0-windows;net472;net48</TargetFrameworks>
 		<UseWPF>true</UseWPF>
 		<Description>WinCopies framework's assembly for basic I/O operations</Description>
 		<Copyright>Copyright © 2021 Pierre Sprimont</Copyright>
 		<PackageTags>WinCopies, IO</PackageTags>
-		<DocumentationFile>WinCopies.IO.xml</DocumentationFile>
-		<SignAssembly>true</SignAssembly>
 		<DefineConstants>WinCopies2;WinCopies3;$(DefineConstants)</DefineConstants>
-		<AssemblyOriginatorKeyFile>WinCopies.IO.snk</AssemblyOriginatorKeyFile>
-		<VersionPrefix>3.13.1</VersionPrefix>
+		<VersionPrefix>3.15</VersionPrefix>
 		<VersionSuffix>preview</VersionSuffix>
-		<AssemblyVersion>3.13.1</AssemblyVersion>
-		<FileVersion>3.13.1</FileVersion>
+		<AssemblyVersion>3.15</AssemblyVersion>
+		<FileVersion>3.15</FileVersion>
 	</PropertyGroup>
 
+	<Import Project="$(SolutionDir)\ExtraProperties.props" Condition="'$(Configuration)'=='Release'" />
+
 	<ItemGroup>
-		<PackageReference Include="WinCopies.Collections" Version="3.17.1-preview" />
-		<PackageReference Include="WinCopies.Util.Desktop" Version="3.17-preview" />
+		<PackageReference Include="WinCopies.Collections" Version="3.18-preview" />
+		<PackageReference Include="WinCopies.Util.Desktop" Version="3.18-preview" />
 		
-		<PackageReference Include="WinCopies.WindowsAPICodePack" Version="3.10-preview" />
+		<PackageReference Include="WinCopies.WindowsAPICodePack" Version="3.11-preview" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -57,17 +55,6 @@
 			<Generator>PublicResXFileCodeGenerator</Generator>
 			<LastGenOutput>PropertyDescriptions.Designer.cs</LastGenOutput>
 		</EmbeddedResource>
-	</ItemGroup>
-
-	<ItemGroup>
-		<None Include="..\..\..\..\LICENSE.md">
-			<Pack>True</Pack>
-			<PackagePath></PackagePath>
-		</None>
-		<None Include="..\..\..\WinCopies.png">
-			<Pack>True</Pack>
-			<PackagePath></PackagePath>
-		</None>
 	</ItemGroup>
 
 	<ItemGroup>

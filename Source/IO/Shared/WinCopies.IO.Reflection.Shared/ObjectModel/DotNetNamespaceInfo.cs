@@ -17,13 +17,11 @@
 
 #region Usings
 using System;
-using System.Diagnostics;
 
 #region WinCopies
 using WinCopies.IO.AbstractionInterop.Reflection;
 using WinCopies.IO.ComponentSources.Item;
 using WinCopies.IO.Enumeration.Reflection;
-using WinCopies.IO.Process;
 using WinCopies.IO.PropertySystem;
 using WinCopies.IO.Reflection;
 using WinCopies.IO.Reflection.PropertySystem;
@@ -52,7 +50,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
             InnerObjectGenericOverride => null;
         #endregion
 
-        protected DotNetNamespaceInfo(in string name, in IBrowsableObjectInfo parent) : base(parent is IDotNetAssemblyInfo ? name : parent == null ? throw GetArgumentNullException(nameof(parent)) : $"{parent.Path}{IO.Path.PathSeparator}{name}", name, parent) { /* Left empty. */ }
+        protected DotNetNamespaceInfo(in string name, in IBrowsableObjectInfo parent) : base(parent is IDotNetAssemblyInfo ? name : parent == null ? throw GetArgumentNullException(nameof(parent)) : $"{parent.Path}{System.IO.Path.DirectorySeparatorChar}{name}", name, parent) { /* Left empty. */ }
 
         protected abstract System.Collections.Generic.IEnumerable<TDictionaryItems> GetItemProviders(System.Collections.Generic.IEnumerable<DotNetItemType> typesToEnumerate, Predicate<TDictionaryItems> func);
 
@@ -122,7 +120,7 @@ namespace WinCopies.IO.ObjectModel.Reflection
         protected internal DotNetNamespaceInfo(in string name, in IBrowsableObjectInfo parent) : base(name, parent)
         {
 #if DEBUG
-            Debug.Assert(Path.EndsWith(WinCopies.IO.Path.PathSeparator + name, StringComparison.CurrentCulture) || name == Path);
+            Debug.Assert(Path.EndsWith(System.IO.Path.DirectorySeparator + name, StringComparison.CurrentCulture) || name == Path);
 #endif
 
             _properties = new DotNetItemInfoProperties<IDotNetNamespaceInfo>(this, DotNetItemType.Namespace);

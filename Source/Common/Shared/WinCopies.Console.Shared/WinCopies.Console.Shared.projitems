@@ -6,7 +6,7 @@
     <SharedGUID>41dcc223-d715-4631-b32d-7a55b03077a0</SharedGUID>
   </PropertyGroup>
   <PropertyGroup Label="Configuration">
-    <Import_RootNamespace>WinCopies.Console.Shared</Import_RootNamespace>
+    <Import_RootNamespace>WinCopies.Console</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Button.cs" />

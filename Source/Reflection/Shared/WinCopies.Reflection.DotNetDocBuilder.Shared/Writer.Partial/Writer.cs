@@ -12,6 +12,7 @@ using WinCopies.Reflection.DotNetParser;
 using WinCopies.Util;
 
 using static System.Console;
+using static System.IO.Path;
 
 using static WinCopies.IO.Path;
 
@@ -138,19 +139,19 @@ namespace WinCopies.Reflection.DotNetDocBuilder
             {
                 directory = _path;
 
-                if (!directory.EndsWith(PathSeparator))
+                if (!directory.EndsWith(DirectorySeparatorChar))
 
-                    directory += PathSeparator;
+                    directory += DirectorySeparatorChar;
 
                 _action = (in string __path) =>
                 {
-                    dotNetPackages.Enqueue(dotNetPackage = new DotNetPackage(dllPath = Path.Combine(directory, __path + ".dll")));
+                    dotNetPackages.Enqueue(dotNetPackage = new DotNetPackage(dllPath = Combine(directory, __path + ".dll")));
 
                     dotNetPackage.Open();
                 };
             };
 
-            path = Path.GetDirectoryName(path);
+            path = GetDirectoryName(path);
 
             string? readLine() => streamReader.ReadLine();
 

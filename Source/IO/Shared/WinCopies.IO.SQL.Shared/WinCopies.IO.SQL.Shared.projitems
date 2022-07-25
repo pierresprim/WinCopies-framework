@@ -6,7 +6,7 @@
     <SharedGUID>ec5f6afe-c86b-4ed1-affa-fb3ee9f5027b</SharedGUID>
   </PropertyGroup>
   <PropertyGroup Label="Configuration">
-    <Import_RootNamespace>WinCopies.IO.SQL.Shared</Import_RootNamespace>
+    <Import_RootNamespace>WinCopies.IO.SQL</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)SQLColumnInfo.cs" />

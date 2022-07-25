@@ -35,6 +35,7 @@ CHANGELOG
 - Writer.UpdateItems\<T, U>(in string, bool, Predicate\<T>, Action\<T, U>?, Action\<T>?, Converter\<T, Type>, in Func\<IEnumerable\<U>>, in Func\<U, Type, DBEntityCollection\<T>, T>, Action\<U, T, DBEntityCollection\<T>>, Action\<U, ulong>, Action\<UpdateItemsStruct>?) has a new parameter: in bool isGenericType.
 - DotNetEnum: new method GetEnumUnderlyingType().
 - Add support for constants in doc builder.
+- Bug fixed in IO commands.
 
 ### 3.13.2-preview
 

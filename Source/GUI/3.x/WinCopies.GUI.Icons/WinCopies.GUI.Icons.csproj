@@ -1,28 +1,30 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <PackageId>WinCopies.GUI.Icons</PackageId>
-    <AssemblyName>WinCopies.GUI.Icons</AssemblyName>
-    <RootNamespace>WinCopies.GUI.Icons</RootNamespace>
-	  <TargetFrameworks>netcoreapp3.0;netcoreapp3.1;net5.0-windows;net6.0-windows;net7.0-windows;net472;net48</TargetFrameworks>
-    <UseWPF>true</UseWPF>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>WinCopies.GUI.Icons.snk</AssemblyOriginatorKeyFile>
-    <DefineConstants>WinCopies2;WinCopies3;$(DefineConstants)</DefineConstants>
-	  <VersionPrefix>3.13</VersionPrefix>
-	  <AssemblyVersion>3.13</AssemblyVersion>
-	  <FileVersion>3.13</FileVersion>
-  </PropertyGroup>
+	<PropertyGroup>
+		<PackageId>WinCopies.GUI.Icons</PackageId>
+		<AssemblyName>WinCopies.GUI.Icons</AssemblyName>
+		<RootNamespace>WinCopies.GUI.Icons</RootNamespace>
+		<TargetFrameworks>netcoreapp3.0;netcoreapp3.1;net5.0-windows;net6.0-windows;net7.0-windows;net472;net48</TargetFrameworks>
+		<UseWPF>true</UseWPF>
+		<SignAssembly>true</SignAssembly>
+		<AssemblyOriginatorKeyFile>WinCopies.GUI.Icons.snk</AssemblyOriginatorKeyFile>
+		<DefineConstants>WinCopies2;WinCopies3;$(DefineConstants)</DefineConstants>
+		<VersionPrefix>3.15</VersionPrefix>
+		<AssemblyVersion>3.15</AssemblyVersion>
+		<FileVersion>3.15</FileVersion>
+	</PropertyGroup>
 
-  <ItemGroup Condition="$(DefineConstants.Contains('CS8'))">
-    <!--<PackageReference Include="Microsoft.Win32.Registry" Version="4.7.0" />-->
-    <PackageReference Include="System.Drawing.Common" Version="4.7.0" />
-    <!--<PackageReference Include="System.Management" Version="4.7.0" />-->
-  </ItemGroup>
+	<Import Project="$(SolutionDir)\ExtraProperties.props" Condition="'$(Configuration)'=='Release'" />
 
-  <ItemGroup Condition="$(DefineConstants.Contains('CS9'))">
-    <PackageReference Include="System.Drawing.Common" Version="5.0.0" />
-  </ItemGroup>
+	<ItemGroup Condition="$(DefineConstants.Contains('CS8'))">
+		<!--<PackageReference Include="Microsoft.Win32.Registry" Version="4.7.0" />-->
+		<PackageReference Include="System.Drawing.Common" Version="4.7.0" />
+		<!--<PackageReference Include="System.Management" Version="4.7.0" />-->
+	</ItemGroup>
+
+	<ItemGroup Condition="$(DefineConstants.Contains('CS9'))">
+		<PackageReference Include="System.Drawing.Common" Version="5.0.0" />
+	</ItemGroup>
 
 	<ItemGroup Condition="$(DefineConstants.Contains('CS10'))">
 		<PackageReference Include="System.Drawing.Common" Version="6.0.0" />
@@ -32,36 +34,39 @@
 		<PackageReference Include="System.Drawing.Common" Version="7.0.0" />
 	</ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.0'">
-    <!--<PackageReference Include="Microsoft.Win32.Registry" Version="4.6.0" />-->
-    <PackageReference Include="System.Drawing.Common" Version="4.6.0" />
-    <!--<PackageReference Include="System.Management" Version="4.6.0" />-->
-  </ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework.TrimEnd(`-windows`))'=='net5.0'">
+		<PackageReference Include="System.Drawing.Common" Version="5.0.0" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Compile Update="Properties\Resources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.1'">
+		<PackageReference Include="System.Drawing.Common" Version="4.7.0" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Update="Properties\Resources.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.0'">
+		<PackageReference Include="System.Drawing.Common" Version="4.6.0" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)'=='netstandard2.1'">
+		<PackageReference Include="System.Drawing.Common" Version="4.7.0" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
+		<PackageReference Include="System.Drawing.Common" Version="4.6.0" />
+	</ItemGroup>
 
 	<ItemGroup>
-		<None Include="..\..\..\..\LICENSE.md">
-			<Pack>True</Pack>
-			<PackagePath></PackagePath>
-		</None>
-		<None Include="..\..\..\WinCopies.png">
-			<Pack>True</Pack>
-			<PackagePath></PackagePath>
-		</None>
+		<Compile Update="Properties\Resources.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Resources.resx</DependentUpon>
+		</Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Update="Properties\Resources.resx">
+			<Generator>PublicResXFileCodeGenerator</Generator>
+			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
 	</ItemGroup>
 
 </Project>

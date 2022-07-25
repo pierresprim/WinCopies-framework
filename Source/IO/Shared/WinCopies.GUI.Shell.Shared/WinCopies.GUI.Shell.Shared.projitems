@@ -6,7 +6,7 @@
     <SharedGUID>d5ddacc8-7290-4f0c-9505-78822411e6ba</SharedGUID>
   </PropertyGroup>
   <PropertyGroup Label="Configuration">
-    <Import_RootNamespace>WinCopies.GUI.Shell.Shared</Import_RootNamespace>
+    <Import_RootNamespace>WinCopies.GUI.Shell</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)ArchiveCompressionProcessInfo.cs" />

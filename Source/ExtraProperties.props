@@ -1,0 +1,8 @@
+﻿<Project>
+	<PropertyGroup Condition="'$(Configuration)'=='Release'">
+		<AssemblyName>$(PackageId)</AssemblyName>
+		<Title>$(PackageId)</Title>
+		<DocumentationFile>$(PackageId).xml</DocumentationFile>
+		<AssemblyOriginatorKeyFile>$(PackageId).snk</AssemblyOriginatorKeyFile>
+	</PropertyGroup>
+</Project>

@@ -16,7 +16,7 @@ See the Change log.
 Description
 -----------
 
-Provides a WPF GUI for the WinCopies.IO.Shell package.
+WinCopies Framework IO plugin for Shell objects.
 
 Project link
 ------------

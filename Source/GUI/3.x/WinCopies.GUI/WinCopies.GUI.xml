@@ -4,11 +4,6 @@
         <name>WinCopies.GUI</name>
     </assembly>
     <members>
-        <member name="T:WinCopies.GUI.Windows.InputBox">
-            <summary>
-            Interaction logic for InputBox.xaml
-            </summary>
-        </member>
         <member name="F:WinCopies.GUI.Windows.InputBox.OrientationProperty">
             <summary>
             Identifies the <see cref="P:WinCopies.GUI.Windows.InputBox.Orientation"/> dependency property.
@@ -437,6 +432,91 @@
         <member name="F:WinCopies.GUI.Controls.PropertyGrid.IconProperty">
             <summary>
             Identifies the <see cref="P:WinCopies.GUI.Controls.PropertyGrid.Icon"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.NumericUpDown.IsReadOnlyProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.NumericUpDown.IsReadOnly"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.NumericUpDown.IsReadOnlyCaretVisibleProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.NumericUpDown.IsReadOnlyCaretVisible"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.NumericUpDown.HorizontalScrollBarVisibilityProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.NumericUpDown.HorizontalScrollBarVisibility"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.NumericUpDown.VerticalScrollBarVisibilityProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.NumericUpDown.VerticalScrollBarVisibility"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.NumericUpDown.IsUndoEnabledProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.NumericUpDown.IsUndoEnabled"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.NumericUpDown.UndoLimitProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.NumericUpDown.UndoLimit"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.NumericUpDown.SelectionBrushProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.NumericUpDown.SelectionBrush"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.NumericUpDown.SelectionTextBrushProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.NumericUpDown.SelectionTextBrush"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.NumericUpDown.SelectionOpacityProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.NumericUpDown.SelectionOpacity"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.NumericUpDown.CaretBrushProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.NumericUpDown.CaretBrush"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.NumericUpDown.MinValueProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.NumericUpDown.MinValue"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.NumericUpDown.ValueProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.NumericUpDown.Value"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.NumericUpDown.MaxValueProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.NumericUpDown.MaxValue"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.NumericUpDown.StepProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.NumericUpDown.Value"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.NumericUpDown.TextAlignmentProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.NumericUpDown.TextAlignment"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.NumericUpDown.TextDecorationsProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.NumericUpDown.TextDecorations"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.NumericUpDown.ValueChangedEvent">
+            <summary>
+            Identifies the <see cref="E:WinCopies.GUI.Controls.NumericUpDown.ValueChanged"/> routed event.
             </summary>
         </member>
     </members>

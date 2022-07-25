@@ -16,7 +16,7 @@ See the Change log.
 Description
 -----------
 
-Provides a WPF GUI for the WinCopies.IO package.
+Base package for WinCopies Framework IO plugins.
 
 Project link
 ------------

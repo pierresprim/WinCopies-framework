@@ -45,27 +45,27 @@
               Looks up a localized string similar to An unknown error occurred..
             </summary>
         </member>
-        <member name="T:WinCopies.IO.IBitmapSources">
+        <member name="T:WinCopies.IO.ComponentSources.Bitmap.IBitmapSources">
             <summary>
             Represents a <see cref="T:System.Windows.Media.Imaging.BitmapSource"/>s provider for a GUI.
             </summary>
         </member>
-        <member name="P:WinCopies.IO.IBitmapSources.Small">
+        <member name="P:WinCopies.IO.ComponentSources.Bitmap.IBitmapSources.Small">
             <summary>
             Gets the small <see cref="T:System.Windows.Media.Imaging.BitmapSource"/> of the object related to the current instance.
             </summary>
         </member>
-        <member name="P:WinCopies.IO.IBitmapSources.Medium">
+        <member name="P:WinCopies.IO.ComponentSources.Bitmap.IBitmapSources.Medium">
             <summary>
             Gets the medium <see cref="T:System.Windows.Media.Imaging.BitmapSource"/> of the object related to the current instance.
             </summary>
         </member>
-        <member name="P:WinCopies.IO.IBitmapSources.Large">
+        <member name="P:WinCopies.IO.ComponentSources.Bitmap.IBitmapSources.Large">
             <summary>
             Gets the large <see cref="T:System.Windows.Media.Imaging.BitmapSource"/> of the object related to the current instance.
             </summary>
         </member>
-        <member name="P:WinCopies.IO.IBitmapSources.ExtraLarge">
+        <member name="P:WinCopies.IO.ComponentSources.Bitmap.IBitmapSources.ExtraLarge">
             <summary>
             Gets the extra large <see cref="T:System.Windows.Media.Imaging.BitmapSource"/> of the object related to the current instance.
             </summary>
@@ -145,6 +145,32 @@
             Provides interoperability for interacting with browsable items.
             </summary>
         </member>
+        <member name="P:WinCopies.IO.ObjectModel.IBrowsableObjectInfo.ItemSources">
+            <summary>
+            Gets the item sources for this <see cref="T:WinCopies.IO.ObjectModel.IBrowsableObjectInfo"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.IBrowsableObjectInfo.IsMonitoringSupported">
+            <summary>
+            Gets a value indicating whether this <see cref="T:WinCopies.IO.ObjectModel.IBrowsableObjectInfo"/> can be monitored. If this value is <see langword="true"/>, a callback can be passed to the current item so that it will call it when changes are made on its context, i.e. when a new item is added or when properties have been updated.
+            </summary>
+            <seealso cref="P:WinCopies.IO.ObjectModel.IBrowsableObjectInfo.IsMonitoring"/>
+            <seealso cref="M:WinCopies.IO.ObjectModel.IBrowsableObjectInfo.StartMonitoring"/>
+            <seealso cref="M:WinCopies.IO.ObjectModel.IBrowsableObjectInfo.StopMonitoring"/>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.IBrowsableObjectInfo.IsMonitoring">
+            <summary>
+            Gets a value indicating whether this <see cref="T:WinCopies.IO.ObjectModel.IBrowsableObjectInfo"/> is currently notifying when changes are made on its context.
+            </summary>
+            <seealso cref="P:WinCopies.IO.ObjectModel.IBrowsableObjectInfo.IsMonitoringSupported"/>
+            <seealso cref="M:WinCopies.IO.ObjectModel.IBrowsableObjectInfo.StartMonitoring"/>
+            <seealso cref="M:WinCopies.IO.ObjectModel.IBrowsableObjectInfo.StopMonitoring"/>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.IBrowsableObjectInfo.IsLocalRoot">
+            <summary>
+            Gets a value indicating whether this <see cref="T:WinCopies.IO.ObjectModel.IBrowsableObjectInfo"/> is the root of its context.
+            </summary>
+        </member>
         <member name="P:WinCopies.IO.ObjectModel.IBrowsableObjectInfo.IsRecursivelyBrowsable">
             <summary>
             Gets a value indicating whether this <see cref="T:WinCopies.IO.ObjectModel.IBrowsableObjectInfo"/> is recursively browsable.
@@ -167,7 +193,77 @@
         </member>
         <member name="P:WinCopies.IO.ObjectModel.IBrowsableObjectInfo.Parent">
             <summary>
-            Gets the <see cref="T:WinCopies.IO.ObjectModel.IBrowsableObjectInfo"/> parent of this <see cref="T:WinCopies.IO.ObjectModel.IBrowsableObjectInfo"/>. Returns <see langword="null"/> if this object is the root object of a hierarchy.
+            Gets the <see cref="T:WinCopies.IO.ObjectModel.IBrowsableObjectInfo"/> parent of this one. Returns <see langword="null"/> if this object is the root object of a hierarchy.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.IBrowsableObjectInfo.ItemTypeName">
+            <summary>
+            Gets the name of this item's type. This value is shown to the user.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.IBrowsableObjectInfo.Description">
+            <summary>
+            Gets a description of this object. This value is shown to the user.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.IBrowsableObjectInfo.Protocol">
+            <summary>
+            Gets a value indicating the protocol to use in order to reach this item when typing its URI or path, if supported, in the address bar. This value is used to identify the selector to use to convert the given URI or path to an <see cref="T:WinCopies.IO.ObjectModel.IBrowsableObjectInfo"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.IBrowsableObjectInfo.URI">
+            <summary>
+            Gets a value indicating the URI of the current item. See the Remarks section.
+            </summary>
+            <remarks>This is the identifier for the current item. For system paths, this value can be equal to <see cref="T:WinCopies.IO.Path"/>. On other data structures, this value may be different, i.e. when an item is reached through a succession of steps (c is an item of b, itself an item of a), but has also a unique identifier like a GUID, for example.</remarks>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.IBrowsableObjectInfo.ConnectionParameters">
+            <summary>
+            For items that need to connect to a server before being able to retrieve their own items, this property can be used to ask the user for the credentials and server parameters to use to open the connection. See the Remarks section.
+            </summary>
+            <remarks><para>This property's type is a read-only dictionary that takes the parameter name as keys and an instance of the <see cref="T:WinCopies.IO.ConnectionParameter"/> class as values. The values typed by the user are stored in the <see cref="P:WinCopies.IO.ConnectionParameter.Value"/> property of the value instances.</para>
+            <para>This property is used by the engine before it retrieves the <see cref="P:WinCopies.IO.ObjectModel.IBrowsableObjectInfo.ItemSources"/> property's value. So the method implementation of the <see cref="T:WinCopies.IO.ComponentSources.Item.IItemSource"/> interface does not need to ask themselves the user for these parameters.</para></remarks>
+        </member>
+        <member name="M:WinCopies.IO.ObjectModel.IBrowsableObjectInfo.GetContextMenu(System.Boolean)">
+            <summary>
+            Returns an <see cref="T:WinCopies.IO.IContextMenu"/>. See the Remarks section.
+            </summary>
+            <param name="extendedVerbs">A value indicating whether to retrieve a full or partial context menu.</param>
+            <returns>The <see cref="T:WinCopies.IO.IContextMenu"/> that is retrieved by this method.</returns>
+            <remarks><para>This method can be used to retrieve a native context menu, for which the commands cannot be managed directly on this layer.</para>
+            <para>This method overload is used to retrieve the context menu specific to the current item. To retrieve the context menu for children items, call the <see cref="M:WinCopies.IO.ObjectModel.IBrowsableObjectInfo.GetContextMenu(System.Collections.Generic.IEnumerable{WinCopies.IO.ObjectModel.IBrowsableObjectInfo},System.Boolean)"/> overload.</para>
+            </remarks>
+        </member>
+        <member name="M:WinCopies.IO.ObjectModel.IBrowsableObjectInfo.StartMonitoring">
+            <summary>
+            Starts monitoring the current item.
+            </summary>
+            <exception cref="T:System.InvalidOperationException"><see cref="P:WinCopies.IO.ObjectModel.IBrowsableObjectInfo.IsMonitoringSupported"/> is set to <see langword="false"/>.</exception>
+        </member>
+        <member name="M:WinCopies.IO.ObjectModel.IBrowsableObjectInfo.StopMonitoring">
+            <summary>
+            Stops monitoring the current item.
+            </summary>
+            <exception cref="T:System.InvalidOperationException"><see cref="P:WinCopies.IO.ObjectModel.IBrowsableObjectInfo.IsMonitoringSupported"/> is set to <see langword="false"/>.</exception>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.IBrowsableObjectInfo`1.ObjectProperties">
+            <summary>
+            Generic version of <see cref="P:WinCopies.IO.ObjectModel.IBrowsableObjectInfo.ObjectProperties"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.IBrowsableObjectInfo3`1.Parent">
+            <summary>
+            Generic version of <see cref="P:WinCopies.IO.ObjectModel.IBrowsableObjectInfo.Parent"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.IEncapsulatorBrowsableObjectInfo`1.InnerObject">
+            <summary>
+            Generic version of <see cref="P:WinCopies.IO.ObjectModel.IBrowsableObjectInfo.InnerObject"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.IBrowsableObjectInfo2`1.ItemSources">
+            <summary>
+            Generic version of <see cref="P:WinCopies.IO.ObjectModel.IBrowsableObjectInfo.ItemSources"/>.
             </summary>
         </member>
         <member name="P:WinCopies.IO.ObjectModel.IBrowsableObjectInfoBase.Path">
@@ -190,10 +286,77 @@
             The base class for all IO browsable objects of the WinCopies framework.
             </summary>
         </member>
-        <member name="P:WinCopies.IO.ObjectModel.BrowsableObjectInfo.Parent">
+        <member name="P:WinCopies.IO.ObjectModel.BrowsableObjectInfo.ItemSourcesOverride">
             <summary>
-            Gets the <see cref="T:WinCopies.IO.ObjectModel.IBrowsableObjectInfo"/> parent of this <see cref="T:WinCopies.IO.ObjectModel.BrowsableObjectInfo"/>. Returns <see langword="null"/> if this object is the root object of a hierarchy.
+            When overridden in a derived class, gets the item sources for this <see cref="T:WinCopies.IO.ObjectModel.BrowsableObjectInfo"/>.
             </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.BrowsableObjectInfo.IsMonitoringSupportedOverride">
+            <summary>
+            When overridden in a derived class, gets a value indicating whether this <see cref="T:WinCopies.IO.ObjectModel.BrowsableObjectInfo"/> can be monitored. If this value is <see langword="true"/>, a callback can be passed to the current item so that it will call it when changes are made on its context, i.e. when a new item is added or when properties have been updated.
+            </summary>
+            <seealso cref="P:WinCopies.IO.ObjectModel.BrowsableObjectInfo.IsMonitoring"/>
+            <seealso cref="M:WinCopies.IO.ObjectModel.BrowsableObjectInfo.StartMonitoringOverride"/>
+            <seealso cref="M:WinCopies.IO.ObjectModel.BrowsableObjectInfo.StopMonitoringOverride"/>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.BrowsableObjectInfo.IsLocalRootOverride">
+            <summary>
+            When overridden in a derived class, gets a value indicating whether this <see cref="T:WinCopies.IO.ObjectModel.BrowsableObjectInfo"/> is the root of its context.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.BrowsableObjectInfo.InnerObjectOverride">
+            <summary>
+            When overridden in a derived class, gets the underlying object of this abstraction class.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.BrowsableObjectInfo.ItemSources">
+            <inheritdoc/>
+            <exception cref="T:System.InvalidOperationException">The current <see cref="T:WinCopies.IO.ObjectModel.BrowsableObjectInfo"/> is disposed.</exception>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.BrowsableObjectInfo.IsMonitoring">
+            <inheritdoc/>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.BrowsableObjectInfo.IsMonitoringSupported">
+            <inheritdoc/>
+            <exception cref="T:System.InvalidOperationException">The current <see cref="T:WinCopies.IO.ObjectModel.BrowsableObjectInfo"/> is disposed.</exception>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.BrowsableObjectInfo.IsLocalRoot">
+            <inheritdoc/>
+            <exception cref="T:System.InvalidOperationException">The current <see cref="T:WinCopies.IO.ObjectModel.BrowsableObjectInfo"/> is disposed.</exception>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.BrowsableObjectInfo.Description">
+            <inheritdoc/>
+            <exception cref="T:System.InvalidOperationException">The current <see cref="T:WinCopies.IO.ObjectModel.BrowsableObjectInfo"/> is disposed.</exception>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.BrowsableObjectInfo.InnerObject">
+            <inheritdoc/>
+            <exception cref="T:System.InvalidOperationException">The current <see cref="T:WinCopies.IO.ObjectModel.BrowsableObjectInfo"/> is disposed.</exception>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.BrowsableObjectInfo.IsRecursivelyBrowsable">
+            <inheritdoc/>
+            <exception cref="T:System.InvalidOperationException">The current <see cref="T:WinCopies.IO.ObjectModel.BrowsableObjectInfo"/> is disposed.</exception>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.BrowsableObjectInfo.ItemTypeName">
+            <inheritdoc/>
+            <exception cref="T:System.InvalidOperationException">The current <see cref="T:WinCopies.IO.ObjectModel.BrowsableObjectInfo"/> is disposed.</exception>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.BrowsableObjectInfo.ObjectProperties">
+            <inheritdoc/>
+            <exception cref="T:System.InvalidOperationException">The current <see cref="T:WinCopies.IO.ObjectModel.BrowsableObjectInfo"/> is disposed.</exception>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.BrowsableObjectInfo.ObjectPropertySystem">
+            <inheritdoc/>
+            <exception cref="T:System.InvalidOperationException">The current <see cref="T:WinCopies.IO.ObjectModel.BrowsableObjectInfo"/> is disposed.</exception>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.BrowsableObjectInfo.Parent">
+            <inheritdoc/>
+            <exception cref="T:System.InvalidOperationException">The current <see cref="T:WinCopies.IO.ObjectModel.BrowsableObjectInfo"/> is disposed.</exception>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.BrowsableObjectInfo.Protocol">
+            <inheritdoc/>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.BrowsableObjectInfo.URI">
+            <inheritdoc/>
         </member>
         <member name="M:WinCopies.IO.ObjectModel.BrowsableObjectInfo.#ctor(System.String@,WinCopies.IO.ClientVersion@)">
             <summary>
@@ -201,41 +364,37 @@
             </summary>
             <param name="path">The path of the new item.</param>
         </member>
-        <member name="M:WinCopies.IO.ObjectModel.BrowsableObjectInfo.GetItemsOverride">
-            <summary>
-            When overridden in a derived class, returns the items of this <see cref="T:WinCopies.IO.ObjectModel.BrowsableObjectInfo"/>.
-            </summary>
-            <returns>An <see cref="T:System.Collections.Generic.IEnumerable`1"/> that enumerates through the items of this <see cref="T:WinCopies.IO.ObjectModel.BrowsableObjectInfo"/>.</returns>
+        <member name="M:WinCopies.IO.ObjectModel.BrowsableObjectInfo.GetContextMenu(System.Boolean)">
+            <inheritdoc/>
+            <exception cref="T:System.InvalidOperationException">The current <see cref="T:WinCopies.IO.ObjectModel.BrowsableObjectInfo"/> is disposed.</exception>
+        </member>
+        <member name="M:WinCopies.IO.ObjectModel.BrowsableObjectInfo.GetContextMenu(System.Collections.Generic.IEnumerable{WinCopies.IO.ObjectModel.IBrowsableObjectInfo},System.Boolean)">
+            <inheritdoc/>
+            <exception cref="T:System.InvalidOperationException">The current <see cref="T:WinCopies.IO.ObjectModel.BrowsableObjectInfo"/> is disposed.</exception>
+        </member>
+        <member name="M:WinCopies.IO.ObjectModel.BrowsableObjectInfo.StartMonitoring">
+            <inheritdoc/>
+            <exception cref="T:System.InvalidOperationException">The current <see cref="T:WinCopies.IO.ObjectModel.BrowsableObjectInfo"/> is disposed.</exception>
+        </member>
+        <member name="M:WinCopies.IO.ObjectModel.BrowsableObjectInfo.StopMonitoring">
+            <inheritdoc/>
+            <exception cref="T:System.InvalidOperationException">The current <see cref="T:WinCopies.IO.ObjectModel.BrowsableObjectInfo"/> is disposed.</exception>
         </member>
         <member name="P:WinCopies.IO.ObjectModel.BrowsableObjectInfo.IsDisposed">
             <summary>
             Gets a value that indicates whether the current object is disposed.
             </summary>
         </member>
-        <member name="M:WinCopies.IO.ObjectModel.BrowsableObjectInfo.DisposeManaged">
+        <member name="P:WinCopies.IO.ObjectModel.BrowsableObjectInfo5`1.ParentGeneric">
             <summary>
-            Sets <see cref="P:WinCopies.IO.ObjectModel.BrowsableObjectInfo.IsDisposed"/> to <see langword="true"/>. This method is called from the <see cref="M:WinCopies.IO.ObjectModel.BrowsableObjectInfo.Dispose"/> method.
+            Gets the <see cref="T:WinCopies.IO.ObjectModel.IBrowsableObjectInfo"/> parent of this <see cref="T:WinCopies.IO.ObjectModel.BrowsableObjectInfo"/>. Returns <see langword="null"/> if this object is the root object of a hierarchy.
             </summary>
         </member>
-        <member name="M:WinCopies.IO.ObjectModel.BrowsableObjectInfo.DisposeUnmanaged">
+        <member name="M:WinCopies.IO.ObjectModel.BrowsableObjectInfo`6.#ctor(System.String@,WinCopies.IO.ClientVersion@)">
             <summary>
-            Not used in this class.
+            When called from a derived class, initializes a new instance of the <see cref="T:WinCopies.IO.ObjectModel.BrowsableObjectInfo`6"/> class with a custom <see cref="T:WinCopies.IO.ClientVersion"/>.
             </summary>
-            <seealso cref="M:WinCopies.IO.ObjectModel.BrowsableObjectInfo.Dispose"/>
-            <seealso cref="M:WinCopies.IO.ObjectModel.BrowsableObjectInfo.DisposeManaged"/>
-        </member>
-        <member name="M:WinCopies.IO.ObjectModel.BrowsableObjectInfo`1.#ctor(System.String@,WinCopies.IO.ClientVersion@)">
-            <summary>
-            Initializes a new instance of the <see cref="T:WinCopies.IO.ObjectModel.BrowsableObjectInfo"/> class.
-            </summary>
-            <param name="path">The path of the new item.</param>
-            <param name="clientVersion">The <see cref="T:WinCopies.IO.ClientVersion"/> that will be used to initialize new <see cref="!:PortableDeviceInfo"/>s and <see cref="!:PortableDeviceObjectInfo"/>s.</param>
-        </member>
-        <member name="M:WinCopies.IO.ObjectModel.BrowsableObjectInfo`5.#ctor(System.String@,WinCopies.IO.ClientVersion@)">
-            <summary>
-            When called from a derived class, initializes a new instance of the <see cref="T:WinCopies.IO.ObjectModel.BrowsableObjectInfo`5"/> class with a custom <see cref="T:WinCopies.IO.ClientVersion"/>.
-            </summary>
-            <param name="path">The path of the new <see cref="T:WinCopies.IO.ObjectModel.BrowsableObjectInfo`5"/>.</param>
+            <param name="path">The path of the new <see cref="T:WinCopies.IO.ObjectModel.BrowsableObjectInfo`6"/>.</param>
             <param name="clientVersion">A custom <see cref="T:WinCopies.IO.ClientVersion"/>. This parameter can be null for non-file system and portable devices-related types.</param>
         </member>
         <member name="T:WinCopies.IO.ObjectModel.BrowsableObjectInfoBase">

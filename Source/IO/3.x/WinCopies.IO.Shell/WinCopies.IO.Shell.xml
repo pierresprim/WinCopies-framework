@@ -322,69 +322,62 @@
             Gets a value that indicates whether files are automatically renamed when they conflict with existing paths.
             </summary>
         </member>
-        <member name="P:WinCopies.IO.Enumeration.ArchiveFileInfoEnumeratorStruct3.ArchiveFileInfo">
-            <summary>
-            Gets the <see cref="T:SevenZip.ArchiveFileInfo"/> that represents the cyrrent archive item. This property is set only when <see cref="T:WinCopies.IO.Path"/> is <see langword="null"/>.
-            </summary>
-        </member>
-        <member name="M:WinCopies.IO.Enumeration.ArchiveFileInfoEnumeratorStruct2.#ctor(System.String@,System.String@)">
-            <summary>
-            Initializes a new instance of the <see cref="T:WinCopies.IO.Enumeration.ArchiveFileInfoEnumeratorStruct"/> struct with a given path.
-            </summary>
-            <param name="relativePath">The relative path of the archive item.</param>
-        </member>
-        <member name="T:WinCopies.IO.Enumeration.ArchiveFileInfoEnumeratorStruct">
-            <summary>
-            Represents an archive item. This struct is used in enumeration methods.
-            </summary>
-        </member>
         <member name="T:WinCopies.IO.ObjectModel.IArchiveItemInfo`4">
             <summary>
             Represents an archive item.
             </summary>
         </member>
-        <member name="M:WinCopies.IO.ObjectModel.Reflection.DotNetAttributeInfo.GetItemProviders">
+        <member name="M:WinCopies.IO.ObjectModel.RegistryItemInfo.#ctor(WinCopies.IO.ClientVersion@)">
             <summary>
-            Returns <see langword="null"/> as this item does not contain any item.
-            </summary>
-            <returns>A <see langword="null"/> value.</returns>
-        </member>
-        <member name="M:WinCopies.IO.ObjectModel.Reflection.DotNetAttributeInfo.GetItemProviders(System.Predicate{System.Object})">
-            <summary>
-            Returns <see langword="null"/> as this item does not contain any item.
-            </summary>
-            <returns>A <see langword="null"/> value.</returns>
-        </member>
-        <member name="M:WinCopies.IO.ObjectModel.Reflection.DotNetAttributeInfo.GetSelectorDictionaryOverride">
-            <summary>
-            Returns <see langword="null"/> as this item does not contain any item.
-            </summary>
-            <returns>A <see langword="null"/> value.</returns>
-        </member>
-        <member name="P:WinCopies.IO.ObjectModel.Reflection.DotNetItemInfo`5.Name">
-            <summary>
-            Gets the name of this <see cref="T:WinCopies.IO.ObjectModel.Reflection.IDotNetItemInfo"/>.
+            Initializes a new instance of the <see cref="T:WinCopies.IO.ObjectModel.RegistryItemInfo"/> class as the Registry root.
             </summary>
         </member>
-        <member name="P:WinCopies.IO.ObjectModel.Reflection.DotNetItemInfo`5.LocalizedName">
+        <member name="T:WinCopies.IO.ObjectModel.ShellObjectInfo`4">
             <summary>
-            Gets the same value as <see cref="P:WinCopies.IO.ObjectModel.Reflection.DotNetItemInfo`5.Name"/>.
+            Represents a file system item.
             </summary>
         </member>
-        <member name="P:WinCopies.IO.ObjectModel.Reflection.DotNetItemInfo`5.DescriptionOverride">
+        <member name="P:WinCopies.IO.ObjectModel.ShellObjectInfo`4.ArchiveShellObject">
             <summary>
-            Gets the <see cref="!:NotApplicable"/> value.
+            The parent <see cref="T:WinCopies.IO.ObjectModel.IShellObjectInfoBase"/> of the current archive item. If the current <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/> represents an archive file, this property returns the current <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/>, or <see langword="null"/> otherwise.
             </summary>
         </member>
-        <member name="P:WinCopies.IO.ObjectModel.Reflection.DotNetItemInfo`5.IsSpecialItemOverride">
+        <member name="P:WinCopies.IO.ObjectModel.ShellObjectInfo`4.InnerObjectGenericOverride">
             <summary>
-            Gets the <see langword="false"/> value.
+            Gets a <see cref="T:Microsoft.WindowsAPICodePack.Shell.ShellObject"/> that represents this <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/>.
             </summary>
         </member>
-        <member name="P:WinCopies.IO.ObjectModel.Reflection.DotNetParameterInfo`2.InnerObjectGenericOverride">
+        <member name="P:WinCopies.IO.ObjectModel.ShellObjectInfo`4.ItemTypeNameOverride">
             <summary>
-            Gets the inner <see cref="T:System.Reflection.ParameterInfo"/>.
+            Gets the type name of the current <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/>. This value corresponds to the description of the file's extension.
             </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.ShellObjectInfo`4.IsSpecialItemOverride">
+            <summary>
+            Gets a value that indicates whether the current item has particularities.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.ShellObjectInfo`4.LocalizedName">
+            <summary>
+            Gets the localized name of this <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/> depending the associated <see cref="T:Microsoft.WindowsAPICodePack.Shell.ShellObject"/> (see the <see cref="T:Microsoft.WindowsAPICodePack.Shell.ShellObject"/> property for more details.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.ShellObjectInfo`4.Name">
+            <summary>
+            Gets the name of this <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/> depending of the associated <see cref="T:Microsoft.WindowsAPICodePack.Shell.ShellObject"/> (see the <see cref="T:Microsoft.WindowsAPICodePack.Shell.ShellObject"/> property for more details.
+            </summary>
+        </member>
+        <member name="M:WinCopies.IO.ObjectModel.ShellObjectInfo`4.GetParent">
+            <summary>
+            Returns the parent of this <see cref="T:WinCopies.IO.ObjectModel.BrowsableObjectInfo"/>.
+            </summary>
+            <returns>The parent of this <see cref="T:WinCopies.IO.ObjectModel.BrowsableObjectInfo"/>.</returns>
+        </member>
+        <member name="M:WinCopies.IO.ObjectModel.ShellObjectInfo`4.ToString">
+            <summary>
+            Gets a string representation of this <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/>.
+            </summary>
+            <returns>The <see cref="P:WinCopies.IO.ObjectModel.ShellObjectInfo`4.LocalizedName"/> of this <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/>.</returns>
         </member>
         <member name="T:WinCopies.IO.ObjectModel.ArchiveItemInfo`4">
             <summary>
@@ -421,7 +414,7 @@
             Gets the name of this <see cref="T:WinCopies.IO.ObjectModel.ArchiveItemInfo"/>.
             </summary>
         </member>
-        <member name="M:WinCopies.IO.ObjectModel.ArchiveItemInfo.GetItemProviders">
+        <member name="M:WinCopies.IO.ObjectModel.ArchiveItemInfo.ItemSource.GetItemProviders">
             <summary>
             Returns the items of this <see cref="T:WinCopies.IO.ObjectModel.ArchiveItemInfo"/>.
             </summary>
@@ -536,58 +529,6 @@
             </summary>
             <returns>The parent of this <see cref="T:WinCopies.IO.ObjectModel.RegistryItemInfo"/>.</returns>
         </member>
-        <member name="M:WinCopies.IO.ObjectModel.RegistryItemInfo.#ctor(WinCopies.IO.ClientVersion@)">
-            <summary>
-            Initializes a new instance of the <see cref="T:WinCopies.IO.ObjectModel.RegistryItemInfo"/> class as the Registry root.
-            </summary>
-        </member>
-        <member name="T:WinCopies.IO.ObjectModel.ShellObjectInfo`4">
-            <summary>
-            Represents a file system item.
-            </summary>
-        </member>
-        <member name="P:WinCopies.IO.ObjectModel.ShellObjectInfo`4.ArchiveShellObject">
-            <summary>
-            The parent <see cref="T:WinCopies.IO.ObjectModel.IShellObjectInfoBase"/> of the current archive item. If the current <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/> represents an archive file, this property returns the current <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/>, or <see langword="null"/> otherwise.
-            </summary>
-        </member>
-        <member name="P:WinCopies.IO.ObjectModel.ShellObjectInfo`4.InnerObjectGenericOverride">
-            <summary>
-            Gets a <see cref="T:Microsoft.WindowsAPICodePack.Shell.ShellObject"/> that represents this <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/>.
-            </summary>
-        </member>
-        <member name="P:WinCopies.IO.ObjectModel.ShellObjectInfo`4.ItemTypeNameOverride">
-            <summary>
-            Gets the type name of the current <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/>. This value corresponds to the description of the file's extension.
-            </summary>
-        </member>
-        <member name="P:WinCopies.IO.ObjectModel.ShellObjectInfo`4.IsSpecialItemOverride">
-            <summary>
-            Gets a value that indicates whether the current item has particularities.
-            </summary>
-        </member>
-        <member name="P:WinCopies.IO.ObjectModel.ShellObjectInfo`4.LocalizedName">
-            <summary>
-            Gets the localized name of this <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/> depending the associated <see cref="T:Microsoft.WindowsAPICodePack.Shell.ShellObject"/> (see the <see cref="T:Microsoft.WindowsAPICodePack.Shell.ShellObject"/> property for more details.
-            </summary>
-        </member>
-        <member name="P:WinCopies.IO.ObjectModel.ShellObjectInfo`4.Name">
-            <summary>
-            Gets the name of this <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/> depending of the associated <see cref="T:Microsoft.WindowsAPICodePack.Shell.ShellObject"/> (see the <see cref="T:Microsoft.WindowsAPICodePack.Shell.ShellObject"/> property for more details.
-            </summary>
-        </member>
-        <member name="M:WinCopies.IO.ObjectModel.ShellObjectInfo`4.GetParent">
-            <summary>
-            Returns the parent of this <see cref="T:WinCopies.IO.ObjectModel.BrowsableObjectInfo"/>.
-            </summary>
-            <returns>The parent of this <see cref="T:WinCopies.IO.ObjectModel.BrowsableObjectInfo"/>.</returns>
-        </member>
-        <member name="M:WinCopies.IO.ObjectModel.ShellObjectInfo`4.ToString">
-            <summary>
-            Gets a string representation of this <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/>.
-            </summary>
-            <returns>The <see cref="P:WinCopies.IO.ObjectModel.ShellObjectInfo`4.LocalizedName"/> of this <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/>.</returns>
-        </member>
         <member name="P:WinCopies.IO.ObjectModel.WMIItemInfo`4.BrowsableObjectInfoBitmapSources.SmallOverride">
             <summary>
             Gets the small <see cref="T:System.Windows.Media.Imaging.BitmapSource"/> of this <see cref="T:WinCopies.IO.ObjectModel.WMIItemInfo"/>.
@@ -659,54 +600,20 @@
             <param name="wmiItemType">The <see cref="T:WinCopies.IO.PropertySystem.WMIItemType"/> of <paramref name="managementObject"/>.</param>
             <returns>The path of the given <see cref="T:System.Management.ManagementBaseObject"/>.</returns>
         </member>
-        <member name="T:WinCopies.IO.PropertySystem.WMIItemType">
+        <member name="P:WinCopies.IO.Enumeration.ArchiveFileInfoEnumeratorStruct3.ArchiveFileInfo">
             <summary>
-            The WMI item type.
+            Gets the <see cref="T:SevenZip.ArchiveFileInfo"/> that represents the cyrrent archive item. This property is set only when <see cref="T:WinCopies.IO.Path"/> is <see langword="null"/>.
             </summary>
         </member>
-        <member name="F:WinCopies.IO.PropertySystem.WMIItemType.Namespace">
+        <member name="M:WinCopies.IO.Enumeration.ArchiveFileInfoEnumeratorStruct2.#ctor(System.String@,System.String@)">
             <summary>
-            The WMI item is a namespace.
+            Initializes a new instance of the <see cref="T:WinCopies.IO.Enumeration.ArchiveFileInfoEnumeratorStruct"/> struct with a given path.
             </summary>
+            <param name="relativePath">The relative path of the archive item.</param>
         </member>
-        <member name="F:WinCopies.IO.PropertySystem.WMIItemType.Class">
+        <member name="T:WinCopies.IO.Enumeration.ArchiveFileInfoEnumeratorStruct">
             <summary>
-            The WMI item is a class.
-            </summary>
-        </member>
-        <member name="F:WinCopies.IO.PropertySystem.WMIItemType.Instance">
-            <summary>
-            The WMI item is an instance.
-            </summary>
-        </member>
-        <member name="T:WinCopies.IO.PropertySystem.RegistryItemType">
-            <summary>
-            The Windows registry item type.
-            </summary>
-        </member>
-        <member name="F:WinCopies.IO.PropertySystem.RegistryItemType.Root">
-            <summary>
-            The current instance represents the Windows registry root node.
-            </summary>
-        </member>
-        <member name="F:WinCopies.IO.PropertySystem.RegistryItemType.Key">
-            <summary>
-            The current instance represents a Windows registry key.
-            </summary>
-        </member>
-        <member name="F:WinCopies.IO.PropertySystem.RegistryItemType.Value">
-            <summary>
-            The current instance represents a Windows registry value.
-            </summary>
-        </member>
-        <member name="P:WinCopies.IO.PropertySystem.FileSystemObjectInfoProperties`1.FileType">
-            <summary>
-            The type of the current item (folder, file, ...)
-            </summary>
-        </member>
-        <member name="P:WinCopies.IO.PropertySystem.FileSystemObjectInfoProperties`1.Size">
-            <summary>
-            The size on disk of the current item.
+            Represents an archive item. This struct is used in enumeration methods.
             </summary>
         </member>
         <member name="F:WinCopies.IO.Process.ProcessError.None">
@@ -802,6 +709,56 @@
             <param name="bufferLength">The buffer length to use to read data.</param>
             <param name="callback">A delegate that is raised after each data block has been checked. If the returned value is <see langword="true"/>, then the process is stopped.</param>
             <returns><see langword="true"/> if the two files are duplicates; <see langword="null"/> if the process has been canceled; otherwise <see langword="false"/>.</returns>
+        </member>
+        <member name="T:WinCopies.IO.PropertySystem.WMIItemType">
+            <summary>
+            The WMI item type.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.PropertySystem.WMIItemType.Namespace">
+            <summary>
+            The WMI item is a namespace.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.PropertySystem.WMIItemType.Class">
+            <summary>
+            The WMI item is a class.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.PropertySystem.WMIItemType.Instance">
+            <summary>
+            The WMI item is an instance.
+            </summary>
+        </member>
+        <member name="T:WinCopies.IO.PropertySystem.RegistryItemType">
+            <summary>
+            The Windows registry item type.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.PropertySystem.RegistryItemType.Root">
+            <summary>
+            The current instance represents the Windows registry root node.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.PropertySystem.RegistryItemType.Key">
+            <summary>
+            The current instance represents a Windows registry key.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.PropertySystem.RegistryItemType.Value">
+            <summary>
+            The current instance represents a Windows registry value.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.PropertySystem.FileSystemObjectInfoProperties`1.FileType">
+            <summary>
+            The type of the current item (folder, file, ...)
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.PropertySystem.FileSystemObjectInfoProperties`1.Size">
+            <summary>
+            The size on disk of the current item.
+            </summary>
         </member>
         <member name="F:WinCopies.IO.Reflection.DotNetItemType.Namespace">
             <summary>
