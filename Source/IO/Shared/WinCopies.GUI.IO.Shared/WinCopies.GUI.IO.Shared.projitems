@@ -9,6 +9,7 @@
     <Import_RootNamespace>WinCopies.GUI.IO</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Application.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AssemblyInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectInfoWindow.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\AddressBar.cs" />

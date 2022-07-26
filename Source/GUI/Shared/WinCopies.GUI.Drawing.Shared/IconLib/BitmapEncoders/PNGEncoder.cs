@@ -25,10 +25,6 @@ namespace WinCopies.GUI.Drawing.BitmapEncoders
     [Author("Franco, Gustavo")]
     internal class PNGEncoder : ImageEncoder
     {
-        #region Constructors
-        public PNGEncoder() { }
-        #endregion
-
         #region Properties
         public override IconImageFormat IconImageFormat => IconImageFormat.PNG;
 
@@ -48,6 +44,10 @@ namespace WinCopies.GUI.Drawing.BitmapEncoders
                 return length;
             }
         }
+        #endregion
+
+        #region Constructors
+        public PNGEncoder() { }
         #endregion
 
         #region Methods

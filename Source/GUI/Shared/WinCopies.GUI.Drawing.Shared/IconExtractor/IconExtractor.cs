@@ -50,7 +50,6 @@ namespace WinCopies.GUI.Drawing
     public class IconExtractor
     {
         #region Constants
-
         // Flags for LoadLibraryEx().
 
         private const uint LOAD_LIBRARY_AS_DATAFILE = 0x00000002;
@@ -59,17 +58,11 @@ namespace WinCopies.GUI.Drawing
 
         private static readonly IntPtr RT_ICON = (IntPtr)3;
         private static readonly IntPtr RT_GROUP_ICON = (IntPtr)14;
-
         #endregion
-
-        #region Fields
 
         private byte[][] iconData = null;   // Binary data of each icon.
 
-        #endregion
-
         #region Public properties
-
         /// <summary>
         /// Gets the full path of the associated file.
         /// </summary>
@@ -79,11 +72,10 @@ namespace WinCopies.GUI.Drawing
         /// Gets the count of the icons in the associated file.
         /// </summary>
         public int Count => iconData.Length;
-
         #endregion
 
         /// <summary>
-        /// Initializes a new instance of the IconExtractor class from the specified file name.
+        /// Initializes a new instance of the <see cref="IconExtractor"/> class from the specified file name.
         /// </summary>
         /// <param name="fileName">The file to extract icons from.</param>
         public IconExtractor(in string fileName) => Initialize(fileName);
@@ -92,17 +84,13 @@ namespace WinCopies.GUI.Drawing
         /// Extracts an icon from the file.
         /// </summary>
         /// <param name="index">Zero based index of the icon to be extracted.</param>
-        /// <returns>A System.Drawing.Icon object.</returns>
-        /// <remarks>Always returns new copy of the Icon. It should be disposed by the user.</remarks>
+        /// <returns>A <see cref="Icon"/> object.</returns>
+        /// <remarks>Always returns new copy of the <see cref="Icon"/>. It should be disposed by the user.</remarks>
         public Icon GetIcon(in int index)
         {
-            if (index < 0 || Count <= index)
-
-                throw new ArgumentOutOfRangeException(nameof(index));
-
             // Create an Icon based on a .ico file in memory.
 
-            using (var ms = new MemoryStream(iconData[index]))
+            using (var ms = index < 0 || Count <= index ? throw new ArgumentOutOfRangeException(nameof(index)) : new MemoryStream(iconData[index]))
 
                 return new Icon(ms);
         }
@@ -110,7 +98,7 @@ namespace WinCopies.GUI.Drawing
         /// <summary>
         /// Extracts all the icons from the file.
         /// </summary>
-        /// <returns>An array of System.Drawing.Icon objects.</returns>
+        /// <returns>An array of <see cref="Icon"/> objects.</returns>
         /// <remarks>Always returns new copies of the Icons. They should be disposed by the user.</remarks>
         public Icon[] GetAllIcons()
         {
@@ -124,10 +112,10 @@ namespace WinCopies.GUI.Drawing
         }
 
         /// <summary>
-        /// Save an icon to the specified output Stream.
+        /// Save an icon to the specified output <see cref="System.IO.Stream"/>.
         /// </summary>
         /// <param name="index">Zero based index of the icon to be saved.</param>
-        /// <param name="outputStream">The Stream to save to.</param>
+        /// <param name="outputStream">The <see cref="System.IO.Stream"/> to save to.</param>
         public void Save(in int index, in System.IO.Stream outputStream)
         {
             if (index < 0 || Count <= index)
@@ -150,11 +138,7 @@ namespace WinCopies.GUI.Drawing
             {
                 hModule = Core.LoadLibraryEx(fileName, IntPtr.Zero, LOAD_LIBRARY_AS_DATAFILE);
 
-                if (hModule == IntPtr.Zero)
-
-                    throw new Win32Exception();
-
-                FileName = GetFileName(hModule);
+                FileName = hModule == IntPtr.Zero ? throw new Win32Exception() : GetFileName(hModule);
 
                 // Enumerate the icon resource and build .ico files in memory.
 
@@ -167,7 +151,7 @@ namespace WinCopies.GUI.Drawing
 
                     // RT_GROUP_ICON resource consists of a GRPICONDIR and GRPICONDIRENTRY's.
 
-                    byte[] dir = GetDataFromResource(hModule, RT_GROUP_ICON, name);
+                    byte[] dir = IconExtractor.GetDataFromResource(hModule, RT_GROUP_ICON, name);
 
                     // Calculate the size of an entire .icon file.
 
@@ -191,7 +175,7 @@ namespace WinCopies.GUI.Drawing
                             // Load the picture.
 
                             ushort id = BitConverter.ToUInt16(dir, 6 + (14 * i) + 12);    // GRPICONDIRENTRY.nID
-                            byte[] pic = GetDataFromResource(hModule, RT_ICON, (IntPtr)id);
+                            byte[] pic = IconExtractor.GetDataFromResource(hModule, RT_ICON, (IntPtr)id);
 
                             // Copy GRPICONDIRENTRY to ICONDIRENTRY.
 
@@ -219,6 +203,7 @@ namespace WinCopies.GUI.Drawing
 
                 iconData = tmpData.ToArray();
             }
+
             finally
             {
                 if (hModule != IntPtr.Zero)
@@ -227,41 +212,25 @@ namespace WinCopies.GUI.Drawing
             }
         }
 
-        private byte[] GetDataFromResource(IntPtr hModule, IntPtr type, IntPtr name)
+        private static byte[] GetDataFromResource(IntPtr hModule, IntPtr type, IntPtr name)
         {
             // Load the binary data from the specified resource.
 
             IntPtr hResInfo = Core.FindResource(hModule, name, type);
 
-            if (hResInfo == IntPtr.Zero)
+            IntPtr hResData = hResInfo == IntPtr.Zero ? throw new Win32Exception() : Core.LoadResource(hModule, hResInfo);
 
-                throw new Win32Exception();
+            IntPtr pResData = hResData == IntPtr.Zero ? throw new Win32Exception() : Core.LockResource(hResData);
 
-            IntPtr hResData = Core.LoadResource(hModule, hResInfo);
+            uint size = pResData == IntPtr.Zero ? throw new Win32Exception() : Core.SizeofResource(hModule, hResInfo);
 
-            if (hResData == IntPtr.Zero)
-
-                throw new Win32Exception();
-
-            IntPtr pResData = Core.LockResource(hResData);
-
-            if (pResData == IntPtr.Zero)
-
-                throw new Win32Exception();
-
-            uint size = Core.SizeofResource(hModule, hResInfo);
-
-            if (size == 0)
-
-                throw new Win32Exception();
-
-            byte[] buf = new byte[size];
+            byte[] buf = new byte[size == 0 ? throw new Win32Exception() : size];
             Marshal.Copy(pResData, buf, 0, buf.Length);
 
             return buf;
         }
 
-        private string GetFileName(IntPtr hModule)
+        private static string GetFileName(IntPtr hModule)
         {
             // Alternative to GetModuleFileName() for the module loaded with
             // LOAD_LIBRARY_AS_DATAFILE option.
@@ -272,14 +241,9 @@ namespace WinCopies.GUI.Drawing
             string fileName;
             {
                 var buf = new StringBuilder(MaxPath);
-                uint len = Core.GetMappedFileName(
-                    Core.GetCurrentProcess(), hModule, buf, (uint)buf.Capacity);
 
-                if (len == 0)
-
-                    throw new Win32Exception();
-
-                fileName = buf.ToString();
+                fileName = Core.GetMappedFileName(
+                    Core.GetCurrentProcess(), hModule, buf, (uint)buf.Capacity) == 0 ? throw new Win32Exception() : buf.ToString();
             }
 
             // Convert the device name to drive name like:

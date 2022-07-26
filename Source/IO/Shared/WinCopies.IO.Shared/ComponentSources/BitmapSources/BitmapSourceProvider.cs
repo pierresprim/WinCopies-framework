@@ -16,10 +16,12 @@
 * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using System;
+using System.Windows.Media.Imaging;
 
 using WinCopies.IO.ComponentSources.Bitmap;
 using WinCopies.IO.ObjectModel;
 
+using static WinCopies.IO.ObjectModel.BrowsableObjectInfo;
 using static WinCopies.ThrowHelper;
 
 namespace WinCopies.IO
@@ -197,7 +199,36 @@ namespace WinCopies.IO
 
     namespace Shell.ComponentSources.Bitmap
     {
-        public class BitmapSourceProvider : IO.ComponentSources.Bitmap.BitmapSourceProvider
+        public struct BitmapSourcesStruct
+        {
+            public int IconIndex { get; }
+
+            public string DllName { get; }
+
+            public BitmapSourcesStruct(in int iconIndex, in string dllName)
+            {
+                IconIndex = iconIndex;
+
+                DllName = dllName;
+            }
+        }
+
+        public class BitmapSources : BitmapSources2<BitmapSourcesStruct>
+        {
+            public BitmapSources(in BitmapSourcesStruct parameters) : base(parameters) { /* Left empty. */ }
+
+            protected BitmapSource TryGetBitmapSource(in int size) => BrowsableObjectInfo.TryGetBitmapSource(InnerObject.IconIndex, InnerObject.DllName, size);
+
+            protected override BitmapSource GetSmall() => TryGetBitmapSource(SmallIconSize);
+
+            protected override BitmapSource GetMedium() => TryGetBitmapSource(MediumIconSize);
+
+            protected override BitmapSource GetLarge() => TryGetBitmapSource(LargeIconSize);
+
+            protected override BitmapSource GetExtraLarge() => TryGetBitmapSource(ExtraLargeIconSize);
+        }
+
+        public static class BitmapSourceProvider
         {
             private static IBitmapSources GetDefaultBitmapSources(in BrowsableAs browsableAs)
             {
@@ -268,25 +299,29 @@ namespace WinCopies.IO
 #endif
             }
 
-            public BitmapSourceProvider(in BrowsableAs browsableAs, in IBitmapSources intermediate, in IBitmapSources
+            public static IO.ComponentSources.Bitmap.BitmapSourceProvider Create(in BrowsableAs browsableAs, in IBitmapSources intermediate, in IBitmapSources
 #if CS8
                 ?
 #endif
-                sources, in bool disposeBitmapSources) : base(GetDefaultBitmapSources(browsableAs), intermediate, sources, disposeBitmapSources) { /* Left empty. */ }
+                sources, in bool disposeBitmapSources) => new
+#if !CS9
+                IO.ComponentSources.Bitmap.BitmapSourceProvider
+#endif
+                (GetDefaultBitmapSources(browsableAs), intermediate, sources, disposeBitmapSources);
 
-            public BitmapSourceProvider(in IBrowsableObjectInfo browsableObjectInfo, in IBitmapSources intermediate, in IBitmapSources
+            public static IO.ComponentSources.Bitmap.BitmapSourceProvider Create(in IBrowsableObjectInfo browsableObjectInfo, in IBitmapSources intermediate, in IBitmapSources
 #if CS8
                 ?
 #endif
-                bitmapSources, in bool disposeBitmapSources) : this(browsableObjectInfo.GetBrowsableAsValue(), intermediate, bitmapSources, disposeBitmapSources) { /* Left empty. */ }
+                bitmapSources, in bool disposeBitmapSources) => Create(browsableObjectInfo.GetBrowsableAsValue(), intermediate, bitmapSources, disposeBitmapSources);
 
-            public BitmapSourceProvider(in IBrowsableObjectInfo browsableObjectInfo, in IBitmapSources
+            public static IO.ComponentSources.Bitmap.BitmapSourceProvider Create(in IBrowsableObjectInfo browsableObjectInfo, in IBitmapSources
 #if CS8
                 ?
 #endif
-                bitmapSources, in bool disposeBitmapSources) : this(browsableObjectInfo.GetBrowsableAsValue(), null, bitmapSources, disposeBitmapSources) { /* Left empty. */ }
+                bitmapSources, in bool disposeBitmapSources) => Create(browsableObjectInfo.GetBrowsableAsValue(), null, bitmapSources, disposeBitmapSources);
 
-            public BitmapSourceProvider(in IBrowsableObjectInfo browsableObjectInfo) : this(browsableObjectInfo, null, false) { /* Left empty. */ }
+            public static IO.ComponentSources.Bitmap.BitmapSourceProvider Create(in IBrowsableObjectInfo browsableObjectInfo) => Create(browsableObjectInfo, null, false);
         }
     }
 }

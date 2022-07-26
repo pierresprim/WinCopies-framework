@@ -19,7 +19,6 @@
 
 using Microsoft.WindowsAPICodePack.Win32Native.GDI;
 
-using System.IO;
 using System.Runtime.InteropServices;
 
 namespace WinCopies.GUI.Drawing.BitmapEncoders
@@ -27,12 +26,12 @@ namespace WinCopies.GUI.Drawing.BitmapEncoders
     [Author("Franco, Gustavo")]
     internal class BMPEncoder : ImageEncoder
     {
-        #region Constructors
-        public BMPEncoder() { }
-        #endregion
-
         #region Properties
         public override IconImageFormat IconImageFormat => IconImageFormat.BMP;
+        #endregion
+
+        #region Constructors
+        public BMPEncoder() { }
         #endregion
 
         #region Methods

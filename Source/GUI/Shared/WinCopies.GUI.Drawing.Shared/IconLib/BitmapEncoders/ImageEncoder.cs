@@ -18,6 +18,7 @@
 //  REMAINS UNCHANGED.
 
 using Microsoft.WindowsAPICodePack.Win32Native.GDI;
+
 using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -34,10 +35,6 @@ namespace WinCopies.GUI.Drawing.BitmapEncoders
         protected RGBQuad[] mColors;
         protected byte[] mXOR;
         protected byte[] mAND;
-        #endregion
-
-        #region Constructors
-        protected ImageEncoder() { }
         #endregion
 
         #region Properties
@@ -66,6 +63,7 @@ namespace WinCopies.GUI.Drawing.BitmapEncoders
                         wBitCount = mHeader.biBitCount,
                         wPlanes = mHeader.biPlanes
                     };
+
                     Write<ICONDIRENTRY>(iconEntry, ms);
 
                     // Image Info Header
@@ -93,17 +91,9 @@ namespace WinCopies.GUI.Drawing.BitmapEncoders
             }
         }
 
-        public virtual BitmapInfoHeader Header
-        {
-            get => mHeader;
-            set => mHeader = value;
-        }
+        public virtual BitmapInfoHeader Header { get => mHeader; set => mHeader = value; }
 
-        public virtual RGBQuad[] Colors
-        {
-            get => mColors;
-            set => mColors = value;
-        }
+        public virtual RGBQuad[] Colors { get => mColors; set => mColors = value; }
 
         public virtual byte[] XOR
         {
@@ -116,11 +106,7 @@ namespace WinCopies.GUI.Drawing.BitmapEncoders
             }
         }
 
-        public virtual byte[] AND
-        {
-            get => mAND;
-            set => mAND = value;
-        }
+        public virtual byte[] AND { get => mAND; set => mAND = value; }
 
         public unsafe virtual int ColorsInPalette => (int)(mHeader.biClrUsed != 0 ?
                                     mHeader.biClrUsed :
@@ -130,6 +116,10 @@ namespace WinCopies.GUI.Drawing.BitmapEncoders
         public unsafe virtual int ImageSize => Marshal.SizeOf<BitmapInfoHeader>() + (Marshal.SizeOf<RGBQuad>() * ColorsInPalette) + mXOR.Length + mAND.Length;
 
         public abstract IconImageFormat IconImageFormat { get; }
+        #endregion
+
+        #region Constructors
+        protected ImageEncoder() { }
         #endregion
 
         #region Abstract Methods

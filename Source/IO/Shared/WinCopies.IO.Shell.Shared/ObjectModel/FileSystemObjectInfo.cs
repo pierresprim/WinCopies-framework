@@ -275,7 +275,7 @@ namespace WinCopies.IO
                 ?
 #endif
                 right) => left is null ? right is null : left.CompareTo(right) >= 0;
-#endregion
+            #endregion
         }
 
         public class ImageList
@@ -323,25 +323,17 @@ namespace WinCopies.IO
 #endif
                 TryGetDefaultBitmapSource<T>(in IFileSystemObjectInfo<T> fileSystemObjectInfo, in int size) where T : IFileSystemObjectInfoProperties => TryGetBitmapSource(System.IO.Path.GetExtension(fileSystemObjectInfo.Path), fileSystemObjectInfo.ObjectProperties?.FileType ?? FileType.Other, size);
 
-            public static Shell.ComponentSources.Bitmap.BitmapSourceProvider GetDefaultBitmapSourcesProvider<T>(in IFileSystemObjectInfo<T> fileSystemObjectInfo, in IBitmapSources
+            public static BitmapSourceProvider GetDefaultBitmapSourcesProvider<T>(in IFileSystemObjectInfo<T> fileSystemObjectInfo, in IBitmapSources
 #if CS8
                 ?
 #endif
-                bitmapSources = null) where T : IFileSystemObjectInfoProperties => new
-#if !CS9
-                Shell.ComponentSources.Bitmap.BitmapSourceProvider
-#endif
-                (fileSystemObjectInfo, new FileSystemObjectInfoBitmapSources<T>(fileSystemObjectInfo), bitmapSources, true);
+                bitmapSources = null) where T : IFileSystemObjectInfoProperties => Shell.ComponentSources.Bitmap.BitmapSourceProvider.Create(fileSystemObjectInfo, new FileSystemObjectInfoBitmapSources<T>(fileSystemObjectInfo), bitmapSources, true);
 
-            public static Shell.ComponentSources.Bitmap.BitmapSourceProvider GetDefaultBitmapSourcesProvider<T>(in IFileSystemObjectInfo<T> fileSystemObjectInfo, in IBitmapSources intermediate, in IBitmapSources
+            public static BitmapSourceProvider GetDefaultBitmapSourcesProvider<T>(in IFileSystemObjectInfo<T> fileSystemObjectInfo, in IBitmapSources intermediate, in IBitmapSources
 #if CS8
             ?
 #endif
-            bitmapSources = null) where T : IFileSystemObjectInfoProperties => new
-#if !CS9
-                Shell.ComponentSources.Bitmap.BitmapSourceProvider
-#endif
-                (fileSystemObjectInfo, intermediate, bitmapSources, true);
+            bitmapSources = null) where T : IFileSystemObjectInfoProperties => Shell.ComponentSources.Bitmap.BitmapSourceProvider.Create(fileSystemObjectInfo, intermediate, bitmapSources, true);
 
             public static ArrayBuilder<IBrowsableObjectInfo> GetRootItems()
             {

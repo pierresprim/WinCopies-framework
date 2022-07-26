@@ -24,11 +24,11 @@ using System.Drawing;
 using System.Drawing.Imaging;
 
 using static WinCopies.
-    #if !WinCopies3
+#if !WinCopies3
     Util.Util
 #else
     ThrowHelper
-    #endif
+#endif
     ;
 
 namespace WinCopies.GUI.Drawing.ColorProcessing
@@ -36,13 +36,13 @@ namespace WinCopies.GUI.Drawing.ColorProcessing
     [Author("Franco, Gustavo")]
     public class EuclideanQuantizer : IColorQuantizer
     {
-#region Variables Declaration
+        #region Variables Declaration
         private readonly IPaletteQuantizer mQuantizer = null;
         private readonly IDithering mDithering = null;
         private Dictionary<uint, byte> mColorMap;
-#endregion
+        #endregion
 
-#region Constructors
+        #region Constructors
         public EuclideanQuantizer() : this(new OctreeQuantizer(), new FloydSteinbergDithering()) { }
 
         public EuclideanQuantizer(in IPaletteQuantizer quantizer, in IDithering dithering)
@@ -50,24 +50,16 @@ namespace WinCopies.GUI.Drawing.ColorProcessing
             mQuantizer = quantizer ?? throw GetArgumentNullException(nameof(quantizer));
             mDithering = dithering;
         }
-#endregion
+        #endregion
 
-#region Methods
+        #region Methods
         public unsafe Bitmap Convert(in Bitmap source, in PixelFormat outputFormat)
         {
             ThrowIfNull(source, nameof(source));
 
             DateTime dt1 = DateTime.Now;
 
-            if ((outputFormat & PixelFormat.Indexed) != PixelFormat.Indexed)
-
-                throw new WinCopies.
-#if !WinCopies3
-Util.
-#endif
-                    InvalidEnumArgumentException("Output format must be one of the indexed formats", nameof(outputFormat), outputFormat);
-
-            var bmpTrg = new Bitmap(source.Width, source.Height, outputFormat);
+            var bmpTrg = (outputFormat & PixelFormat.Indexed) == PixelFormat.Indexed ? new Bitmap(source.Width, source.Height, outputFormat) : throw new InvalidEnumArgumentException("Output format must be one of the indexed formats", nameof(outputFormat), outputFormat);
 
             //Hashtable to chache the mapped colors.
             mColorMap = new Dictionary<uint, byte>();
@@ -91,11 +83,7 @@ Util.
                     newPalette = mQuantizer.CreatePalette(source, 256, 8);
                     break;
                 default:
-                    throw new WinCopies.
-#if !WinCopies3
-                        Util.
-#endif
-                        InvalidEnumArgumentException("Indexed format not supported", nameof(outputFormat), outputFormat);
+                    throw new InvalidEnumArgumentException("Indexed format not supported", nameof(outputFormat), outputFormat);
             }
 
             DateTime dt2 = DateTime.Now;
@@ -257,6 +245,6 @@ Util.
                     break;
             }
         }
-#endregion
+        #endregion
     }
 }

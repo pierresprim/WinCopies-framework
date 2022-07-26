@@ -55,11 +55,7 @@ namespace WinCopies.GUI.Drawing.EncodingFormats
             var singleIcon = new SingleIcon("Untitled");
             var iconDir = new ICONDIR(stream);
 
-            if (iconDir.idReserved != 0 || iconDir.idType != 1)
-
-                throw new InvalidMultiIconFileException();
-
-            int entryOffset = sizeof(ICONDIR);
+            int entryOffset = !(iconDir.idReserved == 0 && iconDir.idType == 1) ? throw new InvalidMultiIconFileException() : sizeof(ICONDIR);
 
             // Add Icon Images one by one to the new entry created
             for (int i = 0; i < iconDir.idCount; i++)
@@ -73,6 +69,7 @@ namespace WinCopies.GUI.Drawing.EncodingFormats
                 _ = stream.Seek(entry.dwImageOffset, SeekOrigin.Begin);
 
                 _ = singleIcon.Add(new IconImage(stream, (int)(stream.Length - stream.Position)));
+
                 entryOffset += sizeof(ICONDIRENTRY);
             }
 

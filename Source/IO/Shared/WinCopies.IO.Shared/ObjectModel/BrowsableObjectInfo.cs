@@ -149,7 +149,7 @@ namespace WinCopies.IO
         [DebuggerDisplay("{Name}")]
         public abstract class BrowsableObjectInfo : BrowsableObjectInfoBase, IBrowsableObjectInfo
         {
-#region Consts
+            #region Consts
             public const ushort SmallIconSize = 16;
             public const ushort MediumIconSize = 48;
             public const ushort LargeIconSize = 128;
@@ -158,7 +158,7 @@ namespace WinCopies.IO
             public const int FileIcon = 0;
             public const int ComputerIcon = 15;
             public const int FolderIcon = 3;
-#endregion
+            #endregion
 
             private BrowsableObjectInfoCallbackQueue
 #if CS8
@@ -171,7 +171,7 @@ namespace WinCopies.IO
 #endif
                 _bitmapSources;
 
-#region Properties
+            #region Properties
             IBitmapSources
 #if CS8
                 ?
@@ -180,7 +180,7 @@ namespace WinCopies.IO
 
             IBrowsableObjectInfo Collections.Generic.IRecursiveEnumerable<IBrowsableObjectInfo>.Value => this;
 
-#region Static Properties
+            #region Static Properties
             public static ClientVersion DefaultClientVersion { get; } = new ClientVersion((Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly()).GetName());
 
             public static ISelectorDictionary<BrowsableObjectInfoURL3, IBrowsableObjectInfo> DefaultBrowsableObjectInfoSelectorDictionary { get; } = new DefaultNullableValueSelectorDictionary<BrowsableObjectInfoURL3, IBrowsableObjectInfo>();
@@ -193,9 +193,9 @@ namespace WinCopies.IO
 
             //    RegisterDefaultSelectors = EmptyVoid;
             //};
-#endregion
+            #endregion
 
-#region Protected Properties
+            #region Protected Properties
             /// <summary>
             /// When overridden in a derived class, gets the item sources for this <see cref="BrowsableObjectInfo"/>.
             /// </summary>
@@ -287,9 +287,9 @@ namespace WinCopies.IO
 #endif
                 ConnectionParametersOverride
             { get; }
-#endregion
+            #endregion
 
-#region Public Properties
+            #region Public Properties
             /// <inheritdoc/>
             /// <exception cref="InvalidOperationException">The current <see cref="BrowsableObjectInfo"/> is disposed.</exception>
             public IItemSourcesProvider
@@ -386,8 +386,8 @@ namespace WinCopies.IO
             public virtual string URI => Path;
 
             public virtual DisplayStyle DisplayStyle => DisplayStyle.Size3;
-#endregion
-#endregion
+            #endregion
+            #endregion
 
             // /// <param name="clientVersion">The <see cref="ClientVersion"/> that will be used to initialize new <see cref="PortableDeviceInfo"/>s and <see cref="PortableDeviceObjectInfo"/>s.</param>
             /// <summary>
@@ -396,10 +396,10 @@ namespace WinCopies.IO
             /// <param name="path">The path of the new item.</param>
             protected BrowsableObjectInfo(in string path, in ClientVersion clientVersion) : base(path) => ClientVersion = clientVersion;
 
-#region Methods
-#region Static Methods
-#region Drawing
-#region Icons
+            #region Methods
+            #region Static Methods
+            #region Drawing
+            #region Icons
             public static Icon
 #if CS8
                 ?
@@ -432,9 +432,9 @@ namespace WinCopies.IO
                 ?
 #endif
                 TryGetIcon(in Icon icon, in ushort size) => TryGetIcon(icon, new System.Drawing.Size(size, size));
-#endregion
+            #endregion
 
-#region BitmapSources
+            #region BitmapSources
             public static BitmapSource
 #if CS8
                 ?
@@ -468,8 +468,8 @@ namespace WinCopies.IO
                 ?
 #endif
                 TryGetBitmapSource(in Icon icon, in ushort size) => TryGetBitmapSource(TryGetIcon(icon, size));
-#endregion
-#endregion
+            #endregion
+            #endregion
 
             internal static bool IsBrowsableObject(in IBrowsableObjectInfo browsableObjectInfo) => browsableObjectInfo.Browsability != null && (browsableObjectInfo.Browsability.Browsability == IO.Browsability.BrowsableByDefault || browsableObjectInfo.Browsability.Browsability == IO.Browsability.Browsable);
 
@@ -491,9 +491,9 @@ namespace WinCopies.IO
             public static bool Predicate(in BrowsableObjectInfoURL3 item, in Type t) => WinCopies.Extensions.UtilHelpers.ContainsFieldValue(t, null, item.URL.Protocol.ToString());
 
             public static bool Predicate(in ProcessFactorySelectorDictionaryParameters item, in Type t) => WinCopies.Extensions.UtilHelpers.ContainsFieldValue(t, null, item.ProcessParameters.Guid.ToString());
-#endregion
+            #endregion
 
-#region Protected Methods
+            #region Protected Methods
             protected virtual IContextMenu
 #if CS8
                 ?
@@ -563,9 +563,9 @@ namespace WinCopies.IO
                 ?
 #endif
                 items = null) => null;
-#endregion
+            #endregion
 
-#region Public Methods
+            #region Public Methods
             public static Icon
 #if CS8
                 ?
@@ -663,10 +663,10 @@ namespace WinCopies.IO
                     IsMonitoring = false;
                 }
             }
-#endregion
+            #endregion
 
-#region Interface Implementations
-#region Enumeration
+            #region Interface Implementations
+            #region Enumeration
             protected System.Collections.Generic.IEnumerable<IBrowsableObjectInfo>
 #if CS8
                 ?
@@ -703,9 +703,9 @@ namespace WinCopies.IO
 #endif
 
             RecursiveEnumeratorAbstract<IBrowsableObjectInfo> IRecursiveEnumerable<IBrowsableObjectInfo>.GetEnumerator() => IsRecursivelyBrowsable ? new RecursiveEnumerator<IBrowsableObjectInfo>(this, RecursiveEnumerationOrder.ParentThenChildren) : throw new NotSupportedException("The current BrowsableObjectInfo does not support recursive browsing.");
-#endregion
+            #endregion
 
-#region IDisposable
+            #region IDisposable
             /// <summary>
             /// Gets a value that indicates whether the current object is disposed.
             /// </summary>
@@ -750,9 +750,9 @@ namespace WinCopies.IO
             //if (disposing)
 
             //    _parent = null;
-#endregion
-#endregion Interface Implementations
-#endregion
+            #endregion
+            #endregion Interface Implementations
+            #endregion
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
             ~BrowsableObjectInfo() => DisposeUnmanaged();
@@ -768,7 +768,7 @@ namespace WinCopies.IO
 
         public abstract class BrowsableObjectInfo5<T> : BrowsableObjectInfo, IBrowsableObjectInfo3<T> where T : IBrowsableObjectInfo
         {
-#region Properties
+            #region Properties
             protected abstract T
 #if CS9
                 ?
@@ -796,21 +796,21 @@ namespace WinCopies.IO
                 ?
 #endif
                 IBrowsableObjectInfo3<T>.Parent => ParentGeneric;
-#endregion
+            #endregion
 
-#region Constructors
+            #region Constructors
             /*/// <summary>
             /// Initializes a new instance of the <see cref="BrowsableObjectInfo"/> class.
             /// </summary>
             /// <param name="path">The path of the new item.</param>
             /// <param name="clientVersion">The <see cref="ClientVersion"/> that will be used to initialize new <see cref="PortableDeviceInfo"/>s and <see cref="PortableDeviceObjectInfo"/>s.</param>*/
             protected BrowsableObjectInfo5(in string path, in ClientVersion clientVersion) : base(path, clientVersion) { /* Left empty. */ }
-#endregion
+            #endregion
         }
 
         public abstract class BrowsableObjectInfo<TParent, TObjectProperties> : BrowsableObjectInfo5<TParent>, IBrowsableObjectInfo<TParent, TObjectProperties> where TParent : IBrowsableObjectInfo
         {
-#region Properties
+            #region Properties
             protected abstract TObjectProperties
 #if CS9
                 ?
@@ -831,21 +831,21 @@ namespace WinCopies.IO
                 ObjectPropertiesOverride => ObjectPropertiesGenericOverride;
 
             TObjectProperties IBrowsableObjectInfo<TObjectProperties>.ObjectProperties => ObjectPropertiesGeneric;
-#endregion
+            #endregion
 
-#region Constructors
+            #region Constructors
             /*/// <summary>
             /// Initializes a new instance of the <see cref="BrowsableObjectInfo"/> class.
             /// </summary>
             /// <param name="path">The path of the new item.</param>
             /// <param name="clientVersion">The <see cref="ClientVersion"/> that will be used to initialize new <see cref="PortableDeviceInfo"/>s and <see cref="PortableDeviceObjectInfo"/>s.</param>*/
             protected BrowsableObjectInfo(in string path, in ClientVersion clientVersion) : base(path, clientVersion) { /* Left empty. */ }
-#endregion
+            #endregion
         }
 
         public abstract class BrowsableObjectInfo2<T> : BrowsableObjectInfo, IEncapsulatorBrowsableObjectInfo<T>
         {
-#region Properties
+            #region Properties
             protected abstract T InnerObjectGenericOverride { get; }
 
             public T InnerObjectGeneric => GetValueIfNotDisposed(() => InnerObjectGenericOverride);
@@ -853,7 +853,7 @@ namespace WinCopies.IO
             T IEncapsulatorBrowsableObjectInfo<T>.InnerObject => InnerObjectGenericOverride;
 
             protected sealed override object InnerObjectOverride => InnerObjectGenericOverride;
-#endregion
+            #endregion
 
             protected BrowsableObjectInfo2(in string path, in ClientVersion clientVersion) : base(path, clientVersion) { /* Left empty. */ }
         }
@@ -884,7 +884,7 @@ namespace WinCopies.IO
 
         public abstract class BrowsableObjectInfo<TParent, TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : BrowsableObjectInfo<TParent, TObjectProperties>, IBrowsableObjectInfo<TParent, TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TParent : IBrowsableObjectInfo where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
         {
-#region Properties
+            #region Properties
             protected abstract TInnerObject
 #if CS9
                 ?
@@ -924,7 +924,7 @@ namespace WinCopies.IO
                 IBrowsableObjectInfo2<TPredicateTypeParameter>.ItemSources => ItemSourcesGeneric;
 
             // public abstract Predicate<TPredicateTypeParameter> RootItemsPredicate { get; }
-#endregion
+            #endregion
 
             /// <summary>
             /// When called from a derived class, initializes a new instance of the <see cref="BrowsableObjectInfo{TParent, TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems}"/> class with a custom <see cref="ClientVersion"/>.
@@ -933,11 +933,11 @@ namespace WinCopies.IO
             /// <param name="clientVersion">A custom <see cref="ClientVersion"/>. This parameter can be null for non-file system and portable devices-related types.</param>
             protected BrowsableObjectInfo(in string path, in ClientVersion clientVersion) : base(path, clientVersion) { /* Left empty. */ }
 
-#region Methods
+            #region Methods
             protected abstract TSelectorDictionary GetSelectorDictionaryOverride();
 
             public TSelectorDictionary GetSelectorDictionary() => GetValueIfNotDisposed(GetSelectorDictionaryOverride);
-#endregion
+            #endregion
         }
 
         public abstract class BrowsableObjectInfo2<TParent, TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> : BrowsableObjectInfo<TParent, TObjectProperties, TInnerObject, TPredicateTypeParameter, TSelectorDictionary, TDictionaryItems> where TParent : IBrowsableObjectInfo where TSelectorDictionary : IEnumerableSelectorDictionary<TDictionaryItems, IBrowsableObjectInfo>
@@ -1041,11 +1041,11 @@ namespace WinCopies.IO
 
             protected override bool IsLocalRootOverride => false;
 
-            protected override IBitmapSourceProvider BitmapSourceProviderOverride => InnerObjectGenericOverride.BitmapSourceProvider;
+            protected override IBitmapSourceProvider BitmapSourceProviderOverride => InnerObjectGenericOverride.BitmapSourceProvider ?? new BitmapSourceProvider(new Shell.ComponentSources.Bitmap.BitmapSources(new Shell.ComponentSources.Bitmap.BitmapSourcesStruct(0, "cabview")), null, null, true);
 
             protected override IBrowsabilityOptions BrowsabilityOverride => BrowsabilityOptions.BrowsableByDefault;
 
-            protected override System.Collections.Generic.IEnumerable<IBrowsabilityPath>
+            protected override IEnumerable<IBrowsabilityPath>
 #if CS8
                 ?
 #endif
@@ -1116,14 +1116,14 @@ namespace WinCopies.IO
 #endif
                 GetRootItemsOverride() => null;
 
-            protected override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo>
+            protected override IEnumerable<IBrowsableObjectInfo>
 #if CS8
                 ?
 #endif
                 GetSubRootItemsOverride() => null;
         }
 
-        public abstract class BrowsableObjectInfoStartPage<T> : AppBrowsableObjectInfo<System.Collections.Generic.IEnumerable<T>> where T : IEncapsulatorBrowsableObjectInfo<IBrowsableObjectInfoPlugin>
+        public abstract class BrowsableObjectInfoStartPage<T> : AppBrowsableObjectInfo<IEnumerable<T>> where T : IEncapsulatorBrowsableObjectInfo<IBrowsableObjectInfoPlugin>
         {
             protected override IItemSourcesProvider ItemSourcesOverride { get; }
 

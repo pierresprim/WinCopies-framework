@@ -6,6 +6,14 @@ The WinCopies® software framework
 CHANGELOG
 ---------
 
+### 3.16-preview
+
+- Add new type: WinCopies.GUI.IO.Application.
+- WinCopies.IO package:
+	- WinCopies.IO.Shell.ComponentSources.Bitmap.BitmapSourceProvider is now static. New method overloads (Create) replace the constructors.
+	- PluginInfo\<T>: BitmapSourceProviderOverride always returns a non-null value. If InnerObjectGenericOverride.BitmapSourceProvider returns a null value, then the property returns a default value.
+- WinCopies.IO.Shell package: BitmapSourcesStruct and BitmapSources types, both in the WinCopies.IO.Shell.ComponentSources.Bitmap namespace are now in the WinCopies.IO package.
+
 ### 3.15-preview
 
 - Add plugin support for WinCopies IO Framework based applications.

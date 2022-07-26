@@ -38,9 +38,7 @@ namespace WinCopies.GUI.Drawing
     [Author("Franco, Gustavo")]
     public class MultiIcon : List<SingleIcon>
     {
-        #region Fields
         private int mSelectedIndex = -1;
-        #endregion
 
         #region Properties
         public int SelectedIndex { get => mSelectedIndex; set => mSelectedIndex = value >= Count ? throw new ArgumentOutOfRangeException(nameof(SelectedIndex)) : value; }
@@ -113,14 +111,9 @@ namespace WinCopies.GUI.Drawing
         #region Public Methods
         public SingleIcon Add(in string iconName)
         {
-            // Already exist?
-            if (Contains(iconName))
-
-                throw new IconNameAlreadyExistException();
-
             // Lets Create the icon group
             // Add group to the master list and also lets give a name
-            var singleIcon = new SingleIcon(iconName);
+            var singleIcon = /*Already exist?*/ Contains(iconName) ? throw new IconNameAlreadyExistException() : new SingleIcon(iconName);
             Add(singleIcon);
             return singleIcon;
         }
@@ -163,6 +156,7 @@ namespace WinCopies.GUI.Drawing
             {
                 Load(fs);
             }
+
             finally
             {
                 fs?.Close();

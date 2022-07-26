@@ -165,11 +165,7 @@ namespace WinCopies.GUI.Drawing
 
             set
             {
-                if (value == IconImageFormat.UNKNOWN)
-
-                    throw new InvalidIconFormatSelectionException();
-
-                if (value == Encoder.IconImageFormat)
+                if (value == IconImageFormat.UNKNOWN ? throw new InvalidIconFormatSelectionException() : value == Encoder.IconImageFormat)
 
                     return;
 
@@ -239,6 +235,7 @@ namespace WinCopies.GUI.Drawing
             // We need to rotate the images, but we don't want to mess with the source image, lets create a clone
             var image = (Bitmap)bitmap.Clone();
             Bitmap mask = bitmapMask != null ? (Bitmap)bitmapMask.Clone() : null;
+
             try
             {
                 //.NET has a bug flipping in the Y axis for 1bpp images, let do it ourself
@@ -322,7 +319,7 @@ namespace WinCopies.GUI.Drawing
                         posCY = strideC * y;
 
                         for (int x = 0; x < bmpData.Width; x++)
-                        {
+                        
                             switch (bpp)
                             {
                                 case 1:
@@ -387,7 +384,6 @@ namespace WinCopies.GUI.Drawing
 
                                     break;
                             }
-                        }
                     }
                     bmpBW.UnlockBits(bmpBWData);
                 }
@@ -402,6 +398,7 @@ namespace WinCopies.GUI.Drawing
                     mask.UnlockBits(bmpBWData);
                 }
             }
+
             finally
             {
                 image?.Dispose();
@@ -448,8 +445,11 @@ namespace WinCopies.GUI.Drawing
                 switch (bSignature)
                 {
                     case 40: // BMP ?
+
                         return IconImageFormat.BMP;
+
                     case 0x89: // PNG ?
+
                         if (br.ReadInt16() == 0x4E50)
 
                             return IconImageFormat.PNG;
@@ -459,6 +459,7 @@ namespace WinCopies.GUI.Drawing
 
                 return IconImageFormat.UNKNOWN;
             }
+
             finally
             {
                 stream.Position = streamPos;

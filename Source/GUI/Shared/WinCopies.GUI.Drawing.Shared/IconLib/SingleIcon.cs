@@ -51,9 +51,7 @@ namespace WinCopies.GUI.Drawing
         private List<IconImage> mIconImages = new List<IconImage>();
         #endregion
 
-        #region Constructors
         public SingleIcon(in string name) => mName = name;
-        #endregion
 
         #region Properties
         public int Count => mIconImages.Count;
@@ -106,6 +104,7 @@ namespace WinCopies.GUI.Drawing
             {
                 Load(fs);
             }
+
             finally
             {
                 fs?.Close();
@@ -118,11 +117,7 @@ namespace WinCopies.GUI.Drawing
 
             var iconFormat = new IconFormat();
 
-            if (!iconFormat.IsRecognizedFormat(stream))
-
-                throw new InvalidFileException();
-
-            MultiIcon multiIcon = iconFormat.Load(stream);
+            MultiIcon multiIcon = iconFormat.IsRecognizedFormat(stream) ? iconFormat.Load(stream) : throw new InvalidFileException();
 
             if (multiIcon.Count < 1)
 
@@ -131,23 +126,19 @@ namespace WinCopies.GUI.Drawing
             CopyFrom(multiIcon[0]);
         }
 
-        public static IconImage GetIconImage(in System.IO.Stream stream)
+        public static IconImage
+#if CS8
+            ?
+#endif
+            GetIconImage(in System.IO.Stream stream)
         {
             ThrowIfNull(stream, nameof(stream));
 
             var iconFormat = new IconFormat();
 
-            if (!iconFormat.IsRecognizedFormat(stream))
+            MultiIcon multiIcon = iconFormat.IsRecognizedFormat(stream) ? iconFormat.Load(stream) : throw new InvalidFileException();
 
-                throw new InvalidFileException();
-
-            MultiIcon multiIcon = iconFormat.Load(stream);
-
-            if (multiIcon.Count < 1)
-
-                return null;
-
-            return multiIcon[0].FirstOrDefault();
+            return multiIcon.Count < 1 ? null : multiIcon[0].FirstOrDefault();
         }
 
         public static IconImage GetIconImage(in string fileName)
@@ -158,6 +149,7 @@ namespace WinCopies.GUI.Drawing
             {
                 return GetIconImage(fs);
             }
+
             finally
             {
                 fs?.Close();
@@ -172,6 +164,7 @@ namespace WinCopies.GUI.Drawing
             {
                 Save(fs);
             }
+
             finally
             {
                 fs?.Close();
@@ -206,8 +199,16 @@ namespace WinCopies.GUI.Drawing
 
                 throw new InvalidMultiIconFileException();
 
-            Bitmap XORImage = null;
-            Bitmap ANDImage = null;
+            Bitmap
+#if CS8
+                ?
+#endif
+                XORImage = null;
+            Bitmap
+#if CS8
+                ?
+#endif
+                ANDImage = null;
 
             try
             {
@@ -273,7 +274,11 @@ namespace WinCopies.GUI.Drawing
                 throw new InvalidPixelFormatException(PixelFormat.Undefined, PixelFormat.Format32bppArgb);
 
             Bitmap bmp;
-            IconImage iconImage = null;
+            IconImage
+#if CS8
+                ?
+#endif
+                iconImage = null;
             IColorQuantizer colorQuantizer = new EuclideanQuantizer();
 
             mIconImages.Clear();
@@ -380,15 +385,7 @@ namespace WinCopies.GUI.Drawing
         #region Private Methods
         private unsafe IconImage Add(in Bitmap bitmap, in Bitmap bitmapMask, in Color transparentColor)
         {
-            if (IndexOf((bitmap ?? throw GetArgumentNullException(nameof(bitmap))).Size, Tools.BitsFromPixelFormat(bitmap.PixelFormat)) != -1)
-
-                throw new ImageAlreadyExistsException();
-
-            if (bitmap.Width > 256 || bitmap.Height > 256)
-
-                throw new ImageTooBigException();
-
-            var iconImage = new IconImage();
+            var iconImage = IndexOf((bitmap ?? throw GetArgumentNullException(nameof(bitmap))).Size, Tools.BitsFromPixelFormat(bitmap.PixelFormat)) >= 0 ? throw new ImageAlreadyExistsException() : bitmap.Width > 256 || bitmap.Height > 256 ? throw new ImageTooBigException() : new IconImage();
 
             iconImage.Set(bitmap, bitmapMask, transparentColor);
 
@@ -438,7 +435,11 @@ struct
             private readonly SingleIcon mList;
             private int mIndex;
 #if WinCopies3
-            private IconImage _current = null;
+            private IconImage
+#if CS8
+                ?
+#endif
+                _current = null;
 #endif
             #endregion
 

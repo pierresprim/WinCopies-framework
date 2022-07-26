@@ -22,11 +22,11 @@ using System.Drawing;
 using System.Drawing.Imaging;
 
 using static WinCopies.
-    #if !WinCopies3
+#if !WinCopies3
     Util.Util
 #else
     ThrowHelper
-    #endif
+#endif
     ;
 
 namespace WinCopies.GUI.Drawing.ColorProcessing
@@ -34,14 +34,16 @@ namespace WinCopies.GUI.Drawing.ColorProcessing
     [Author("Franco, Gustavo")]
     public class OctreeQuantizer : IPaletteQuantizer
     {
-#region Constructors
-        public OctreeQuantizer()
-        {
-        }
-#endregion
+        #region Constructors
+        public OctreeQuantizer() { }
+        #endregion
 
-#region Methods
-        public unsafe ColorPalette CreatePalette(in Bitmap image, in int maxColors, in int bitsPerPixel)
+        #region Methods
+        public unsafe ColorPalette
+#if CS8
+            ?
+#endif
+            CreatePalette(in Bitmap image, in int maxColors, in int bitsPerPixel)
         {
             ThrowIfNull(image, nameof(image));
 
@@ -55,9 +57,17 @@ namespace WinCopies.GUI.Drawing.ColorProcessing
             ushort wColor;
             uint dwColor;
             ColorPalette newPalette;
-            Node tree;
+            Node
+#if CS8
+                ?
+#endif
+                tree;
             int nLeafCount, nIndex;
-            var reducibleNodes = new Node[9];
+            var reducibleNodes = new Node
+#if CS8
+                ?
+#endif
+                [9];
 
             if (maxColors > Math.Pow(2, bitsPerPixel))
 
@@ -320,7 +330,7 @@ namespace WinCopies.GUI.Drawing.ColorProcessing
 
             // If the node doesn't exist, create it
 #if CS8
-                node ??= CreateNode(nLevel, nColorBits, ref leafCount, ref reducibleNodes);
+            node ??= CreateNode(nLevel, nColorBits, ref leafCount, ref reducibleNodes);
 #else
             if (node == null)
 
@@ -368,9 +378,9 @@ namespace WinCopies.GUI.Drawing.ColorProcessing
 
             return newNode;
         }
-#endregion
+        #endregion
 
-#region Inner Classes
+        #region Inner Classes
         private class Node
         {
             public bool bIsLeaf;               // TRUE if node has no children
@@ -381,6 +391,6 @@ namespace WinCopies.GUI.Drawing.ColorProcessing
             public Node[] Child = new Node[8]; // Pointers to child nodes
             public Node Next;                  // Pointer to next reducible node
         }
-#endregion
+        #endregion
     }
 }

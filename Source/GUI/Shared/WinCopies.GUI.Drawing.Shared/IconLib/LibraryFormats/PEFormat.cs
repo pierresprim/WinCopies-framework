@@ -113,17 +113,9 @@ namespace WinCopies.GUI.Drawing.EncodingFormats
                         ? Core.FindResource(hLib, (IntPtr)int.Parse(id, CultureInfo.InvariantCulture), (IntPtr)ResourceType.RT_GROUP_ICON)
                         : Win32.FindResource(hLib, id, (IntPtr)ResourceType.RT_GROUP_ICON);
 
-                    if (hRsrc == IntPtr.Zero)
+                    IntPtr hGlobal = hRsrc == IntPtr.Zero ? throw new InvalidFileException() : Core.LoadResource(hLib, hRsrc);
 
-                        throw new InvalidFileException();
-
-                    IntPtr hGlobal = Core.LoadResource(hLib, hRsrc);
-
-                    if (hGlobal == IntPtr.Zero)
-
-                        throw new InvalidFileException();
-
-                    var pDirectory = (MEMICONDIR*)Core.LockResource(hGlobal);
+                    var pDirectory = (MEMICONDIR*)Core.LockResource(hGlobal == IntPtr.Zero ? throw new InvalidFileException() : hGlobal);
 
                     if (pDirectory->wCount != 0)
                     {
@@ -135,23 +127,11 @@ namespace WinCopies.GUI.Drawing.EncodingFormats
                         {
                             IntPtr hIconInfo = Core.FindResource(hLib, (IntPtr)pEntry[i].wId, (IntPtr)ResourceType.RT_ICON);
 
-                            if (hIconInfo == IntPtr.Zero)
+                            IntPtr hIconRes = hIconInfo == IntPtr.Zero ? throw new InvalidFileException() : Core.LoadResource(hLib, hIconInfo);
 
-                                throw new InvalidFileException();
+                            IntPtr dibBits = Core.LockResource(hIconRes == IntPtr.Zero ? throw new InvalidFileException() : hIconRes);
 
-                            IntPtr hIconRes = Core.LoadResource(hLib, hIconInfo);
-
-                            if (hIconRes == IntPtr.Zero)
-
-                                throw new InvalidFileException();
-
-                            IntPtr dibBits = Core.LockResource(hIconRes);
-
-                            if (dibBits == IntPtr.Zero)
-
-                                throw new InvalidFileException();
-
-                            buffer = new byte[Core.SizeofResource(hLib, hIconInfo)];
+                            buffer = dibBits == IntPtr.Zero ? throw new InvalidFileException() : new byte[Core.SizeofResource(hLib, hIconInfo)];
 
                             Marshal.Copy(dibBits, buffer, 0, buffer.Length);
 

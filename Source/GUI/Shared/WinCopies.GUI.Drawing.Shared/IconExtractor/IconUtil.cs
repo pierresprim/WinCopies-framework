@@ -29,7 +29,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-
+using WinCopies.Util;
 using static WinCopies.
 #if !WinCopies3
     Util.Util
@@ -84,16 +84,12 @@ namespace WinCopies.GUI.Drawing
         /// consists of single icon.
         /// </summary>
         /// <param name="icon">A <see cref="Icon"/> to be split.</param>
-        /// <returns>An array of <see cref="Icon"/>.</returns>
+        /// <returns>An array of <see cref="Icon"/>s.</returns>
         public static Icon[] Split(this Icon icon)
         {
-            if (icon == null)
-
-                throw new ArgumentNullException(nameof(icon));
-
             // Get an .ico file in memory, then split it into separate icons.
 
-            byte[] src = GetIconData(icon);
+            byte[] src = icon == null ? throw new ArgumentNullException(nameof(icon)) : GetIconData(icon);
 
             var splitIcons = new List<Icon>();
             {
@@ -131,9 +127,17 @@ namespace WinCopies.GUI.Drawing
             return splitIcons.ToArray();
         }
 
-        public static Icon TryGetIcon(this Icon icon, in Size size, in int bits, in bool tryResize, in bool tryRedefineBitsCount) => icon.Split().TryGetIcon(size, bits, tryResize, tryRedefineBitsCount);
+        public static Icon
+#if CS8
+            ?
+#endif
+            TryGetIcon(this Icon icon, in Size size, in int bits, in bool tryResize, in bool tryRedefineBitsCount) => icon.Split().TryGetIcon(size, bits, tryResize, tryRedefineBitsCount);
 
-        public static Icon TryGetIcon(this Icon[] icons, in Size size, in int bits, in bool tryResize, in bool tryRedefineBitsCount)
+        public static Icon
+#if CS8
+            ?
+#endif
+            TryGetIcon(this Icon[] icons, in Size size, in int bits, in bool tryResize, in bool tryRedefineBitsCount)
         {
             //Icon[] icons = icon.Split();
 
@@ -175,10 +179,10 @@ namespace WinCopies.GUI.Drawing
         }
 
         /// <summary>
-        /// Converts an Icon to a GDI+ Bitmap preserving the transparent area.
+        /// Converts an <see cref="Icon"/> to a GDI+ <see cref="Bitmap"/> preserving the transparent area.
         /// </summary>
         /// <param name="icon">An <see cref="Icon"/> to be converted.</param>
-        /// <returns>A <see cref="Bitmap"/> Object.</returns>
+        /// <returns>A <see cref="Bitmap"/> object.</returns>
         public static Bitmap ToBitmap(in Icon icon)
         {
             ThrowIfNull(icon, nameof(icon));
@@ -196,13 +200,13 @@ namespace WinCopies.GUI.Drawing
         }
 
         /// <summary>
-        /// Gets the bit depth of an Icon.
+        /// Gets the bit depth of an <see cref="Icon"/>.
         /// </summary>
-        /// <param name="icon">An System.Drawing.Icon object.</param>
-        /// <returns>Bit depth of the icon.</returns>
+        /// <param name="icon">An <see cref="Icon"/> object.</param>
+        /// <returns>Bit depth of the <see cref="Icon"/>.</returns>
         /// <remarks>
         /// This method takes into account the PNG header.
-        /// If the icon has multiple variations, this method returns the bit 
+        /// If the <see cref="Icon"/> has multiple variations, this method returns the bit
         /// depth of the first variation.
         /// </remarks>
         public static int GetBitCount(this Icon icon)
@@ -212,13 +216,26 @@ namespace WinCopies.GUI.Drawing
             // Get an .ico file in memory, then read the header.
 
             byte[] data = GetIconData(icon);
+            var values = new ArrayValueProvider<byte>(data, 22);
+
+            bool check(params byte[] valuesToCheck)
+            {
+                using (IEnumerator<byte> enumerator = valuesToCheck.AsFromType<IReadOnlyList<byte>>().GetEnumerator())
+                {
+                    bool moveNextSucceeded;
+
+                    while ((moveNextSucceeded = enumerator.MoveNext()) && values.CurrentValue == enumerator.Current) { /* Left empty. */ }
+
+                    return !moveNextSucceeded;
+                }
+            }
 
             if (data.Length >= 51
-                && data[22] == 0x89 && data[23] == 0x50 && data[24] == 0x4e && data[25] == 0x47
-                && data[26] == 0x0d && data[27] == 0x0a && data[28] == 0x1a && data[29] == 0x0a
-                && data[30] == 0x00 && data[31] == 0x00 && data[32] == 0x00 && data[33] == 0x0d
-                && data[34] == 0x49 && data[35] == 0x48 && data[36] == 0x44 && data[37] == 0x52)
-            {
+                && check(0x89, 0x50, 0x4e, 0x47,
+                         0x0d, 0x0a, 0x1a, 0x0a,
+                         0x00, 0x00, 0x00, 0x0d,
+                         0x49, 0x48, 0x44, 0x52))
+
                 // The picture is PNG. Read IHDR chunk.
 
                 switch (data[47])
@@ -237,7 +254,6 @@ namespace WinCopies.GUI.Drawing
                         // NOP
                         break;
                 }
-            }
 
             else if (data.Length >= 22)
 

@@ -32,7 +32,6 @@ namespace WinCopies.GUI.Drawing
         }
 
         #region BitmapInfoHeader
-
         #region Constructors
         public static BitmapInfoHeader GetBitmapInfoHeader(System.IO.Stream stream)
         {

@@ -84,22 +84,14 @@ namespace WinCopies.GUI.Drawing.EncodingFormats
             //Lets read the MS DOS header
             var dos_header = new IMAGE_DOS_HEADER(stream);
 
-            if (dos_header.e_magic != (int)HeaderSignatures.IMAGE_DOS_SIGNATURE) //MZ
-
-                throw new InvalidICLFileException();
-
             //Lets position over the "NE" header
-            _ = stream.Seek(dos_header.e_lfanew, SeekOrigin.Begin);
+            _ = dos_header.e_magic == (int)HeaderSignatures.IMAGE_DOS_SIGNATURE /*MZ*/ ? stream.Seek(dos_header.e_lfanew, SeekOrigin.Begin) : throw new InvalidICLFileException();
 
             //Lets read the NE header
             var os2_header = new IMAGE_OS2_HEADER(stream);
 
-            if (os2_header.ne_magic != (int)HeaderSignatures.IMAGE_OS2_SIGNATURE) //NE
-
-                throw new InvalidICLFileException();
-
             //Lets position over the "Resource Table"
-            _ = stream.Seek(os2_header.ne_rsrctab + dos_header.e_lfanew, SeekOrigin.Begin);
+            _ = os2_header.ne_magic == (int)HeaderSignatures.IMAGE_OS2_SIGNATURE /*NE*/ ? stream.Seek(os2_header.ne_rsrctab + dos_header.e_lfanew, SeekOrigin.Begin) : throw new InvalidICLFileException();
 
             //Resource Table doesn't contain ICON resources
             if (os2_header.ne_restab == os2_header.ne_rsrctab)

@@ -126,7 +126,7 @@ namespace WinCopies.IO.ObjectModel
 #else
             ?? (_bitmapSourceProvider =
 #endif
-            new Shell.ComponentSources.Bitmap.BitmapSourceProvider(this)
+            Shell.ComponentSources.Bitmap.BitmapSourceProvider.Create(this)
 #if !CS8
             )
 #endif
@@ -152,7 +152,7 @@ namespace WinCopies.IO.ObjectModel
 #else
                         )
 #endif
-                        {
+                    {
 #if !CS9
                         case
 #endif
@@ -190,7 +190,7 @@ namespace WinCopies.IO.ObjectModel
 
                             break;
 #endif
-                        };
+                    };
                 }
 
                 return _browsability;
