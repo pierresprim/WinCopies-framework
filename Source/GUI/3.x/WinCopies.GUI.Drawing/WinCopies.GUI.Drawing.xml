@@ -68,7 +68,7 @@
         </member>
         <member name="M:WinCopies.GUI.Drawing.IconExtractor.#ctor(System.String@)">
             <summary>
-            Initializes a new instance of the IconExtractor class from the specified file name.
+            Initializes a new instance of the <see cref="T:WinCopies.GUI.Drawing.IconExtractor"/> class from the specified file name.
             </summary>
             <param name="fileName">The file to extract icons from.</param>
         </member>
@@ -77,22 +77,22 @@
             Extracts an icon from the file.
             </summary>
             <param name="index">Zero based index of the icon to be extracted.</param>
-            <returns>A System.Drawing.Icon object.</returns>
-            <remarks>Always returns new copy of the Icon. It should be disposed by the user.</remarks>
+            <returns>A <see cref="T:System.Drawing.Icon"/> object.</returns>
+            <remarks>Always returns new copy of the <see cref="T:System.Drawing.Icon"/>. It should be disposed by the user.</remarks>
         </member>
         <member name="M:WinCopies.GUI.Drawing.IconExtractor.GetAllIcons">
             <summary>
             Extracts all the icons from the file.
             </summary>
-            <returns>An array of System.Drawing.Icon objects.</returns>
+            <returns>An array of <see cref="T:System.Drawing.Icon"/> objects.</returns>
             <remarks>Always returns new copies of the Icons. They should be disposed by the user.</remarks>
         </member>
         <member name="M:WinCopies.GUI.Drawing.IconExtractor.Save(System.Int32@,System.IO.Stream@)">
             <summary>
-            Save an icon to the specified output Stream.
+            Save an icon to the specified output <see cref="T:System.IO.Stream"/>.
             </summary>
             <param name="index">Zero based index of the icon to be saved.</param>
-            <param name="outputStream">The Stream to save to.</param>
+            <param name="outputStream">The <see cref="T:System.IO.Stream"/> to save to.</param>
         </member>
         <member name="M:WinCopies.GUI.Drawing.IconUtil.Split(System.Drawing.Icon)">
             <summary>
@@ -100,24 +100,24 @@
             consists of single icon.
             </summary>
             <param name="icon">A <see cref="T:System.Drawing.Icon"/> to be split.</param>
-            <returns>An array of <see cref="T:System.Drawing.Icon"/>.</returns>
+            <returns>An array of <see cref="T:System.Drawing.Icon"/>s.</returns>
         </member>
         <member name="M:WinCopies.GUI.Drawing.IconUtil.ToBitmap(System.Drawing.Icon@)">
             <summary>
-            Converts an Icon to a GDI+ Bitmap preserving the transparent area.
+            Converts an <see cref="T:System.Drawing.Icon"/> to a GDI+ <see cref="T:System.Drawing.Bitmap"/> preserving the transparent area.
             </summary>
             <param name="icon">An <see cref="T:System.Drawing.Icon"/> to be converted.</param>
-            <returns>A <see cref="T:System.Drawing.Bitmap"/> Object.</returns>
+            <returns>A <see cref="T:System.Drawing.Bitmap"/> object.</returns>
         </member>
         <member name="M:WinCopies.GUI.Drawing.IconUtil.GetBitCount(System.Drawing.Icon)">
             <summary>
-            Gets the bit depth of an Icon.
+            Gets the bit depth of an <see cref="T:System.Drawing.Icon"/>.
             </summary>
-            <param name="icon">An System.Drawing.Icon object.</param>
-            <returns>Bit depth of the icon.</returns>
+            <param name="icon">An <see cref="T:System.Drawing.Icon"/> object.</param>
+            <returns>Bit depth of the <see cref="T:System.Drawing.Icon"/>.</returns>
             <remarks>
             This method takes into account the PNG header.
-            If the icon has multiple variations, this method returns the bit 
+            If the <see cref="T:System.Drawing.Icon"/> has multiple variations, this method returns the bit
             depth of the first variation.
             </remarks>
         </member>
