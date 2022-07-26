@@ -47,11 +47,11 @@ namespace WinCopies.IO.SQL.ObjectModel
 
         protected override bool IsLocalRootOverride => false;
 
-        protected override IBitmapSourceProvider BitmapSourceProviderOverride => new Shell.ComponentSources.Bitmap.BitmapSourceProvider(this);
+        protected override IBitmapSourceProvider BitmapSourceProviderOverride => Shell.ComponentSources.Bitmap.BitmapSourceProvider.Create(this);
 
         protected override IBrowsabilityOptions BrowsabilityOverride => BrowsabilityOptions.BrowsableByDefault;
 
-        protected override System.Collections.Generic.IEnumerable<IBrowsabilityPath>
+        protected override IEnumerable<IBrowsabilityPath>
 #if CS8
             ?
 #endif
@@ -103,7 +103,7 @@ namespace WinCopies.IO.SQL.ObjectModel
 
         protected override bool IsLocalRootOverride => false;
 
-        protected override IBitmapSourceProvider BitmapSourceProviderOverride => new Shell.ComponentSources.Bitmap.BitmapSourceProvider(this);
+        protected override IBitmapSourceProvider BitmapSourceProviderOverride =>  Shell.ComponentSources.Bitmap.BitmapSourceProvider.Create(this);
 
         protected override IBrowsabilityOptions BrowsabilityOverride => BrowsabilityOptions.NotBrowsable;
 

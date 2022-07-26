@@ -97,7 +97,7 @@ namespace WinCopies.IO.SQL
 
             protected override bool IsLocalRootOverride => true;
 
-            protected override IBitmapSourceProvider BitmapSourceProviderOverride => new Shell.ComponentSources.Bitmap.BitmapSourceProvider(this);
+            protected override IBitmapSourceProvider BitmapSourceProviderOverride => Shell.ComponentSources.Bitmap.BitmapSourceProvider.Create(this);
 
             protected override IBrowsabilityOptions BrowsabilityOverride => BrowsabilityOptions.BrowsableByDefault;
 

@@ -7,10 +7,10 @@
 		<Copyright>Copyright © 2022 Pierre Sprimont</Copyright>
 		<PackageTags>WinCopies, IO</PackageTags>
 		<DefineConstants>WinCopies2;WinCopies3;$(DefineConstants)</DefineConstants>
-		<VersionPrefix>3.15</VersionPrefix>
+		<VersionPrefix>3.16</VersionPrefix>
 		<VersionSuffix>preview</VersionSuffix>
-		<AssemblyVersion>3.15</AssemblyVersion>
-		<FileVersion>3.15</FileVersion>
+		<AssemblyVersion>3.16</AssemblyVersion>
+		<FileVersion>3.16</FileVersion>
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 	</PropertyGroup>
 
