@@ -13,6 +13,7 @@ CHANGELOG
 	- WinCopies.IO.Shell.ComponentSources.Bitmap.BitmapSourceProvider is now static. New method overloads (Create) replace the constructors.
 	- PluginInfo\<T>: BitmapSourceProviderOverride always returns a non-null value. If InnerObjectGenericOverride.BitmapSourceProvider returns a null value, then the property returns a default value.
 - WinCopies.IO.Shell package: BitmapSourcesStruct and BitmapSources types, both in the WinCopies.IO.Shell.ComponentSources.Bitmap namespace are now in the WinCopies.IO package.
+- WinCopies.GUI.Models package: depends on WinCopies.Util 3.18 instead of 3.18-preview.
 
 ### 3.15-preview
 
