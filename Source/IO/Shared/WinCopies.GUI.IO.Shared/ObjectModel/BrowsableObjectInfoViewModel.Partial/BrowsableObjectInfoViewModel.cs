@@ -63,7 +63,7 @@ namespace WinCopies.GUI.IO.ObjectModel
     {
         public static IExplorerControlViewModel GetDefaultExplorerControlViewModel(in IBrowsableObjectInfoViewModel browsableObjectInfo, in IBrowsableObjectInfoFactory factory, in bool selected = false)
         {
-            IExplorerControlViewModel viewModel = ExplorerControlViewModel.From(browsableObjectInfo, factory);
+            IExplorerControlViewModel viewModel = new ExplorerControlViewModel(browsableObjectInfo, factory);
 
             if (selected)
 

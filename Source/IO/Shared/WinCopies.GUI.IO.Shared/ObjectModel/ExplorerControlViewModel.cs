@@ -258,7 +258,7 @@ namespace WinCopies.GUI.IO
 
                         return;
 
-                    _ = Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(bitmapSourcesLinker.OnBitmapSourcesLoaded));
+                    _ = System.Windows.Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(bitmapSourcesLinker.OnBitmapSourcesLoaded));
                 }
 
                 public void UpdatePath(in IBrowsableObjectInfoViewModel browsableObjectInfo)
@@ -495,6 +495,8 @@ namespace WinCopies.GUI.IO
                 OnPathAdded(path);
             }
 
+            public ExplorerControlViewModel(in IBrowsableObjectInfoViewModel path) : this(path ?? throw GetArgumentNullException(nameof(path)), BrowsableObjectInfo.GetFactory(path)) { /* Left empty. */ }
+
             #region Methods
             #region Common Commands
             public IButtonModel GetCommonCommand(CommonCommandsIndex index) => GetValueIfNotDisposed(_commonCommands)[(int)index];
@@ -536,8 +538,6 @@ namespace WinCopies.GUI.IO
 
             protected virtual void OnRenameItem(BitmapSource icon) => OnTryExecuteCommand(GetRenameItemCommand, ItemCouldNotBeRenamed, ItemRenameError, icon, SelectedItemsInnerObjects.First().Name);
             #endregion
-
-            public static IExplorerControlViewModel From(in IBrowsableObjectInfoViewModel path, in IBrowsableObjectInfoFactory factory) => new ExplorerControlViewModel(path, factory);
 
             public static IBrowsableObjectInfoViewModel GetBrowsableObjectInfoOrLaunchItem(IBrowsableObjectInfoViewModel browsableObjectInfo)
             {
@@ -836,7 +836,7 @@ namespace WinCopies.GUI.IO
 
             protected virtual bool OnGoCommandCanExecute() => true;
 
-            protected virtual void OnGoCommandExecuted() => Path = _factory.GetBrowsableObjectInfoViewModel(WinCopies.IO.ObjectModel.BrowsableObjectInfo.DefaultBrowsableObjectInfoSelectorDictionary.Select(new BrowsableObjectInfoURL3(new BrowsableObjectInfoURL2(Text), WinCopies.IO.ObjectModel.BrowsableObjectInfo.GetDefaultClientVersion())));
+            protected virtual void OnGoCommandExecuted() => Path = _factory.GetBrowsableObjectInfoViewModel(WinCopies.IO.ObjectModel.BrowsableObjectInfo.Create(Text));
 
             protected virtual void Dispose(bool disposing)
             {

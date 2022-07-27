@@ -34,27 +34,25 @@ using Directory = System.IO.Directory;
 
 namespace WinCopies.GUI.IO
 {
-    public partial class Application : System.Windows.Application
+    public interface IApplication
     {
-        private class AssemblyLoadContext : WinCopies.AssemblyLoadContext
-        {
-            public AssemblyLoadContext(string path) : base(path, false) { }
+        WinCopies.Extensions.Logger Logger { get; }
 
-            //protected override Assembly Load(AssemblyName assemblyName) => Default.Assemblies.FirstOrDefault(assembly => assemblyName.Name == "WinCopies.IO" && assembly.FullName == assemblyName.FullName) ?? base.Load(assemblyName);
-        }
+        void Shutdown(int errorCode);
+    }
 
+    public partial class Application : System.Windows.Application, IApplication
+    {
         protected IEnumerable<IBrowsableObjectInfoPlugin> PluginParameters { get; private set; }
 
-        public readonly WinCopies.Extensions.Logger Logger = FileLogger.GetLogger();
+        public WinCopies.Extensions.Logger Logger { get; } = FileLogger.GetLogger();
 
         public static new Application Current => (Application)System.Windows.Application.Current;
 
-        protected override void OnStartup(StartupEventArgs e)
+        public static void Initialize(IApplication application, in Action<IBrowsableObjectInfoPlugin> action, Action<int> shutdownAction, out IEnumerable<IBrowsableObjectInfoPlugin> __pluginParameters)
         {
-            base.OnStartup(e);
-
             void showMessage(in string message, in string caption) => _ = MessageBox.Show(message, caption, MessageBoxButton.OK, MessageBoxImage.Error);
-            void shutdown() => Shutdown((int)Microsoft.WindowsAPICodePack.Win32Native.ErrorCode.BadEnvironment);
+            void shutdown() => shutdownAction(Environment.ExitCode = (int)Microsoft.WindowsAPICodePack.Win32Native.ErrorCode.BadEnvironment);
 
             void _shutdown(in Action action)
             {
@@ -92,7 +90,7 @@ namespace WinCopies.GUI.IO
 
                             bool onError(in string msg)
                             {
-                                Logger(msg, null, LoggingLevel.Error);
+                                application.Logger(msg, null, LoggingLevel.Error);
 
                                 return !(error = true);
                             }
@@ -147,7 +145,7 @@ namespace WinCopies.GUI.IO
 
                             catch (ReflectionTypeLoadException ex)
                             {
-                                Logger(ex.Message, null, LoggingLevel.Error);
+                                application.Logger(ex.Message, null, LoggingLevel.Error);
 
                                 error = true;
 
@@ -165,20 +163,18 @@ namespace WinCopies.GUI.IO
                             continue;
                         }
 
-                        _pluginParameters.RegisterBrowsabilityPaths();
-                        _pluginParameters.RegisterItemSelectors();
-                        _pluginParameters.RegisterProcessSelectors();
+                        action(_pluginParameters);
 
                         pluginParameters.Enqueue(_pluginParameters);
 
                         plugins++;
                     }
 
-                    Logger($"{found} plugins found; {loaded} loaded; {plugins} parsed successfully.", null, LoggingLevel.Information);
+                    application.Logger($"{found} plugins found; {loaded} loaded; {plugins} parsed successfully.", null, LoggingLevel.Information);
 
                     if (pluginParameters.HasItems)
                     {
-                        PluginParameters = pluginParameters.AsReadOnlyEnumerable();
+                        __pluginParameters = pluginParameters.AsReadOnlyEnumerable();
 
                         void _showMessage(in string msg) => showMessage($"{msg} be loaded. See the log file for more information.", "Plugin load error");
 
@@ -194,14 +190,34 @@ namespace WinCopies.GUI.IO
                     }
 
                     else
-
+                    {
                         __shutdown("No plugin successfully parsed.", "Plugin parse error.");
+
+                        __pluginParameters = null;
+                    }
 
                     return;
                 }
+
                 catch (Exception ex) when (ex.Is(false, typeof(System.IO.IOException), typeof(SecurityException), typeof(UnauthorizedAccessException))) { /* Left empty. */ }
 
             __shutdown("No plugin found. You have to install at least one plugin for the program to work.", "No plugin found");
+
+            __pluginParameters = null;
+        }
+
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+
+            Initialize(this, pluginParameters =>
+            {
+                pluginParameters.RegisterBrowsabilityPaths();
+                pluginParameters.RegisterItemSelectors();
+                pluginParameters.RegisterProcessSelectors();
+            }, Shutdown, out IEnumerable<IBrowsableObjectInfoPlugin> pluginParameters);
+
+            PluginParameters = pluginParameters;
         }
     }
 }

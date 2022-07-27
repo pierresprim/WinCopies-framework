@@ -137,23 +137,6 @@ namespace WinCopies.GUI.IO.Samples
 
         protected override BrowsableObjectInfoWindow GetNewBrowsableObjectInfoWindow(in IBrowsableObjectInfoWindowViewModel dataContext) => new ExplorerControlWindow(dataContext);
 
-        //protected void StartProcess(in IProcessFactoryProcessInfo processInfo)
-        //{
-        //    if (processInfo.UserConfirmationRequired)
-
-        //        if (MessageBox.Show(processInfo.GetUserConfirmationText(), Assembly.GetExecutingAssembly().GetName().Name, MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.No)
-
-        //            return;
-
-        //    if (processInfo is IRunnableProcessInfo runnableProcessInfo)
-
-        //        runnableProcessInfo.Run(GetEnumerable(), 10u);
-
-        //    else
-
-        //        AddProcess(((IDirectProcessInfo)processInfo).TryGetProcessParameters(GetEnumerable()));
-        //}
-
         private static void AddProcess<T>(in T factory, in Converter<T, IProcessParameters> parameters) where T : IProcessFactoryProcessInfoBase
         {
             if (!(factory.UserConfirmationRequired && MessageBox.Show(factory.GetUserConfirmationText(), "Process confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.No))
@@ -194,7 +177,7 @@ namespace WinCopies.GUI.IO.Samples
             GetPathCollection().CollectionChanged -= ExplorerControlWindow_CollectionChanged;
         }
 
-        protected override IBrowsableObjectInfoWindowViewModel GetDefaultDataContextOverride() => new BrowsableObjectInfoWindowViewModel(new BrowsableObjectInfoCollectionViewModel());
+        protected override IBrowsableObjectInfoWindowViewModel GetDefaultDataContextOverride() => new BrowsableObjectInfoWindowViewModel(GetDefaultBrowsableObjectInfoCollection());
         protected override IBrowsableObjectInfoCollectionViewModel GetDefaultBrowsableObjectInfoCollection() => new BrowsableObjectInfoCollectionViewModel();
         protected override IBrowsableObjectInfoCollectionViewModel GetDefaultBrowsableObjectInfoCollection(in IEnumerable<IExplorerControlViewModel> items) => new BrowsableObjectInfoCollectionViewModel(items);
     }

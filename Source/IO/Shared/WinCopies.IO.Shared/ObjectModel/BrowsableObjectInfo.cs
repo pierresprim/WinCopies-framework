@@ -471,6 +471,8 @@ namespace WinCopies.IO
             #endregion
             #endregion
 
+            public static IBrowsableObjectInfo Create(in string text) => DefaultBrowsableObjectInfoSelectorDictionary.Select(new BrowsableObjectInfoURL3(new BrowsableObjectInfoURL2(text), GetDefaultClientVersion()));
+
             internal static bool IsBrowsableObject(in IBrowsableObjectInfo browsableObjectInfo) => browsableObjectInfo.Browsability != null && (browsableObjectInfo.Browsability.Browsability == IO.Browsability.BrowsableByDefault || browsableObjectInfo.Browsability.Browsability == IO.Browsability.Browsable);
 
             public static ClientVersion GetDefaultClientVersion()

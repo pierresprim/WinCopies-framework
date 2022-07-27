@@ -6,6 +6,18 @@ The WinCopies® software framework
 CHANGELOG
 ---------
 
+### 3.17-preview
+
+- WinCopies.GUI.IO:
+	- Bug fixed in BitmapSources loader. An InvalidCastException was thrown when the application definition type did not inherit from the default class.
+	- new interface: IApplication. Application implements it.
+	- Application:
+		- Logger is now a read-only property instead of a read-only field.
+		- new static method: Initialize. This method can be used to initialize application definitions that do not inherit from the default class. They have to implement IApplication to be passed to this method.
+	- ExplorerControlViewModel: new constructor.
+- WinCopies.GUI.Shell: remove ExplorerControlViewModel class. Its method has been replaced with the new constructor added to the class of the same name in the WinCopies.GUI.IO namespace and package.
+- WinCopies.IO.ObjectModel.BrowsableObjectInfo: new static method: Create. This method returns an IBrowsableObjectInfo from a given path, based on loaded plugins.
+
 ### 3.16-preview
 
 - Add new type: WinCopies.GUI.IO.Application.

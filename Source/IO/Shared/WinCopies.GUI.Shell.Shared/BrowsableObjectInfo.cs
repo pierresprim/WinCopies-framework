@@ -138,10 +138,5 @@ namespace WinCopies.GUI.Shell
 
             public static IExplorerControlViewModel GetDefaultExplorerControlViewModel() => IO.ObjectModel.BrowsableObjectInfo.GetDefaultExplorerControlViewModel(ShellObjectInfo.GetDefault());
         }
-
-        public static class ExplorerControlViewModel
-        {
-            public static IExplorerControlViewModel From(in IBrowsableObjectInfoViewModel path) => new IO.ObjectModel.ExplorerControlViewModel(path ?? throw ThrowHelper.GetArgumentNullException(nameof(path)), IO.ObjectModel.BrowsableObjectInfo.GetFactory(path));
-        }
     }
 }
