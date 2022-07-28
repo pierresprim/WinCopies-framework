@@ -20,59 +20,9 @@
               resource lookups using this strongly typed resource class.
             </summary>
         </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.About">
-            <summary>
-              Looks up a localized string similar to _About....
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.AboutStatusBarLabel">
-            <summary>
-              Looks up a localized string similar to Opens the About dialog box..
-            </summary>
-        </member>
         <member name="P:WinCopies.GUI.Shell.Properties.Resources.ArchiveFormat">
             <summary>
               Looks up a localized string similar to Archive format:.
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.CloseAllTabs">
-            <summary>
-              Looks up a localized string similar to Close _all tabs.
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.CloseAllTabsStatusBarLabel">
-            <summary>
-              Looks up a localized string similar to Closes all tabs..
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.CloseOtherTabs">
-            <summary>
-              Looks up a localized string similar to Close other _tabs.
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.CloseOtherTabsStatusBarLabel">
-            <summary>
-              Looks up a localized string similar to Closes all tabs but the current one..
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.CloseTab">
-            <summary>
-              Looks up a localized string similar to _Close tab.
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.CloseTabStatusBarLabel">
-            <summary>
-              Looks up a localized string similar to Closes the current tab..
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.CloseWindow">
-            <summary>
-              Looks up a localized string similar to Close _window.
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.CloseWindowStatusBarLabel">
-            <summary>
-              Looks up a localized string similar to Closes the window..
             </summary>
         </member>
         <member name="P:WinCopies.GUI.Shell.Properties.Resources.Compression">
@@ -95,51 +45,6 @@
               Looks up a localized string similar to Compression mode:.
             </summary>
         </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.Copy">
-            <summary>
-              Looks up a localized string similar to Copy.
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.CopyStatusBarLabel">
-            <summary>
-              Looks up a localized string similar to Copies the selected items to the Clipboard..
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.Cut">
-            <summary>
-              Looks up a localized string similar to Cut.
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.CutStatusBarLabel">
-            <summary>
-              Looks up a localized string similar to Copies the selected items to the Clipboard and mark them to be moved..
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.Delete">
-            <summary>
-              Looks up a localized string similar to Delete.
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.DeleteStatusBarLabel">
-            <summary>
-              Looks up a localized string similar to Deletes the selected items permanently..
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.Edit">
-            <summary>
-              Looks up a localized string similar to _Edit.
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.EmptyRecycleBin">
-            <summary>
-              Looks up a localized string similar to Empty Recycle Bin.
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.EmptyRecycleBinStatusBarLabel">
-            <summary>
-              Looks up a localized string similar to Empties the Recycle Bin and delete all of its content from the disk..
-            </summary>
-        </member>
         <member name="P:WinCopies.GUI.Shell.Properties.Resources.Extraction">
             <summary>
               Looks up a localized string similar to Extraction.
@@ -150,69 +55,9 @@
               Looks up a localized string similar to Fast compression.
             </summary>
         </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.File">
+        <member name="P:WinCopies.GUI.Shell.Properties.Resources.NewFolderStatusBarLabel">
             <summary>
-              Looks up a localized string similar to _File.
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.Help">
-            <summary>
-              Looks up a localized string similar to _Help.
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.NewFileSystemTab">
-            <summary>
-              Looks up a localized string similar to New file system tab.
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.NewFileSystemTabStatusBarLabel">
-            <summary>
-              Looks up a localized string similar to Opens a new tab for file system browsing..
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.NewTab">
-            <summary>
-              Looks up a localized string similar to _New tab.
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.NewTabStatusBarLabel">
-            <summary>
-              Looks up a localized string similar to Open a new tab..
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.NewWindow">
-            <summary>
-              Looks up a localized string similar to New _window....
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.NewWindowStatusBarLabel">
-            <summary>
-              Looks up a localized string similar to Opens a new window..
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.OpenInNewTab">
-            <summary>
-              Looks up a localized string similar to Open in new tab.
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.OpenInNewWindow">
-            <summary>
-              Looks up a localized string similar to Open in new window.
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.OpenOrLaunch">
-            <summary>
-              Looks up a localized string similar to Open selected items.
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.Paste">
-            <summary>
-              Looks up a localized string similar to Paste.
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.PasteStatusBarLabel">
-            <summary>
-              Looks up a localized string similar to Pastes the Clipboard items in the selected folder..
+              Looks up a localized string similar to Shows a dialog box where a name can be typed for the new folder..
             </summary>
         </member>
         <member name="P:WinCopies.GUI.Shell.Properties.Resources.PreserveDirectoryStructure">
@@ -220,14 +65,9 @@
               Looks up a localized string similar to Preserve directory structure:.
             </summary>
         </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.Recycle">
+        <member name="P:WinCopies.GUI.Shell.Properties.Resources.RenameStatusBarLabel">
             <summary>
-              Looks up a localized string similar to Recycle.
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Shell.Properties.Resources.RecycleStatusBarLabel">
-            <summary>
-              Looks up a localized string similar to Moves the selected items to the Recycle Bin..
+              Looks up a localized string similar to Shows a dialog box where a new name can be typed..
             </summary>
         </member>
         <member name="M:WinCopies.GUI.Shell.BrowsableObjectInfoFactory.#ctor(WinCopies.IO.ClientVersion@)">

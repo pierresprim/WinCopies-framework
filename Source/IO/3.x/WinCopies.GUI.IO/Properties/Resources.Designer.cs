@@ -61,6 +61,105 @@ namespace WinCopies.GUI.IO.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to _About....
+        /// </summary>
+        public static string About {
+            get {
+                return ResourceManager.GetString("About", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Opens the About dialog box..
+        /// </summary>
+        public static string AboutStatusBarLabel {
+            get {
+                return ResourceManager.GetString("AboutStatusBarLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Close _all tabs.
+        /// </summary>
+        public static string CloseAllTabs {
+            get {
+                return ResourceManager.GetString("CloseAllTabs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Closes all tabs..
+        /// </summary>
+        public static string CloseAllTabsStatusBarLabel {
+            get {
+                return ResourceManager.GetString("CloseAllTabsStatusBarLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Close other _tabs.
+        /// </summary>
+        public static string CloseOtherTabs {
+            get {
+                return ResourceManager.GetString("CloseOtherTabs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Closes all tabs but the current one..
+        /// </summary>
+        public static string CloseOtherTabsStatusBarLabel {
+            get {
+                return ResourceManager.GetString("CloseOtherTabsStatusBarLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Close tab.
+        /// </summary>
+        public static string CloseTab {
+            get {
+                return ResourceManager.GetString("CloseTab", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Closes the current tab..
+        /// </summary>
+        public static string CloseTabStatusBarLabel {
+            get {
+                return ResourceManager.GetString("CloseTabStatusBarLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Close _window.
+        /// </summary>
+        public static string CloseWindow {
+            get {
+                return ResourceManager.GetString("CloseWindow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Closes the window..
+        /// </summary>
+        public static string CloseWindowStatusBarLabel {
+            get {
+                return ResourceManager.GetString("CloseWindowStatusBarLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Copy.
+        /// </summary>
+        public static string Copy {
+            get {
+                return ResourceManager.GetString("Copy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Copies the name of the selected item..
         /// </summary>
         public static string CopyNameStatusBarLabel {
@@ -79,6 +178,51 @@ namespace WinCopies.GUI.IO.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Copies the selected items to the Clipboard..
+        /// </summary>
+        public static string CopyStatusBarLabel {
+            get {
+                return ResourceManager.GetString("CopyStatusBarLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cut.
+        /// </summary>
+        public static string Cut {
+            get {
+                return ResourceManager.GetString("Cut", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Copies the selected items to the Clipboard and mark them to be moved..
+        /// </summary>
+        public static string CutStatusBarLabel {
+            get {
+                return ResourceManager.GetString("CutStatusBarLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete.
+        /// </summary>
+        public static string Delete {
+            get {
+                return ResourceManager.GetString("Delete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Deletes the selected items permanently..
+        /// </summary>
+        public static string DeleteStatusBarLabel {
+            get {
+                return ResourceManager.GetString("DeleteStatusBarLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Destination path:.
         /// </summary>
         public static string DestinationPath {
@@ -93,6 +237,51 @@ namespace WinCopies.GUI.IO.Properties {
         public static string DirectoryStructure {
             get {
                 return ResourceManager.GetString("DirectoryStructure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Edit.
+        /// </summary>
+        public static string Edit {
+            get {
+                return ResourceManager.GetString("Edit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Empty Recycle Bin.
+        /// </summary>
+        public static string EmptyRecycleBin {
+            get {
+                return ResourceManager.GetString("EmptyRecycleBin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Empties the Recycle Bin and delete all of its content from the disk..
+        /// </summary>
+        public static string EmptyRecycleBinStatusBarLabel {
+            get {
+                return ResourceManager.GetString("EmptyRecycleBinStatusBarLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _File.
+        /// </summary>
+        public static string File {
+            get {
+                return ResourceManager.GetString("File", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Help.
+        /// </summary>
+        public static string Help {
+            get {
+                return ResourceManager.GetString("Help", resourceCulture);
             }
         }
         
@@ -151,11 +340,56 @@ namespace WinCopies.GUI.IO.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to _New tab.
+        /// </summary>
+        public static string NewTab {
+            get {
+                return ResourceManager.GetString("NewTab", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open a new tab..
+        /// </summary>
+        public static string NewTabStatusBarLabel {
+            get {
+                return ResourceManager.GetString("NewTabStatusBarLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New _window....
+        /// </summary>
+        public static string NewWindow {
+            get {
+                return ResourceManager.GetString("NewWindow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Opens a new window..
+        /// </summary>
+        public static string NewWindowStatusBarLabel {
+            get {
+                return ResourceManager.GetString("NewWindowStatusBarLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Open.
         /// </summary>
         public static string OpenFile {
             get {
                 return ResourceManager.GetString("OpenFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open in new tab.
+        /// </summary>
+        public static string OpenInNewTab {
+            get {
+                return ResourceManager.GetString("OpenInNewTab", resourceCulture);
             }
         }
         
@@ -169,6 +403,15 @@ namespace WinCopies.GUI.IO.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Open in new window.
+        /// </summary>
+        public static string OpenInNewWindow {
+            get {
+                return ResourceManager.GetString("OpenInNewWindow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Opens the selected item in a new window..
         /// </summary>
         public static string OpenInNewWindowStatusBarLabel {
@@ -178,11 +421,38 @@ namespace WinCopies.GUI.IO.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Open selected items.
+        /// </summary>
+        public static string OpenOrLaunch {
+            get {
+                return ResourceManager.GetString("OpenOrLaunch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Opens the selected items..
         /// </summary>
         public static string OpenOrLaunchStatusBarLabel {
             get {
                 return ResourceManager.GetString("OpenOrLaunchStatusBarLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Paste.
+        /// </summary>
+        public static string Paste {
+            get {
+                return ResourceManager.GetString("Paste", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pastes the Clipboard items in the selected folder..
+        /// </summary>
+        public static string PasteStatusBarLabel {
+            get {
+                return ResourceManager.GetString("PasteStatusBarLabel", resourceCulture);
             }
         }
         
@@ -210,6 +480,24 @@ namespace WinCopies.GUI.IO.Properties {
         public static string QuitStatusBarLabel {
             get {
                 return ResourceManager.GetString("QuitStatusBarLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Recycle.
+        /// </summary>
+        public static string Recycle {
+            get {
+                return ResourceManager.GetString("Recycle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Moves the selected items to the Recycle Bin..
+        /// </summary>
+        public static string RecycleStatusBarLabel {
+            get {
+                return ResourceManager.GetString("RecycleStatusBarLabel", resourceCulture);
             }
         }
         

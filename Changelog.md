@@ -6,6 +6,10 @@ The WinCopies® software framework
 CHANGELOG
 ---------
 
+### 3.17.1.1-preview
+
+- Updated resources.
+
 ### 3.17.1-preview
 
 - Bugs fixes:
