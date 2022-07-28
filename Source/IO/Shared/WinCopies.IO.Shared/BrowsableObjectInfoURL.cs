@@ -45,7 +45,7 @@ namespace WinCopies.IO
         {
             int index = path.IndexOf("://");
 
-            this = new BrowsableObjectInfoURL2(new BrowsableObjectInfoURL(path.Substring(0, index)), path.Substring(index + 3));
+            this = index >= 0 ? new BrowsableObjectInfoURL2(new BrowsableObjectInfoURL(path.Substring(index + 3)), path.Substring(0, index)) : new BrowsableObjectInfoURL2(new BrowsableObjectInfoURL(path), "file");
         }
 
         public bool Equals(BrowsableObjectInfoURL2 other) => other.Protocol == Protocol && other.URL == URL;

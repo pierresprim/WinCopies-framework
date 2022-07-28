@@ -6,6 +6,21 @@ The WinCopies® software framework
 CHANGELOG
 ---------
 
+### 3.17.1-preview
+
+- Bugs fixes:
+	- ExplorerControlViewModel.OnGoCommandExecuted: the method was not handling path or plugin not found errors.
+	- WinCopies.GUI.IO.Application: BrowsableObjectInfoSelectors were not registered.
+	- BrowsableObjectInfoWindow's protected constructor has a new parameter that indicates whether a default tab should be added automatically.
+	- BrowsableObjectInfoURL2(in string path) constructor: the given path was not correctly parsed.
+	- WinCopies.IO.Shell.ObjectModel.BrowsableObjectInfo.RegisterDefaultBrowsableObjectInfoSelector: the Action value of the property was pushing a predicate with a wrong type to check for constants.
+	- WinCopies.IO.Shell.BrowsableObjectInfoPlugin's constructor: WinCopies.IO.Shell.ObjectModel.BrowsableObjectInfo.RegisterDefaultBrowsableObjectInfoSelector was not registered.
+	- WinCopies.IO.Consts.Protocols has new constant (FILE). The absence of this constant was leading to a bug when looking for a BrowsableObjectInfo to handle the file:// protocol.
+- WinCopies.IO.ObjectModel.BrowsableObjectInfo:
+	- new static method: PromptPathNotFound.
+	- Create method has new parameters.
+- WinCopies.IO.Consts.Protocols has been moved to WinCopies.IO.Consts.Shell namespace.
+
 ### 3.17-preview
 
 - WinCopies.GUI.IO:

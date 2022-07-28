@@ -83,7 +83,11 @@ namespace WinCopies.IO.Shell
 
         public override System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetProtocols(IBrowsableObjectInfo parent, ClientVersion clientVersion) => GetEnumerable<IBrowsableObjectInfo>(new ObjectModel.FileProtocolInfo(parent, clientVersion), new ObjectModel.ShellProtocolInfo(parent, clientVersion));
 
-        public BrowsableObjectInfoPlugin() => RegisterProcessSelectorsStack.Push(ShellObjectInfo.RegisterDefaultProcessSelectors);
+        public BrowsableObjectInfoPlugin()
+        {
+            RegisterBrowsableObjectInfoSelectorsStack.Push(ObjectModel.BrowsableObjectInfo.RegisterDefaultBrowsableObjectInfoSelector);
+            RegisterProcessSelectorsStack.Push(ShellObjectInfo.RegisterDefaultProcessSelectors);
+        }
     }
 
     namespace ObjectModel
@@ -146,15 +150,13 @@ namespace WinCopies.IO.Shell
         {
             public static Action RegisterDefaultBrowsableObjectInfoSelector { get; private set; } = () =>
             {
-                DefaultBrowsableObjectInfoSelectorDictionary.Push(item => Predicate(item, typeof(Consts.Guids.Shell.Process.Shell)), TryGetBrowsableObjectInfo
+                DefaultBrowsableObjectInfoSelectorDictionary.Push(item => Predicate(item, typeof(Consts.Protocols)), TryGetBrowsableObjectInfo
 
                 // System.Reflection.Assembly.GetExecutingAssembly().DefinedTypes.FirstOrDefault(t => t.Namespace.StartsWith(typeof(Process.ObjectModel.IProcess).Namespace) && t.GetCustomAttribute<ProcessGuidAttribute>().Guid == guid);
                 );
 
-                RegisterDefaultBrowsableObjectInfoSelector = EmptyVoid;
+                RegisterDefaultBrowsableObjectInfoSelector = Delegates.EmptyVoid;
             };
-
-            private static void EmptyVoid() { /* Left empty. */ }
 
             public static IBrowsableObjectInfo GetBrowsableObjectInfo(string path) => ShellObjectInfo.From(ShellObjectFactory.Create(path));
 
@@ -165,72 +167,78 @@ namespace WinCopies.IO.Shell
                 TryGetBrowsableObjectInfo(BrowsableObjectInfoURL3 url)
             {
                 BrowsableObjectInfoURL2 _url = url.URL;
-
-#if CS8
+#if CS9
                 return
 #else
                 switch (
 #endif
                     _url.Protocol
-#if CS8
+#if CS9
                     switch
 #else
                     )
 #endif
                     {
-#if !CS8
-                        case
+#if !CS9
+                    case
 #endif
                         Consts.Protocols.SHELL
-#if CS8
+#if CS9
+                        or
+#else
+                        :
+                    case
+#endif
+                        Consts.Protocols.FILE
+#if CS9
                         =>
 #else
                         :
                         return
 #endif
                         GetBrowsableObjectInfo(_url.URL.URI)
-#if CS8
+#if CS9
                         ,
 #else
                         ;
-                        case
+                    case
 #endif
                         Consts.Protocols.REGISTRY
-#if CS8
+#if CS9
                         =>
 #else
                         :
                         return
 #endif
                         new RegistryItemInfo(_url.URL.URI, url.ClientVersion)
-#if CS8
+#if CS9
                         ,
 #else
                         ;
-                        case
+                    case
 #endif
                         Consts.Protocols.WMI
-#if CS8
+#if CS9
                         =>
 #else
                         :
                         return
 #endif
                         WMIItemInfo.GetWMIItemInfo(WMIItemInfo.RootPath, _url.URL.URI, null, url.ClientVersion)
-#if CS8
+#if CS9
                         ,
                         _ =>
 #else
                         ;
-                        default:
+                    default:
                         return
 #endif
                         null
-#if CS8
+#if CS9
                     };
 #else
                         ;
-                    }
+                }
 #endif
             }
 

@@ -836,7 +836,24 @@ namespace WinCopies.GUI.IO
 
             protected virtual bool OnGoCommandCanExecute() => true;
 
-            protected virtual void OnGoCommandExecuted() => Path = _factory.GetBrowsableObjectInfoViewModel(WinCopies.IO.ObjectModel.BrowsableObjectInfo.Create(Text));
+            protected virtual void OnGoCommandExecuted()
+            {
+                string text = Text;
+
+                IBrowsableObjectInfo
+#if CS8
+                    ?
+#endif
+                    path = WinCopies.IO.ObjectModel.BrowsableObjectInfo.Create(text, true, false);
+
+                if (path == null)
+
+                    WinCopies.IO.ObjectModel.BrowsableObjectInfo.PromptPathNotFound(text);
+
+                else
+
+                    Path = _factory.GetBrowsableObjectInfoViewModel(path);
+            }
 
             protected virtual void Dispose(bool disposing)
             {

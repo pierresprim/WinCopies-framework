@@ -471,13 +471,47 @@ namespace WinCopies.IO
             #endregion
             #endregion
 
-            public static IBrowsableObjectInfo Create(in string text) => DefaultBrowsableObjectInfoSelectorDictionary.Select(new BrowsableObjectInfoURL3(new BrowsableObjectInfoURL2(text), GetDefaultClientVersion()));
+            public static void PromptPathNotFound(in string path) => MessageBox.Show($"Could not find the path:\n{path}\nor the given path is not handled by any installed plugin. It may does not exist or the protocol may be wrong.", "Path not found", MessageBoxButton.OK, MessageBoxImage.Error);
+
+            public static IBrowsableObjectInfo
+#if CS8
+                ?
+#endif
+                Create(in string text, in bool prompt, in bool rethrow)
+            {
+                IBrowsableObjectInfo
+#if CS8
+                    ?
+#endif
+                    result = null;
+
+                try
+                {
+                    result = DefaultBrowsableObjectInfoSelectorDictionary.Select(new BrowsableObjectInfoURL3(new BrowsableObjectInfoURL2(text), GetDefaultClientVersion()));
+                }
+
+                catch
+                {
+                    if (rethrow)
+
+                        throw;
+                }
+
+                finally
+                {
+                    if (result == null && prompt)
+
+                        PromptPathNotFound(text);
+                }
+
+                return result;
+            }
 
             internal static bool IsBrowsableObject(in IBrowsableObjectInfo browsableObjectInfo) => browsableObjectInfo.Browsability != null && (browsableObjectInfo.Browsability.Browsability == IO.Browsability.BrowsableByDefault || browsableObjectInfo.Browsability.Browsability == IO.Browsability.Browsable);
 
             public static ClientVersion GetDefaultClientVersion()
             {
-                AssemblyName assemblyName = Assembly.GetExecutingAssembly().GetName();
+                AssemblyName assemblyName = (Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly()).GetName();
 
                 Version
 #if CS8
@@ -490,7 +524,7 @@ namespace WinCopies.IO
                 return new ClientVersion(assemblyName.Name, (uint)assemblyVersion.Major, (uint)assemblyVersion.Minor, (uint)assemblyVersion.Revision);
             }
 
-            public static bool Predicate(in BrowsableObjectInfoURL3 item, in Type t) => WinCopies.Extensions.UtilHelpers.ContainsFieldValue(t, null, item.URL.Protocol.ToString());
+            public static bool Predicate(in BrowsableObjectInfoURL3 item, in Type t) => WinCopies.Extensions.UtilHelpers.ContainsFieldValue(t, null, item.URL.Protocol);
 
             public static bool Predicate(in ProcessFactorySelectorDictionaryParameters item, in Type t) => WinCopies.Extensions.UtilHelpers.ContainsFieldValue(t, null, item.ProcessParameters.Guid.ToString());
             #endregion

@@ -685,7 +685,7 @@ namespace WinCopies.GUI.IO
 #if CS8
             ?
 #endif
-            dataContext = null)
+            dataContext = null, in bool createDefaultTab = true)
         {
             /*dataContext.HookRegistration = new HookRegistration(hook =>
     {
@@ -708,7 +708,7 @@ namespace WinCopies.GUI.IO
 #endif
                 );
 
-            if (dataContext.Paths.Paths.Count == 0)
+            if (createDefaultTab && dataContext.Paths.Paths.Count == 0)
 
                 dataContext.Paths.Paths.Add(GetDefaultExplorerControlViewModel());
 

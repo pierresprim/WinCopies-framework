@@ -1,10 +1,14 @@
 ﻿namespace WinCopies.IO.Consts
 {
-    public static class Protocols
+    namespace Shell
     {
-        public const string SHELL = "shell";
-        public const string REGISTRY = "registry";
-        public const string WMI = "wmi";
+        public static class Protocols
+        {
+            public const string FILE = "file";
+            public const string SHELL = "shell";
+            public const string REGISTRY = "registry";
+            public const string WMI = "wmi";
+        }
     }
 
     namespace Guids.Shell

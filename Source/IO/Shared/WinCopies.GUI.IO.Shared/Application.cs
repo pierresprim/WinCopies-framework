@@ -213,6 +213,7 @@ namespace WinCopies.GUI.IO
             Initialize(this, pluginParameters =>
             {
                 pluginParameters.RegisterBrowsabilityPaths();
+                pluginParameters.RegisterBrowsableObjectInfoSelectors();
                 pluginParameters.RegisterItemSelectors();
                 pluginParameters.RegisterProcessSelectors();
             }, Shutdown, out IEnumerable<IBrowsableObjectInfoPlugin> pluginParameters);
