@@ -9,10 +9,10 @@
 		<Copyright>Copyright © 2021 Pierre Sprimont</Copyright>
 		<PackageTags>WinCopies, IO</PackageTags>
 		<DefineConstants>WinCopies2;WinCopies3;$(DefineConstants)</DefineConstants>
-		<VersionPrefix>3.16</VersionPrefix>
+		<VersionPrefix>3.16.1</VersionPrefix>
 		<VersionSuffix>preview</VersionSuffix>
-		<AssemblyVersion>3.16</AssemblyVersion>
-		<FileVersion>3.16</FileVersion>
+		<AssemblyVersion>3.16.1</AssemblyVersion>
+		<FileVersion>3.16.1</FileVersion>
 	</PropertyGroup>
 
 	<Import Project="$(SolutionDir)\ExtraProperties.props" Condition="'$(Configuration)'=='Release'" />

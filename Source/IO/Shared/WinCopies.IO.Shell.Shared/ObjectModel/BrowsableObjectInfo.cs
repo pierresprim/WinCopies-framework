@@ -150,7 +150,7 @@ namespace WinCopies.IO.Shell
         {
             public static Action RegisterDefaultBrowsableObjectInfoSelector { get; private set; } = () =>
             {
-                DefaultBrowsableObjectInfoSelectorDictionary.Push(item => Predicate(item, typeof(Consts.Protocols)), TryGetBrowsableObjectInfo
+                DefaultBrowsableObjectInfoSelectorDictionary.Push(item => Predicate(item, typeof(Consts.Shell.Protocols)), TryGetBrowsableObjectInfo
 
                 // System.Reflection.Assembly.GetExecutingAssembly().DefinedTypes.FirstOrDefault(t => t.Namespace.StartsWith(typeof(Process.ObjectModel.IProcess).Namespace) && t.GetCustomAttribute<ProcessGuidAttribute>().Guid == guid);
                 );
@@ -182,14 +182,14 @@ namespace WinCopies.IO.Shell
 #if !CS9
                     case
 #endif
-                        Consts.Protocols.SHELL
+                        Consts.Shell.Protocols.SHELL
 #if CS9
                         or
 #else
                         :
                     case
 #endif
-                        Consts.Protocols.FILE
+                        Consts.Shell.Protocols.FILE
 #if CS9
                         =>
 #else
@@ -203,7 +203,7 @@ namespace WinCopies.IO.Shell
                         ;
                     case
 #endif
-                        Consts.Protocols.REGISTRY
+                        Consts.Shell.Protocols.REGISTRY
 #if CS9
                         =>
 #else
@@ -217,7 +217,7 @@ namespace WinCopies.IO.Shell
                         ;
                     case
 #endif
-                        Consts.Protocols.WMI
+                        Consts.Shell.Protocols.WMI
 #if CS9
                         =>
 #else
