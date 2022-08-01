@@ -1,19 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
 	<PropertyGroup>
 		<PackageId>WinCopies.Installer</PackageId>
 		<TargetFrameworks>netcoreapp3.0;netcoreapp3.1;net5.0-windows;net6.0-windows;net7.0-windows;net472;net48</TargetFrameworks>
 		<TargetPlatformIdentifier>windows</TargetPlatformIdentifier>
 		<UseWPF>true</UseWPF>
-		<VersionPrefix>3.0</VersionPrefix>
-		<AssemblyVersion>3.0</AssemblyVersion>
-		<FileVersion>3.0</FileVersion>
+		<VersionPrefix>3.0.2</VersionPrefix>
+		<AssemblyVersion>3.0.2</AssemblyVersion>
+		<FileVersion>3.0.2</FileVersion>
 		<PackageTags>WinCopies, Installer</PackageTags>
 	</PropertyGroup>
 
 	<Import Project="$(SolutionDir)\ExtraProperties.props" Condition="'$(Configuration)'=='Release'" />
 
 	<ItemGroup>
+		<PackageReference Include="WinCopies.Collections" Version="3.19-preview" />
 		<PackageReference Include="WinCopies.Util.Desktop" Version="3.18-preview" />
 		<PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="3.11-preview" />
 		<PackageReference Include="WinCopies.WindowsAPICodePack.Win32Native" Version="3.11-preview" />
@@ -29,22 +29,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\..\GUI\3.x\WinCopies.GUI\WinCopies.GUI.csproj" />
+		<ProjectReference Include="..\..\..\GUI\3.x\WinCopies.GUI.Templates\WinCopies.GUI.Templates.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<Compile Update="Properties\Resources.Designer.cs">
-			<DesignTime>True</DesignTime>
-			<AutoGen>True</AutoGen>
-			<DependentUpon>Resources.resx</DependentUpon>
-		</Compile>
+	  <Compile Update="D:\repositories\WinCopies Ecosystem\WinCopies-framework\Source\Common\Shared\WinCopies.Installer.Shared\Properties\Resources.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	  </Compile>
 	</ItemGroup>
-
-	<ItemGroup>
-		<EmbeddedResource Update="Properties\Resources.resx">
-			<Generator>ResXFileCodeGenerator</Generator>
-			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
-		</EmbeddedResource>
-	</ItemGroup>
-
 </Project>

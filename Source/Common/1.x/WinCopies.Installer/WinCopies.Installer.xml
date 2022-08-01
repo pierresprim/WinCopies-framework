@@ -4,6 +4,16 @@
         <name>WinCopies.Installer</name>
     </assembly>
     <members>
+        <member name="T:WinCopies.Installer.IMainPage">
+            <summary>
+            Dummy interface for data template.
+            </summary>
+        </member>
+        <member name="T:WinCopies.Installer.IEndPage">
+            <summary>
+            Dummy interface for data template.
+            </summary>
+        </member>
         <member name="T:WinCopies.Installer.Properties.Resources">
             <summary>
               A strongly-typed resource class, for looking up localized strings, etc.
@@ -23,16 +33,6 @@
         <member name="P:WinCopies.Installer.Properties.Resources.InstallDirectoryStringFormat">
             <summary>
               Looks up a localized string similar to {0} will be installed to the following directory. If you want to install to a different one, please click on the Browse button to select a new one or type it directly in the text box..
-            </summary>
-        </member>
-        <member name="T:WinCopies.Installer.IMainPage">
-            <summary>
-            Dummy interface for data template.
-            </summary>
-        </member>
-        <member name="T:WinCopies.Installer.IEndPage">
-            <summary>
-            Dummy interface for data template.
             </summary>
         </member>
     </members>

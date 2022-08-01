@@ -22,7 +22,7 @@ namespace WinCopies.Installer.Properties {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    public class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace WinCopies.Installer.Properties {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("WinCopies.Installer.Properties.Resources", typeof(Resources).Assembly);
@@ -51,7 +51,7 @@ namespace WinCopies.Installer.Properties {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,7 +63,7 @@ namespace WinCopies.Installer.Properties {
         /// <summary>
         ///   Looks up a localized string similar to {0} will be installed to the following directory. If you want to install to a different one, please click on the Browse button to select a new one or type it directly in the text box..
         /// </summary>
-        internal static string InstallDirectoryStringFormat {
+        public static string InstallDirectoryStringFormat {
             get {
                 return ResourceManager.GetString("InstallDirectoryStringFormat", resourceCulture);
             }

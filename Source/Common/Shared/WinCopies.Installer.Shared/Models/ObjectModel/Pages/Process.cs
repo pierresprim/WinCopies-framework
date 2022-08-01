@@ -21,7 +21,8 @@ namespace WinCopies.Installer
 #if CS8
             ?
 #endif
-            Resources { get; }
+            Resources
+        { get; }
 
         IInstallerStream GetWriter(string path);
 
@@ -85,14 +86,19 @@ namespace WinCopies.Installer
 
             protected DefaultProcessData(in Installer installer) : base(installer) { /* Left empty. */ }
 
-            protected IEnumerable<KeyValuePair<string, string>> GetResources()
-            {
-                foreach (PropertyInfo property in RelativePathResourcesType.GetProperties(BindingFlags.Public | BindingFlags.Static))
+            protected IEnumerable<KeyValuePair<string, string>> GetResources() => Enumerable.ForEachIfNotNull(RelativePathResourcesType, t => t.GetProperties(BindingFlags.Public | BindingFlags.Static), (PropertyInfo p, out KeyValuePair<string, string> result) =>
+                {
+                    if (p.GetValue(null) is string value)
+                    {
+                        result = new KeyValuePair<string, string>(p.Name, value);
 
-                    if (property.GetValue(null) is string value)
+                        return true;
+                    }
 
-                        yield return new KeyValuePair<string, string>(property.Name, value);
-            }
+                    result = default;
+
+                    return false;
+                });
 
             public override IInstallerStream GetWriter(string path) => new InstallerStream(path);
 

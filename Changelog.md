@@ -6,6 +6,12 @@ The WinCopies® software framework
 CHANGELOG
 ---------
 
+### 3.17.1.2-preview
+
+Bug fixes in WinCopies.Installer package:
+	- The resource manager was internal instead of public.
+	- ProcessPage.DefaultProcessData: GetResources method threw a NullArgumentException when RelativePathResourcesType returns a null value.
+
 ### 3.17.1.1-preview
 
 - Updated resources.

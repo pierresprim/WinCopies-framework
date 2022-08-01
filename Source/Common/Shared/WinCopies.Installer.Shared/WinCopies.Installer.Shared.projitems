@@ -22,6 +22,11 @@
     <Compile Include="$(MSBuildThisFileDirectory)Models\Misc\OptionGroup.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\ObjectModel\Pages\Process.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\ObjectModel\Pages\UserGroup.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Properties\Resources.Designer.cs">
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)ViewModels\CommonPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModels\Installer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModels\Pages\Destination.cs" />
@@ -37,5 +42,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)Properties\Resources.resx">
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <Generator>PublicResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
   </ItemGroup>
 </Project>
