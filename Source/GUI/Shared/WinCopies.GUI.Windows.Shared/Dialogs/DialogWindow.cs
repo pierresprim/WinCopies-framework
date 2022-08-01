@@ -59,7 +59,7 @@ namespace WinCopies.GUI.Windows
         /// <summary>
         /// Identifies the <see cref="CommandParameter"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty CommandParameterProperty = Register< object>(nameof(CommandParameter));
+        public static readonly DependencyProperty CommandParameterProperty = Register<object>(nameof(CommandParameter));
 
         /// <summary>
         /// Gets or sets a value that represents a user defined data value that can be passed to the command when it is executed.
@@ -188,7 +188,7 @@ namespace WinCopies.GUI.Windows
         /// </summary>
         public static readonly DependencyProperty CustomButtonsSourceProperty = DependencyProperty.Register(nameof(CustomButtonsSource), typeof(IEnumerable), typeof(DialogWindow), new PropertyMetadata(null, (DependencyObject d, DependencyPropertyChangedEventArgs e) => ((DialogWindow)d).OnCustomButtonsSourceChanged((IEnumerable)e.OldValue, (IEnumerable)e.NewValue)));
 
-        public IEnumerable CustomButtonsSource { get => (IEnumerable<Controls.Models.ButtonModel>)GetValue(CustomButtonsSourceProperty); set => SetValue(CustomButtonsSourceProperty, value); }
+        public IEnumerable CustomButtonsSource { get => (IEnumerable)GetValue(CustomButtonsSourceProperty); set => SetValue(CustomButtonsSourceProperty, value); }
 
         public static readonly DependencyProperty ContentDecoratorStyleProperty = DependencyProperty.Register(nameof(ContentDecoratorStyle), typeof(Style), typeof(DialogWindow), new PropertyMetadata(new Style()));
 
