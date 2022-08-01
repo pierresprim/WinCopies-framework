@@ -1,0 +1,29 @@
+﻿<!-- Copyright © Pierre Sprimont, 2019
+ 
+  This file is part of the WinCopies Framework.
+ 
+  The WinCopies Framework is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+ 
+  The WinCopies Framework is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. -->
+
+<ResourceDictionary x:Class="WinCopies.IO.Generic"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:WinCopies.IO"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <sys:String x:Key="NotBrowsableObject" >Items can only be loaded from browsable object.</sys:String>
+    <sys:String x:Key="FileTypeAndSpecialFolderNotCorrespond" >'{0}' and '{1}' are not corresponding. '{0}' is {2} and '{1}' is {3}</sys:String>
+    <sys:String x:Key="BackgroundWorkerIsBusy" >The BackgroundWorker is currently busy.</sys:String>
+    <sys:String x:Key="NotValidRegistryKey" >'{0}' is not a valid registry key.</sys:String>
+    <sys:String x:Key="RegistryKeyNotExists" >The Registry key does not exist. Path: {0}.</sys:String>
+</ResourceDictionary>

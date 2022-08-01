@@ -1,0 +1,71 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>da1e9bd1-1aa5-4ccf-8079-e7591ae8ec62</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>WinCopies.GUI.Explorer</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)ActionsFromObjects.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ArchiveItemInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectInfoViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Data\FileNameConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Data\FileSystemInfoAttributesToOpacityConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Data\FileSystemInfoAttributesToVisibilityConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Data\FileSystemInfoConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Data\FileTypeConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Data\HistorySelectedItemConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Data\PathToItemsConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Data\ShowInFilePropertiesGridConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Data\ShowItemsCheckBoxConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Data\StringArrayToFoldersDialogFilterConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Data\ViewStyleConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Dialogs\FilePropertiesDialog.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Dialogs\FilePropertyEditorDialog.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Dialogs\FolderBrowserDialog.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Dialogs\FolderBrowserDialogCommandButtonContentConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ExplorerControl.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FilePropertyGrid.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)HistoryItemData.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IBrowsableObjectInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IBrowsableObjectInfoHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InArchiveFormats.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ListView.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ListViewItem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MultiplePathsOpenRequestedEventArgs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)OpenMode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ResourcesHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SelectionChangedEventArgs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ShellObjectInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ShellObjectInfoConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ShellPropertyContainer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ShellPropertyConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Themes\Generic.xaml.cs">
+      <DependentUpon>Generic.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)TreeView.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeViewItem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewStyles.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="$(MSBuildThisFileDirectory)Resources\arrow_up.png" />
+    <Resource Include="$(MSBuildThisFileDirectory)Resources\cancel.png" />
+    <Resource Include="$(MSBuildThisFileDirectory)Resources\folder_go.png" />
+    <Resource Include="$(MSBuildThisFileDirectory)Resources\resultset_next.png" />
+    <Resource Include="$(MSBuildThisFileDirectory)Resources\resultset_previous.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)Resources\cut.png" />
+    <None Include="$(MSBuildThisFileDirectory)Resources\page_copy.png" />
+    <None Include="$(MSBuildThisFileDirectory)Resources\page_paste.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="$(MSBuildThisFileDirectory)Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+</Project>
