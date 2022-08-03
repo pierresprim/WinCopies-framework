@@ -39,7 +39,7 @@ namespace WinCopies.Installer
 
         public string Location { get; internal set; }
 
-        public IEnumerable<KeyValuePair<string, File>> Files { get; internal set; }
+        public IEnumerable<KeyValuePair<string, IFile>> Files { get; internal set; }
 
         public bool Completed { get => GetBit(1); private set => SetBit(1, value); }
 

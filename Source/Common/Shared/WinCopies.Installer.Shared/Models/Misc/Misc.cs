@@ -1,6 +1,18 @@
 ﻿namespace WinCopies.Installer
 {
-    public struct File
+    public interface IFile
+    {
+        bool IsMainApp { get; }
+
+        System.IO.Stream Stream { get; }
+    }
+
+    public interface IValidableFile : IFile
+    {
+        System.IO.Stream SHA256 { get; }
+    }
+
+    public struct File : IFile
     {
         public bool IsMainApp { get; }
 
@@ -11,6 +23,23 @@
             IsMainApp = isMainApp;
 
             Stream = stream;
+        }
+    }
+
+    public struct ValidableFile : IValidableFile
+    {
+        public File File { get; }
+
+        public System.IO.Stream SHA256 { get; }
+
+        bool IFile.IsMainApp => File.IsMainApp;
+        System.IO.Stream IFile.Stream => File.Stream;
+
+        public ValidableFile(in File file, in System.IO.Stream sha256)
+        {
+            File = file;
+
+            SHA256 = sha256;
         }
     }
 

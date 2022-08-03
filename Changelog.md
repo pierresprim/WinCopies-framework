@@ -6,6 +6,15 @@ The WinCopies® software framework
 CHANGELOG
 ---------
 
+### ????
+
+- Installer:
+	- New types.
+	- File enumeration and default process data classes redesigned.
+	- Add:
+		- a default process data class to download the files to install from a server.
+		- the ability to perform validation checks.
+
 ### 3.17.1.2-preview
 
 Bug fixes in WinCopies.Installer package:

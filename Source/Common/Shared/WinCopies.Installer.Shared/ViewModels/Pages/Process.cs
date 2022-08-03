@@ -13,6 +13,7 @@ using WinCopies.Linq;
 using WinCopies.Util;
 
 using static WinCopies.Installer.Error;
+using static WinCopies.UtilHelpers;
 
 using ICustomStream = WinCopies.DotNetFix.IWriterStream;
 
@@ -37,9 +38,9 @@ namespace WinCopies.Installer
 #endif
                 directory = System.IO.Path.GetDirectoryName(path);
 
-            if (!(directory == null || System.IO.Directory.Exists(directory)))
+            if (!(directory == null || Directory.Exists(directory)))
 
-                System.IO.Directory.CreateDirectory(directory);
+                Directory.CreateDirectory(directory);
 
             return new FileStream(path, FileMode.CreateNew);
         }
@@ -84,26 +85,16 @@ namespace WinCopies.Installer
                 {
                     void reportProgress(in byte percentProgress) => ReportProgress(percentProgress, percentProgress);
 
-                    reportProgress(0);
-
-                    ulong total = 0;
-
-                    foreach (KeyValuePair<string, File> _stream in ProcessData)
-
-                        total += (ulong)_stream.Value.Stream.Length;
-
                     void log(in string message)
                     {
                         ProcessData.AddLogMessage(message);
                         System.Console.WriteLine(message);
                     }
 
-                    Collections.Generic.EnumerableHelper<KeyValuePair<string, Action>>.IEnumerableStack items = Collections.Generic.EnumerableHelper<KeyValuePair<string, Action>>.GetEnumerableStack();
-
                     byte bools = 0;
 
                     bool isOK() => bools.GetBit(0);
-                    void ok(in bool value) => UtilHelpers.SetBit(ref bools, 0, value);
+                    void ok(in bool value) => SetBit(ref bools, 0, value);
 
                     bool hasError() => bools.GetBit(1);
                     void error(in bool value) => bools.SetBit(1, value);
@@ -112,7 +103,7 @@ namespace WinCopies.Installer
 
                     void trySetError()
                     {
-                        if (ProcessData.Installer.Error == Succeeded)
+                        if (ProcessData.Installer.Error <= RecoveredError)
 
                             error(true);
                     }
@@ -127,6 +118,24 @@ namespace WinCopies.Installer
                         }
                     }
 
+                    ulong total = 0;
+
+                    Collections.Generic.EnumerableHelper<KeyValuePair<string, Action>>.IEnumerableStack tmpFiles = Collections.Generic.EnumerableHelper<KeyValuePair<string, Action>>.GetEnumerableStack();
+
+                    void process(in Collections.Generic.EnumerableHelper<KeyValuePair<string, Action>>.IEnumerableStack items, in Action<Collections.Generic.EnumerableHelper<KeyValuePair<string, Action>>.IEnumerableStack> action)
+                    {
+                        total = 0;
+                        bools = 0;
+
+                        reportProgress(0);
+
+                        foreach (KeyValuePair<string, IFile> _stream in ProcessData)
+
+                            total += (ulong)_stream.Value.Stream.Length;
+
+                        action(items);
+                    }
+
                     bool doInnerWork<T>(in string enter, in string errorMessage, in string errorCaption, in string exit, in IEnumerable<KeyValuePair<string, T>> _items, in ActionIn<KeyValuePair<string, T>> action)
                     {
                         void onError() => setError(FatalError);
@@ -137,6 +146,13 @@ namespace WinCopies.Installer
                             msg, in string _msg) => log($"An {msg}error occurred. Error message: {_msg}");
 
                         foreach (KeyValuePair<string, T> item in _items)
+                        {
+                            if (ProcessData.Installer.Error >= FatalError)
+                            {
+                                log("Fatal error during file enumeration.");
+
+                                return false;
+                            }
 
                             do
                             {
@@ -192,187 +208,301 @@ namespace WinCopies.Installer
                             }
 
                             while (isOK());
+                        }
 
                         log(exit);
 
                         return true;
                     }
 
-                    uint count = 0;
-                    ulong totalWritten = 0;
-                    int currentTotalWritten = 0;
-                    string location;
-                    string path;
-                    string relativePath;
+                    string path = null;
+                    string relativePath = null;
                     string tmp;
+                    string location = ProcessData.Installer.Location;
                     IEnumerable<KeyValuePair<string, string>>
 #if CS8
                         ?
 #endif
-                        resources = ProcessData.Resources;
+                        resources;
+                    uint count = 0;
+                    ulong totalWritten = 0;
+                    int currentTotalWritten = 0;
 
                     int setPercentProgress() => currentTotalWritten = (int)((float)(totalWritten += count) / total * 100);
 
-                    bool doWork()
+                    bool doCopy<T>(in string destination, in IFileEnumerableBase current, in KeyValuePair<string, T> item, in Collections.Generic.EnumerableHelper<KeyValuePair<string, Action>>.IEnumerableStack items) where T : IFile
                     {
-                        location = ProcessData.Installer.Location;
+                        long currentTotal = 0;
+                        const byte COMPLETED = 100;
+                        const ushort MAX_LENGTH = 4096;
+                        System.IO.Stream stream;
+                        var buffer = new byte[MAX_LENGTH];
+                        ulong length = (ulong)(stream = item.Value.Stream).Length;
 
-                        try
-                        {
-                            ProcessData.DeleteOldFiles(message => log(message));
-                        }
-                        catch (Exception ex)
-                        {
-                            log($"Error: {ex.Message}");
-
-                            return false;
-                        }
-
-                        return doInnerWork("Extracting", "copy", "Extraction", "Files extracted.", ProcessData, (in KeyValuePair<string, File> item) =>
-                            {
-                                const ushort MAX_LENGTH = 4096;
-                                const byte COMPLETED = 100;
-                                System.IO.Stream stream;
-                                var buffer = new byte[MAX_LENGTH];
-                                long currentTotal;
-                                ulong length;
-
-                                currentTotal = 0;
-                                length = (ulong)(stream = item.Value.Stream).Length;
-                                relativePath = item.Key;
-
-                                if (resources != null)
-                                {
-                                    string replace(in string text) => text.Replace("_u", "_").Replace("_b", "\\").Replace("_d", ".");
-
-                                    foreach (KeyValuePair<string, string> resource in resources)
-
-                                        if (replace(relativePath).StartsWith(tmp = replace(resource.Key) + '.'))
-                                        {
-                                            relativePath = $"{resource.Value}\\{relativePath.Substring(tmp.Length)}";
-
-                                            break;
-                                        }
-                                }
-
-                                using
+                        using
 #if !CS8
-                                (
+                        (
 #endif
-                                    IInstallerStream writer = ProcessData.GetWriter(path = Path.Combine(location, relativePath))
+                            IInstallerStream writer = current.GetWriter(path = Path.Combine(destination, relativePath))
 #if CS8
-                                    ;
+                            ;
 #else
-                                )
+                        )
 #endif
-                                {
-                                    while ((count = (uint)stream.Read(buffer, 0, 4096)) > 0)
-                                    {
-                                        writer.Write(buffer, 0, count);
+                        {
+                            items.Push(GetKeyValuePair(item.Key, writer.GetDeleter()));
 
-                                        ReportProgress(setPercentProgress(), (byte)(((float)(currentTotal += count)) / length * 100));
-                                    }
-
-                                    ReportProgress(currentTotalWritten, COMPLETED);
-
-                                    items.Push(UtilHelpers.GetKeyValuePair(item.Key, writer.GetDeleter()));
-                                }
-
-                                log($"Extracted {path}");
-                            });
-                    }
-
-                    void doExtraWork(in (string enter, string exit, byte progress, Action action) vars)
-                    {
-                        log(vars.enter);
-
-                        vars.action();
-
-                        base.OnDoWork(e);
-
-                        log(vars.exit);
-
-                        reportProgress(vars.progress);
-                    }
-
-                    doExtraWork(doWork() ? ("Starting custom actions...", "Custom actions completed.\nCompleted.", 100, () =>
-                    {
-                        string
-#if CS8
-                            ?
-#endif
-                             errorMessage;
-                        string
-#if CS8
-                            ?
-#endif
-                            _log;
-
-                        foreach (IOption option in ProcessData.ModelGeneric.Installer.Options.Where(optionGroup => optionGroup.IsChecked == true).SelectMany().Where(option => option.IsChecked))
-
-                            do
+                            while ((count = (uint)stream.Read(buffer, 0, 4096)) > 0)
                             {
-                                errorMessage = null;
-                                _log = null;
+                                writer.Write(buffer, 0, count);
 
-                                try
+                                ReportProgress(setPercentProgress(), (byte)(((float)(currentTotal += count)) / length * 100));
+                            }
+
+                            if (validate())
+
+                                ReportProgress(currentTotalWritten, COMPLETED);
+
+                            else
+
+                                msgbox
+                        }
+                    }
+
+                    bool copy<T>(in string destination, in IFileEnumerableBase current, in KeyValuePair<string, T> item, in Collections.Generic.EnumerableHelper<KeyValuePair<string, Action>>.IEnumerableStack items, in FuncIn<string, IFileEnumerableBase, KeyValuePair<string, T>, Collections.Generic.EnumerableHelper<KeyValuePair<string, Action>>.IEnumerableStack, bool> action) where T : IFile
+                    {
+                        count = 0;
+                        totalWritten = 0;
+                        currentTotalWritten = 0;
+                        relativePath = item.Key;
+
+                        if ((resources = current.Resources) != null)
+                        {
+                            string replace(in string text) => text.Replace("_u", "_").Replace("_b", "\\").Replace("_d", ".");
+
+                            foreach (KeyValuePair<string, string> resource in resources)
+
+                                if (replace(relativePath).StartsWith(tmp = replace(resource.Key) + '.'))
                                 {
-                                    ok(option.Action(out _log));
-                                }
-
-                                catch (Exception ex)
-                                {
-                                    ok(false);
-                                    errorMessage = ex.Message;
-                                }
-
-                                log($"Custom Action: {option.Name} -- {_log ?? "<No log could be retrieved or provided.>"}");
-
-                                if (isOK())
-                                {
-                                    onSucceeded();
+                                    relativePath = $"{resource.Value}\\{relativePath.Substring(tmp.Length)}";
 
                                     break;
                                 }
+                        }
 
-                                MessageBoxResult result = MessageBox.Show($"Could not perform the action '{option.Name}'.\nMessage: {errorMessage ?? "<No error message.>"}\nClick 'Yes' to retry, 'No' to skip this action, 'Cancel' to skip all custom actions.", "Custom Action Error", MessageBoxButton.YesNoCancel, MessageBoxImage.Question, MessageBoxResult.Yes);
+                        action(destination, current, item, items);
 
-                                switch (result)
+                        log($"Copied {path}");
+                    }
+
+                    Collections.Generic.EnumerableHelper<ITemporaryFileEnumerable>.IEnumerableStack
+#if CS8
+                        ?
+#endif
+                        temporaryFiles = ProcessData.GetTemporaryFiles((string errorMessage, bool recoverable) =>
+                        {
+                            MessageBoxResult show(in string msg, in MessageBoxButton buttons, in MessageBoxResult result) => MessageBox.Show($"{errorMessage}\n{msg}, the installation could be unstable.", "Gathering Files Error", buttons, MessageBoxImage.Error, result);
+
+                            if (recoverable)
+                            {
+                                switch (show("Do you want to try again? If you skip this file", MessageBoxButton.YesNoCancel, MessageBoxResult.Yes))
                                 {
                                     case MessageBoxResult.Yes:
 
-                                        ok(true);
+                                        setError(RecoveredError);
 
-                                        trySetError();
-
-                                        break;
+                                        return true;
 
                                     case MessageBoxResult.No:
 
                                         setError(NotRecoveredError);
 
-                                        break;
-
-                                    case MessageBoxResult.Cancel:
-
-                                        setError(FatalError);
-
-                                        return;
+                                        return false;
                                 }
                             }
-                            while (isOK());
-                    }
-                    ) :
+
+                            else
+
+                                switch (show("Do you want to continue anyway? If you continue", MessageBoxButton.YesNo, MessageBoxResult.No))
+                                {
+                                    case MessageBoxResult.Yes:
+
+                                        setError(RecoveredError);
+
+                                        return true;
+                                }
+
+                            setError(FatalError);
+
+                            return false;
+                        });
+
+                    void _process()
+                    {
+                        if (temporaryFiles != null)
+
+                            foreach (ITemporaryFileEnumerable enumerable in temporaryFiles)
+                            {
+                                process(tmpFiles, items => doInnerWork("Starting " + enumerable.ActionName, enumerable.ActionName, enumerable.ActionName, "Completed " + enumerable.ActionName, enumerable.Files, (in KeyValuePair<string, IValidableFile> item) => copy(ProcessData.Installer.ProgramName, enumerable.Files, item, items, (in string destination, in IFileEnumerableBase current, in KeyValuePair<string, IValidableFile> item, in Collections.Generic.EnumerableHelper<KeyValuePair<string, Action>>.IEnumerableStack items) =>
+                                {
+                                    if (!validate())
+
+                                        doCopy(destination, current, item, items);
+                                })));
+
+                                if (ProcessData.Installer.Error >= FatalError)
+
+                                    return;
+                            }
+
+                        process(Collections.Generic.EnumerableHelper<KeyValuePair<string, Action>>.GetEnumerableStack(), items =>
+                        {
+                            bool doWork()
+                            {
+                                try
+                                {
+                                    ProcessData.DeleteOldFiles(message => log(message));
+                                }
+                                catch (Exception ex)
+                                {
+                                    log($"Error: {ex.Message}");
+
+                                    return false;
+                                }
+
+                                return doInnerWork("Copying", "copy", "Copy", "Files copied.", ProcessData, (in KeyValuePair<string, IFile> item) => copy(location, ProcessData, item, items, doCopy));
+                            }
+
+                            void doExtraWork(in (string enter, string exit, byte progress, Action action) vars)
+                            {
+                                log(vars.enter);
+
+                                vars.action();
+
+                                base.OnDoWork(e);
+
+                                log(vars.exit);
+
+                                reportProgress(vars.progress);
+                            }
+
+                            doExtraWork(doWork() ? ("Starting custom actions...", "Custom actions completed.\nCompleted.", 100, () =>
+                            {
+                                string
+#if CS8
+                                    ?
+#endif
+                                     errorMessage;
+                                string
+#if CS8
+                                    ?
+#endif
+                                    _log;
+
+                                foreach (IOption option in ProcessData.ModelGeneric.Installer.Options.Where(optionGroup => optionGroup.IsChecked == true).SelectMany().Where(option => option.IsChecked))
+
+                                    do
+                                    {
+                                        errorMessage = null;
+                                        _log = null;
+
+                                        try
+                                        {
+                                            ok(option.Action(out _log));
+                                        }
+
+                                        catch (Exception ex)
+                                        {
+                                            ok(false);
+                                            errorMessage = ex.Message;
+                                        }
+
+                                        log($"Custom Action: {option.Name} -- {_log ?? "<No log could be retrieved or provided.>"}");
+
+                                        if (isOK())
+                                        {
+                                            onSucceeded();
+
+                                            break;
+                                        }
+
+                                        MessageBoxResult result = MessageBox.Show($"Could not perform the action '{option.Name}'.\nMessage: {errorMessage ?? "<No error message.>"}\nClick 'Yes' to retry, 'No' to skip this action, 'Cancel' to skip all custom actions.", "Custom Action Error", MessageBoxButton.YesNoCancel, MessageBoxImage.Question, MessageBoxResult.Yes);
+
+                                        switch (result)
+                                        {
+                                            case MessageBoxResult.Yes:
+
+                                                ok(true);
+
+                                                trySetError();
+
+                                                break;
+
+                                            case MessageBoxResult.No:
+
+                                                setError(NotRecoveredError);
+
+                                                break;
+
+                                            case MessageBoxResult.Cancel:
+
+                                                setError(FatalError);
+
+                                                return;
+                                        }
+                                    }
+                                    while (isOK());
+                            }
+                            ) :
 #if !CS9
                     (ValueTuple<string, string, byte, Action>)
 #endif
-                    ("Cancelling...", "All files deleted.", 0, () => setError(doInnerWork("Deleting", "delete", "Deletion", "Cancelled.", items, (in KeyValuePair<string, Action> stream) =>
-                        {
-                            stream.Value();
+                            ("Cancelling...", "All files deleted.", 0, () => setError(doInnerWork("Deleting", "delete", "Deletion", "Cancelled.", items, (in KeyValuePair<string, Action> stream) =>
+                                {
+                                    stream.Value();
 
-                            setPercentProgress();
-                        }) ? FatalError : SuperFatalError)
-                    ));
+                                    setPercentProgress();
+                                }) ? FatalError : SuperFatalError)
+                            ));
+                        });
+                    }
+
+                    _process();
+
+                    while (tmpFiles.TryPeek(out KeyValuePair<string, Action> item))
+                    {
+                        try
+                        {
+                            item.Value();
+                        }
+                        catch (Exception ex)
+                        {
+                            switch (MessageBox.Show($"Could not delete the file '{item.Key}'.\nMessage: {ex.Message}\nClick 'Yes' to retry, 'No' to skip this file or 'Cancel' to quit the installation.", $"File Deletion Error", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning, MessageBoxResult.Yes))
+                            {
+                                case MessageBoxResult.Yes:
+
+                                    trySetError();
+
+                                    continue;
+
+                                case MessageBoxResult.No:
+
+                                    setError(NotRecoveredError);
+
+                                    break;
+
+                                case MessageBoxResult.Cancel:
+
+                                    setError(SuperFatalError);
+
+                                    return;
+                            }
+                        }
+
+                        onSucceeded();
+
+                        tmpFiles.Pop();
+                    }
                 }
             }
 
@@ -445,8 +575,19 @@ namespace WinCopies.Installer
                 CanExecuteChanged?.Invoke(this, EventArgs.Empty);
             }
 
-            public IEnumerator<KeyValuePair<string, File>> GetEnumerator() => ModelGeneric.GetEnumerator();
+            public Collections.Generic.EnumerableHelper<ITemporaryFileEnumerable>.IEnumerableStack
+#if CS8
+            ?
+#endif
+            GetTemporaryFiles(Func<string, bool, bool> onError) => ModelGeneric.GetTemporaryFiles(onError);
+
+            public IEnumerator<KeyValuePair<string, IFile>> GetEnumerator() => ModelGeneric.GetEnumerator();
+
+#if !CS8
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+            IEnumerable<KeyValuePair<string, IFile>> IAsEnumerable<KeyValuePair<string, IFile>>.AsEnumerable() => this.Select(item => GetKeyValuePair(item.Key, item.Value.AsFromType()));
+#endif
         }
 
         public sealed override bool CanBrowseBack => false;
