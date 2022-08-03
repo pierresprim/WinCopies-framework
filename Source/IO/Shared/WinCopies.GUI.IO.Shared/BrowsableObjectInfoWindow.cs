@@ -70,9 +70,12 @@ using static WinCopies.GUI.Icons.Properties.Resources;
 #endregion
 #endregion
 
+#region Aliases
+using Enumerable = System.Linq.Enumerable;
 using IOResources = WinCopies.GUI.IO.Properties.Resources;
 using ListViewItem = WinCopies.GUI.Controls.ListViewItem;
 using TabItem = WinCopies.GUI.Controls.TabItem;
+#endregion
 #endregion
 
 namespace WinCopies.GUI.IO
