@@ -6,14 +6,42 @@ The WinCopies® software framework
 CHANGELOG
 ---------
 
-### ????
+### 3.18
 
+- New types.
 - Installer:
-	- New types.
-	- File enumeration and default process data classes redesigned.
+	- File enumeration, default process data and enumerable types redesigned.
+	- InstallerViewModel is abstract.
 	- Add:
 		- a default process data class to download the files to install from a server.
-		- the ability to perform validation checks.
+		- ability to perform validation checks on already downloaded files.
+		- underscores to button labels in order to navigate through the installer pages with the keyboard.
+		- UserGroupPage: new protected inner class: UserGroupData.
+		- IInstaller: new properties.
+		- new styles and templates.
+	- Update:
+		- some templates.
+		- UserGroup and Destination types in order to have ability to add custom views to these pages.
+	- Remove (I)InstallerStream types. Use System.IO.Stream instead.
+- Console:
+	- RadioButton.Group: the initializer is internal.
+	- RadioButtonGroup.SelectedItem, Screen.Console and Console/ControlBase.Screen are nullable.
+	- Console.Loop method: 'control' parameter is nullable.
+	- CheckBox: new method: AddToScreen.
+	- ControlElement: new protected method: ResetCursorPosition.
+	- Control: new constructor for 'params' array.
+	- ProgressBar class redesigned.
+	- Remove Setup class and related types.
+- GUI:
+	- CommandSourceControl\<T>: genericity bug fixed when registring dependency properties.
+	- Progress: the exception that is thrown when updating progress properties includes the actual value in the error message.
+- IO:
+	- Directory: new methods.
+	- Path: new method: RemoveExtension.
+	- RecursivelyEnumerablePath\<T>'s constructor parameters 'searchPattern' and 'enumerationOptions' are nullable.
+	- Size.ToString: only the two first decimals are shown.
+- GUI.IO: BrowsableObjectInfoWindow dependency property fields are read-only.
+- New package: Installer.Decompressor.
 
 ### 3.17.1.2-preview
 

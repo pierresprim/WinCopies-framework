@@ -29,8 +29,16 @@ namespace WinCopies.GUI.Controls
     {
         public const string TemplateRoot = "templateRoot";
         public const string PART_Popup = "PART_Popup";
-        private Button _rootButton;
-        private Popup _popup;
+        private Button
+#if CS8
+            ?
+#endif
+            _rootButton;
+        private Popup
+#if CS8
+            ?
+#endif
+            _popup;
 
         protected override void OnInitialized(EventArgs e)
         {
@@ -94,9 +102,17 @@ namespace WinCopies.GUI.Controls
 
         protected virtual void OnSubmenuClosed() => RaiseEvent(new RoutedEventArgs(SubmenuClosedEvent, this));
 
-        private void Submenu_Opened(object sender, EventArgs e) => OnSubmenuOpened();
+        private void Submenu_Opened(object
+#if CS8
+            ?
+#endif
+            sender, EventArgs e) => OnSubmenuOpened();
 
-        private void Submenu_Closed(object sender, EventArgs e) => OnSubmenuClosed();
+        private void Submenu_Closed(object
+#if CS8
+            ?
+#endif
+            sender, EventArgs e) => OnSubmenuClosed();
 
         protected override void OnMouseDown(MouseButtonEventArgs e)
         {

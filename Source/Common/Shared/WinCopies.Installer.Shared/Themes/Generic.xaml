@@ -28,7 +28,7 @@
                         <Button Command="BrowseBack">
                             <StackPanel Orientation="Horizontal">
                                 <Image Source="{Binding Source={x:Static icons:Resources.resultset_previous}, Converter={StaticResource BitmapToImageSourceConverter}}" />
-                                <Label>Previous</Label>
+                                <Label>_Previous</Label>
                             </StackPanel>
                         </Button>
                         <Button Command="BrowseForward" IsDefault="True">
@@ -110,12 +110,17 @@
     </DataTemplate>
 
     <ControlTemplate x:Key="WinCopies.Templates.Installer.UserGroup" TargetType="{x:Type gui:UserGroup}">
-        <StackPanel>
-            <TextBlock Text="{Binding Installer.ProgramName, RelativeSource={RelativeSource TemplatedParent}, StringFormat={}Select whether you want {0} to be installed for all users using this computer or only for yourself.}" TextWrapping="Wrap" />
-            <StackPanel Margin="10,50,0,0">
-                <RadioButton IsChecked="{Binding InstallForCurrentUserOnly, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay, Converter={converters:ReverseBooleanConverter}}">for all users</RadioButton>
-                <RadioButton IsChecked="{Binding InstallForCurrentUserOnly, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}">just for me</RadioButton>
-            </StackPanel>
+        <StackPanel Margin="10,30,0,0">
+            <GroupBox Header="User Group">
+                <StackPanel>
+                    <TextBlock Text="{Binding Installer.ProgramName, RelativeSource={RelativeSource TemplatedParent}, StringFormat={}Select whether you want {0} to be installed for all users using this computer or only for yourself.}" TextWrapping="Wrap" />
+                    <StackPanel Margin="0,10,0,0">
+                        <RadioButton IsChecked="{Binding InstallForCurrentUserOnly, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay, Converter={converters:ReverseBooleanConverter}}">for all users</RadioButton>
+                        <RadioButton IsChecked="{Binding InstallForCurrentUserOnly, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}">just for me</RadioButton>
+                    </StackPanel>
+                </StackPanel>
+            </GroupBox>
+            <ContentPresenter ContentSource="ExtraData" />
         </StackPanel>
     </ControlTemplate>
 
@@ -124,32 +129,60 @@
     </Style>
 
     <DataTemplate DataType="{x:Type local:IUserGroupData}">
-        <gui:UserGroup InstallForCurrentUserOnly="{Binding InstallForCurrentUserOnly, Mode=TwoWay}" Installer="{Binding Installer}" />
+        <gui:UserGroup InstallForCurrentUserOnly="{Binding InstallForCurrentUserOnly, Mode=TwoWay}" Installer="{Binding Installer}" ExtraData="{Binding Installer.ExtraData.UserGroup}" />
     </DataTemplate>
 
+    <ControlTemplate x:Key="WinCopies.Templates.Installer.Actions" TargetType="{x:Type gui:ActionsControl}">
+        <GroupBox Header="What do you want to do?">
+            <StackPanel>
+                <RadioButton Content="Download" IsChecked="{Binding Actions, RelativeSource={x:Static RelativeSource.TemplatedParent}, Converter={converters:EnumToBooleanConverter}, ConverterParameter={x:Static local:Actions.Prepare}}" />
+                <RadioButton Content="Install" IsChecked="{Binding Actions, RelativeSource={x:Static RelativeSource.TemplatedParent}, Converter={converters:EnumToBooleanConverter}, ConverterParameter={x:Static local:Actions.Install}}" />
+                <RadioButton Content="Both" IsChecked="{Binding Actions, RelativeSource={x:Static RelativeSource.TemplatedParent}, Converter={converters:EnumToBooleanConverter}, ConverterParameter={x:Static local:Actions.Both}}" />
+            </StackPanel>
+        </GroupBox>
+    </ControlTemplate>
+
+    <Style TargetType="{x:Type gui:ActionsControl}">
+        <Setter Property="Template" Value="{StaticResource WinCopies.Templates.Installer.Actions}" />
+    </Style>
+
+    <DataTemplate DataType="{x:Type local:ActionsViewModel}">
+        <gui:ActionsControl />
+    </DataTemplate>
+
+    <ControlTemplate x:Key="WinCopies.Templates.Installer.BrowseTextBoxBase" TargetType="{x:Type gui:BrowseTextBoxBase}">
+        <GroupBox Header="{TemplateBinding Header}">
+            <StackPanel>
+                <TextBlock Text="{TemplateBinding Text}" TextWrapping="Wrap" />
+                <DockPanel>
+                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                        <controls:HeaderedButton Command="{x:Static commands:NavigationCommands.Browse}" Padding="2">
+                            <controls:HeaderedButton.Header>
+                                <Image Source="{Binding Source={x:Static icons:Resources.folder_explore}, Converter={StaticResource BitmapToImageSourceConverter}}" />
+                            </controls:HeaderedButton.Header>
+                            Browse...
+                        </controls:HeaderedButton>
+                        <controls:HeaderedButton Command="{x:Static commands:ApplicationCommands.Reset}">
+                            <controls:HeaderedButton.Header>
+                                <Image Source="{Binding Source={x:Static icons:Resources.arrow_rotate_clockwise}, Converter={StaticResource BitmapToImageSourceConverter}}" />
+                            </controls:HeaderedButton.Header>
+                            Reset
+                        </controls:HeaderedButton>
+                    </StackPanel>
+                    <TextBox Text="{Binding Location, Mode=TwoWay, RelativeSource={x:Static RelativeSource.TemplatedParent}, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center" />
+                </DockPanel>
+            </StackPanel>
+        </GroupBox>
+    </ControlTemplate>
+
+    <Style TargetType="{x:Type gui:BrowseTextBoxBase}">
+        <Setter Property="Template" Value="{StaticResource WinCopies.Templates.Installer.BrowseTextBoxBase}" />
+    </Style>
+
     <ControlTemplate x:Key="WinCopies.Templates.Installer.Destination" TargetType="{x:Type gui:Destination}">
-        <StackPanel>
-            <TextBlock Text="{Binding Installer.ProgramName, RelativeSource={RelativeSource TemplatedParent}, StringFormat={x:Static properties:Resources.InstallDirectoryStringFormat}}" TextWrapping="Wrap" />
-            <Grid Margin="0,50,0,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition />
-                    <ColumnDefinition Width="auto" />
-                    <ColumnDefinition Width="auto" />
-                </Grid.ColumnDefinitions>
-                <TextBox Grid.Row="1" Text="{Binding Location, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center" />
-                <Button Grid.Column="1" Grid.Row="1" Command="{x:Static commands:NavigationCommands.Browse}">
-                    <StackPanel Orientation="Horizontal">
-                        <Image Source="{Binding Source={x:Static icons:Resources.folder_explore}, Converter={StaticResource BitmapToImageSourceConverter}}" />
-                        <Label>Browse...</Label>
-                    </StackPanel>
-                </Button>
-                <Button Grid.Column="2" Grid.Row="1" Command="{x:Static commands:ApplicationCommands.Reset}">
-                    <StackPanel Orientation="Horizontal">
-                        <Image Source="{Binding Source={x:Static icons:Resources.arrow_rotate_clockwise}, Converter={StaticResource BitmapToImageSourceConverter}}" />
-                        <Label>Reset</Label>
-                    </StackPanel>
-                </Button>
-            </Grid>
+        <StackPanel Margin="0,40,0,0">
+            <ContentPresenter ContentSource="ExtraData" />
+            <gui:BrowseTextBox Header="Installation Directory" Text="{Binding Installer.ProgramName, RelativeSource={x:Static RelativeSource.TemplatedParent}, StringFormat={x:Static properties:Resources.InstallDirectoryStringFormat}}" Location="{Binding Location, Mode=TwoWay, RelativeSource={x:Static RelativeSource.TemplatedParent}}" Installer="{TemplateBinding Installer}" />
         </StackPanel>
     </ControlTemplate>
 
@@ -158,7 +191,16 @@
     </Style>
 
     <DataTemplate DataType="{x:Type local:IDestinationData}">
-        <gui:Destination Location="{Binding Location, Mode=TwoWay}" Installer="{Binding Installer}" />
+        <gui:Destination Location="{Binding Location, Mode=TwoWay}" Installer="{Binding Installer}" ExtraData="{Binding Installer.ExtraData.Destination}" />
+    </DataTemplate>
+
+    <Style TargetType="{x:Type gui:TemporaryDestination}" BasedOn="{StaticResource {x:Type gui:BrowseTextBoxBase}}">
+        <Setter Property="Header" Value="Temporary Files Directory" />
+        <Setter Property="Text" Value="Select the directory into which to download the temporary files." />
+    </Style>
+
+    <DataTemplate DataType="{x:Type local:TemporaryDestinationViewModel}">
+        <gui:TemporaryDestination Installer="{Binding Installer}" TemporaryDirectory="{Binding TemporaryDirectory, Mode=TwoWay}" />
     </DataTemplate>
 
     <ControlTemplate x:Key="WinCopies.Templates.Installer.Options" TargetType="{x:Type gui:Options}">
@@ -211,9 +253,15 @@
     </DataTemplate>
 
     <ControlTemplate x:Key="WinCopies.Templates.Installer.ProcessPage" TargetType="{x:Type gui:Process}">
-        <DockPanel FocusManager.FocusedElement="{Binding ElementName=PART_TextBox}">
-            <controls:Progress DockPanel.Dock="Top" OverallProgressHeader="Overall progress:" OverallProgress="{TemplateBinding OverallProgress}" CurrentItemProgressHeader="Current item progress:" CurrentItemProgress="{TemplateBinding CurrentItemProgress}" Height="75" VerticalContentAlignment="Center" />
-            <controls:TextBox x:Name="PART_TextBox" IsReadOnly="True" IsReadOnlyCaretVisible="True" AcceptsReturn="True" Text="{TemplateBinding Log}" CaretIndex="{Binding Text.Length, RelativeSource={x:Static RelativeSource.Self}}" />
+        <DockPanel>
+            <Grid DockPanel.Dock="Top">
+                <Label Content="{TemplateBinding StepName}" HorizontalAlignment="Left" />
+                <Label Content="{TemplateBinding StepData, Converter={local:StepDataToStringConverter}}" HorizontalAlignment="Right" />
+            </Grid>
+            <DockPanel FocusManager.FocusedElement="{Binding ElementName=PART_TextBox}">
+                <controls:Progress DockPanel.Dock="Top" OverallProgressHeader="Overall progress:" OverallProgress="{TemplateBinding OverallProgress}" CurrentItemProgressHeader="Current item progress:" CurrentItemProgress="{TemplateBinding CurrentItemProgress}" Height="75" VerticalContentAlignment="Center" />
+                <controls:TextBox x:Name="PART_TextBox" IsReadOnly="True" IsReadOnlyCaretVisible="True" AcceptsReturn="True" Text="{TemplateBinding Log}" CaretIndex="{Binding Text.Length, RelativeSource={x:Static RelativeSource.Self}}" />
+            </DockPanel>
         </DockPanel>
     </ControlTemplate>
 
@@ -222,7 +270,7 @@
     </Style>
 
     <DataTemplate DataType="{x:Type local:IProcessDataViewModel}">
-        <gui:Process OverallProgress="{Binding OverallProgress}" CurrentItemProgress="{Binding CurrentItemProgress}" Command="{Binding}" Log="{Binding Log}" />
+        <gui:Process OverallProgress="{Binding OverallProgress}" CurrentItemProgress="{Binding CurrentItemProgress}" StepName="{Binding StepName}" StepData="{Binding StepData}" Command="{Binding}" Log="{Binding Log}" />
     </DataTemplate>
 
     <ControlTemplate x:Key="WinCopies.Templates.Installer.CommonPage" TargetType="{x:Type gui:CommonPage}">

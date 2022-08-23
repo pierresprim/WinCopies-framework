@@ -494,7 +494,7 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         protected ItemSourcesProviderViewModel(in IItemSourcesProvider itemSources) : base(itemSources)
         {
-            if ((ItemSources = new Collections.Generic.ReadOnlyArray<ItemSourceViewModel>(new Collections.Generic.ArrayBuilder<ItemSourceViewModel>((itemSources.ExtraItemSources?.Select(item => new ItemSourceViewModel(this, item)) ?? Enumerable.Empty<ItemSourceViewModel>()).Prepend(Default = new ItemSourceViewModel(this, itemSources.Default))).ToArray())).Count > 1)
+            if ((ItemSources = new Collections.Generic.ReadOnlyArray<ItemSourceViewModel>(new Collections.Generic.ArrayBuilder<ItemSourceViewModel>((itemSources.ExtraItemSources?.Select(item => new ItemSourceViewModel(this, item)) ?? System.Linq.Enumerable.Empty<ItemSourceViewModel>()).Prepend(Default = new ItemSourceViewModel(this, itemSources.Default))).ToArray())).Count > 1)
 
                 ExtraItemSources = new Collections.Generic.SubReadOnlyList<ItemSourceViewModel>(ItemSources, 1);
 

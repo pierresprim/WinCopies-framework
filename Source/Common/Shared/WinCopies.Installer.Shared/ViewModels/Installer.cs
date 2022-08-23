@@ -27,7 +27,30 @@ namespace WinCopies.Installer
         new IInstallerPageViewModel Current { get; }
     }
 
-    public class InstallerViewModel : ViewModel<Installer>, IInstallerModel
+    public struct ExtraData
+    {
+        public object
+#if CS8
+                ?
+#endif
+                UserGroup
+        { get; }
+
+        public object
+#if CS8
+                ?
+#endif
+                Destination
+        { get; }
+
+        public ExtraData(in object userGroup, in object destination)
+        {
+            UserGroup = userGroup;
+            Destination = destination;
+        }
+    }
+
+    public abstract class InstallerViewModel : ViewModel<Installer>, IInstallerModel
     {
         private IInstallerPageViewModel _current;
 
@@ -40,6 +63,15 @@ namespace WinCopies.Installer
         public bool InstallForCurrentUserOnly => ModelGeneric.InstallForCurrentUserOnly;
 
         public string Location => ModelGeneric.Location;
+
+        public string
+#if CS8
+            ?
+#endif
+            TemporaryDirectory
+        { get => ModelGeneric.TemporaryDirectory; set => ModelGeneric.TemporaryDirectory = value; }
+
+        public Actions Actions { get => ModelGeneric.Actions; set => ModelGeneric.Actions = value; }
 
         public bool Completed => ModelGeneric.Completed;
 
@@ -67,7 +99,16 @@ namespace WinCopies.Installer
 
         internal new Installer Model => ModelGeneric;
 
-        public InstallerViewModel(in Installer model) : base(model) => Current = new StartPageViewModel(this);
+        public ExtraData? ExtraData { get; }
+
+        public InstallerViewModel(in Installer model) : base(model)
+        {
+            Current = new StartPageViewModel(this);
+
+            ExtraData = GetExtraData();
+        }
+
+        protected abstract ExtraData GetExtraData();
 
         internal new void OnPropertyChanged(in string propertyName) => base.OnPropertyChanged(propertyName);
     }

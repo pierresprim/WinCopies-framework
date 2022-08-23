@@ -170,7 +170,7 @@ namespace WinCopies.Sample.Installer
 
     public class ProcessPage : WinCopies.Installer.ProcessPage
     {
-        protected new class ProcessData : WinCopies.Installer.ProcessPage.ProcessData
+        protected new class ProcessData : WinCopies.Installer.ProcessData
         {
             protected class DummyStreamReader : ReadOnlyStream
             {
@@ -251,7 +251,9 @@ namespace WinCopies.Sample.Installer
                 public Action GetDeleter() => () => Log($"Deleted {Path}.");
             }
 
-            protected IDictionary<string, WinCopies.Installer.File> InnerDictionary { get; } = new Dictionary<string, WinCopies.Installer.File>();
+            protected IDictionary<string, IFile> InnerDictionary { get; } = new Dictionary<string, IFile>();
+
+            public override string TemporaryDirectory => null;
 
             public override IEnumerable<KeyValuePair<string, string>>? Resources => null;
 
@@ -259,9 +261,9 @@ namespace WinCopies.Sample.Installer
 
             public ProcessData(in WinCopies.Installer.Installer installer) : base(installer) { /* Left empty. */ }
 
-            protected override IReadOnlyDictionary<string, WinCopies.Installer.File> GetFiles()
+            protected override IReadOnlyDictionary<string, IFile> GetFiles()
             {
-                IDictionary<string, WinCopies.Installer.File> dic = InnerDictionary;
+                IDictionary<string, IFile> dic = InnerDictionary;
 
                 var random = new Random();
 
@@ -278,10 +280,12 @@ namespace WinCopies.Sample.Installer
 
                     dic.Add(c.ToString(), func());
 
-                return new ReadOnlyDictionary<string, WinCopies.Installer.File>(InnerDictionary);
+                return new ReadOnlyDictionary<string, IFile>(InnerDictionary);
             }
 
             public override void DeleteOldFiles(Action<string> logger) => logger("Deleted old files.");
+
+            public override IEnumerable<ITemporaryFileEnumerable>? GetTemporaryFiles(Func<string, bool, bool> onError) => null;
         }
 
         public override Icon Icon => LocalResources.WinCopies;

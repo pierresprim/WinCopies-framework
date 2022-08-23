@@ -30,7 +30,7 @@ namespace WinCopies.GUI.Controls
 {
     public class CommandSourceControl<T> : Control, ICommandSource<T>
     {
-        private static DependencyProperty Register<T>(in string propertyName) => Register<T, CommandSourceControl<T>>(propertyName);
+        private static DependencyProperty Register<U>(in string propertyName) => Register<U, CommandSourceControl<T>>(propertyName);
 
         public static readonly DependencyProperty CommandProperty = Register<ICommand>(nameof(Command));
 
@@ -51,7 +51,7 @@ namespace WinCopies.GUI.Controls
 #endif
     }
 
-    public class ItemsControl<TEnumerable> : ItemsControl where TEnumerable : System.Collections.IEnumerable
+    public class ItemsControl<TEnumerable> : ItemsControl where TEnumerable : IEnumerable
     {
         public new TEnumerable ItemsSource { get => base.ItemsSource == null ? default : (TEnumerable)base.ItemsSource; set => base.ItemsSource = value; }
 
@@ -67,7 +67,7 @@ namespace WinCopies.GUI.Controls
         }
     }
 
-    public class CommandItemsControl<TEnumerable, TCommandParameter> : ItemsControl<TEnumerable>, ICommandSource<TCommandParameter> where TEnumerable : System.Collections.IEnumerable
+    public class CommandItemsControl<TEnumerable, TCommandParameter> : ItemsControl<TEnumerable>, ICommandSource<TCommandParameter> where TEnumerable : IEnumerable
     {
         private static DependencyProperty Register<T>(in string propertyName) => Register<T, CommandItemsControl<TEnumerable, TCommandParameter>>(propertyName);
 

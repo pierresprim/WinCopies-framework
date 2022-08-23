@@ -16,6 +16,8 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security;
@@ -25,6 +27,8 @@ using WinCopies.IO.Enumeration;
 using WinCopies.Util;
 
 using static WinCopies.Collections.Util;
+using static WinCopies.Delegates;
+using static WinCopies.UtilHelpers;
 
 namespace WinCopies.IO
 {
@@ -33,11 +37,11 @@ namespace WinCopies.IO
         #region Safe Enumeration
         public static Type[] GetIOSafeEnumerationExceptionTypes() => new Type[] { typeof(DirectoryNotFoundException), typeof(IOException), typeof(PathTooLongException), typeof(SecurityException), typeof(UnauthorizedAccessException) };
 
-        public static System.Collections.Generic.IEnumerable<string> EnumerateFileSystemEntriesIOSafe(string path)
+        private static IEnumerable<string> Enumerate(in Func<IEnumerable<string>> func)
         {
             try
             {
-                return System.IO.Directory.EnumerateFileSystemEntries(path);
+                return func();
             }
 
             catch (Exception ex) when (ex.Is(false, GetIOSafeEnumerationExceptionTypes()))
@@ -46,182 +50,50 @@ namespace WinCopies.IO
             }
         }
 
-        public static System.Collections.Generic.IEnumerable<string> EnumerateFileSystemEntriesIOSafe(in string path, in string searchPattern)
-        {
-            try
-            {
-                return System.IO.Directory.EnumerateFileSystemEntries(path, searchPattern);
-            }
+        public static IEnumerable<string> EnumerateFileSystemEntriesIOSafe(string path) => Enumerate(() => System.IO.Directory.EnumerateFileSystemEntries(path));
 
-            catch (Exception ex) when (ex.Is(false, GetIOSafeEnumerationExceptionTypes()))
-            {
-                return GetEmptyEnumerable<string>();
-            }
-        }
+        public static IEnumerable<string> EnumerateFileSystemEntriesIOSafe(string path, string searchPattern) => Enumerate(() => System.IO.Directory.EnumerateFileSystemEntries(path, searchPattern));
 
 #if CS8
-        public static System.Collections.Generic.IEnumerable<string> EnumerateFileSystemEntriesIOSafe(in string path, in string searchPattern, in EnumerationOptions enumerationOptions)
-        {
-            try
-            {
-                return System.IO.Directory.EnumerateFileSystemEntries(path, searchPattern, enumerationOptions);
-            }
-
-            catch (Exception ex) when (ex.Is(false, GetIOSafeEnumerationExceptionTypes()))
-            {
-                return GetEmptyEnumerable<string>();
-            }
-        }
+        public static IEnumerable<string> EnumerateFileSystemEntriesIOSafe(string path, string searchPattern, EnumerationOptions enumerationOptions) => Enumerate(() => System.IO.Directory.EnumerateFileSystemEntries(path, searchPattern, enumerationOptions));
 #endif
 
-        public static System.Collections.Generic.IEnumerable<string> EnumerateFileSystemEntriesIOSafe(string path, in string searchPattern, in SearchOption searchOption)
-        {
-            try
-            {
-                return System.IO.Directory.EnumerateFileSystemEntries(path, searchPattern, searchOption);
-            }
-
-            catch (Exception ex) when (ex.Is(false, GetIOSafeEnumerationExceptionTypes()))
-            {
-                return GetEmptyEnumerable<string>();
-            }
-        }
+        public static IEnumerable<string> EnumerateFileSystemEntriesIOSafe(string path, string searchPattern, SearchOption searchOption) => Enumerate(() => System.IO.Directory.EnumerateFileSystemEntries(path, searchPattern, searchOption));
 
 
 
-        public static System.Collections.Generic.IEnumerable<string> EnumerateDirectoriesIOSafe(string path)
-        {
-            try
-            {
-                return System.IO.Directory.EnumerateDirectories(path);
-            }
+        public static IEnumerable<string> EnumerateDirectoriesIOSafe(string path) => Enumerate(() => System.IO.Directory.EnumerateDirectories(path));
 
-            catch (Exception ex) when (ex.Is(false, GetIOSafeEnumerationExceptionTypes()))
-            {
-                return GetEmptyEnumerable<string>();
-            }
-        }
-
-        public static System.Collections.Generic.IEnumerable<string> EnumerateDirectoriesIOSafe(string path, string searchPattern)
-        {
-            try
-            {
-                return System.IO.Directory.EnumerateDirectories(path, searchPattern);
-            }
-
-            catch (Exception ex) when (ex.Is(false, GetIOSafeEnumerationExceptionTypes()))
-            {
-                return GetEmptyEnumerable<string>();
-            }
-        }
+        public static IEnumerable<string> EnumerateDirectoriesIOSafe(string path, string searchPattern) => Enumerate(() => System.IO.Directory.EnumerateDirectories(path, searchPattern));
 
 #if CS8
-        public static System.Collections.Generic.IEnumerable<string> EnumerateDirectoriesIOSafe(string path, string searchPattern, EnumerationOptions enumerationOptions)
-        {
-            try
-            {
-                return System.IO.Directory.EnumerateDirectories(path, searchPattern, enumerationOptions);
-            }
-
-            catch (Exception ex) when (ex.Is(false, GetIOSafeEnumerationExceptionTypes()))
-            {
-                return GetEmptyEnumerable<string>();
-            }
-        }
+        public static IEnumerable<string> EnumerateDirectoriesIOSafe(string path, string searchPattern, EnumerationOptions enumerationOptions) => Enumerate(() => System.IO.Directory.EnumerateDirectories(path, searchPattern, enumerationOptions));
 #endif
 
-        public static System.Collections.Generic.IEnumerable<string> EnumerateDirectoriesIOSafe(string path, string searchPattern, SearchOption searchOption)
-        {
-            try
-            {
-                return System.IO.Directory.EnumerateDirectories(path, searchPattern, searchOption);
-            }
-
-            catch (Exception ex) when (ex.Is(false, GetIOSafeEnumerationExceptionTypes()))
-            {
-                return GetEmptyEnumerable<string>();
-            }
-        }
+        public static IEnumerable<string> EnumerateDirectoriesIOSafe(string path, string searchPattern, SearchOption searchOption) => Enumerate(() => System.IO.Directory.EnumerateDirectories(path, searchPattern, searchOption));
 
 
 
-        public static System.Collections.Generic.IEnumerable<string> EnumerateFilesIOSafe(string path)
-        {
-            try
-            {
-                return System.IO.Directory.EnumerateFiles(path);
-            }
+        public static IEnumerable<string> EnumerateFilesIOSafe(string path) => Enumerate(() => System.IO.Directory.EnumerateFiles(path));
 
-            catch (Exception ex) when (ex.Is(false, GetIOSafeEnumerationExceptionTypes()))
-            {
-                return GetEmptyEnumerable<string>();
-            }
-        }
-
-        public static System.Collections.Generic.IEnumerable<string> EnumerateFilesIOSafe(string path, string searchPattern)
-        {
-            try
-            {
-                return System.IO.Directory.EnumerateFiles(path, searchPattern);
-            }
-
-            catch (Exception ex) when (ex.Is(false, GetIOSafeEnumerationExceptionTypes()))
-            {
-                return GetEmptyEnumerable<string>();
-            }
-        }
+        public static IEnumerable<string> EnumerateFilesIOSafe(string path, string searchPattern) => Enumerate(() => System.IO.Directory.EnumerateFiles(path, searchPattern));
 
 #if CS8
-        public static System.Collections.Generic.IEnumerable<string> EnumerateFilesIOSafe(string path, string searchPattern, EnumerationOptions enumerationOptions)
-        {
-            try
-            {
-                return System.IO.Directory.EnumerateFiles(path, searchPattern, enumerationOptions);
-            }
-
-            catch (Exception ex) when (ex.Is(false, GetIOSafeEnumerationExceptionTypes()))
-            {
-                return GetEmptyEnumerable<string>();
-            }
-        }
+        public static IEnumerable<string> EnumerateFilesIOSafe(string path, string searchPattern, EnumerationOptions enumerationOptions) => Enumerate(() => System.IO.Directory.EnumerateFiles(path, searchPattern, enumerationOptions));
 #endif
 
-        public static System.Collections.Generic.IEnumerable<string> EnumerateFilesIOSafe(string path, string searchPattern, SearchOption searchOption)
-        {
-            try
-            {
-                return System.IO.Directory.EnumerateFiles(path, searchPattern, searchOption);
-            }
-
-            catch (Exception ex) when (ex.Is(false, GetIOSafeEnumerationExceptionTypes()))
-            {
-                return GetEmptyEnumerable<string>();
-            }
-        }
+        public static IEnumerable<string> EnumerateFilesIOSafe(string path, string searchPattern, SearchOption searchOption) => Enumerate(() => System.IO.Directory.EnumerateFiles(path, searchPattern, searchOption));
         #endregion Safe Enumeration
 
 
 
-        public static System.Collections.Generic.IEnumerable<T> Enumerate<T>(in System.Collections.Generic.IEnumerable<T> paths, RecursiveEnumerationOrder recursiveEnumerationOrder, in Func<IPathInfo, T> getNewPathInfoDelegate, in bool safeEnumeration
-            //#if DEBUG
-            //            , FileSystemEntryEnumeratorProcessSimulation simulationParameters
-            //#endif
-            ) where T : IPathInfo => Enumerate(paths, null, null
+        public static IEnumerable<T> Enumerate<T>(IEnumerable<T> paths, string
 #if CS8
-            , null
+            ?
 #endif
-                , FileSystemEntryEnumerationOrder.None, recursiveEnumerationOrder, getNewPathInfoDelegate, safeEnumeration
-            //#if DEBUG
-            //                , simulationParameters
-            //#endif
-            );
-
-        ///// <summary>
-        ///// Loads the items.
-        ///// </summary>
-        public static System.Collections.Generic.IEnumerable<T> Enumerate<T>(System.Collections.Generic.IEnumerable<T> paths, string searchPattern, SearchOption? searchOption
+            searchPattern, SearchOption? searchOption
 #if CS8
-            , EnumerationOptions enumerationOptions
+            , EnumerationOptions? enumerationOptions
 #endif
             , FileSystemEntryEnumerationOrder enumerationOrder, RecursiveEnumerationOrder recursiveEnumerationOrder, Func<IPathInfo, T> getNewPathInfoDelegate, bool safeEnumeration
             //#if DEBUG
@@ -237,8 +109,97 @@ namespace WinCopies.IO
                 //#endif
                 )), recursiveEnumerationOrder));
 
-        #region Old
+        public static IEnumerable<T> Enumerate<T>(in IEnumerable<T> paths, RecursiveEnumerationOrder recursiveEnumerationOrder, in Func<IPathInfo, T> getNewPathInfoDelegate, in bool safeEnumeration
+            //#if DEBUG
+            //            , FileSystemEntryEnumeratorProcessSimulation simulationParameters
+            //#endif
+            ) where T : IPathInfo => Enumerate(paths, null, null
+#if CS8
+            , null
+#endif
+                , FileSystemEntryEnumerationOrder.None, recursiveEnumerationOrder, getNewPathInfoDelegate, safeEnumeration
+            //#if DEBUG
+            //                , simulationParameters
+            //#endif
+            );
 
+        public static IEnumerable<KeyValuePair<string, bool>> EnumerateFileSystemEntries(string directory)
+        {
+            foreach (string item in System.IO.Directory.EnumerateDirectories(directory))
+
+                yield return UtilHelpers.GetKeyValuePair(item, true);
+
+            foreach (string item in System.IO.Directory.EnumerateFiles(directory))
+
+                yield return UtilHelpers.GetKeyValuePair(item, false);
+        }
+
+        public static IEnumerable<string> EnumerateDirectoriesRecursively(string directory) => EnumerateRecursively(directory, System.IO.Directory.EnumerateDirectories);
+
+        public static IEnumerable<string> EnumerateFilesRecursively(string directory)
+        {
+            foreach (string item in EnumerateDirectoriesRecursively(directory))
+
+                foreach (string file in System.IO.Directory.EnumerateFiles(item))
+
+                    yield return file;
+        }
+
+        private static IEnumerable<T> EnumerateFileSystemEntriesRecursively<T>(string directory, ConverterIn<string, T> directoryConverter, ConverterIn<string, T> fileConverter)
+        {
+            foreach (string item in EnumerateDirectoriesRecursively(directory))
+            {
+                yield return directoryConverter(item);
+
+                foreach (string file in System.IO.Directory.EnumerateFiles(item))
+
+                    yield return fileConverter(file);
+            }
+        }
+
+        public static IEnumerable<string> EnumerateFileSystemEntriesRecursively(string directory) => EnumerateFileSystemEntriesRecursively(directory, SelfIn, SelfIn);
+
+        private static ConverterIn<string, KeyValuePair<string, bool>> GetKeyValuePair(bool isDirectory) => (in string item) => UtilHelpers.GetKeyValuePair(item, isDirectory);
+
+        public static IEnumerable<KeyValuePair<string, bool>> EnumerateFileSystemEntryInfoRecursively(string directory) => EnumerateFileSystemEntriesRecursively(directory, GetKeyValuePair(true), GetKeyValuePair(false));
+
+        private static IEnumerable<T> EnumerateFileSystemEntriesRecursively<T>(string directory, ConverterIn<string, T> directoryConverter, ConverterIn<string, T> fileConverter, Action enteringFileEnumeration, Action exitingFileEnumeration)
+        {
+            foreach (string item in EnumerateDirectoriesRecursively(directory))
+            {
+                yield return directoryConverter(item);
+
+                foreach (string file in Collections.Enumerable.FromEnumerator(new ActionObservableEnumerator<string>(System.IO.Directory.EnumerateFiles(item), enteringFileEnumeration, exitingFileEnumeration)))
+
+                    yield return fileConverter(file);
+            }
+        }
+
+        public static IEnumerable<string> EnumerateFileSystemEntriesRecursively(string directory, Action enteringFileEnumeration, Action exitingFileEnumeration) => EnumerateFileSystemEntriesRecursively(directory, SelfIn, SelfIn, enteringFileEnumeration, exitingFileEnumeration);
+
+        public static IEnumerable<KeyValuePair<string, bool>> EnumerateFileSystemEntryInfoRecursively(string directory, Action enteringFileEnumeration, Action exitingFileEnumeration) => EnumerateFileSystemEntriesRecursively(directory, GetKeyValuePair(true), GetKeyValuePair(false), enteringFileEnumeration, exitingFileEnumeration);
+
+        private static IEnumerable<T> EnumerateFileSystemEntriesRecursively2<T>(string directory, ConverterIn<string, T> directoryConverter, ConverterIn<string, T> fileConverter, Action enteringFileEnumeration, Action exitingFileEnumeration)
+        {
+            foreach (string item in EnumerateDirectoriesRecursively(directory))
+            {
+                yield return directoryConverter(item);
+
+                enteringFileEnumeration();
+
+                foreach (string file in System.IO.Directory.EnumerateFiles(item))
+
+                    yield return fileConverter(file);
+
+                exitingFileEnumeration();
+            }
+        }
+
+        public static IEnumerable<string> EnumerateFileSystemEntriesRecursively2(string directory, Action enteringFileEnumeration, Action exitingFileEnumeration) => EnumerateFileSystemEntriesRecursively2(directory, SelfIn, SelfIn, enteringFileEnumeration, exitingFileEnumeration);
+
+        public static IEnumerable<KeyValuePair<string, bool>> EnumerateFileSystemEntryInfoRecursively2(string directory, Action enteringFileEnumeration, Action exitingFileEnumeration) => EnumerateFileSystemEntriesRecursively2(directory, GetKeyValuePair(true), GetKeyValuePair(false), enteringFileEnumeration, exitingFileEnumeration);
+
+        #region Old
         // _pathsLoaded = new ObservableCollection<FileSystemInfo>();
 
         //string parent_Path = "";
@@ -524,7 +485,6 @@ namespace WinCopies.IO
         //System.Windows.Forms.MessageBox.Show(path.FileSystemInfoProperties.FullName);
 
         //} // next
-
         #endregion
     }
 }

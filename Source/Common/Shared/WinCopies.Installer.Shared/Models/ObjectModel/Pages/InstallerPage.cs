@@ -37,7 +37,7 @@ namespace WinCopies.Installer
 
         public abstract string Description { get; }
 
-        public virtual string NextStepName => "Next";
+        public virtual string NextStepName => "_Next";
 
         public abstract ImageSource ImageSource { get; }
 

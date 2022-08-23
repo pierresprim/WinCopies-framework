@@ -1,6 +1,7 @@
 ﻿using System;
 
 using WinCopies.Collections.DotNetFix.Generic;
+using WinCopies.Collections.Generic;
 
 using static System.Console;
 
@@ -32,15 +33,25 @@ namespace WinCopies.Console
     public abstract class ControlBase : IControlBase
     {
         internal int? maxLength;
-        internal Screen screen;
+        internal Screen
+#if CS8
+            ?
+#endif
+            screen;
 
-        public Screen Screen => screen ?? (this as ControlElement)?.Parent?.screen;
+        public Screen
+#if CS8
+            ?
+#endif
+            Screen => screen ?? (this as ControlElement)?.Parent?.screen;
 
         public CursorPosition RelativeCursorPosition { get; internal set; }
 
         public CursorPosition CursorPosition => Screen == null ? RelativeCursorPosition : new CursorPosition(Screen.Console.CursorPosition.Left + RelativeCursorPosition.Left, Screen.Console.CursorPosition.Top + RelativeCursorPosition.Top);
 
         public int GetMaxLength() => Screen == null ? maxLength ?? WindowWidth : Screen.GetMaxLength();
+
+        protected abstract void RenderOverride();
 
         public void Render()
         {
@@ -50,8 +61,6 @@ namespace WinCopies.Console
 
             RenderOverride();
         }
-
-        protected abstract void RenderOverride();
     }
 
     public abstract class ControlElement : ControlBase, IControl
@@ -72,6 +81,8 @@ namespace WinCopies.Console
         protected void UpdateProperty<T>(ref T value, in T newValue) => ConsoleExtensions.UpdateProperty(this, ref value, newValue);
 
         protected sealed override void RenderOverride() => Render(null);
+
+        protected void ResetCursorPosition() => SetCursorPosition(this is SelectableControl selectable && selectable.IsSelected ? CursorPosition : Screen == null ? new CursorPosition(0, CursorPosition.Top + 1) : Screen.GetCursorPosition(false));
 
         internal void Render(int? previousLength)
         {
@@ -128,7 +139,7 @@ namespace WinCopies.Console
 
             _ = this is SelectableControl _selectable && _selectable.IsSelected;
 
-            SetCursorPosition(this is SelectableControl selectable && selectable.IsSelected ? CursorPosition : Screen == null ? new CursorPosition(0, CursorPosition.Top + 1) : Screen.GetCursorPosition(false));
+            ResetCursorPosition();
 
             ResetColor();
         }
@@ -138,27 +149,19 @@ namespace WinCopies.Console
 
     public class Control : ControlBase
     {
-        protected internal Collections.Generic.IEnumerable<ControlElement> Controls { get; private set; }
+        protected internal Collections.Extensions.Generic.IEnumerable<ControlElement> Controls { get; private set; }
 
         public bool Rendering { get; private set; }
 
-        public Control(in Collections.Generic.IEnumerable<ControlElement> controls)
+        public Control(in Collections.Extensions.Generic.IEnumerable<ControlElement> controls)
         {
+            void renderedItem(ControlElement sender, EventArgs e) => OnRenderedItem(sender);
+
             ThrowIfNull(controls, nameof(controls));
 
             foreach (ControlElement control in controls)
             {
-                if (control == null)
-
-                    throw new InvalidOperationException("At least one of the given controls is null.");
-
-                if (control.Parent != null)
-
-                    throw new InvalidOperationException("The given control already has a parent.");
-
-                void renderedItem(ControlElement sender, EventArgs e) => OnRenderedItem(sender);
-
-                control.Parent = this;
+                ((control ?? throw new InvalidOperationException("At least one of the given controls is null.")).Parent == null ? control : throw new InvalidOperationException("The given control already has a parent.")).Parent = this;
 
                 control.Rendered += renderedItem;
 
@@ -167,6 +170,8 @@ namespace WinCopies.Console
 
             Controls = controls;
         }
+
+        public Control(params ControlElement[] controls) : this(new ReadOnlyArray<ControlElement>(controls)) { /* Left empty. */ }
 
         protected virtual void OnRenderedItem(ControlElement control) => Render(control);
 
@@ -249,6 +254,6 @@ namespace WinCopies.Console
             OnDeselect();
         }
 
-        protected internal virtual void OnDeselect() { }
+        protected internal virtual void OnDeselect() { /* Left empty. */ }
     }
 }

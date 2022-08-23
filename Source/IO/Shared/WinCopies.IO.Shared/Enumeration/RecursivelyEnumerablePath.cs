@@ -43,9 +43,13 @@ namespace WinCopies.IO.Enumeration
 
         public T Value { get; }
 
-        public RecursivelyEnumerablePath(in T path, string searchPattern, SearchOption? searchOption
+        public RecursivelyEnumerablePath(in T path, string
 #if CS8
-            , EnumerationOptions enumerationOptions
+            ?
+#endif
+            searchPattern, SearchOption? searchOption
+#if CS8
+            , EnumerationOptions? enumerationOptions
 #endif
                 , FileSystemEntryEnumerationOrder enumerationOrder, in RecursiveEnumerationOrder recursiveEnumerationOrder, in Func<PathTypes<IPathInfo>.PathInfo, T> getNewPathInfoDelegate, bool safeEnumeration
            //#if DEBUG

@@ -3,8 +3,9 @@
 using WinCopies.Collections;
 
 using static System.Console;
-using static WinCopies.ThrowHelper;
+
 using static WinCopies.Console.Console;
+using static WinCopies.ThrowHelper;
 
 namespace WinCopies.Console
 {
@@ -14,7 +15,7 @@ namespace WinCopies.Console
         {
             ThrowIfNull(control, nameof(control));
 
-            if (!object.Equals(value, newValue))
+            if (!Equals(value, newValue))
             {
                 value = newValue;
 
@@ -45,7 +46,6 @@ namespace WinCopies.Console
         public CursorPosition(in int left, in int top)
         {
             Left = left;
-
             Top = top;
         }
     }

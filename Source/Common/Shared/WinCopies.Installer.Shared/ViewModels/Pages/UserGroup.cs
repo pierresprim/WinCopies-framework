@@ -16,6 +16,12 @@
                 }
             }
 
+            public object
+#if CS8
+                ?
+#endif
+                ExtraData => Installer.ExtraData?.UserGroup;
+
             public UserGroupDataViewModel(in UserGroupPageViewModel userGroupPage) : base(userGroupPage.ModelGeneric.Data, userGroupPage.Installer) { /* Left empty. */ }
         }
 

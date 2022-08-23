@@ -14,6 +14,15 @@ namespace WinCopies.Installer
 
         string Location { get; }
 
+        string
+#if CS8
+           ?
+#endif
+           TemporaryDirectory
+        { get; }
+
+        Actions Actions { get; }
+
         bool Completed { get; }
 
         bool RequiresRestart { get; }
@@ -25,6 +34,8 @@ namespace WinCopies.Installer
         Error Error { get; }
 
         IInstallerPage Current { get; set; }
+
+        ExtraData? ExtraData { get; }
     }
 
     public abstract class Installer : IInstaller
@@ -39,6 +50,15 @@ namespace WinCopies.Installer
 
         public string Location { get; internal set; }
 
+        public string
+#if CS8
+            ?
+#endif
+            TemporaryDirectory
+        { get; internal set; }
+
+        public Actions Actions { get; internal set; }
+
         public IEnumerable<KeyValuePair<string, IFile>> Files { get; internal set; }
 
         public bool Completed { get => GetBit(1); private set => SetBit(1, value); }
@@ -52,6 +72,8 @@ namespace WinCopies.Installer
         public Error Error { get; internal set; }
 
         public abstract bool RequiresRestart { get; }
+
+        ExtraData? IInstaller.ExtraData => null;
 
         public Installer() => StartPage = GetStartPage();
 

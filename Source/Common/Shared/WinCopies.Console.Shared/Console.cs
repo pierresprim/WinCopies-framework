@@ -32,7 +32,12 @@ namespace WinCopies.Console
 
         public SelectableControl SelectedItem { get; internal set; }
 
-        public Console Console { get; internal set; }
+        public Console
+#if CS8
+            ?
+#endif
+            Console
+        { get; internal set; }
 
         public uint Count => _controls.Count;
 
@@ -242,35 +247,42 @@ namespace WinCopies.Console
     public sealed class Console
     {
         private bool _initialized;
-        private Screen screen;
+        private Screen
+#if CS8
+            ?
+#endif
+            _screen;
 
         public bool Looping { get; private set; }
 
-        public Screen Screen
+        public Screen
+#if CS8
+            ?
+#endif
+            Screen
         {
-            get => screen; set
-            {
-                if (!_initialized)
+            get => _screen;
 
-                    throw GetNotInitializedException();
+            set => _ = _initialized ? UpdateValue(ref _screen, value, (Screen oldScreen, Screen newScreen) =>
+                {
+                    if (oldScreen != null)
+                    {
+                        oldScreen.Console = null;
 
-                _ = UpdateValue(ref screen, value, (Screen oldScreen, Screen newScreen) =>
-  {
-      if (oldScreen != null)
-      {
-          oldScreen.Console = null;
+                        oldScreen.SelectedItem?.Deselect();
+                    }
 
-          oldScreen.SelectedItem?.Deselect();
-      }
+                    if (newScreen == null)
 
-      if (newScreen != null)
-      {
-          newScreen.Console = this;
+                        Clear();
 
-          _Render();
-      }
-  });
-            }
+                    else
+                    {
+                        newScreen.Console = this;
+
+                        _Render();
+                    }
+                }) : throw GetNotInitializedException();
         }
 
         public ImmutableArray<Button> Commands { get; } = new Button[1] { new ActionButton(() => { Environment.Exit(0); return false; }) { Text = "Exit", maxLength = 6 } }.ToImmutableArray();
@@ -281,10 +293,7 @@ namespace WinCopies.Console
 
         public static Console Instance { get; } = new Console();
 
-        private Console()
-        {
-
-        }
+        private Console() { /* Left empty. */ }
 
         public static void SetCursorPosition(in CursorPosition cursorPosition) => System.Console.SetCursorPosition(cursorPosition.Left, cursorPosition.Top);
 
@@ -301,7 +310,7 @@ namespace WinCopies.Console
 
             Commands[0].Render();
 
-            screen.Render();
+            _screen.Render();
         }
 
         private static InvalidOperationException GetNotInitializedException() => new
@@ -312,16 +321,12 @@ namespace WinCopies.Console
 
         public int GetMaxLength() => WindowWidth - CursorPosition.Left - Margin;
 
-        public void Initialize(in CursorPosition cursorPosition)
+        public void Initialize(in CursorPosition windowSize)
         {
-            if (_initialized)
+            _initialized = _initialized ? throw new InvalidOperationException("The console was already initialized.") : true;
 
-                throw new InvalidOperationException("The console was already initialized.");
-
-            _initialized = true;
-
-            WindowHeight = cursorPosition.Top;
-            WindowWidth = cursorPosition.Left;
+            WindowHeight = windowSize.Top;
+            WindowWidth = windowSize.Left;
 
             //DeleteMenu(GetSystemMenu(GetConsoleWindow(), false), SC_MINIMIZE, MF_BYCOMMAND);
             Microsoft.WindowsAPICodePack.Win32Native.Console.Console.DeleteConsoleMenu(SystemMenuCommands.Maximize, SystemMenuCommands.Size);
@@ -336,12 +341,16 @@ namespace WinCopies.Console
 
         private void ThrowIfNoScreen()
         {
-            if (screen == null)
+            if (_screen == null)
 
                 throw new InvalidOperationException("No screen registered.");
         }
 
-        public void Loop(in SelectableControl control = null)
+        public void Loop(in SelectableControl
+#if CS8
+            ?
+#endif
+            control = null)
         {
             ThrowIfNoScreen();
 
@@ -353,15 +362,11 @@ namespace WinCopies.Console
 
                 while (true)
                 {
-                    if (screen == null)
+                    if (!(tuple = control == null ? _screen.SelectFirst() : _screen.Select(control)).result)
 
                         return;
 
-                    if (!(tuple = control == null ? screen.SelectFirst() : screen.Select(control)).result)
-
-                        return;
-
-                    if (screen == null)
+                    if (_screen == null)
 
                         return;
 
@@ -373,7 +378,7 @@ namespace WinCopies.Console
                         {
                             while (true)
                             {
-                                if (screen == null)
+                                if (_screen == null)
 
                                     return true;
 

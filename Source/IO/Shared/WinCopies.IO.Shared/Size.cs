@@ -99,10 +99,10 @@ namespace WinCopies.IO
         public float GetFloatValueInUnit(in ByteUnit unit) => unit == ByteUnit.Byte
                 ? (float)ValueInBytes
                 : (float)ValueInBytes /
-#if !WinCopies3
-            Util
-#else
+#if WinCopies3
             WinCopies
+#else
+            Util
 #endif
             .Math.Pow(1024f, (float)unit);
 
@@ -285,7 +285,7 @@ namespace WinCopies.IO
         /// Returns a string with the size value and unit.
         /// </summary>
         /// <returns>A string with the size value and unit</returns>
-        public override string ToString() => ValueInBytes.IsNaN ? "NaN": $"{GetFloatValueInUnit(Unit)} {GetDisplaySizeUnit(Unit)}";
+        public override string ToString() => ValueInBytes.IsNaN ? "NaN": $"{GetFloatValueInUnit(Unit):F2} {GetDisplaySizeUnit(Unit)}";
 
         public int CompareTo(
 #if NETCORE

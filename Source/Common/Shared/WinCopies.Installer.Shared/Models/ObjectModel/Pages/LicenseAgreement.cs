@@ -26,7 +26,7 @@ namespace WinCopies.Installer
 
         public override string Description => $"Please read the terms of the license of {Installer.ProgramName} before starting the installation.";
 
-        public override string NextStepName => "I Agree";
+        public override string NextStepName => "I _Agree";
 
         IStartPage IBrowsableInstallerPage<IStartPage, IUserGroupPage>.PreviousPage => PreviousPage;
 

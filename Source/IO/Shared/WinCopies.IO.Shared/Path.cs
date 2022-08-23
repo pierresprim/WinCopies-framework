@@ -757,6 +757,8 @@ namespace WinCopies.IO
             return !path.ContainsOneOrMoreValues(invalidChars) && IsPathRooted(path);
         }
 
+        public static string RemoveExtension(in string path) => ChangeExtension(path, null);
+
         public static bool Exists(in string path) => File.Exists(path) || System.IO.Directory.Exists(path);
 
         public static DirectoryInfo

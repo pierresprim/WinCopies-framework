@@ -213,17 +213,17 @@ return
 
         public RadioButtonGroup Group
         {
-            get;
+            get; internal
 #if CS9
-        init;
+            init;
 #else
-            internal set;
+            set;
 #endif
         }
 
         public override string Label => $"({(IsChecked ? 'o' : ' ')}) ";
 
-        internal RadioButton() { }
+        internal RadioButton() { /* Left empty. */ }
 
         protected override bool OnClick() => IsChecked || base.OnClick();
 
@@ -257,7 +257,12 @@ return
 
     public class RadioButtonGroup
     {
-        public RadioButton SelectedItem { get; internal set; }
+        public RadioButton
+#if CS8
+            ?
+#endif
+            SelectedItem
+        { get; internal set; }
 
         public virtual CheckBox GetNewRadioButton() => CheckBox.GetNewRadioButton(this);
 
@@ -286,23 +291,17 @@ return
             return label;
         }
 
-        public CheckBox(in Label label, in CheckableButtonBase2 button) : base(new ReadOnlyArray<ControlElement>(new ControlElement[] { GetLabel(label, button), button }))
+        public CheckBox(in Label label, in CheckableButtonBase2 button) : base(new ReadOnlyArray<ControlElement>(new ControlElement[] { GetLabel(label, button), button })) { /* Left empty. */ }
+
+        public CheckBox(in CheckableButtonBase2 button) : this(new Label(), button) { /* Left empty. */ }
+
+        public void Register() => _ = Screen == null ? throw new InvalidOperationException("This control was not added to any screen.") : Screen.AddSelectable(Button);
+
+        public void AddToScreen(in Screen screen)
         {
+            _ = screen.Add(this);
 
-        }
-
-        public CheckBox(in CheckableButtonBase2 button) : this(new Label(), button)
-        {
-
-        }
-
-        public void Register()
-        {
-            if (Screen == null)
-
-                throw new InvalidOperationException("This control was not added to any screen.");
-
-            _ = Screen.AddSelectable(Button);
+            Register();
         }
 
         public static CheckBox GetNewCheckBox() => new

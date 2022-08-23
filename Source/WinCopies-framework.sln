@@ -123,6 +123,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "WinCopies.Installer.Decompressor.Shared", "Common\Shared\WinCopies.Installer.Decompressor.Shared\WinCopies.Installer.Decompressor.Shared.shproj", "{45289C70-1F80-4FD5-927A-00D96760F625}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinCopies.Installer.Decompressor", "Common\1.x\WinCopies.Installer.Decompressor\WinCopies.Installer.Decompressor.csproj", "{699C3FEC-8345-4C16-97D0-1CFCB75FA2FE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -209,6 +213,10 @@ Global
 		{6AD23224-28F2-4B5A-B6BE-745879A2F73E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6AD23224-28F2-4B5A-B6BE-745879A2F73E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6AD23224-28F2-4B5A-B6BE-745879A2F73E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{699C3FEC-8345-4C16-97D0-1CFCB75FA2FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{699C3FEC-8345-4C16-97D0-1CFCB75FA2FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{699C3FEC-8345-4C16-97D0-1CFCB75FA2FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{699C3FEC-8345-4C16-97D0-1CFCB75FA2FE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -265,6 +273,8 @@ Global
 		{6AD23224-28F2-4B5A-B6BE-745879A2F73E} = {3CEFFB7D-F0FD-4BDA-A6AA-3E897A329166}
 		{3CEFFB7D-F0FD-4BDA-A6AA-3E897A329166} = {2D66AEF6-F415-4DFB-BE71-CAEEFEBC6651}
 		{2A9B6D6F-5710-4686-B47D-A57DC606A9A1} = {2D66AEF6-F415-4DFB-BE71-CAEEFEBC6651}
+		{45289C70-1F80-4FD5-927A-00D96760F625} = {2A9B6D6F-5710-4686-B47D-A57DC606A9A1}
+		{699C3FEC-8345-4C16-97D0-1CFCB75FA2FE} = {3CEFFB7D-F0FD-4BDA-A6AA-3E897A329166}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {73C3DE5A-6253-4133-A7D1-39C4447D466E}
@@ -276,6 +286,7 @@ Global
 		GUI\Shared\WinCopies.GUI.Shared\WinCopies.GUI.Shared.projitems*{3aaf402a-7c4a-455f-8f42-6f4f13c5e185}*SharedItemsImports = 13
 		GUI\Shared\WinCopies.GUI.Windows.Shared\WinCopies.GUI.Windows.Shared.projitems*{3fa63940-0513-455d-a3d1-fba954c22869}*SharedItemsImports = 13
 		Common\Shared\WinCopies.Console.Shared\WinCopies.Console.Shared.projitems*{41dcc223-d715-4631-b32d-7a55b03077a0}*SharedItemsImports = 13
+		Common\Shared\WinCopies.Installer.Decompressor.Shared\WinCopies.Installer.Decompressor.Shared.projitems*{45289c70-1f80-4fd5-927a-00d96760f625}*SharedItemsImports = 13
 		Reflection\Shared\WinCopies.Reflection.DotNetDocBuilder.Shared\WinCopies.Reflection.DotNetDocBuilder.Shared.projitems*{479febe9-432f-4e15-82f6-626e519b68a3}*SharedItemsImports = 13
 		IO\Shared\WinCopies.IO.Reflection.Shared\WinCopies.IO.Reflection.Shared.projitems*{4b8a702b-60af-4747-895c-73cfc0d83d44}*SharedItemsImports = 13
 		GUI\Shared\WinCopies.GUI.ViewModels.Shared\WinCopies.GUI.ViewModels.Shared.projitems*{589fcd51-85a1-46ff-ab94-3cdd133f92de}*SharedItemsImports = 13
@@ -283,6 +294,7 @@ Global
 		GUI\Shared\WinCopies.GUI.Templates.Shared\WinCopies.GUI.Templates.Shared.projitems*{608dd80f-b4fb-4a6f-a4b2-80d5cd49e1ab}*SharedItemsImports = 5
 		Reflection\Shared\WinCopies.Reflection.DotNetParser.Shared\WinCopies.Reflection.DotNetParser.Shared.projitems*{65ba5ac0-50dc-4948-b145-ba0f82ec4fb5}*SharedItemsImports = 13
 		IO\Shared\WinCopies.GUI.IO.Shared\WinCopies.GUI.IO.Shared.projitems*{690260b7-f85d-481e-9527-0a6034e39053}*SharedItemsImports = 13
+		Common\Shared\WinCopies.Installer.Decompressor.Shared\WinCopies.Installer.Decompressor.Shared.projitems*{699c3fec-8345-4c16-97d0-1cfcb75fa2fe}*SharedItemsImports = 5
 		Common\Shared\WinCopies.Installer.Shared\WinCopies.Installer.Shared.projitems*{6ad23224-28f2-4b5a-b6be-745879a2f73e}*SharedItemsImports = 5
 		Reflection\Shared\WinCopies.Reflection.DotNetDocBuilder.Shared\WinCopies.Reflection.DotNetDocBuilder.Shared.projitems*{6d65caa3-f760-4f67-a7fd-784dc797ce5f}*SharedItemsImports = 5
 		Data\Shared\WinCopies.Data.MySQL.Shared\WinCopies.Data.MySQL.Shared.projitems*{6fbe6f45-d410-4c96-aa53-fbf028ae3bd5}*SharedItemsImports = 5

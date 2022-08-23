@@ -151,7 +151,7 @@ namespace WinCopies.Installer
 
         public override string Description => "Please choose the options you want to activate.";
 
-        public override string NextStepName => "Install";
+        public override string NextStepName => "_Install";
 
         IDestinationPage IBrowsableInstallerPage<IDestinationPage, IProcessPage>.PreviousPage => PreviousPage;
 

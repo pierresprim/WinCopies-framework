@@ -1,4 +1,4 @@
-﻿using Microsoft.WindowsAPICodePack.Shell;
+﻿/*using Microsoft.WindowsAPICodePack.Shell;
 using SevenZip;
 
 using System;
@@ -195,7 +195,7 @@ namespace WinCopies.Console
                         //    updateProgress(_progress);
                         //};
 
-                        fileOperation.DeleteItem(ShellObjectFactory.Create(Path), pfopsItem: null /* progress */);
+                        fileOperation.DeleteItem(ShellObjectFactory.Create(Path), pfopsItem: null /* progress *//*);
 
                         // fileOperation.SetOperationFlags(ShowElevationPrompt |  NoConfirmation | NoErrorUI );
 
@@ -309,3 +309,4 @@ namespace WinCopies.Console
         }
     }
 }
+*/

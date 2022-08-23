@@ -16,6 +16,8 @@
     xmlns:primitives="clr-namespace:System.Windows.Controls.Primitives;assembly=PresentationFramework"
     xmlns:diagnostics="clr-namespace:WinCopies.Diagnostics;assembly=WinCopies.Util"
     xmlns:wincopies="clr-namespace:WinCopies;assembly=WinCopies.Util"
+    xmlns:symbols="clr-namespace:WinCopies.Consts.Symbols;assembly=WinCopies.Util"
+    xmlns:desktop="clr-namespace:WinCopies.Desktop;assembly=WinCopies.Util.Desktop"
     xmlns:sys="clr-namespace:System;assembly=mscorlib">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary>
@@ -100,6 +102,19 @@
             <util:InterfaceDataTemplateSelector x:Key="WinCopies.Templates.InterfaceDataTemplateSelector" />
         </ResourceDictionary>
     </ResourceDictionary.MergedDictionaries>
+
+    <Style TargetType="{x:Type local:HeaderedButton}" BasedOn="{StaticResource {x:Type Button}}">
+        <Setter Property="ContentTemplate">
+            <Setter.Value>
+                <DataTemplate>
+                    <DockPanel Margin="{Binding Padding, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:HeaderedButton}}}">
+                        <ContentControl DockPanel.Dock="{Binding HeaderDock, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:HeaderedButton}}}" Content="{Binding Header, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:HeaderedButton}}}" />
+                        <ContentControl HorizontalAlignment="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:HeaderedButton}}}" VerticalAlignment="{Binding VerticalContentAlignment, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:HeaderedButton}}}" Content="{Binding Content, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:HeaderedButton}}}" />
+                    </DockPanel>
+                </DataTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 
     <DataTemplate DataType="{x:Type wincopies:ICheckableNamedObject}">
         <CheckBox Content="{Binding Name}" IsChecked="{Binding IsChecked, Mode=TwoWay}" />
@@ -957,8 +972,8 @@
                             <RowDefinition />
                             <RowDefinition />
                         </Grid.RowDefinitions>
-                        <Button FontFamily="Segoe UI" FontSize="8" Command="{TemplateBinding UpCommand}" CommandParameter="{TemplateBinding UpCommandParameter}" CommandTarget="{TemplateBinding UpCommandTarget}">▲</Button>
-                        <Button Grid.Row="1" FontFamily="Segoe UI" FontSize="8" Command="{TemplateBinding DownCommand}" CommandParameter="{TemplateBinding DownCommandParameter}" CommandTarget="{TemplateBinding DownCommandTarget}">▼</Button>
+                        <Button Content="{x:Static symbols:GeometricShapes.TriangleUp}" FontFamily="Segoe UI" FontSize="8" Command="{TemplateBinding UpCommand}" CommandParameter="{TemplateBinding UpCommandParameter}" CommandTarget="{TemplateBinding UpCommandTarget}" />
+                        <Button Content="{x:Static symbols:GeometricShapes.TriangleDown}" Grid.Row="1" FontFamily="Segoe UI" FontSize="8" Command="{TemplateBinding DownCommand}" CommandParameter="{TemplateBinding DownCommandParameter}" CommandTarget="{TemplateBinding DownCommandTarget}" />
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>

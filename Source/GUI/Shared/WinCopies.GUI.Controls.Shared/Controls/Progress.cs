@@ -34,7 +34,7 @@ namespace WinCopies.GUI.Controls
 
             if (newValue < 0d || newValue > 100d)
 
-                throw new InvalidOperationException("The value must be a percentage.");
+                throw new InvalidOperationException($"The value must be a percentage. Value was {newValue}.");
         }));
 
         public static readonly DependencyProperty OverallProgressProperty = RegisterProgressProperty<double>(nameof(OverallProgress));

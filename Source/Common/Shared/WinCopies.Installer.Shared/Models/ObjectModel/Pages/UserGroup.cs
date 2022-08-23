@@ -12,7 +12,7 @@
 
     public abstract class UserGroupPage : CommonInstallerPage<LicenseAgreementPage, IDestinationPage, IUserGroupData>, IUserGroupPage
     {
-        private class UserGroupData : InstallerPageData, IUserGroupData
+        protected class UserGroupData : InstallerPageData, IUserGroupData
         {
             public bool InstallForCurrentUserOnly { get => Installer.InstallForCurrentUserOnly; set => Installer.InstallForCurrentUserOnly = value; }
 

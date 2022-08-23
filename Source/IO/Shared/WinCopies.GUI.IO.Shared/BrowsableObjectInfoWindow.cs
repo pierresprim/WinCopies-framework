@@ -168,11 +168,11 @@ namespace WinCopies.GUI.IO
 
         public static RoutedCommand SubmitABug { get; } = GetRoutedCommand(IOResources.SubmitABug, nameof(SubmitABug));
 
-        public static DependencyProperty ViewModelProperty = Register<IBrowsableObjectInfoWindowViewModel>(nameof(ViewModel));
+        public static readonly DependencyProperty ViewModelProperty = Register<IBrowsableObjectInfoWindowViewModel>(nameof(ViewModel));
 
         public IBrowsableObjectInfoWindowViewModel ViewModel { get => (IBrowsableObjectInfoWindowViewModel)GetValue(ViewModelProperty); set => SetValue(ViewModelProperty, value); }
 
-        public static DependencyProperty StatusBarLabelProperty = Register<string>(nameof(StatusBarLabel));
+        public static readonly DependencyProperty StatusBarLabelProperty = Register<string>(nameof(StatusBarLabel));
 
         public string StatusBarLabel { get => (string)GetValue(StatusBarLabelProperty); set => SetValue(StatusBarLabelProperty, value); }
 
@@ -567,7 +567,7 @@ namespace WinCopies.GUI.IO
                            {
                                IProcessCommand renameItemProcessCommand = parentPath.ItemSources?.SelectedItem.ProcessSettings?.ProcessFactory.RenameItemProcessCommand;
 
-                               if (InputBox.ShowDialog(renameItemProcessCommand.Name, DialogButton.OKCancel, renameItemProcessCommand.Caption, path.Name, null, out string _result, (path.IsLocalRoot == true ? drive_rename : textfield_rename).ToImageSource()) == true && !renameItemProcessCommand.TryExecute(_result, Enumerable.Repeat(path, 1), out _))
+                               if (InputBox.ShowDialog(renameItemProcessCommand.Name, DialogButton.OKCancel, renameItemProcessCommand.Caption, path.Name, null, out string _result, (path.IsLocalRoot == true ? drive_rename : textfield_rename).ToImageSource()) == true && !renameItemProcessCommand.TryExecute(_result, System.Linq.Enumerable.Repeat(path, 1), out _))
 
                                    _ = MessageBox.Show("An error occurred while renaming the selected item.", "Error", MessageBoxButton.OK, Error);
                            }

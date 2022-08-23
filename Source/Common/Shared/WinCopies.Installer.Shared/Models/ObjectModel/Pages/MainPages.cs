@@ -48,7 +48,7 @@ namespace WinCopies.Installer
 
         public override string Description => _description;
 
-        public override string NextStepName => "Quit";
+        public override string NextStepName => "_Quit";
 
         protected EndPage(Installer installer) : base(installer)
         {
