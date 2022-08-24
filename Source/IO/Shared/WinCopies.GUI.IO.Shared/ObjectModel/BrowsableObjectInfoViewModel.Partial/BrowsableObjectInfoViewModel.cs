@@ -322,6 +322,10 @@ namespace WinCopies.GUI.IO.ObjectModel
         #endregion
 
         #region Methods
+        public IBrowsableObjectInfoViewModel Clone() => new BrowsableObjectInfoViewModel((IBrowsableObjectInfoViewModel)ModelGeneric.Clone(), RootParentIsRootNode);
+
+        object ICloneable.Clone() => Clone();
+
         protected internal virtual void RaiseSelectedItemsChanged(ItemsChangedEventArgs<IBrowsableObjectInfoViewModel> e) => SelectedItemsChanged?.Invoke(this, e);
 
         public IContextMenu
@@ -441,9 +445,9 @@ namespace WinCopies.GUI.IO.ObjectModel
         public bool Equals(IBrowsableObjectInfoViewModel other) => ModelGeneric.Equals(other.Model);
 
         public int CompareTo(IBrowsableObjectInfoViewModel other) => ModelGeneric.CompareTo(other.Model);
-#endregion
+        #endregion
 
-#region Operators
+        #region Operators
         public static bool operator ==(BrowsableObjectInfoViewModel left, BrowsableObjectInfoViewModel right) => left is null ? right is null : left.Equals(right);
 
         public static bool operator !=(BrowsableObjectInfoViewModel left, BrowsableObjectInfoViewModel right) => !(left == right);
@@ -455,9 +459,9 @@ namespace WinCopies.GUI.IO.ObjectModel
         public static bool operator >(BrowsableObjectInfoViewModel left, BrowsableObjectInfoViewModel right) => left is object && left.CompareTo(right) > 0;
 
         public static bool operator >=(BrowsableObjectInfoViewModel left, BrowsableObjectInfoViewModel right) => left is null ? right is null : left.CompareTo(right) >= 0;
-#endregion
+        #endregion
 
-#region IDisposable Support
+        #region IDisposable Support
         public bool IsDisposed => ModelGeneric.IsDisposed;
 
         protected virtual void Dispose(in bool disposing)
@@ -473,6 +477,6 @@ namespace WinCopies.GUI.IO.ObjectModel
 
             GC.SuppressFinalize(this);
         }
-#endregion
+        #endregion
     }
 }

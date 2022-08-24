@@ -134,7 +134,7 @@ namespace WinCopies.IO.ObjectModel
         /// <summary>
         /// Not applicable for this item type.
         /// </summary>
-        protected override string DescriptionOverride => WinCopies.Consts.NotApplicable;
+        protected override string DescriptionOverride => WinCopies.Consts.Common.NotApplicable;
 
         /// <summary>
         /// The <see cref="ArchiveFileInfo"/> that this <see cref="ArchiveItemInfo"/> represents.
@@ -298,7 +298,7 @@ namespace WinCopies.IO.ObjectModel
         }
 
         #region Methods
-        #region Construction helpers
+        #region Construction Helpers
         ///// <summary>
         ///// Initializes a new instance of the <see cref="ArchiveItemInfo"/> class using a custom factory for <see cref="ArchiveItemInfo"/>s.
         ///// </summary>
@@ -321,7 +321,9 @@ namespace WinCopies.IO.ObjectModel
 
             return new ArchiveItemInfo(System.IO.Path.Combine(archiveShellObjectInfo.Path, archiveFilePath), FileType.Folder, archiveShellObjectInfo, null, archiveShellObjectInfo.ClientVersion);
         }
-        #endregion Construction helpers
+        #endregion Construction Helpers
+
+        public override IBrowsableObjectInfo Clone() => new ArchiveItemInfo(Path, ObjectPropertiesGeneric.FileType, ArchiveShellObject, InnerObjectGenericOverride, ClientVersion);
 
         protected override IEnumerableSelectorDictionary<ArchiveItemInfoItemProvider, IBrowsableObjectInfo> GetSelectorDictionaryOverride() => DefaultItemSelectorDictionary;
 

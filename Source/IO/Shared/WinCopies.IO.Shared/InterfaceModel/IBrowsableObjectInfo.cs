@@ -56,8 +56,6 @@ namespace WinCopies.IO
 
         Delete,
 
-        LastDelegatedCommand = Delete,
-
         Open,
 
         OpenInNewTab,
@@ -66,7 +64,9 @@ namespace WinCopies.IO
 
         CopyPath,
 
-        CopyName
+        CopyName,
+
+        LastDelegatedCommand = CopyName
     }
 
     public interface IContextMenu : System.IDisposable
@@ -150,7 +150,7 @@ namespace WinCopies.IO
         /// <summary>
         /// Provides interoperability for interacting with browsable items.
         /// </summary>
-        public interface IBrowsableObjectInfo : IBrowsableObjectInfoBase, IRecursiveEnumerable<IBrowsableObjectInfo>, DotNetFix.IDisposable
+        public interface IBrowsableObjectInfo : IBrowsableObjectInfoBase, IRecursiveEnumerable<IBrowsableObjectInfo>, DotNetFix.IDisposable, ICloneable
         {
             #region Properties
             /// <summary>

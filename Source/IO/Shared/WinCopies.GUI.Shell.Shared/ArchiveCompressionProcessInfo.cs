@@ -87,7 +87,7 @@ namespace WinCopies.GUI.IO.Process
 
                 values[i] = properties[i].GetValue(this).ToString();
 
-            return new ProcessParameters(Guid, values.Surround(Enumerable.Repeat(sourcePath, 1), paths));
+            return new ProcessParameters(Guid, values.Surround(System.Linq.Enumerable.Repeat(sourcePath, 1), paths));
         }
 
         public static void InitFromProcessParameters<T>(T obj, IEnumerator<string> enumerator) where T : ArchiveProcessParameters

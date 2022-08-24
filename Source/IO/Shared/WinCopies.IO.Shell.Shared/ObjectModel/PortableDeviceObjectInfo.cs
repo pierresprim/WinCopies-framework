@@ -86,7 +86,7 @@ namespace WinCopies.IO.ObjectModel
 
         protected override string ItemTypeNameOverride => FileSystemObjectInfo.GetItemTypeName(System.IO.Path.GetExtension(Path), ObjectPropertiesGeneric.FileType);
 
-        protected override string DescriptionOverride => WinCopies.Consts.NotApplicable;
+        protected override string DescriptionOverride => WinCopies.Consts.Common.NotApplicable;
 
         protected override IBrowsableObjectInfo ParentGenericOverride => _parent;
 
@@ -110,11 +110,15 @@ namespace WinCopies.IO.ObjectModel
         #endregion Properties
 
         #region Constructors
-        private PortableDeviceObjectInfo(in string path, in IPortableDeviceObject portableDeviceObject, in ClientVersion clientVersion) : base(path, clientVersion) => _portableDeviceObject = portableDeviceObject;
+        private protected PortableDeviceObjectInfo(in IPortableDeviceObject portableDeviceObject, in IBrowsableObjectInfo parent, in string parentParamName, in ClientVersion clientVersion) : base(GetPath(portableDeviceObject, parent, parentParamName), clientVersion)
+        {
+            _portableDeviceObject = portableDeviceObject;
+            _parent = parent;
+        }
 
-        protected PortableDeviceObjectInfo(in IPortableDeviceObject portableDeviceObject, in IPortableDeviceInfoBase parentPortableDevice, in ClientVersion clientVersion) : this(GetPath(portableDeviceObject, parentPortableDevice), portableDeviceObject, clientVersion) => _parent = parentPortableDevice;
+        protected PortableDeviceObjectInfo(in IPortableDeviceObject portableDeviceObject, in IPortableDeviceInfoBase parentPortableDevice, in ClientVersion clientVersion) : this(portableDeviceObject, parentPortableDevice, nameof(parentPortableDevice), clientVersion) { /* Left empty. */ }
 
-        protected PortableDeviceObjectInfo(in IPortableDeviceObject portableDeviceObject, in IPortableDeviceObjectInfoBase parent, in ClientVersion clientVersion) : this(GetPath(portableDeviceObject, parent), portableDeviceObject, clientVersion) => _parent = parent;
+        protected PortableDeviceObjectInfo(in IPortableDeviceObject portableDeviceObject, in IPortableDeviceObjectInfoBase parent, in ClientVersion clientVersion) : this(portableDeviceObject, parent, nameof(parent), clientVersion) => _parent = parent;
         #endregion
 
         protected override void DisposeUnmanaged()
@@ -133,21 +137,7 @@ namespace WinCopies.IO.ObjectModel
             base.DisposeManaged();
         }
 
-        private static string GetPath(in IPortableDeviceObject portableDeviceObject, in IPortableDeviceInfoBase parentPortableDevice)
-        {
-            ThrowIfNull(portableDeviceObject, nameof(portableDeviceObject));
-            ThrowIfNull(parentPortableDevice, nameof(parentPortableDevice));
-
-            return $"{parentPortableDevice.Path}{DirectorySeparatorChar}{portableDeviceObject.Name}";
-        }
-
-        private static string GetPath(in IPortableDeviceObject portableDeviceObject, in IPortableDeviceObjectInfoBase parent)
-        {
-            ThrowIfNull(portableDeviceObject, nameof(portableDeviceObject));
-            ThrowIfNull(parent, nameof(parent));
-
-            return $"{(parent ?? throw GetArgumentNullException(nameof(parent))).Path}{DirectorySeparatorChar}{(portableDeviceObject ?? throw GetArgumentNullException(nameof(portableDeviceObject))).Name}";
-        }
+        private static string GetPath(in IPortableDeviceObject portableDeviceObject, in IBrowsableObjectInfo parent, in string parentParamName) => $"{(parent ?? throw new ArgumentNullException(parentParamName)).Path}{DirectorySeparatorChar}{(portableDeviceObject ?? throw new ArgumentNullException(nameof(portableDeviceObject))).Name}";
     }
 
     public class PortableDeviceObjectInfo : PortableDeviceObjectInfo<IFileSystemObjectInfoProperties, IPortableDeviceObject, IEnumerableSelectorDictionary<PortableDeviceObjectInfoItemProvider, IBrowsableObjectInfo>, PortableDeviceObjectInfoItemProvider>, IPortableDeviceObjectInfo
@@ -211,22 +201,24 @@ namespace WinCopies.IO.ObjectModel
         protected sealed override IFileSystemObjectInfoProperties ObjectPropertiesGenericOverride => IsDisposed ? throw GetExceptionForDispose(false) : _objectProperties;
 
         protected override IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystemOverride => null; // TODO
-        #endregion
+        #endregion Properties
 
         #region Constructors
-        internal PortableDeviceObjectInfo(in IPortableDeviceObject portableDeviceObject, in IPortableDeviceInfoBase parentPortableDevice, in ClientVersion clientVersion) : base(portableDeviceObject, parentPortableDevice, clientVersion) => SetProperties();
-
-        internal PortableDeviceObjectInfo(in IPortableDeviceObject portableDeviceObject, in IPortableDeviceObjectInfoBase parent, in ClientVersion clientVersion) : base(portableDeviceObject, parent, clientVersion) => SetProperties();
-        #endregion
-
-        #region Methods
-        protected override IEnumerableSelectorDictionary<PortableDeviceObjectInfoItemProvider, IBrowsableObjectInfo> GetSelectorDictionaryOverride() => DefaultItemSelectorDictionary;
-
-        private void SetProperties()
+        private PortableDeviceObjectInfo(in IPortableDeviceObject portableDeviceObject, in IBrowsableObjectInfo parent, in string parentParamName, in ClientVersion clientVersion) : base(portableDeviceObject, parent, parentParamName, clientVersion)
         {
             _objectProperties = new PortableDeviceObjectInfoProperties<IPortableDeviceObjectInfoBase>(this);
             _itemSourcesOverride = ItemSourcesProvider.Construct(new ItemSource(this));
         }
+
+        internal PortableDeviceObjectInfo(in IPortableDeviceObject portableDeviceObject, in IPortableDeviceInfoBase parentPortableDevice, in ClientVersion clientVersion) : this(portableDeviceObject, parentPortableDevice, nameof(parentPortableDevice), clientVersion) { /* Left empty. */ }
+
+        internal PortableDeviceObjectInfo(in IPortableDeviceObject portableDeviceObject, in IPortableDeviceObjectInfoBase parent, in ClientVersion clientVersion) : this(portableDeviceObject, parent, nameof(parent), clientVersion) { /* Left empty. */ }
+        #endregion Constructors
+
+        #region Methods
+        public override IBrowsableObjectInfo Clone() => new PortableDeviceObjectInfo(InnerObjectGeneric, ParentGenericOverride, "parent", ClientVersion);
+
+        protected override IEnumerableSelectorDictionary<PortableDeviceObjectInfoItemProvider, IBrowsableObjectInfo> GetSelectorDictionaryOverride() => DefaultItemSelectorDictionary;
 
         protected override void DisposeManaged()
         {
@@ -234,6 +226,6 @@ namespace WinCopies.IO.ObjectModel
 
             _objectProperties = null;
         }
-        #endregion
+        #endregion Methods
     }
 }

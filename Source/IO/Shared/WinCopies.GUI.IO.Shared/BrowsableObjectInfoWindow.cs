@@ -1060,6 +1060,7 @@ namespace WinCopies.GUI.IO
             add(OpenOrLaunch, Open_Executed, Open_CanExecute);
             add(OpenInNewTab, OpenInNewTab_Executed, OpenInNewTabOrWindow_CanExecute);
             add(OpenInNewWindow, OpenInNewWindow_Executed, OpenInNewTabOrWindow_CanExecute);
+            add(DuplicateTab, OpenInNewWindow_Executed, OpenInNewTabOrWindow_CanExecute);
             #endregion Open
 
             #region Close
@@ -1127,7 +1128,7 @@ namespace WinCopies.GUI.IO
 
                     if (item != null)
 
-                        AddNewDefaultTab(IO.ObjectModel.BrowsableObjectInfo.GetDefaultExplorerControlViewModel(item), false);
+                        AddNewDefaultTab(ObjectModel.BrowsableObjectInfo.GetDefaultExplorerControlViewModel(item), false);
                 }
 
                 void openItem(IBrowsableObjectInfoViewModel browsableObjectInfo)
@@ -1145,7 +1146,11 @@ namespace WinCopies.GUI.IO
 
                 action = openItem;
 
-                foreach (object item in selectedItems)
+                foreach (object
+#if CS8
+                    ?
+#endif
+                    item in selectedItems)
 
                     if (item is IBrowsableObjectInfoViewModel _item)
 
@@ -1192,11 +1197,9 @@ namespace WinCopies.GUI.IO
         {
             IBrowsableObjectInfoCollectionViewModel items;
 
-            ActionIn<IExplorerControlViewModel> action = addItem;
-
             void _addItem(in IExplorerControlViewModel item) => items.Paths.Add(item);
 
-            void addItem(in IExplorerControlViewModel item)
+            ActionIn<IExplorerControlViewModel> action = (in IExplorerControlViewModel item) =>
             {
                 items = GetDefaultBrowsableObjectInfoCollection();
 
@@ -1205,10 +1208,12 @@ namespace WinCopies.GUI.IO
                 _addItem(item);
 
                 GetNewBrowsableObjectInfoWindow(new BrowsableObjectInfoWindowViewModel(items)).Show();
-            }
+            };
 
             OpenInNewTabOrWindow((in IExplorerControlViewModel item, in bool selected) => action(item));
         }, e);
+
+        private void DuplicateTab_Executed(object sender, ExecutedRoutedEventArgs e) => AddNewTab(ObjectModel.BrowsableObjectInfo.GetDefaultExplorerControlViewModel((IBrowsableObjectInfoViewModel)((BrowsableObjectInfoWindowViewModel)DataContext).Paths.SelectedItem.Path.Clone()), e);
 
         private void AddNewDefaultTab(in IExplorerControlViewModel viewModel, in bool selected)
         {

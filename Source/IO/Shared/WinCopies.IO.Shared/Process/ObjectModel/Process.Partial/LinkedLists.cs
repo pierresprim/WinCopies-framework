@@ -164,7 +164,7 @@ namespace WinCopies.IO.Process
 
         TErrorItems IQueue<TErrorItems>.Peek() => InnerList.Peek();
 
-        TErrorItems ISimpleLinkedListBase<TErrorItems>.Peek() => InnerList.Peek();
+        TErrorItems IPeekable<TErrorItems>.Peek() => InnerList.Peek();
 
         TErrorItems IQueueBase<TErrorItems>.Peek() => InnerList.Peek();
 
@@ -177,7 +177,7 @@ namespace WinCopies.IO.Process
 
         bool IQueue<TErrorItems>.TryPeek(out TErrorItems result) => InnerList.TryPeek(out result);
 
-        bool ISimpleLinkedListBase<TErrorItems>.TryPeek(out TErrorItems result) => InnerList.TryPeek(out result);
+        bool IPeekable<TErrorItems>.TryPeek(out TErrorItems result) => InnerList.TryPeek(out result);
 
         bool IQueueBase<TErrorItems>.TryPeek(out TErrorItems result) => InnerList.TryPeek(out result);
 
@@ -242,7 +242,7 @@ namespace WinCopies.IO.Process
 
         TItemsOut IQueue<TItemsOut>.Peek() => InnerList.Peek();
 
-        TItemsOut ISimpleLinkedListBase<TItemsOut>.Peek() => InnerList.Peek();
+        TItemsOut IPeekable<TItemsOut>.Peek() => InnerList.Peek();
 
         TItemsOut IQueueBase<TItemsOut>.Peek() => InnerList.Peek();
 
