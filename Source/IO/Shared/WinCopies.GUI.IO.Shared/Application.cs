@@ -143,7 +143,7 @@ namespace WinCopies.GUI.IO
                                 return assembly.DefinedTypes.WhereSelect(type => type.Assembly == assembly && type.Name == nameof(WinCopies.IO.ObjectModel.BrowsableObjectInfo), type => type.GetMethods().FirstOrDefault(method => method.IsStatic && method.Name == "GetPluginParameters" && method.ReturnType == typeof(IBrowsableObjectInfoPlugin))?.Invoke(null, null)).FirstOrDefault() as IBrowsableObjectInfoPlugin;
                             }
 
-                            catch (ReflectionTypeLoadException ex)
+                            catch (Exception ex) when (ex.Is(false, typeof(ReflectionTypeLoadException), typeof(TargetInvocationException)))
                             {
                                 application.Logger(ex.Message, null, LoggingLevel.Error);
 

@@ -1290,7 +1290,7 @@ namespace WinCopies.GUI.IO
 #if CS8
             ?
 #endif
-            dataContext = null) : base(dataContext) { /* Left empty. */ }
+            dataContext = null, in bool createDefaultTab = true) : base(dataContext, createDefaultTab) { /* Left empty. */ }
 
         protected override BrowsableObjectInfoWindow GetNewBrowsableObjectInfoWindow() => GetNewBrowsableObjectInfoWindow(GetDefaultDataContext());
     }

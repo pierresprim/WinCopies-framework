@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+using System.Collections;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
@@ -23,9 +24,81 @@ using System.Windows.Input;
 using System.Windows.Media;
 
 using WinCopies.Commands;
+using WinCopies.Data;
 
 namespace WinCopies.GUI.Controls.Models
 {
+    public interface IPropertyGroup : IPropertyGroup<string>
+    {
+
+    }
+
+    public interface IPropertyGroupEnumerable :
+#if CS8
+        Collections.DotNetFix.Generic.
+#endif
+        IEnumerable<IPropertyGroup>
+    {
+
+    }
+
+    public interface IPropertyCategory : INode<IPropertyCategory
+#if CS8
+        ?
+#endif
+        >, IEnumerable<IPropertyGroupEnumerable>
+    {
+        string Header { get; }
+
+        string Description { get; }
+    }
+
+    public interface IPropertyEnumerable :
+#if CS8
+        Collections.DotNetFix.Generic.
+#endif
+        IEnumerable<INode<IPropertyCategory
+#if CS8
+            ?
+#endif
+            >>
+    {
+
+    }
+
+    public static class Extensions
+    {
+        private struct PropertyEnumerable : IPropertyEnumerable
+        {
+            private readonly IEnumerable<INode<IPropertyCategory
+#if CS8
+            ?
+#endif
+            >> _node;
+
+            public PropertyEnumerable(in IEnumerable<INode<IPropertyCategory
+#if CS8
+            ?
+#endif
+            >> node) => _node = node;
+
+            public IEnumerator<INode<IPropertyCategory
+#if CS8
+                ?
+#endif
+                >> GetEnumerator() => _node.GetEnumerator();
+#if !CS8
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+#endif
+        }
+
+        public static IPropertyEnumerable GetPropertyEnumerable(this IEnumerable<INode<IPropertyCategory
+#if CS8
+            ?
+#endif
+            >> node) => new PropertyEnumerable(node);
+    }
+
     public interface IControlModel
     {
         bool IsEnabled { get; set; }

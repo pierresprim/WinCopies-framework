@@ -35,6 +35,8 @@ using WinCopies.Util.Data;
 using static WinCopies.IO.Resources.ExceptionMessages;
 using static WinCopies.ThrowHelper;
 
+using Enumerable = System.Linq.Enumerable;
+
 namespace WinCopies.GUI.IO.Process
 {
     public interface IArchiveProcessParameters

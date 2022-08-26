@@ -6,9 +6,8 @@ The WinCopies® software framework
 CHANGELOG
 ---------
 
-### 3.18
+### 3.19
 
-- New types.
 - Installer:
 	- File enumeration, default process data and enumerable types redesigned.
 	- InstallerViewModel is abstract.
@@ -23,6 +22,11 @@ CHANGELOG
 		- some templates.
 		- UserGroup and Destination types in order to have ability to add custom views to these pages.
 	- Remove (I)InstallerStream types. Use System.IO.Stream instead.
+- New package: Installer.Decompressor.
+
+### 3.18
+
+- New types.
 - Console:
 	- RadioButton.Group: the initializer is internal.
 	- RadioButtonGroup.SelectedItem, Screen.Console and Console/ControlBase.Screen are nullable.
@@ -33,15 +37,19 @@ CHANGELOG
 	- ProgressBar class redesigned.
 	- Remove Setup class and related types.
 - GUI:
+	- New controls, models, templates and styles.
 	- CommandSourceControl\<T>: genericity bug fixed when registring dependency properties.
 	- Progress: the exception that is thrown when updating progress properties includes the actual value in the error message.
 - IO:
+	- Add nullable attribute to some items.
 	- Directory: new methods.
 	- Path: new method: RemoveExtension.
 	- RecursivelyEnumerablePath\<T>'s constructor parameters 'searchPattern' and 'enumerationOptions' are nullable.
 	- Size.ToString: only the two first decimals are shown.
-- GUI.IO: BrowsableObjectInfoWindow dependency property fields are read-only.
-- New package: Installer.Decompressor.
+- GUI.IO:
+	- BrowsableObjectInfoWindow dependency property fields are read-only.
+	- Application handles the TargetInvocationException when loading plugins.
+	- BrowsableObjectInfoWindow2's constructor: new optional parameter: createDefaultTab (defaults to `true`).
 
 ### 3.17.1.2-preview
 

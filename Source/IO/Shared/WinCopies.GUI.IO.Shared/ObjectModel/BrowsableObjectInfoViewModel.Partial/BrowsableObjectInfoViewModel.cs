@@ -191,7 +191,11 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         public IBitmapSourceProvider BitmapSourceProvider => ModelGeneric.BitmapSourceProvider;
 
-        public IBitmapSources BitmapSources => ModelGeneric.BitmapSources;
+        public IBitmapSources
+#if CS8
+            ?
+#endif
+            BitmapSources => ModelGeneric.BitmapSources;
 
         public object InnerObject => ModelGeneric.InnerObject;
 
@@ -282,7 +286,7 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         ClientVersion IBrowsableObjectInfo.ClientVersion => ModelGeneric.ClientVersion;
 
-        public System.Collections.Generic.IEnumerable<IBrowsabilityPath> BrowsabilityPaths => ModelGeneric.BrowsabilityPaths;
+        public IEnumerable<IBrowsabilityPath> BrowsabilityPaths => ModelGeneric.BrowsabilityPaths;
 
         public IBrowsableObjectInfoContextCommandEnumerable
 #if CS8
@@ -334,13 +338,17 @@ namespace WinCopies.GUI.IO.ObjectModel
 #if CS8
             ?
 #endif
-            GetContextMenu(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> children, bool extendedVerbs) => ModelGeneric.GetContextMenu(children, extendedVerbs);
+            GetContextMenu(IEnumerable<IBrowsableObjectInfo> children, bool extendedVerbs) => ModelGeneric.GetContextMenu(children, extendedVerbs);
 
-        public System.Collections.Generic.IEnumerable<ICommand>
+        public IEnumerable<ICommand>
 #if CS8
             ?
 #endif
-            GetCommands(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> items) => ModelGeneric.GetCommands(items);
+            GetCommands(IEnumerable<IBrowsableObjectInfo>
+#if CS8
+                ?
+#endif
+                items) => ModelGeneric.GetCommands(items);
 
         protected T GetIfNotDisposed<T>(in T value) => GetOrThrowIfDisposed(this, value);
 
@@ -399,20 +407,27 @@ namespace WinCopies.GUI.IO.ObjectModel
         }
 
         public void StartMonitoring() => ModelGeneric.StartMonitoring();
-
         public void StopMonitoring() => ModelGeneric.StopMonitoring();
 
         public IBrowsableObjectInfoCallback RegisterCallback(Action<BrowsableObjectInfoCallbackArgs> callback) => ModelGeneric.RegisterCallback(callback);
 
-        ArrayBuilder<IBrowsableObjectInfo> IBrowsableObjectInfo.GetRootItems() => ModelGeneric.GetRootItems();
+        ArrayBuilder<IBrowsableObjectInfo>
+#if CS8
+            ?
+#endif
+            IBrowsableObjectInfo.GetRootItems() => ModelGeneric.GetRootItems();
 
         //public System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems() => Items;
 
-        public System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetSubRootItems() => RootParentIsRootNode ? ItemSources.Default.Items : ModelGeneric.GetSubRootItems();
+        public IEnumerable<IBrowsableObjectInfo>
+#if CS8
+            ?
+#endif
+            GetSubRootItems() => RootParentIsRootNode ? ItemSources?.Default.Items : ModelGeneric.GetSubRootItems();
 
-        IEnumerator<IBrowsableObjectInfo> System.Collections.Generic.IEnumerable<IBrowsableObjectInfo>.GetEnumerator() => ((System.Collections.Generic.IEnumerable<IBrowsableObjectInfo>)ModelGeneric).GetEnumerator();
+        IEnumerator<IBrowsableObjectInfo> IEnumerable<IBrowsableObjectInfo>.GetEnumerator() => ModelGeneric.AsFromType<IEnumerable<IBrowsableObjectInfo>>().GetEnumerator();
 
-        IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)ModelGeneric).GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => ModelGeneric.AsFromType<IEnumerable>().GetEnumerator();
 
         public RecursiveEnumeratorAbstract<IBrowsableObjectInfo> GetEnumerator() => ModelGeneric.GetEnumerator();
 
@@ -434,16 +449,28 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         public Collections.Generic.IComparer<IBrowsableObjectInfoBase> GetDefaultComparer() => ModelGeneric.GetDefaultComparer();
 
-        public override bool Equals(object obj) => !(obj is null) && (ReferenceEquals(this, obj) || ModelGeneric.Equals(obj));
+        public override bool Equals(object
+#if CS8
+            ?
+#endif
+            obj) => !(obj is null) && (ReferenceEquals(this, obj) || ModelGeneric.Equals(obj));
 
         public override int GetHashCode() => ModelGeneric.GetHashCode();
 
-        public bool Equals(IBrowsableObjectInfoViewModel other) => ModelGeneric.Equals(other.Model);
+        public bool Equals(IBrowsableObjectInfoViewModel
+#if CS8
+            ?
+#endif
+            other) => ModelGeneric.Equals(other?.Model);
 
-        public int CompareTo(IBrowsableObjectInfoViewModel other) => ModelGeneric.CompareTo(other.Model);
-#endregion
+        public int CompareTo(IBrowsableObjectInfoViewModel
+#if CS8
+            ?
+#endif
+            other) => ModelGeneric.CompareTo(other?.Model);
+        #endregion
 
-#region Operators
+        #region Operators
         public static bool operator ==(BrowsableObjectInfoViewModel left, BrowsableObjectInfoViewModel right) => left is null ? right is null : left.Equals(right);
 
         public static bool operator !=(BrowsableObjectInfoViewModel left, BrowsableObjectInfoViewModel right) => !(left == right);
@@ -455,9 +482,9 @@ namespace WinCopies.GUI.IO.ObjectModel
         public static bool operator >(BrowsableObjectInfoViewModel left, BrowsableObjectInfoViewModel right) => left is object && left.CompareTo(right) > 0;
 
         public static bool operator >=(BrowsableObjectInfoViewModel left, BrowsableObjectInfoViewModel right) => left is null ? right is null : left.CompareTo(right) >= 0;
-#endregion
+        #endregion
 
-#region IDisposable Support
+        #region IDisposable Support
         public bool IsDisposed => ModelGeneric.IsDisposed;
 
         protected virtual void Dispose(in bool disposing)
@@ -473,6 +500,6 @@ namespace WinCopies.GUI.IO.ObjectModel
 
             GC.SuppressFinalize(this);
         }
-#endregion
+        #endregion
     }
 }

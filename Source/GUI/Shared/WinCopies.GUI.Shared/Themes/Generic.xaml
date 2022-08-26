@@ -18,6 +18,7 @@
     xmlns:wincopies="clr-namespace:WinCopies;assembly=WinCopies.Util"
     xmlns:symbols="clr-namespace:WinCopies.Consts.Symbols;assembly=WinCopies.Util"
     xmlns:desktop="clr-namespace:WinCopies.Desktop;assembly=WinCopies.Util.Desktop"
+    xmlns:models="clr-namespace:WinCopies.GUI.Controls.Models;assembly=WinCopies.GUI.Models"
     xmlns:sys="clr-namespace:System;assembly=mscorlib">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary>
@@ -102,6 +103,53 @@
             <util:InterfaceDataTemplateSelector x:Key="WinCopies.Templates.InterfaceDataTemplateSelector" />
         </ResourceDictionary>
     </ResourceDictionary.MergedDictionaries>
+
+    <ControlTemplate x:Key="WinCopies.Templates.PropertyEditor" TargetType="{x:Type local:PropertyEditor}">
+        <DockPanel>
+            <TreeView DockPanel.Dock="Left" ItemTemplate="{TemplateBinding ItemTemplate}" ItemTemplateSelector="{TemplateBinding ItemTemplateSelector}" ItemsSource="{Binding ItemsSource}" ItemContainerStyle="{TemplateBinding ItemContainerStyle}" ItemContainerStyleSelector="{TemplateBinding ItemContainerStyleSelector}" />
+            <DockPanel>
+                <ContentControl DockPanel.Dock="Top" ContentTemplate="{TemplateBinding HeaderTemplate}" ContentTemplateSelector="{TemplateBinding HeaderTemplateSelector}">
+                    <StackPanel>
+                        <ContentPresenter ContentSource="Header" />
+                        <ContentPresenter ContentSource="Description" />
+                    </StackPanel>
+                </ContentControl>
+                <ScrollViewer>
+                    <ContentPresenter ContentTemplate="{TemplateBinding ContentTemplate}" ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}" />
+                </ScrollViewer>
+            </DockPanel>
+        </DockPanel>
+    </ControlTemplate>
+
+    <Style TargetType="{x:Type local:PropertyEditor}">
+        <Setter Property="Template" Value="{StaticResource WinCopies.Templates.PropertyEditor}" />
+    </Style>
+
+    <DataTemplate DataType="{x:Type models:IPropertyGroup}">
+        <GroupBox Header="{Binding Group}">
+            <ItemsControl ItemsSource="{Binding}" ItemTemplateSelector="{StaticResource WinCopies.Templates.InterfaceDataTemplateSelector}" />
+        </GroupBox>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type models:IPropertyGroupEnumerable}">
+        <ItemsControl ItemsSource="{Binding}" ItemTemplateSelector="{StaticResource WinCopies.Templates.InterfaceDataTemplateSelector}" />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type models:IPropertyEnumerable}">
+        <local:PropertyEditor ItemsSource="{Binding}" Header="{Binding SelectedItem.Value.Header}" Description="{Binding SelectedItem.Value.Description}" Content="{Binding SelectedItem.Value}" ContentTemplateSelector="{StaticResource WinCopies.Templates.InterfaceDataTemplateSelector}">
+            <local:PropertyEditor.Style>
+                <Style TargetType="{x:Type local:PropertyEditor}" BasedOn="{StaticResource {x:Type local:PropertyEditor}}">
+                    <Setter Property="ItemContainerStyle">
+                        <Setter.Value>
+                            <Style TargetType="{x:Type TreeViewItem}">
+                                <Setter Property="ItemsSource" Value="{Binding}" />
+                            </Style>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </local:PropertyEditor.Style>
+        </local:PropertyEditor>
+    </DataTemplate>
 
     <Style TargetType="{x:Type local:HeaderedButton}" BasedOn="{StaticResource {x:Type Button}}">
         <Setter Property="ContentTemplate">

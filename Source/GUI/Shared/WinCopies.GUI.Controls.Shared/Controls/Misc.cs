@@ -15,8 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Markup;
 
 using WinCopies.Desktop;
 
@@ -66,6 +68,37 @@ namespace WinCopies.GUI.Controls
         public Dock Dock { get => (Dock)GetValue(DockProperty); set => SetValue(DockProperty, value); }
 
         static HeaderedContentControl() => DefaultStyleKeyProperty.OverrideDefaultStyleKey<HeaderedContentControl>();
+    }
+
+    [DefaultProperty(nameof(Content))]
+    [ContentProperty(nameof(Content))]
+    public class HeaderedContentItemsControl : HeaderedItemsControl
+    {
+        private static DependencyProperty Register<T>(in string propertyName) => Register<T, HeaderedContentItemsControl>(propertyName);
+
+        /// <summary>
+        /// Identifies the <see cref="Content"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ContentProperty = Register<object>(nameof(Content));
+
+        /// <summary>
+        /// Gets or sets the content of the control. This is a dependency property.
+        /// </summary>
+        public object Content { get => GetValue(ContentProperty); set => SetValue(ContentProperty, value); }
+
+        /// <summary>
+        /// Identifies the <see cref="ContentTemplate"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ContentTemplateProperty = Register<DataTemplate>(nameof(ContentTemplate));
+
+        public object ContentTemplate { get => GetValue(ContentTemplateProperty); set => SetValue(ContentTemplateProperty, value); }
+
+        /// <summary>
+        /// Identifies the <see cref="ContentTemplateSelector"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ContentTemplateSelectorProperty = Register<DataTemplateSelector>(nameof(ContentTemplateSelector));
+
+        public object ContentTemplateSelector { get => GetValue(ContentTemplateSelectorProperty); set => SetValue(ContentTemplateSelectorProperty, value); }
     }
 
     public class Label : System.Windows.Controls.Label

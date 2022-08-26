@@ -71,9 +71,9 @@ namespace WinCopies.IO
 
     public interface IContextMenu : System.IDisposable
     {
-        void AddCommands(System.Collections.Generic.IEnumerable<MenuItemInfo> menuItem);
+        void AddCommands(IEnumerable<MenuItemInfo> menuItem);
 
-        void AddExtensionCommands(System.Collections.Generic.IEnumerable<KeyValuePair<ExtensionCommand, MenuItemInfo>> menuItems);
+        void AddExtensionCommands(IEnumerable<KeyValuePair<ExtensionCommand, MenuItemInfo>> menuItems);
 
         string
 #if CS8
@@ -181,7 +181,7 @@ namespace WinCopies.IO
 
             IBrowsabilityOptions Browsability { get; }
 
-            System.Collections.Generic.IEnumerable<IBrowsabilityPath> BrowsabilityPaths { get; }
+            IEnumerable<IBrowsabilityPath> BrowsabilityPaths { get; }
 
             /// <summary>
             /// Gets a value indicating whether this <see cref="IBrowsableObjectInfo"/> is the root of its context.
@@ -291,7 +291,7 @@ namespace WinCopies.IO
             /// <param name="extendedVerbs">A value indicating whether to retrieve a full or partial context menu.</param>
             /// <returns>The <see cref="IContextMenu"/> that is retrieved by this method.</returns>
             /// <remarks><para>This method can be used to retrieve a native context menu, for which the commands cannot be managed directly on this layer.</para>
-            /// <para>This method overload is used to retrieve the context menu specific to the current item. To retrieve the context menu for children items, call the <see cref="GetContextMenu(System.Collections.Generic.IEnumerable{IBrowsableObjectInfo}, bool)"/> overload.</para>
+            /// <para>This method overload is used to retrieve the context menu specific to the current item. To retrieve the context menu for children items, call the <see cref="GetContextMenu(IEnumerable{IBrowsableObjectInfo}, bool)"/> overload.</para>
             /// </remarks>
             IContextMenu
 #if CS8
@@ -303,7 +303,7 @@ namespace WinCopies.IO
 #if CS8
                 ?
 #endif
-                GetContextMenu(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> children, bool extendedVerbs);
+                GetContextMenu(IEnumerable<IBrowsableObjectInfo> children, bool extendedVerbs);
 
             IBrowsableObjectInfoCallback RegisterCallback(Action<BrowsableObjectInfoCallbackArgs> callback);
 
@@ -325,17 +325,17 @@ namespace WinCopies.IO
 #endif
             GetRootItems();
 
-            System.Collections.Generic.IEnumerable<IBrowsableObjectInfo>
+            IEnumerable<IBrowsableObjectInfo>
 #if CS8
                 ?
 #endif
                 GetSubRootItems();
 
-            System.Collections.Generic.IEnumerable<ICommand>
+            IEnumerable<ICommand>
 #if CS8
                 ?
 #endif
-                GetCommands(System.Collections.Generic.IEnumerable<IBrowsableObjectInfo>
+                GetCommands(IEnumerable<IBrowsableObjectInfo>
 #if CS8
                 ?
 #endif
