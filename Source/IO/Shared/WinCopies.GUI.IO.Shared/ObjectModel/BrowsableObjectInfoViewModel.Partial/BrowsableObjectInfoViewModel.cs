@@ -322,7 +322,7 @@ namespace WinCopies.GUI.IO.ObjectModel
         #endregion
 
         #region Methods
-        public IBrowsableObjectInfoViewModel Clone() => new BrowsableObjectInfoViewModel((IBrowsableObjectInfoViewModel)ModelGeneric.Clone(), RootParentIsRootNode);
+        public IBrowsableObjectInfoViewModel Clone() => new BrowsableObjectInfoViewModel((IBrowsableObjectInfo)ModelGeneric.Clone(), RootParentIsRootNode);
 
         object ICloneable.Clone() => Clone();
 

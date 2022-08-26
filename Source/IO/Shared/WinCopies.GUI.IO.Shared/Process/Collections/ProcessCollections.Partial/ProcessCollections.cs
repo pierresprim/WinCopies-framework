@@ -31,7 +31,7 @@ namespace WinCopies.GUI.IO.Process
         {
             public Size TotalSize => InnerQueue.TotalSize;
 
-            public ObservableProcessCollection() : this(new WinCopies.IO.Process.ProcessTypes<TItems>.ProcessQueue()) { }
+            public ObservableProcessCollection() : this(new WinCopies.IO.Process.ProcessTypes<TItems>.ProcessQueue()) { /* Left empty. */ }
 
             public ObservableProcessCollection(in WinCopies.IO.Process.ProcessTypes<TItems>.IProcessQueue queue) : base(queue.IsReadOnly ? throw new ArgumentException($"{nameof(queue)} must be non-read-only.", nameof(queue)) : queue)
             {
@@ -45,13 +45,9 @@ namespace WinCopies.GUI.IO.Process
         {
             public Size TotalSize => InnerQueue.TotalSize;
 
-            public bool IsReadOnly => true;
-
             public object SyncRoot => InnerQueue.SyncRoot;
 
             public bool IsSynchronized => InnerQueue.IsSynchronized;
-
-            public uint Count => InnerQueue.Count;
 
             public bool HasItems => InnerQueue.HasItems;
 
@@ -60,26 +56,22 @@ namespace WinCopies.GUI.IO.Process
                 // Left empty.
             }
 
-            public TItems Peek() => InnerQueue.Peek();
-
-            public bool TryPeek(out TItems result) => InnerQueue.TryPeek(out result);
-
-            void IQueue<TItems>.Clear() => throw GetReadOnlyListOrCollectionException();
-
-            void ISimpleLinkedListBase2.Clear() => throw GetReadOnlyListOrCollectionException();
+            void ISimpleLinkedListBase.Clear() => throw GetReadOnlyListOrCollectionException();
 
             void IQueueBase<TItems>.Enqueue(TItems item) => throw GetReadOnlyListOrCollectionException();
 
             TItems IQueueBase<TItems>.Dequeue() => throw GetReadOnlyListOrCollectionException();
 
-            bool IQueueBase<TItems>.TryDequeue(out TItems result)
+            bool IQueueBase<TItems>.TryDequeue(out TItems
+#if CS9
+                ?
+#endif
+                result)
             {
                 result = default;
 
                 return false;
             }
-
-            void IQueueBase<TItems>.Clear() => throw GetReadOnlyListOrCollectionException();
 
             WinCopies.IO.Process.ProcessTypes<TItems>.IProcessQueue WinCopies.IO.Process.ProcessTypes<TItems>.IProcessQueue.AsReadOnly() => this;
         }

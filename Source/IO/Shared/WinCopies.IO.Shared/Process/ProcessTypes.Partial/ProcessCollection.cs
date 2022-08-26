@@ -69,7 +69,11 @@ namespace WinCopies.IO.Process
 
         public class ProcessQueue : QueueCollection<T>, IProcessQueue
         {
-            private readonly ProcessQueueSizeHelper _totalSize = new ProcessQueueSizeHelper();
+            private readonly ProcessQueueSizeHelper _totalSize = new
+#if !CS9
+            ProcessQueueSizeHelper
+#endif
+                ();
 
             public Size TotalSize => _totalSize.TotalSize;
 
@@ -121,7 +125,7 @@ namespace WinCopies.IO.Process
         {
             public Size TotalSize { get; private set; }
 
-            public ProcessCollection() : this(new ProcessQueue()) { }
+            public ProcessCollection() : this(new ProcessQueue()) { /* Left empty. */ }
 
             public ProcessCollection(in IProcessQueue queue) : base(queue.IsReadOnly ? throw new ArgumentException($"{nameof(queue)} must be non-read-only.", nameof(queue)) : queue)
             {
@@ -162,13 +166,9 @@ namespace WinCopies.IO.Process
         {
             public Size TotalSize => InnerQueue.TotalSize;
 
-            public bool IsReadOnly => true;
-
             public object SyncRoot => InnerQueue.SyncRoot;
 
             public bool IsSynchronized => InnerQueue.IsSynchronized;
-
-            public uint Count => InnerQueue.Count;
 
             public bool HasItems => InnerQueue.HasItems;
 
@@ -177,21 +177,13 @@ namespace WinCopies.IO.Process
                 // Left empty.
             }
 
-            public T Peek() => InnerQueue.Peek();
-
-            public bool TryPeek(out T result) => InnerQueue.TryPeek(out result);
-
-            void IQueue<T>.Clear() => throw GetReadOnlyListOrCollectionException();
-
-            void ISimpleLinkedListBase2.Clear() => throw GetReadOnlyListOrCollectionException();
+            void ISimpleLinkedListBase.Clear() => throw GetReadOnlyListOrCollectionException();
 
             void IQueueBase<T>.Enqueue(T item) => throw GetReadOnlyListOrCollectionException();
 
             T IQueueBase<T>.Dequeue() => throw GetReadOnlyListOrCollectionException();
 
             bool IQueueBase<T>.TryDequeue(out T result) => throw GetReadOnlyListOrCollectionException();
-
-            void IQueueBase<T>.Clear() => throw GetReadOnlyListOrCollectionException();
 
             IProcessQueue IProcessQueue.AsReadOnly() => this;
         }

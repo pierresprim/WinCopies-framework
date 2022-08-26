@@ -742,7 +742,6 @@ namespace WinCopies.GUI.IO
         private void Command_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = true;
-
             e.Handled = true;
         }
 
@@ -822,7 +821,11 @@ namespace WinCopies.GUI.IO
 
             CanRunCommand(GetProcessFactory()?.Copy, e);
 
-        protected IProcessFactory GetProcessFactory() => ((BrowsableObjectInfoWindowViewModel)DataContext).Paths.SelectedItem.Path.ItemSources?.SelectedItem.ProcessSettings?.ProcessFactory;
+        protected IProcessFactory
+#if CS8
+            ?
+#endif
+            GetProcessFactory() => ((BrowsableObjectInfoWindowViewModel)DataContext).Paths.SelectedItem.Path.ItemSources?.SelectedItem.ProcessSettings?.ProcessFactory;
 
         private void RunProcess(in ExecutedRoutedEventArgs e, in FuncIn<IProcessFactory, IRunnableProcessInfo> func)
         {
@@ -1060,7 +1063,7 @@ namespace WinCopies.GUI.IO
             add(OpenOrLaunch, Open_Executed, Open_CanExecute);
             add(OpenInNewTab, OpenInNewTab_Executed, OpenInNewTabOrWindow_CanExecute);
             add(OpenInNewWindow, OpenInNewWindow_Executed, OpenInNewTabOrWindow_CanExecute);
-            add(DuplicateTab, OpenInNewWindow_Executed, OpenInNewTabOrWindow_CanExecute);
+            add(DuplicateTab, DuplicateTab_Executed, Command_CanExecute);
             #endregion Open
 
             #region Close

@@ -819,7 +819,7 @@
                                 <local:BrowsableObjectInfoWindowMenuItem ResourceKey="OpenInNewTab" Icon="{x:Static guiResources:Resources.tab_go}" Command="{x:Static commands:ApplicationCommands.OpenInNewTab}" />
                                 <local:BrowsableObjectInfoWindowMenuItem ResourceKey="OpenInNewWindow" Icon="{x:Static guiResources:Resources.application_go}" Command="{x:Static commands:ApplicationCommands.OpenInNewWindow}" />
                             </local:BrowsableObjectInfoWindowMenuItem>
-                            <local:BrowsableObjectInfoWindowMenuItem ResourceKey="DuplicateTab" Icon="{x:Static guiResources:Resources.folder_explore}" Command="{x:Static commands:ApplicationCommands.DuplicateTab}" />
+                            <local:BrowsableObjectInfoWindowMenuItem ResourceKey="DuplicateTab" Icon="{x:Static guiResources:Resources.tab_go}" Command="{x:Static commands:ApplicationCommands.DuplicateTab}" />
                             <local:BrowsableObjectInfoWindowMenuItem ResourceKey="CloseTab">
                                 <local:BrowsableObjectInfoWindowMenuItem ResourceKey="CloseTab" Icon="{x:Static guiResources:Resources.tab_delete}" Command="{x:Static commands:ApplicationCommands.CloseTab}" />
                                 <local:BrowsableObjectInfoWindowMenuItem ResourceKey="CloseOtherTabs" Command="{x:Static commands:ApplicationCommands.CloseOtherTabs}" />
