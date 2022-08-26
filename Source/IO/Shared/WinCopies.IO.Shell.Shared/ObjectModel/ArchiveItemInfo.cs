@@ -134,7 +134,11 @@ namespace WinCopies.IO.ObjectModel
         /// <summary>
         /// Not applicable for this item type.
         /// </summary>
-        protected override string DescriptionOverride => WinCopies.Consts.Common.NotApplicable;
+        protected override string DescriptionOverride => WinCopies.Consts.
+#if WinCopies4
+            Common.
+#endif
+            NotApplicable;
 
         /// <summary>
         /// The <see cref="ArchiveFileInfo"/> that this <see cref="ArchiveItemInfo"/> represents.
@@ -179,8 +183,8 @@ namespace WinCopies.IO.ObjectModel
 #else
             ?? (_parent = GetParent());
 #endif
-        #endregion Overrides
-        #endregion Properties
+#endregion Overrides
+#endregion Properties
 
         protected ArchiveItemInfo(in string path, in IShellObjectInfoBase archiveShellObject, in ArchiveFileInfo? archiveFileInfo, in ClientVersion clientVersion/*, DeepClone<ArchiveFileInfo?> archiveFileInfoDelegate*/) : base(path, clientVersion)
         {
@@ -189,7 +193,7 @@ namespace WinCopies.IO.ObjectModel
             _innerObject = archiveFileInfo;
         }
 
-        #region Methods
+#region Methods
         private IBrowsableObjectInfo GetParent()
         {
             if (Path.Length > ArchiveShellObject.Path.Length)
@@ -222,7 +226,7 @@ namespace WinCopies.IO.ObjectModel
 
             base.DisposeUnmanaged();
         }
-        #endregion Methods
+#endregion Methods
     }
 
     public class ArchiveItemInfo : ArchiveItemInfo<IFileSystemObjectInfoProperties, ArchiveFileInfoEnumeratorStruct, IEnumerableSelectorDictionary<ArchiveItemInfoItemProvider, IBrowsableObjectInfo>, ArchiveItemInfoItemProvider>, IArchiveItemInfo
@@ -264,7 +268,7 @@ namespace WinCopies.IO.ObjectModel
         private static readonly BrowsabilityPathStack<IArchiveItemInfo> __browsabilityPathStack = new BrowsabilityPathStack<IArchiveItemInfo>();
         private IFileSystemObjectInfoProperties _objectProperties;
 
-        #region Properties
+#region Properties
         protected override IItemSourcesProvider<ArchiveFileInfoEnumeratorStruct> ItemSourcesGenericOverride { get; }
 
         public static IBrowsabilityPathStack<IArchiveItemInfo> BrowsabilityPathStack { get; } = __browsabilityPathStack.AsWriteOnly();
@@ -284,7 +288,7 @@ namespace WinCopies.IO.ObjectModel
         protected sealed override IFileSystemObjectInfoProperties ObjectPropertiesGenericOverride => _objectProperties;
 
         protected override IPropertySystemCollection<PropertyId, ShellPropertyGroup> ObjectPropertySystemOverride => null;
-        #endregion Properties
+#endregion Properties
 
         protected internal ArchiveItemInfo(in string path, in FileType fileType, in IShellObjectInfoBase archiveShellObject, in ArchiveFileInfo? archiveFileInfo, ClientVersion clientVersion/*, DeepClone<ArchiveFileInfo?> archiveFileInfoDelegate*/) : base(path, archiveShellObject, archiveFileInfo, clientVersion)
 
@@ -297,8 +301,8 @@ namespace WinCopies.IO.ObjectModel
             ItemSourcesGenericOverride = ItemSourcesProvider.Construct(new ItemSource(this));
         }
 
-        #region Methods
-        #region Construction Helpers
+#region Methods
+#region Construction Helpers
         ///// <summary>
         ///// Initializes a new instance of the <see cref="ArchiveItemInfo"/> class using a custom factory for <see cref="ArchiveItemInfo"/>s.
         ///// </summary>
@@ -321,7 +325,7 @@ namespace WinCopies.IO.ObjectModel
 
             return new ArchiveItemInfo(System.IO.Path.Combine(archiveShellObjectInfo.Path, archiveFilePath), FileType.Folder, archiveShellObjectInfo, null, archiveShellObjectInfo.ClientVersion);
         }
-        #endregion Construction Helpers
+#endregion Construction Helpers
 
         public override IBrowsableObjectInfo Clone() => new ArchiveItemInfo(Path, ObjectPropertiesGeneric.FileType, ArchiveShellObject, InnerObjectGenericOverride, ClientVersion);
 
@@ -335,6 +339,6 @@ namespace WinCopies.IO.ObjectModel
         }
 
         internal static System.Collections.Generic.IEnumerable<ArchiveItemInfoItemProvider> GetArchiveItemInfoItems(IArchiveItemInfoProvider item, Predicate<ArchiveFileInfoEnumeratorStruct> func) => new Enumerable<ArchiveItemInfoItemProvider>(() => new ArchiveItemInfoEnumerator(item, func));
-        #endregion Methods
+#endregion Methods
     }
 }

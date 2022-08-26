@@ -113,7 +113,7 @@ namespace WinCopies.IO.Process
         public bool TryDequeue(out TErrorItems result) => OnTryDequeue(out result);
 
         public bool TryPeek(out TErrorItems
-#if CS8
+#if CS9
             ?
 #endif
             result)

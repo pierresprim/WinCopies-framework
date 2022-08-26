@@ -84,9 +84,13 @@ namespace WinCopies.IO.ObjectModel
 #endif
             ;
 
-        protected override string ItemTypeNameOverride => FileSystemObjectInfo.GetItemTypeName(System.IO.Path.GetExtension(Path), ObjectPropertiesGeneric.FileType);
+        protected override string ItemTypeNameOverride => FileSystemObjectInfo.GetItemTypeName(GetExtension(Path), ObjectPropertiesGeneric.FileType);
 
-        protected override string DescriptionOverride => WinCopies.Consts.Common.NotApplicable;
+        protected override string DescriptionOverride => WinCopies.Consts.
+#if WinCopies4
+            Common.
+#endif
+            NotApplicable;
 
         protected override IBrowsableObjectInfo ParentGenericOverride => _parent;
 

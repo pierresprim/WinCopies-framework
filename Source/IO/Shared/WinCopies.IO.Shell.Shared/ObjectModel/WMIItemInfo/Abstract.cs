@@ -191,7 +191,11 @@ namespace WinCopies.IO
                     {
                         object value = _managementObject.Qualifiers[nameof(Description)].Value;
 
-                        _description = value == null ? WinCopies.Consts.Common.NotApplicable : (string)value;
+                        _description = value == null ? WinCopies.Consts.
+#if WinCopies4
+                        Common.
+#endif
+                        NotApplicable : (string)value;
                     }
 
                     return _description;

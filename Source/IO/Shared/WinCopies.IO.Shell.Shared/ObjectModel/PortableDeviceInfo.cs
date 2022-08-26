@@ -71,7 +71,11 @@ namespace WinCopies.IO.ObjectModel
 
         protected override string ItemTypeNameOverride => Shell.Properties.Resources.PortableDevice;
 
-        protected override string DescriptionOverride => WinCopies.Consts.Common.NotApplicable;
+        protected override string DescriptionOverride => WinCopies.Consts.
+#if WinCopies4
+            Common.
+#endif
+            NotApplicable;
 
         protected override IBrowsableObjectInfo ParentGenericOverride => ShellObjectInfo.From(ShellObjectFactory.Create(KnownFolders.Computer.ParsingName), ClientVersion);
 

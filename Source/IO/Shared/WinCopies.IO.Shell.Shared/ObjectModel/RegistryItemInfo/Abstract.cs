@@ -79,7 +79,11 @@ namespace WinCopies.IO.ObjectModel
             }
         }
 
-        protected override string DescriptionOverride => WinCopies.Consts.Common.NotApplicable;
+        protected override string DescriptionOverride => WinCopies.Consts.
+#if WinCopies4
+            Common.
+#endif
+            NotApplicable;
 
         /// <summary>
         /// Gets the localized path of this <see cref="RegistryItemInfo"/>.
