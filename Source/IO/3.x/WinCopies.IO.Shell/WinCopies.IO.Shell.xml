@@ -327,6 +327,50 @@
             Represents an archive item.
             </summary>
         </member>
+        <member name="T:WinCopies.IO.ObjectModel.RegistryItemInfo`4">
+            <summary>
+            Represents a Windows registry item.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.RegistryItemInfo`4.LocalizedName">
+            <summary>
+            Gets the localized path of this <see cref="T:WinCopies.IO.ObjectModel.RegistryItemInfo"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.RegistryItemInfo`4.Name">
+            <summary>
+            Gets the name of this <see cref="T:WinCopies.IO.ObjectModel.RegistryItemInfo"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.RegistryItemInfo`4.BrowsabilityOverride">
+            <summary>
+            Gets a value that indicates whether this <see cref="T:WinCopies.IO.ObjectModel.RegistryItemInfo"/> is browsable.
+            </summary>
+        </member>
+        <member name="M:WinCopies.IO.ObjectModel.RegistryItemInfo`4.OpenKey">
+            <summary>
+            Opens the <see cref="T:Microsoft.Win32.RegistryKey"/> that this <see cref="T:WinCopies.IO.ObjectModel.RegistryItemInfo"/> represents.
+            </summary>
+        </member>
+        <member name="M:WinCopies.IO.ObjectModel.RegistryItemInfo`4.OpenKey(Microsoft.Win32.RegistryKeyPermissionCheck,System.Security.AccessControl.RegistryRights)">
+            <summary>
+            Opens the <see cref="T:Microsoft.Win32.RegistryKey"/> that this <see cref="T:WinCopies.IO.ObjectModel.RegistryItemInfo"/> represents using custom <see cref="T:Microsoft.Win32.RegistryKeyPermissionCheck"/> and <see cref="T:System.Security.AccessControl.RegistryRights"/>.
+            </summary>
+            <param name="registryKeyPermissionCheck">Specifies whether security checks are performed when opening the registry key and accessing its name/value pairs.</param>
+            <param name="registryRights">Specifies the access control rights that can be applied to the registry objects in registry key's scope.</param>
+        </member>
+        <member name="M:WinCopies.IO.ObjectModel.RegistryItemInfo`4.OpenKey(System.Boolean)">
+            <summary>
+            Opens the <see cref="T:Microsoft.Win32.RegistryKey"/> that this <see cref="T:WinCopies.IO.ObjectModel.RegistryItemInfo"/> represents with a <see cref="T:System.Boolean"/> value that indicates whether the registry key has to be opened with write-rights.
+            </summary>
+            <param name="writable">A <see cref="T:System.Boolean"/> value that indicates whether the registry key has to be opened with write-rights</param>
+        </member>
+        <member name="M:WinCopies.IO.ObjectModel.RegistryItemInfo`4.GetParent">
+            <summary>
+            Returns the parent of this <see cref="T:WinCopies.IO.ObjectModel.RegistryItemInfo"/>.
+            </summary>
+            <returns>The parent of this <see cref="T:WinCopies.IO.ObjectModel.RegistryItemInfo"/>.</returns>
+        </member>
         <member name="M:WinCopies.IO.ObjectModel.RegistryItemInfo.#ctor(WinCopies.IO.ClientVersion@)">
             <summary>
             Initializes a new instance of the <see cref="T:WinCopies.IO.ObjectModel.RegistryItemInfo"/> class as the Registry root.
@@ -378,6 +422,77 @@
             Gets a string representation of this <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/>.
             </summary>
             <returns>The <see cref="P:WinCopies.IO.ObjectModel.ShellObjectInfo`4.LocalizedName"/> of this <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/>.</returns>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.WMIItemInfo`4.BrowsableObjectInfoBitmapSources.SmallOverride">
+            <summary>
+            Gets the small <see cref="T:System.Windows.Media.Imaging.BitmapSource"/> of this <see cref="T:WinCopies.IO.ObjectModel.WMIItemInfo"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.WMIItemInfo`4.BrowsableObjectInfoBitmapSources.MediumOverride">
+            <summary>
+            Gets the medium <see cref="T:System.Windows.Media.Imaging.BitmapSource"/> of this <see cref="T:WinCopies.IO.ObjectModel.WMIItemInfo"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.WMIItemInfo`4.BrowsableObjectInfoBitmapSources.LargeOverride">
+            <summary>
+            Gets the large <see cref="T:System.Windows.Media.Imaging.BitmapSource"/> of this <see cref="T:WinCopies.IO.ObjectModel.WMIItemInfo"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.WMIItemInfo`4.BrowsableObjectInfoBitmapSources.ExtraLargeOverride">
+            <summary>
+            Gets the extra large <see cref="T:System.Windows.Media.Imaging.BitmapSource"/> of this <see cref="T:WinCopies.IO.ObjectModel.WMIItemInfo"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.WMIItemInfo`4.LocalizedName">
+            <summary>
+            Gets the localized path of this <see cref="T:WinCopies.IO.ObjectModel.WMIItemInfo"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.WMIItemInfo`4.Name">
+            <summary>
+            Gets the name of this <see cref="T:WinCopies.IO.ObjectModel.WMIItemInfo"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.WMIItemInfo`4.BrowsabilityOverride">
+            <summary>
+            Gets a value that indicates whether this <see cref="T:WinCopies.IO.ObjectModel.WMIItemInfo"/> is browsable.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ObjectModel.WMIItemInfo`4.InnerObjectGenericOverride">
+            <summary>
+            Gets the <see cref="T:System.Management.ManagementBaseObject"/> that this <see cref="T:WinCopies.IO.ObjectModel.WMIItemInfo"/> represents.
+            </summary>
+        </member>
+        <member name="M:WinCopies.IO.ObjectModel.WMIItemInfo`4.#ctor(WinCopies.IO.ClientVersion@)">
+            <summary>
+            Initializes a new instance of the <see cref="T:WinCopies.IO.ObjectModel.WMIItemInfo"/> class as the WMI root item.
+            </summary>
+        </member>
+        <member name="M:WinCopies.IO.ObjectModel.WMIItemInfo.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:WinCopies.IO.ObjectModel.WMIItemInfo"/> class as the WMI root item.
+            </summary>
+        </member>
+        <member name="M:WinCopies.IO.ObjectModel.WMIItemInfo.#ctor(WinCopies.IO.PropertySystem.IWMIItemInfoOptions@,WinCopies.IO.ClientVersion@)">
+            <summary>
+            Initializes a new instance of the <see cref="T:WinCopies.IO.ObjectModel.WMIItemInfo"/> class as the WMI root item.
+            </summary>
+        </member>
+        <member name="M:WinCopies.IO.ObjectModel.WMIItemInfo.GetName(System.Management.ManagementBaseObject,WinCopies.IO.PropertySystem.WMIItemType)">
+            <summary>
+            Gets the name of the given <see cref="T:System.Management.ManagementBaseObject"/>.
+            </summary>
+            <param name="managementObject">The <see cref="T:System.Management.ManagementBaseObject"/> for which get the name.</param>
+            <param name="wmiItemType">The <see cref="T:WinCopies.IO.PropertySystem.WMIItemType"/> of <paramref name="managementObject"/>.</param>
+            <returns>The name of the given <see cref="T:System.Management.ManagementBaseObject"/>.</returns>
+        </member>
+        <member name="M:WinCopies.IO.ObjectModel.WMIItemInfo.GetPath(System.Management.ManagementBaseObject,WinCopies.IO.PropertySystem.WMIItemType)">
+            <summary>
+            Gets the path of the given <see cref="T:System.Management.ManagementBaseObject"/>.
+            </summary>
+            <param name="managementObject">The <see cref="T:System.Management.ManagementBaseObject"/> for which get the path.</param>
+            <param name="wmiItemType">The <see cref="T:WinCopies.IO.PropertySystem.WMIItemType"/> of <paramref name="managementObject"/>.</param>
+            <returns>The path of the given <see cref="T:System.Management.ManagementBaseObject"/>.</returns>
         </member>
         <member name="T:WinCopies.IO.ObjectModel.ArchiveItemInfo`4">
             <summary>
@@ -484,121 +599,6 @@
             <param name="left">Left operand.</param>
             <param name="right">Right operand.</param>
             <returns>A <see cref="T:System.Boolean"/> value that indicates whether the given <see cref="T:WinCopies.IO.ObjectModel.FileSystemObjectInfo`5"/> is greater or equal to the <see cref="T:WinCopies.IO.ObjectModel.FileSystemObjectInfo`5"/> to compare with.</returns>
-        </member>
-        <member name="T:WinCopies.IO.ObjectModel.RegistryItemInfo`4">
-            <summary>
-            Represents a Windows registry item.
-            </summary>
-        </member>
-        <member name="P:WinCopies.IO.ObjectModel.RegistryItemInfo`4.LocalizedName">
-            <summary>
-            Gets the localized path of this <see cref="T:WinCopies.IO.ObjectModel.RegistryItemInfo"/>.
-            </summary>
-        </member>
-        <member name="P:WinCopies.IO.ObjectModel.RegistryItemInfo`4.Name">
-            <summary>
-            Gets the name of this <see cref="T:WinCopies.IO.ObjectModel.RegistryItemInfo"/>.
-            </summary>
-        </member>
-        <member name="P:WinCopies.IO.ObjectModel.RegistryItemInfo`4.BrowsabilityOverride">
-            <summary>
-            Gets a value that indicates whether this <see cref="T:WinCopies.IO.ObjectModel.RegistryItemInfo"/> is browsable.
-            </summary>
-        </member>
-        <member name="M:WinCopies.IO.ObjectModel.RegistryItemInfo`4.OpenKey">
-            <summary>
-            Opens the <see cref="T:Microsoft.Win32.RegistryKey"/> that this <see cref="T:WinCopies.IO.ObjectModel.RegistryItemInfo"/> represents.
-            </summary>
-        </member>
-        <member name="M:WinCopies.IO.ObjectModel.RegistryItemInfo`4.OpenKey(Microsoft.Win32.RegistryKeyPermissionCheck,System.Security.AccessControl.RegistryRights)">
-            <summary>
-            Opens the <see cref="T:Microsoft.Win32.RegistryKey"/> that this <see cref="T:WinCopies.IO.ObjectModel.RegistryItemInfo"/> represents using custom <see cref="T:Microsoft.Win32.RegistryKeyPermissionCheck"/> and <see cref="T:System.Security.AccessControl.RegistryRights"/>.
-            </summary>
-            <param name="registryKeyPermissionCheck">Specifies whether security checks are performed when opening the registry key and accessing its name/value pairs.</param>
-            <param name="registryRights">Specifies the access control rights that can be applied to the registry objects in registry key's scope.</param>
-        </member>
-        <member name="M:WinCopies.IO.ObjectModel.RegistryItemInfo`4.OpenKey(System.Boolean)">
-            <summary>
-            Opens the <see cref="T:Microsoft.Win32.RegistryKey"/> that this <see cref="T:WinCopies.IO.ObjectModel.RegistryItemInfo"/> represents with a <see cref="T:System.Boolean"/> value that indicates whether the registry key has to be opened with write-rights.
-            </summary>
-            <param name="writable">A <see cref="T:System.Boolean"/> value that indicates whether the registry key has to be opened with write-rights</param>
-        </member>
-        <member name="M:WinCopies.IO.ObjectModel.RegistryItemInfo`4.GetParent">
-            <summary>
-            Returns the parent of this <see cref="T:WinCopies.IO.ObjectModel.RegistryItemInfo"/>.
-            </summary>
-            <returns>The parent of this <see cref="T:WinCopies.IO.ObjectModel.RegistryItemInfo"/>.</returns>
-        </member>
-        <member name="P:WinCopies.IO.ObjectModel.WMIItemInfo`4.BrowsableObjectInfoBitmapSources.SmallOverride">
-            <summary>
-            Gets the small <see cref="T:System.Windows.Media.Imaging.BitmapSource"/> of this <see cref="T:WinCopies.IO.ObjectModel.WMIItemInfo"/>.
-            </summary>
-        </member>
-        <member name="P:WinCopies.IO.ObjectModel.WMIItemInfo`4.BrowsableObjectInfoBitmapSources.MediumOverride">
-            <summary>
-            Gets the medium <see cref="T:System.Windows.Media.Imaging.BitmapSource"/> of this <see cref="T:WinCopies.IO.ObjectModel.WMIItemInfo"/>.
-            </summary>
-        </member>
-        <member name="P:WinCopies.IO.ObjectModel.WMIItemInfo`4.BrowsableObjectInfoBitmapSources.LargeOverride">
-            <summary>
-            Gets the large <see cref="T:System.Windows.Media.Imaging.BitmapSource"/> of this <see cref="T:WinCopies.IO.ObjectModel.WMIItemInfo"/>.
-            </summary>
-        </member>
-        <member name="P:WinCopies.IO.ObjectModel.WMIItemInfo`4.BrowsableObjectInfoBitmapSources.ExtraLargeOverride">
-            <summary>
-            Gets the extra large <see cref="T:System.Windows.Media.Imaging.BitmapSource"/> of this <see cref="T:WinCopies.IO.ObjectModel.WMIItemInfo"/>.
-            </summary>
-        </member>
-        <member name="P:WinCopies.IO.ObjectModel.WMIItemInfo`4.LocalizedName">
-            <summary>
-            Gets the localized path of this <see cref="T:WinCopies.IO.ObjectModel.WMIItemInfo"/>.
-            </summary>
-        </member>
-        <member name="P:WinCopies.IO.ObjectModel.WMIItemInfo`4.Name">
-            <summary>
-            Gets the name of this <see cref="T:WinCopies.IO.ObjectModel.WMIItemInfo"/>.
-            </summary>
-        </member>
-        <member name="P:WinCopies.IO.ObjectModel.WMIItemInfo`4.BrowsabilityOverride">
-            <summary>
-            Gets a value that indicates whether this <see cref="T:WinCopies.IO.ObjectModel.WMIItemInfo"/> is browsable.
-            </summary>
-        </member>
-        <member name="P:WinCopies.IO.ObjectModel.WMIItemInfo`4.InnerObjectGenericOverride">
-            <summary>
-            Gets the <see cref="T:System.Management.ManagementBaseObject"/> that this <see cref="T:WinCopies.IO.ObjectModel.WMIItemInfo"/> represents.
-            </summary>
-        </member>
-        <member name="M:WinCopies.IO.ObjectModel.WMIItemInfo`4.#ctor(WinCopies.IO.ClientVersion@)">
-            <summary>
-            Initializes a new instance of the <see cref="T:WinCopies.IO.ObjectModel.WMIItemInfo"/> class as the WMI root item.
-            </summary>
-        </member>
-        <member name="M:WinCopies.IO.ObjectModel.WMIItemInfo.#ctor">
-            <summary>
-            Initializes a new instance of the <see cref="T:WinCopies.IO.ObjectModel.WMIItemInfo"/> class as the WMI root item.
-            </summary>
-        </member>
-        <member name="M:WinCopies.IO.ObjectModel.WMIItemInfo.#ctor(WinCopies.IO.PropertySystem.IWMIItemInfoOptions@,WinCopies.IO.ClientVersion@)">
-            <summary>
-            Initializes a new instance of the <see cref="T:WinCopies.IO.ObjectModel.WMIItemInfo"/> class as the WMI root item.
-            </summary>
-        </member>
-        <member name="M:WinCopies.IO.ObjectModel.WMIItemInfo.GetName(System.Management.ManagementBaseObject,WinCopies.IO.PropertySystem.WMIItemType)">
-            <summary>
-            Gets the name of the given <see cref="T:System.Management.ManagementBaseObject"/>.
-            </summary>
-            <param name="managementObject">The <see cref="T:System.Management.ManagementBaseObject"/> for which get the name.</param>
-            <param name="wmiItemType">The <see cref="T:WinCopies.IO.PropertySystem.WMIItemType"/> of <paramref name="managementObject"/>.</param>
-            <returns>The name of the given <see cref="T:System.Management.ManagementBaseObject"/>.</returns>
-        </member>
-        <member name="M:WinCopies.IO.ObjectModel.WMIItemInfo.GetPath(System.Management.ManagementBaseObject,WinCopies.IO.PropertySystem.WMIItemType)">
-            <summary>
-            Gets the path of the given <see cref="T:System.Management.ManagementBaseObject"/>.
-            </summary>
-            <param name="managementObject">The <see cref="T:System.Management.ManagementBaseObject"/> for which get the path.</param>
-            <param name="wmiItemType">The <see cref="T:WinCopies.IO.PropertySystem.WMIItemType"/> of <paramref name="managementObject"/>.</param>
-            <returns>The path of the given <see cref="T:System.Management.ManagementBaseObject"/>.</returns>
         </member>
         <member name="P:WinCopies.IO.Enumeration.ArchiveFileInfoEnumeratorStruct3.ArchiveFileInfo">
             <summary>
