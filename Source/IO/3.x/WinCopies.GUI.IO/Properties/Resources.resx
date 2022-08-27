@@ -177,6 +177,12 @@
   <data name="DirectoryStructure" xml:space="preserve">
     <value>Directory structure</value>
   </data>
+  <data name="DuplicateTab" xml:space="preserve">
+    <value>_Duplicate tab</value>
+  </data>
+  <data name="DuplicateTabStatusBarLabel" xml:space="preserve">
+    <value>Duplicates the current tab.</value>
+  </data>
   <data name="Edit" xml:space="preserve">
     <value>_Edit</value>
   </data>
