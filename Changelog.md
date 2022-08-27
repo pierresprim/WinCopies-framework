@@ -47,15 +47,12 @@ CHANGELOG
 	- RecursivelyEnumerablePath\<T>'s constructor parameters 'searchPattern' and 'enumerationOptions' are nullable.
 	- Size.ToString: only the two first decimals are shown.
 - GUI.IO:
-	- BrowsableObjectInfoWindow dependency property fields are read-only.
 	- Application handles the TargetInvocationException when loading plugins.
+	- BrowsableObjectInfoWindow dependency property fields are read-only.
+	- BrowsableObjectInfoWindow: add a new menu: Duplicate Tab.
 	- BrowsableObjectInfoWindow2's constructor: new optional parameter: createDefaultTab (defaults to `true`).
-
-### ????
-
-- BrowsableObjectInfoWindow: add a new menu: Duplicate Tab.
-- IBrowsableObjectInfo implements ICloneable. BrowsableObjectInfo has a new abstract method (Clone) consequently. ICloneable.Clone is implemented explicitly and calls the abstract version of the method. This version returns IBrowsableObjectInfo instead of object to make it easier to use.
-- Bug fixed in ContextMenuCommand: the LastDelegatedCommand was wrong.
+	- IBrowsableObjectInfo implements ICloneable. BrowsableObjectInfo has a new abstract method (Clone) consequently. ICloneable.Clone is implemented explicitly and calls the abstract version of the method. This version returns IBrowsableObjectInfo instead of object to make it easier to use.
+	- Bug fixed in ContextMenuCommand: the LastDelegatedCommand value was wrong.
 
 ### 3.17.1.2-preview
 
