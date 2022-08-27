@@ -241,6 +241,24 @@ namespace WinCopies.GUI.IO.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to _Duplicate tab.
+        /// </summary>
+        public static string DuplicateTab {
+            get {
+                return ResourceManager.GetString("DuplicateTab", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Duplicates the current tab..
+        /// </summary>
+        public static string DuplicateTabStatusBarLabel {
+            get {
+                return ResourceManager.GetString("DuplicateTabStatusBarLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to _Edit.
         /// </summary>
         public static string Edit {

@@ -4,10 +4,10 @@
 		<PackageId>WinCopies.Console</PackageId>
 		<TargetFrameworks>netcoreapp3.0;netcoreapp3.1;net5.0-windows;net6.0-windows;net7.0-windows;net472;net48</TargetFrameworks>
 		<TargetPlatformIdentifier>windows</TargetPlatformIdentifier>
-		<VersionPrefix>3.1</VersionPrefix>
+		<VersionPrefix>3.2</VersionPrefix>
 		<VersionSuffix>preview</VersionSuffix>
-		<AssemblyVersion>3.1</AssemblyVersion>
-		<FileVersion>3.1</FileVersion>
+		<AssemblyVersion>3.2</AssemblyVersion>
+		<FileVersion>3.2</FileVersion>
 		<PackageTags>WinCopies, Console</PackageTags>
 	</PropertyGroup>
 
@@ -18,8 +18,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="WinCopies.Util" Version="3.16-preview" />
-		<PackageReference Include="WinCopies.Collections" Version="3.16-preview" />
+		<PackageReference Include="WinCopies.Collections" Version="3.20-preview" />
 		<PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="3.8.2-preview" />
 		<PackageReference Include="WinCopies.WindowsAPICodePack.Win32Native" Version="3.9-preview" />
 	</ItemGroup>

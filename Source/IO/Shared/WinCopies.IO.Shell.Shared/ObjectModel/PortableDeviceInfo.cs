@@ -71,7 +71,11 @@ namespace WinCopies.IO.ObjectModel
 
         protected override string ItemTypeNameOverride => Shell.Properties.Resources.PortableDevice;
 
-        protected override string DescriptionOverride => WinCopies.Consts.NotApplicable;
+        protected override string DescriptionOverride => WinCopies.Consts.
+#if WinCopies4
+            Common.
+#endif
+            NotApplicable;
 
         protected override IBrowsableObjectInfo ParentGenericOverride => ShellObjectInfo.From(ShellObjectFactory.Create(KnownFolders.Computer.ParsingName), ClientVersion);
 
@@ -106,7 +110,7 @@ namespace WinCopies.IO.ObjectModel
     {
         public class ItemSource : ItemSourceBase4<IPortableDeviceInfo, IPortableDeviceObject, IEnumerableSelectorDictionary<PortableDeviceObjectInfoItemProvider, IBrowsableObjectInfo>, PortableDeviceObjectInfoItemProvider>
         {
-            protected override IProcessSettings ProcessSettingsOverride { get; } 
+            protected override IProcessSettings ProcessSettingsOverride { get; }
 
             public override bool IsPaginationSupported => false;
 
@@ -158,6 +162,8 @@ namespace WinCopies.IO.ObjectModel
         }
 
         public PortableDeviceInfo(in IPortableDevice portableDevice, in ClientVersion clientVersion) : this(portableDevice, new PortableDeviceOpeningOptions(GenericRights.Read, FileShareOptions.Read, true), clientVersion) { /* Left empty. */ }
+
+        public override IBrowsableObjectInfo Clone() => new PortableDeviceInfo(InnerObjectGeneric, ObjectPropertiesGenericOverride.OpeningOptions, ClientVersion);
 
         protected override IEnumerableSelectorDictionary<PortableDeviceObjectInfoItemProvider, IBrowsableObjectInfo> GetSelectorDictionaryOverride() => DefaultItemSelectorDictionary;
 

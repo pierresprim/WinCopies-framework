@@ -37,10 +37,18 @@ namespace WinCopies.IO.Process
     {
         TError Error { get; }
 
-        TAction Action { get; set; }
+        TAction
+#if CS9
+            ?
+#endif
+            Action { get; set; }
 
 #if CS8
-        object IProcessError.Error => Error;
+        object
+#if CS8
+            ?
+#endif
+            IProcessError.Error => Error;
 #endif
     }
 
@@ -53,9 +61,9 @@ namespace WinCopies.IO.Process
 
     public interface IProcessErrorItem<TInnerItem, TError, TAction> : IProcessErrorItem
     {
-        TInnerItem Item { get; }
+        new TInnerItem Item { get; }
 
-        IProcessError<TError, TAction> Error { get; }
+        new IProcessError<TError, TAction> Error { get; }
 
 #if CS8
         object IProcessErrorItem.Item => Item;

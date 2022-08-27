@@ -51,6 +51,12 @@ CHANGELOG
 	- Application handles the TargetInvocationException when loading plugins.
 	- BrowsableObjectInfoWindow2's constructor: new optional parameter: createDefaultTab (defaults to `true`).
 
+### ????
+
+- BrowsableObjectInfoWindow: add a new menu: Duplicate Tab.
+- IBrowsableObjectInfo implements ICloneable. BrowsableObjectInfo has a new abstract method (Clone) consequently. ICloneable.Clone is implemented explicitly and calls the abstract version of the method. This version returns IBrowsableObjectInfo instead of object to make it easier to use.
+- Bug fixed in ContextMenuCommand: the LastDelegatedCommand was wrong.
+
 ### 3.17.1.2-preview
 
 Bug fixes in WinCopies.Installer package:
@@ -70,7 +76,7 @@ Bug fixes in WinCopies.Installer package:
 	- BrowsableObjectInfoURL2(in string path) constructor: the given path was not correctly parsed.
 	- WinCopies.IO.Shell.ObjectModel.BrowsableObjectInfo.RegisterDefaultBrowsableObjectInfoSelector: the Action value of the property was pushing a predicate with a wrong type to check for constants.
 	- WinCopies.IO.Shell.BrowsableObjectInfoPlugin's constructor: WinCopies.IO.Shell.ObjectModel.BrowsableObjectInfo.RegisterDefaultBrowsableObjectInfoSelector was not registered.
-	- WinCopies.IO.Consts.Protocols has new constant (FILE). The absence of this constant was leading to a bug when looking for a BrowsableObjectInfo to handle the file:// protocol.
+	- WinCopies.IO.Consts.Protocols has a new constant (FILE). The absence of this constant was leading to a bug when looking for a BrowsableObjectInfo to handle the file:// protocol.
 - WinCopies.IO.ObjectModel.BrowsableObjectInfo:
 	- new static method: PromptPathNotFound.
 	- Create method has new parameters.

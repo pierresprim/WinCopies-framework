@@ -602,6 +602,8 @@ namespace WinCopies.IO
             #endregion
 
             #region Public Methods
+            public abstract IBrowsableObjectInfo Clone();
+
             public static Icon
 #if CS8
                 ?
@@ -702,6 +704,8 @@ namespace WinCopies.IO
             #endregion
 
             #region Interface Implementations
+            object ICloneable.Clone() => Clone();
+
             #region Enumeration
             protected System.Collections.Generic.IEnumerable<IBrowsableObjectInfo>
 #if CS8
@@ -772,15 +776,12 @@ namespace WinCopies.IO
             }
 
             //if (ItemsLoader != null)
-
             //{
-
             //    if (ItemsLoader.IsBusy)
 
             //        ItemsLoader.Cancel();
 
-            //    // ItemsLoader.Path = null;
-
+            //    ItemsLoader.Path = null;
             //}
 
             //if (disposing)

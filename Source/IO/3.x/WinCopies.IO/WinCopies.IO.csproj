@@ -9,17 +9,16 @@
 		<Copyright>Copyright © 2021 Pierre Sprimont</Copyright>
 		<PackageTags>WinCopies, IO</PackageTags>
 		<DefineConstants>WinCopies2;WinCopies3;$(DefineConstants)</DefineConstants>
-		<VersionPrefix>3.17.1</VersionPrefix>
+		<VersionPrefix>3.18</VersionPrefix>
 		<VersionSuffix>preview</VersionSuffix>
-		<AssemblyVersion>3.17.1</AssemblyVersion>
-		<FileVersion>3.17.1</FileVersion>
+		<AssemblyVersion>3.18</AssemblyVersion>
+		<FileVersion>3.18</FileVersion>
 	</PropertyGroup>
 
 	<Import Project="$(SolutionDir)\ExtraProperties.props" Condition="'$(Configuration)'=='Release'" />
 
 	<ItemGroup>
-		<PackageReference Include="WinCopies.Collections" Version="3.18-preview" />
-		<PackageReference Include="WinCopies.Util.Desktop" Version="3.18-preview" />
+		<PackageReference Include="WinCopies.Util.Desktop" Version="3.20-preview" />
 		
 		<PackageReference Include="WinCopies.WindowsAPICodePack" Version="3.11-preview" />
 	</ItemGroup>

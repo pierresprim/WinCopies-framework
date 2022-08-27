@@ -38,7 +38,7 @@ namespace WinCopies.IO.Process
 
     public interface IProcessLinkedList<TItems, TError, TErrorItems, TAction> : ILinkedList3<TErrorItems>, ProcessTypes<TErrorItems>.IProcessQueue where TItems : IPath where TErrorItems : IProcessErrorItem<TItems, TError, TAction>
     {
-        void Enqueue(TErrorItems item);
+        new void Enqueue(TErrorItems item);
 
         new void Clear();
 
@@ -66,7 +66,11 @@ namespace WinCopies.IO.Process
                 TotalSize -= node.Value.Size.Value;
         }
 
-        protected virtual bool OnTryDequeue(out TErrorItems result)
+        protected virtual bool OnTryDequeue(out TErrorItems
+#if CS9
+            ?
+#endif
+            result)
         {
             if (InnerList.IsReadOnly)
             {
@@ -99,7 +103,7 @@ namespace WinCopies.IO.Process
 
                 TotalSize += item.Size.Value;
 
-            InnerList.AddLast(item);
+            _ = InnerList.AddLast(item);
         }
 
         public void Enqueue(TErrorItems item) => OnEnqueue(item);
@@ -108,7 +112,11 @@ namespace WinCopies.IO.Process
 
         public bool TryDequeue(out TErrorItems result) => OnTryDequeue(out result);
 
-        public bool TryPeek(out TErrorItems result)
+        public bool TryPeek(out TErrorItems
+#if CS9
+            ?
+#endif
+            result)
         {
             if (InnerList.Count == 0)
             {
@@ -152,36 +160,28 @@ namespace WinCopies.IO.Process
 
         ProcessTypes<TErrorItems>.IProcessQueue ProcessTypes<TErrorItems>.IProcessQueue.AsReadOnly() => this;
 
-        void IQueue<TErrorItems>.Clear() => throw GetReadOnlyListOrCollectionException();
-
-        void ISimpleLinkedListBase2.Clear() => throw GetReadOnlyListOrCollectionException();
-
-        void IQueueBase<TErrorItems>.Clear() => throw GetReadOnlyListOrCollectionException();
+        void ISimpleLinkedListBase.Clear() => throw GetReadOnlyListOrCollectionException();
 
         TErrorItems IQueueBase<TErrorItems>.Dequeue() => throw GetReadOnlyListOrCollectionException();
 
         void IQueueBase<TErrorItems>.Enqueue(TErrorItems item) => throw GetReadOnlyListOrCollectionException();
 
-        TErrorItems IQueue<TErrorItems>.Peek() => InnerList.Peek();
-
         TErrorItems IPeekable<TErrorItems>.Peek() => InnerList.Peek();
 
-        TErrorItems IQueueBase<TErrorItems>.Peek() => InnerList.Peek();
-
-        bool IQueueBase<TErrorItems>.TryDequeue(out TErrorItems result)
+        bool IQueueBase<TErrorItems>.TryDequeue(out TErrorItems
+#if CS9
+            ?
+#endif
+            result)
         {
             result = default;
 
             return false;
         }
 
-        bool IQueue<TErrorItems>.TryPeek(out TErrorItems result) => InnerList.TryPeek(out result);
-
         bool IPeekable<TErrorItems>.TryPeek(out TErrorItems result) => InnerList.TryPeek(out result);
 
-        bool IQueueBase<TErrorItems>.TryPeek(out TErrorItems result) => InnerList.TryPeek(out result);
-
-        TErrorItems ISimpleLinkedList<TErrorItems>.Peek() => ((ISimpleLinkedList<TErrorItems>)InnerList).Peek();
+        bool ISimpleLinkedListBase<TErrorItems>.TryPeek(out TErrorItems result) => InnerList.TryPeek(out result);
 
 #if !CS8
         bool ISimpleLinkedList.TryPeek(out object result) => InnerList.TryPeek(out result);
@@ -230,21 +230,11 @@ namespace WinCopies.IO.Process
 
         ProcessTypes<TItemsOut>.IProcessQueue ProcessTypes<TItemsOut>.IProcessQueue.AsReadOnly() => this;
 
-        void IQueue<TItemsOut>.Clear() => throw GetReadOnlyListOrCollectionException();
-
-        void ISimpleLinkedListBase2.Clear() => throw GetReadOnlyListOrCollectionException();
-
-        void IQueueBase<TItemsOut>.Clear() => throw GetReadOnlyListOrCollectionException();
-
         TItemsOut IQueueBase<TItemsOut>.Dequeue() => throw GetReadOnlyListOrCollectionException();
 
         void IQueueBase<TItemsOut>.Enqueue(TItemsOut item) => throw GetReadOnlyListOrCollectionException();
 
-        TItemsOut IQueue<TItemsOut>.Peek() => InnerList.Peek();
-
         TItemsOut IPeekable<TItemsOut>.Peek() => InnerList.Peek();
-
-        TItemsOut IQueueBase<TItemsOut>.Peek() => InnerList.Peek();
 
         bool IQueueBase<TItemsOut>.TryDequeue(out TItemsOut
 #if CS9
@@ -295,11 +285,7 @@ namespace WinCopies.IO.Process
 
         public void CopyTo(TItemsOut[] array, int arrayIndex)
         {
-            if (array.Length - arrayIndex < InnerList.Count)
-
-                throw new InvalidOperationException("The given array does not have enough space.");
-
-            int i = -1;
+            int i = (array.Length - arrayIndex < InnerList.Count) ? throw new InvalidOperationException("The given array does not have enough space.") : (-1);
 
             foreach (TItemsIn item in InnerList)
 
@@ -310,11 +296,7 @@ namespace WinCopies.IO.Process
 
         public void CopyTo(Array array, int index)
         {
-            if (array.Length - index < InnerList.Count)
-
-                throw new InvalidOperationException("The given array does not have enough space.");
-
-            int i = -1;
+            int i = (array.Length - index < InnerList.Count) ? throw new InvalidOperationException("The given array does not have enough space.") : (-1);
 
             foreach (TItemsIn item in InnerList)
 
@@ -369,7 +351,11 @@ namespace WinCopies.IO.Process
                 private class LinkedList : _IQueue<ProcessTypes<TItemsOut, TError, TAction>.ProcessErrorItem>
                 {
                     private ILinkedList<ProcessTypes<TItemsOut, TError, TAction>.ProcessErrorItem> _list;
-                    private ILinkedListNode<ProcessTypes<TItemsOut, TError, TAction>.ProcessErrorItem> _currentNode;
+                    private ILinkedListNode<ProcessTypes<TItemsOut, TError, TAction>.ProcessErrorItem>
+#if CS8
+                        ?
+#endif
+                        _currentNode;
                     private ILinkedListNode<ProcessTypes<TItemsOut, TError, TAction>.ProcessErrorItem> _nextNode;
                     // private IProcessError<TError, TAction> _processError;
                     private Predicate<string> _func;
@@ -393,21 +379,21 @@ namespace WinCopies.IO.Process
                         _error = _currentNode.Value.Error.Error;
                     }
 
-                    private ILinkedListNode<ProcessTypes<TItemsOut, TError, TAction>.ProcessErrorItem> Peek()
+                    private ILinkedListNode<ProcessTypes<TItemsOut, TError, TAction>.ProcessErrorItem>
+#if CS8
+                        ?
+#endif
+                        Peek()
                     {
                         ILinkedListNode<ProcessTypes<TItemsOut, TError, TAction>.ProcessErrorItem> node = _nextNode;
 
                         bool check() => node.Value.Error == null || Equals(node.Value.Error.Error, _error);
 
-                        Func<bool> func;
-
-                        if (_func == null)
-
-                            func = check;
-
-                        else
-
-                            func = () => check() && _func(node.Value.Item.Path);
+                        Func<bool> func = _func == null ?
+#if !CS9
+                            (Func<bool>)
+#endif
+                            check : (() => check() && _func(node.Value.Item.Path));
 
                         while (!(node == null || func()))
 

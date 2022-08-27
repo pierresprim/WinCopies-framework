@@ -326,6 +326,10 @@ namespace WinCopies.GUI.IO.ObjectModel
         #endregion
 
         #region Methods
+        public IBrowsableObjectInfoViewModel Clone() => new BrowsableObjectInfoViewModel((IBrowsableObjectInfo)ModelGeneric.Clone(), RootParentIsRootNode);
+
+        object ICloneable.Clone() => Clone();
+
         protected internal virtual void RaiseSelectedItemsChanged(ItemsChangedEventArgs<IBrowsableObjectInfoViewModel> e) => SelectedItemsChanged?.Invoke(this, e);
 
         public IContextMenu

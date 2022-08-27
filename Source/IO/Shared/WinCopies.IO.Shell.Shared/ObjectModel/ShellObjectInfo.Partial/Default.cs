@@ -99,6 +99,8 @@ namespace WinCopies.IO.ObjectModel
         #endregion
 
         #region Methods
+        public override IBrowsableObjectInfo Clone() => new ShellObjectInfo(new BrowsableObjectInfoURL(Path, URI), ObjectPropertiesGeneric.FileType, InnerObjectGenericOverride, ClientVersion);
+
         private static BrowsableObjectInfoURL GetURL(in IKnownFolder knownFolder)
         {
             string path = knownFolder.Path;

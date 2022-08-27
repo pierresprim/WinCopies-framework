@@ -7,6 +7,7 @@
 		<RepositoryUrl>https://github.com/pierresprim/WinCopies-framework.git</RepositoryUrl>
 		<RepositoryType>Git</RepositoryType>
 		<ProduceReferenceAssembly>true</ProduceReferenceAssembly>
+		<Copyright>Copyright © 2022 Pierre Sprimont</Copyright>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">

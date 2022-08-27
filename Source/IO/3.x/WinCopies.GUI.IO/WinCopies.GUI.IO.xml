@@ -120,6 +120,16 @@
               Looks up a localized string similar to Directory structure.
             </summary>
         </member>
+        <member name="P:WinCopies.GUI.IO.Properties.Resources.DuplicateTab">
+            <summary>
+              Looks up a localized string similar to _Duplicate tab.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.Properties.Resources.DuplicateTabStatusBarLabel">
+            <summary>
+              Looks up a localized string similar to Duplicates the current tab..
+            </summary>
+        </member>
         <member name="P:WinCopies.GUI.IO.Properties.Resources.Edit">
             <summary>
               Looks up a localized string similar to _Edit.

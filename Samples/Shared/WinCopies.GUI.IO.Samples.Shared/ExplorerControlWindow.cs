@@ -49,12 +49,16 @@ namespace WinCopies.GUI.IO.Samples
         public PluginInfo(in IBrowsableObjectInfoPlugin plugin, in ClientVersion clientVersion) : base(plugin, clientVersion) { /* Left empty. */ }
 
         protected override ObjectModel.BrowsableObjectInfoStartPage GetBrowsableObjectInfoStartPage() => new BrowsableObjectInfoStartPage(ClientVersion);
+
+        public override IBrowsableObjectInfo Clone() => new PluginInfo(InnerObjectGeneric, ClientVersion);
     }
 
     public class BrowsableObjectInfoStartPage : ObjectModel.BrowsableObjectInfoStartPage
     {
         public BrowsableObjectInfoStartPage(ClientVersion clientVersion) : base(App.Current.PluginParameters.Select(plugin => new PluginInfo(plugin, clientVersion)), clientVersion) { /* Left empty. */ }
         public BrowsableObjectInfoStartPage() : this(DefaultClientVersion) { /* Left empty. */ }
+
+        public override IBrowsableObjectInfo Clone() => new BrowsableObjectInfoStartPage(ClientVersion);
 
         protected override Icon GetIcon() => Properties.Resources.WinCopies;
     }

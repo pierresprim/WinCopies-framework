@@ -106,6 +106,8 @@ namespace WinCopies.IO.Shell
 
                 return GetEnumerable(getShellObjectInfo(KnownFolders.Desktop), getShellObjectInfo(Computer), getShellObjectInfo(UsersFiles), getShellObjectInfo(UsersLibraries));
             });
+
+            public override IBrowsableObjectInfo Clone() => new FileProtocolInfo(Parent, ClientVersion);
         }
 
         public class ShellProtocolInfo : ProtocolInfo
@@ -113,6 +115,8 @@ namespace WinCopies.IO.Shell
             protected override IItemSourcesProvider ItemSourcesOverride { get; }
 
             public ShellProtocolInfo(in IBrowsableObjectInfo parent, in ClientVersion clientVersion) : base("shell", parent, clientVersion) => ItemSourcesOverride = new ItemSourcesProvider(GetItems);
+
+            public override IBrowsableObjectInfo Clone() => new ShellProtocolInfo(Parent, ClientVersion);
 
             private System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetItems()
             {
@@ -178,7 +182,7 @@ namespace WinCopies.IO.Shell
 #else
                     )
 #endif
-                    {
+                {
 #if !CS9
                     case
 #endif

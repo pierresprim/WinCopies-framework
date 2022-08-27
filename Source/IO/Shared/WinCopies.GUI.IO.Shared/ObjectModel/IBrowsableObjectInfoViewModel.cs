@@ -42,6 +42,7 @@ using WinCopies.Util.Data;
 
 using static WinCopies.Extensions.UtilHelpers;
 
+using Enumerable = System.Linq.Enumerable;
 using IEnumerator = System.Collections.IEnumerator;
 #endregion Usings
 

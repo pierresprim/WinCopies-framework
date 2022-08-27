@@ -36,9 +36,31 @@ using static WinCopies.ThrowHelper;
 
 namespace WinCopies.GUI.IO.Process
 {
-    public interface IProcessLinkedList<TItems, TError, TErrorItems, TAction> : System.Collections.Generic.ICollection<TErrorItems>, System.Collections.Generic.IEnumerable<TErrorItems>, IEnumerable, System.Collections.Generic.IReadOnlyCollection<TErrorItems>, ICollection, ILinkedList3<TErrorItems>, IReadOnlyLinkedList2<TErrorItems>, IReadOnlyLinkedList<TErrorItems>, IUIntCountable, Collections.Extensions.Generic.IEnumerable<TErrorItems>, Collections.Extensions.Generic.IEnumerable<ILinkedListNode<TErrorItems>>, System.Collections.Generic.IEnumerable<ILinkedListNode<TErrorItems>>, INotifyPropertyChanged, INotifyLinkedCollectionChanged<TErrorItems>, WinCopies.IO.Process.IProcessLinkedList<TItems, TError, TErrorItems, TAction> where TItems : IPath where TErrorItems : IProcessErrorItem<TItems, TError, TAction>
+    public interface IProcessLinkedList<TItems, TError, TErrorItems, TAction> :
+        System.Collections.Generic.ICollection<TErrorItems>,
+        System.Collections.Generic.IEnumerable<TErrorItems>,
+        IEnumerable,
+        System.Collections.Generic.IReadOnlyCollection<TErrorItems>,
+        ICollection,
+        ILinkedList3<TErrorItems>,
+        IReadOnlyLinkedList2<TErrorItems>,
+        IReadOnlyLinkedList<TErrorItems>,
+        IUIntCountable,
+        Collections.Extensions.Generic.IEnumerable<TErrorItems>,
+        Collections.Extensions.Generic.IEnumerable<ILinkedListNode<TErrorItems>>,
+      System.Collections.Generic.IEnumerable<ILinkedListNode<TErrorItems>>,
+        INotifyPropertyChanged,
+        INotifyLinkedCollectionChanged<TErrorItems>,
+        WinCopies.IO.Process.IProcessLinkedList<TItems, TError, TErrorItems, TAction>
+        where TItems : IPath
+        where TErrorItems : IProcessErrorItem<TItems, TError, TAction>
     {
-        new object SyncRoot { get; }
+        new object
+#if CS8
+            ?
+#endif
+            SyncRoot
+        { get; }
 
         new bool IsSynchronized { get; }
     }
@@ -47,27 +69,27 @@ namespace WinCopies.GUI.IO.Process
     {
         public Size TotalSize { get; private set; } = new Size(0);
 
-        public object SyncRoot => null;
+        public object
+#if CS8
+            ?
+#endif
+            SyncRoot => null;
 
         public bool IsSynchronized => false;
 
         public bool HasItems => Count != 0;
 
-        public ObservableProcessLinkedCollection() : base()
-        {
-            // Left empty.
-        }
+        public ObservableProcessLinkedCollection() : base() { /* Left empty. */ }
 
-        public ObservableProcessLinkedCollection(in Collections.DotNetFix.Generic.LinkedList<TErrorItems> list) : base(list)
-        {
-            // Left empty.
-        }
+        public ObservableProcessLinkedCollection(in Collections.DotNetFix.Generic.LinkedList<TErrorItems> list) : base(list) { /* Left empty. */ }
 
-        private static InvalidOperationException GetInvalidOperationException() => new InvalidOperationException("This operation is invalid in the current context.");
+        private static InvalidOperationException GetInvalidOperationException() => new
+#if !CS9
+            InvalidOperationException
+#endif
+            ("This operation is invalid in the current context.");
 
-        public TErrorItems Dequeue() => TryDequeue(out TErrorItems result) ? result : throw GetInvalidOperationException();
-
-        protected virtual void OnPropertyChanged(in string propertyName) => OnPropertyChanged(new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+        protected virtual void OnPropertyChanged(in string propertyName) => OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
 
         protected virtual void OnEnqueue(TErrorItems item)
         {
@@ -106,9 +128,29 @@ namespace WinCopies.GUI.IO.Process
             return result;
         }
 
-        public TErrorItems Peek() => TryPeek(out TErrorItems result) ? result : throw GetInvalidOperationException();
+#if CS8
+#pragma warning disable CS8603 // Possible null reference return.
+#endif
+        public TErrorItems Peek() => TryPeek(out TErrorItems
+#if CS9
+            ?
+#endif
+            result) ? result : throw GetInvalidOperationException();
 
-        public bool TryDequeue(out TErrorItems result)
+        public TErrorItems Dequeue() => TryDequeue(out TErrorItems
+#if CS9
+            ?
+#endif
+            result) ? result : throw GetInvalidOperationException();
+#if CS8
+#pragma warning restore CS8603
+#endif
+
+        public bool TryDequeue(out TErrorItems
+#if CS9
+            ?
+#endif
+            result)
         {
             if (Count != 0)
             {
@@ -122,7 +164,11 @@ namespace WinCopies.GUI.IO.Process
             return false;
         }
 
-        public bool TryPeek(out TErrorItems result)
+        public bool TryPeek(out TErrorItems
+#if CS9
+            ?
+#endif
+            result)
         {
             if (Count != 0)
             {
@@ -158,52 +204,54 @@ namespace WinCopies.GUI.IO.Process
 
     public class ReadOnlyObservableProcessLinkedCollection<TItems, TError, TErrorItems, TAction> : ReadOnlyObservableLinkedCollection<TErrorItems>, ProcessTypes<TErrorItems>.IProcessQueue, IReadOnlyProcessLinkedList<TItems, TError, TErrorItems, TAction> where TItems : IPath where TErrorItems : IProcessErrorItem<TItems, TError, TAction>
     {
-        public Size TotalSize => ((IProcessQueue)InnerLinkedCollection).TotalSize;
+        private new ObservableProcessLinkedCollection<TItems, TError, TErrorItems, TAction> InnerLinkedCollection => (ObservableProcessLinkedCollection<TItems, TError, TErrorItems, TAction>)base.InnerLinkedCollection;
 
-        object ISimpleLinkedListBase2.SyncRoot => ((ISimpleLinkedListBase2)InnerLinkedCollection).SyncRoot;
+        public Size TotalSize => InnerLinkedCollection.TotalSize;
 
-        bool ISimpleLinkedListBase2.IsSynchronized => ((ISimpleLinkedListBase2)InnerLinkedCollection).IsSynchronized;
+        object ISimpleLinkedListBase2.SyncRoot => InnerLinkedCollection.SyncRoot;
 
-        bool ISimpleLinkedListBase.HasItems => ((ISimpleLinkedListBase)InnerLinkedCollection).HasItems;
+        bool ISimpleLinkedListBase2.IsSynchronized => InnerLinkedCollection.IsSynchronized;
+
+        bool ISimpleLinkedListBase.HasItems => InnerLinkedCollection.HasItems;
 
         public ReadOnlyObservableProcessLinkedCollection(in ObservableProcessLinkedCollection<TItems, TError, TErrorItems, TAction> collection) : base(collection)
         {
             // Left empty.
         }
 
-        void IQueue<TErrorItems>.Clear() => throw GetReadOnlyListOrCollectionException();
-
-        void ISimpleLinkedListBase2.Clear() => throw GetReadOnlyListOrCollectionException();
-
-        void IQueueBase<TErrorItems>.Clear() => throw GetReadOnlyListOrCollectionException();
+        void ISimpleLinkedListBase.Clear() => throw GetReadOnlyListOrCollectionException();
 
         TErrorItems IQueueBase<TErrorItems>.Dequeue() => throw GetReadOnlyListOrCollectionException();
 
         void IQueueBase<TErrorItems>.Enqueue(TErrorItems item) => throw GetReadOnlyListOrCollectionException();
 
-        public TErrorItems Peek() => ((IQueue<TErrorItems>)InnerLinkedCollection).Peek();
+        public TErrorItems Peek() => InnerLinkedCollection.Peek();
 
-        bool IQueueBase<TErrorItems>.TryDequeue(out TErrorItems result)
+        bool IQueueBase<TErrorItems>.TryDequeue(out TErrorItems
+#if CS9
+            ?
+#endif
+            result)
         {
             result = default;
 
             return false;
         }
 
-        public bool TryPeek(out TErrorItems result) => ((IQueue<TErrorItems>)InnerLinkedCollection).TryPeek(out result);
+        public bool TryPeek(out TErrorItems result) => InnerLinkedCollection.TryPeek(out result);
 
         ProcessTypes<TErrorItems>.IProcessQueue ProcessTypes<TErrorItems>.IProcessQueue.AsReadOnly() => this;
 
 #if !CS8
-        object ISimpleLinkedList.Peek() => ((ISimpleLinkedList)InnerLinkedCollection).Peek();
+        object ISimpleLinkedList.Peek() => InnerLinkedCollection.Peek();
 
-        bool ISimpleLinkedList.TryPeek(out object result) => ((ISimpleLinkedList)InnerLinkedCollection).TryPeek(out result);
+        bool ISimpleLinkedList.TryPeek(out object result) => InnerLinkedCollection.AsFromType<ISimpleLinkedList>().TryPeek(out result);
 #endif
     }
 
     public class ReadOnlyObservableProcessLinkedCollection<TItems, TError, TItemsIn, TItemsOut, TAction> : System.Collections.Generic.ICollection<TItemsOut>, System.Collections.Generic.IEnumerable<TItemsOut>, System.Collections.Generic.IReadOnlyCollection<TItemsOut>, ICollection, INotifyPropertyChanged, INotifyLinkedCollectionChanged<TItemsOut>, IReadOnlyLinkedList2<TItemsOut>, IReadOnlyLinkedList<TItemsOut>, IUIntCountable, Collections.Extensions.Generic.IEnumerable<TItemsOut>,
 #if CS8
-        Collections.DotNetFix.Generic.IEnumerable<TItemsOut>, 
+        Collections.DotNetFix.Generic.IEnumerable<TItemsOut>,
 #endif
         Collections.Enumeration.IEnumerable, ProcessTypes<TItemsOut>.IProcessQueue, IReadOnlyProcessLinkedList<TItems, TError, TItemsOut, TAction> where TItems : IPath where TItemsIn : TItemsOut where TItemsOut : IProcessErrorItem<TItems, TError, TAction>
     {
@@ -241,7 +289,11 @@ namespace WinCopies.GUI.IO.Process
 
         TItemsOut IReadOnlyLinkedList2<TItemsOut>.LastValue => InnerLinkedCollection.LastValue;
 
-        private Dictionary<LinkedCollectionChangedEventHandler<TItemsOut>, LinkedCollectionChangedEventHandler<TItemsIn>> _events = new Dictionary<LinkedCollectionChangedEventHandler<TItemsOut>, LinkedCollectionChangedEventHandler<TItemsIn>>();
+        private readonly Dictionary<LinkedCollectionChangedEventHandler<TItemsOut>, LinkedCollectionChangedEventHandler<TItemsIn>> _events = new
+#if !CS9
+            Dictionary<LinkedCollectionChangedEventHandler<TItemsOut>, LinkedCollectionChangedEventHandler<TItemsIn>>
+#endif
+            ();
 
         public event LinkedCollectionChangedEventHandler<TItemsOut> CollectionChanged
         {
@@ -267,7 +319,7 @@ namespace WinCopies.GUI.IO.Process
             {
                 InnerLinkedCollection.CollectionChanged -= _events[value];
 
-                _events.Remove(value);
+                _ = _events.Remove(value);
             }
         }
 
@@ -280,11 +332,7 @@ namespace WinCopies.GUI.IO.Process
 
         public ReadOnlyObservableProcessLinkedCollection(in ObservableProcessLinkedCollection<TItems, TError, TItemsIn, TAction> collection) => InnerLinkedCollection = collection ?? throw GetArgumentNullException(nameof(collection));
 
-        void IQueue<TItemsOut>.Clear() => throw GetReadOnlyListOrCollectionException();
-
-        void ISimpleLinkedListBase2.Clear() => throw GetReadOnlyListOrCollectionException();
-
-        void IQueueBase<TItemsOut>.Clear() => throw GetReadOnlyListOrCollectionException();
+        void ISimpleLinkedListBase.Clear() => throw GetReadOnlyListOrCollectionException();
 
         TItemsOut IQueueBase<TItemsOut>.Dequeue() => throw GetReadOnlyListOrCollectionException();
 
@@ -292,16 +340,24 @@ namespace WinCopies.GUI.IO.Process
 
         public TItemsOut Peek() => ((IQueue<TItemsIn>)InnerLinkedCollection).Peek();
 
-        bool IQueueBase<TItemsOut>.TryDequeue(out TItemsOut result)
+        bool IQueueBase<TItemsOut>.TryDequeue(out TItemsOut
+#if CS9
+            ?
+#endif
+            result)
         {
             result = default;
 
             return false;
         }
 
-        public bool TryPeek(out TItemsOut result)
+        public bool TryPeek(out TItemsOut
+#if CS9
+            ?
+#endif
+            result)
         {
-            if (((IQueue<TItemsIn>)InnerLinkedCollection).TryPeek(out TItemsIn _result))
+            if (InnerLinkedCollection.TryPeek(out TItemsIn _result))
             {
                 result = _result;
 
@@ -323,11 +379,7 @@ namespace WinCopies.GUI.IO.Process
 
         public void CopyTo(TItemsOut[] array, int arrayIndex)
         {
-            if (array.Length - arrayIndex < InnerLinkedCollection.Count)
-
-                throw new InvalidOperationException("The given array does not have enough space.");
-
-            int i = -1;
+            int i = (array.Length - arrayIndex < InnerLinkedCollection.Count) ? throw new InvalidOperationException("The given array does not have enough space.") : (-1);
 
             foreach (TItemsIn item in InnerLinkedCollection)
 
@@ -342,11 +394,7 @@ namespace WinCopies.GUI.IO.Process
 
         public void CopyTo(Array array, int index)
         {
-            if (array.Length - index < InnerLinkedCollection.Count)
-
-                throw new InvalidOperationException("The given array does not have enough space.");
-
-            int i = -1;
+            int i = (array.Length - index < InnerLinkedCollection.Count) ? throw new InvalidOperationException("The given array does not have enough space.") : (-1);
 
             foreach (TItemsIn item in InnerLinkedCollection)
 
