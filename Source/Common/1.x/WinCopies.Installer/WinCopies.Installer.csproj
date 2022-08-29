@@ -28,6 +28,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\..\GUI\3.x\WinCopies.GUI.Templates\WinCopies.GUI.Templates.csproj" />
+		<ProjectReference Include="..\..\..\IO\3.x\WinCopies.IO\WinCopies.IO.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
