@@ -38,7 +38,7 @@ namespace WinCopies.Installer
                 _files = files;
             }
 
-            public System.IO.Stream GetWriter(string path) => DefaultProcessData.GetFileStream(path);
+            public System.IO.Stream GetWriter(string path) => GetFileStream(path);
 
             public IEnumerator<KeyValuePair<string, IFile>> GetEnumerator() => _files.GetEnumerator();
 #if !CS8
@@ -82,6 +82,8 @@ namespace WinCopies.Installer
                 _deleteAction = deleteAction;
                 _disposeAction = disposeAction;
             }
+
+            public Func<System.IO.Stream>? GetLocalValidationStream(string file) => Validator?.Invoke(file);
 
             public System.IO.Stream? GetRemoteValidationStream(string file, out ulong? length)
             {

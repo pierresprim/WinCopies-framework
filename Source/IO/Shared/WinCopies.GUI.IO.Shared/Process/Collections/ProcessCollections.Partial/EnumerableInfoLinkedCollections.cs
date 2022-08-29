@@ -338,7 +338,7 @@ namespace WinCopies.GUI.IO.Process
 
         void IQueueBase<TItemsOut>.Enqueue(TItemsOut item) => throw GetReadOnlyListOrCollectionException();
 
-        public TItemsOut Peek() => ((IQueue<TItemsIn>)InnerLinkedCollection).Peek();
+        public TItemsOut Peek() => InnerLinkedCollection.AsFromType<IQueue<TItemsIn>>().Peek();
 
         bool IQueueBase<TItemsOut>.TryDequeue(out TItemsOut
 #if CS9
@@ -357,7 +357,11 @@ namespace WinCopies.GUI.IO.Process
 #endif
             result)
         {
-            if (InnerLinkedCollection.TryPeek(out TItemsIn _result))
+            if (InnerLinkedCollection.TryPeek(out TItemsIn
+#if CS9
+                ?
+#endif
+                _result))
             {
                 result = _result;
 

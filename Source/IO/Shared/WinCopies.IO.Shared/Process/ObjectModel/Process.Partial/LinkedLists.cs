@@ -166,7 +166,7 @@ namespace WinCopies.IO.Process
 
         void IQueueBase<TErrorItems>.Enqueue(TErrorItems item) => throw GetReadOnlyListOrCollectionException();
 
-        TErrorItems IPeekable<TErrorItems>.Peek() => InnerList.Peek();
+        public TErrorItems Peek() => InnerList.Peek();
 
         bool IQueueBase<TErrorItems>.TryDequeue(out TErrorItems
 #if CS9
@@ -180,8 +180,6 @@ namespace WinCopies.IO.Process
         }
 
         bool IPeekable<TErrorItems>.TryPeek(out TErrorItems result) => InnerList.TryPeek(out result);
-
-        bool ISimpleLinkedListBase<TErrorItems>.TryPeek(out TErrorItems result) => InnerList.TryPeek(out result);
 
 #if !CS8
         bool ISimpleLinkedList.TryPeek(out object result) => InnerList.TryPeek(out result);
@@ -234,7 +232,7 @@ namespace WinCopies.IO.Process
 
         void IQueueBase<TItemsOut>.Enqueue(TItemsOut item) => throw GetReadOnlyListOrCollectionException();
 
-        TItemsOut IPeekable<TItemsOut>.Peek() => InnerList.Peek();
+        public TItemsOut Peek() => InnerList.Peek();
 
         bool IQueueBase<TItemsOut>.TryDequeue(out TItemsOut
 #if CS9
@@ -264,8 +262,6 @@ namespace WinCopies.IO.Process
 
             return false;
         }
-
-        TItemsOut ISimpleLinkedList<TItemsOut>.Peek() => InnerList.AsFromType<ISimpleLinkedList<TItemsIn>>().Peek();
 
         protected IUIntCountableEnumerator<TItemsOut> GetEnumerator(in System.Collections.Generic.IEnumerable<TItemsIn> enumerable) => new UIntCountableEnumerator<EnumeratorInfo<TItemsOut>, TItemsOut>(new EnumeratorInfo<TItemsOut>(enumerable.Select<TItemsIn, TItemsOut>(item => item)), () => InnerList.Count);
 

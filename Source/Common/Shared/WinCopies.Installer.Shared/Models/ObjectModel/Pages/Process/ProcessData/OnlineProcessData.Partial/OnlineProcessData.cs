@@ -43,8 +43,6 @@ namespace WinCopies.Installer
         private static System.IO.Stream GetStream(Task<System.IO.Stream> task) => Task.Run(() => task).GetAwaiter().GetResult();
         private static Task<System.IO.Stream> GetStream(in string file, in HttpClient httpClient) => httpClient.GetStreamAsync(file);
 
-        protected abstract byte[] GetValidationData(System.IO.Stream stream);
-
         protected virtual IRemoteFileEnumerable GetRemoteFiles(Func<string, bool, bool> onError) => new RemoteFileEnumerable(this, onError);
 
         protected virtual IEnumerable<string> GetPhysicalFiles(string directory)
@@ -155,7 +153,7 @@ namespace WinCopies.Installer
             return enumerables;
         }
 
-        public override IPeekableEnumerable<ITemporaryFileEnumerable> GetTemporaryFiles(Func<string, bool, bool> onError) => GetTemporaryFileQueue(onError, out _/*, out _*/);
+        public override Collections.DotNetFix.Generic.IPeekableEnumerable<ITemporaryFileEnumerable> GetTemporaryFiles(Func<string, bool, bool> onError) => GetTemporaryFileQueue(onError, out _/*, out _*/);
 
         protected virtual IEnumerable<string> GetPhysicalFiles()
         {

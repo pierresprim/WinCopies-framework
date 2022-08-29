@@ -21,11 +21,13 @@ namespace WinCopies.Installer
             ValidationDirectory
         { get; }*/
 
-        IPeekableEnumerable<ITemporaryFileEnumerable>
+        Collections.DotNetFix.Generic.IPeekableEnumerable<ITemporaryFileEnumerable>
 #if CS8
             ?
 #endif
             GetTemporaryFiles(Func<string, bool, bool> onError);
+
+        byte[] GetValidationData(System.IO.Stream stream);
 
         void DeleteOldFiles(Action<string> action);
     }
@@ -64,6 +66,8 @@ namespace WinCopies.Installer
 
         public ProcessData(in Installer installer) : base(installer) => Installer.Files = Files = GetFiles();
 
+        public abstract byte[] GetValidationData(System.IO.Stream stream);
+
         public static void Copy(System.IO.Stream reader, System.IO.Stream writer, Action<uint> progressReporter, out ulong? length)
         {
             const ushort MAX_LENGTH = 4096;
@@ -97,7 +101,7 @@ namespace WinCopies.Installer
 
         protected abstract IEnumerable<KeyValuePair<string, IFile>> GetFiles();
 
-        public abstract IPeekableEnumerable<ITemporaryFileEnumerable>
+        public abstract Collections.DotNetFix.Generic.IPeekableEnumerable<ITemporaryFileEnumerable>
 #if CS8
              ?
 #endif
@@ -107,11 +111,25 @@ namespace WinCopies.Installer
 
         public abstract void DeleteOldFiles(Action<string> logger);
 
+        /*public abstract Func<System.IO.Stream>
+#if CS8
+                ?
+#endif
+                GetLocalValidationStream(string file);
+        public abstract System.IO.Stream
+#if CS8
+                ?
+#endif
+                GetRemoteValidationStream(string file, out ulong? length);
+        public abstract byte[]
+#if CS8
+                ?
+#endif
+                GetValidationData(System.IO.Stream stream);*/
+
         public IEnumerator<KeyValuePair<string, IFile>> GetEnumerator() => Files.GetEnumerator();
 #if !CS8
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-            IEnumerable<KeyValuePair<string, IFile>> IAsEnumerable<KeyValuePair<string, IFile>>.AsEnumerable() => this.Select(item => GetKeyValuePair(item.Key, item.Value.AsFromType()));
 #endif
     }
 
@@ -176,7 +194,7 @@ namespace WinCopies.Installer
 
         protected DefaultEmbeddedProcessData(in Installer installer) : base(installer) { /* Left empty. */ }
 
-        public override IPeekableEnumerable<ITemporaryFileEnumerable>
+        public override Collections.DotNetFix.Generic.IPeekableEnumerable<ITemporaryFileEnumerable>
 #if CS8
             ?
 #endif

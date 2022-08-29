@@ -3,7 +3,29 @@ using System.Collections.Generic;
 
 namespace WinCopies.Installer
 {
-    public interface IFileEnumerable : 
+    public interface IFileValidationProvider
+    {
+
+        Func<System.IO.Stream>
+#if CS8
+            ?
+#endif
+            GetLocalValidationStream(string file);
+
+        System.IO.Stream
+#if CS8
+           ?
+#endif
+           GetRemoteValidationStream(string file, out ulong? length);
+
+        byte[]
+#if CS8
+            ?
+#endif
+            GetValidationData(System.IO.Stream stream);
+    }
+
+    public interface IFileEnumerable :
 #if CS8
         Collections.DotNetFix.Generic.
 #endif
@@ -35,20 +57,9 @@ namespace WinCopies.Installer
 
     public delegate void Copier(System.IO.Stream reader, System.IO.Stream writer, Action<uint> progressReporter, out ulong? length);
 
-    public interface ITemporaryFileEnumerable : System.IDisposable
+    public interface ITemporaryFileEnumerable : IFileValidationProvider, System.IDisposable
     {
         string ActionName { get; }
-
-        Converter<string, Func<System.IO.Stream>
-#if CS8
-            ?
-#endif
-            >
-#if CS8
-            ?
-#endif
-            Validator
-        { get; }
 
         IFileEnumerable Files { get; }
 
@@ -59,18 +70,6 @@ namespace WinCopies.Installer
         IEnumerable<string> PhysicalFiles { get; }
 
         Copier Copier { get; }
-
-        System.IO.Stream
-#if CS8
-           ?
-#endif
-           GetRemoteValidationStream(string file, out ulong? length);
-
-        byte[]
-#if CS8
-            ?
-#endif
-            GetValidationData(System.IO.Stream stream);
 
         /*System.IO.Stream
 #if CS8

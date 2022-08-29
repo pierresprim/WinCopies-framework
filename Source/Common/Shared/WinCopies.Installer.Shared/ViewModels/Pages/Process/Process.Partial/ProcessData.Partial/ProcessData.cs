@@ -2,14 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Text;
 using System.Windows.Input;
 
 using WinCopies.Collections;
-using WinCopies.Util;
-
-using static WinCopies.UtilHelpers;
 
 namespace WinCopies.Installer
 {
@@ -146,18 +142,34 @@ namespace WinCopies.Installer
                 CanExecuteChanged?.Invoke(this, EventArgs.Empty);
             }
 
-            public IPeekableEnumerable<ITemporaryFileEnumerable>
+            public Collections.DotNetFix.Generic.IPeekableEnumerable<ITemporaryFileEnumerable>
 #if CS8
                 ?
 #endif
                 GetTemporaryFiles(Func<string, bool, bool> onError) => ModelGeneric.GetTemporaryFiles(onError);
 
+            public byte[] GetValidationData(System.IO.Stream stream) => ModelGeneric.GetValidationData(stream);
+
+            /*public Func<System.IO.Stream>
+#if CS8
+                ?
+#endif
+                GetLocalValidationStream(string file) => ModelGeneric.GetLocalValidationStream(file);
+            public System.IO.Stream
+#if CS8
+                ?
+#endif
+                GetRemoteValidationStream(string file, out ulong? length) => ModelGeneric.GetRemoteValidationStream(file, out length);
+            public byte[]
+#if CS8
+                ?
+#endif
+                GetValidationData(System.IO.Stream stream) => ModelGeneric.GetValidationData(stream);*/
+
             public IEnumerator<KeyValuePair<string, IFile>> GetEnumerator() => ModelGeneric.GetEnumerator();
 
 #if !CS8
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-            IEnumerable<KeyValuePair<string, IFile>> IAsEnumerable<KeyValuePair<string, IFile>>.AsEnumerable() => this.Select(item => GetKeyValuePair(item.Key, item.Value.AsFromType()));
 #endif
         }
     }
