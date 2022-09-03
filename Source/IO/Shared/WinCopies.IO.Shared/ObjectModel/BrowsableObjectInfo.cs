@@ -513,11 +513,11 @@ namespace WinCopies.IO
             {
                 AssemblyName assemblyName = (Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly()).GetName();
 
-                Version
+                System.Version
 #if CS8
-                ?
+                    ?
 #endif
-                assemblyVersion = assemblyName.Version;
+                    assemblyVersion = assemblyName.Version;
 
                 // todo: use the new constructor
 

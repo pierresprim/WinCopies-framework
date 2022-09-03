@@ -8,6 +8,8 @@ CHANGELOG
 
 ### 3.19
 
+- GUI.IO: Application.Initialize returns a string? value. This value contains the error message in the case any error occurred. This method does not display the error message itself anymore. The new out parameter caption (of type string?) contains the error caption to display.
+
 - Installer:
 	- File enumeration, default process data and enumerable types redesigned.
 	- InstallerViewModel is abstract.

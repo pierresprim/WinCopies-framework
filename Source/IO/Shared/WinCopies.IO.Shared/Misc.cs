@@ -60,25 +60,24 @@ namespace WinCopies.IO
         public ClientVersion(in string clientName, in uint majorVersion, in uint minorVersion, in uint revision)
         {
             ClientName = clientName;
-
             MajorVersion = majorVersion;
-
             MinorVersion = minorVersion;
-
             Revision = revision;
         }
 
-        public ClientVersion(in string clientName, in Version version) : this(clientName, (uint)version.Major, (uint)version.Minor, (uint)version.Revision)
-        {
-            // Left empty.
-        }
+        public ClientVersion(in string clientName, in System.Version version) => this = new
+#if !CS9
+            ClientVersion
+#endif
+            (clientName, (uint)version.Major, (uint)version.Minor, (uint)version.Revision);
 
-        public ClientVersion(in AssemblyName assemblyName) : this(assemblyName.Name, assemblyName.Version)
-        {
-            // Left empty.
-        }
+        public ClientVersion(in AssemblyName assemblyName) => this = new
+#if !CS9
+            ClientVersion
+#endif
+            (assemblyName.Name, assemblyName.Version);
 
-        public override bool Equals(object obj) => obj is ClientVersion _obj ? _obj.ClientName == ClientName && _obj.MajorVersion == MajorVersion && _obj.MinorVersion == MinorVersion && _obj.Revision == Revision : false;
+        public override bool Equals(object obj) => obj is ClientVersion _obj && _obj.ClientName == ClientName && _obj.MajorVersion == MajorVersion && _obj.MinorVersion == MinorVersion && _obj.Revision == Revision;
 
         public override int GetHashCode() => ClientName.GetHashCode() ^ MajorVersion.GetHashCode() ^ MinorVersion.GetHashCode() ^ Revision.GetHashCode();
 

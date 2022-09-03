@@ -21,7 +21,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Security;
+using System.Threading;
 using System.Windows;
 
 using WinCopies.Collections.Generic;
@@ -49,176 +51,197 @@ namespace WinCopies.GUI.IO
 
         public static new Application Current => (Application)System.Windows.Application.Current;
 
-        public static void Initialize(IApplication application, in Action<IBrowsableObjectInfoPlugin> action, Action<int> shutdownAction, out IEnumerable<IBrowsableObjectInfoPlugin> __pluginParameters)
+        public static string? Initialize(IApplication application, Action<IBrowsableObjectInfoPlugin> action, Action<int> shutdownAction, out IEnumerable<IBrowsableObjectInfoPlugin> __pluginParameters, out string? caption)
         {
-            void showMessage(in string message, in string caption) => _ = MessageBox.Show(message, caption, MessageBoxButton.OK, MessageBoxImage.Error);
-            void shutdown() => shutdownAction(Environment.ExitCode = (int)Microsoft.WindowsAPICodePack.Win32Native.ErrorCode.BadEnvironment);
+            string? _caption = null;
+            string? result = null;
 
-            void _shutdown(in Action action)
+            void doWork(out IEnumerable<IBrowsableObjectInfoPlugin> ___pluginParameters)
             {
-                action();
-                shutdown();
-            }
-
-            void __shutdown(string message, string caption) => _shutdown(() => showMessage(message, caption));
-
-            string directoryName;
-            string assemblyPath;
-            Version version;
-            AssemblyLoadContext assemblyLoadContext;
-            string directory = System.IO.Path.Combine(Environment.CurrentDirectory, "plugins");
-
-            if (Directory.Exists(directory))
-
-                try
+                void showMessage(in string message, in string __caption)
                 {
-                    Assembly? assembly;
-                    EnumerableHelper<IBrowsableObjectInfoPlugin>.IEnumerableQueue pluginParameters = EnumerableHelper<IBrowsableObjectInfoPlugin>.GetEnumerableQueue();
-                    bool error = false;
-                    ulong found = 0ul;
-                    ulong loaded = 0ul;
-                    ulong plugins = 0ul;
+                    _caption = __caption;
+                    result = message;
+                }
 
-                    foreach (IBrowsableObjectInfoPlugin? _pluginParameters in Directory.EnumerateDirectories(directory).Select(directory =>
+                void shutdown() => shutdownAction(Environment.ExitCode = (int)Microsoft.WindowsAPICodePack.Win32Native.ErrorCode.BadEnvironment);
+
+                void _shutdown(in Action action)
+                {
+                    action();
+                    shutdown();
+                }
+
+                void __shutdown(string message, string caption) => _shutdown(() => showMessage(message, caption));
+
+                string directoryName;
+                string assemblyPath;
+                System.Version version;
+                AssemblyLoadContext assemblyLoadContext;
+                string directory = System.IO.Path.Combine(Environment.CurrentDirectory, "plugins");
+
+                if (Directory.Exists(directory))
+
+                    try
                     {
-                        directoryName = System.IO.Path.GetFileName(directory);
-                        assemblyPath = System.IO.Path.Combine(directory, $"{directoryName}.dll");
+                        Assembly? assembly;
+                        EnumerableHelper<IBrowsableObjectInfoPlugin>.IEnumerableQueue pluginParameters = EnumerableHelper<IBrowsableObjectInfoPlugin>.GetEnumerableQueue();
+                        bool error = false;
+                        ulong found = 0ul;
+                        ulong loaded = 0ul;
+                        ulong plugins = 0ul;
 
-                        bool tryLoadAssembly()
+                        foreach (IBrowsableObjectInfoPlugin? _pluginParameters in Directory.EnumerateDirectories(directory).Select(directory =>
                         {
-                            assembly = null;
+                            directoryName = System.IO.Path.GetFileName(directory);
+                            assemblyPath = System.IO.Path.Combine(directory, $"{directoryName}.dll");
 
-                            bool onError(in string msg)
+                            bool tryLoadAssembly()
                             {
-                                application.Logger(msg, null, LoggingLevel.Error);
+                                assembly = null;
 
-                                return !(error = true);
-                            }
-
-                            if (File.Exists(assemblyPath))
-
-                                try
+                                bool onError(in string msg)
                                 {
-                                    found++;
+                                    application.Logger(msg, null, LoggingLevel.Error);
 
-                                    //assembly = Assembly.LoadFrom(assemblyPath);
+                                    return !(error = true);
+                                }
 
-                                    assembly = (assemblyLoadContext = new AssemblyLoadContext(assemblyPath)).LoadFromAssemblyPath(assemblyPath);
+                                if (File.Exists(assemblyPath))
 
-                                    var paths = Directory.EnumerateFiles(Environment.CurrentDirectory).Select(path => System.IO.Path.GetFileName(path));
+                                    try
+                                    {
+                                        found++;
 
-                                    foreach (string assemblyName in Directory.EnumerateFiles(directory))
+                                        //assembly = Assembly.LoadFrom(assemblyPath);
 
-                                        if (paths.Contains(System.IO.Path.GetFileName(assemblyName)))
+                                        assembly = (assemblyLoadContext = new AssemblyLoadContext(assemblyPath)).LoadFromAssemblyPath(assemblyPath);
 
-                                            File.Delete(assemblyName);
-
-                                    if (Directory.Exists(assemblyPath = System.IO.Path.Combine(directory, @"runtimes\win\lib")) && (Directory.Exists(directory = System.IO.Path.Combine(assemblyPath, $"net{(version = Environment.Version).Major}.0")) || Directory.Exists(directory = System.IO.Path.Combine(assemblyPath, $"net{version.Major}.{version.Minor}"))))
+                                        var paths = Directory.EnumerateFiles(Environment.CurrentDirectory).Select(path => System.IO.Path.GetFileName(path));
 
                                         foreach (string assemblyName in Directory.EnumerateFiles(directory))
 
-                                            //_ = Assembly.LoadFrom(assemblyName);
+                                            if (paths.Contains(System.IO.Path.GetFileName(assemblyName)))
 
-                                            _ = assemblyLoadContext.LoadFromAssemblyPath(assemblyName);
+                                                File.Delete(assemblyName);
 
-                                    loaded++;
+                                        if (Directory.Exists(assemblyPath = System.IO.Path.Combine(directory, @"runtimes\win\lib")) && (Directory.Exists(directory = System.IO.Path.Combine(assemblyPath, $"net{(version = Environment.Version).Major}.0")) || Directory.Exists(directory = System.IO.Path.Combine(assemblyPath, $"net{version.Major}.{version.Minor}"))))
 
-                                    return true;
-                                }
+                                            foreach (string assemblyName in Directory.EnumerateFiles(directory))
 
-                                catch (Exception ex) when (ex.Is(false, typeof(System.IO.IOException), typeof(BadImageFormatException), typeof(SecurityException)))
-                                {
-                                    return onError(ex.Message);
-                                }
+                                                //_ = Assembly.LoadFrom(assemblyName);
 
-                            else
+                                                _ = assemblyLoadContext.LoadFromAssemblyPath(assemblyName);
 
-                                return onError($"Cannot find {assemblyPath}.");
-                        }
+                                        loaded++;
 
-                        IBrowsableObjectInfoPlugin? tryGetPlugin()
-                        {
-                            try
-                            {
-                                return assembly.DefinedTypes.WhereSelect(type => type.Assembly == assembly && type.Name == nameof(WinCopies.IO.ObjectModel.BrowsableObjectInfo), type => type.GetMethods().FirstOrDefault(method => method.IsStatic && method.Name == "GetPluginParameters" && method.ReturnType == typeof(IBrowsableObjectInfoPlugin))?.Invoke(null, null)).FirstOrDefault() as IBrowsableObjectInfoPlugin;
+                                        return true;
+                                    }
+
+                                    catch (Exception ex) when (ex.Is(false, typeof(System.IO.IOException), typeof(BadImageFormatException), typeof(SecurityException)))
+                                    {
+                                        return onError(ex.Message);
+                                    }
+
+                                else
+
+                                    return onError($"Cannot find {assemblyPath}.");
                             }
 
-                            catch (Exception ex) when (ex.Is(false, typeof(ReflectionTypeLoadException), typeof(TargetInvocationException)))
+                            IBrowsableObjectInfoPlugin? tryGetPlugin()
                             {
-                                application.Logger(ex.Message, null, LoggingLevel.Error);
+                                try
+                                {
+                                    return assembly.DefinedTypes.WhereSelect(type => type.Assembly == assembly && type.Name == nameof(WinCopies.IO.ObjectModel.BrowsableObjectInfo), type => type.GetMethods().FirstOrDefault(method => method.IsStatic && method.Name == "GetPluginParameters" && method.ReturnType == typeof(IBrowsableObjectInfoPlugin))?.Invoke(null, null)).FirstOrDefault() as IBrowsableObjectInfoPlugin;
+                                }
 
+                                catch (Exception ex) when (ex.Is(false, typeof(ReflectionTypeLoadException), typeof(TargetInvocationException)))
+                                {
+                                    application.Logger(ex.Message, null, LoggingLevel.Error);
+
+                                    error = true;
+
+                                    return null;
+                                }
+                            }
+
+                            return tryLoadAssembly() ? tryGetPlugin() : null;
+                        }))
+                        {
+                            if (_pluginParameters == null)
+                            {
                                 error = true;
 
-                                return null;
+                                continue;
                             }
+
+                            action(_pluginParameters);
+
+                            pluginParameters.Enqueue(_pluginParameters);
+
+                            plugins++;
                         }
 
-                        return tryLoadAssembly() ? tryGetPlugin() : null;
-                    }))
-                    {
-                        if (_pluginParameters == null)
+                        application.Logger($"{found} plugins found; {loaded} loaded; {plugins} parsed successfully.", null, LoggingLevel.Information);
+
+                        if (pluginParameters.HasItems)
                         {
-                            error = true;
+                            ___pluginParameters = pluginParameters.AsReadOnlyEnumerable();
 
-                            continue;
+                            void _showMessage(in string msg) => showMessage($"{msg} be loaded. See the log file for more information.", "Plugin load error");
+
+                            if (error)
+
+                                if (pluginParameters.HasItems)
+
+                                    _showMessage("One or more plugins could not");
+
+                                else
+
+                                    _shutdown(() => _showMessage("No plugin could"));
                         }
 
-                        action(_pluginParameters);
+                        else
+                        {
+                            __shutdown("No plugin successfully parsed.", "Plugin parse error.");
 
-                        pluginParameters.Enqueue(_pluginParameters);
+                            ___pluginParameters = null;
+                        }
 
-                        plugins++;
+                        return;
                     }
 
-                    application.Logger($"{found} plugins found; {loaded} loaded; {plugins} parsed successfully.", null, LoggingLevel.Information);
+                    catch (Exception ex) when (ex.Is(false, typeof(System.IO.IOException), typeof(SecurityException), typeof(UnauthorizedAccessException))) { /* Left empty. */ }
 
-                    if (pluginParameters.HasItems)
-                    {
-                        __pluginParameters = pluginParameters.AsReadOnlyEnumerable();
+                __shutdown("No plugin found. You have to install at least one plugin for the program to work.", "No plugin found");
 
-                        void _showMessage(in string msg) => showMessage($"{msg} be loaded. See the log file for more information.", "Plugin load error");
+                ___pluginParameters = null;
+            }
 
-                        if (error)
+            doWork(out __pluginParameters);
 
-                            if (pluginParameters.HasItems)
+            caption = _caption;
 
-                                _showMessage("One or more plugins could not");
-
-                            else
-
-                                _shutdown(() => _showMessage("No plugin could"));
-                    }
-
-                    else
-                    {
-                        __shutdown("No plugin successfully parsed.", "Plugin parse error.");
-
-                        __pluginParameters = null;
-                    }
-
-                    return;
-                }
-
-                catch (Exception ex) when (ex.Is(false, typeof(System.IO.IOException), typeof(SecurityException), typeof(UnauthorizedAccessException))) { /* Left empty. */ }
-
-            __shutdown("No plugin found. You have to install at least one plugin for the program to work.", "No plugin found");
-
-            __pluginParameters = null;
+            return result;
         }
 
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
 
-            Initialize(this, pluginParameters =>
+            string? errorMessage = Initialize(this, pluginParameters =>
             {
                 pluginParameters.RegisterBrowsabilityPaths();
                 pluginParameters.RegisterBrowsableObjectInfoSelectors();
                 pluginParameters.RegisterItemSelectors();
                 pluginParameters.RegisterProcessSelectors();
-            }, Shutdown, out IEnumerable<IBrowsableObjectInfoPlugin> pluginParameters);
+            }, Shutdown, out IEnumerable<IBrowsableObjectInfoPlugin> pluginParameters, out string? caption);
 
             PluginParameters = pluginParameters;
+
+            if (errorMessage != null)
+
+                _ = MessageBox.Show(errorMessage, caption, MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 }
