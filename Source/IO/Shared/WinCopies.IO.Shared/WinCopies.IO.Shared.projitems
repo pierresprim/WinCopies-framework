@@ -60,5 +60,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)PropertySystem\ShellPropertyGroup.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Size.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentSources\ItemSources\ItemSource.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Stream.cs" />
   </ItemGroup>
 </Project>
