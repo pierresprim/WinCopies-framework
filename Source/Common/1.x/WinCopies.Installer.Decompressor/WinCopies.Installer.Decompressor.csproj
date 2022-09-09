@@ -1,11 +1,18 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net6.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <Import Project="..\..\Shared\WinCopies.Installer.Decompressor.Shared\WinCopies.Installer.Decompressor.Shared.projitems" Label="Shared" />
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\IO\3.x\WinCopies.IO\WinCopies.IO.csproj" />
+    <ProjectReference Include="..\WinCopies.Installer\WinCopies.Installer.csproj" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Squid-Box.SevenZipSharp" Version="1.2.231" />
+	</ItemGroup>
 </Project>

@@ -2,7 +2,7 @@
 
 namespace WinCopies.Installer
 {
-    public partial class ProcessPageViewModel : CommonPageViewModel2<IProcessPage, IEndPage, IProcessData>, IProcessPage
+    public partial class ProcessPageViewModel : CommonPageViewModel2<IProcessPage, IEndPage, IProcessData>, IProcessPageViewModel
     {
         public sealed override bool CanBrowseBack => false;
 

@@ -8,11 +8,25 @@ CHANGELOG
 
 ### 3.19
 
+#### Misc:
+
+- Add nullable attributes for some types.
+- New view models.
+
 - GUI.IO: Application.Initialize returns a string? value. This value contains the error message in the case any error occurred. This method does not display the error message itself anymore. The new out parameter caption (of type string?) contains the error caption to display.
 
+#### Installation:
+
 - Installer:
+	- IInstaller: new property: Files.
+	- InstallerViewModel:
+		- is abstract.
+		- explicit implementation of IInstaller.Current setter throw a NotSupportedException instead of an InvalidOperationException. The protected version did not changed.
+		- new protected virtual methods:
+			- IInstallerPageViewModel GetFirstPage().
+			- IProcessPageViewModel GetProcessPageViewModel(IProcessPage processPage).
+		- loads a custom start page in constructor. This page is returned by the call to the new GetFirstPage method. This method can be overridden to return a null value in order to load an other page than a start one or to leave the Current property empty.
 	- File enumeration, default process data and enumerable types redesigned.
-	- InstallerViewModel is abstract.
 	- Add:
 		- a default process data class to download the files to install from a server.
 		- ability to perform validation checks on already downloaded files.
@@ -25,6 +39,8 @@ CHANGELOG
 		- UserGroup and Destination types in order to have ability to add custom views to these pages.
 	- Remove (I)InstallerStream types. Use System.IO.Stream instead.
 - New package: Installer.Decompressor.
+
+- Installer Sample disabled due to the new changes on the Installation APIs.
 
 ### 3.18
 

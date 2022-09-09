@@ -149,6 +149,16 @@
             Identifies the <see cref="P:WinCopies.GUI.Controls.CommandableTextBox.CommandTarget"/> dependency property.
             </summary>
         </member>
+        <member name="F:WinCopies.GUI.Controls.HeaderedButton.HeaderProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.HeaderedButton.Header"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.HeaderedButton.HeaderDockProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.HeaderedButton.HeaderDock"/> dependency property.
+            </summary>
+        </member>
         <member name="T:WinCopies.GUI.Controls.HeaderedControl">
             <summary>
             Represents a WPF control that can display a header.
@@ -162,6 +172,26 @@
         <member name="P:WinCopies.GUI.Controls.HeaderedControl.Header">
             <summary>
             Gets or sets the header of the control. This is a dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.HeaderedContentItemsControl.ContentProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.HeaderedContentItemsControl.Content"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Controls.HeaderedContentItemsControl.Content">
+            <summary>
+            Gets or sets the content of the control. This is a dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.HeaderedContentItemsControl.ContentTemplateProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.HeaderedContentItemsControl.ContentTemplate"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.HeaderedContentItemsControl.ContentTemplateSelectorProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.HeaderedContentItemsControl.ContentTemplateSelector"/> dependency property.
             </summary>
         </member>
         <member name="F:WinCopies.GUI.Controls.Label.RecognizesAccessKeyProperty">
@@ -517,6 +547,36 @@
         <member name="F:WinCopies.GUI.Controls.NumericUpDown.ValueChangedEvent">
             <summary>
             Identifies the <see cref="E:WinCopies.GUI.Controls.NumericUpDown.ValueChanged"/> routed event.
+            </summary>
+        </member>
+        <member name="T:XamlGeneratedNamespace.GeneratedInternalTypeHelper">
+            <summary>
+            GeneratedInternalTypeHelper
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateInstance(System.Type,System.Globalization.CultureInfo)">
+            <summary>
+            CreateInstance
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.GetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            GetPropertyValue
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.SetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            SetPropertyValue
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateDelegate(System.Type,System.Object,System.String)">
+            <summary>
+            CreateDelegate
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.AddEventHandler(System.Reflection.EventInfo,System.Object,System.Delegate)">
+            <summary>
+            AddEventHandler
             </summary>
         </member>
     </members>

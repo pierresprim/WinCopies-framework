@@ -1,4 +1,5 @@
-﻿#region Usings
+﻿#if SAMPLE_INSTALLER
+#region Usings
 #region System
 using System;
 using System.Collections.Generic;
@@ -170,7 +171,7 @@ namespace WinCopies.Sample.Installer
 
     public class ProcessPage : WinCopies.Installer.ProcessPage
     {
-        protected new class ProcessData : WinCopies.Installer.ProcessData
+        protected class ProcessData : WinCopies.Installer.ProcessData
         {
             protected class DummyStreamReader : ReadOnlyStream
             {
@@ -310,3 +311,4 @@ namespace WinCopies.Sample.Installer
         public MainWindow() : base(new InstallerViewModel(new Installer())) { /* Left empty. */ }
     }
 }
+#endif

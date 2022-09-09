@@ -60,7 +60,7 @@
     </Style>
 
     <DataTemplate DataType="{x:Type local:IInstallerModel}">
-        <gui:InstallerControl Content="{Binding Current}" NextStepName="{Binding Current.NextStepName}" />
+        <gui:InstallerControl DataContext="{Binding Current}" Content="{Binding}" NextStepName="{Binding NextStepName}" />
     </DataTemplate>
 
     <ControlTemplate x:Key="WinCopies.Templates.Installer.MainPage" TargetType="{x:Type gui:InstallerPage}">

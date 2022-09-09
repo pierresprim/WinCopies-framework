@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows.Media;
 
 using WinCopies.Util.Data;
@@ -50,6 +51,11 @@ namespace WinCopies.Installer
         }
     }
 
+    public interface IProcessPageViewModel : IProcessPage, IInstallerPageViewModel
+    {
+        // Left empty.
+    }
+
     public abstract class InstallerViewModel : ViewModel<Installer>, IInstallerModel
     {
         private IInstallerPageViewModel _current;
@@ -89,7 +95,7 @@ namespace WinCopies.Installer
             }
         }
 
-        IInstallerPage IInstaller.Current { get => Current; set => throw new InvalidOperationException(); }
+        IInstallerPage IInstaller.Current { get => Current; set => throw new NotSupportedException(); }
 
         public IOptionsData Options => ModelGeneric.Options;
 
@@ -101,16 +107,25 @@ namespace WinCopies.Installer
 
         public ExtraData? ExtraData { get; }
 
+        public IEnumerable<KeyValuePair<string, IFile>>
+#if CS8
+            ?
+#endif
+            Files => ModelGeneric.Files;
+
         public InstallerViewModel(in Installer model) : base(model)
         {
-            Current = new StartPageViewModel(this);
-
+            Current = GetFirstPage();
             ExtraData = GetExtraData();
         }
+
+        protected virtual IInstallerPageViewModel GetFirstPage() => new StartPageViewModel(this);
 
         protected abstract ExtraData GetExtraData();
 
         internal new void OnPropertyChanged(in string propertyName) => base.OnPropertyChanged(propertyName);
+
+        protected virtual IProcessPageViewModel GetProcessPageViewModel(IProcessPage processPage) => processPage is ProcessPageViewModel _processPage ? _processPage : new ProcessPageViewModel(processPage, this);
     }
 
     public class InstallerPageDataViewModel<T> : ViewModel<T>, IInstallerPageData where T : IInstallerPageData

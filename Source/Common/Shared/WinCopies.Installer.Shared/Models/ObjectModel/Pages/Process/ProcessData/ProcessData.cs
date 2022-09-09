@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 
 using WinCopies.Linq;
@@ -66,7 +65,11 @@ namespace WinCopies.Installer
 
         public ProcessData(in Installer installer) : base(installer) => Installer.Files = Files = GetFiles();
 
-        public abstract byte[] GetValidationData(System.IO.Stream stream);
+        public abstract byte[]
+#if CS8
+             ?
+#endif
+             GetValidationData(System.IO.Stream stream);
 
         public static void Copy(System.IO.Stream reader, System.IO.Stream writer, Action<uint> progressReporter, out ulong? length)
         {

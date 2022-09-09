@@ -37,7 +37,6 @@ namespace WinCopies.IO.Process
         public ProcessParameters(Guid guid, System.Collections.Generic.IEnumerable<string> parameters)
         {
             Guid = guid;
-
             Parameters = parameters;
         }
 

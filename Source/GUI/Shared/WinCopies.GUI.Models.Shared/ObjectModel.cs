@@ -184,7 +184,7 @@ namespace WinCopies.GUI.Controls.Models
             ThrowIfNull(dataTemplateSelectorsModel, nameof(dataTemplateSelectorsModel));
 
             if (value is IDataTemplateSelectorsModel _dataTemplateSelectorsModel)
-            {
+
                 switch (bindingDirection)
                 {
                     case BindingDirection.OneWay:
@@ -209,7 +209,6 @@ namespace WinCopies.GUI.Controls.Models
 
                         break;
                 }
-            }
         }
 
         public static void TryReset(this IDataTemplateSelectorsModel dataTemplateSelectorsModel, in object value)
@@ -259,7 +258,6 @@ namespace WinCopies.GUI.Controls.Models
         public ContentControlModel(in object content, in BindingDirection bindingDirection)
         {
             Content = content;
-
             BindingDirection = bindingDirection;
         }
 
@@ -305,7 +303,6 @@ namespace WinCopies.GUI.Controls.Models
         public ContentControlModel(in T content, in BindingDirection bindingDirection)
         {
             Content = content;
-
             BindingDirection = bindingDirection;
         }
 
@@ -416,7 +413,6 @@ namespace WinCopies.GUI.Controls.Models
         public ItemsControlModel(in IEnumerable items, in BindingDirection bindingDirection)
         {
             Items = items;
-
             BindingDirection = bindingDirection;
         }
 
@@ -462,7 +458,6 @@ namespace WinCopies.GUI.Controls.Models
         public ItemsControlModel(in IEnumerable<T> items, in BindingDirection bindingDirection)
         {
             Items = items;
-
             BindingDirection = bindingDirection;
         }
 

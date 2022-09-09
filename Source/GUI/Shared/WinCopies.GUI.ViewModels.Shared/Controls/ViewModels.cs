@@ -18,6 +18,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 using WinCopies.Commands;
@@ -30,6 +31,41 @@ using System.Collections;
 
 namespace WinCopies.GUI.Controls.ViewModels
 {
+    public class HeaderedViewModel : ViewModelBase
+    {
+        private object? _header;
+
+        public object? Header { get => _header; set => UpdateValue(ref _header, value, nameof(Header)); }
+    }
+
+    public class HeaderedContentViewModel : HeaderedViewModel
+    {
+        private object? _content;
+
+        public object? Content { get => _content; set => UpdateValue(ref _content, value, nameof(Content)); }
+    }
+
+    public class InnerTabWindowViewModel : CollectionViewModel<HeaderedContentViewModel>
+    {
+        private object? _header;
+        private bool _canClose;
+        private Dock _tabStripPlacement;
+        private Dock _titleBarPlacement;
+        private Visibility _visibility;
+
+        public object? Header { get => _header; set => UpdateValue(ref _header, value, nameof(Header)); }
+
+        public bool CanClose { get => _canClose; set => UpdateValue(ref _canClose, value, nameof(CanClose)); }
+
+        public Dock TabStripPlacement { get => _tabStripPlacement; set => UpdateValue(ref _tabStripPlacement, value, nameof(TabStripPlacement)); }
+
+        public Dock TitleBarPlacement { get => _titleBarPlacement; set => UpdateValue(ref _titleBarPlacement, value, nameof(TitleBarPlacement)); }
+
+        public Visibility Visibility { get => _visibility; set => UpdateValue(ref _visibility, value, nameof(Visibility)); }
+
+        public InnerTabWindow(in Collection<HeaderedContentViewModel> collection) : base(collection) { /* Left empty. */ }
+    }
+
     [TypeForDataTemplate(typeof(IGroupBoxModel))]
     public class GroupBoxViewModel<T> : HeaderedContentControlViewModel<T>, IGroupBoxModel where T : IGroupBoxModel
     {

@@ -1,5 +1,9 @@
-﻿using System;
+﻿using SevenZip;
+
+using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -29,7 +33,7 @@ namespace WinCopies.Installer.Decompressor
 
         private const string ZIP = "\\zip";
 
-        protected abstract SevenZip.InArchiveFormat InArchiveFormat { get; }
+        protected abstract InArchiveFormat InArchiveFormat { get; }
 
         public ProcessData(in Installer installer) : base(installer) { /* Left empty. */ }
 
@@ -48,9 +52,9 @@ namespace WinCopies.Installer.Decompressor
             {
                 length = (ulong)reader.Length;
 
-                var extractor = new SevenZip.SevenZipExtractor(reader, InArchiveFormat);
+                var extractor = new SevenZipExtractor(reader, InArchiveFormat);
 
-                extractor.Extracting += (object? sender, SevenZip.ProgressEventArgs e) => progressReporter((uint)(e.PercentDelta / 100 * reader.Length));
+                extractor.Extracting += (object? sender, ProgressEventArgs e) => progressReporter((uint)(e.PercentDelta / 100 * reader.Length));
 
                 extractor.ExtractFile(0, writer);
 
@@ -62,5 +66,59 @@ namespace WinCopies.Installer.Decompressor
 
             return enumerables;
         }
+    }
+
+    public abstract class DefaultProcessData : ProcessData
+    {
+        private string? _url;
+
+        public DefaultProcessData(in Installer installer) : base(installer) { /* Left empty. */ }
+
+        public override IEnumerable<KeyValuePair<string, string>>? Resources => null;
+
+        protected abstract string RootURL { get; }
+
+        protected override string URL
+        {
+            get
+            {
+                if (_url == null)
+                {
+                    string rootURL = RootURL;
+
+                    _url = rootURL + new StreamReader(new HttpClient().GetStreamAsync(rootURL + "latest").GetAwaiter().GetResult()).ReadLine();
+                }
+
+                return _url;
+            }
+        }
+
+        protected override string RelativeDirectoryURL => "directories";
+        protected override string RelativeFileURL => "files";
+
+        public override string? RelativeDirectory => null;
+        public override string? OldRelativeDirectory => null;
+
+        protected abstract System.Security.Cryptography.HashAlgorithmName HashAlgorithmName { get; }
+
+        protected override Predicate<string> Predicate => item => item.EndsWith($"{nameof(Installer.ProgramName)}.exe");
+
+        /*public override Func<System.IO.Stream>? GetLocalValidationStream(string file) => GetLocalValidator(IO.Path.RemoveExtension(file));
+        public override System.IO.Stream? GetRemoteValidationStream(string file, out ulong? length) => GetRemoteValidatorData(file, true, )(out length);*/
+
+        public override byte[]? GetValidationData(System.IO.Stream stream)
+        {
+            string? name = HashAlgorithmName.Name;
+
+            if (name == null)
+
+                return null;
+
+            System.Security.Cryptography.HashAlgorithm? hashAlgorithm = System.Security.Cryptography.HashAlgorithm.Create(name);
+
+            return hashAlgorithm?.ComputeHash(stream);
+        }
+
+        protected override string? RelativeTemporaryDirectory => "pkg";
     }
 }

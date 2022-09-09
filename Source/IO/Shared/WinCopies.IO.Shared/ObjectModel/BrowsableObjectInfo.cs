@@ -1160,7 +1160,11 @@ namespace WinCopies.IO
                 GetSubRootItemsOverride() => null;
         }
 
-        public abstract class BrowsableObjectInfoStartPage<T> : AppBrowsableObjectInfo<IEnumerable<T>> where T : IEncapsulatorBrowsableObjectInfo<IBrowsableObjectInfoPlugin>
+        public abstract class BrowsableObjectInfoStartPage<T> : AppBrowsableObjectInfo<IEnumerable<T>
+#if CS8
+            ?
+#endif
+            > where T : IEncapsulatorBrowsableObjectInfo<IBrowsableObjectInfoPlugin>
         {
             protected override IItemSourcesProvider ItemSourcesOverride { get; }
 
@@ -1204,7 +1208,11 @@ namespace WinCopies.IO
 #endif
                 ParentOverride => null;
 
-            protected BrowsableObjectInfoStartPage(in System.Collections.Generic.IEnumerable<T> plugins, in ClientVersion clientVersion) : base(plugins, "start", clientVersion) => ItemSourcesOverride = new ItemSourcesProvider(InnerObjectGenericOverride.Cast<IBrowsableObjectInfo>);
+            protected BrowsableObjectInfoStartPage(in System.Collections.Generic.IEnumerable<T>
+#if CS8
+                ?
+#endif
+                plugins, in ClientVersion clientVersion) : base(plugins, "start", clientVersion) => ItemSourcesOverride = new ItemSourcesProvider(InnerObjectGenericOverride.Cast<IBrowsableObjectInfo>);
 
             protected override ArrayBuilder<IBrowsableObjectInfo>
 #if CS8

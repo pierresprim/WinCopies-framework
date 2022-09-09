@@ -46,7 +46,11 @@ namespace WinCopies.GUI.IO.ObjectModel
     {
         protected override IBitmapSourceProvider BitmapSourceProviderOverride { get; }
 
-        protected BrowsableObjectInfoStartPage(in System.Collections.Generic.IEnumerable<PluginInfo> pluginInfo, in ClientVersion clientVersion) : base(pluginInfo, clientVersion) => BitmapSourceProviderOverride = new BitmapSourceProvider(new IconBitmapSources(GetIcon()), null, null, true);
+        protected BrowsableObjectInfoStartPage(in System.Collections.Generic.IEnumerable<PluginInfo>
+#if CS8
+            ?
+#endif
+            pluginInfo, in ClientVersion clientVersion) : base(pluginInfo, clientVersion) => BitmapSourceProviderOverride = new BitmapSourceProvider(new IconBitmapSources(GetIcon()), null, null, true);
 
         protected abstract System.Drawing.Icon GetIcon();
     }
