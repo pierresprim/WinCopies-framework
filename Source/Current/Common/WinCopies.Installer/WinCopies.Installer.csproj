@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<PackageId>WinCopies.Installer</PackageId>
+		<TargetFrameworks>netcoreapp3.0;netcoreapp3.1;net5.0-windows;net6.0-windows;net7.0-windows;net8.0-windows;net472;net48</TargetFrameworks>
+		<TargetPlatformIdentifier>windows</TargetPlatformIdentifier>
+		<UseWPF>true</UseWPF>
+		<VersionPrefix>3.0.2</VersionPrefix>
+		<AssemblyVersion>3.0.2</AssemblyVersion>
+		<FileVersion>3.0.2</FileVersion>
+		<PackageTags>WinCopies, Installer</PackageTags>
+	</PropertyGroup>
+
+	<Import Project="$(SolutionDir)\ExtraProperties.props" Condition="'$(Configuration)'=='Release'" />
+
+	<ItemGroup>
+		<PackageReference Include="WinCopies.Util.Desktop" Version="3.21" />
+		<PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="3.11-preview" />
+	</ItemGroup>
+
+	<Import Project="..\..\..\Common\Shared\WinCopies.Installer.Shared\WinCopies.Installer.Shared.projitems" Label="Shared" />
+
+	<ItemGroup>
+		<Page Update="Themes\Generic.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="D:\repositories\WinCopies Ecosystem\WinCopies-framework\Source\Common\Shared\WinCopies.Installer.Shared\Properties\Resources.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	  </Compile>
+	</ItemGroup>
+</Project>

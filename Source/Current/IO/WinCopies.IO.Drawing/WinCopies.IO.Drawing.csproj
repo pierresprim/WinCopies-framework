@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+	<PropertyGroup>
+		<PackageId>WinCopies.IO.Drawing</PackageId>
+		<RootNamespace>WinCopies.IO.Drawing</RootNamespace>
+		<TargetFrameworks>netcoreapp3.1;net5.0-windows;net6.0-windows;net7.0-windows;net8.0-windows;net472;net48</TargetFrameworks>
+		<Description>WinCopies framework's assembly for basic I/O operations</Description>
+		<Copyright>Copyright © 2022 Pierre Sprimont</Copyright>
+		<PackageTags>WinCopies, IO</PackageTags>
+		<DefineConstants>WinCopies2;WinCopies3;$(DefineConstants)</DefineConstants>
+		<VersionPrefix>3.15</VersionPrefix>
+		<VersionSuffix>preview</VersionSuffix>
+		<AssemblyVersion>3.15</AssemblyVersion>
+		<FileVersion>3.15</FileVersion>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+	</PropertyGroup>
+
+	<Import Project="$(SolutionDir)\ExtraProperties.props" Condition="'$(Configuration)'=='Release'" />
+
+	<ItemGroup>
+		<ProjectReference Include="..\WinCopies.IO\WinCopies.IO.csproj" />
+	</ItemGroup>
+</Project>

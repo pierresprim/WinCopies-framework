@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<PackageId>WinCopies.Data.MySQL</PackageId>
+		<RootNamespace>WinCopies.Data.MySQL</RootNamespace>
+		<TargetFrameworks>netcoreapp3.0;netcoreapp3.1;net5.0-windows;net6.0-windows;net7.0-windows;net8.0-windows;net472;net48</TargetFrameworks>
+		<Copyright>Copyright © 2022 Pierre Sprimont</Copyright>
+		<VersionPrefix>3.0</VersionPrefix>
+		<AssemblyVersion>3.0</AssemblyVersion>
+		<FileVersion>3.0</FileVersion>
+		<VersionSuffix>preview</VersionSuffix>
+	</PropertyGroup>
+
+	<Import Project="$(SolutionDir)\ExtraProperties.props" Condition="'$(Configuration)'=='Release'" />
+
+	<ItemGroup>
+		<PackageReference Include="MySql.Data" Version="8.0.28" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\WinCopies.Data.SQL\WinCopies.Data.SQL.csproj" />
+	</ItemGroup>
+
+	<Import Project="..\..\..\Data\Shared\WinCopies.Data.MySQL.Shared\WinCopies.Data.MySQL.Shared.projitems" Label="Shared" />
+
+</Project>
