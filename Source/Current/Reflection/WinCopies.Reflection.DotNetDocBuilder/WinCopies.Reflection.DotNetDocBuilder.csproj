@@ -12,6 +12,8 @@
 	  <FileVersion>3.15</FileVersion>
   </PropertyGroup>
 
+  <Import Project="..\..\..\Shared\Reflection\WinCopies.Reflection.DotNetDocBuilder.Shared\WinCopies.Reflection.DotNetDocBuilder.Shared.projitems" Label="Shared" />
+
 	<Import Project="$(SolutionDir)\ExtraProperties.props" Condition="'$(Configuration)'=='Release'" />
 
 	<ItemGroup>
@@ -21,8 +23,6 @@
   <ItemGroup>
     <ProjectReference Include="..\WinCopies.Reflection.DotNetParser\WinCopies.Reflection.DotNetParser.csproj" />
   </ItemGroup>
-
-  <Import Project="..\..\..\Reflection\Shared\WinCopies.Reflection.DotNetDocBuilder.Shared\WinCopies.Reflection.DotNetDocBuilder.Shared.projitems" Label="Shared" />
 
 	<ItemGroup>
 	  <None Update="README.md">

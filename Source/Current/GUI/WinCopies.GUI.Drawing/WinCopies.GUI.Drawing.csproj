@@ -11,6 +11,8 @@
 		<FileVersion>3.15.1</FileVersion>
 	</PropertyGroup>
 
+	<Import Project="..\..\..\Shared\GUI\WinCopies.GUI.Drawing.Shared\WinCopies.GUI.Drawing.Shared.projitems" Label="Shared" />
+
 	<Import Project="$(SolutionDir)\ExtraProperties.props" Condition="'$(Configuration)'=='Release'" />
 
 	<ItemGroup>
@@ -76,7 +78,5 @@
 			<DependentUpon>ExceptionMessages.resx</DependentUpon>
 		</Compile>
 	</ItemGroup>
-
-	<Import Project="..\..\..\GUI\Shared\WinCopies.GUI.Drawing.Shared\WinCopies.GUI.Drawing.Shared.projitems" Label="Shared" />
 
 </Project>

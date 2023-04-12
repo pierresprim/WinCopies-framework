@@ -58,6 +58,6 @@
 		</Page>
 	</ItemGroup>
 
-	<Import Project="..\..\..\IO\Shared\WinCopies.GUI.Shell.Shared\WinCopies.GUI.Shell.Shared.projitems" Label="Shared" />
+	<Import Project="..\..\..\Shared\IO\WinCopies.GUI.Shell.Shared\WinCopies.GUI.Shell.Shared.projitems" Label="Shared" />
 
 </Project>

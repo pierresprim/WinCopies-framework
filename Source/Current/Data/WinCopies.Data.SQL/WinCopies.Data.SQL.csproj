@@ -11,8 +11,8 @@
 		<VersionSuffix>preview</VersionSuffix>
 	</PropertyGroup>
 
+	<Import Project="..\..\..\Shared\Data\WinCopies.Data.SQL.Shared\WinCopies.Data.SQL.Shared.projitems" Label="Shared" />
+
 	<Import Project="$(SolutionDir)\ExtraProperties.props" Condition="'$(Configuration)'=='Release'" />
-		
-	<Import Project="..\..\..\Data\Shared\WinCopies.Data.SQL.Shared\WinCopies.Data.SQL.Shared.projitems" Label="Shared" />
 
 </Project>

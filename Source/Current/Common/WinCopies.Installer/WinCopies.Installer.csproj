@@ -9,6 +9,8 @@
 		<FileVersion>3.0.2</FileVersion>
 		<PackageTags>WinCopies, Installer</PackageTags>
 	</PropertyGroup>
+	
+	<Import Project="..\..\..\Shared\Common\WinCopies.Installer.Shared\WinCopies.Installer.Shared.projitems" Label="Shared" />
 
 	<Import Project="$(SolutionDir)\ExtraProperties.props" Condition="'$(Configuration)'=='Release'" />
 
@@ -16,8 +18,6 @@
 		<PackageReference Include="WinCopies.Util.Desktop" Version="3.21" />
 		<PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="3.11-preview" />
 	</ItemGroup>
-
-	<Import Project="..\..\..\Common\Shared\WinCopies.Installer.Shared\WinCopies.Installer.Shared.projitems" Label="Shared" />
 
 	<ItemGroup>
 		<Page Update="Themes\Generic.xaml">

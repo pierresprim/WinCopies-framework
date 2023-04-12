@@ -12,12 +12,11 @@
 		<AssemblyVersion>3.15</AssemblyVersion>
 		<FileVersion>3.15</FileVersion>
 	</PropertyGroup>
+	<Import Project="..\..\..\Shared\IO\WinCopies.IO.SQL.Shared\WinCopies.IO.SQL.Shared.projitems" Label="Shared" />
 
 	<Import Project="$(SolutionDir)\ExtraProperties.props" Condition="'$(Configuration)'=='Release'" />
 
 	<ItemGroup>
 		<ProjectReference Include="..\WinCopies.IO\WinCopies.IO.csproj" />
 	</ItemGroup>
-
-	<Import Project="..\..\..\IO\Shared\WinCopies.IO.SQL.Shared\WinCopies.IO.SQL.Shared.projitems" Label="Shared" />
 </Project>

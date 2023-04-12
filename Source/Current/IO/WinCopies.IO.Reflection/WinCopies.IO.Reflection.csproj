@@ -12,10 +12,9 @@
 		<FileVersion>3.15</FileVersion>
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 	</PropertyGroup>
+	<Import Project="..\..\..\Shared\IO\WinCopies.IO.Reflection.Shared\WinCopies.IO.Reflection.Shared.projitems" Label="Shared" />
 
 	<Import Project="$(SolutionDir)\ExtraProperties.props" Condition="'$(Configuration)'=='Release'" />
-	
-	<Import Project="..\..\..\IO\Shared\WinCopies.IO.Reflection.Shared\WinCopies.IO.Reflection.Shared.projitems" Label="Shared" />
 
 	<ItemGroup>
 		<ProjectReference Include="..\WinCopies.IO\WinCopies.IO.csproj" />

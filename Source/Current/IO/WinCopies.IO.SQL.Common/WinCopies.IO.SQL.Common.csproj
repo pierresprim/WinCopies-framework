@@ -13,8 +13,7 @@
 		<FileVersion>3.16</FileVersion>
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 	</PropertyGroup>
+	<Import Project="..\..\..\Shared\IO\WinCopies.IO.SQL.Common.Shared\WinCopies.IO.SQL.Common.Shared.projitems" Label="Shared" />
 
 	<Import Project="$(SolutionDir)\ExtraProperties.props" Condition="'$(Configuration)'=='Release'" />
-
-	<Import Project="..\..\..\IO\Shared\WinCopies.IO.SQL.Common.Shared\WinCopies.IO.SQL.Common.Shared.projitems" Label="Shared" />
 </Project>

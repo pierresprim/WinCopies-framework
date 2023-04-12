@@ -11,6 +11,8 @@
 		<PackageTags>WinCopies, Console</PackageTags>
 	</PropertyGroup>
 
+	<Import Project="..\..\..\Shared\Console\WinCopies.Console.Shared\WinCopies.Console.Shared.projitems" Label="Shared" />
+
 	<Import Project="$(SolutionDir)\ExtraProperties.props" Condition="'$(Configuration)'=='Release'" />
 
 	<ItemGroup Condition="!$(DefineConstants.Contains('CS8'))">
@@ -21,7 +23,5 @@
 		<PackageReference Include="WinCopies.Collections" Version="3.21" />
 		<PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="3.11-preview" />
 	</ItemGroup>
-
-	<Import Project="..\..\..\Common\Shared\WinCopies.Console.Shared\WinCopies.Console.Shared.projitems" Label="Shared" />
 
 </Project>

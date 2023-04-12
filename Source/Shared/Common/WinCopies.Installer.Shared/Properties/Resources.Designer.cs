@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace WinCopies.Installer.Properties {
+namespace WinCopies.Installer..........Shared.Common.WinCopies.Installer.Shared.Properties {
     using System;
     
     

@@ -15,6 +15,8 @@
 		<FileVersion>3.15</FileVersion>
 	</PropertyGroup>
 
+	<Import Project="..\..\..\Shared\GUI\WinCopies.GUI.ViewModels.Shared\WinCopies.GUI.ViewModels.Shared.projitems" Label="Shared" />
+
 	<Import Project="$(SolutionDir)\ExtraProperties.props" Condition="'$(Configuration)'=='Release'" />
 
 	<ItemGroup>
@@ -24,7 +26,5 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\WinCopies.GUI.Models\WinCopies.GUI.Models.csproj" />
 	</ItemGroup>
-
-	<Import Project="..\..\..\GUI\Shared\WinCopies.GUI.ViewModels.Shared\WinCopies.GUI.ViewModels.Shared.projitems" Label="Shared" />
 
 </Project>
