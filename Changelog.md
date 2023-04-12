@@ -6,6 +6,11 @@ The WinCopies® software framework
 CHANGELOG
 ---------
 
+### 3.18-preview
+
+- Add support for .Net 8.
+- Update to latest frameworks.
+
 ### 3.17.1.2-preview
 
 Bug fixes in WinCopies.Installer package:

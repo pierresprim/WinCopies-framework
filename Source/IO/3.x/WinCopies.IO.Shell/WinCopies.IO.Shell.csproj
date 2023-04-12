@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<PackageId>WinCopies.IO.Shell</PackageId>
 		<RootNamespace>WinCopies.IO.Shell</RootNamespace>
-		<TargetFrameworks>netcoreapp3.0;netcoreapp3.1;net5.0-windows;net6.0-windows;net7.0-windows;net472;net48</TargetFrameworks>
+		<TargetFrameworks>netcoreapp3.0;netcoreapp3.1;net5.0-windows;net6.0-windows;net7.0-windows;net8.0-windows;net472;net48</TargetFrameworks>
 		<UseWPF>true</UseWPF>
 		<Description>WinCopies framework assembly for basic I/O operations</Description>
 		<Copyright>Copyright © 2021 Pierre Sprimont</Copyright>
@@ -20,6 +20,10 @@
 	<ItemGroup>
 		<ProjectReference Include="..\..\..\GUI\3.x\WinCopies.GUI.Drawing\WinCopies.GUI.Drawing.csproj" />
 		<ProjectReference Include="..\WinCopies.IO\WinCopies.IO.csproj" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(TargetFramework.TrimEnd(`-windows`))'=='net8.0'">
+		<PackageReference Include="System.Management" Version="8.0-preview" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(TargetFramework.TrimEnd(`-windows`))'=='net7.0'">
@@ -53,9 +57,6 @@
 	<ItemGroup>
 		<PackageReference Include="Squid-Box.SevenZipSharp" Version="1.2.231" />
 
-		<PackageReference Include="WinCopies.WindowsAPICodePack.Consts" Version="3.11-preview" />
-		<PackageReference Include="WinCopies.WindowsAPICodePack.Win32Native" Version="3.11-preview" />
-		<PackageReference Include="WinCopies.WindowsAPICodePack.COMNative" Version="3.11-preview" />
 		<PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="3.11-preview" />
 		<PackageReference Include="WinCopies.WindowsAPICodePack.PortableDevices" Version="3.11-preview" />
 	</ItemGroup>

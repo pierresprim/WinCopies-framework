@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<PackageId>WinCopies.GUI</PackageId>
 		<RootNamespace>WinCopies.GUI</RootNamespace>
-		<TargetFrameworks>netcoreapp3.0;netcoreapp3.1;net5.0-windows;net6.0-windows;net7.0-windows;net472;net48</TargetFrameworks>
+		<TargetFrameworks>netcoreapp3.0;netcoreapp3.1;net5.0-windows;net6.0-windows;net7.0-windows;net8.0-windows;net472;net48</TargetFrameworks>
 		<UseWPF>true</UseWPF>
 		<Description>Some basic visual types. This is a dependency package for other packages of the WinCopies framework.</Description>
 		<Copyright>Copyright © 2021 Pierre Sprimont</Copyright>
@@ -18,11 +18,9 @@
 	<Import Project="$(SolutionDir)\ExtraProperties.props" Condition="'$(Configuration)'=='Release'" />
 
 	<ItemGroup>
-		<PackageReference Include="WinCopies.Util.Extensions" Version="3.18-preview" />
-		<PackageReference Include="WinCopies.Util.Desktop" Version="3.18-preview" />
+		<PackageReference Include="WinCopies.Util.Desktop" Version="3.21" />
 
 		<PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="3.11-preview" />
-		<PackageReference Include="WinCopies.WindowsAPICodePack.Win32Native" Version="3.11-preview" />
 	</ItemGroup>
 
 	<ItemGroup>
