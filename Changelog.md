@@ -8,6 +8,7 @@ CHANGELOG
 
 ### 3.18-preview
 
+- Add new projects.
 - Add support for .Net 8.
 - Update to latest frameworks.
 
