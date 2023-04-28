@@ -1,7 +1,26 @@
-﻿using System;
+﻿/* Copyright © Pierre Sprimont, 2022
+ *
+ * This file is part of the WinCopies Framework.
+ *
+ * The WinCopies Framework is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * The WinCopies Framework is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
+
+using System;
+using System.Collections.Generic;
 using System.Windows.Media;
 
 using WinCopies.Util.Data;
+using static Microsoft.WindowsAPICodePack.COMNative.Shell.PropertySystem.SystemProperties.System;
 
 namespace WinCopies.Installer
 {
@@ -27,7 +46,35 @@ namespace WinCopies.Installer
         new IInstallerPageViewModel Current { get; }
     }
 
-    public class InstallerViewModel : ViewModel<Installer>, IInstallerModel
+    public readonly struct ExtraData
+    {
+        public object
+#if CS8
+                ?
+#endif
+                UserGroup
+        { get; }
+
+        public object
+#if CS8
+                ?
+#endif
+                Destination
+        { get; }
+
+        public ExtraData(in object userGroup, in object destination)
+        {
+            UserGroup = userGroup;
+            Destination = destination;
+        }
+    }
+
+    public interface IProcessPageViewModel : IProcessPage, IInstallerPageViewModel
+    {
+        // Left empty.
+    }
+
+    public abstract class InstallerViewModel : ViewModel<Installer>, IInstallerModel
     {
         private IInstallerPageViewModel _current;
 
@@ -40,6 +87,15 @@ namespace WinCopies.Installer
         public bool InstallForCurrentUserOnly => ModelGeneric.InstallForCurrentUserOnly;
 
         public string Location => ModelGeneric.Location;
+
+        public string
+#if CS8
+            ?
+#endif
+            TemporaryDirectory
+        { get => ModelGeneric.TemporaryDirectory; set => ModelGeneric.TemporaryDirectory = value; }
+
+        public Actions Actions { get => ModelGeneric.Actions; set => ModelGeneric.Actions = value; }
 
         public bool Completed => ModelGeneric.Completed;
 
@@ -57,7 +113,7 @@ namespace WinCopies.Installer
             }
         }
 
-        IInstallerPage IInstaller.Current { get => Current; set => throw new InvalidOperationException(); }
+        IInstallerPage IInstaller.Current { get => Current; set => throw new NotSupportedException(); }
 
         public IOptionsData Options => ModelGeneric.Options;
 
@@ -67,9 +123,27 @@ namespace WinCopies.Installer
 
         internal new Installer Model => ModelGeneric;
 
-        public InstallerViewModel(in Installer model) : base(model) => Current = new StartPageViewModel(this);
+        public ExtraData? ExtraData { get; }
+
+        public IEnumerable<KeyValuePair<string, IFile>>
+#if CS8
+            ?
+#endif
+            Files => ModelGeneric.Files;
+
+        public InstallerViewModel(in Installer model) : base(model)
+        {
+            ModelGeneric.Current = (_current = GetFirstPage());
+            ExtraData = GetExtraData();
+        }
+
+        protected virtual IInstallerPageViewModel GetFirstPage() => new StartPageViewModel(this);
+
+        protected abstract ExtraData GetExtraData();
 
         internal new void OnPropertyChanged(in string propertyName) => base.OnPropertyChanged(propertyName);
+
+        protected virtual IProcessPageViewModel GetProcessPageViewModel(IProcessPage processPage) => processPage is ProcessPageViewModel _processPage ? _processPage : new ProcessPageViewModel(processPage, this);
     }
 
     public class InstallerPageDataViewModel<T> : ViewModel<T>, IInstallerPageData where T : IInstallerPageData

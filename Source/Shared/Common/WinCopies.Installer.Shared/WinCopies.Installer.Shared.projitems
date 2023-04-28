@@ -33,6 +33,7 @@
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)ViewModels\CommonPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModels\Installer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\Misc.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModels\Pages\Destination.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModels\Pages\LicenseAgreement.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModels\Pages\Option.cs" />
