@@ -31,6 +31,7 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
     </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)StepDataToStringConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModels\CommonPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModels\Installer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModels\Misc.cs" />
@@ -45,7 +46,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)ViewModels\Pages\Process\Process.Partial\ProcessData.Partial\ProcessData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModels\Pages\StartPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModels\Pages\UserGroup.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Window.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Views\InstallerWindow.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Views\Misc.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Views\Process.cs" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="$(MSBuildThisFileDirectory)Themes\Generic.xaml">
