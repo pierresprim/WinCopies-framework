@@ -8,9 +8,55 @@ CHANGELOG
 
 ### 3.18-preview
 
-- Add new projects.
-- Add support for .Net 8.
+- Add:
+	- new projects
+	- support for .Net 8
+	- new types
 - Update to latest frameworks.
+
+#### WinCopies.Installer
+
+##### WinCopies.Installer namespace
+
+- Remove the CommonInstallerPageBase\<TNext, TData>.Icon property.
+- File struct:
+	- implements the new IFile interface.
+	- has a new read-only property (string Name). The structure constructor has been updated consequently.
+- Add a new property to InstallerPage: Icon.
+- Redesign IProcessData.
+- Default/ProcessData are now located directly in the current namespace.
+- ProcessData:
+	- the Files property type is IEnumerable\<KeyValuePair\<string, IFile>>.
+	- add new properties and update methods.
+- IProcessDataViewModel:
+	- the CurrentItemProgress, Log, and OverallProgress properties are read-only.
+	- has new read-only properties string StepName and byte StepData.
+- IInstaller: new properties.
+- Installer:
+	- the Files property type is now IEnumerable\<KeyValuePair\<string, IFile>>.
+	- GetStartPage is now called only on the first call to the StartPage property. It was previous called by the constructor.
+- ProcessPageViewModel:
+	- ProcessDataViewModel:
+		- BackgroundWorker: new protected virtual method: DoExtraWork(DoWorkEventArgs e).
+		- the OverallProgress and CurrentItemProgress property setters are now protected.
+		- the Log property is now read-only.
+		- the GetEnumerator() method return type is now IEnumerator\<KeyValuePair\<string, IFile>>.
+		- has new properties and methods.
+	- implements IProcessPageViewModel.
+- UserGroupPageViewModel.UserGroupDataViewModel: new property: object ExtraData.
+- InstallerViewModel:
+	- is now abstract
+	- has new properties
+	- has a new method: protected virtual IProcessPageViewModel GetProcessPageViewModel(IProcessPage processPage).
+	- the IInstaller.Current explicit property implementation setter now throws a NotSupportedException instead of an InvalidOperationException.
+
+##### Misc
+
+- WinCopies.Installer.GUI:
+	- Destination: removed the Reset() and AddCommandBindings() methods. More generally, destination path handling itself was delegated to the new BrowseTextBox/Base types.
+	- Destination and UserGroup types have a new dependency property: object ExtraData.
+	- Process has new dependency properties: string StepName and byte StepData.
+- Update XAML views.
 
 ### 3.17.1.2-preview
 
