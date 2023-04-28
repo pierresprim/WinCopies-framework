@@ -10,4 +10,8 @@
 	<ItemGroup>
 		<PackageReference Include="Squid-Box.SevenZipSharp" Version="1.2.231" />
 	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\WinCopies.Installer\WinCopies.Installer.csproj" />
+	</ItemGroup>
 </Project>
