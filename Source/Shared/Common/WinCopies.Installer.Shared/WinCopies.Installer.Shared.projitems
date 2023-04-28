@@ -20,7 +20,11 @@
     <Compile Include="$(MSBuildThisFileDirectory)Models\ObjectModel\Pages\MainPages.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\ObjectModel\Pages\Option.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Misc\OptionGroup.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Models\ObjectModel\Pages\Process.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\ObjectModel\Pages\Process\Misc.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\ObjectModel\Pages\Process\Process.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\ObjectModel\Pages\Process\ProcessData\OnlineProcessData.Partial\Misc.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\ObjectModel\Pages\Process\ProcessData\OnlineProcessData.Partial\OnlineProcessData.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\ObjectModel\Pages\Process\ProcessData\ProcessData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\ObjectModel\Pages\UserGroup.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Properties\Resources.Designer.cs">
       <DependentUpon>Resources.resx</DependentUpon>
